@@ -49,7 +49,10 @@ births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
 deaths = deathMat * pop;
 vaxed = pop * 0;
-vaxRate = linspace(0 , 0.3 , (endYear - startYear) * stepsPerYear);
+vaxStartYear = 2017;
+targetYear = 2025;
+vaxRate = linspace(0 , 0.9 , (targetYear - vaxStartYear) * stepsPerYear); % linear scale-up of vaccination rate
+vaxRate = [vaxRate , ones(length((endYear - targetYear) * stepsPerYear) , 1) .* vaxRate(end)];
 yrs = vaxStartYear : 1 / stepsPerYear : endYear;
 ind = yrs == year;
 if year >= vaxStartYear

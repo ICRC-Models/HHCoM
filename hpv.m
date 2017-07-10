@@ -9,7 +9,7 @@ function[dPop , extraOut] = hpv(t , pop , immuneInds , infInds , cin1Inds , ...
     kInf_Cin1 , kInf_Cin2 , kCin1_Cin2 , kCin1_Cin3 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , kCin2_Inf , kCin3_Cin1 ,...
     kNormal_Cin1 , kNormal_Cin2 , rNormal_Inf , hpv_hivClear , c3c2Mults , ...
-    c2c1Mults , fImm , muCC , disease , viral , age , hpvTypes , hpvStates , hystOption)
+    c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , hpvStates , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sumall = @(x) sum(x(:));
 hyst = 0;
@@ -108,7 +108,7 @@ for d = 1 : disease
                 ccLoc = ccInds(d , v , h , a , :);
                 dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
                     - kRL * pop(ccLoc)... % local -> regional
-                    - muCC(1) * pop(ccLog); % local CC mortality
+                    - muCC(1) * pop(ccLoc); % local CC mortality
                 
                 ccReg = ccRegInds(d , v , h , a , :);
                 dPop(ccReg) = dPop(ccLoc) + kRL * pop(ccLoc)...  % local -> regional
@@ -120,7 +120,7 @@ for d = 1 : disease
                     - muCC(3) * pop(ccDist); % distant CC mortality
                 
                 % CC incidence tracker
-                ccInc(d , v , h , a) = kCC_Cin3(a , h - 1) .* pop(cin3);
+                ccInc(d , v , h , a) = sum(kCC_Cin3(a , h - 1) .* pop(cin3));
             end
         end
     end
