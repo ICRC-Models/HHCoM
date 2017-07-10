@@ -169,9 +169,9 @@ hivCin2 = xlsread(file , 'HPV' , 'R21 : R23'); % HIV multipliers for precancer p
 hivCin3 = hivCin2;
 
 
-muCC = xlsread(file , 'Cervical Cancer' , 'C3 : E11'); % [period x region] mortality
-pCCSize = xlsread(file , 'Cervical Cancer' , 'B3 : B5'); % [group size x 1]
-pCC = xlsread(file , 'Cervical Cancer' , 'H2 : H3'); % [transition x 1]  progression
+muCC = xlsread(file , 'Cervical Cancer' , 'C13 : E13'); % mortality
+kRL = xlsread(file , 'Cervical Cancer' , 'H2'); % local -> regional  progression
+kDR = xlsread(file , 'Cervical Cancer' , 'H3'); % regional -> distant progression
 detCC = xlsread(file , 'Cervical Cancer' , 'K2 : K4'); % [region x 1] detection probability
 kCC = xlsread(file , 'Cervical Cancer' , 'B3 : B11'); % [period x region] group size
 hivCC = xlsread(file , 'Cervical Cancer' , 'O3 : O6'); % HIV multipliers (HR) for cervical cancer mortality rate
@@ -207,7 +207,7 @@ hpv_hivClear = xlsread(file , 'CIN Transition' , 'D108 : D111');
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B115 : B118');
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B121 : B124');
 save('hpvData' , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
-    'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'pCCSize' , 'pCC' , 'detCC' , 'hivCC' , ...
+    'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'kRL' , 'kDR' , 'detCC' , 'hivCC' , ...
     'kPap' , 'hpvSens' , 'cytoSens' , 'leep' , 'screenFreq' , 'ageStart' , 'ageEnd',...
     'kInf_Cin1' , 'kInf_Cin2' , 'kCin1_Cin2' , 'kCin1_Cin3' , 'kCin2_Cin3' , 'kCin2_Cin1', ...
     'kCin3_Cin2' , 'kCC_Cin3' , 'kCin1_Inf' , 'kCin2_Inf' , 'kCin3_Cin1' , 'kNormal_Cin1' , ...

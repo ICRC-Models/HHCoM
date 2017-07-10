@@ -5,11 +5,11 @@
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.
 function[dPop , extraOut] = hpv(t , pop , immuneInds , infInds , cin1Inds , ...
-    cin2Inds , cin3Inds , normalInds , ccInds ,  kInf_Cin1 , kInf_Cin2 , ...
-    kCin1_Cin2 , kCin1_Cin3 , kCin2_Cin3 , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , ...
-    kCin1_Inf , kCin2_Inf , kCin3_Cin1 , kNormal_Cin1 , kNormal_Cin2 , ...
-    rNormal_Inf , hpv_hivClear , c3c2Mults , c2c1Mults , fImm ,...
-    disease , viral , age , hpvTypes , hpvStates , hystOption)
+    cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
+    kInf_Cin1 , kInf_Cin2 , kCin1_Cin2 , kCin1_Cin3 , kCin2_Cin3 , ...
+    kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , kCin2_Inf , kCin3_Cin1 ,...
+    kNormal_Cin1 , kNormal_Cin2 , rNormal_Inf , hpv_hivClear , c3c2Mults , ...
+    c2c1Mults , fImm , muCC , disease , viral , age , hpvTypes , hpvStates , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sumall = @(x) sum(x(:));
 hyst = 0;
@@ -105,11 +105,22 @@ for d = 1 : disease
                     * c2c3Mult .* pop(cin3); % CIN3 -> CIN1 (Fast regressors), CIN3 -> CIN2
                 
                 % CC group
-                cc = ccInds(d , v , h , a , :);
-                dPop(cc) = dPop(cc) + kCC_Cin3(a , h - 1) .* pop(cin3); % CIN3 -> CC
+                ccLoc = ccInds(d , v , h , a , :);
+                dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
+                    - kRL * pop(ccLoc)... % local -> regional
+                    - muCC(1) * pop(ccLog); % local CC mortality
+                
+                ccReg = ccRegInds(d , v , h , a , :);
+                dPop(ccReg) = dPop(ccLoc) + kRL * pop(ccLoc)...  % local -> regional
+                    - kDR * pop(ccReg)... % regional -> distant
+                    - muCC(2) * pop(ccReg); % regional CC mortality
+                
+                ccDist = ccDistInds(d , v , h , a , :);
+                dPop(ccDist) = dPop(ccDist) + kDR * pop(ccReg) ... % regional -> distant
+                    - muCC(3) * pop(ccDist); % distant CC mortality
                 
                 % CC incidence tracker
-                ccInc(d , v , h , a) = sumall(dPop(cc));
+                ccInc(d , v , h , a) = kCC_Cin3(a , h - 1) .* pop(cin3);
             end
         end
     end

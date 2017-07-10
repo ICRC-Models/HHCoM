@@ -55,11 +55,11 @@ c(1 , : , :) = partnersM;
 c(2 , : , :) = partnersF;
 
 % HPV parameters
-beta_hrHPV_F2M = 0.718;% 0.143;%beta_hrHPV_val; % from hpvData.m
-beta_hrHPV_M2F = 0.718;%0.143;%beta_hrHPV_val;
+beta_hrHPV_F2M = 0.718; % per year per partner probability, 1 - (1 - 0.1) ^ 12 
+beta_hrHPV_M2F = 0.718; %
 
-beta_lrHPV_F2M = 0.718;%0.143;% beta_lrHPV_val; % from hpvData.m
-beta_lrHPV_M2F = 0.718;%0.143;%beta_lrHPV_val;
+beta_lrHPV_F2M = 0.718; %
+beta_lrHPV_M2F = 0.718; %
 
 % per year, per partnership betaHPV for high risk and low risk HPV. int = periods per
 % year. Act values are per year.
