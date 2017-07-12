@@ -16,6 +16,8 @@ tit = 'Model Inputs';
 inputs = inputdlg(prompt , tit);
 calibrate = str2double(inputs{5});
 loadNew = str2double(inputs{4});
+c = fix(clock);
+currYear = c(1); % get the current year
 if isempty(inputs)
     return
 end
@@ -276,7 +278,8 @@ else % simulation
 
         disp(['Reached year ' num2str(endYear)])
         popVec = sparse(popVec); % compress population vectors
-        save('results' , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
+        savdir = '/c/Users/nicktzr/Google Drive/ICRC/CISNET/Results';
+	      save(fullfile(savdir , 'results') , 'results' , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
             'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear');
         disp(' ')
         disp('Simulation complete.')
@@ -285,7 +288,7 @@ else % simulation
         error(['Error after ' num2str(startYear + s(i) - 1) ' ('...
             num2str(length(s) - i) ' time steps remaining until year ' ...
             num2str(endYear) ')'])
-        save('errorWorkspace')
+        save(fullfile(savdir , 'errorWorkspace'), 'errorWorkspace')
         disp('All variables saved to errorWorkspace for debugging.')
         return
     end
