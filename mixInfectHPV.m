@@ -7,7 +7,7 @@
 function [dPop , newInfs] = mixInfectHPV(t , pop , currStep , ...
    gar , epsA_vec , epsR_vec , yr , modelYr1 , ...
     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-    hpv_hivMult , hpvSus , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
     hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year)
 sumall = @(x) sum(x(:));
 %% mixInfect Constants
@@ -55,7 +55,7 @@ c(1 , : , :) = partnersM;
 c(2 , : , :) = partnersF;
 
 % HPV parameters
-beta_hrHPV_F2M = 0.718; % per year per partner probability, 1 - (1 - 0.1) ^ 12 
+beta_hrHPV_F2M = 0.718; % per year per partner probability, 1 - (1 - 0.1) ^ 12
 beta_hrHPV_M2F = 0.718; %
 
 beta_lrHPV_F2M = 0.718; %
@@ -153,7 +153,7 @@ rho(2 , : , : , : , :) = rhoF;
 mfRatio = zeros(age , age , risk , risk);
 for aa = 1 : age
     for rr = 1 : risk
-        if popSum(2 , aa , rr) ~= 0 
+        if popSum(2 , aa , rr) ~= 0
             mfRatio(: , aa , : , rr) = ...
                 max(popSum(1 , : , :) ./ popSum(2 , aa ,rr) , 0);
         end
@@ -232,7 +232,7 @@ end
 
 % coinfection transmission matrix
 states = 3; % (2 single HPV infection states, 1 dual infection state)
-beta(: , : , : , 1) = y; 
+beta(: , : , : , 1) = y;
 beta(: , : , : , 2) = z;
 beta(: , : , : , 3) = y .* z;
 
@@ -269,6 +269,9 @@ psi(7) = 1 - circProtect .* cond;
 psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond;
 dPop = zeros(size(pop));
 newHpv = zeros(gender , age , risk);
+newImmHpv = newHpv;
+newVaxHpv = newHpv;
+lambdaMultImm = 1 - 0.15; % Previously infected individuals receive 15% protection against future infections
 %% Infection
 for d = 1 : disease
     for h = 1 : hpvTypes - 1 % coinfected compartments cannot acquire more infections
@@ -281,36 +284,89 @@ for d = 1 : disease
                 for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
                     if lambda(1 , a , r , toState) > 10 ^ -6 || lambda(2 , a , r , toState) > 10 ^ -6 ... % only evaluate if lambda is non-zero
                             && hTo ~= h % and if not acquiring pre-existing infection
+                        % non-vaccinated, non-naturally immune
                         mSus = hpvSus(d , h , 1 , a , r , :);
                         fSus = hpvSus(d , h , 2 , a , r , :);
                         mTo = toHpv(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
                         fTo = toHpv(d , hTo , 2 , a , r , :);
+
+                        % vaccinated, naturally immune
+                        mSusImm = hpvImm(d , h , 1 , a , r , :);
+                        mSusVax = hpvVaxd(d , h , 1 , a , r , :);
+                        fSusImm = hpvImm(d , h , 2 , a , r , :);
+                        fSusVax = hpvVaxd(d , h , 2 , a , r , :);
+                        mToImm = toHpvImm(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
+                        mToVax = toHpvVaxd(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
+                        fToImm = toHpvImm(d , hTo , 2 , a , r , :);
+                        fToVax = toHpvVaxd(d , hTo , 2 , a , r , :);
+
                         lambdaMult = 1;
                         if d > 2 && d < 7 && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2 , toState);
                         end
-                        
+
+                        % normal susceptibles
                         % infection rate capped at 0.99
                         mInfected = min(lambdaMult * lambda(1 , a , r , toState)...
                             .* psi(d) , 0.99) .* pop(mSus); % infected males
                         fInfected = min(lambdaMult * lambda(2 , a , r , toState)...
                             .* psi(d) , 0.99) .* pop(fSus); % infected females
-                        
+
+                        % naturally immune
+                        mInfImm = min(lambdaMult * lambdaMultImm * lambda(1 , a , r , toState) ...
+                        .* psi(d) , 0.99) .* pop(mSusImm);
+                        fInfImm = min(lambdaMult * lambdaMultImm * lambda(1 , a , r , toState) ...
+                        .* psi(d) , 0.99) .* pop(fSusImm);
+
+                        % vaccinated susceptibles
+                        mInfVax = min(lambdaMult * lambdaMultVax * lambda(1 , a , r , toState) ...
+                        .* psi(d) , 0.99) .* pop(mSusVax);
+                        fInfVax = min(lambdaMult * lambdaMultVax * lambda(1 , a , r , toState) ...
+                        .* psi(d) , 0.99) .* pop(fSusVax);
+
+
                         % incidence tracker
+                        % normal
                         newHpv(1 , a , r) = newHpv(1 , a , r) + sumall(mInfected);
                         newHpv(2 , a , r) = newHpv(2 , a , r) + sumall(fInfected);
-                        
+
+                        % naturally immune
+                        newImmHpv(1 , a , r) = newImmHpv(1 , a , r) + sumall(mInfImm);
+                        newImmHpv(2 , a , r) = newImmHpv(2 , a , r) + sumall(fInfImm);
+
+                        % vaccinated
+                        newVaxHpv(1 , a , r) = newVaxHpv(1 , a , r) + sumalL(mInfVax);
+                        newVaxHpv(2 , a , r) = newVaxHpv(2 , a , r) + sumall(fInfVax);
+
+                        % normal
                         dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
                         dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
 
                         dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
                         dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
+
+                        %immune
+                        dPop(mSusImm) = dPop(mSusImm) - mInfImm;
+                        dPop(fSusImm) = dPop(fSusImm) - fInfImm;
+
+                        dPop(mToImm) = dPop(mToImm) + mInfImm;
+                        dPop(fToImm) = dPop(fToImm) + fInfImm;
+
+                        %vaccinated
+                        dPop(mSusVax) = dPop(mSusVax) - mInfVax;
+                        dPop(fSusVax) = dPop(fSusVax) - fInfVax;
+
+                        dPop(mToVax) = dPop(mToVax) + mInfVax;
+                        dPop(fToVax) = dPop(fToVax) + fInfVax;
                     end
                 end
             end
         end
     end
 end
+
 newInfs{1} = newHpv;
+newInfs{2} = newImmHpv;
+newInfs{3} = newVaxHpv;
 % Convert to column vector for output to ODE solver
 dPop = sparse(dPop);

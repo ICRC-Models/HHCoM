@@ -21,14 +21,12 @@ ccInc = zeros(disease , viral , hpvTypes , age);
 % see model notes for index values
 % leep (effective treatment rate by leep)
 rImmune = 0.024; % for HPV16, Johnson
-%rNormal_Inf = rNormal_Inf * 0.5; % adjust rate of inf -> immunity downward
-% fImm(1 : 3) = 1; %0.1;
-% fImm(4 : age) = 0.58; % (0.48; 0.27 , 0.69) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dPop = zeros(size(pop));
 for d = 1 : disease
     c3c2Mult = c3c2Mults(1); % multiplier used for CIN2 -> CIN3 in HIV infecteds
-    c2c1Mult = c2c1Mults(1); % multiplier used for CIN1 -> CIN2 in HIV infecteds
+    c2c1Mult = c2c1Mults(1); % multiplier
+    lier used for CIN1 -> CIN2 in HIV infecteds
     c1c2Mult = 1; % CIN2 -> CIN1 regression multiplier
     c2c3Mult = 1; % CIN3 -> CIN2 regression multiplier
     rHivHpvMult = 1; % for HIV negative

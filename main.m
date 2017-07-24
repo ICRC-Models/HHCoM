@@ -154,8 +154,10 @@ else % simulation
     load('ager')
     load('vlBeta')
     load('hpvTreatIndices')
-    load('calibParams') % calibrated fImm
-    fImm = calibParams;
+%     load('calibParams') % calibrated fImm
+%     fImm = calibParams;
+    fImm(1 : 3) = 0.25;
+    fImm(4 : age) = 0.25; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
     OMEGA(1 : 3) = 0;
     OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
     hivPositiveArtAll = sort(toInd(allcomb(10 , 6 , 1 : hpvStates , 1 : hpvTypes , ...
@@ -175,6 +177,8 @@ else % simulation
     popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
     newHpv = newHiv;
+    newImmHpv = newHpv;
+    newVaxHpv = newHpv;
     newCC = zeros(length(s) - 1 , disease , viral , hpvTypes , age);
     hivDeaths = zeros(length(s) - 1 , age);
     deaths = popVec;
@@ -215,11 +219,12 @@ else % simulation
             end
 
             if hpvOn
-                [~ , pop , newHpv(i , : , : , :)] = ...
+                [~ , pop , newHpv(i , : , : , :) , newImmHpv(i , : , : , :) , ...
+                newVaxHpv(i , : , : , :)] = ...
                     ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
                     gar , epsA_vec , epsR_vec , yr , modelYr1 , ...
                     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-                    hpv_hivMult , hpvSus , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+                    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
                     hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year) , tspan , popIn);
                 if any(pop(end , :) < 0)
                     disp('After mixInfectHPV')
@@ -278,8 +283,8 @@ else % simulation
 
         disp(['Reached year ' num2str(endYear)])
         popVec = sparse(popVec); % compress population vectors
-        savdir = '/c/Users/nicktzr/Google Drive/ICRC/CISNET/Results';
-	      save(fullfile(savdir , 'results') , 'results' , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
+        savdir = '/Users/nicktzr/Google Drive/ICRC/CISNET/Results';
+        save(fullfile(savdir , 'results') , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
             'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear');
         disp(' ')
         disp('Simulation complete.')
