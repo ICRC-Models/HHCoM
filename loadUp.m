@@ -7,10 +7,10 @@ disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
 popInit = xlsread(file , 'Demographics' , 'B2:C17'); % [age x gender]; initial population
-riskDistM = xlsread(file , 'Demographics' , 'G3:I18'); % [age x risk] 
+riskDistM = xlsread(file , 'Demographics' , 'G3:I18'); % [age x risk]
 riskDistF = xlsread(file , 'Demographics' , 'J3:L18');
 mue = xlsread(file , 'Demographics' , 'P4:Q19'); % [age x gender]; background mortality
-fertility = xlsread(file , 'Demographics' , 'R4:W19'); % [age x disease] 
+fertility = xlsread(file , 'Demographics' , 'R4:W19'); % [age x disease]
 partnersM = xlsread(file , 'Demographics' , 'Z3:AB18'); % [age x risk]; male partnerships per year
 partnersF = xlsread(file , 'Demographics' , 'AC3:AE18'); % [age x risk]; female partnerships per year
 actsPer = xlsread(file , 'Demographics' , 'AI2:AK3'); % [gender x risk]; acts per partnership
@@ -32,7 +32,7 @@ circProtect = xlsread(file , 'Protection' , 'R3'); % Protection conferred by cir
 condProtect = xlsread(file , 'Protection' , 'R4'); % Protection conferred by condom use
 condUse = xlsread(file , 'Protection' , 'R10'); % Average proportion of population using condoms
 % disease data
-MTCTRate = xlsread(file , 'Disease Data' , 'Q2:Q4'); % <2004, 2005 , >2008   
+MTCTRate = xlsread(file , 'Disease Data' , 'Q2:Q4'); % <2004, 2005 , >2008
 muHIV = xlsread(file , 'Disease Data' , 'BA3 : BF18'); %[Age x cd4], [12 x 6]
 mtctVec = linspace(MTCTRate(1) , MTCTRate(end) , size(MTCTRate , 1) * 4);
 kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'AP30:AS34'); % [gender x vl x cd4]
@@ -47,13 +47,13 @@ toPrep = 0; % initially
 
 % 2004 - 2006 begin ART
 below200Art_2004 = interp1([2004 , 2006] , [0 0.25] ,[2004 : 1 / stepsPerYear : 2006]); % ART coverage for persons with CD4 < 200
-above200Art_2004 = interp1([2004 , 2006] , [0 0.25] , [2004 : 1 / stepsPerYear : 2006]); 
-pie4Vec_2004 = interp1([2004 , 2006] , [0 0.01] , [2004 : 1 / stepsPerYear : 2006]); 
+above200Art_2004 = interp1([2004 , 2006] , [0 0.25] , [2004 : 1 / stepsPerYear : 2006]);
+pie4Vec_2004 = interp1([2004 , 2006] , [0 0.01] , [2004 : 1 / stepsPerYear : 2006]);
 % 2006 - 2013 begin ART
 below200Art_2006 = interp1([2006 , 2013] , [0.03 0.25] , [2006 : 1 / stepsPerYear : 2013]);
-% pieVec5_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.02 0.06]); 
-% pieVec4_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.01 0.06]); 
-% 
+% pieVec5_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.02 0.06]);
+% pieVec4_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.01 0.06]);
+%
 % if year >= 2014
 %     pie(6 , : , : , 4 : end , :) = 0.06; % Home HTC study
 %     pie(5 , : , : , 4 : end , :) = 0.02;
@@ -64,7 +64,7 @@ below200Art_2006 = interp1([2006 , 2013] , [0.03 0.25] , [2006 : 1 / stepsPerYea
 
 % Treatment dropout rates
 prepOut = xlsread(file , 'Disease Data' , 'B3');
-artOut = xlsread(file , 'Disease Data' , 'C3'); 
+artOut = xlsread(file , 'Disease Data' , 'C3');
 
 save('HIVParams') % save HIV parameters to a workspace file
 
@@ -99,7 +99,7 @@ save('general', 'disease' , 'viral' , 'hpvTypes' , 'hpvStates' , 'periods' ,...
 load('settings')
 step = 1 / stepsPerYear;
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1); 
+epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1
     period = [yr(i) , yr(i + 1)];
     epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
@@ -113,13 +113,13 @@ save('mixInfectParams'  , 'epsA_vec' , ...
     'epsR_vec' , 'yr' , 'modelYr1' , 'modelYrLast' , ...
     'circProtect' , 'condProtect')
 
-analProp = [0 , 0; 
-    0.5111 , 0.4266; 
+analProp = [0 , 0;
+    0.5111 , 0.4266;
     0.5111 , 0.4266]; % risk x gender
 analProp = analProp .* 0; % no anal transmission for now
 analTrans = [138 ; 11] ./ 10 ^ 4; % gender x 1
-vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1); 
-vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1); 
+vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 transM = vagTransM .* (1 - analProp(: , 1)) + analTrans(1) * analProp(: , 1);
 transF = vagTransF .* (1 - analProp(: , 2)) + analTrans(2) * analProp(: , 2);
 betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04;
@@ -180,32 +180,32 @@ hivCC(end) = 1;
 kPap = xlsread(file , 'Screening and Treatment' , 'N3');
 hpvSens = xlsread(file , 'Screening and Treatment' , 'T4 : U4'); % [1 x Cin] 2 , 3
 cytoSens = xlsread(file , 'Screening and Treatment' , 'T5 : U5'); % [1 x Cin] 2 , 3
-leep = 1- xlsread(file , 'Screening and Treatment' , 'Z2'); 
+leep = 1- xlsread(file , 'Screening and Treatment' , 'Z2');
 screenFreq = xlsread(file , 'Screening and Treatment' , 'Z7 : AA8'); % [Test x HIV status] (2 x 2)
 screenCover = xlsread(file , 'Screening and Treatment' , 'Z16');
 ageStart = xlsread(file , 'Screening and Treatment' , 'Z12');
 ageEnd = xlsread(file , 'Screening and Treatment' , 'Z13');
 
 % CIN transition data
-kInf_Cin1 = xlsread(file , 'CIN Transition' , 'U71 : W86') ./ 100;
-kInf_Cin2 = xlsread(file , 'CIN Transition' , 'M89 : O104') ./ 100;
-kCin1_Cin2 = xlsread(file , 'CIN Transition', 'Q89 : S104') ./ 100;
-kCin1_Cin3 = xlsread(file , 'CIN Transition', 'U89 : W104') ./ 100;
-kCin2_Cin3 = xlsread(file , 'CIN Transition', 'Y89 : AA104') ./ 100;
-kCin2_Cin1 = xlsread(file , 'CIN Transition' , 'A89 : C104') ./ 100;
-kCin3_Cin2 = xlsread(file , 'CIN Transition', 'E89 : G104') ./ 100;
-kCC_Cin3 = xlsread(file , 'CIN Transition' , 'I89 : K104') ./ 100;
-kCin1_Inf = xlsread(file , 'CIN Transition' , 'A71 : C86') ./ 100;
-kCin2_Inf = xlsread(file , 'CIN Transition' , 'E71 : G86') ./ 100;
-kCin3_Cin1 = xlsread(file , 'CIN Transition' , 'I71 : K86') ./ 100;
-kNormal_Cin1 = xlsread(file , 'CIN Transition' , 'Q71 : S86') ./ 100;
-kNormal_Cin2 = xlsread(file , 'CIN Transition' , 'Y71 : AA86') ./ 100;
-rNormal_Inf = xlsread(file , 'CIN Transition' , 'M71 : O86') ./ 100;
+kInf_Cin1 = xlsread(file , 'CIN Transition' , 'G28 : G43');
+kInf_Cin2 = xlsread(file , 'CIN Transition' , 'K28 : K43');
+kCin1_Cin2 = xlsread(file , 'CIN Transition', 'L28 : L43');
+kCin1_Cin3 = xlsread(file , 'CIN Transition', 'P28 : P43');
+kCin2_Cin3 = xlsread(file , 'CIN Transition', 'Q28 : Q43');
+kCin2_Cin1 = xlsread(file , 'CIN Transition' , 'H28 : H43');
+kCin3_Cin2 = xlsread(file , 'CIN Transition', 'M28 : M43');
+kCC_Cin3 = xlsread(file , 'CIN Transition' , 'R28 : R43');
+kCin1_Inf = xlsread(file , 'CIN Transition' , 'C28 : C43');
+kCin2_Inf = xlsread(file , 'CIN Transition' , 'D28 : D43');
+kCin3_Cin1 = xlsread(file , 'CIN Transition' , 'I28 : I43');
+kNormal_Cin1 = xlsread(file , 'CIN Transition' , 'F28 : L43');
+kNormal_Cin2 = xlsread(file , 'CIN Transition' , 'J28 : J43');
+rNormal_Inf = xlsread(file , 'CIN Transition' , 'B28 : B43');
 
-hpv_hivMult = xlsread(file , 'HPV' , 'B21 : C24');
-hpv_hivClear = xlsread(file , 'CIN Transition' , 'D108 : D111');
-c3c2Mults = xlsread(file , 'CIN Transition' , 'B115 : B118');
-c2c1Mults = xlsread(file , 'CIN Transition' , 'B121 : B124');
+hpv_hivMult = xlsread(file , 'HPV' , 'C21 : D24');
+hpv_hivClear = xlsread(file , 'CIN Transition' , 'D48 : D51');
+c3c2Mults = xlsread(file , 'CIN Transition' , 'B55 : B58');
+c2c1Mults = xlsread(file , 'CIN Transition' , 'B61 : B64');
 save('hpvData' , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
     'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'kRL' , 'kDR' , 'detCC' , 'hivCC' , ...
     'kPap' , 'hpvSens' , 'cytoSens' , 'leep' , 'screenFreq' , 'ageStart' , 'ageEnd',...
@@ -233,7 +233,7 @@ disp(' ')
 clear
 cinPos2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
 cinNeg2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
-hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41'); 
+hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
 hpv_hivNeg_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D42 : F51');
 hivPrevM_obs = xlsread('config.xlsx' , 'Calibration' , 'D60 : F101');
 hivPrevF_obs = xlsread('config.xlsx' , 'Calibration' , 'D102 : F143');

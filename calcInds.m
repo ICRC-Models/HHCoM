@@ -68,7 +68,7 @@ end
 coInf = zeros(hpvTypes , gender , age , risk , periods);
 
 for h = 1 : hpvTypes
-    for g = 1 : gender 
+    for g = 1 : gender
         for a = 1 : age
             for r = 1 : risk
                 coInf(h , g , a , r , :) = sort(toInd(allcomb(2 , 2 , h , 2 , 1 : periods , g , a , r)));
@@ -91,15 +91,19 @@ for d = 1 : disease
 end
 
 hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral * periods * 7);
-hpvSusImm = zeros(disease , gender , age , risk , viral * periods);
+hpvImm = zeros(disease , gender , age , risk , viral * periods);
+hpvVax = hpvImm;
 for d = 1 : disease
     for g = 1 : gender
         for a = 1 : age
             for r = 1 : risk
-                hpvSusImm(d , g , a , r , :) = sort(toInd(allcomb(d , 1 : viral , 1 , 10 , 1 : periods , g , a , r)));
                 for h = 1 : hpvTypes
                     hpvSus(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 : periods , g , a , r)));
+                    hpvImm(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 10 , 1 : periods , g , a , r)));
+                    hpvVaxd(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 9 , 1 : periods , g , a , r)));
                 end
             end
         end
@@ -153,7 +157,7 @@ end
 
 save('mixInfectIndices' , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
     'toHpv' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
-    'lrInds' , 'hrlrInds' , 'hpvSusImm')
+    'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd')
 disp('mixInfect indices loaded')
 %% hiv.m , treatDist.m indices
 % hivInds(d , v , g , a , r) = makeVec('d' , 'v' , 1 : hpvTypes , 1 : hpvStates , ...
@@ -229,7 +233,7 @@ screen35PlusInds = zeros(disease , viral , hpvTypes , (age - 8 + 1) * risk);
 screen25_35Inds = zeros(disease , viral , hpvTypes , 2 * risk);
 
 for d = 1 : disease
-    for v = 1 : viral 
+    for v = 1 : viral
         for h = 2 : hpvTypes
             screen35PlusInds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 , 2 , 8 : age , 1 : risk)));
             screen25_35Inds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 , 2 , 6 : 7 , 1 : risk)));
@@ -292,7 +296,7 @@ for d = 1 : disease
                         ccRInds(d , v , h , s , p , a , :) = toInd(allcomb(d , v , h , s , p , 2 , a , 1 : risk));
                     end
                 end
-                
+
             end
         end
     end
@@ -317,7 +321,7 @@ for a = 1 : age
 end
 
 save('hpvTreatIndices' , 'ccRInds' , 'ccSusInds' , 'getHystPopInds' , 'hystPopInds')
-disp('hpvTreatIndices loaded')            
+disp('hpvTreatIndices loaded')
 %% cinAdv.m indices
 inf1 = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : hpvStates ,...
     1 , 1 : gender , 1 : age , 1 : risk));
@@ -335,17 +339,17 @@ disp('cinAdv indices loaded')
 %% agePop.m indices
 % Pre-calculate agePop indices
 % genPrevInds = zeros(gender , age - 1 , risk , 7 * viral * hpvTypes * hpvStates * periods);
-% prepPrevInds = zeros(gender , age - 1 , risk , 2 * viral * hpvTypes * hpvStates * periods); 
+% prepPrevInds = zeros(gender , age - 1 , risk , 2 * viral * hpvTypes * hpvStates * periods);
 % artPrevInds = zeros(gender , age - 1 , risk , 1 * viral * hpvTypes * hpvStates * periods);
-% 
+%
 % genNextInds = zeros(gender , age - 1 , risk , 7 * viral * hpvTypes * hpvStates * periods);
 % prepNextInds = zeros(gender , age - 1 , risk , 2 * viral * hpvTypes * hpvStates * periods);
 % artNextInds = zeros(gender , age - 1 , risk , 1 * viral * hpvTypes * hpvStates * periods);
-% 
+%
 % genLastInds = zeros(gender , risk , 7 * viral * hpvTypes * hpvStates * periods);
 % prepLastInds = zeros(gender , risk , 2 * viral * hpvTypes * hpvStates * periods);
 % artLastInds = zeros(gender , risk , 1 * viral * hpvTypes * hpvStates * periods);
-% 
+%
 % for g = 1 : gender
 %     for a = 2 : age
 %         for r = 1 : risk
@@ -368,7 +372,7 @@ disp('cinAdv indices loaded')
 %         end
 %     end
 % end
-% 
+%
 % for g = 1 : gender
 %     for r = 1 : risk
 %         genLastInds(g , r , :) = ...
@@ -388,7 +392,7 @@ disp('cinAdv indices loaded')
 % genLastInds = sort(genLastInds);
 % prepLastInds = sort(prepLastInds);
 % artLastInds = sort(artLastInds);
-% 
+%
 % save('ageIndices' , 'genPrevInds' , 'prepPrevInds' , 'artPrevInds' , 'genNextInds' , 'prepNextInds' ,...
 %     'artNextInds' , 'genLastInds' , 'prepLastInds' , 'artLastInds');
 

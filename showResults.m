@@ -1,6 +1,7 @@
 function[] = showResults()
 %%
 load('actual')
+load('calibData')
 load('C:/Users/nicktzr/Google Drive/ICRC/CISNET/Results/results.mat');% , 'results')
 %% Plot Settings
 
@@ -89,16 +90,15 @@ for g = 1 : gender
 end
 legend('Male' , 'Female')
 
+
+hivM = hivPrevObs_M(: , 2) ./ hivPrevObs_M(: , 3) .* 100;
+hivF = hivPrevObs_F(: , 2) ./hivPrevObs_F(: , 3) .* 100;
+prevYears = unique(hivPrevObs_F(: , 1));
 for g = 1 : gender
-    figure()
-    hivAge = zeros(age , length(tVec));
-    gen = ' Male';
-    hivPrevs = HivPrevMen;
+    hivPrevs = hivM;
     if g == 2
-        gen = ' Female';
-        hivPrevs = HivPrevWomen;
+        hivPrevs = hivF;
     end
-    hivPrevs = hivPrevs * 100; % convert to percent
     for a = 4 : 10
         hivAgeInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk));
@@ -107,7 +107,7 @@ for g = 1 : gender
         hivAge(a , :) = sum(popVec(: , hivAgeInds) , 2);
         hivAgeRel = bsxfun(@rdivide , hivAge(a , :)' , sum(popVec(: , ageInds) , 2)) * 100;
         subplot(4 , 2 , a - 3)
-        plot(tVec , hivAgeRel , prevYears , hivPrevs(a - 3 , :) ,'o');
+        plot(tVec , hivAgeRel , prevYears .* stepsPerYear , hivPrevs((a - 3) : 7 : end) ,'o');
         xlabel('Year'); ylabel('% HIV'); title([' Age group ' , ageGroup{a} , gen , ' HIV Prevalence'])
         legend('Model' , 'Africa Center Data')
     end
@@ -188,7 +188,7 @@ for a = 4 : age
         1 : gender , a , 1 : risk));
     hpv2008(a - 3) = sum(popVec((2008 - startYear) * stepsPerYear , hpvInds))...
         ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
-    
+
     % immune
     hpvImmInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 10, ...
         1 : periods , 1 : gender , a , 1 : risk));
@@ -216,7 +216,7 @@ for a = 4 : age
     hpv2008(a - 3) = (sum(popVec((2008 - startYear) * stepsPerYear , hrInds))...
         + sum(popVec((2008 - startYear) * stepsPerYear , hrlrInds)))...
         ./ sum(popVec((2008 - startYear) * stepsPerYear , ageInds)) * 100;
-    
+
     % immune
     hrImmInds = toInd(allcomb(1 : disease , 1 : viral , 2 , 10 , ...
         1 : periods , 1 : gender , a , 1 : risk));
@@ -288,7 +288,7 @@ for a = 1 : 4
     hpv2017(a) = (sum(popVec((2017 - startYear) * stepsPerYear , hrInds))...
         + sum(popVec((2017 - startYear) * stepsPerYear , hrlrInds)))...
         ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
-    
+
     % immune
     hrImmInds = toInd(allcomb(2 : 6 , 1 : viral , 2 , 10 , ...
         1 : periods , 2 , 2 * a + 2 : 2 * a + 3 , 1 : risk));
@@ -352,7 +352,7 @@ for a = 4 : age
         2 , a , 1 : risk));
     cinPos2008(a - 3) = (sum(popVec((2008 - startYear) * stepsPerYear , cinInds)))...
         ./ sum(popVec((2008 - startYear) * stepsPerYear , ageInds)) * 100;
-    
+
     cinNegInds = toInd(allcomb(1, 1 : viral , 1 : hpvTypes , 3 : 4, ...
         1 : periods , 2 , a , 1 : risk));
     cinNeg2Inds = toInd(allcomb(7 : disease , 1 : viral , 1 : hpvTypes , 3 : 4, ...
@@ -513,15 +513,15 @@ for a = 1 : age
             2 , a , 1 : risk));
     ccAgeRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccInds) , 2) ...
         / sum(popVec((2017 - startYear) * stepsPerYear , ageInds) , 2) * 100;
-    
+
     % HIV Negative
     ccHivNegInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
     ageNegInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-            2 , a , 1 : risk));      
+            2 , a , 1 : risk));
     ccAgeNegRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivNegInds) , 2) ...
-        / (sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds) , 2)) * 100;    
-        
+        / (sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds) , 2)) * 100;
+
     % HIV Positive
     ccHivPosInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
@@ -529,7 +529,7 @@ for a = 1 : age
         2 , a , 1 : risk));
     ccAgePosRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivPosInds) , 2) ...
         / (sum(popVec((2017 - startYear) * stepsPerYear , agePosInds) , 2)) * 100;
-    
+
     % On ART
     ccArtInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
@@ -582,25 +582,25 @@ for a = 1 : age
         2 , a , 1 : risk));
     ccAgeRel(a , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 1 : disease , 1 : viral , 1 : hpvTypes , a) , 2) , 3) , 4) ...
         ./ sum(popVec((ccIncYears - startYear) * stepsPerYear - 1 , ageInds) , 2) * fScale;
-    
+
     % HIV Negative
     ageNegInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
     ccAgeNegRel(a , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 1 , 1 : viral , 1 : hpvTypes , a) , 2) , 3) , 4) ...
         ./ (sum(popVec((ccIncYears - startYear) * stepsPerYear - 1, ageNegInds) , 2)) * fScale;
-    
+
     % HIV Positive
     agePosInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
     ccAgePosRel(a , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 2 : 6 , 1 : viral , 1 : hpvTypes , a), 2) , 3) , 4) ...
         ./ (sum(popVec((ccIncYears - startYear) * stepsPerYear - 1 , agePosInds) , 2)) * fScale;
-    
+
     % On ART
     ageArtInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
     ccArtRel(a , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 10 , 6 , 1 : hpvTypes , a) , 2) , 3) , 4) ...
         ./ (sum(popVec((ccIncYears - startYear) * stepsPerYear - 1, ageArtInds) , 2)) * fScale;
-    
+
     % Proportion of cervical cancers by HIV/ART status and age
     % Total by age
     ageTotal = sum(sum(sum(popVec((ccIncYears - startYear) * stepsPerYear , ...
@@ -617,7 +617,7 @@ for a = 1 : age
     % ART
     ccNegPosArt(a , 3 , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 10 , 6 , 1 : hpvTypes , a), 2) , 3) , 4) ...
         ./ ageTotal;
-    
+
 end
 
 
@@ -703,7 +703,7 @@ end
 newCCAge = (sum(sum(sum(newCC(1 : size(newCC , 1) , 1 : disease , 1 : viral ,...
     1 : hpvTypes , 1 : age) , 2) , 3) , 4));
 
-ccIncEvo = bsxfun(@rdivide , permute(newCCAge , [1 , 5 , 4 , 3 , 2]) * fScale , ageTotal); 
+ccIncEvo = bsxfun(@rdivide , permute(newCCAge , [1 , 5 , 4 , 3 , 2]) * fScale , ageTotal);
 figure()
 mesh(1 : age , tVec , ccIncEvo)
 set(gca , 'yLim' , [tVec(1) tVec(end)]);
@@ -747,15 +747,15 @@ for i = 1 : length(tVec)
     m0_14Inds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
         1 : hpvStates , 1 : periods , 1 , 1 : 3 , 1 : risk));
     m0_14all(i) = sumall(popVec(i , m0_14Inds));
-    
+
     f0_14Inds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
         1 : hpvStates , 1 : periods , 2 , 1 : 3 , 1 : risk));
     f0_14all(i) = sumall(popVec(i , f0_14Inds));
-    
+
     m15_64Inds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
         1 : hpvStates , 1 :  periods , 1 , 4 : age , 1 : risk));
     m15_64all(i) = sumall(popVec(i , m15_64Inds));
-    
+
     f15_64Inds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
         1 : hpvStates , 1 : periods , 2 , 4 : age , 1 : risk));
     f15_64all(i) = sumall(popVec(i , f15_64Inds));
@@ -1064,7 +1064,7 @@ ylabel('Initiated ART')
 % %     title(['Year : ' , num2str(floor(tVec(i)))])
 % %     writeVideo(vid , getframe(gcf));
 % % end
-% 
+%
 % for i = 1 : length(tVec)
 %     %     %     s = stem3(1 : 6 , 1 : 6 , squeeze(cd4Vl(i , : , :)) , '--');
 %     %     %     s.Color = 'red';
