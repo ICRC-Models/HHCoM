@@ -132,7 +132,7 @@ if year >= 2004
                         cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     elseif year >= 2020 && fracART < 0.6
-                        cover = (0.999 - fracART) ./ (1 - fracART);
+                        cover = -log(1 - (0.6 - fracART)) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     end
                 end
