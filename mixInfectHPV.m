@@ -5,9 +5,10 @@
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfectHPV(t , pop , currStep , ...
-   gar , epsA_vec , epsR_vec , yr , modelYr1 , ...
+   gar , perActHpv , lambdaMultImm , lambdaMultVax , epsA_vec , epsR_vec , yr , modelYr1 , ...
     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
+    disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
     hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year)
 sumall = @(x) sum(x(:));
 %% mixInfect Constants
@@ -55,20 +56,13 @@ c(1 , : , :) = partnersM;
 c(2 , : , :) = partnersF;
 
 % HPV parameters
-beta_hrHPV_F2M = 0.718; % per year per partner probability, 1 - (1 - 0.1) ^ 12
-beta_hrHPV_M2F = 0.718; %
+beta_hrHPV_F2M = 1 - (1 - perActHpv) ^ 12; % per year per partner probability
+beta_hrHPV_M2F = 1 - (1 - perActHpv) ^ 12; %
 
-beta_lrHPV_F2M = 0.718; %
-beta_lrHPV_M2F = 0.718; %
+beta_lrHPV_F2M = 1 - (1 - perActHpv) ^ 12; %
+beta_lrHPV_M2F = 1 - (1 - perActHpv) ^ 12; %
 
-% per year, per partnership betaHPV for high risk and low risk HPV. int = periods per
-% year. Act values are per year.
-% beta_hrHPV(1 , :) = 1 - (1 - beta_hrHPV_F2M) .^ (acts(1 , :)); % HPV(-) males [g x r]
-% beta_hrHPV(2 , :) = 1 - (1 - beta_hrHPV_M2F) .^ (acts(2 , :)); % HPV(-) females [g x r]
-% beta_lrHPV(1 , :) = 1 - (1 - beta_lrHPV_F2M) .^ (acts(1 , :)); % HPV(-) males [g x r]
-% beta_lrHPV(2 , :) = 1 - (1 - beta_lrHPV_M2F) .^ (acts(2 , :)); % HPV(-) females [g x r]
-
-% Change to per partnership beta
+% Per partnership beta
 beta_hrHPV(1 , 1 : 3) = beta_hrHPV_F2M;  % HPV(-) males [g x r]
 beta_hrHPV(2 , 1 : 3) = beta_hrHPV_M2F; % HPV(-) females [g x r]
 beta_lrHPV(1 , 1 : 3) = beta_lrHPV_F2M; % HPV(-) males [g x r]
@@ -256,12 +250,15 @@ for g = 1 : gender
         end
     end
 end
-condGrowth = log(0.502 * 0.306 / 0.001) / ((2004 - 1980) * stepsPerYear);
+condGrowth = log(0.5 * 0.306 / 0.001) / ((2000 - 1980) * stepsPerYear);
 condUse = 0.001 * exp(condGrowth * (year - 1980) * stepsPerYear );
 if year > 2012
-    condUse = 0.502* 0.5;
-elseif year > 2004
-    condUse = 0.502 * 0.306;
+    condUse = 0.5* 0.5;
+elseif year >= 2000
+    yrs = 2000 : 1 / stepsPerYear : 2012;
+    ind = yrs == year;
+    condUseVec = 0.5 * linspace(0.306 , 0.5 , length(yrs));
+    condUse = condUseVec(ind);
 end
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
@@ -271,7 +268,6 @@ dPop = zeros(size(pop));
 newHpv = zeros(gender , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
-lambdaMultImm = 1 - 0.15; % Previously infected individuals receive 15% protection against future infections
 %% Infection
 for d = 1 : disease
     for h = 1 : hpvTypes - 1 % coinfected compartments cannot acquire more infections
@@ -291,14 +287,14 @@ for d = 1 : disease
                         fTo = toHpv(d , hTo , 2 , a , r , :);
 
                         % vaccinated, naturally immune
-                        mSusImm = hpvImm(d , h , 1 , a , r , :);
+%                         mSusImm = hpvImm(d , h , 1 , a , r , :);
                         mSusVax = hpvVaxd(d , h , 1 , a , r , :);
                         fSusImm = hpvImm(d , h , 2 , a , r , :);
                         fSusVax = hpvVaxd(d , h , 2 , a , r , :);
-                        mToImm = toHpvImm(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
-                        mToVax = toHpvVaxd(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
-                        fToImm = toHpvImm(d , hTo , 2 , a , r , :);
-                        fToVax = toHpvVaxd(d , hTo , 2 , a , r , :);
+%                         mToImm = toHpv_ImmVax(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
+                        mToVax = toHpv_ImmVax(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
+                        fToImm = toHpv_ImmVax(d , hTo , 2 , a , r , :);
+                        fToVax = toHpv_ImmVax(d , hTo , 2 , a , r , :);
 
                         lambdaMult = 1;
                         if d > 2 && d < 7 && toState < 3 % CD4 > 500 -> CD4 < 200
@@ -313,9 +309,9 @@ for d = 1 : disease
                             .* psi(d) , 0.99) .* pop(fSus); % infected females
 
                         % naturally immune
-                        mInfImm = min(lambdaMult * lambdaMultImm * lambda(1 , a , r , toState) ...
-                        .* psi(d) , 0.99) .* pop(mSusImm);
-                        fInfImm = min(lambdaMult * lambdaMultImm * lambda(1 , a , r , toState) ...
+%                         mInfImm = min(lambdaMult * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
+%                         .* psi(d) , 0.99) .* pop(mSusImm);
+                        fInfImm = min(lambdaMult * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
                         .* psi(d) , 0.99) .* pop(fSusImm);
 
                         % vaccinated susceptibles
@@ -331,11 +327,11 @@ for d = 1 : disease
                         newHpv(2 , a , r) = newHpv(2 , a , r) + sumall(fInfected);
 
                         % naturally immune
-                        newImmHpv(1 , a , r) = newImmHpv(1 , a , r) + sumall(mInfImm);
+%                         newImmHpv(1 , a , r) = newImmHpv(1 , a , r) + sumall(mInfImm);
                         newImmHpv(2 , a , r) = newImmHpv(2 , a , r) + sumall(fInfImm);
 
                         % vaccinated
-                        newVaxHpv(1 , a , r) = newVaxHpv(1 , a , r) + sumalL(mInfVax);
+                        newVaxHpv(1 , a , r) = newVaxHpv(1 , a , r) + sumall(mInfVax);
                         newVaxHpv(2 , a , r) = newVaxHpv(2 , a , r) + sumall(fInfVax);
 
                         % normal
@@ -346,10 +342,10 @@ for d = 1 : disease
                         dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
 
                         %immune
-                        dPop(mSusImm) = dPop(mSusImm) - mInfImm;
+%                         dPop(mSusImm) = dPop(mSusImm) - mInfImm;
                         dPop(fSusImm) = dPop(fSusImm) - fInfImm;
-
-                        dPop(mToImm) = dPop(mToImm) + mInfImm;
+% 
+%                         dPop(mToImm) = dPop(mToImm) + mInfImm;
                         dPop(fToImm) = dPop(fToImm) + fInfImm;
 
                         %vaccinated
