@@ -1,0 +1,174 @@
+function sensAnalyze(currYear , endYear , paramSet)
+% Intervention start years
+circStartYear = 1990;
+vaxStartYear = 2017;
+%% Simulation
+disp(['Starting sensitivity analysis from current year (' , currYear , ')'])
+load('general');
+load('settings');
+load('mixInfectIndices')
+load('vlAdvancer')
+load('fertMat')
+load('hivFertMats')
+load('deathMat')
+load('circMat')
+load('vaxer')
+load('mixInfectParams');
+load('hpvData')
+load('popData')
+load('HIVParams')
+load('hivIndices')
+load('hpvIndices')
+load('ager')
+load('vlBeta')
+load('hpvTreatIndices')
+load('calibParams') % calibrated fImm
+fImm = calibParams;
+OMEGA(1 : 3) = 0;
+OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
+hivPositiveArtAll = sort(toInd(allcomb(10 , 6 , 1 : hpvStates , 1 : hpvTypes , ...
+    1 : periods , 1 : gender  , 1 : age , 1 : risk)));
+profile on
+disp(' ')
+% Initialize vectors
+timeStep = 1 / stepsPerYear;
+years = endYear - currYear;
+s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
+artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
+%performance tracking
+runtimes = zeros(size(s , 2) - 2 , 1);
+import java.util.LinkedList
+artDistList = LinkedList();
+popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
+popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
+newHiv = zeros(length(s) - 1 , gender , age , risk);
+newHpv = newHiv;
+newCC = zeros(length(s) - 1 , disease , viral , hpvTypes , age);
+hivDeaths = zeros(length(s) - 1 , age);
+deaths = popVec;
+artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+popVec(1 , :) = popIn;
+tVec = linspace(currYear , endYear , size(popVec , 1));
+k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
+artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+disp(['Simulating period from ' num2str(currYear) ' to ' num2str(endYear) ...
+    ' with ' num2str(stepsPerYear), ' steps per year.'])
+disp(' ')
+disp('Simulation running...')
+disp(' ')
+% Run sensitivity analysis for each parameter set
+parfor q = 1 : paramSet
+  vaxCoverStart = paramSet{q}.vaxProvidePeriod;
+  vaxCoverEnd = paramSet{q}.vaxProvideEnd;
+  vaxStartYear = paramSet{q}.vaxStartYear;
+  vaxEndYear = paramSet{q}.vaxEndYear;
+  vaxVec = linspace(vaxCoverStart , vaxCoverEnd , ...
+  (vaxEndYear - vaxStartYear) * stepsPerYear) % linear scale up of vaccine
+  vaxEff = paramSet{q}.vaxEff; % vaccine efficacy (1, 2, 3 doses)
+  pDose = paramSet{q}.pDose; % 1 dose, 2 dose, 3 dose uptake rate
+  try
+      progressbar('Simulation Progress')
+      for i = 2 : length(s) - 1
+          tic
+          year = startYear + s(i) - 1;
+          currStep = round(s(i) * stepsPerYear);
+          disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
+              num2str(length(s) - i) ' time steps remaining until year ' ...
+              num2str(endYear) ')'])
+          tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
+          popIn = popVec(i - 1 , :);
+          if hivOn
+              [~ , pop , newHiv(i , : , : , :)] = ...
+                  ode4xtra(@(t , pop) mixInfectHIV(t , pop , currStep , ...
+                  gar , hivSus , toHiv , mCurr , fCurr , ...
+                  mCurrArt , fCurrArt ,epsA_vec , epsR_vec , yr , modelYr1 , ...
+                  circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
+                  betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , ...
+                  hpvStates , hpvTypes , k , periods , stepsPerYear , year) , tspan , popIn);
+              popIn = pop(end , :); % for next mixing and infection module
+              if any(pop(end , :) < 0)
+                  disp('After mixInfectHIV')
+                  break
+              end
+          end
+
+          if hpvOn
+              [~ , pop , newHpv(i , : , : , :)] = ...
+                  ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
+                  gar , epsA_vec , epsR_vec , yr , modelYr1 , ...
+                  circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
+                  hpv_hivMult , hpvSus , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+                  hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year) , tspan , popIn);
+              if any(pop(end , :) < 0)
+                  disp('After mixInfectHPV')
+                  break
+              end
+          end
+
+          if hivOn
+              [~ , pop , hivDeaths(i , :) , artTreat] =...
+                  ode4xtra(@(t , pop) hiv(t , pop , vlAdvancer , artDist , muHIV , ...
+                  kCD4 , disease , viral , gender , age , risk , k , hivInds , ...
+                  stepsPerYear , year) , tspan , pop(end , :));
+              artTreatTracker(i , : , : , : , :  ,:) = artTreat;
+              if any(pop(end , :) < 0)
+                  disp('After hiv')
+                  break
+              end
+              %         [~ , artTreat] = ode4x(@(t , artDist) treatDist(t , popCopy(end , :) , year) , tspan , artDist);
+              if size(artDistList) >= 20
+                  artDistList.remove(); % remove earlier artDist matrix more than "20 time steps old"
+              else
+                  artDistList.add(artTreat);
+              end
+              artDist = calcDist(artDistList);
+          end
+
+          if hpvOn
+              hystOption = 'on';
+              [~ , pop , newCC(i , : , : , : , :)] = ode4xtra(@(t , pop) ...
+                  hpv(t , pop , immuneInds , infInds , cin1Inds , ...
+                  cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , kInf_Cin1 , kInf_Cin2 , ...
+                  kCin1_Cin2 , kCin1_Cin3 , kCin2_Cin3 , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , ...
+                  kCin1_Inf , kCin2_Inf , kCin3_Cin1 , kNormal_Cin1 , kNormal_Cin2 , ...
+                  rNormal_Inf , hpv_hivClear , c3c2Mults , c2c1Mults , fImm , kRL , kDR , muCC , ...
+                  disease , viral , age , hpvTypes , hpvStates , hystOption) , tspan , pop(end , :));
+
+  %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
+  %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
+  %                     hystPopInds , screenFreq , screenCover , hpvSens , ccTreat , ...
+  %                     cytoSens , cin1Inds , cin2Inds , cin3Inds ,  normalInds , getHystPopInds ,...
+  %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
+          end
+          [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie(t , pop , ...
+              ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
+              hivFertNegBirth , deathMat , circMat , vaxer , MTCTRate , circStartYear , ...
+              vaxStartYear , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
+          if any(pop(end , :) < 0)
+              disp('After bornAgeDie')
+              break
+          end
+          % add results to population vector
+          popVec(i , :) = pop(end , :);
+          runtimes(i) = toc;
+          progressbar(i/(length(s) - 1))
+      end
+
+      disp(['Reached year ' num2str(endYear)])
+      popVec = sparse(popVec); % compress population vectors
+      savdir = '/c/Users/nicktzr/Google Drive/ICRC/CISNET/Results';
+      save(fullfile(savdir , 'results') , 'results' , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
+          'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear');
+      disp(' ')
+      disp('Simulation complete.')
+  catch
+      disp('Simulation aborted.')
+      error(['Error after ' num2str(startYear + s(i) - 1) ' ('...
+          num2str(length(s) - i) ' time steps remaining until year ' ...
+          num2str(endYear) ')'])
+      save(fullfile(savdir , 'errorWorkspaceSensAnalyze'), 'errorWorkspace')
+      disp('All variables saved to errorWorkspace for debugging.')
+      return
+  end
+end
+profile viewer

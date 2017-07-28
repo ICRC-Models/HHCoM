@@ -218,11 +218,11 @@ end
 condGrowth = log(0.5 * 0.306 / 0.001) / ((2000 - 1980) * stepsPerYear);
 condUse = 0.001 * exp(condGrowth * (year - 1980) * stepsPerYear );
 if year > 2012
-    condUse = 0.5* 0.5;
+    condUse = 0.5* 0.4;
 elseif year >= 2000
     yrs = 2000 : 1 / stepsPerYear : 2012;
     ind = yrs == year;
-    condUseVec = 0.5 * linspace(0.306 , 0.5 , length(yrs));
+    condUseVec = 0.5 * linspace(0.306 , 0.4 , length(yrs));
     condUse = condUseVec(ind);
 end
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
