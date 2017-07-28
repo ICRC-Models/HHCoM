@@ -91,14 +91,16 @@ end
 legend('Male' , 'Female')
 
 
-hivM = hivPrevObs_M(: , 2) ./ hivPrevObs_M(: , 3) .* 100;
-hivF = hivPrevObs_F(: , 2) ./hivPrevObs_F(: , 3) .* 100;
-prevYears = unique(hivPrevObs_F(: , 1));
+hivM = hivPrevM_obs(: , 2) ./ hivPrevM_obs(: , 3) .* 100;
+hivF = hivPrevF_obs(: , 2) ./hivPrevF_obs(: , 3) .* 100;
+prevYears = unique(hivPrevF_obs(: , 1));
+gen = {'Male' , 'Female'};
 for g = 1 : gender
     hivPrevs = hivM;
     if g == 2
         hivPrevs = hivF;
     end
+    figure()
     for a = 4 : 10
         hivAgeInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk));
@@ -107,10 +109,10 @@ for g = 1 : gender
         hivAge(a , :) = sum(popVec(: , hivAgeInds) , 2);
         hivAgeRel = bsxfun(@rdivide , hivAge(a , :)' , sum(popVec(: , ageInds) , 2)) * 100;
         subplot(4 , 2 , a - 3)
-        plot(tVec , hivAgeRel , prevYears .* stepsPerYear , hivPrevs((a - 3) : 7 : end) ,'o');
-        xlabel('Year'); ylabel('% HIV'); title([' Age group ' , ageGroup{a} , gen , ' HIV Prevalence'])
-        legend('Model' , 'Africa Center Data')
+        plot(tVec , hivAgeRel , prevYears , hivPrevs((a - 3) : 7 : end) ,'o');
+        xlabel('Year'); ylabel('% HIV'); title([gen{g} , ' Age group ' , ageGroup{a} , ' HIV Prevalence'])
     end
+    legend('Model' , 'Africa Center Data')
 end
 
 %% HIV mortality by age
@@ -164,7 +166,7 @@ ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model' , 'Observed')
 %% Overall HPV Prevalence
-hpvInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : 8, ...
+hpvInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : 10, ...
     1 : periods , 1 : gender , 4 : age , 1 : risk));
 hpvPop = sum(popVec(: , hpvInds) , 2);
 figure()
@@ -679,7 +681,7 @@ for y = 1 : length(ccIncYears)
     hold on
     % globocan data
     plot(4 : age , globocan , '-' , 4 : age , globocan_ub , '--' , 4 : age , globocan_lb , '--')
-    legend('HIV-' , 'HIV+' , 'ART' , 'Globocan' , 'Globocan UB' , 'Globocan LB' , ...
+    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Globocan' , 'Globocan UB' , 'Globocan LB' , ...
         'Location' , 'NorthEastOutside')
 
     figure()

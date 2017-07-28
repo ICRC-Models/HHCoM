@@ -40,7 +40,7 @@ kOn(6) = 0;
 if year >= 2013
     yrs = 2013 : 1 / stepsPerYear : 2020; % assuming 90-90-90 target reached by 2020 
     ind = yrs == year;
-    maxCover = linspace(-log(1 - 0.46) , -log(1 - 0.46) , length(yrs));
+    maxCover = linspace(-log(1 - 0.45) , -log(1 - 0.45) , length(yrs));
     for g = 1 : gender
         for a = 1 : age
             for r = 1 : risk
@@ -58,7 +58,7 @@ if year >= 2013
                     cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 elseif year >= 2020 && fracART < 0.6
-                    cover = (0.999 - fracART) ./ (1 - fracART);
+                    cover = (-log(1 - 0.6) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
             end

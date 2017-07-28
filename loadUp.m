@@ -46,11 +46,11 @@ kVl(2 , : , :) = xlsread(file , 'Disease Data' , 'AV39 : AY43'); % [gender x cd4
 toPrep = 0; % initially
 
 % 2004 - 2006 begin ART
-below200Art_2004 = interp1([2004 , 2006] , [0 0.25] ,[2004 : 1 / stepsPerYear : 2006]); % ART coverage for persons with CD4 < 200
-above200Art_2004 = interp1([2004 , 2006] , [0 0.25] , [2004 : 1 / stepsPerYear : 2006]);
-pie4Vec_2004 = interp1([2004 , 2006] , [0 0.01] , [2004 : 1 / stepsPerYear : 2006]);
-% 2006 - 2013 begin ART
-below200Art_2006 = interp1([2006 , 2013] , [0.03 0.25] , [2006 : 1 / stepsPerYear : 2013]);
+% below200Art_2004 = interp1([2004 , 2006] , [0 0.25] ,[2004 : 1 / stepsPerYear : 2006]); % ART coverage for persons with CD4 < 200
+% above200Art_2004 = interp1([2004 , 2006] , [0 0.25] , [2004 : 1 / stepsPerYear : 2006]);
+% pie4Vec_2004 = interp1([2004 , 2006] , [0 0.01] , [2004 : 1 / stepsPerYear : 2006]);
+% % 2006 - 2013 begin ART
+% below200Art_2006 = interp1([2006 , 2013] , [0.03 0.25] , [2006 : 1 / stepsPerYear : 2013]);
 % pieVec5_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.02 0.06]);
 % pieVec4_2006 = interp1(linspace(2006 , 2013 , stepsPerYear) , [0.01 0.06]);
 %
