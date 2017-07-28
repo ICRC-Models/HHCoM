@@ -65,14 +65,18 @@ if calibrate % calibrate model
     disp('Running immunity calibration')
     fImm(1 : 3) = 1;
     fImm(4 : age) = 0.58; % (0.48; 0.27 , 0.69) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
+    lambdaMultImm(1 : 4) = 0.01;
+    lambdaMultImm(5 : 10) = logspace(log10(0.01) , log10(0.2) , 6); 
+    lambdaMultImm(11 : age ) = lambdaMultImm(10);
+    perActHpv = 0.07; % initial estimate
     A = [];
     b = [];
     Aeq = [];
     beq = [];
     nonlcon = [];
-    x0 = [fImm(:)];
-    lb = [0.27 * ones(length(fImm(:)) , 1)];
-    ub = [0.69 * ones(length(fImm(:)) , 1)];
+    x0 = [lambdaMultImm(:) ; kCin2_Cin3(:) ; kCin3_Cin2(:) ; kCC_Cin3(:) ; perActHpv];
+    lb = [0.01 * ones(length(lambdaMultImm(:)) , 1) ; 0.9 * kCin2_Cin3(:) ; 0.9 * kCin3_Cin2(:) ; 0.9 * kCC_Cin3(:) ; 0.01];
+    ub = [0.2 * ones(length(lambdaMultImm(:)) , 1) ; 1.5 * kCin2_Cin3(:) ; 1.5 * kCin3_Cin2(:) ; 1.5 * kCC_Cin3(:) ; 0.1]; 
     options  = optimoptions('patternsearch' , 'UseParallel' , true , ...
         'UseCompletePoll' , true , 'PlotFcn' , ...
         {@psplotbestf , @psplotfuncount , @psplotmeshsize} , ...
@@ -155,9 +159,13 @@ else % simulation
     load('vlBeta')
     load('hpvTreatIndices')
 %     load('calibParams') % calibrated fImm
-%     fImm = calibParams;
-    fImm(1 : 3) = 0.25;
-    fImm(4 : age) = 0.25; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
+    fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
+    lambdaMultImm(1 : 4) = 0.01;
+    lambdaMultImm(5 : 10) = logspace(log10(0.01) , log10(0.2) , 6); 
+    lambdaMultImm(11 : age ) = lambdaMultImm(10);
+    lambdaMultVax = 1 - (0.9 * 0.8);
+%     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
+    perActHpv = 0.07;
     OMEGA(1 : 3) = 0;
     OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
     hivPositiveArtAll = sort(toInd(allcomb(10 , 6 , 1 : hpvStates , 1 : hpvTypes , ...
@@ -222,9 +230,10 @@ else % simulation
                 [~ , pop , newHpv(i , : , : , :) , newImmHpv(i , : , : , :) , ...
                 newVaxHpv(i , : , : , :)] = ...
                     ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
-                    gar , epsA_vec , epsR_vec , yr , modelYr1 , ...
+                    gar , perActHpv , lambdaMultImm , lambdaMultVax , epsA_vec , epsR_vec , yr , modelYr1 , ...
                     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-                    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+                    hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
+                    disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
                     hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year) , tspan , popIn);
                 if any(pop(end , :) < 0)
                     disp('After mixInfectHPV')

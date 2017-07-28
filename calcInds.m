@@ -91,8 +91,8 @@ for d = 1 : disease
 end
 
 hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral * periods * 7);
-hpvImm = zeros(disease , gender , age , risk , viral * periods);
-hpvVax = hpvImm;
+hpvImm = zeros(disease , hpvTypes , gender , age , risk , viral * periods);
+hpvVaxd = hpvImm;
 for d = 1 : disease
     for g = 1 : gender
         for a = 1 : age
@@ -121,6 +121,7 @@ for g = 1 : gender
 end
 
 toHpv = zeros(disease , hpvTypes , gender , age , risk , viral * periods * 7);
+toHpv_ImmVax = zeros(size(hpvImm));
 
 for d = 1 : disease
     for g = 1 : gender
@@ -129,6 +130,8 @@ for d = 1 : disease
                 for r = 1 : risk
                     toHpv(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 : periods , g , a , r)));
+                    toHpv_ImmVax(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 : periods , g , a , r)));
                 end
             end
         end
@@ -156,7 +159,7 @@ for g = 1 : gender
 end
 
 save('mixInfectIndices' , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
-    'toHpv' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
+    'toHpv' , 'toHpv_ImmVax' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
     'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd')
 disp('mixInfect indices loaded')
 %% hiv.m , treatDist.m indices
