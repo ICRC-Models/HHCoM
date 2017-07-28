@@ -55,6 +55,7 @@ end
 load('general')
 %% Initial population
 load('popData')
+load('hpvData')
 if calibrate % calibrate model
 %     disp('Pulling variables to be calibrated...')
 %     file = 'PopData.xlsx';
