@@ -202,7 +202,7 @@ kNormal_Cin1 = xlsread(file , 'CIN Transition' , 'F28 : L43');
 kNormal_Cin2 = xlsread(file , 'CIN Transition' , 'J28 : J43');
 rNormal_Inf = xlsread(file , 'CIN Transition' , 'B28 : B43');
 
-hpv_hivMult = xlsread(file , 'HPV' , 'C21 : D24');
+hpv_hivMult = xlsread(file , 'HPV' , 'E21 : E24');
 hpv_hivClear = xlsread(file , 'CIN Transition' , 'D48 : D51');
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B55 : B58');
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B61 : B64');
