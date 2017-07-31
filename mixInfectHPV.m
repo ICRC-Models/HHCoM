@@ -253,7 +253,7 @@ end
 condGrowth = log(0.5 * 0.306 / 0.001) / ((2000 - 1980) * stepsPerYear);
 condUse = 0.001 * exp(condGrowth * (year - 1980) * stepsPerYear );
 if year > 2012
-    condUse = 0.5* 0.4;
+    condUse = 0.5* 0.35;
 elseif year >= 2000
     yrs = 2000 : 1 / stepsPerYear : 2012;
     ind = yrs == year;
@@ -298,7 +298,7 @@ for d = 1 : disease
 
                         lambdaMult = 1;
                         if d > 2 && d < 7 && toState < 3 % CD4 > 500 -> CD4 < 200
-                            lambdaMult = hpv_hivMult(d - 2 , toState);
+                            lambdaMult = hpv_hivMult(d - 2);
                         end
 
                         % normal susceptibles
