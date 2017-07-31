@@ -77,7 +77,7 @@ for d = 1 : disease
                     + kCin2_Inf(a) ... % progression to CIN2 from infected females (fast progressors)
                     + rNormal_Inf(a) * rHivHpvMult) .* pop(infF); % regression to immune from infected females
                 
-                dPop(infM) = dPop(infM) - rNormal_Inf(a) * rHivHpvMult * pop(infM); % regression to immune from infected males              
+                dPop(infM) = dPop(infM) - rNormal_Inf(a) * rHivHpvMult * pop(infM); % regression to normal from infected males              
                 
                 % Infection and CIN progression in females only
                 % kCin_Inf(stage , hpvType , age group)

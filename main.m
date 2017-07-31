@@ -66,8 +66,8 @@ if calibrate % calibrate model
     disp('Running immunity calibration')
 %     fImm(1 : 3) = 1;
 %     fImm(4 : age) = 0.58; % (0.48; 0.27 , 0.69) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-    lambdaMultImm(1 : 4) = 0.01;
-    lambdaMultImm(5 : 10) = logspace(log10(0.01) , log10(0.2) , 6); 
+    lambdaMultImm(1 : 4) = 1 - 0.01;
+    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6); 
     lambdaMultImm(11 : age ) = lambdaMultImm(10);
     perActHpv = 0.07; % initial estimate
     A = [];
@@ -77,7 +77,7 @@ if calibrate % calibrate model
     nonlcon = [];
     x0 = [lambdaMultImm(:) ; kCin2_Cin3(:) ; kCin3_Cin2(:) ; kCC_Cin3(:) ; perActHpv];
     lb = [0.01 * ones(length(lambdaMultImm(:)) , 1) ; 0.9 * kCin2_Cin3(:) ; 0.9 * kCin3_Cin2(:) ; 0.9 * kCC_Cin3(:) ; 0.01];
-    ub = [0.2 * ones(length(lambdaMultImm(:)) , 1) ; 1.5 * kCin2_Cin3(:) ; 1.5 * kCin3_Cin2(:) ; 1.5 * kCC_Cin3(:) ; 0.1]; 
+    ub = [0.99 * ones(length(lambdaMultImm(:)) , 1) ; 1.5 * kCin2_Cin3(:) ; 1.5 * kCin3_Cin2(:) ; 1.5 * kCC_Cin3(:) ; 0.1]; 
     options  = optimoptions('patternsearch' , 'UseParallel' , true , ...
         'UseCompletePoll' , true , 'PlotFcn' , ...
         {@psplotbestf , @psplotfuncount , @psplotmeshsize} , ...
@@ -160,14 +160,18 @@ else % simulation
     load('vlBeta')
     load('hpvTreatIndices')
     load('calibParams')
-    lambdaMultImm = calibParams(1 : age);
-    kCin2_Cin3 = calibParams(age + 1 : 2 * age);
+%     hpv_hivClear = hpv_hivClear * 0.8;
+%     rNormal_Inf = rNormal_Inf * 0.6;
+%     kCin2_Cin1 = kCin2_Cin1 .* 1.8; %test
+%     kCin1_Cin2 = kCin1_Cin2 .* 0.7; %test
+%     kCin1_Inf = kCin1_Inf .* 1.8; % test
+    kCin2_Cin3 = calibParams(age + 1 : 2 * age);% * 0.8;
     kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
-    kCC_Cin3 = calibParams(3 * age + 1 : 4 * age);
-    perActHpv = calibParams(4 * age + 1);
+    kCC_Cin3 = calibParams(3 * age + 1 : 4 * age) * 2; % test
+    perActHpv = calibParams(4 * age + 1);%
     fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-    lambdaMultImm(1 : 4) = 0.01;
-    lambdaMultImm(5 : 10) = logspace(log10(0.01) , log10(0.2) , 6); 
+    lambdaMultImm(1 : 4) = 1 - 0.01;
+    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6); 
     lambdaMultImm(11 : age ) = lambdaMultImm(10);
     lambdaMultVax = 1 - (0.9 * 0.8);
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
