@@ -222,7 +222,7 @@ if year > 2012
 elseif year >= 2000
     yrs = 2000 : 1 / stepsPerYear : 2012;
     ind = yrs == year;
-    condUseVec = 0.5 * linspace(0.306 , 0.4 , length(yrs));
+    condUseVec = 0.5 * linspace(0.306 , 0.35 , length(yrs));
     condUse = condUseVec(ind);
 end
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
