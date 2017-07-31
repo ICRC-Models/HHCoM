@@ -159,14 +159,18 @@ else % simulation
     load('ager')
     load('vlBeta')
     load('hpvTreatIndices')
-%     load('calibParams') % calibrated fImm
+    load('calibParams')
+    lambdaMultImm = calibParams(1 : age);
+    kCin2_Cin3 = calibParams(age + 1 : 2 * age);
+    kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
+    kCC_Cin3 = calibParams(3 * age + 1 : 4 * age);
+    perActHpv = calibParams(4 * age + 1);
     fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
     lambdaMultImm(1 : 4) = 0.01;
     lambdaMultImm(5 : 10) = logspace(log10(0.01) , log10(0.2) , 6); 
     lambdaMultImm(11 : age ) = lambdaMultImm(10);
     lambdaMultVax = 1 - (0.9 * 0.8);
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-    perActHpv = 0.07;
     OMEGA(1 : 3) = 0;
     OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
     hivPositiveArtAll = sort(toInd(allcomb(10 , 6 , 1 : hpvStates , 1 : hpvTypes , ...
@@ -293,7 +297,7 @@ else % simulation
 
         disp(['Reached year ' num2str(endYear)])
         popVec = sparse(popVec); % compress population vectors
-        savdir = '/Users/nicktzr/Google Drive/ICRC/CISNET/Results';
+        savdir = 'H:\HHCoM Results';
         save(fullfile(savdir , 'results') , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
             'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear');
         disp(' ')
