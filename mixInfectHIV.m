@@ -40,14 +40,19 @@ deltaR = eye(3 , 3);
 % if currStep <= (2005 - modelYr1) * int
 deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
-deltaAM(1 , 2) = 0.7;
 % after 2005
 if currStep > (2005 - modelYr1) * stepsPerYear
     deltaAF = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , 1);
-%     deltaAF(12 , 11) = 0.3;
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
-%     deltaAM(1 , 2) = 0.3;
+    deltaR = eye(3);
 end
+deltaAF(4 , 4) = 1; 
+deltaAF(3 , 4) = 0; 
+deltaAF(4 , 5) = 0;
+deltaAF(3 , 3) = 1;
+
+deltaAM(4 , 4) = 1;
+deltaAM(4 , 3) = 0;
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk]
 % rate of partner change (contact)
@@ -171,26 +176,28 @@ cAdj(2 , : , : , : , :) = cAdjFemale;
 cAdj(isnan(cAdj)) = 0;
 cAdj(isinf(cAdj)) = 0;
 % HIV average betas
-beta = zeros(gender , age , risk);
+beta = zeros(gender , age , risk , risk);
 
 % infection probability by viral load
 for a = 1 : age
     for r = 1 : risk
-        if popSum(1 , a , r) ~= 0
-            for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                beta(1 , a , r) = beta(1 , a , r) + sumall(pop(mCurr(a , r , v , :))) * ...
-                    betaHIVM2F(a , r , v) ./ popSum(1 , a , r);
+        for rr = 1 : risk
+            if popSum(1 , a , r) ~= 0
+                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                    beta(1 , a , r , rr) = beta(1 , a , r , rr) + sumall(pop(mCurr(a , r , v , :))) * ...
+                        betaHIVM2F(a , rr , v) ./ popSum(1 , a , r);
+                end
+                beta(1 , a , r , rr) = beta(1 , a , r , rr) + sumall(pop(mCurrArt(a , r , 1 , :))) * ...
+                    betaHIVM2F(a , rr , 6) ./ popSum(1 , a , r);
             end
-            beta(1 , a , r) = beta(1 , a , r) + sumall(pop(mCurrArt(a , r , 1 , :))) * ...
-                betaHIVM2F(a , r , 6) ./ popSum(1 , a , r);
-        end
-        if popSum(2 , a , r) ~= 0
-            for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                beta(2 , a , r) = beta(2 , a , r) + sumall(pop(fCurr(a , r , v , :))) * ...
-                    betaHIVF2M(a , r , v) ./ popSum(2 , a , r);
+            if popSum(2 , a , r) ~= 0
+                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                    beta(2 , a , r , rr) = beta(2 , a , r , rr) + sumall(pop(fCurr(a , r , v , :))) * ...
+                        betaHIVF2M(a , rr , v) ./ popSum(2 , a , r);
+                end
+                beta(2 , a , r , rr) = beta(2 , a , r , rr) + sumall(pop(fCurrArt(a , r , 1 , :))) * ...
+                    betaHIVF2M(a , rr , 6) ./ popSum(2 , a , r);
             end
-            beta(2 , a , r) = beta(2 , a , r) + sumall(pop(fCurrArt(a , r , 1 , :))) * ...
-                betaHIVF2M(a , r , 6) ./ popSum(2 , a , r);
         end
     end
 end
@@ -209,7 +216,7 @@ for g = 1 : gender
                     lambda(g , i , j) = ...
                         squeeze(lambda(g , i , j))...
                         + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
-                        * squeeze(beta(gg , ii , jj));
+                        * beta(gg , ii , jj , j);
                 end
             end
         end
