@@ -17,7 +17,7 @@
 % to aging.
 
 function [dPop , extraOut] = bornAgeDie(t , pop , ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-    hivFertNegBirth , deathMat , circMat , vaxer , MTCTRate , circStartYear , vaxStartYear , startYear , endYear, stepsPerYear)
+    hivFertNegBirth , deathMat , circMat , vaxer , MTCTRate , circStartYear , vaxStartYear , vaxRate , startYear , endYear, stepsPerYear)
 %% births and deaths
 %fertility = zeros(age , 6);
 kHiv = MTCTRate(1); % year <= 2004
@@ -50,13 +50,14 @@ hivBirths = hivFertPosBirth * pop;
 deaths = deathMat * pop;
 vaxed = pop * 0;
 vaxStartYear = 2017;
-targetYear = 2025;
-vaxRate = linspace(0 , 0.9 , (targetYear - vaxStartYear) * stepsPerYear); % linear scale-up of vaccination rate
-vaxRate = [vaxRate , ones(length((endYear - targetYear) * stepsPerYear) , 1) .* vaxRate(end)];
+% vaxRate = 0.9;
+% targetYear = 2025;
+% vaxRate = linspace(0 , 0.9 , (targetYear - vaxStartYear) * stepsPerYear); % linear scale-up of vaccination rate
+% vaxRate = [vaxRate , ones(length((endYear - targetYear) * stepsPerYear) , 1) .* vaxRate(end)];
 yrs = vaxStartYear : 1 / stepsPerYear : endYear;
 ind = yrs == year;
 if year >= vaxStartYear
-    vaxed = vaxer .* vaxRate(ind) * pop;
+    vaxed = vaxer .* vaxRate * pop;
 end
 
 circBirths = births * 0;
@@ -69,4 +70,5 @@ end
 aged = ager * pop;
 
 extraOut{1} = abs(deaths);
+% extraOut{2} = vaxed;
 dPop = circBirths + births + hivBirths + deaths + vaxed + aged;

@@ -22,7 +22,7 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
     + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
-artDist = reshape(artDist, [disease , viral , gender , age , risk]);
+% artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 % disease related mortality
 %
 % pie [d x v x g x a x r]
@@ -195,7 +195,7 @@ for g = 1 : gender
                     % calculate CD4 changes
                     dPop(cd4Curr) = ...
                         kCD4(g , v , d - 2) * pop(cd4Prev) ... % CD4 progression from previous disease state
-                        + artOut * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
+                        + artOut * 0 ... %artDist(d , v , g , a , r) ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state (when d = 6 , kOn = 0 , else kOn = 1)
                         + muHIV(a , d) ... % disease-related mortality

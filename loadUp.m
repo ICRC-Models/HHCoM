@@ -194,7 +194,24 @@ kCin1_Cin3 = xlsread(file , 'CIN Transition', 'P28 : P43');
 kCin2_Cin3 = xlsread(file , 'CIN Transition', 'Q28 : Q43');
 kCin2_Cin1 = xlsread(file , 'CIN Transition' , 'H28 : H43');
 kCin3_Cin2 = xlsread(file , 'CIN Transition', 'M28 : M43');
-kCC_Cin3 = xlsread(file , 'CIN Transition' , 'R28 : R43');
+% kCC_Cin3 = xlsread(file , 'CIN Transition' , 'T28 : T43');
+kCC_Cin3 = [0.001161267
+0.001161267
+0.001161267
+0.001161267
+0.001161267
+0.012279325
+0.01546286
+0.018646395
+0.02182993
+0.025013465
+0.028197
+0.029204507
+0.030212013
+0.03121952
+0.032227027
+0.033234533
+];
 kCin1_Inf = xlsread(file , 'CIN Transition' , 'C28 : C43');
 kCin2_Inf = xlsread(file , 'CIN Transition' , 'D28 : D43');
 kCin3_Cin1 = xlsread(file , 'CIN Transition' , 'I28 : I43');
@@ -202,7 +219,7 @@ kNormal_Cin1 = xlsread(file , 'CIN Transition' , 'F28 : L43');
 kNormal_Cin2 = xlsread(file , 'CIN Transition' , 'J28 : J43');
 rNormal_Inf = xlsread(file , 'CIN Transition' , 'B28 : B43');
 
-hpv_hivMult = xlsread(file , 'HPV' , 'E21 : E24');
+hpv_hivMult = flipud(xlsread(file , 'HPV' , 'E21 : E24'));
 hpv_hivClear = xlsread(file , 'CIN Transition' , 'D48 : D51');
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B55 : B58');
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B61 : B64');

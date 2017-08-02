@@ -61,7 +61,7 @@ for d = 1 : disease
                     + rNormal_Inf(a) * rHivHpvMult .* pop(infM);  % Infected -> Normal
                 
                 dPop(immuneF) = dPop(immuneF) + kNormal_Cin2(a) * fImm(a) .* pop(cin2)... %CIN2 -> immune
-                    + kNormal_Cin1(a) * fImm(a) .* pop(cin1)... % CIN1 -> immune
+                    + rHivHpvMult * kNormal_Cin1(a) * fImm(a) .* pop(cin1)... % CIN1 -> immune
                     + rNormal_Inf(a) * fImm(a) * rHivHpvMult .* pop(infF)... % Inf -> immune
                     - rImmune * pop(immuneF); % immune -> normal
                 
@@ -86,7 +86,7 @@ for d = 1 : disease
                     + kCin1_Cin2(a) * c1c2Mult .* pop(cin2)... % CIN2 -> CIN1
                     + kCin1_Cin3(a) * c2c3Mult .* pop(cin3) ... % CIN3 -> CIN1 (Fast regressors)
                     - (kCin2_Cin1(a) * c2c1Mult + kCin3_Cin1(a)... % CIN1 -> CIN2, CIN1 -> CIN3 (Fast Progressors)
-                    + kInf_Cin1(a) + kNormal_Cin1(a)) .* pop(cin1); % CIN1 -> Infected , CIN1 -> Normal/immuneF
+                    + kInf_Cin1(a) + rHivHpvMult * kNormal_Cin1(a)) .* pop(cin1); % CIN1 -> Infected , CIN1 -> Normal/immuneF
                 
                 % CIN2 group
                 dPop(cin2) = dPop(cin2) + kCin2_Inf(a) .* pop(infF)... % Infected -> CIN2 (Fast progressors)

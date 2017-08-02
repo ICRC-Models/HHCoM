@@ -69,13 +69,13 @@ if calibrate % calibrate model
     lambdaMultImm(1 : 4) = 1 - 0.01;
     lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6); 
     lambdaMultImm(11 : age ) = lambdaMultImm(10);
-    perActHpv = 0.07; % initial estimate
+    perPartnerHpv = 0.07; % initial estimate
     A = [];
     b = [];
     Aeq = [];
     beq = [];
     nonlcon = [];
-    x0 = [lambdaMultImm(:) ; kCin2_Cin3(:) ; kCin3_Cin2(:) ; kCC_Cin3(:) ; perActHpv];
+    x0 = [lambdaMultImm(:) ; kCin2_Cin3(:) ; kCin3_Cin2(:) ; kCC_Cin3(:) ; perPartnerHpv];
     lb = [0.01 * ones(length(lambdaMultImm(:)) , 1) ; 0.9 * kCin2_Cin3(:) ; 0.9 * kCin3_Cin2(:) ; 0.9 * kCC_Cin3(:) ; 0.01];
     ub = [0.99 * ones(length(lambdaMultImm(:)) , 1) ; 1.5 * kCin2_Cin3(:) ; 1.5 * kCin3_Cin2(:) ; 1.5 * kCC_Cin3(:) ; 0.1]; 
     options  = optimoptions('patternsearch' , 'UseParallel' , true , ...
@@ -111,11 +111,15 @@ else % simulation
 
     if hpvOn
         % initPop(1 , 1 , 2 : 4 , 1 , 1 , : , 4 : 9 , :) = 2; % initial HPV hr and lr infecteds (test)
-        infected = initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * 0.1; % try 10% intial HPV prevalence among age groups 4 - 9 (sexually active)
-        initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
-            initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected;
+        infected = initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) * 0.20; % try 20% intial HPV prevalence among age groups 6 - 9 (sexually active)
+        initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) = ...
+            initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) - infected;
+        infected34 = initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) * 0.2; %try 20% initial HPV prevalence among age groups 4 - 5 (more sexually active)
+        initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) = ...
+            initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) - infected34;
         for h = 2
-            initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = infected;
+            initPop(1 , 1 , 2 , 1 , 1 , : , 6 : 9 , :) = infected;
+            initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 5 , :) = infected34;
         end
         initPop = max(initPop , 0);
     end
@@ -159,26 +163,24 @@ else % simulation
     load('ager')
     load('vlBeta')
     load('hpvTreatIndices')
-    load('calibParams')
-%     hpv_hivClear = hpv_hivClear * 0.8;
-%     rNormal_Inf = rNormal_Inf * 0.6;
+    endYear = 2017;
+%     load('calibParams')
+    hpv_hivClear = hpv_hivClear * 0.8;
+    rNormal_Inf = rNormal_Inf * 0.7;
 %     kCin2_Cin1 = kCin2_Cin1 .* 1.8; %test
-%     kCin1_Cin2 = kCin1_Cin2 .* 0.7; %test
+    kCin1_Cin2 = kCin1_Cin2 .* 0.6; %test
 %     kCin1_Inf = kCin1_Inf .* 1.8; % test
-    kCin2_Cin3 = calibParams(age + 1 : 2 * age);% * 0.8;
-    kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
-    kCC_Cin3 = calibParams(3 * age + 1 : 4 * age) * 2; % test
-    perActHpv = calibParams(4 * age + 1);%
+%     kCin2_Cin3 = calibParams(age + 1 : 2 * age);% * 0.8;
+%     kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
+%     kCC_Cin3 = calibParams(3 * age + 1 : 4 * age) * 2; % test
+    kCC_Cin3 = kCC_Cin3 * 2;
+    perPartnerHpv = 0.1;%calibParams(4 * age + 1);%
     fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6); 
+    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.05) , 6); 
     lambdaMultImm(11 : age ) = lambdaMultImm(10);
     lambdaMultVax = 1 - (0.9 * 0.8);
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-    OMEGA(1 : 3) = 0;
-    OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
-    hivPositiveArtAll = sort(toInd(allcomb(10 , 6 , 1 : hpvStates , 1 : hpvTypes , ...
-        1 : periods , 1 : gender  , 1 : age , 1 : risk)));
     profile on
     disp(' ')
     % Initialize vectors
@@ -193,7 +195,7 @@ else % simulation
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
     popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
-    newHpv = newHiv;
+    newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
     newImmHpv = newHpv;
     newVaxHpv = newHpv;
     newCC = zeros(length(s) - 1 , disease , viral , hpvTypes , age);
@@ -209,6 +211,7 @@ else % simulation
     disp(' ')
     disp('Simulation running...')
     disp(' ')
+    vaxRate = 0.9;
     try
         progressbar('Simulation Progress')
         for i = 2 : length(s) - 1
@@ -236,10 +239,10 @@ else % simulation
             end
 
             if hpvOn
-                [~ , pop , newHpv(i , : , : , :) , newImmHpv(i , : , : , :) , ...
-                newVaxHpv(i , : , : , :)] = ...
+                [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
+                newVaxHpv(i , : , : , : , :)] = ...
                     ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
-                    gar , perActHpv , lambdaMultImm , lambdaMultVax , epsA_vec , epsR_vec , yr , modelYr1 , ...
+                    gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , epsA_vec , epsR_vec , yr , modelYr1 , ...
                     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
                     hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
                     disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
@@ -288,7 +291,7 @@ else % simulation
             [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie(t , pop , ...
                 ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
                 hivFertNegBirth , deathMat , circMat , vaxer , MTCTRate , circStartYear , ...
-                vaxStartYear , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
+                vaxStartYear , vaxRate , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
             if any(pop(end , :) < 0)
                 disp('After bornAgeDie')
                 break
@@ -298,12 +301,13 @@ else % simulation
             runtimes(i) = toc;
             progressbar(i/(length(s) - 1))
         end
-
+        popLast = popVec(end , :);
         disp(['Reached year ' num2str(endYear)])
         popVec = sparse(popVec); % compress population vectors
         savdir = 'H:\HHCoM Results';
-        save(fullfile(savdir , 'results') , 'tVec' ,  'popVec' , 'newHiv' , 'newHpv' , 'hivDeaths' , ...
-            'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear');
+        save(fullfile(savdir , 'results') , 'tVec' ,  'popVec' , 'newHiv' ,...
+            'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
+            'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
         disp(' ')
         disp('Simulation complete.')
     catch
