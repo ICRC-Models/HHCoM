@@ -54,11 +54,11 @@ vaxStartYear = 2017;
 % targetYear = 2025;
 % vaxRate = linspace(0 , 0.9 , (targetYear - vaxStartYear) * stepsPerYear); % linear scale-up of vaccination rate
 % vaxRate = [vaxRate , ones(length((endYear - targetYear) * stepsPerYear) , 1) .* vaxRate(end)];
-yrs = vaxStartYear : 1 / stepsPerYear : endYear;
-ind = yrs == year;
-if year >= vaxStartYear
-    vaxed = vaxer .* vaxRate * pop;
-end
+% yrs = vaxStartYear : 1 / stepsPerYear : endYear;
+% ind = yrs == year;
+% if year >= vaxStartYear
+%     vaxed = vaxer .* vaxRate * pop;
+% end
 
 circBirths = births * 0;
 if year > circStartYear

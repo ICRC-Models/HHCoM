@@ -195,7 +195,7 @@ for g = 1 : gender
                     % calculate CD4 changes
                     dPop(cd4Curr) = ...
                         kCD4(g , v , d - 2) * pop(cd4Prev) ... % CD4 progression from previous disease state
-                        + artOut * 0 ... %artDist(d , v , g , a , r) ... % Distributed dropouts from ART
+                        + artOut * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state (when d = 6 , kOn = 0 , else kOn = 1)
                         + muHIV(a , d) ... % disease-related mortality

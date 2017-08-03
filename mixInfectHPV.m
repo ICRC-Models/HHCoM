@@ -248,7 +248,7 @@ for g = 1 : gender
             for ii = 1 : age
                 for jj = 1 : risk
                     lambda(g , i , j , :) = ...
-                        squeeze(lambda(g , i , j , jj))...
+                        squeeze(lambda(g , i , j , :))...
                         + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
                         * squeeze(beta(gg , ii , jj , :)); % [3 x 1]
                 end
@@ -276,7 +276,7 @@ newImmHpv = newHpv;
 newVaxHpv = newHpv;
 %% Infection
 for d = 1 : disease
-    for h = 1 : hpvTypes - 1 % coinfected compartments cannot acquire more infections
+    for h = 1 : 2 % hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 : states
             hTo = toState + 1;
             if h > 1 && h ~= hTo % if pre-existing infection present

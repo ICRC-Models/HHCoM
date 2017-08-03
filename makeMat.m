@@ -460,21 +460,21 @@ disp('Death matrix complete')
 % ALPHA version: assumes vaccination rate is dependent on age. Female
 % vaccination only.
 disp('Building vaccination matrix')
-vaxer = spalloc(numel(pop) , numel(pop) , numel(pop));
+vaxer = speye(numel(pop) , numel(pop));
 V = zeros(gender , age);
-V(2 , 3) = 1; % turn on vaccination for females in 10 - 14 age group
-for a = 1 : age
-    susFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 2 , a , 1 : risk));
-    vaxdFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 10 , 1 : periods , 2 , a , 1 : risk));
-    vaxer(at(vaxdFemale , susFemale)) = V(2 , a);
-    vaxer(at(susFemale , susFemale)) = -V(2 , a);
-    
-    % for males (future version?)
-%     susMale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 1 , a , 1 : risk));
-%     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
-%     vaxer(vaxdMale , susMale) = V(2 , a);
-%     vaxer(susMale , susMale) = -V(2 , a);
-end
+% V(2 , 3) = 1; % turn on vaccination for females in 10 - 14 age group
+% for a = 1 : age
+%     susFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 2 , a , 1 : risk));
+%     vaxdFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 10 , 1 : periods , 2 , a , 1 : risk));
+%     vaxer(at(vaxdFemale , susFemale)) = V(2 , a);
+%     vaxer(at(susFemale , susFemale)) = -V(2 , a);
+%     
+%     % for males (future version?)
+% %     susMale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 1 , a , 1 : risk));
+% %     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
+% %     vaxer(vaxdMale , susMale) = V(2 , a);
+% %     vaxer(susMale , susMale) = -V(2 , a);
+% end
 save('vaxer' , 'vaxer')
 disp('Vaccination matrix complete')
 %% Make circumcision matrix (use when circumcision begins in model)
