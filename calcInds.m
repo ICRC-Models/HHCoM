@@ -401,6 +401,18 @@ disp('cinAdv indices loaded')
 
 %% calcDist.m indices
 % N/A
+
+%% Vaccinated group indices
+
+vaccinated = zeros(age , disease * viral * gender * risk);
+waned = vaccinated;
+
+vaccinated = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , 1 : gender , ...
+    1 : age , 1 : risk));
+waned = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , 1 : gender , ...
+    1 : age , 1 : risk));
+
+save('vaxInds' , 'waned' , 'vaccinated')
 disp('Done')
 disp('All indices loaded.')
 disp(' ')
