@@ -193,7 +193,7 @@ for a = 1 : age
             if popSum(2 , a , r) ~= 0
                 for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
                     beta(2 , a , r , rr) = beta(2 , a , r , rr) - log(1 - betaHIVF2M(a , rr , v))...
-                      * sumall(pop(fCurr(a , r , v , :))) * ./ popSum(2 , a , r);
+                      * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
                 end
                 beta(2 , a , r , rr) = beta(2 , a , r , rr) - log(1 -   betaHIVF2M(a , rr , 6))...
                   * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
