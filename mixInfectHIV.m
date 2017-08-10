@@ -180,6 +180,7 @@ beta = zeros(gender , age , age , risk , risk);
 
 % infection probability by viral load
 for a = 1 : age
+  for aa = 1 : age
     for r = 1 : risk
         for rr = 1 : risk
             if popSum(1 , a , r) ~= 0
@@ -200,6 +201,7 @@ for a = 1 : age
             end
         end
     end
+  end
 end
 
 % lambda
