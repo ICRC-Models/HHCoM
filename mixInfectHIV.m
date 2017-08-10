@@ -46,8 +46,8 @@ if currStep > (2005 - modelYr1) * stepsPerYear
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
     deltaR = eye(3);
 end
-deltaAF(4 , 4) = 1; 
-deltaAF(3 , 4) = 0; 
+deltaAF(4 , 4) = 1;
+deltaAF(3 , 4) = 0;
 deltaAF(4 , 5) = 0;
 deltaAF(3 , 3) = 1;
 
@@ -135,7 +135,7 @@ rho(2 , : , : , : , :) = rhoF;
 mfRatio = zeros(age , age , risk , risk);
 for aa = 1 : age
     for rr = 1 : risk
-        if popSum(2 , aa , rr) ~= 0 
+        if popSum(2 , aa , rr) ~= 0
             mfRatio(: , aa , : , rr) = ...
                 max(popSum(1 , : , :) ./ popSum(2 , aa ,rr) , 0);
         end
@@ -176,7 +176,7 @@ cAdj(2 , : , : , : , :) = cAdjFemale;
 cAdj(isnan(cAdj)) = 0;
 cAdj(isinf(cAdj)) = 0;
 % HIV average betas
-beta = zeros(gender , age , risk , risk);
+beta = zeros(gender , age , age , risk , risk);
 
 % infection probability by viral load
 for a = 1 : age
@@ -184,19 +184,19 @@ for a = 1 : age
         for rr = 1 : risk
             if popSum(1 , a , r) ~= 0
                 for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(1 , a , r , rr) = beta(1 , a , r , rr) + sumall(pop(mCurr(a , r , v , :))) * ...
-                        betaHIVM2F(a , rr , v) ./ popSum(1 , a , r);
+                    beta(1 , a , r , rr) = beta(1 , a , r , rr) - log(1 - betaHIVM2F(a , rr , v)) ...
+                      * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
                 end
-                beta(1 , a , r , rr) = beta(1 , a , r , rr) + sumall(pop(mCurrArt(a , r , 1 , :))) * ...
-                    betaHIVM2F(a , rr , 6) ./ popSum(1 , a , r);
+                beta(1 , a , r , rr) = beta(1 , a , r , rr) - log(1 - betaHIVM2F(a , rr , 6)) ...
+                * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
             end
             if popSum(2 , a , r) ~= 0
                 for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(2 , a , r , rr) = beta(2 , a , r , rr) + sumall(pop(fCurr(a , r , v , :))) * ...
-                        betaHIVF2M(a , rr , v) ./ popSum(2 , a , r);
+                    beta(2 , a , r , rr) = beta(2 , a , r , rr) - log(1 - betaHIVF2M(a , rr , v))...
+                      * sumall(pop(fCurr(a , r , v , :))) * ./ popSum(2 , a , r);
                 end
-                beta(2 , a , r , rr) = beta(2 , a , r , rr) + sumall(pop(fCurrArt(a , r , 1 , :))) * ...
-                    betaHIVF2M(a , rr , 6) ./ popSum(2 , a , r);
+                beta(2 , a , r , rr) = beta(2 , a , r , rr) - log(1 -   betaHIVF2M(a , rr , 6))...
+                  * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
             end
         end
     end
@@ -249,19 +249,19 @@ for a = 1 : age
                 fSus = hivSus(d , 2 , a , r , :);
                 mTo = toHiv(1 , a , r , :); % set disease state = 2 (acute)
                 fTo = toHiv(2 , a , r , :);
-                
+
                 mInfected = lambda(1 , a , r)...
                     .* psi(d) .* pop(mSus); % infected males
                 fInfected = lambda(2 , a , r)...
                     .* psi(d) .* pop(fSus); % infected females
-                
+
                 % HIV incidence tracker
                 newHiv(1 , a , r) = newHiv(1 , a , r) + sumall(mInfected);
                 newHiv(2 , a , r) = newHiv(2 , a , r) + sumall(fInfected);
-                
+
                 dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
                 dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
-                
+
                 dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
                 dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
             end

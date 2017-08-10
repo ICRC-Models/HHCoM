@@ -46,8 +46,8 @@ if currStep > (2005 - modelYr1) * stepsPerYear
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
     deltaR = eye(3);
 end
-deltaAF(4 , 4) = 1; 
-deltaAF(3 , 4) = 0; 
+deltaAF(4 , 4) = 1;
+deltaAF(3 , 4) = 0;
 deltaAF(4 , 5) = 0;
 deltaAF(3 , 3) = 1;
 
@@ -224,8 +224,8 @@ for g = 1 : gender
             % adjust betas for HPV transmission to account for proportion of population
             % that is carrying HPV. Transmission probability throughout population
             % is dependent on the "concentration" of HPV carriers in the population.
-            y(g , a , r) = y(g , a , r) .* p_hrHPV;
-            z(g , a , r) = z(g , a , r) .* p_lrHPV;
+            y(g , a , r) = -log(1 - y(g , a , r)) .* p_hrHPV;
+            z(g , a , r) = -log(1 - z(g , a , r)) .* p_lrHPV;
         end
     end
 end
@@ -234,7 +234,7 @@ end
 states = 3; % (2 single HPV infection states, 1 dual infection state)
 beta(: , : , : , 1) = y;
 beta(: , : , : , 2) = z;
-beta(: , : , : , 3) = y .* z;
+beta(: , : , : , 3) = y + z;
 
 % lambda
 lambda = zeros(gender, age , risk , states);
@@ -350,7 +350,7 @@ for d = 1 : disease
                         %immune
 %                         dPop(mSusImm) = dPop(mSusImm) - mInfImm;
                         dPop(fSusImm) = dPop(fSusImm) - fInfImm;
-% 
+%
 %                         dPop(mToImm) = dPop(mToImm) + mInfImm;
                         dPop(fToImm) = dPop(fToImm) + fInfImm;
 
