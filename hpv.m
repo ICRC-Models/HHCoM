@@ -33,8 +33,8 @@ for d = 1 : disease
     c2c3Mult = 1; % CIN3 -> CIN2 regression multiplier
     rHivHpvMult = 1; % for HIV negative
     if d > 2 && d < 7 % CD4 > 500 -> CD4 < 200
-        c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 multiplier
-        c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
+        c3c2Mult = c3c2Mults(d - 2) * 1.8; % CIN2 -> CIN3 multiplier
+        c2c1Mult = c2c1Mults(d - 2) * 1.8; % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
         rHivHpvMult = hpv_hivClear(d - 2); % Infection clearance multiplier

@@ -128,10 +128,10 @@ if year >= 2004
                     yrs = 2017 : 1 / stepsPerYear : 2020; % assuming 90-90-90 target reached by 2020
                     ind = yrs == year;
                     maxCover = linspace(-log(1 - 0.46) , -log(1 - 0.46) , length(yrs));
-                    if fracART < maxCover(ind)
+                    if fracART < maxCover(ind) && year < 2020
                         cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                    elseif year >= 2020 && fracART < 0.6
+                    elseif year >= 2020 && fracART < -log(1 - 0.46)
                         cover = -log(1 - (0.6 - fracART)) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     end
