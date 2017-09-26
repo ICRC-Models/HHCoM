@@ -9,7 +9,7 @@ function [dPop , newInfs] = mixInfectHPV(t , pop , currStep , ...
     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
     hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
     disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-    hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year)
+    hrInds , lrInds , hrlrInds,  k , periods , startYear , stepsPerYear , year)
 sumall = @(x) sum(x(:));
 %% mixInfect Constants
 % load workspace and get constants
@@ -34,24 +34,26 @@ else % assortativity in last year
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
 
-% deltaR and deltaA - nature of assortative mixing (Kronecker delta)
-% for all times
 deltaR = eye(3 , 3);
-% if currStep <= (2005 - modelYr1) * int
+% if currStep <= (2005 - modelYr1)
 deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
+
 % after 2005
-if currStep > (2005 - modelYr1) * stepsPerYear
+if currStep > (2000 - modelYr1) * stepsPerYear
     deltaAF = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , 1);
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
     deltaR = eye(3);
+    deltaAM(5 , 4) = 0.6;
+    deltaAM(5 , 5) = 0.4;
 end
-deltaAF(4 , 4) = 1;
+deltaAF(4 , 4) = 0.8;
 deltaAF(3 , 4) = 0;
-deltaAF(4 , 5) = 0;
+deltaAF(4 , 5) = 0.2;
 deltaAF(3 , 3) = 1;
 
-deltaAM(4 , 4) = 1;
+deltaAM(4 , 4) = 0.8;
+deltaAM(4 , 5) = 0.2;
 deltaAM(4 , 3) = 0;
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk]
@@ -203,7 +205,7 @@ y = permute(y , [1 3 2]); % [g x r x a] -> [g x a x r]
 sexPop = zeros(2 , 1);
 sexPop(1) = sumall(popSum(1 , 3 : age , :)); % total sexually active males in population
 sexPop(2) = sumall(popSum(2 , 3 : age , :)); % total sexually active females in population
-
+beta = zeros(gender , age , risk , 3);
 for g = 1 : gender
     for a = 1 : age
         for r = 1 : risk
@@ -224,17 +226,18 @@ for g = 1 : gender
             % adjust betas for HPV transmission to account for proportion of population
             % that is carrying HPV. Transmission probability throughout population
             % is dependent on the "concentration" of HPV carriers in the population.
-            y(g , a , r) = -log(1 - y(g , a , r)) .* p_hrHPV;
-            z(g , a , r) = -log(1 - z(g , a , r)) .* p_lrHPV;
+            beta(g , a , r , 1) = -log(1 - beta_hrHPV(g , r)) .* p_hrHPV;
+            beta(g , a , r , 2) = -log(1 - beta_lrHPV(g , r)) .* p_lrHPV;
+            beta(g , a , r , 3) = -log(1 - beta_hrHPV(g , r) * beta_lrHPV(g , r)) .* p_hrlrHPV;
         end
     end
 end
 
 % coinfection transmission matrix
 states = 3; % (2 single HPV infection states, 1 dual infection state)
-beta(: , : , : , 1) = y;
-beta(: , : , : , 2) = z;
-beta(: , : , : , 3) = y + z;
+% beta(: , : , : , 1) = y;
+% beta(: , : , : , 2) = z;
+% beta(: , : , : , 3) = y + z;
 
 % lambda
 lambda = zeros(gender, age , risk , states);
@@ -256,27 +259,27 @@ for g = 1 : gender
         end
     end
 end
-condGrowth = log(0.5 * 0.306 / 0.001) / ((2000 - 1980) * stepsPerYear);
-condUse = 0.001 * exp(condGrowth * (year - 1980) * stepsPerYear );
-if year > 2012
-    condUse = 0.5* 0.35;
-elseif year >= 2000
-    yrs = 2000 : 1 / stepsPerYear : 2012;
-    ind = yrs == year;
-    condUseVec = 0.5 * linspace(0.306 , 0.35 , length(yrs));
-    condUse = condUseVec(ind);
-end
+peakYear = 2000;
+condStart = 1988;
+yrVec = condStart : 1 / stepsPerYear : peakYear;
+condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUse = condUseVec(1); % year >= peakYear
+if year < peakYear && year > condStart
+    yrInd = year == yrVec;
+    condUse = condUseVec(yrInd);
+elseif year >= peakYear
+    condUse = condUseVec(end);
+end     
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = 1 - circProtect .* cond;
-psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond;
 dPop = zeros(size(pop));
 newHpv = zeros(gender , disease , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
 %% Infection
 for d = 1 : disease
-    for h = 1 : 2 % hpvTypes - 1 % coinfected compartments cannot acquire more infections
+    for h = 1 : hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 : states
             hTo = toState + 1;
             if h > 1 && h ~= hTo % if pre-existing infection present
@@ -303,8 +306,10 @@ for d = 1 : disease
                         fToVax = toHpv_ImmVax(d , hTo , 2 , a , r , :);
 
                         lambdaMult = 1;
-                        if d > 2 && d < 7 && toState < 3 % CD4 > 500 -> CD4 < 200
+                        if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2);
+                        elseif d == 10
+                            lambdaMult = hpv_hivMult(1) * 0.5;                            
                         end
 
                         % normal susceptibles
@@ -322,9 +327,9 @@ for d = 1 : disease
 
                         % vaccinated susceptibles
                         mInfVax = min(lambdaMult * lambdaMultVax * lambda(1 , a , r , toState) ...
-                        .* psi(d) , 0.99) .* pop(mSusVax);
+                        .* psi(d) , 0.99 * lambdaMultVax) .* pop(mSusVax);
                         fInfVax = min(lambdaMult * lambdaMultVax * lambda(2 , a , r , toState) ...
-                        .* psi(d) , 0.99) .* pop(fSusVax);
+                        .* psi(d) , 0.99 * lambdaMultVax) .* pop(fSusVax);
 
 
                         % incidence tracker

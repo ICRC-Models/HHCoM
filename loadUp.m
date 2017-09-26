@@ -169,7 +169,11 @@ hivCin2 = xlsread(file , 'HPV' , 'R21 : R23'); % HIV multipliers for precancer p
 hivCin3 = hivCin2;
 
 
+<<<<<<< HEAD
 muCC = xlsread(file , 'Cervical Cancer' , 'C13 : E13'); % mortality
+=======
+muCC = xlsread(file , 'Cervical Cancer' , 'C24 : E25'); % mortality
+>>>>>>> 0b8d00309157244bdeabda53dafa8f57b2fd4f0f
 kRL = xlsread(file , 'Cervical Cancer' , 'H2'); % local -> regional  progression
 kDR = xlsread(file , 'Cervical Cancer' , 'H3'); % regional -> distant progression
 detCC = xlsread(file , 'Cervical Cancer' , 'K2 : K4'); % [region x 1] detection probability
@@ -186,6 +190,7 @@ screenCover = xlsread(file , 'Screening and Treatment' , 'Z16');
 ageStart = xlsread(file , 'Screening and Treatment' , 'Z12');
 ageEnd = xlsread(file , 'Screening and Treatment' , 'Z13');
 
+<<<<<<< HEAD
 % CIN transition data
 kInf_Cin1 = xlsread(file , 'CIN Transition' , 'G28 : G43');
 kInf_Cin2 = xlsread(file , 'CIN Transition' , 'K28 : K43');
@@ -230,6 +235,54 @@ save('hpvData' , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
     'kCin3_Cin2' , 'kCC_Cin3' , 'kCin1_Inf' , 'kCin2_Inf' , 'kCin3_Cin1' , 'kNormal_Cin1' , ...
     'kNormal_Cin2' , 'rNormal_Inf' , 'hpv_hivClear' , 'c3c2Mults' , 'c2c1Mults' , 'hpv_hivMult' ,...
     'screenCover')
+=======
+
+% CIN transition data
+%HPV 16/18/Vaccine type ohr
+kCin1_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'B47 : B62');
+kCin2_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'C47 : C62');
+kCin3_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'D47 : D62');
+kCC_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'E47 : E62');
+
+rNormal_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'F47 : F62');
+kInf_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'G47 : G62');
+kCin1_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'H47 : H62');
+kCin2_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'I47 : I62');
+
+%Non-vaccine type ohr
+kCin1_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'W47 : W62');
+kCin2_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'X47 : X62');
+kCin3_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'Y47 : Y62');
+kCC_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'Z47 : Z62');
+
+rNormal_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'AA47 : AA62');
+kInf_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'AB47 : AB62');
+kCin1_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'AC47 : AC62');
+kCin2_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'AD47 : AD62');
+
+kCin1_Inf(: , 3) = (kCin1_Inf(: , 1) + kCin1_Inf(: , 2)) ./ 2;
+kCin2_Cin1(: , 3) = (kCin2_Cin1(: , 1) + kCin2_Cin1(: , 2)) ./ 2;
+kCin3_Cin2(: , 3) = (kCin3_Cin2(: , 1) + kCin3_Cin2(: , 2)) ./ 2;
+kCC_Cin3(: , 3) = (kCC_Cin3(: , 1) + kCC_Cin3(: , 2)) ./ 2;
+
+rNormal_Inf(: , 3) = (rNormal_Inf(: , 1) + rNormal_Inf(: , 2)) ./ 2;
+kInf_Cin1(: , 3) = (kInf_Cin1(: , 1) + kInf_Cin1(: , 2)) ./ 2;
+kCin1_Cin2(: , 3) = (kCin1_Cin2(: , 1) + kCin1_Cin2(: , 2)) ./ 2;
+kCin2_Cin3(: , 3) = (kCin2_Cin3(: , 1) + kCin2_Cin3(: , 2)) ./ 2;
+
+
+
+hpv_hivMult = flipud(xlsread(file , 'HPV' , 'E21 : E24'));
+hpv_hivClear = xlsread(file , 'CIN Transition' , 'D68 : D71');
+c3c2Mults = xlsread(file , 'CIN Transition' , 'B75 : B78');
+c2c1Mults = xlsread(file , 'CIN Transition' , 'B81 : B84');
+save('hpvData' , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
+    'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'kRL' , 'kDR' , 'detCC' , 'hivCC' , ...
+    'kPap' , 'hpvSens' , 'cytoSens' , 'leep' , 'screenFreq' , 'ageStart' , 'ageEnd',...
+    'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'kCin2_Cin1', ...
+    'kCin3_Cin2' , 'kCC_Cin3' , 'kCin1_Inf' , 'rNormal_Inf' , 'hpv_hivClear' , ...
+    'c3c2Mults' , 'c2c1Mults' , 'hpv_hivMult' , 'screenCover')
+>>>>>>> 0b8d00309157244bdeabda53dafa8f57b2fd4f0f
 disp('HPV data loaded.')
 disp(' ')
 %% Actual data
@@ -252,6 +305,13 @@ cinPos2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
 cinNeg2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
 hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
 hpv_hivNeg_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D42 : F51');
+<<<<<<< HEAD
+=======
+
+hpv_hiv_obs = xlsread('config.xlsx' , 'Calibration' , 'D144 : F152');
+hpv_hivNeg_obs = xlsread('config.xlsx' , 'Calibration' , 'D153 : D161');
+
+>>>>>>> 0b8d00309157244bdeabda53dafa8f57b2fd4f0f
 hivPrevM_obs = xlsread('config.xlsx' , 'Calibration' , 'D60 : F101');
 hivPrevF_obs = xlsread('config.xlsx' , 'Calibration' , 'D102 : F143');
 save('calibData')

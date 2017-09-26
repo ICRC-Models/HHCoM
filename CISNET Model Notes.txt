@@ -6,7 +6,8 @@ d - disease
 v - viral load
 h - HPV types
 s - HPV/Cervical cancer status
-p - period of infection or cervical cancer status
+
+p - period of infection or cervical cancer status / vaccination history
 g - gender
 a - age
 r - risk
