@@ -9,7 +9,7 @@ function [dPop , newInfs] = mixInfectHPV(t , pop , currStep , ...
     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
     hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
     disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-    hrInds , lrInds , hrlrInds,  k , periods , stepsPerYear , year)
+    hrInds , lrInds , hrlrInds,  k , periods , startYear , stepsPerYear , year)
 sumall = @(x) sum(x(:));
 %% mixInfect Constants
 % load workspace and get constants
@@ -35,12 +35,12 @@ else % assortativity in last year
 end
 
 deltaR = eye(3 , 3);
-% if currStep <= (2005 - modelYr1) * int
+% if currStep <= (2005 - modelYr1)
 deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
 
 % after 2005
-if currStep > (2005 - modelYr1) * stepsPerYear
+if currStep > (2000 - modelYr1) * stepsPerYear
     deltaAF = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , 1);
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
     deltaR = eye(3);
@@ -259,9 +259,17 @@ for g = 1 : gender
         end
     end
 end
-if year >= 2002
-    condUse = 0.5* 0.5;
-end
+peakYear = 2000;
+condStart = 1988;
+yrVec = condStart : 1 / stepsPerYear : peakYear;
+condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUse = condUseVec(1); % year >= peakYear
+if year < peakYear && year > condStart
+    yrInd = year == yrVec;
+    condUse = condUseVec(yrInd);
+elseif year >= peakYear
+    condUse = condUseVec(end);
+end     
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = 1 - circProtect .* cond;
@@ -271,7 +279,7 @@ newImmHpv = newHpv;
 newVaxHpv = newHpv;
 %% Infection
 for d = 1 : disease
-    for h = 1 : 2 % hpvTypes - 1 % coinfected compartments cannot acquire more infections
+    for h = 1 : hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 : states
             hTo = toState + 1;
             if h > 1 && h ~= hTo % if pre-existing infection present
@@ -298,8 +306,10 @@ for d = 1 : disease
                         fToVax = toHpv_ImmVax(d , hTo , 2 , a , r , :);
 
                         lambdaMult = 1;
-                        if d > 2 && d < 7 && toState < 3 % CD4 > 500 -> CD4 < 200
+                        if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2);
+                        elseif d == 10
+                            lambdaMult = hpv_hivMult(1) * 0.5;                            
                         end
 
                         % normal susceptibles

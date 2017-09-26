@@ -9,7 +9,7 @@ function [dPop , newInfs] = mixInfectHIV(t , pop , currStep , ...
     mCurrArt , fCurrArt ,epsA_vec , epsR_vec , yr , modelYr1 , ...
     circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
     betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , ...
-    hpvStates , hpvTypes , k , periods , stepsPerYear , year)
+    hpvStates , hpvTypes , k , periods , startYear , stepsPerYear , year)
 sumall = @(x) sum(x(:));
 %% mixInfect Constants
 % load workspace and get constants
@@ -42,7 +42,7 @@ deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
 
 % after 2005
-if currStep > (2005 - modelYr1) * stepsPerYear
+if currStep > (2000 - modelYr1) * stepsPerYear
     deltaAF = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , 1);
     deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
     deltaR = eye(3);
@@ -228,9 +228,17 @@ for g = 1 : gender
         end
     end
 end
-if year >= 2002
-    condUse = 0.5* 0.5;
-end
+peakYear = 2000;
+condStart = 1988;
+yrVec = condStart : 1 / stepsPerYear : peakYear;
+condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUse = condUseVec(1); % year >= peakYear
+if year < peakYear && year > condStart
+    yrInd = year == yrVec;
+    condUse = condUseVec(yrInd);
+elseif year >= peakYear
+    condUse = condUseVec(end);
+end     
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = 1 - circProtect .* cond;
