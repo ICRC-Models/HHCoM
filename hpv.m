@@ -10,7 +10,7 @@ function[dPop , extraOut] = hpv(t , pop , immuneInds , infInds , cin1Inds , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
     rNormal_Inf , hpv_hivClear , c3c2Mults , ...
     c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
-    k_wane , vaccinated , waned , hystOption)
+    rImmuneHiv , vaccinated , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sumall = @(x) sum(x(:));
 hyst = 0;
@@ -34,6 +34,7 @@ for d = 1 : disease
     rHivHpvMult = 1; % for HIV negative
     hivPos = 0;
     deathCC = muCC(1 , :);
+    rHiv = 1; % Multiplier for immunity clearance for HIV+
     if d > 2 && d < 7 % CD4 > 500 -> CD4 < 200
         c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 multiplier
         c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
@@ -41,6 +42,7 @@ for d = 1 : disease
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
         rHivHpvMult = hpv_hivClear(d - 2); % Infection clearance multiplier
         deathCC = muCC(2 , :); % HIV+ CC death rate
+        rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
     elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
         c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 multiplier
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 multiplier
@@ -48,6 +50,7 @@ for d = 1 : disease
         c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
         rHivHpvMult = hpv_hivClear(1); % Infection clearance multiplier
         deathCC = muCC(2 , :); % HIV+ CC death rate
+        rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
     for v = 1 : viral
         for h = 2 : hpvTypes % infected onwards
@@ -64,7 +67,7 @@ for d = 1 : disease
                 normalF = normalInds(d , v , 2 , a , :);
                 % to immune from HPV infected, CIN1, CIN2, CIN3 (remove immunity for now)
 
-                dPop(normalF) = dPop(normalF) + rImmune * 3 / rHivHpvMult * pop(immuneF) ... % immuneF -> normalF
+                dPop(normalF) = dPop(normalF) + rImmune * rHiv * pop(immuneF) ... % immuneF -> normalF
                     + rNormal_Inf(a , h - 1) * (1 - fImm(a)) * rHivHpvMult .* pop(infF); % infF -> normalF
 
                 dPop(normalM) = dPop(normalM) + rImmune * pop(immuneM) ...% immuneM -> normalM
@@ -72,7 +75,7 @@ for d = 1 : disease
 
                 dPop(immuneF) = dPop(immuneF)...
                     + rNormal_Inf(a , h - 1) * fImm(a) * rHivHpvMult .* pop(infF)... % infF -> immuneF
-                    - rImmune * 3 / rHivHpvMult * pop(immuneF); % immuneF -> normalF
+                    - rImmune * rHiv * pop(immuneF); % immuneF -> normalF
 
 %                 dPop(immuneM) = dPop(immuneM) + rNormal_Inf(a) ...
 %                     * fImm(a) * rHivHpvMult * pop(infM)...; % infected -> immune
