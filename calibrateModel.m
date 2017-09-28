@@ -48,7 +48,9 @@ ub = initParams .* 3;
 ub(end) = 0.1;
 
 
-options = optimoptions('patternsearch', 'UseParallel' , true , 'cache' , 'on');
+options = optimoptions('patternsearch', 'UseParallel' , true , 'Cache' , 'on' ,...
+    'CacheTol' , 0.1 , 'UseCompletePoll' , true , 'MeshTolerance' , 0.1, ...
+    'Display','iter','PlotFcn',@psplotbestf);
 x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 %%
 file = 'HPV_calib.dat';
