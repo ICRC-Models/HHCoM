@@ -23,7 +23,7 @@ load('calibData')
 load('calibParams')
 load('vaxInds')
 
-artHpvMult = hpv_hivMult * 0.5;
+artHpvMult = hpv_hivMult(1) * 0.5;
 perPartnerHpv = 0.08;
 rImmuneHiv = 1 ./ hpv_hivClear;
 
