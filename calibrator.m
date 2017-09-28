@@ -132,11 +132,11 @@ kCC_Cin3(: , 2) = initParams(5 * age + 1 : 6 * age);
 kCin2_Cin3(: , 3) = initParams(6 * age + 1 : 7 * age);
 kCin3_Cin2(: , 3) = initParams(7 * age + 1 : 8 * age);
 kCC_Cin3(: , 3) = initParams(8 * age + 1 : 9 * age);
-rImmuneHiv = initParams(9 * age + 1 : 9 * age + 1 + 4);
-c3c2Mults = initParams(9 * age + 6 : 9 * age + 10);
-c2c1Mults = initParams(9 * age + 11 : 9 * age + 15);
-artHpvMult = initParams(9 * age + 16);
-perPartnerHpv = initParams(9 * age + 17);
+rImmuneHiv = initParams(9 * age + 1 : 9 * age + 1 + 3);
+c3c2Mults = initParams(9 * age + 5 : 9 * age + 8);
+c2c1Mults = initParams(9 * age + 9 : 9 * age + 12);
+artHpvMult = initParams(9 * age + 13);
+perPartnerHpv = initParams(9 * age + 14);
 
 
 %% Simulation variable preparation
