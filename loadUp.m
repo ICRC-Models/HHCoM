@@ -256,7 +256,7 @@ hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
 hpv_hivNeg_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D42 : F51');
 
 hpv_hiv_obs = xlsread('config.xlsx' , 'Calibration' , 'D144 : F152');
-hpv_hivNeg_obs = xlsread('config.xlsx' , 'Calibration' , 'D153 : D161');
+hpv_hivNeg_obs = xlsread('config.xlsx' , 'Calibration' , 'D153 : F161');
 
 hivPrevM_obs = xlsread('config.xlsx' , 'Calibration' , 'D60 : F101');
 hivPrevF_obs = xlsread('config.xlsx' , 'Calibration' , 'D102 : F143');

@@ -153,7 +153,7 @@ vaxRate = 0;
 vaxerAger = ager;
 artHpvMult = hpv_hivMult(1) * 0.5;
 perPartnerHpv = 0.08;
-rImmuneHiv = 1 ./ hpv_hivClear;
+rImmuneHiv = 3 ./ hpv_hivClear;
 % rNormal_Inf(4 : 5) = 0.59;
 % kCC_Cin3 = kCC_Cin3 .* 1.5;
 % for a = 3
@@ -310,13 +310,16 @@ end
 popLast = popVec(end , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
-savdir = 'C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results';
+%For local runs
+% savdir = 'C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results';
+% save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
+%     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
+%     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
+% For cluster runs
+savdir = 'H:\HHCoM_Results'; 
 save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
-% save('results_test' , 'tVec' ,  'popVec' , 'newHiv' ,...
-%     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
-%     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')
 
