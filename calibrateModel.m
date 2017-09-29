@@ -25,7 +25,7 @@ load('vaxInds')
 
 artHpvMult = hpv_hivMult(1) * 0.5;
 perPartnerHpv = 0.08;
-rImmuneHiv = 1 ./ hpv_hivClear;
+rImmuneHiv = 3 ./ hpv_hivClear;
 
 initParams = [kCin2_Cin3(: , 1);
 kCin3_Cin2(: , 1);
