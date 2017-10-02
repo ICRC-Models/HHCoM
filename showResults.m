@@ -633,9 +633,7 @@ legend('Model' , 'Firnhaber')
 title('CIN Prevalence in HIV Positive Women')
 %% HPV status by age
 % hivAge = zeros(age , length(tVec));
-ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
-    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+
 figure()
 for g = 1 : gender
     for a = 1 : age
@@ -731,8 +729,9 @@ ccArtRel = ccAgeRel;
 fScale = 10^5;
 for a = 1 : age
     % Total population
-    ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-        2 , a , 1 : risk));
+    ageInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+        2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 10 , 1 : periods , ...
+        2 , a , 1 : risk))];
     ccAgeRel(a , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 1 : disease , 1 : viral , 1 : hpvTypes , a) , 2) , 3) , 4) ...
         ./ sum(popVec(((ccIncYears - startYear) - 1) * stepsPerYear , ageInds) , 2) * fScale;
 

@@ -154,34 +154,15 @@ vaxerAger = ager;
 artHpvMult = hpv_hivMult(1) * 0.5;
 perPartnerHpv = 0.08;
 rImmuneHiv = 3 ./ hpv_hivClear;
-% rNormal_Inf(4 : 5) = 0.59;
-% kCC_Cin3 = kCC_Cin3 .* 1.5;
-% for a = 3
-%     susFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 2 , a , 1 : risk));
-%     vaxdFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 : periods , 2 , a , 1 : risk));
-%     vaxer(at(vaxdFemale , susFemale)) = vaxRate;
-%     vaxer(at(susFemale , susFemale)) = 1-vaxRate;
-%     % for males (future version?)
-%     %     susMale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 1 , a , 1 : risk));
-%     %     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
-%     %     vaxer(vaxdMale , susMale) = V(2 , a);
-%     %     vaxer(susMale , susMale) = -V(2 , a);
-% end
-%
-% hpv_hivClear = hpv_hivClear * 0.8;
-% rNormal_Inf = rNormal_Inf * 0.7;
-% kCin2_Cin1 = kCin2_Cin1 .* 1.8; %test
-% kCin1_Cin2 = kCin1_Cin2 .* 0.6; %test
-% kCin1_Inf = kCin1_Inf .* 1.8; % test
-% kCin2_Cin3 = calibParams(age + 1 : 2 * age);% * 0.8;
-% kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
-%     kCC_Cin3 = calibParams(3 * age + 1 : 4 * age) * 2; % test
-% kCC_Cin3 = kCC_Cin3 * 2;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 lambdaMultImm(1 : 4) = 1 - 0.01;
 lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
 lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = 1 - (0.9 * 0.8);
+
+% Test calib
+kCC_Cin3 = kCC_Cin3 .* 2;
+kCin2_Cin3 = kCin2_Cin3 * 0.5;
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
 profile on
 disp(' ')
