@@ -83,7 +83,7 @@ nPos = [cinPos2008_obs(: , 2) ; cinNeg2008_obs(: , 2)];
 % nPos = [nPos ; hpv_hivNeg_2008_obs(: , 2)];
 
 %% HPV prevalence in HIV- women (including CIN)
-yr = 2017;
+yr = 2013;
 hpv_hivNeg = zeros(9 , 1);
 
 for a = 4 : 11 % 15-19 ->  50-54
