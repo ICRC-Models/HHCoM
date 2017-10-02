@@ -3,13 +3,9 @@
 
 % function simVax(lastYear , nTests, testParams , currPop)
 
-close all; clear all;clc
+close all; clear all; clc
 lastYear = 2100;
-vaxCover = [0 , 0.5 , 0.7, 0.9];
-k_wane = [0 , 1/10 , 1/15 , 1/20];
-testParams = allcomb(vaxCover , k_wane);
-% titles = {'noVax' , 'vax50' , 'vax70' , 'vax90'};
-nTests = size(testParams , 1);
+
 
 disp('Start up')
 % load population
@@ -36,35 +32,33 @@ load('ager')
 load('vlBeta')
 load('hpvTreatIndices')
 load('vaxInds')
-
-% hpv_hivClear = hpv_hivClear * 0.8;
-% rNormal_Inf = rNormal_Inf * 0.7;
-% %     kCin2_Cin1 = kCin2_Cin1 .* 1.8; %test
-% kCin1_Cin2 = kCin1_Cin2 .* 0.6; %test
-% kCC_Cin3 = kCC_Cin3 * 2;
-% perPartnerHpv = 0.1;%calibParams(4 * age + 1);%
-% fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-% lambdaMultImm(1 : 4) = 1 - 0.01;
-% lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6);
-% lambdaMultImm(11 : age ) = lambdaMultImm(10);
-% lambdaMultVax = 1 - (0.9 * 0.8);
 %%%%%%%
 load('calibParams')
-hpv_hivClear = hpv_hivClear * 0.8;
-rNormal_Inf = rNormal_Inf * 0.7;
-kCin2_Cin1 = kCin2_Cin1 .* 1.8; %test
-kCin1_Cin2 = kCin1_Cin2 .* 0.6; %test
-kCin1_Inf = kCin1_Inf .* 1.8; % test
-kCin2_Cin3 = calibParams(age + 1 : 2 * age);% * 0.8;
-kCin3_Cin2 = calibParams(2 * age + 1 : 3 * age);
-%     kCC_Cin3 = calibParams(3 * age + 1 : 4 * age) * 2; % test
-kCC_Cin3 = kCC_Cin3 * 2;
-perPartnerHpv = calibParams(4 * age + 1);%
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 lambdaMultImm(1 : 4) = 1 - 0.01;
-lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.2) , 6);
-lambdaMultImm(11 : age ) = lambdaMultImm(10);
+lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
+lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = 1 - (0.9 * 0.8);
+
+c = fix(clock);
+currYear = c(1); % get the current year
+vaxEff = 0.9;
+k_wane = - vaxEff / 20;
+lambdaMultImm_Arr = {zeros(age , 1) , zeros(age , 1) , zeros(age , 1)};
+lambdaMultImm_Arr{1}(3 : 6) = vaxEff;
+lambdaMultImm_Arr{1}(7 : 10) = vaxEff + k_wane * [5 : 5 : 20];
+lambdaMultImm_Arr{2}(3 : 5) = vaxEff;
+lambdaMultImm_Arr{2}(6 : 9) = vaxEff + k_wane * [5 : 5 : 20];
+lambdaMultImm_Arr{3}(3 : 4) = vaxEff;
+lambdaMultImm_Arr{3}(5 : 8) = vaxEff + k_wane * [5 : 5 : 20];
+
+
+
+vaxCover = [0 , 0.5 , 0.7, 0.9];
+testParams = allcomb(vaxCover , k_wane);
+% titles = {'noVax' , 'vax50' , 'vax70' , 'vax90'};
+nTests = size(testParams , 1);
+
 %%%%%%%
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 % run analyses
@@ -98,11 +92,11 @@ for n = 1 : size(testParams , 1)
     vaxRate = testParams(n , 1);
     at = @(x , y) sort(prod(dim)*(y-1) + x);
     fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , ...
-        2 , 3 , 1 : risk));
+        2 , 2 , 1 : risk));
     toAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , ...
-        2 , 4 , 1 : risk));
+        2 , 3 , 1 : risk));
     toAgeVaxd = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 : periods , ...
-        2 , 4 , 1 : risk));
+        2 , 3 , 1 : risk));
     vaxerAger(at(toAge , fromAge)) = (1 - vaxRate) * ager(at(toAge , fromAge));
     vaxerAger(at(toAgeVaxd , fromAge)) = vaxRate * ager(at(toAge , fromAge)) ;
 %     vaxer(at(toAge , fromAge)) = 1 - vaxRate;

@@ -326,10 +326,10 @@ for d = 1 : disease
                         .* psi(d) , 0.99) .* pop(fSusImm);
 
                         % vaccinated susceptibles
-                        mInfVax = min(lambdaMult * lambdaMultVax * lambda(1 , a , r , toState) ...
-                        .* psi(d) , 0.99 * lambdaMultVax) .* pop(mSusVax);
-                        fInfVax = min(lambdaMult * lambdaMultVax * lambda(2 , a , r , toState) ...
-                        .* psi(d) , 0.99 * lambdaMultVax) .* pop(fSusVax);
+                        mInfVax = min(lambdaMult * lambdaMultVax(a) * lambda(1 , a , r , toState) ...
+                        .* psi(d) , 0.99 * lambdaMultVax(a)) .* pop(mSusVax);
+                        fInfVax = min(lambdaMult * lambdaMultVax(a) * lambda(2 , a , r , toState) ...
+                        .* psi(d) , 0.99 * lambdaMultVax(a)) .* pop(fSusVax);
 
 
                         % incidence tracker
