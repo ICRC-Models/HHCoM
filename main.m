@@ -184,12 +184,12 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
-
-kCin3_Cin2 = 2 * kCin3_Cin2;
-kCC_Cin3(1 : 9) = 3 .* kCC_Cin3(1 : 9);
-kCC_Cin3(10 : end) = 4 .* kCC_Cin3(10 : end);
-hpv_hivClear = hpv_hivClear * 0.8;
-rNormal_Inf = rNormal_Inf * 0.85;
+kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :); 
+kCin3_Cin2(10 : end , :) = 3 * kCin3_Cin2(10 : end , :);
+kCC_Cin3(7 : end , :) = 3 .* kCC_Cin3(7 : end , :);
+hpv_hivClear = 0.8 * hpv_hivClear;
+rNormal_Inf(8 : end , :) = rNormal_Inf(8 : end , :) * 0.85;
+muCC = 1 - (1 - muCC) .^ 12; % convert cervical cancer mortality rate from yearly to monthly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
 profile on
 disp(' ')
@@ -319,15 +319,15 @@ popLast = popVec(end , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 %For local runs
-savdir = 'C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results';
-save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
-    'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
-% For cluster runs
-% savdir = 'H:\HHCoM_Results'; 
+% savdir = 'C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results';
 % save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
 %     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
+% For cluster runs
+savdir = 'H:\HHCoM_Results'; 
+save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
+    'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')
 

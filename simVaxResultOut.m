@@ -1,9 +1,9 @@
 %%
 load('general')
-o90 = load('U:\HHCoM Results\Vax_0.9_wane_0.mat'); % 90% coverage
-o70 = load('U:\HHCoM Results\Vax_0.7_wane_0.mat'); % 70% coverage
-o50 = load('U:\HHCoM Results\Vax_0.5_wane_0.mat'); % 50% coverage
-oNo = load('U:\HHCoM Results\Vax_0_wane_0.mat'); % No vaccine
+o90 = load('H:\HHCoM_Results\Vax_0.9_wane_0.mat'); % 90% coverage
+o70 = load('H:\HHCoM_Results\Vax_0.7_wane_0.mat'); % 70% coverage
+o50 = load('H:\HHCoM_Results\Vax_0.5_wane_0.mat'); % 50% coverage
+oNo = load('H:\HHCoM_Results\Vax_0_wane_0.mat'); % No vaccine
 tVec = o90.tVec;
 set(0 , 'defaultlinelinewidth' , 2)
 
@@ -358,9 +358,9 @@ T = table(tVec(2 : end)' , hivNegRelRed_90 , hivNegRelRed_70 , hivNegRelRed_50);
 writetable(T , 'HIVNeg_Reduction.csv' , 'Delimiter' , ',')
 
 %% Waning
-v90_w20 = load('U:\HHCoM Results\Vax_0.9_wane_0.05.mat');
-v90_w15 = load('U:\HHCoM Results\Vax_0.9_wane_1_15.mat');
-v90_w10 = load('U:\HHCoM Results\Vax_0.9_wane_0.1.mat');
+v90_w20 = load('H:\HHCoM Results\Vax_0.9_wane_20.mat');
+v90_w15 = load('U:\HHCoM Results\Vax_0.9_wane_15.mat');
+v90_w10 = load('U:\HHCoM Results\Vax_0.9_wane_10.mat');
 v90_w0 = load('U:\HHCoM Results\Vax_0.9_wane_0.mat');
 v0_w0 = load('U:\HHCoM Results\Vax_0_wane_0.mat');
 %% Deaths

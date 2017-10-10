@@ -114,7 +114,7 @@ for d = 1 : disease
 
                 % CC group
                 ccLoc = ccInds(d , v , h , a , :);
-                dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a) .* pop(cin3)... % CIN3 -> CC
+                dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
                     - kRL * pop(ccLoc)... % local -> regional
                     - deathCC(1) * pop(ccLoc); % local CC mortality
 
@@ -128,7 +128,7 @@ for d = 1 : disease
                     - deathCC(3) * pop(ccDist); % distant CC mortality
 
                 % CC incidence tracker
-                ccInc(d , v , h , a) = sum(kCC_Cin3(a) .* pop(cin3));
+                ccInc(d , v , h , a) = sum(kCC_Cin3(a , h - 1) .* pop(cin3));
 
                 % CC death tracker
                 ccDeath(d , v , h , a) = sum(deathCC(1) * pop(ccLoc) ...
