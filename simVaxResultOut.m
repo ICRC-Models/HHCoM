@@ -21,6 +21,7 @@ inds = {':' , 2 : 6 , 1};
 genArray = {allF , allHivF , hivNeg};
 files = {'General_CCMortality_VaxCover' , 'HivAll_CCMortality_VaxCover' , 'HivNeg_CCMortality_VaxCover'};
 plotTits = {'General Cervical Cancer' , 'HIV+ Cervical Cancer' , 'HIV- Cervical Cancer'};
+fac = 10 ^ 5;
 for i = 1 : length(genArray)
     vNo_Mort = ...
         sum(sum(sum(sum(oNo.ccDeath(2 : end , inds{i} , : , : , :),2),3),4),5) ./ ...
@@ -267,10 +268,10 @@ hivAllCCNo = sum(sum(sum(sum(newCC_0(: , 2 : 6 , : , : , :),2),3),4),5);
 hivAllSus = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
     2 , 4 : age , 1 : risk)); toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes ,...
     8 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
-pop90_susHiv = sum(pop90(1 : end - 1 , hivAllSus) , 2);
-pop70_susHiv = sum(pop70(1 : end - 1 , hivAllSus) , 2);
-pop50_susHiv = sum(pop50(1 : end - 1 , hivAllSus) , 2);
-popNo_susHiv = sum(popNo(1 : end - 1 , hivAllSus) , 2);
+pop90_susHiv = sum(pop90(1 : end - 1 , hivAllSus) + pop90(2 : end , hivAllSus) , 2) ./ 2;
+pop70_susHiv = sum(pop70(1 : end - 1 , hivAllSus) + pop70(2 : end , hivAllSus) , 2) ./ 2;
+pop50_susHiv = sum(pop50(1 : end - 1 , hivAllSus) + pop50(2 : end , hivAllSus) , 2) ./ 2;
+popNo_susHiv = sum(popNo(1 : end - 1 , hivAllSus) + popNo(2 : end , hivAllSus) , 2) ./ 2;
 
 hivAllInc90 = hivAllCC90(2 : end) ./ pop90_susHiv * fac;
 hivAllInc70 = hivAllCC70(2 : end) ./ pop70_susHiv * fac;
@@ -358,11 +359,12 @@ T = table(tVec(2 : end)' , hivNegRelRed_90 , hivNegRelRed_70 , hivNegRelRed_50);
 writetable(T , 'HIVNeg_Reduction.csv' , 'Delimiter' , ',')
 
 %% Waning
-v90_w20 = load('H:\HHCoM Results\Vax_0.9_wane_20.mat');
-v90_w15 = load('U:\HHCoM Results\Vax_0.9_wane_15.mat');
-v90_w10 = load('U:\HHCoM Results\Vax_0.9_wane_10.mat');
-v90_w0 = load('U:\HHCoM Results\Vax_0.9_wane_0.mat');
-v0_w0 = load('U:\HHCoM Results\Vax_0_wane_0.mat');
+v90_w20 = load('H:\HHCoM_Results\Vax_0.9_wane_20.mat');
+v90_w15 = load('H:\HHCoM_Results\Vax_0.9_wane_15.mat');
+v90_w10 = load('H:\HHCoM_Results\Vax_0.9_wane_10.mat');
+v90_w0 = load('H:\HHCoM_Results\Vax_0.9_wane_0.mat');
+v0_w0 = load('H:\HHCoM_Results\Vax_0_wane_0.mat');
+
 %% Deaths
 % general
 allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...

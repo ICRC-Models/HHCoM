@@ -152,7 +152,7 @@ end
 parfor n = 1 : nTests
     vaxerAger = vaxerAgerArray{n};
     k_wane = k_wane_d(testParams(n , 2));
-    lambdaMultVax = lambdaMultVax_Arr{testParams(n , 2)};
+    lambdaMultVax = 1 - lambdaMultVax_Arr{testParams(n , 2)};
     vaxRate = testParams(n , 1);
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
@@ -270,3 +270,5 @@ parfor n = 1 : nTests
     %         'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 end
 disp('Done')
+%%
+simVaxResultOut()
