@@ -57,8 +57,8 @@ if year >= 2013
                 if year < 2020 && fracART < maxCover(ind)
                     cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2020 && fracART < 0.6
-                    cover = (-log(1 - 0.6) - fracART) ./ (1 - fracART);
+                elseif year >= 2020 && fracART < maxCover(end)
+                    cover = (maxCover(end)- fracART) ./ (1 - fracART));
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
             end
@@ -92,8 +92,8 @@ if year >= 2006 % to 2013
                     %                             hivPos = sum(pop(hivPositive));
                     cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2013 && fracART < 0.46
-                    cover = (-log(1 - 0.46) - fracART) ./ (1 - fracART);
+                elseif year >= 2013 && fracART < maxCover(end)
+                    cover = (maxCover(end) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
             end
@@ -120,8 +120,8 @@ if year >= 2004
                     %                             hivPos = sum(pop(hivPositive));
                     cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                     treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2006 && fracART < 0.45
-                    cover = (-log(1 - 0.45) - fracART) ./ (1 - fracART);
+                elseif year >= 2006 && fracART < maxCover(end)
+                    cover = (maxCover(end) - fracART) ./ (1 - fracART);
                     treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
                 if year >= 2017 && year < 2020 
@@ -132,7 +132,7 @@ if year >= 2004
                         cover = (maxCover(ind) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     elseif year >= 2020 && fracART < -log(1 - 0.46)
-                        cover = -log(1 - (0.6 - fracART)) ./ (1 - fracART);
+                        cover = (maxCover(end) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     end
                 end
