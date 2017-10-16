@@ -90,20 +90,23 @@ for d = 1 : disease
     end
 end
 
-hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral * periods * 7);
-hpvImm = zeros(disease , hpvTypes , gender , age , risk , viral * periods);
-hpvVaxd = hpvImm;
+hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral * 7);
+hpvImm = zeros(disease , hpvTypes , gender , age , risk , viral);
+hpvVaxd = zeros(disease , hpvTypes , gender , age , risk , viral);
+hpvVaxd2 = hpvVaxd;
 for d = 1 : disease
     for g = 1 : gender
         for a = 1 : age
             for r = 1 : risk
                 for h = 1 : hpvTypes
                     hpvSus(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 : periods , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 , g , a , r)));
                     hpvImm(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 10 , 1 : periods , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 10 , 1 , g , a , r)));
                     hpvVaxd(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 9 , 1 : periods , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 9 , 1 , g , a , r)));
+                    hpvVaxd2(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 9 , 2 , g , a , r)));
                 end
             end
         end
@@ -120,8 +123,9 @@ for g = 1 : gender
     end
 end
 
-toHpv = zeros(disease , hpvTypes , gender , age , risk , viral * periods * 7);
-toHpv_ImmVax = zeros(size(hpvImm));
+toHpv = zeros(disease , hpvTypes , gender , age , risk , viral * 7);
+toHpv_ImmVax = zeros(size(hpvVaxd));
+toHpv_Imm = zeros(size(toHpv_ImmVax));
 
 for d = 1 : disease
     for g = 1 : gender
@@ -129,16 +133,18 @@ for d = 1 : disease
             for h = 1 : hpvTypes
                 for r = 1 : risk
                     toHpv(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 : periods , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 , g , a , r)));
+                    toHpv_Imm(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 , g , a , r)));
                     toHpv_ImmVax(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 : periods , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 2 , g , a , r)));
                 end
             end
         end
     end
 end
 
-hrInds = zeros(gender , age , risk , disease * viral * 9 * periods);
+hrInds = zeros(gender , age , risk , disease * viral * 7 * periods + disease * viral);
 lrInds = hrInds;
 hrlrInds = hrInds;
 
@@ -146,21 +152,24 @@ for g = 1 : gender
     for a = 1 : age
         for r = 1 : risk
             hrInds(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 2 , ...
-                1 : 9 , 1 : periods , g , a , r)));
+                sort([toInd(allcomb(1 : disease , 1 : viral , 2 , ...
+                1 : 7 , 1 : periods , g , a , r)); toInd(allcomb(1 : disease , 1 : viral , 2 , ...
+                9 , 2 , g , a , r))]);
             lrInds(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 3 , ...
-                1 : 9 , 1 : periods , g , a , r)));
+                sort([toInd(allcomb(1 : disease , 1 : viral , 3 , ...
+                1 : 7 , 1 : periods , g , a , r)); toInd(allcomb(1 : disease , 1 : viral , 3 , ...
+                9 , 2 , g , a , r))]);
             hrlrInds(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 4 , ...
-                1 : 9 , 1 : periods , g , a , r)));
+                sort([toInd(allcomb(1 : disease , 1 : viral , 4 , ...
+                1 : 7 , 1 : periods , g , a , r)); toInd(allcomb(1 : disease , 1 : viral , 4 , ...
+                9 , 2 , g , a , r))]);
         end
     end
 end
 
 save('mixInfectIndices' , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
-    'toHpv' , 'toHpv_ImmVax' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
-    'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd')
+    'toHpv' , 'toHpv_ImmVax' , 'toHpv_Imm' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
+    'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd' , 'hpvVaxd2')
 disp('mixInfect indices loaded')
 %% hiv.m , treatDist.m indices
 % hivInds(d , v , g , a , r) = makeVec('d' , 'v' , 1 : hpvTypes , 1 : hpvStates , ...
@@ -210,7 +219,7 @@ disp('Preparing indices for HPV modules...')
 disp('This might take a while...')
 
 
-ccInds = zeros(disease , viral , hpvTypes , age , risk);
+ccInds = zeros(disease , viral , hpvTypes , age , risk * periods);
 ccRegInds = ccInds;
 ccDistInds = ccInds;
 cin1Inds = ccInds;
@@ -221,25 +230,25 @@ for d = 1 : disease
     for v = 1 : viral
         for h = 2 : hpvTypes
             for a = 1 : age
-                ccInds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 5 , 1 , 2 , a , 1 : risk)));
-                ccRegInds(d , v , h , a, :) = sort(toInd(allcomb(d , v , h , 6 , 1 , 2 , a , 1 : risk)));
-                ccDistInds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 7 , 1 , 2 , a , 1 : risk)));
-                cin1Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 2 , 1 , 2 , a , 1 : risk)));
-                cin2Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 3 , 1 , 2 , a , 1 : risk)));
-                cin3Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 4 , 1 , 2 , a , 1 : risk)));
+                ccInds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 5 , 1 : periods , 2 , a , 1 : risk)));
+                ccRegInds(d , v , h , a, :) = sort(toInd(allcomb(d , v , h , 6 , 1 : periods , 2 , a , 1 : risk)));
+                ccDistInds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 7 , 1 : periods , 2 , a , 1 : risk)));
+                cin1Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 2 , 1 : periods , 2 , a , 1 : risk)));
+                cin2Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 3 , 1 : periods , 2 , a , 1 : risk)));
+                cin3Inds(d , v , h , a , :) = sort(toInd(allcomb(d , v , h , 4 , 1 : periods , 2 , a , 1 : risk)));
             end
         end
     end
 end
 
-screen35PlusInds = zeros(disease , viral , hpvTypes , (age - 8 + 1) * risk);
-screen25_35Inds = zeros(disease , viral , hpvTypes , 2 * risk);
+screen35PlusInds = zeros(disease , viral , hpvTypes , (age - 8 + 1) * risk * periods);
+screen25_35Inds = zeros(disease , viral , hpvTypes , 2 * risk , periods);
 
 for d = 1 : disease
     for v = 1 : viral
         for h = 2 : hpvTypes
-            screen35PlusInds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 , 2 , 8 : age , 1 : risk)));
-            screen25_35Inds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 , 2 , 6 : 7 , 1 : risk)));
+            screen35PlusInds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 : periods , 2 , 8 : age , 1 : risk)));
+            screen25_35Inds(d , v , h , :) = sort(toInd(allcomb(d , v , h , 4 , 1 : periods , 2 , 6 : 7 , 1 : risk)));
         end
     end
 end
@@ -263,20 +272,20 @@ for d = 1 : disease
     end
 end
 
-normalInds = zeros(disease , viral , gender , age , risk);
-infInds = zeros(disease , viral , hpvTypes , gender , age , risk);
+normalInds = zeros(disease , viral , gender , age , risk * periods);
+infInds = zeros(disease , viral , hpvTypes , gender , age , risk * periods);
 immuneInds = infInds;
 for g = 1 : gender
     for d = 1 : disease
         for v = 1 : viral
             for a = 1 : age
                 normalInds(d , v , g , a , :) = ...
-                    sort(toInd(allcomb(d , v , 1 , 1 , 1 , g , a , 1 : risk)));
+                    sort(toInd(allcomb(d , v , 1 , 1 , 1 : periods , g , a , 1 : risk)));
                 for h = 2 : hpvTypes
                     immuneInds(d , v , h , g , a , :) = ...
-                        sort(toInd(allcomb(d , v , h , 10 , 1 , g , a , 1 : risk)));
+                        sort(toInd(allcomb(d , v , h , 10 , 1 : periods , g , a , 1 : risk)));
                     infInds(d , v , h , g , a , :) = ...
-                        sort(toInd(allcomb(d , v , h , 1 , 1 , g , a , 1 : risk)));
+                        sort(toInd(allcomb(d , v , h , 1 , 1 : periods , g , a , 1 : risk)));
                 end
             end
         end
@@ -326,19 +335,19 @@ end
 save('hpvTreatIndices' , 'ccRInds' , 'ccSusInds' , 'getHystPopInds' , 'hystPopInds')
 disp('hpvTreatIndices loaded')
 %% cinAdv.m indices
-inf1 = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : hpvStates ,...
-    1 , 1 : gender , 1 : age , 1 : risk));
-%kAdv = 1 / (stepsPerYear .* pCinSize); % pCinSize is a vector detailing the interval sizes of each CIN period group
-kCC = 1 / (stepsPerYear .* pCCSize);% pCCSize is a vector detailing the interval sizes of each CC period group
-local = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 5 , 1 : periods ,...
-        1 : gender , 1 : age , 1 : risk));
-regional = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 6 , 1 : periods ,...
-        1 : gender , 1 : age , 1 : risk));
-distant = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 7 , 1 : periods ,...
-        1 : gender , 1 : age , 1 : risk));
-save('cinAdvData' , 'kCC')
-save('cinAdvIndices' , 'inf1' , 'local' , 'regional' , 'distant')
-disp('cinAdv indices loaded')
+% inf1 = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : hpvStates ,...
+%     1 , 1 : gender , 1 : age , 1 : risk));
+% %kAdv = 1 / (stepsPerYear .* pCinSize); % pCinSize is a vector detailing the interval sizes of each CIN period group
+% kCC = 1 / (stepsPerYear .* pCCSize);% pCCSize is a vector detailing the interval sizes of each CC period group
+% local = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 5 , 1 : periods ,...
+%         1 : gender , 1 : age , 1 : risk));
+% regional = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 6 , 1 : periods ,...
+%         1 : gender , 1 : age , 1 : risk));
+% distant = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 7 , 1 : periods ,...
+%         1 : gender , 1 : age , 1 : risk));
+% save('cinAdvData' , 'kCC')
+% save('cinAdvIndices' , 'inf1' , 'local' , 'regional' , 'distant')
+% disp('cinAdv indices loaded')
 %% agePop.m indices
 % Pre-calculate agePop indices
 % genPrevInds = zeros(gender , age - 1 , risk , 7 * viral * hpvTypes * hpvStates * periods);

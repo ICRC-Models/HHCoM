@@ -6,30 +6,30 @@ load('calibData')
 load('H:\HHCoM_Results\to2017')
 %% Plot Settings
 
-% colors = [241, 90, 90;
-%           240, 196, 25;
-%           78, 186, 111;
-%           45, 149, 191;
-%           149, 91, 165]/255;
-% 
-% set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
-% set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
-% set(groot, 'DefaultFigureInvertHardcopy', 'off');
-% set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
-% set(groot, 'DefaultAxesColorOrder', colors);
-% set(groot, 'DefaultLineLineWidth', 3);
-% set(groot, 'DefaultTextColor', [1, 1, 1]);
-% set(groot, 'DefaultAxesXColor', [1, 1, 1]);
-% set(groot, 'DefaultAxesYColor', [1, 1, 1]);
-% set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
-% set(0,'defaultAxesFontSize',14)
-% ax = gca;
-% ax.XGrid = 'on';
-% ax.XMinorGrid = 'on';
-% ax.YGrid = 'on';
-% ax.YMinorGrid = 'on';
-% ax.GridColor = [1, 1, 1];
-% ax.GridAlpha = 0.4;
+colors = [241, 90, 90;
+          240, 196, 25;
+          78, 186, 111;
+          45, 149, 191;
+          149, 91, 165]/255;
+
+set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
+set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
+set(groot, 'DefaultFigureInvertHardcopy', 'off');
+set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
+set(groot, 'DefaultAxesColorOrder', colors);
+set(groot, 'DefaultLineLineWidth', 3);
+set(groot, 'DefaultTextColor', [1, 1, 1]);
+set(groot, 'DefaultAxesXColor', [1, 1, 1]);
+set(groot, 'DefaultAxesYColor', [1, 1, 1]);
+set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
+set(0,'defaultAxesFontSize',14)
+ax = gca;
+ax.XGrid = 'on';
+ax.XMinorGrid = 'on';
+ax.YGrid = 'on';
+ax.YMinorGrid = 'on';
+ax.GridColor = [1, 1, 1];
+ax.GridAlpha = 0.4;
 
 %% Plot results
 % gropInds();
@@ -854,7 +854,16 @@ for y = 1 : length(ccIncYears)
     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
     legend('HIV-' , 'HIV+' , 'ART')
 end
-
+%% Cervical cancer incidence type distribution
+newCCTotal = sum(sum(sum(sum(newCC(: , : , : , : , :) , 2) , 3) , 4), 5);
+newCCType = zeros(size(newCC , 1) , 3);
+for h = 2 : hpvTypes
+    newCCType(: , h - 1) = sum(sum(sum(newCC(: , : , : , h  , :) , 2) , 3) , 5) ...
+        ./ newCCTotal;
+end
+figure(); area(tVec , newCCType)
+legend('Vaccine Type' , 'Non-Vaccine Type' , 'Both')
+title('Cervical Cancer Incidence Type Distribution')
 %% cervical cancer incidence by age over time
 ageTotal = zeros(length(tVec) , age);
 for a = 1 : age

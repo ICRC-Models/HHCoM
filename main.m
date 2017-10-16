@@ -99,10 +99,10 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HIV infe
 
 if hpvOn
     % initPop(1 , 1 , 2 : 4 , 1 , 1 , : , 4 : 9 , :) = 2; % initial HPV hr and lr infecteds (test)
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) * 0.30; % try 30% intial HPV prevalence among age groups 6 - 9 (sexually active)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) * 0.10; % try 10% intial HPV prevalence among age groups 6 - 9 (sexually active)
     initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 9 , :) - infected;
-    infected45 = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) * 0.60; %try 60% initial HPV prevalence among age groups 4 - 5 (more sexually active)
+    infected45 = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) * 0.20; %try 20% initial HPV prevalence among age groups 4 - 5 (more sexually active)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) - infected45;
     for h = 2 : 3
@@ -152,13 +152,13 @@ k_wane = 0;
 vaxRate = 0;
 vaxerAger = ager;
 artHpvMult = hpv_hivMult(1) * 0.5;
-perPartnerHpv = 0.1;
+perPartnerHpv = 0.1; % high risk HPV transmission risk per month
 rImmuneHiv = 3 ./ hpv_hivClear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 lambdaMultImm(1 : 4) = 1 - 0.01;
 lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
 lambdaMultImm(11 : age) = lambdaMultImm(10);
-lambdaMultVax = ones(age , 1);
+lambdaMultVax = ones(age , 2);
 
 
 % Test (Weighted 4 age group moving average of CIN progression rates)
@@ -188,8 +188,8 @@ kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :);
 kCin3_Cin2(10 : end , :) = 3 * kCin3_Cin2(10 : end , :);
 kCC_Cin3(7 : end , :) = 3 .* kCC_Cin3(7 : end , :);
 hpv_hivClear = 0.8 * hpv_hivClear;
-rNormal_Inf(8 : end , :) = rNormal_Inf(8 : end , :) * 0.85;
-muCC = 1 - (1 - muCC) .^ 12; % convert cervical cancer mortality rate from yearly to monthly
+rNormal_Inf = rNormal_Inf .* 0.85;
+muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from yearly to monthly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
 profile on
 disp(' ')
@@ -233,6 +233,7 @@ for i = 2 : length(s) - 1
         num2str(endYear) ')'])
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
+        
     if hpvOn
         hystOption = 'on';
         [~ , pop , newCC(i , : , : , : , :) , ccDeath(i , : , : , : , :)] ...
@@ -245,6 +246,10 @@ for i = 2 : length(s) - 1
             c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
             rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
         popIn = pop(end , :);
+        if any(pop(end , :) <  0)
+            disp('After hpv')
+            break
+        end
         
         %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
         %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
@@ -252,13 +257,14 @@ for i = 2 : length(s) - 1
         %                     cytoSens , cin1Inds , cin2Inds , cin3Inds ,  normalInds , getHystPopInds ,...
         %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
     end
+    
     if hpvOn
         [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
             newVaxHpv(i , : , : , : , :)] = ...
             ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
             gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
             circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-            hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
+            hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
             disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
             hrInds , lrInds , hrlrInds,  k , periods , startYear , stepsPerYear , year) , tspan , popIn);
         popIn = pop(end , :); % for next mixing and infection module
@@ -267,6 +273,7 @@ for i = 2 : length(s) - 1
             break
         end
     end
+
     
     if hivOn
         [~ , pop , newHiv(i , : , : , :)] = ...

@@ -169,7 +169,7 @@ hivCin2 = xlsread(file , 'HPV' , 'R21 : R23'); % HIV multipliers for precancer p
 hivCin3 = hivCin2;
 
 
-muCC = xlsread(file , 'Cervical Cancer' , 'C24 : E25'); % mortality
+muCC = xlsread(file , 'Cervical Cancer' , 'B24 : D29'); % mortality
 kRL = xlsread(file , 'Cervical Cancer' , 'H2'); % local -> regional  progression
 kDR = xlsread(file , 'Cervical Cancer' , 'H3'); % regional -> distant progression
 detCC = xlsread(file , 'Cervical Cancer' , 'K2 : K4'); % [region x 1] detection probability

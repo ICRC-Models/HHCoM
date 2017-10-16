@@ -74,7 +74,7 @@ tits = {'Acute' , 'CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , 'CD4 < 200' , ..
 filenames = {'AcuteMort' , 'CD4_500Mort' , 'CD4_500_350Mort' , 'CD4_350_200Mort' , ...
     'CD4_200Mort' , 'ARTMort'};
 for d = 1 : length(dVec)
-    hiv_ccSus = [toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+    hiv_ccSus = [toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , 1 : 8 , 1 : periods , ...
         2 , 4 : age , 1 : risk)) ; toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , ...
         9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
 
@@ -141,10 +141,10 @@ popNo = oNo.popVec;
 % susceptible population
 ccSusGen = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , 2 , 4 : age , 1 : risk));
     toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
-pop90_susGen = sum(pop90(1 : end - 1 , ccSusGen) , 2);
-pop70_susGen = sum(pop70(1 : end - 1 , ccSusGen) , 2);
-pop50_susGen = sum(pop50(1 : end - 1 , ccSusGen) , 2);
-popNo_susGen = sum(popNo(1 : end - 1 , ccSusGen) , 2);
+pop90_susGen = (sum(pop90(1 : end - 1 , ccSusGen) , 2) + sum(pop90(2 : end , ccSusGen) , 2)) * 0.5;
+pop70_susGen = (sum(pop70(1 : end - 1 , ccSusGen) , 2) + sum(pop70(2 : end , ccSusGen) , 2)) * 0.5;
+pop50_susGen = (sum(pop50(1 : end - 1 , ccSusGen) , 2) + sum(pop50(2 : end , ccSusGen) , 2)) * 0.5;
+popNo_susGen = (sum(popNo(1 : end - 1 , ccSusGen) , 2) + sum(popNo(2 : end , ccSusGen) , 2)) * 0.5;
 
 % cases in general population
 genCC90 = sum(sum(sum(sum(newCC_90 , 2),3),4),5);
@@ -199,10 +199,10 @@ for i = 1 : length(hiv_vec)
     hivSus = [toInd(allcomb(d , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
         2 , 4 : age , 1 : risk)) ; toInd(allcomb(d , 1 : viral , 1 : hpvTypes , ...
         9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
-    pop90_susHiv = sum(pop90(1 : end - 1 , hivSus) , 2);
-    pop70_susHiv = sum(pop70(1 : end - 1 , hivSus) , 2);
-    pop50_susHiv = sum(pop50(1 : end - 1 , hivSus) , 2);
-    popNo_susHiv = sum(popNo(1 : end - 1 , hivSus) , 2);
+    pop90_susHiv = (sum(pop90(1 : end - 1 , hivSus) , 2) + sum(pop90(2 : end , hivSus , 2))) * 0.5;
+    pop70_susHiv = (sum(pop70(1 : end - 1 , hivSus) , 2) + sum(pop70(2 : end , hivSus , 2))) * 0.5;
+    pop50_susHiv = (sum(pop50(1 : end - 1 , hivSus) , 2) + sum(pop50(2 : end , hivSus , 2))) * 0.5;
+    popNo_susHiv = (sum(popNo(1 : end - 1 , hivSus) , 2) + sum(popNo(2 : end , hivSus , 2))) * 0.5;
 
 
     h_gen90 = hivCC90(2 : end) ./ pop90_susHiv .* fac;
@@ -309,10 +309,10 @@ hivNegCCNo = sum(sum(sum(newCC_0(: , 1 , : , : , :),3),4),5);
 hivNegSus = [toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
     2 , 4 : age , 1 : risk)) ; toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , ...
     9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
-pop90_susHivNeg = sum(pop90(1 : end - 1 , hivNegSus) , 2);
-pop70_susHivNeg = sum(pop70(1 : end - 1 , hivNegSus) , 2);
-pop50_susHivNeg = sum(pop50(1 : end - 1 , hivNegSus) , 2);
-popNo_susHivNeg = sum(popNo(1 : end - 1 , hivNegSus) , 2);
+pop90_susHivNeg = (sum(pop90(1 : end - 1 , hivNegSus) , 2) + sum(pop90(2 : end , hivNegSus) , 2)) * 0.5;
+pop70_susHivNeg = (sum(pop70(1 : end - 1 , hivNegSus) , 2) + sum(pop70(2 : end , hivNegSus) , 2)) * 0.5;
+pop50_susHivNeg = (sum(pop50(1 : end - 1 , hivNegSus) , 2) + sum(pop50(2 : end, hivNegSus) , 2)) * 0.5;
+popNo_susHivNeg = (sum(popNo(1 : end - 1 , hivNegSus) , 2) + sum(popNo(2 : end, hivNegSus) , 2)) * 0.5;
 
 
 h_neg90 = hivNegCC90(2 : end) ./ pop90_susHivNeg .* fac;
@@ -333,10 +333,6 @@ figure()
 hivSus = [toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
     2 , 4 : age , 1 : risk)) ; toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , ...
     9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
-pop90_susHivNeg = sum(pop90(1 : end - 1 , hivSus) , 2);
-pop70_susHivNeg = sum(pop70(1 : end - 1 , hivSus) , 2);
-pop50_susHivNeg = sum(pop50(1 : end - 1 , hivSus) , 2);
-popNo_susHivNeg = sum(popNo(1 : end - 1 , hivSus) , 2);
 
 h_gen90 = hivNegCC90(2 : end) ./ pop90_susHivNeg .* fac;
 h_gen70 = hivNegCC70(2 : end) ./ pop70_susHivNeg .* fac;
@@ -431,13 +427,14 @@ for i = 1 : length(genArray)
 end
 %%
 % By CD4
+
 dVec = [2 : 6 , 10];
 tits = {'Acute' , 'CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , 'CD4 < 200' , ...
     'ART'};
 filenames = {'AcuteMort' , 'CD4_500Mort' , 'CD4_500_350Mort' , 'CD4_350_200Mort' , ...
     'CD4_200Mort' , 'ARTMort'};
 for d = 1 : length(dVec)
-    hiv_ccSus = [toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+    hiv_ccSus = [toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , 1 : 8 , 1 : periods , ...
         2 , 4 : age , 1 : risk)) ; toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , ...
         9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
 
@@ -470,7 +467,7 @@ for d = 1 : length(dVec)
     plot(tVec(2 : end) , vNo_wNoMort , tVec(2 : end) , v90_wNoMort , ...
         tVec(2 : end) , v90_w20Mort , tVec(2 : end) , v90_w15Mort , ...
         tVec(2 : end) , v90_w10Mort)
-    title([tits{i} , ' Mortality'])
+    title([tits{d} , ' Mortality'])
     xlabel('Year'); ylabel('Mortality per 100,000')
     legend('No vaccination' , 'No Waning' , '20 years' , '15 years' , '10 years' ,...
         'Location' , 'northeastoutside')
@@ -494,7 +491,65 @@ for d = 1 : length(dVec)
         v90_wNoMort , v90_wNoRed , v90_w20Red , v90_w15Red , v90_w10Red);
     writetable(T , [filenames{d} , '.csv'] , 'Delimiter' , ',')
 end
+%% Acute and CD4 > 500
+vec = [2 : 3];
+tit = 'Acute and CD4 > 500';
+filename = 'Acute_CD4_500Mort';
 
+hiv_ccSus = [toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , 1 : 8 , 1 : periods , ...
+    2 , 4 : age , 1 : risk)) ; toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , ...
+    9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
+
+vNo_wNoMort = ...
+    sum(sum(sum(sum(v0_w0.ccDeath(2 : end , vec , : , : , :),2),3),4),5) ./ ...
+    sum((v0_w0.popVec(1 : end - 1 , hiv_ccSus) ...
+    + v0_w0.popVec(2 : end , hiv_ccSus)) * 0.5 , 2) * fac;
+
+v90_w20Mort = ...
+    sum(sum(sum(sum(v90_w20.ccDeath(2 : end , vec , : , : , :),2),3),4),5) ./ ...
+    sum((v90_w20.popVec(1 : end - 1 , hiv_ccSus) ...
+    + v90_w20.popVec(2 : end , hiv_ccSus)) * 0.5 , 2) * fac;
+
+v90_w15Mort = ...
+    sum(sum(sum(sum(v90_w15.ccDeath(2 : end , vec , : , : , :),2),3),4),5) ./ ...
+    sum((v90_w15.popVec(1 : end - 1 , hiv_ccSus) ...
+    + v90_w15.popVec(2 : end , hiv_ccSus)) * 0.5 , 2) * fac;
+
+v90_w10Mort = ...
+    sum(sum(sum(sum(v90_w10.ccDeath(2 : end , vec , : , : , :),2),3),4),5) ./ ...
+    sum((v90_w10.popVec(1 : end - 1 , hiv_ccSus) ...
+    + v90_w10.popVec(2 : end , hiv_ccSus)) * 0.5 , 2) * fac;
+
+v90_wNoMort = ...
+    sum(sum(sum(sum(v90_w0.ccDeath(2 : end , vec , : , : , :),2),3),4),5) ./ ...
+    sum((v90_w0.popVec(1 : end - 1 , hiv_ccSus) ...
+    + v90_w0.popVec(2 : end , hiv_ccSus)) * 0.5 , 2) * fac;
+figure(109)
+plot(tVec(2 : end) , vNo_wNoMort , tVec(2 : end) , v90_wNoMort , ...
+    tVec(2 : end) , v90_w20Mort , tVec(2 : end) , v90_w15Mort , ...
+    tVec(2 : end) , v90_w10Mort)
+title([tit , ' Mortality'])
+xlabel('Year'); ylabel('Mortality per 100,000')
+legend('No vaccination' , 'No Waning' , '20 years' , '15 years' , '10 years' ,...
+    'Location' , 'northeastoutside')
+% Reduction
+v90_wNoRed = (v90_wNoMort - vNo_wNoMort) ./ vNo_wNoMort * 100;
+v90_w20Red = (v90_w20Mort - vNo_wNoMort) ./ vNo_wNoMort * 100;
+v90_w15Red = (v90_w15Mort - vNo_wNoMort) ./ vNo_wNoMort * 100;
+v90_w10Red = (v90_w10Mort - vNo_wNoMort) ./ vNo_wNoMort * 100;
+
+figure(110)
+plot(tVec(2 : end) , v90_wNoRed , tVec(2 : end) , v90_w20Red , ...
+    tVec(2 : end) , v90_w15Red , tVec(2 : end) , v90_w10Red)
+title([tit , ' Mortality Reduction'])
+xlabel('Year'); ylabel('Reduction (%)')
+legend('No Waning' , '20 years' , '15 years' , '10 years' , ...
+    'Location' , 'northeastoutside')
+axis([tVec(2) tVec(end) -100 0])
+
+T = table(tVec(2 : end)' , v90_w20Mort , v90_w15Mort , v90_w10Mort , ...
+    v90_wNoMort , v90_wNoRed , v90_w20Red , v90_w15Red , v90_w10Red);
+writetable(T , [filename , '.csv'] , 'Delimiter' , ',')
 
 %%
 % General susceptibles
@@ -577,17 +632,21 @@ hiv_ccSus = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : period
     2 , 4 : age , 1 : risk)) ; toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , ...
     9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
 v90_w0_incHiv  = sum(sum(sum(sum(v90_w0.newCC(2 : end , 2 : 6 , : , : , :)...
-    ,2),3),4),5) ./ sum(v90_w0.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+    ,2),3),4),5) ./ (0.5 * (sum(v90_w0.popVec(1 : end - 1 , hiv_ccSus) , 2)...
+    + sum(v90_w0.popVec(2 : end , hiv_ccSus) , 2))) * fac;
 v90_w20_incHiv  = sum(sum(sum(sum(v90_w20.newCC(2 : end , 2 : 6 , : , : , :)...
-    ,2),3),4),5) ./ sum(v90_w20.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+    ,2),3),4),5) ./ (0.5 * (sum(v90_w20.popVec(1 : end - 1 , hiv_ccSus) , 2) ...
+    + sum(v90_w20.popVec(2 : end , hiv_ccSus) , 2))) * fac;
 v90_w15_incHiv  = sum(sum(sum(sum(v90_w15.newCC(2 : end , 2 : 6 , : , : , :)...
-    ,2),3),4),5) ./ sum(v90_w15.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+    ,2),3),4),5) ./ (0.5 * (sum(v90_w15.popVec(1 : end - 1 , hiv_ccSus) , 2) ...
+    + sum(v90_w15.popVec(2 : end , hiv_ccSus) , 2)))* fac;
 v90_w10_incHiv  = sum(sum(sum(sum(v90_w10.newCC(2 : end , 2 : 6 , : , : , :)...
-    ,2),3),4),5) ./ sum(v90_w10.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+    ,2),3),4),5) ./ (0.5 * (sum(v90_w10.popVec(1 : end - 1 , hiv_ccSus) , 2)...
+    + sum(v90_w10.popVec(2 : end , hiv_ccSus) , 2)))* fac;
 figure()
 plot(tVec(2 : end) , hivAllIncNo , tVec(2 : end) , v90_w0_incHiv , tVec(2 : end) , ...
     v90_w20_incHiv , tVec(2 : end) , v90_w15_incHiv , tVec(2 : end) , v90_w10_incHiv)
-title('Vaccine Waning Period and General Cervical Cancer Incidence in HIV+')
+title('Vaccine Waning Period and General Cervical Cancer Incidence in HIV+ (90% coverage)')
 xlabel('Year'); ylabel('Incidence per 100,000')
 legend('No vaccination' , 'No waning' , '20 years' , '15 years' , '10 years' , ...
     'Location' , 'northeastoutside')
@@ -633,7 +692,7 @@ for d = 1 : length(dVec)
     hivCCNo = sum(sum(sum(newCC_0(: , dVec(d) , : , : , :),3),4),5);
     popNo_susHiv = sum(popNo(1 : end - 1 , hiv_ccSus) , 2);
     h_genNo = hivCCNo(2 : end) ./ popNo_susHiv .* fac;
-
+    
     figure(100)
     subplot(3 , 2 , d)
     plot(tVec(2 : end) , h_genNo , tVec(2 : end) , v90_wNo_incCD4 , tVec(2 : end) , ...
@@ -642,7 +701,7 @@ for d = 1 : length(dVec)
     xlabel('Year'); ylabel('Incidence per 100,000')
     legend('No vaccination' , 'No waning' , '20 years' , '15 years' , '10 years' , ...
         'Location' , 'northeastoutside')
-
+    
     % Relative reduction
     wNoRedCD4 = (v90_wNo_incCD4 - h_genNo) ./ h_genNo * 100;
     w20RedCD4 = (v90_w20_incCD4 - h_genNo) ./ h_genNo * 100;
@@ -663,3 +722,53 @@ for d = 1 : length(dVec)
         w10RedCD4);
     writetable(T , [filenames{d} , '_Waning.csv'] , 'Delimiter' , ',')
 end
+
+%% Acute and CD4 > 500
+vec = [2 : 3];
+tits = 'Acute and  CD4 > 500';
+filename= 'Acute_CD4 > 500';
+% Incidence
+hiv_ccSus = [toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+    2 , 4 : age , 1 : risk)) ; toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , ...
+    9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
+v90_wNo_incCD4  = sum(sum(sum(v90_w0.newCC(2 : end , vec , : , : , :)...
+    ,3),4),5) ./ sum(v90_w0.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+v90_w20_incCD4  = sum(sum(sum(v90_w20.newCC(2 : end , vec , : , : , :)...
+    ,3),4),5) ./ sum(v90_w20.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+v90_w15_incCD4  = sum(sum(sum(v90_w15.newCC(2 : end , vec , : , : , :)...
+    ,3),4),5) ./ sum(v90_w15.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+v90_w10_incCD4  = sum(sum(sum(v90_w10.newCC(2 : end , vec , : , : , :)...
+    ,3),4),5) ./ sum(v90_w10.popVec(1 : end - 1 , hiv_ccSus) , 2) * fac;
+% base (no vaccine)
+hivCCNo = sum(sum(sum(newCC_0(: , vec , : , : , :),3),4),5);
+popNo_susHiv = sum(popNo(1 : end - 1 , hiv_ccSus) , 2);
+h_genNo = hivCCNo(2 : end) ./ popNo_susHiv .* fac;
+
+figure(111)
+plot(tVec(2 : end) , h_genNo , tVec(2 : end) , v90_wNo_incCD4 , tVec(2 : end) , ...
+    v90_w20_incCD4 , tVec(2 : end) , v90_w15_incCD4 , tVec(2 : end) , v90_w10_incCD4)
+title(['Vaccine Waning Period and CC Incidence in ' , tits{d}])
+xlabel('Year'); ylabel('Incidence per 100,000')
+legend('No vaccination' , 'No waning' , '20 years' , '15 years' , '10 years' , ...
+    'Location' , 'northeastoutside')
+
+% Relative reduction
+wNoRedCD4 = (v90_wNo_incCD4 - h_genNo) ./ h_genNo * 100;
+w20RedCD4 = (v90_w20_incCD4 - h_genNo) ./ h_genNo * 100;
+w15RedCD4 = (v90_w15_incCD4 - h_genNo) ./ h_genNo * 100;
+w10RedCD4 = (v90_w10_incCD4 - h_genNo) ./ h_genNo * 100;
+figure(101)
+subplot(3 , 2 , d)
+plot(tVec(2 : end) , wNoRedCD4 , tVec(2 : end) , w20RedCD4 , tVec(2 : end) , ...
+    w15RedCD4 , tVec(2 : end) , w10RedCD4)
+axis([tVec(2) tVec(end) -100 0 ]);
+title(['Vaccine Waning Period and CC Reduction in ' tits{d}])
+xlabel('Year'); ylabel('Reduction (%)')
+legend('No waning' , '20 years' , '15 years' , '10 years' , ...
+    'Location' , 'northeastoutside')
+% Export general incidence/reduction as csv
+T = table(tVec(2 : end)' , v90_wNo_incCD4 , v90_w20_incCD4 , ...
+    v90_w15_incCD4 , v90_w10_incCD4 , wNoRedCD4 , w20RedCD4 , w15RedCD4 , ...
+    w10RedCD4);
+writetable(T , [filename , '_Waning.csv'] , 'Delimiter' , ',')
+

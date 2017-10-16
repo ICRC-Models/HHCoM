@@ -257,10 +257,10 @@ for a = 1 : age
                 mTo = toHiv(1 , a , r , :); % set disease state = 2 (acute)
                 fTo = toHiv(2 , a , r , :);
 
-                mInfected = lambda(1 , a , r)...
-                    .* psi(d) .* pop(mSus); % infected males
-                fInfected = lambda(2 , a , r)...
-                    .* psi(d) .* pop(fSus); % infected females
+                mInfected = min(lambda(1 , a , r)...
+                    .* psi(d) , 0.99) .* pop(mSus); % infected males
+                fInfected = min(lambda(2 , a , r)...
+                    .* psi(d) , 0.99) .* pop(fSus); % infected females
 
                 % HIV incidence tracker
                 newHiv(1 , a , r) = newHiv(1 , a , r) + sumall(mInfected);

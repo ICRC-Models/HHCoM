@@ -65,30 +65,31 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
-kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :); 
+kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :);
 kCin3_Cin2(10 : end , :) = 3 * kCin3_Cin2(10 : end , :);
 kCC_Cin3(7 : end , :) = 3 .* kCC_Cin3(7 : end , :);
 hpv_hivClear = 0.8 * hpv_hivClear;
 rNormal_Inf(8 : end , :) = rNormal_Inf(8 : end , :) * 0.85;
-muCC = 1 - (1 - muCC) .^ 12; % convert cervical cancer mortality rate from yearly to monthly
+muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from yearly to monthly
 %%%%%
 
 c = fix(clock);
 currYear = c(1); % get the current year
-vaxEff = 0.9;
+vaxEff = 0.8;
 k_wane = - vaxEff / 20;
-lambdaMultVax_Arr = {zeros(age , 1) , zeros(age , 1) , zeros(age , 1)};
+lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
+    zeros(age , 2)};
 % 20 year waning
-lambdaMultVax_Arr{1}(3 : 6) = vaxEff;
-lambdaMultVax_Arr{1}(7 : 10) = vaxEff + k_wane * (5 : 5 : 20);
+lambdaMultVax_Arr{1}(3 : 6 , 1) = vaxEff;
+lambdaMultVax_Arr{1}(7 : 10 , 1) = vaxEff + k_wane * (5 : 5 : 20);
 % 15 year waning
-lambdaMultVax_Arr{2}(3 : 5) = vaxEff;
-lambdaMultVax_Arr{2}(6 : 9) = vaxEff + k_wane * (5 : 5 : 20);
+lambdaMultVax_Arr{2}(3 : 5 , 1) = vaxEff;
+lambdaMultVax_Arr{2}(6 : 9 , 1) = vaxEff + k_wane * (5 : 5 : 20);
 % 10 year waning
-lambdaMultVax_Arr{3}(3 : 4) = vaxEff;
-lambdaMultVax_Arr{3}(5 : 8) = vaxEff + k_wane * (5 : 5 : 20);
+lambdaMultVax_Arr{3}(3 : 4 , 1) = vaxEff;
+lambdaMultVax_Arr{3}(5 : 8 , 1) = vaxEff + k_wane * (5 : 5 : 20);
 % 0 year waning
-lambdaMultVax_Arr{4}(3 : age) = vaxEff;
+lambdaMultVax_Arr{4}(3 : age , 1) = vaxEff;
 
 k_wane_d = [20 , 15 , 10 , 0];
 
@@ -172,7 +173,7 @@ parfor n = 1 : nTests
     %%
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;
-        currStep = round(s(i) * stepsPerYear);
+        currStep = round((s(i) + currYear) * stepsPerYear);
         tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
         popIn = popVec(i - 1 , :);
         if hpvOn
@@ -187,6 +188,10 @@ parfor n = 1 : nTests
                 c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
                 rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
             popIn = pop(end , :);
+            if any(pop(end , :) <  0)
+                disp('After hpv')
+                break
+            end
             
             %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
             %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
@@ -194,13 +199,14 @@ parfor n = 1 : nTests
             %                     cytoSens , cin1Inds , cin2Inds , cin3Inds ,  normalInds , getHystPopInds ,...
             %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
         end
+        
         if hpvOn
             [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
                 newVaxHpv(i , : , : , : , :)] = ...
                 ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
                 gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
                 circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-                hpv_hivMult , hpvSus , hpvImm , hpvVaxd , toHpv , toHpv_ImmVax , ...
+                hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
                 disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
                 hrInds , lrInds , hrlrInds,  k , periods , startYear , stepsPerYear , year) , tspan , popIn);
             popIn = pop(end , :); % for next mixing and infection module
@@ -209,6 +215,7 @@ parfor n = 1 : nTests
                 break
             end
         end
+        
         
         if hivOn
             [~ , pop , newHiv(i , : , : , :)] = ...
@@ -254,12 +261,11 @@ parfor n = 1 : nTests
         end
         % add results to population vector
         popVec(i , :) = pop(end , :);
-        
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
     filename = ['Vax_' , num2str(vaxRate) , '_wane_' , ...
-        num2str(k_wane)]; %sprintf('test_output%d.mat' , n);
+        num2str(k_wane) , '.mat']; %sprintf('test_output%d.mat' , n);
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , hivDeaths , ccDeath , ...
         newCC , artTreatTracker , currYear , lastYear , popLast);

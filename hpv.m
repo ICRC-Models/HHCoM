@@ -33,7 +33,7 @@ for d = 1 : disease
     c2c3Mult = 1; % CIN3 -> CIN2 regression multiplier
     rHivHpvMult = 1; % for HIV negative
     hivPos = 0;
-    deathCC = muCC(1 , :);
+    deathCC = muCC(6 , :); % HIV negative
     rHiv = 1; % Multiplier for immunity clearance for HIV+
     if d > 2 && d < 7 % CD4 > 500 -> CD4 < 200
         c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 multiplier
@@ -41,7 +41,7 @@ for d = 1 : disease
         c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
         rHivHpvMult = hpv_hivClear(d - 2); % Infection clearance multiplier
-        deathCC = muCC(2 , :); % HIV+ CC death rate
+        deathCC = muCC(d - 2 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
     elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
         c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 multiplier
@@ -49,7 +49,7 @@ for d = 1 : disease
         c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
         rHivHpvMult = hpv_hivClear(1); % Infection clearance multiplier
-        deathCC = muCC(2 , :); % HIV+ CC death rate
+        deathCC = muCC(5 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
     for v = 1 : viral
@@ -111,7 +111,7 @@ for d = 1 : disease
                     - (kCC_Cin3(a , h - 1)... % CIN3 -> CC
                     + kCin2_Cin3(a , h - 1) * c2c3Mult)... % CIN3 -> CIN2
                     .* pop(cin3);
-
+                
                 % CC group
                 ccLoc = ccInds(d , v , h , a , :);
                 dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
@@ -119,7 +119,7 @@ for d = 1 : disease
                     - deathCC(1) * pop(ccLoc); % local CC mortality
 
                 ccReg = ccRegInds(d , v , h , a , :);
-                dPop(ccReg) = dPop(ccLoc) + kRL * pop(ccLoc)...  % local -> regional
+                dPop(ccReg) = dPop(ccReg) + kRL * pop(ccLoc)...  % local -> regional
                     - kDR * pop(ccReg)... % regional -> distant
                     - deathCC(2) * pop(ccReg); % regional CC mortality
 
