@@ -258,9 +258,9 @@ for a = 1 : age
                 fTo = toHiv(2 , a , r , :);
 
                 mInfected = min(lambda(1 , a , r)...
-                    .* psi(d) , 0.99) .* pop(mSus); % infected males
+                    .* psi(d) , 0.999) .* pop(mSus); % infected males
                 fInfected = min(lambda(2 , a , r)...
-                    .* psi(d) , 0.99) .* pop(fSus); % infected females
+                    .* psi(d) , 0.999) .* pop(fSus); % infected females
 
                 % HIV incidence tracker
                 newHiv(1 , a , r) = newHiv(1 , a , r) + sumall(mInfected);

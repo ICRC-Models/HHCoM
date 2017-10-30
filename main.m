@@ -85,12 +85,12 @@ if hivOn
             initPop(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.25 .* ...
                 initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
     
-            for h = 2 : 3
+            for h = 2 : 4
                 % females
-                initPop(3 , 2 , h , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.75 / 2 .* ...
+                initPop(3 , 2 , h , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.75 / 3 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 1 : 3);
                % males
-                initPop(3 , 2 , h , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.75 / 2 .* ...
+                initPop(3 , 2 , h , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.75 / 3 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
             end
         end
@@ -105,16 +105,16 @@ if hpvOn
     infected45 = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) * 0.20; %try 20% initial HPV prevalence among age groups 4 - 5 (more sexually active)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) - infected45;
-    for h = 2 : 3
-        initPop(1 , 1 , h , 1 , 1 , : , 6 : 9 , :) = infected ./ 2;
-        initPop(1 , 1 , h , 1 , 1 , : , 4 : 5 , :) = infected45 ./ 2;
+    for h = 2 : 4
+        initPop(1 , 1 , h , 1 , 1 , : , 6 : 9 , :) = infected ./ 3;
+        initPop(1 , 1 , h , 1 , 1 , : , 4 : 5 , :) = infected45 ./ 3;
         initPop(1 , 1 , h , 3 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.07 ./ 2;
+            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.07 ./ 3;
         initPop(1 , 1 , h , 4 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.03 ./ 2;
-        initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) * 0.9 ./ 2;
+            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.03 ./ 3;   
     end
+    initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) = ...
+            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) * 0.9;
     initPop = max(initPop , 0);
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')

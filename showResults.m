@@ -1025,7 +1025,7 @@ for h = 2 : hpvTypes
         ./ newCCTotal;
 end
 figure(); area(tVec , newCCType)
-legend('Vaccine Type' , 'Non-Vaccine Type')
+legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV')
 title('Cervical Cancer Incidence Type Distribution')
 %% cervical cancer incidence by age over time
 ageTotal = zeros(length(tVec) , age);

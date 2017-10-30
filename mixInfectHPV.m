@@ -65,7 +65,7 @@ c(2 , : , :) = partnersF;
 % HPV parameters
 % for 4V analsys
 perPartnerHpv_lr = 0.9 .* perPartnerHpv; 
-perPartnerHpv = perPartnerHpv;
+perPartnerHpv_nonV = 0.9 .* perPartnerHpv_lr;
 
 beta_hrHPV_F2M = 1 - (1 - perPartnerHpv) ^ 12; % per year per partner probability
 beta_hrHPV_M2F = 1 - (1 - perPartnerHpv) ^ 12; %
@@ -73,12 +73,16 @@ beta_hrHPV_M2F = 1 - (1 - perPartnerHpv) ^ 12; %
 beta_lrHPV_F2M = 1 - (1 - perPartnerHpv_lr) ^ 12; %
 beta_lrHPV_M2F = 1 - (1 - perPartnerHpv_lr) ^ 12; %
 
+beta_nonV_HPV_F2M = 1 - (1 - perPartnerHpv_nonV) ^ 12;
+beta_nonV_HPV_M2F = 1 - (1 - perPartnerHpv_nonV) ^ 12; %
+
 % Per partnership beta
 beta_hrHPV(1 , 1 : 3) = beta_hrHPV_F2M;  % HPV(-) males [g x r]
 beta_hrHPV(2 , 1 : 3) = beta_hrHPV_M2F; % HPV(-) females [g x r]
 beta_lrHPV(1 , 1 : 3) = beta_lrHPV_F2M; % HPV(-) males [g x r]
 beta_lrHPV(2 , 1 : 3) = beta_lrHPV_M2F; % HPV(-) females [g x r]
-
+beta_nonV_HPV(1 , 1 : 3) = beta_nonV_HPV_F2M; % HPV(-) males [g x r]
+beta_nonV_HPV(2 , 1 : 3) = beta_nonV_HPV_M2F; % HPV(-) females [g x r]
 
 
 
@@ -221,9 +225,9 @@ for g = 1 : gender
             hrSum = hrSum + sumall(pop(hr));
             lrSum = lrSum + sumall(pop(lr));
             hrlrSum = hrlrSum + sumall(pop(hrlr));
-            p_hrHPV = max(hrSum / popSum(g , a , r) , 0); % proportion of sexually active with hrHPV. Max handles divide by 0 error.
-            p_lrHPV = max(lrSum / popSum(g , a , r) , 0); % proportion of sexually active with lrHPV
-            p_hrlrHPV = max(hrlrSum / popSum(g , a , r) , 0);  % proportion of sexually active with hrHPV and lrHPV
+            p_hrHPV = max(hrSum / popSum(g , a , r) , 0); % proportion of sexually active with 9vHPV. Max handles divide by 0 error.
+            p_lrHPV = max(lrSum / popSum(g , a , r) , 0); % proportion of sexually active with 4vHPV
+            p_hrlrHPV = max(hrlrSum / popSum(g , a , r) , 0);  % proportion of sexually active with non-vax type HPV
             p_hrHPV = p_hrHPV + p_hrlrHPV;  % total proportion with hr HPV
             p_lrHPV = p_lrHPV + p_hrlrHPV; % total proportion with lr HPV
             % adjust betas for HPV transmission to account for proportion of population
@@ -231,7 +235,7 @@ for g = 1 : gender
             % is dependent on the "concentration" of HPV carriers in the population.
             beta(g , a , r , 1) = -log(1 - beta_hrHPV(g , r)) .* p_hrHPV;
             beta(g , a , r , 2) = -log(1 - beta_lrHPV(g , r)) .* p_lrHPV;
-            beta(g , a , r , 3) = -log(1 - beta_hrHPV(g , r) * beta_lrHPV(g , r)) .* p_hrlrHPV;
+            beta(g , a , r , 3) = -log(1 - beta_nonV_HPV(g , r)) .* p_hrlrHPV;
         end
     end
 end
@@ -285,9 +289,9 @@ for d = 1 : disease
     for h = 1% : hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 : states
             hTo = toState + 1;
-            if h > 1 && h ~= hTo % if pre-existing infection present
-                hTo = 4; % HPV coinfection
-            end
+%             if h > 1 && h ~= hTo % if pre-existing infection present
+%                 hTo = 4; % HPV coinfection
+%             end
             for a = 1 : age
                 for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
                     if lambda(1 , a , r , toState) > 10 ^ -6 || lambda(2 , a , r , toState) > 10 ^ -6 ... % only evaluate if lambda is non-zero
@@ -320,9 +324,9 @@ for d = 1 : disease
                         % normal susceptibles
                         % infection rate capped at 0.99
                         mInfected = min(lambdaMult * lambda(1 , a , r , toState)...
-                            .* psi(d) , 0.99) .* pop(mSus); % infected males
+                            .* psi(d) , 0.999) .* pop(mSus); % infected males
                         fInfected = min(lambdaMult * lambda(2 , a , r , toState)...
-                            .* psi(d) , 0.99) .* pop(fSus); % infected females
+                            .* psi(d) , 0.999) .* pop(fSus); % infected females
 
                         % naturally immune
 %                         mInfImm = min(lambdaMult * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
@@ -336,14 +340,14 @@ for d = 1 : disease
                             hVax = 2;
                         end
                         mInfVax = min(lambdaMult * lambdaMultVax(a , hVax) * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.99 * lambdaMultVax(a , hVax)) .* pop(mSusVax);
+                            .* psi(d) , 0.999 * lambdaMultVax(a , hVax)) .* pop(mSusVax);
                         fInfVax = min(lambdaMult * lambdaMultVax(a , hVax) * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.99 * lambdaMultVax(a , hVax)) .* pop(fSusVax);
+                            .* psi(d) , 0.999 * lambdaMultVax(a , hVax)) .* pop(fSusVax);
                         
                         mInfVax2 = min(lambdaMult * lambdaMultVax(a , hVax) * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.99 * 0.8 * lambdaMultVax(a , hVax)) .* pop(mSusVax2);
+                            .* psi(d) , 0.999 * 0.8 * lambdaMultVax(a , hVax)) .* pop(mSusVax2);
                         fInfVax2 = min(lambdaMult * lambdaMultVax(a , hVax) * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.99 * 0.8 * lambdaMultVax(a , hVax)) .* pop(fSusVax2);
+                            .* psi(d) , 0.999 * 0.8 * lambdaMultVax(a , hVax)) .* pop(fSusVax2);
                         
                         
                         % incidence tracker

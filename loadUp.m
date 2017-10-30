@@ -199,26 +199,29 @@ kInf_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'G47 : G62');
 kCin1_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'H47 : H62');
 kCin2_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'I47 : I62');
 
+% 9v type ohr
+kCin1_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'M47 : M62');
+kCin2_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'N47 : N62');
+kCin3_Cin2(: , 2) = xlsread(file , 'CIN Transition' , 'O47 : O62');
+kCC_Cin3(: , 2) = xlsread(file , 'CIN Transition' , 'P47 : P62');
+
+rNormal_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'Q47 : Q62');
+kInf_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'R47 : R62');
+kCin1_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'S47 : S62');
+kCin2_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'T47 : T62');
+
 %Non-vaccine type ohr
-kCin1_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'W47 : W62');
-kCin2_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'X47 : X62');
-kCin3_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'Y47 : Y62');
-kCC_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'Z47 : Z62');
+kCin1_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'W47 : W62');
+kCin2_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'X47 : X62');
+kCin3_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'Y47 : Y62');
+kCC_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'Z47 : Z62');
 
-rNormal_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'AA47 : AA62');
-kInf_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'AB47 : AB62');
-kCin1_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'AC47 : AC62');
-kCin2_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'AD47 : AD62');
+rNormal_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'AA47 : AA62');
+kInf_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'AB47 : AB62');
+kCin1_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'AC47 : AC62');
+kCin2_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'AD47 : AD62');
 
-kCin1_Inf(: , 3) = (kCin1_Inf(: , 1) + kCin1_Inf(: , 2)) ./ 2;
-kCin2_Cin1(: , 3) = (kCin2_Cin1(: , 1) + kCin2_Cin1(: , 2)) ./ 2;
-kCin3_Cin2(: , 3) = (kCin3_Cin2(: , 1) + kCin3_Cin2(: , 2)) ./ 2;
-kCC_Cin3(: , 3) = (kCC_Cin3(: , 1) + kCC_Cin3(: , 2)) ./ 2;
 
-rNormal_Inf(: , 3) = (rNormal_Inf(: , 1) + rNormal_Inf(: , 2)) ./ 2;
-kInf_Cin1(: , 3) = (kInf_Cin1(: , 1) + kInf_Cin1(: , 2)) ./ 2;
-kCin1_Cin2(: , 3) = (kCin1_Cin2(: , 1) + kCin1_Cin2(: , 2)) ./ 2;
-kCin2_Cin3(: , 3) = (kCin2_Cin3(: , 1) + kCin2_Cin3(: , 2)) ./ 2;
 
 
 
