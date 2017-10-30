@@ -184,6 +184,7 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
+% kCin1_Cin2(1 : end , :) = 2 * kCin1_Cin2(1 : end , :);
 kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :); 
 kCin3_Cin2(10 : end , :) = 3 * kCin3_Cin2(10 : end , :);
 kCC_Cin3(7 : end , :) = 3 .* kCC_Cin3(7 : end , :);

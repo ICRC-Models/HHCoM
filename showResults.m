@@ -998,11 +998,14 @@ for y = 1 : length(ccIncYears)
     xlabel('Age Group'); ylabel('Incidence per 100,000')
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
-    legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
-        'CD4 < 200' , 'ART' , 'Location' , 'NorthWest')
+%     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest');
+%     legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
+%         'CD4 < 200' , 'ART' , 'Location' , 'NorthWest')
     hold on
     % globocan data
     plot(4 : age , globocan , '-' , 4 : age , globocan_ub , 'k--' , 4 : age , globocan_lb , 'k--')
+%     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
+%         'Location' , 'NorthEastOutside')
     legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
         'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
         'Location' , 'NorthEastOutside')

@@ -1,7 +1,7 @@
 %% summary results
 load('general')
-load('results')
-
+% load('results')
+load('H:\HHCoM_Results\to2017')
 sumall = @(x) sum(x(:));
 disp('Saving HIV results')
 
