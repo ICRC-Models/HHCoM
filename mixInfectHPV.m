@@ -64,8 +64,8 @@ c(2 , : , :) = partnersF;
 
 % HPV parameters
 % for 4V analsys
-perPartnerHpv_lr = 0.9 .* perPartnerHpv; 
-perPartnerHpv_nonV = 0.9 .* perPartnerHpv_lr;
+perPartnerHpv_lr = perPartnerHpv; 
+perPartnerHpv_nonV = perPartnerHpv_lr;
 
 beta_hrHPV_F2M = 1 - (1 - perPartnerHpv) ^ 12; % per year per partner probability
 beta_hrHPV_M2F = 1 - (1 - perPartnerHpv) ^ 12; %
