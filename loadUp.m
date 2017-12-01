@@ -225,7 +225,7 @@ kCin2_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'AD47 : AD62');
 
 
 
-hpv_hivMult = flipud(xlsread(file , 'HPV' , 'E21 : E24'));
+hpv_hivMult = flipud(xlsread(file , 'HPV' , 'B21 : D24'));
 hpv_hivClear = xlsread(file , 'CIN Transition' , 'D68 : D71');
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B75 : B78');
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B81 : B84');

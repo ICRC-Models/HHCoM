@@ -105,21 +105,28 @@ if hpvOn
     infected45 = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) * 0.20; %try 20% initial HPV prevalence among age groups 4 - 5 (more sexually active)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 5 , :) - infected45;
-    for h = 2 : 4
+    % HPV 16/18
+    initPop(1 , 1 , 2 , 1 , 1 , : , 6 : 9 , :) = 0.7 * infected;
+    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 5 , :) = 0.7 * infected45;
+    initPop(1 , 1 , 2 , 3 , 1 , : , 6 : 13 , :) = ...
+        initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.07 * 0.7;
+    initPop(1 , 1 , 2 , 4 , 1 , : , 6 : 13 , :) = ...
+        initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.03 * 0.7;
+    
+    % 4v and oHR
+    for h = 3 : 4
         initPop(1 , 1 , h , 1 , 1 , : , 6 : 9 , :) = infected ./ 3;
         initPop(1 , 1 , h , 1 , 1 , : , 4 : 5 , :) = infected45 ./ 3;
         initPop(1 , 1 , h , 3 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.07 ./ 3;
+            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.07 * 0.3 / 2;
         initPop(1 , 1 , h , 4 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.03 ./ 3;   
+            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) .* 0.03 * 0.3 / 2;
     end
     initPop(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) = ...
-            initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) * 0.9;
+        initPop_0(1 , 1 , 1 , 1 , 1 , : , 6 : 13 , :) * 0.9;
     initPop = max(initPop , 0);
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
-
-
 
 % Intervention start years
 circStartYear = 1990;
@@ -151,14 +158,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
 vaxerAger = ager;
-artHpvMult = hpv_hivMult(1) * 0.5;
-perPartnerHpv = 0.1; % high risk HPV transmission risk per month
-rImmuneHiv = 3 ./ hpv_hivClear;
-fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-lambdaMultImm(1 : 4) = 1 - 0.01;
-lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
-lambdaMultImm(11 : age) = lambdaMultImm(10);
-lambdaMultVax = ones(age , 2);
+
 
 
 % Test (Weighted 4 age group moving average of CIN progression rates)
@@ -184,14 +184,27 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
-% kCin1_Cin2(1 : end , :) = 2 * kCin1_Cin2(1 : end , :);
-kCin2_Cin1(6 : end , :) = 2 * kCin2_Cin1(6 : end , :); 
-kCin3_Cin2(10 : end , :) = 3 * kCin3_Cin2(10 : end , :);
-kCC_Cin3(7 : end , :) = 3 .* kCC_Cin3(7 : end , :);
-hpv_hivClear = 0.8 * hpv_hivClear;
+% rNormal_Inf(: , 1) = rNormal_Inf(: , 1) .* 1.2;
+% rNormal_Inf(: , 2) = rNormal_Inf(: , 2) .* 0.8;
+% rNormal_Inf(: , 3) = rNormal_Inf(: , 3) .* 0.9;
 rNormal_Inf = rNormal_Inf .* 0.85;
+% c2c1Mults = 1.5 .* c2c1Mults;
+% kCin1_Cin2(1 : end , :) = 1.2 * kCin1_Cin2(1 : end , :);
+kCin2_Cin1(6 : end , :) = 1.25 * kCin2_Cin1(6 : end , :); 
+kCin3_Cin2(10 : end , :) = 2.8 * kCin3_Cin2(10 : end , :);
+kCin2_Cin3 = 0.5 .* kCin2_Cin3;
+kCC_Cin3(7 : end , :) = 4 .* kCC_Cin3(7 : end , :);
 muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from yearly to monthly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
+artHpvMult = hpv_hivMult(1 , :) * 0.25;
+perPartnerHpv = 0.1; % high risk HPV transmission risk per month
+rImmuneHiv = 3 ./ hpv_hivClear;
+fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
+lambdaMultImm(1 : 4) = 1 - 0.01;
+lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
+lambdaMultImm(11 : age) = lambdaMultImm(10);
+lambdaMultVax = ones(age , 2);
+
 profile on
 disp(' ')
 % Initialize vectors
@@ -259,35 +272,19 @@ for i = 2 : length(s) - 1
         %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
     end
     
-    if hpvOn
-        [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
-            newVaxHpv(i , : , : , : , :)] = ...
-            ode4xtra(@(t , pop) mixInfectHPV(t , pop , currStep , ...
-            gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
-            circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-            hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
-            disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-            hrInds , lrInds , hrlrInds,  k , periods , startYear , stepsPerYear , year) , tspan , popIn);
-        popIn = pop(end , :); % for next mixing and infection module
-        if any(pop(end , :) < 0)
-            disp('After mixInfectHPV')
-            break
-        end
-    end
-
-    
-    if hivOn
-        [~ , pop , newHiv(i , : , : , :)] = ...
-            ode4xtra(@(t , pop) mixInfectHIV(t , pop , currStep , ...
-            gar , hivSus , toHiv , mCurr , fCurr , ...
-            mCurrArt , fCurrArt ,epsA_vec , epsR_vec , yr , modelYr1 , ...
-            circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-            betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , ...
-            hpvStates , hpvTypes , k , periods , startYear , stepsPerYear , year) , tspan , popIn);
-        if any(pop(end , :) < 0)
-            disp('After mixInfectHIV')
-            break
-        end
+    [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
+        newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
+        ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
+        gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
+        circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
+        hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
+        hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
+        betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
+        hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
+    popIn = pop(end , :); % for next mixing and infection module
+    if any(pop(end , :) < 0)
+        disp('After mixInfect')
+        break
     end
     
     if hivOn
