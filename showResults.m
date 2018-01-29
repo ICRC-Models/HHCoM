@@ -6,31 +6,32 @@ load('calibData')
 load('H:\HHCoM_Results\to2017')
 %% Plot Settings
 
-colors = [241, 90, 90;
-          240, 196, 25;
-          78, 186, 111;
-          45, 149, 191;
-          149, 91, 165]/255;
-
-set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureInvertHardcopy', 'off');
-set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
-set(groot, 'DefaultAxesColorOrder', colors);
-set(groot, 'DefaultLineLineWidth', 3);
-set(groot, 'DefaultTextColor', [1, 1, 1]);
-set(groot, 'DefaultAxesXColor', [1, 1, 1]);
-set(groot, 'DefaultAxesYColor', [1, 1, 1]);
-set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
-set(0,'defaultAxesFontSize',14)
-ax = gca;
-ax.XGrid = 'on';
-ax.XMinorGrid = 'on';
-ax.YGrid = 'on';
-ax.YMinorGrid = 'on';
-ax.GridColor = [1, 1, 1];
-ax.GridAlpha = 0.4;
-
+% colors = [241, 90, 90;
+%           240, 196, 25;
+%           78, 186, 111;
+%           45, 149, 191;
+%           149, 91, 165]/255;
+% 
+% set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureInvertHardcopy', 'off');
+% set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
+% set(groot, 'DefaultAxesColorOrder', colors);
+% set(groot, 'DefaultLineLineWidth', 3);
+% set(groot, 'DefaultTextColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesXColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesYColor', [1, 1, 1]);
+% set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
+% set(0,'defaultAxesFontSize',14)
+% ax = gca;
+% ax.XGrid = 'on';
+% ax.XMinorGrid = 'on';
+% ax.YGrid = 'on';
+% ax.YMinorGrid = 'on';
+% ax.GridColor = [1, 1, 1];
+% ax.GridAlpha = 0.4;
+reset(0)
+set(0 , 'defaultlinelinewidth' , 2)
 %% Plot results
 % gropInds();
 % load('groupedInds');u
@@ -841,6 +842,7 @@ ccAgeRel = zeros(age , length(ccIncYears));
 ccAgeNegRel = ccAgeRel;
 ccAgePosRel = zeros(age , 4 , length(ccIncYears));
 ccNegPosArt = zeros(age , 3 , length(ccIncYears));
+ccNegPosArtTot = ccNegPosArt;
 ccArtRel = ccAgeRel;
 fScale = 10^5;
 ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
@@ -906,7 +908,23 @@ for a = 1 : age
     % ART
     ccNegPosArt(a , 3 , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 10 , 6 , 1 : hpvTypes , a), 2) , 3) , 4) ...
         ./ ageTotal;
-
+    
+    
+     ageAllPosInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+        2 , a , 1 : risk)); toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , ...
+        2 , a , 1 : risk))];    
+    % HIV-
+    ccNegPosArtTot(a , 1 , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 1 , 1 : viral , 1 : hpvTypes , a), 2) , 3) , 4) ...
+        ./ ((sum(popVec(((ccIncYears - startYear) - 1) * stepsPerYear , ageNegInds) , 2) ...
+        + sum(popVec(((ccIncYears - startYear)) * stepsPerYear , ageNegInds) , 2)) ./ 2) * fScale;
+    % HIV+
+    ccNegPosArtTot(a , 2 , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 2 : 6 , 1 : viral , 1 : hpvTypes , a) , 2) , 3) , 4) ...
+        ./ ((sum(popVec(((ccIncYears - startYear) - 1) * stepsPerYear , ageAllPosInds) , 2) ...
+        + sum(popVec(((ccIncYears - startYear)) * stepsPerYear , ageAllPosInds) , 2)) ./ 2) * fScale;
+    % ART
+    ccNegPosArtTot(a , 3 , :) = sum(sum(sum(newCC((ccIncYears - startYear) * stepsPerYear , 10 , 6 , 1 : hpvTypes , a), 2) , 3) , 4) ...
+        ./ ((sum(popVec(((ccIncYears - startYear) - 1) * stepsPerYear , ageArtInds) , 2) ...
+        + sum(popVec(((ccIncYears - startYear) - 1) * stepsPerYear , ageArtInds) , 2)) ./ 2) * fScale;;
 end
 
 
@@ -954,6 +972,7 @@ globocan_lb = [0.00
 42.43
 52.01];
 
+ccNegPosArt = ccNegPosArt .* fScale;
 
 for y = 1 : length(ccIncYears)
     ccIncYear = ccIncYears(y);
@@ -977,11 +996,22 @@ for y = 1 : length(ccIncYears)
         'Location' , 'NorthEastOutside')
 
     figure()
-    bar(1 : length(ccNegPosArt(: , : , y)) , ccNegPosArt(: , : , y) * fScale , 'stacked')
+    bar(1 : length(ccNegPosArt(: , : , y)) , ccNegPosArt(: , : , y), 'stacked')
     xlabel('Age Group'); ylabel('Incidence per 100,000')
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
     legend('HIV-' , 'HIV+' , 'ART')
+    
+    figure()
+     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-o' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 1 , y) , '-o' , 1 : size(ccNegPosArtTot, 1) , ...
+        ccNegPosArtTot(: , 2 , y) , '-o' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 3 , y) , '-o');
+    hold on
+    plot(4 : age , globocan , '-' , 4 : age , globocan_ub , 'k--' , 4 : age , globocan_lb , 'k--')
+    title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
+    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound')
+    xlabel('Age Group'); ylabel('Incidence per 100,000')
+    set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
+    title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
 end
 %% Cervical cancer incidence type distribution
 newCCTotal = sum(sum(sum(sum(newCC(: , : , : , : , :) , 2) , 3) , 4), 5);

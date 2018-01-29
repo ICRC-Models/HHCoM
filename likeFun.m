@@ -1,11 +1,11 @@
-function negSumLogL = likeFun(popVec , cinPos2008_obs , cinNeg2008_obs ,...
+function negSumLogL = likeFun(popVec , cinPos2014_obs , cinNeg2014_obs ,...
     hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
     hivPrevM_obs , hivPrevF_obs , disease , viral , gender , age , risk , ...
     hpvTypes , hpvStates , periods , startYear , stepsPerYear)
 toInd = @(x)(x(:,8)-1)*k(7)+(x(:,7)-1)*k(6)+(x(:,6)-1)*k(5)+(x(:,5)-1)*k(4)+(x(:,4)-1)*k(3)+(x(:,3)-1)*k(2)+(x(:,2)-1)*k(1)+x(:,1);
 %% CIN2/3 prevalence by HIV status
-cinPos2008 = zeros(10 , 1);
-cinNeg2008 = cinPos2008;
+cinPos2014 = zeros(10 , 1);
+cinNeg2014 = cinPos2014;
 load('general')
 for a = 4 : 13 % 15-19 -> 60-64
     % HIV+
@@ -13,8 +13,8 @@ for a = 4 : 13 % 15-19 -> 60-64
         1 : periods , 2 , a , 1 : risk));
     ageInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    cinPos2008(a - 3) = (sum(popVec((2008 - startYear) * stepsPerYear , cinInds)))...
-        ./ sum(popVec((2008 - startYear) * stepsPerYear , ageInds)) * 100;
+    cinPos2014(a - 3) = (sum(popVec((2014 - startYear) * stepsPerYear , cinInds)))...
+        ./ sum(popVec((2014 - startYear) * stepsPerYear , ageInds)) * 100;
     % HIV-
     cinNegInds = toInd(allcomb(1, 1 : viral , 1 : hpvTypes , 3 : 4, ...
         1 : periods , 2 , a , 1 : risk));
@@ -24,15 +24,15 @@ for a = 4 : 13 % 15-19 -> 60-64
         2 , a , 1 : risk));
     ageNeg2Inds = toInd(allcomb(7 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    cinNeg2008(a - 3) = (sum(popVec((2008 - startYear) * stepsPerYear , cinNegInds))...
-        + sum(popVec((2008 - startYear) * stepsPerYear , cinNeg2Inds)))...
-        ./ (sum(popVec((2008 - startYear) * stepsPerYear , ageNegInds)) +...
-        sum(popVec((2008 - startYear) * stepsPerYear , ageNeg2Inds))) * 100;
+    cinNeg2014(a - 3) = (sum(popVec((2014 - startYear) * stepsPerYear , cinNegInds))...
+        + sum(popVec((2014 - startYear) * stepsPerYear , cinNeg2Inds)))...
+        ./ (sum(popVec((2014 - startYear) * stepsPerYear , ageNegInds)) +...
+        sum(popVec((2014 - startYear) * stepsPerYear , ageNeg2Inds))) * 100;
 end
 
-pPos = [cinPos2008; cinNeg2008];
-N = [cinPos2008_obs(: , 3) ; cinNeg2008_obs(: , 3)];
-nPos = [cinPos2008_obs(: , 2) ; cinNeg2008_obs(: , 2)];
+pPos = [cinPos2014; cinNeg2014];
+N = [cinPos2014_obs(: , 3) ; cinNeg2014_obs(: , 3)];
+nPos = [cinPos2014_obs(: , 2) ; cinNeg2014_obs(: , 2)];
 
 %% General HPV Prevalence by Age in 2008 (no CIN2/3)
 % hpv2008 = zeros(10 , 1);
@@ -83,7 +83,7 @@ nPos = [cinPos2008_obs(: , 2) ; cinNeg2008_obs(: , 2)];
 % nPos = [nPos ; hpv_hivNeg_2008_obs(: , 2)];
 
 %% HPV prevalence in HIV- women (including CIN)
-yr = 2013;
+yr = 2014;
 hpv_hivNeg = zeros(9 , 1);
 
 for a = 4 : 11 % 15-19 ->  50-54

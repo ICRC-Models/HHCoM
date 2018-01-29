@@ -1,3 +1,4 @@
+function simVaxResultOut_AgeStand()
 %%
 load('general')
 o90 = load('H:\HHCoM_Results\Vax_0.9_wane_0.mat'); % 90% coverage
@@ -7,36 +8,242 @@ oNo = load('H:\HHCoM_Results\Vax_0_wane_0.mat'); % No vaccine
 tVec = o90.tVec;
 %% Plot Settings
 
-colors = [241, 90, 90;
-          240, 196, 25;
-          78, 186, 111;
-          45, 149, 191;
-          149, 91, 165]/255;
-
-set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureInvertHardcopy', 'off');
-set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
-set(groot, 'DefaultAxesColorOrder', colors);
-set(groot, 'DefaultLineLineWidth', 3);
-set(groot, 'DefaultTextColor', [1, 1, 1]);
-set(groot, 'DefaultAxesXColor', [1, 1, 1]);
-set(groot, 'DefaultAxesYColor', [1, 1, 1]);
-set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
-set(0,'defaultAxesFontSize',14)
-ax = gca;
-ax.XGrid = 'on';
-ax.XMinorGrid = 'on';
-ax.YGrid = 'on';
-ax.YMinorGrid = 'on';
-ax.GridColor = [1, 1, 1];
-ax.GridAlpha = 0.4;
-% set(0 , 'defaultlinelinewidth' , 2)
+% colors = [241, 90, 90;
+%           240, 196, 25;
+%           78, 186, 111;
+%           45, 149, 191;
+%           149, 91, 165]/255;
+% 
+% set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureInvertHardcopy', 'off');
+% set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
+% set(groot, 'DefaultAxesColorOrder', colors);
+% set(groot, 'DefaultLineLineWidth', 3);
+% set(groot, 'DefaultTextColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesXColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesYColor', [1, 1, 1]);
+% set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
+% set(0,'defaultAxesFontSize',14)
+% ax = gca;
+% ax.XGrid = 'on';
+% ax.XMinorGrid = 'on';
+% ax.YGrid = 'on';
+% ax.YMinorGrid = 'on';
+% ax.GridColor = [1, 1, 1];
+% ax.GridAlpha = 0.4;
+set(0 , 'defaultlinelinewidth' , 2)
 %%
 ageGroups = age - 4 + 1;
 wVec = zeros(age , 1);
 wVec(5 : age) = [0.188 , 0.18 , 0.159 , 0.121 , 0.088 , 0.067 , 0.054 , ...
     0.046 , 0.038 , 0.029 , 0.017 , 0.013]; 
+% if ageStand == 0
+%     wVec = ones(age , 1) ./ age;
+% end
+%% HPV Incidence
+inds = {':' , 2 : 6 , 1 , 10};
+files = {'General_Hpv_VaxCover' , 'HivAll_Hpv_VaxCover' , 'HivNeg_Hpv_VaxCover' , 'ART_HPV_VaxCover'};
+plotTits = {'General HPV' , 'HIV-Positive + HPV' , 'HIV-Negative + HPV' , ...
+    'HIV-Positive on ART'};
+fac = 10 ^ 5;
+vNo_HpvAge = zeros(ageGroups , length(tVec) - 1);
+v90_HpvAge = vNo_HpvAge;
+v70_HpvAge = vNo_HpvAge;
+v50_HpvAge = vNo_HpvAge;
+fac = 10 ^ 5;
+for i = 1 : length(inds)
+    for a = 1 : age
+        % general
+        allF = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % All HIV-positive women (not on ART)
+        allHivF = toInd(allcomb(2 : 6 , 1 : viral , 1 , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % All HIV-negative women
+        hivNeg = toInd(allcomb(1 , 1 : viral , 1 , 1 : hpvStates , 1 : periods , ...
+            2 , a , 1 : risk));
+        % Women on ART
+        artF = toInd(allcomb(10 , 6 , 1 , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        
+        genArray = {allF , allHivF , hivNeg , artF};
+        
+        vNo_HpvAge(a , :) = ...
+            sum(sum(sum(sum(oNo.newHpv(2 : end , 2 , inds{i} , a , :),2),3),4),5) ./ ...
+            sum((oNo.popVec(1 : end - 1 , genArray{i}) ...
+            + oNo.popVec(2 : end , genArray{i})) * 0.5 , 2) * fac;
+        
+        v90_HpvAge(a , :) = ...
+            sum(sum(sum(sum(o90.newHpv(2 : end , 2 , inds{i} , a , :),2),3),4),5) ./ ...
+            sum((o90.popVec(1 : end - 1 , genArray{i}) ...
+            + o90.popVec(2 : end , genArray{i})) * 0.5 , 2) * fac;
+        
+        v70_HpvAge(a , :) = ...
+            sum(sum(sum(sum(o70.newHpv(2 : end , 2 , inds{i} , a , :),2),3),4),5) ./ ...
+            sum((o70.popVec(1 : end - 1 , genArray{i}) ...
+            + o70.popVec(2 : end , genArray{i})) * 0.5 , 2) * fac;
+        
+        v50_HpvAge(a , :) = ...
+            sum(sum(sum(sum(o50.newHpv(2 : end , 2 , inds{i} , a , :),2),3),4),5) ./ ...
+            sum((o50.popVec(1 : end - 1 , genArray{i}) ...
+            + o50.popVec(2 : end , genArray{i})) * 0.5 , 2) * fac;
+    end
+    
+    % Perform age standardization
+    vNo_Hpv = sum(bsxfun(@times , vNo_HpvAge , wVec));
+    v90_Hpv = sum(bsxfun(@times , v90_HpvAge , wVec));
+    v70_Hpv = sum(bsxfun(@times , v70_HpvAge , wVec));
+    v50_Hpv = sum(bsxfun(@times , v50_HpvAge , wVec));
+    
+    figure()
+    plot(tVec(2 : end) , vNo_Hpv , tVec(2 : end) , v90_Hpv , ...
+        tVec(2 : end) , v70_Hpv , tVec(2 : end) , v50_Hpv)
+    title([plotTits{i} , ' Incidence'])
+    xlabel('Year'); ylabel('Incidence per 100,000')
+    legend('No vaccination' , '90% coverage' , '70% coverage' , ...
+        '50% coverage')
+    % Reduction
+    v90_Red = (v90_Hpv - vNo_Hpv) ./ vNo_Hpv * 100;
+    v70_Red = (v70_Hpv - vNo_Hpv) ./ vNo_Hpv * 100;
+    v50_Red = (v50_Hpv - vNo_Hpv) ./ vNo_Hpv * 100;
+    
+    figure()
+    plot(tVec(2 : end) , v90_Red , tVec(2 : end) , v70_Red , ...
+        tVec(2 : end) , v50_Red)
+    title([plotTits{i} , ' Incidence Reduction'])
+    xlabel('Year'); ylabel('Reduction (%)')
+    legend('90% coverage' , '70% coverage' , '50% coverage')
+    axis([tVec(2) tVec(end) -100 0])
+    
+    T = table(tVec(2 : end)' , v90_Hpv' , v70_Hpv' , v50_Hpv' , ...
+        v90_Red' , v70_Red' , v50_Red');
+    writetable(T , [files{i} , '_stand.csv'] , 'Delimiter' , ',')
+end
+%% HPV Prevalence
+inds = {':' , 2 : 6 , 1 , 10};
+files = {'General_HpvPrev_VaxCover' , 'HivAll_HpvPrev_VaxCover' , 'HivNegPrev_Hpv_VaxCover' , ...
+    'ART_HpvPrev_VaxCover'};
+plotTits = {'General HPV' , 'HIV-Positive + HPV' , 'HIV-Negative + HPV' , ...
+    'HIV-Positive on ART'};
+fac = 10 ^ 5;
+vNo_HpvPrevAge = zeros(age , length(tVec));
+v90_HpvPrevAge = vNo_HpvPrevAge;
+v70_HpvPrevAge = vNo_HpvPrevAge;
+v50_HpvPrevAge = vNo_HpvPrevAge;
+fac = 10 ^ 5;
+% ageTotal = zeros(length(tVec) , age);
+% for a = 1 : age
+%     ageTotal(: , a) = sum(popVec(1 : size(popVec , 1) , ...
+%         toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+%         2 , a , 1 : risk))), 2) + sum(popVec(1 : size(popVec , 1) , ...
+%         toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , ...
+%         2 , a , 1 : risk))) , 2);
+% end
+for i = 1
+    for a = 3 : age
+        % all
+        % general
+        allFTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % All HIV-positive women (not on ART)
+        allHivFTot = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % All HIV-negative women
+        hivNegTot = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+            2 , a , 1 : risk));
+        % ART
+        artTot = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+            2 , a , 1 : risk));
+        
+        % HPV positive
+        % general with HPV
+        allF = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % HIV-positive women (not on ART)with HPV
+        allHivF = toInd(allcomb(2 : 6 , 1 : viral , 2 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , a , 1 : risk));
+        % HIV-negative women with HPV
+        hivNeg = toInd(allcomb(1 , 1 : viral , 2 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+            2 , a , 1 : risk));
+         % ART and HPV
+        art = toInd(allcomb(10 , 6 , 2 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+            2 , a , 1 : risk));
+        
+        
+        
+        infArray = {allF , allHivF , hivNeg , art};
+        totArray = {allFTot, allHivFTot , hivNegTot , artTot};
+        
+        vNo_HpvPrevAge(a , :) = ...
+            sum(sum(sum(sum(sum(sum(sum(sum(oNo.popVec(: , infArray{i}) ,2),3),4),5),6),7),8),9) ./ ...
+            sum(sum(sum(sum(sum(sum(sum(sum(oNo.popVec(: , totArray{i}) ,2),3),4),5),6),7),8),9);
+        
+        v90_HpvPrevAge(a , :) = ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o90.popVec(: , infArray{i}) ,2),3),4),5),6),7),8),9) ./ ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o90.popVec(: , totArray{i}) ,2),3),4),5),6),7),8),9);
+        
+        v70_HpvPrevAge(a , :) = ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o70.popVec(: , infArray{i}) ,2),3),4),5),6),7),8),9) ./ ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o70.popVec(: , totArray{i}) ,2),3),4),5),6),7),8),9);
+        
+        v50_HpvPrevAge(a , :) = ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o50.popVec(: , infArray{i}) ,2),3),4),5),6),7),8),9) ./ ...
+            sum(sum(sum(sum(sum(sum(sum(sum(o50.popVec(: , totArray{i}) ,2),3),4),5),6),7),8),9);
+        
+        
+    end
+    T_HpvPrevAge = table(tVec' ,  vNo_HpvPrevAge' , v90_HpvPrevAge' , ...
+        v70_HpvPrevAge' , v50_HpvPrevAge');
+    writetable(T_HpvPrevAge , [files{i} , '_stand.csv'] , 'Delimiter' , ',')
+end
+%%
+figure()
+ageGroup = {'10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+    '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+
+m1 = mesh(1 : age , tVec , vNo_HpvPrevAge' * 100);
+set(m1 , 'edgecolor' , 'r')
+alpha(0.1)
+hold on
+m2 = mesh(1 : age , tVec , v90_HpvPrevAge' * 100);
+set(m2 , 'edgecolor' , 'b')
+alpha(0.1)
+set(gca , 'yLim' , [tVec(1) tVec(end)]);
+set(gca , 'xtick' , 3 : age , 'xtickLabel' , ageGroup);
+xlabel('Age Group'); ylabel('Year'); zlabel('Prevalence (%)')
+title('HPV Prevalence')
+legend('No Vaccination' , '90% coverage')
+
+% Vax start year
+% hold on
+% [px , py] = meshgrid(1 : age , 2018 ...
+%     .* ones(age , 1));
+% pz = bsxfun(@times , ones(size(px , 1) , size(py , 1)) , linspace(0 , 100 , size(px , 1)));
+% m = surf(px , py , pz' , 'edgecolor' , 'r');
+% set(m , 'facecolor' , 'r')
+% legend('No Vaccination' , '90% Coverage' , 'Vaccination Start')
+% alpha(0.4)
+%%
+figure()
+v90_HpvPrevRed = (v90_HpvPrevAge - vNo_HpvPrevAge) ./ vNo_HpvPrevAge .* 100;
+mesh(1 : age , tVec , v90_HpvPrevRed')
+set(gca , 'yLim' , [tVec(1) tVec(end)]);
+set(gca , 'xtick' , 3 : age , 'xtickLabel' , ageGroup);
+xlabel('Age Group'); ylabel('Year'); zlabel('Prevalence Reduction (%)')
+title('HPV Prevalence Reduction (90% coverage)')
+% Vax start year
+% hold on
+% [px , py] = meshgrid(1 : age , 2018 ...
+%     .* ones(age , 1));
+% pz = bsxfun(@times , ones(size(px , 1) , size(py , 1)) , linspace(0 , 100 , size(px , 1)));
+% m = surf(px , py , pz' , 'edgecolor' , 'r');
+% set(m , 'facecolor' , 'r')
+% alpha(0.4)
+yr = 2088; % 70 years post-vaccination start
+t = (yr - 2018) * stepsPerYear;
+v90_HpvPrevRed_2088 = sum(wVec(3 : end) .* v90_HpvPrevRed(3 : end , t));
 %% CC associated deaths
 inds = {':' , 2 : 6 , 1};
 files = {'General_CCMortality_VaxCover' , 'HivAll_CCMortality_VaxCover' , 'HivNeg_CCMortality_VaxCover'};
@@ -201,7 +408,7 @@ pop50_susGen = pop90_susGen;
 popNo_susGen = pop90_susGen;
 for a = 1 : age
     ccSusGen = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , 2 , a , 1 : risk));
-        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , 2 , a , 1 : risk))];
+        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , 1 : periods , 2 , a , 1 : risk))];
     pop90_susGen(a , :) = (sum(pop90(1 : end - 1 , ccSusGen) , 2) + sum(pop90(2 : end , ccSusGen) , 2)) * 0.5;
     pop70_susGen(a , :) = (sum(pop70(1 : end - 1 , ccSusGen) , 2) + sum(pop70(2 : end , ccSusGen) , 2)) * 0.5;
     pop50_susGen(a , :) = (sum(pop50(1 : end - 1 , ccSusGen) , 2) + sum(pop50(2 : end , ccSusGen) , 2)) * 0.5;

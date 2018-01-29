@@ -42,6 +42,14 @@ kCin1_Cin2_Orig = kCin1_Cin2;
 kCin3_Cin2_Orig = kCin3_Cin2;
 rNormal_Inf_Orig = rNormal_Inf;
 
+w = ones(4 , 1) ./ 4;
+kCC_Cin3_Orig = kCC_Cin3;
+kCin2_Cin3_Orig = kCin2_Cin3;
+kCin2_Cin1_Orig = kCin2_Cin1;
+kCin1_Cin2_Orig = kCin1_Cin2;
+kCin3_Cin2_Orig = kCin3_Cin2;
+rNormal_Inf_Orig = rNormal_Inf;
+
 for i = 1 : 3
     rNormal_Inf(: , i) = conv(rNormal_Inf_Orig(: , i) , w , 'same');
     rNormal_Inf(end - 1 : end , i) = conv(rNormal_Inf_Orig(end - 1 : end , i) , w , 'same');
@@ -68,7 +76,7 @@ kCin2_Cin3 = 0.5 .* kCin2_Cin3;
 kCC_Cin3(7 : end , :) = 4 .* kCC_Cin3(7 : end , :);
 muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from yearly to monthly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-artHpvMult = hpv_hivMult(1 , :) * 0.25;
+artHpvMult = 1;%hpv_hivMult(1 , :) * 0.25;
 perPartnerHpv = 0.1; % high risk HPV transmission risk per month
 rImmuneHiv = 3 ./ hpv_hivClear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -78,9 +86,27 @@ lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 %%%%%
 
+% load('HPV_calib.dat')
+% kCin2_Cin3(: , 1) = HPV_calib(1 : age);
+% kCin3_Cin2(: , 1) = HPV_calib(age + 1 : 2 * age);
+% kCC_Cin3(: , 1) = HPV_calib(2 * age + 1 : 3 * age);
+% kCin2_Cin3(: , 2) = HPV_calib(3 * age + 1 : 4 * age);
+% kCin3_Cin2(: , 2) = HPV_calib(4 * age + 1 : 5 * age);
+% kCC_Cin3(: , 2) = HPV_calib(5 * age + 1 : 6 * age);
+% kCin2_Cin3(: , 3) = HPV_calib(6 * age + 1 : 7 * age);
+% kCin3_Cin2(: , 3) = HPV_calib(7 * age + 1 : 8 * age);
+% kCC_Cin3(: , 3) = HPV_calib(8 * age + 1 : 9 * age);
+% rImmuneHiv = HPV_calib(9 * age + 1 : 9 * age + 1 + 3);
+% c3c2Mults = HPV_calib(9 * age + 5 : 9 * age + 8);
+% c2c1Mults = HPV_calib(9 * age + 9 : 9 * age + 12);
+% artHpvMult = HPV_calib(9 * age + 13);
+% perPartnerHpv = HPV_calib(9 * age + 14);
+
+%%%%%
+
 c = fix(clock);
 currYear = c(1); % get the current year
-vaxEff = 0.8;
+vaxEff = 1;
 t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
 lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
@@ -256,7 +282,7 @@ parfor n = 1 : nTests
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
-    filename = ['Vax_' , num2str(vaxRate) , '_wane_' , ...
+    filename = ['FullEff_Vax_' , num2str(vaxRate) , '_wane_' , ...
         num2str(k_wane) , '.mat']; %sprintf('test_output%d.mat' , n);
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...

@@ -253,8 +253,8 @@ disp(' ')
 %% Retrieve calibration data
 % dimensions = [pos , N]
 clear
-cinPos2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
-cinNeg2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
+cinPos2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
+cinNeg2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
 hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
 hpv_hivNeg_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D42 : F51');
 
