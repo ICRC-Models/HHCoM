@@ -161,32 +161,41 @@ for g = 1 : gender
     susInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         g , 4 : 10, 1 : risk));
     
-    % population at risk (use midpoint)
-    basePopSus = (sum(artBase.popVec(1 : end - 1 , susInds) , 2) + ...
-        sum(artBase.popVec(2 : end , susInds) , 2)) ./ 2;
-    medPopSus =(sum(artMed.popVec(1 : end - 1 , susInds) , 2) + ...
-        sum(artMed.popVec(2 : end , susInds) , 2)) ./ 2;
-    highPopSus = (sum(artHigh.popVec(1 : end - 1 , susInds) , 2) + ...
-        sum(artHigh.popVec(2 : end , susInds) , 2)) ./ 2;
-    mhPopSus = (sum(artMH.popVec(1 : end - 1 , susInds) , 2) + ...
-        sum(artHigh.popVec(2 : end , susInds) , 2)) ./ 2;
+    annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) ...
+        / stepsPerYear)); % calculates total for year
     
-    fac = 10 ^ 5;
+    % population at risk (average per year)
+    basePopSus_step = sum(artBase.popVec(1 : end , susInds) , 2);
+    basePopSus = annlz(basePopSus_step) ./ stepsPerYear;
+    medPopSus_step = sum(artMed.popVec(1 : end , susInds) , 2);
+    medPopSus = annlz(medPopSus_step) ./ stepsPerYear;
+    highPopSus_step = sum(artHigh.popVec(1 : end , susInds) , 2);
+    highPopSus = annlz(highPopSus_step) ./ stepsPerYear;
+    mhPopSus_step = sum(artMH.popVec(1 : end , susInds) , 2);
+    mhPopSus = annlz(mhPopSus_step) ./ stepsPerYear;
     
-    baseInc = sum(sum(sum(artBase.newHiv(2 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4)...
-        ./ basePopSus * fac;
-    medInc =sum(sum(sum(artMed.newHiv(2 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4)...
-        ./ medPopSus * fac;
-    highInc = sum(sum(sum(artHigh.newHiv(2 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4)...
-        ./ highPopSus * fac;
-    mhInc = sum(sum(sum(artMH.newHiv(2 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4)...
-        ./ highPopSus * fac;
+    fac = 10 ^ 2;
+    
+    newHiv_base_step = sum(sum(sum(artBase.newHiv(1 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4);
+    newHiv_med_step = sum(sum(sum(artMed.newHiv(1 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4);
+    newHiv_high_step = sum(sum(sum(artHigh.newHiv(1 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4);
+    newHiv_mh_step = sum(sum(sum(artMH.newHiv(1 : end , g , 4 : 10 , 1 : risk), 2), 3 ), 4);
+    
+    newHiv_base = annlz(newHiv_base_step);
+    newHiv_med = annlz(newHiv_med_step);
+    newHiv_high = annlz(newHiv_high_step);
+    newHiv_mh = annlz(newHiv_mh_step);
+    
+    baseInc = newHiv_base ./ basePopSus * fac;
+    medInc = newHiv_med ./ medPopSus * fac;
+    highInc = newHiv_mh ./ highPopSus * fac;
+    mhInc = newHiv_mh ./ highPopSus * fac;
     
     figure()
-    plot(tVec(2 : end) , medInc , tVec(2 : end ) , mhInc , ...
-        tVec( 2 : end) , highInc , tVec(2 : end) , baseInc);
+    plot(tVec(1 : stepsPerYear : end) , medInc , tVec(1 : stepsPerYear : end) , mhInc , ...
+        tVec(1 : stepsPerYear : end) , highInc , tVec(1 : stepsPerYear : end) , baseInc);
     xlim([tVec(1) , tVec(end)])
-    xlabel('Year'); ylabel('Incidence per 100,000');
+    xlabel('Year'); ylabel('Incidence per 100');
     title(['HIV Incidence in ' , gendLabel{g}])
     legend('65% Both' , 'M:65%, F:80%' , '80% Both' , 'M:45%, F:65%')
     
@@ -195,26 +204,34 @@ for g = 1 : gender
     deltaMH = (mhInc - baseInc) ./ baseInc * 100;
     
     figure()
-    plot(tVec(2 : end) , deltaMed , tVec(2 : end) , deltaMH , ...
-        tVec(2 : end) , deltaHigh);
+    plot(tVec(1 : stepsPerYear : end) , deltaMed , ...
+        tVec(1 : stepsPerYear : end) , deltaMH , ...
+        tVec(1 : stepsPerYear : end) , deltaHigh);
     xlim([tVec(1) , tVec(end)])
     xlabel('Year'); ylabel('Change (%)');
     title(['Change in Incidence in ' , gendLabel{g}])
     legend('65% Both' , 'M:65%, F:80%' , '80% Both')
     
     % Change in HIV-related mortality
-    fac = 10 ^ 5;
+    fac = 10 ^ 2;
     
-    baseMort = sum(sum(artBase.hivDeaths(2 : end , g , 1 : age), 2), 3) ./ basePopSus * fac;
-    medMort = sum(sum(artMed.hivDeaths(2 : end  , g , 1 : age) , 2), 3) ./ medPopSus * fac;
-    highMort = sum(sum(artHigh.hivDeaths(2 : end , g , 1 : age) , 2), 3) ./ highPopSus * fac;
-    mhMort = sum(sum(artMH.hivDeaths(2 : end , g , 1 : age) , 2), 3) ./ mhPopSus * fac;
+    baseMort_step = sum(sum(artBase.hivDeaths(1 : end , g , 1 : age), 2), 3);
+    medMort_step = sum(sum(artMed.hivDeaths(1 : end  , g , 1 : age) , 2), 3) ;
+    highMort_step = sum(sum(artHigh.hivDeaths(1 : end , g , 1 : age) , 2), 3);
+    mhMort_step = sum(sum(artMH.hivDeaths(1 : end , g , 1 : age) , 2), 3);
+    
+    baseMort = annlz(baseMort_step) ./ basePopSus * fac;
+    medMort = annlz(medMort_step) ./ medPopSus * fac;
+    highMort = annlz(highMort_step) ./ highPopSus * fac;
+    mhMort = annlz(mhMort_step) ./ mhPopSus * fac;
     
     figure()
-    plot(tVec(2 : end) , medMort , tVec(2 : end) , mhMort , ...
-        tVec( 2 : end) , highMort , tVec(2 : end) , baseMort);
+    plot(tVec(1 : stepsPerYear : end) , medMort , ...
+        tVec(1 : stepsPerYear : end) , mhMort , ...
+        tVec(1 : stepsPerYear : end) , highMort , ...
+        tVec(1 : stepsPerYear : end) , baseMort);
     xlim([tVec(1) , tVec(end)])
-    xlabel('Year'); ylabel('Mortality per 100,000');
+    xlabel('Year'); ylabel('Mortality per 100');
     title(['HIV Mortality in ' , gendLabel{g}])
     legend('65% Both' , 'M:65%, F:80%' , '80% Both' , 'M:45%, F:65%')
     
@@ -223,17 +240,18 @@ for g = 1 : gender
     deltaMortMH = (mhMort - baseMort) ./ baseMort * 100;
     
     figure()
-    plot(tVec(2 : end) , deltaMortMed , tVec(2 : end) , deltaMortMH , ...
-        tVec(2 : end) , deltaMortHigh);
+    plot(tVec(1 : stepsPerYear : end) , deltaMortMed , ...
+        tVec(1 : stepsPerYear : end) , deltaMortMH , ...
+        tVec(1 : stepsPerYear : end) , deltaMortHigh);
     xlim([tVec(1) , tVec(end)])
     xlabel('Year'); ylabel('Change (%)');
     title(['Change in Mortality in ' , gendLabel{g}])
     legend('65% Both' , 'M:65%, F:80%' , '80% Both')
     
     %% summary table
-    yr_2030 = (2030 - startYear) * stepsPerYear;
-    yr_2040 = (2040 - startYear) * stepsPerYear;
-    yr_2050 = (2050 - startYear) * stepsPerYear - 1;
+    yr_2030 = (2030 - startYear);% * stepsPerYear;
+    yr_2040 = (2040 - startYear);% * stepsPerYear;
+    yr_2050 = (2050 - startYear);% * stepsPerYear - 1;
     
     % Change in mortality
     deltaM_Med = [deltaMortMed(yr_2030) ; deltaMortMed(yr_2040) ; ...

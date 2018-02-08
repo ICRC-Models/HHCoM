@@ -259,7 +259,7 @@ end
 rImmuneHiv = HPV_calib3(10 : 13);
 c3c2Mults = HPV_calib3(14 : 17);
 c2c1Mults = HPV_calib3(18 : 21);
-artHpvMult = 1;%HPV_calib3(22);
+artHpvMult = HPV_calib3(22);
 perPartnerHpv= HPV_calib3(23);
 lambdaMultImm = HPV_calib3(24 : 39);
 

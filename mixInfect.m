@@ -310,7 +310,7 @@ for d = 1 : disease
                         if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2 , h);
                         elseif d == 10
-                            lambdaMult = artHpvMult(h);                            
+                            lambdaMult = artHpvMult;                            
                         end
 
                         % normal susceptibles
