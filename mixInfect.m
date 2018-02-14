@@ -194,7 +194,7 @@ elseif year >= peakYear
 end     
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
-psi(7) = 1 - circProtect .* cond;
+psi(7) = (1 - circProtect) .* cond;
 psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond;
 dPop = zeros(size(pop));
 newHiv = zeros(gender , age , risk); % incidence tally by gender
