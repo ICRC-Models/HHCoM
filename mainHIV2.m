@@ -270,11 +270,11 @@ parfor sim = 1 : length(tits)
 %     maxRateM_vec = maxRateM_arr{sim};
 %     maxRateF_vec = maxRateF_arr{sim};
     circAger = circAgerArray{sim};
-    maxRateM1 = 1 - exp(-0.9); %1 - exp(-maxRateM_vec(1));
-    maxRateM2 = 1 - exp(-0.9); %1 - exp(-maxRateM_vec(2));
-    maxRateF1 = 1 - exp(-0.9); %1 - exp(-maxRateF_vec(1));
-    maxRateF2 = 1 - exp(-0.9); %1 - exp(-maxRateF_vec(2));
-
+    maxRateM1 = -log(1-0.9); %-log(1-maxRateM_vec(1));
+    maxRateM2 = -log(1-0.9); %-log(1-maxRateM_vec(2));
+    maxRateF1 = -log(1-0.9); %-log(1-maxRateF_vec(1));
+    maxRateF2 = -log(1-0.9); %-log(1-maxRateF_vec(2));
+    baseCirc = sim == 1;
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
