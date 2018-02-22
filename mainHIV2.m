@@ -157,7 +157,7 @@ load('hpvData')
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
-vaxerAger = ager;
+circAger = ager;
 
 
 
@@ -235,26 +235,46 @@ perPartnerHpv = 0.1;%HPV_calib(9 * age + 14);
 % maxRateM_vec = [0.25 , 0.35];
 % maxRateF_vec = [0.35 , 0.5];
 circProtect = 0.6;
-maxRateM_arr = {[0.25 , 0.35] , [0.35 , 0.35] , [0.25 , 0.35] , [0.35 , 0.35]};
-maxRateF_arr = {[0.35 , 0.5] , [0.35, 0.5] , [0.5 , 0.5] , [0.5 , 0.5]};
-tits = {'unequalAll_Age' , 'equalMale_Age' , 'equalFemale_Age' , 'equalAll_Age'};
+maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95]};
+maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95]};
+tits = {'all90' , 'art70_90' , 'art70_95'};
+testParams = [0.4 , 0.9];
+circAgerArray = cell(2 , 1);
+for n = 1 : length(testParams)
+    circAger = ager;
+    circRate = testParams(n);
+    at = @(x , y) sort(prod(dim)*(y-1) + x);
+    fromAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+        1 , 3 : 6 , 1 : risk));
+    toAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+        1 , 3 : 6 , 1 : risk));
+    toAgeCircd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
+        1 , 3 : 6 , 1 : risk));
+    circAger(at(toAge , fromAge)) = (1 - circRate) * ager(at(toAge , fromAge));
+    circAger(at(toAgeCircd , fromAge)) = circRate * ager(at(toAge , fromAge)) ;
+    %     vaxer(at(toAge , fromAge)) = 1 - vaxRate;
+    circAgerArray{n} = circAger;
+end
+tits = {'baseCirc' , 'circHigh'};
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
-disp([num2str(length(maxRateM_arr)) , ' simulation(s) running...'])
+disp([num2str(length(circAgerArray)) , ' simulation(s) running...'])
 disp(' ')
 % progressbar('Simulation Progress')
-parfor sim = 1 : length(maxRateM_arr)
+parfor sim = 1 : size(circAgerArray , 1) %length(maxRateM_arr)
 % Gender and age specific max ART rates to test
-    maxRateM_vec = maxRateM_arr{sim};
-    maxRateF_vec = maxRateF_arr{sim};
+    maxRateM_vec = [0.9 , 0.9];%maxRateM_arr{sim};
+    maxRateF_vec = [0.9 , 0.9];%maxRateF_arr{sim};
 
     maxRateM1 = 1 - exp(-maxRateM_vec(1));
     maxRateM2 = 1 - exp(-maxRateM_vec(2));
     maxRateF1 = 1 - exp(-maxRateF_vec(1));
     maxRateF2 = 1 - exp(-maxRateF_vec(2));
-
+    
+    baseCirc = sim == 1;
+    circAger = circAgerArray{sim};
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
@@ -272,7 +292,8 @@ parfor sim = 1 : length(maxRateM_arr)
     tVec = linspace(startYear , endYear , size(popVec , 1));
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-
+    
+    
     for i = 2 : length(s) - 1
         tic
         year = startYear + s(i) - 1;
@@ -343,10 +364,17 @@ parfor sim = 1 : length(maxRateM_arr)
         end
 
 
-        [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie(t , pop , ...
+%         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie(t , pop , ...
+%             ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
+%             hivFertNegBirth , deathMat , circMat , circAger , MTCTRate , circStartYear , ...
+%             vaxStartYear , vaxRate , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
+        
+        [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie2(t , pop ,...
             ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-            hivFertNegBirth , deathMat , circMat , vaxerAger , MTCTRate , circStartYear , ...
-            vaxStartYear , vaxRate , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
+            hivFertNegBirth , deathMat , baseCirc , circMat , ...
+            circAger , MTCTRate , circStartYear , vaxStartYear , ...
+            vaxRate , startYear , endYear, currYear , stepsPerYear) , tspan , pop(end , :));
+        
         if any(pop(end , :) < 0)
             disp('After bornAgeDie')
             break
@@ -397,6 +425,8 @@ disp('Simulation complete.')
 % %% Show results
 % showResultsHIV() % for single scenario run
 % hivSimResults() % for multiple scenario runs
-ageGenderResults()
+% ageGenderResults()
+% ageResults()
+circResults()
 %% Convert results to CSV
 % resultOut()

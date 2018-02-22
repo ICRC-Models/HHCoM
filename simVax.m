@@ -86,27 +86,25 @@ lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 %%%%%
 
-% load('HPV_calib.dat')
-% kCin2_Cin3(: , 1) = HPV_calib(1 : age);
-% kCin3_Cin2(: , 1) = HPV_calib(age + 1 : 2 * age);
-% kCC_Cin3(: , 1) = HPV_calib(2 * age + 1 : 3 * age);
-% kCin2_Cin3(: , 2) = HPV_calib(3 * age + 1 : 4 * age);
-% kCin3_Cin2(: , 2) = HPV_calib(4 * age + 1 : 5 * age);
-% kCC_Cin3(: , 2) = HPV_calib(5 * age + 1 : 6 * age);
-% kCin2_Cin3(: , 3) = HPV_calib(6 * age + 1 : 7 * age);
-% kCin3_Cin2(: , 3) = HPV_calib(7 * age + 1 : 8 * age);
-% kCC_Cin3(: , 3) = HPV_calib(8 * age + 1 : 9 * age);
-% rImmuneHiv = HPV_calib(9 * age + 1 : 9 * age + 1 + 3);
-% c3c2Mults = HPV_calib(9 * age + 5 : 9 * age + 8);
-% c2c1Mults = HPV_calib(9 * age + 9 : 9 * age + 12);
-% artHpvMult = HPV_calib(9 * age + 13);
-% perPartnerHpv = HPV_calib(9 * age + 14);
+load('calibInitParams')
+load('HPV_calib3.dat')
+for i = 1 : 3
+    kCin2_Cin3(: , i) = HPV_calib3(i) .* kCin2_Cin3(: , i);
+    kCin3_Cin2(: , i) = HPV_calib3(3 + i) .* kCin3_Cin2(: , i);
+    kCC_Cin3(: , i) = HPV_calib3(6 + i) .* kCC_Cin3(: , i);
+end
 
+rImmuneHiv = HPV_calib3(10 : 13);
+c3c2Mults = HPV_calib3(14 : 17);
+c2c1Mults = HPV_calib3(18 : 21);
+artHpvMult = HPV_calib3(22);
+perPartnerHpv= HPV_calib3(23);
+lambdaMultImm = HPV_calib3(24 : 39);
 %%%%%
 
 c = fix(clock);
 currYear = c(1); % get the current year
-vaxEff = 1;
+vaxEff = 0.8;
 t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
 lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
@@ -282,7 +280,7 @@ parfor n = 1 : nTests
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
-    filename = ['FullEff_Vax_' , num2str(vaxRate) , '_wane_' , ...
+    filename = ['Vax_' , num2str(vaxRate) , '_wane_' , ...
         num2str(k_wane) , '.mat']; %sprintf('test_output%d.mat' , n);
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
@@ -295,4 +293,4 @@ parfor n = 1 : nTests
 end
 disp('Done')
 %%
-simVaxResultOut()
+simVaxResultOut_AgeStand()

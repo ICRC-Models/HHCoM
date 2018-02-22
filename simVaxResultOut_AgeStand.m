@@ -32,6 +32,7 @@ tVec = o90.tVec;
 % ax.YMinorGrid = 'on';
 % ax.GridColor = [1, 1, 1];
 % ax.GridAlpha = 0.4;
+reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 %%
 ageGroups = age - 4 + 1;
