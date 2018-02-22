@@ -16,9 +16,12 @@
 % derivatives that describes the change in the population's subgroups due
 % to aging.
 
-function [dPop , extraOut] = bornAgeDie2(t , pop , ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-    hivFertNegBirth , deathMat , baseCirc , circMat , circMat2 , circMat2B , circAger , MTCTRate , circStartYear , vaxStartYear , ...
-    vaxRate , startYear , endYear, currYear , stepsPerYear)
+function [dPop , extraOut] = bornAgeDie2(t , pop ,...
+            ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
+            hivFertNegBirth , deathMat , baseCirc , circMat , ...
+            circAger , MTCTRate , circStartYear , vaxStartYear , ...
+            vaxRate , startYear , endYear, currYear , stepsPerYear)
+        
 %% births and deaths
 %fertility = zeros(age , 6);
 kHiv = MTCTRate(1); % year <= 2004
@@ -62,16 +65,15 @@ deaths = deathMat * pop;
 % end
 
 circBirths = births * 0;
-if year > currYear && ~baseCirc
-    circBirths = 9 .* circMat * births; % 9 * 10% circumcised
-elseif year > currYear
-    circBirths = 4 .* circMat * births; %4 * 10% circumcised
-elseif year > circStartYear
+if year > currYear && baseCirc
+    circBirths = 4 .* circMat * births;
+elseif year > circStartYear && year < currYear
     circBirths = circMat * births;
+elseif year > circStartYear && ~baseCirc
+    circBirths = 9 .* circMat * births;
 end
-%% aging
 
-% aged = ager * pop;
+%% aging
 aged_circd = ager * pop;
 if year > currYear
     aged_circd = circAger * pop;

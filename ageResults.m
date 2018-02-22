@@ -1,10 +1,38 @@
-all90 = load('H:\HHCoM_Results\allSupp.mat');
+all90 = load('H:\HHCoM_Results\all90.mat');
 art70_90 = load('H:\HHCoM_Results\art70_90.mat');
 art70_95 = load('H:\HHCoM_Results\art70_95.mat');
-equalAll_Age = load('H:\HHCoM_Results\equalAll_Age.mat');
+load('general')
+load('settings')
 c = fix(clock);
 currYear = c(1); % get the current year
 yearNow = round((currYear - startYear) * stepsPerYear);
+
+colors = [241, 90, 90;
+          240, 196, 25;
+          78, 186, 111;
+          45, 149, 191;
+          149, 91, 165]/255;
+
+set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
+set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
+set(groot, 'DefaultFigureInvertHardcopy', 'off');
+set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
+set(groot, 'DefaultAxesColorOrder', colors);
+set(groot, 'DefaultLineLineWidth', 3);
+set(groot, 'DefaultTextColor', [1, 1, 1]);
+set(groot, 'DefaultAxesXColor', [1, 1, 1]);
+set(groot, 'DefaultAxesYColor', [1, 1, 1]);
+set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
+set(0,'defaultAxesFontSize',14)
+ax = gca;
+ax.XGrid = 'on';
+ax.XMinorGrid = 'on';
+ax.YGrid = 'on';
+ax.YMinorGrid = 'on';
+ax.GridColor = [1, 1, 1];
+ax.GridAlpha = 0.4;
+% reset(0)
+% set(0 , 'defaultlinelinewidth' , 2)
 %% Age-aggregated Disease Incidence
 wVec = zeros(age , 1);
 wVec(5 : age) = [0.188 , 0.18 , 0.159 , 0.121 , 0.088 , 0.067 , 0.054 , ...
@@ -39,6 +67,75 @@ for i = 1 : length(newHiv_Arr)
     hold on
 end
 xlabel('Year'); ylabel('Incidence per 100'); title('HIV Incidence')
+% Women aged 16-29:  35% on treatment (30% suppressed)
+% Women aged 30+: 60% on treatment (55% suppressed)
+% Men aged 16-29: 25% on treatment (20% suppressed)
+% Men aged 30+: 50% on treatment (40% suppressed).
+legend('Base (90% all)' , '70/90' , '70/95', ...
+    'Location' , 'northeastoutside')
+%% Difference in Age-standardized Disease Incidence
+% relative to base case, i.e. 90% coverage for all
+figure()
+for i = 2 : length(newHiv_Arr)
+    incAS = sum(bsxfun(@times , inc{i} , wVec)) ...
+        - sum(bsxfun(@times , inc{1} , wVec));
+    plot(tVec(1 : stepsPerYear : end) , incAS)
+    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+    hold on
+end
+xlabel('Year'); ylabel('Difference in Incidence per 100'); 
+title('Difference in HIV Incidence (vs Base Case)')
+% Women aged 16-29:  35% on treatment (30% suppressed)
+% Women aged 30+: 60% on treatment (55% suppressed)
+% Men aged 16-29: 25% on treatment (20% suppressed)
+% Men aged 30+: 50% on treatment (40% suppressed).
+legend('70/90' , '70/95', ...
+    'Location' , 'northeastoutside')
+
+% percentage form
+figure()
+for i = 2 : length(newHiv_Arr)
+    incAS = (sum(bsxfun(@times , inc{i} , wVec)) ...
+        - sum(bsxfun(@times , inc{1} , wVec))) ...
+        ./ sum(bsxfun(@times , inc{1} , wVec)) * 100;
+    plot(tVec(1 : stepsPerYear : end) , incAS)
+    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+    hold on
+end
+xlabel('Year'); ylabel('Difference in Incidence (%)'); 
+title('Difference in HIV Incidence (vs Base Case)')
+% Women aged 16-29:  35% on treatment (30% suppressed)
+% Women aged 30+: 60% on treatment (55% suppressed)
+% Men aged 16-29: 25% on treatment (20% suppressed)
+% Men aged 30+: 50% on treatment (40% suppressed).
+legend('70/90' , '70/95', ...
+    'Location' , 'northeastoutside')
+
+%% Non Age-standardized Disease Incidence
+figure()
+inc = {incMat , incMat , incMat , incMat};
+tVec = all90.tVec;
+for i = 1 : length(newHiv_Arr)
+    newHiv = sum(sum(sum(newHiv_Arr{i}(1 : end , 1 : gender , 4 : age , :)...
+        ,2),3),4);
+    popVec = popVec_Arr{i};
+    hivSusInds = toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 1 : gender , 4 : age , 1 : risk));
+    hivSus = sum(popVec(1 : end , hivSusInds) , 2);
+    hivSus_Year = sum(reshape(hivSus , stepsPerYear , size(hivSus , 1) ...
+        / stepsPerYear)) ./ stepsPerYear; % average susceptible population size per year
+    newHiv_Year = sum(reshape(newHiv , stepsPerYear , size(newHiv , 1) ...
+        /stepsPerYear)); % total new HIV infections per year
+    inc{i} = newHiv_Year ./ hivSus_Year .* 100;
+end
+
+for i = 1 : length(newHiv_Arr)
+    incAS = sum(bsxfun(@times , inc{i} , wVec));
+    plot(tVec(1 : stepsPerYear : end) , incAS)
+    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+    hold on
+end
+xlabel('Year'); ylabel('Non-Age-Standardized Incidence per 100'); title('HIV Incidence')
 % Women aged 16-29:  35% on treatment (30% suppressed)
 % Women aged 30+: 60% on treatment (55% suppressed)
 % Men aged 16-29: 25% on treatment (20% suppressed)

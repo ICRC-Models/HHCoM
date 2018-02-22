@@ -85,6 +85,7 @@ for i = 1 : 3
     kCin3_Cin2(: , i) = HPV_calib3(3 + i) .* kCin3_Cin2(: , i);
     kCC_Cin3(: , i) = HPV_calib3(6 + i) .* kCC_Cin3(: , i);
 end
+<<<<<<< HEAD
 
 rImmuneHiv = HPV_calib3(10 : 13);
 c3c2Mults = HPV_calib3(14 : 17);
@@ -92,7 +93,15 @@ c2c1Mults = HPV_calib3(18 : 21);
 artHpvMult = HPV_calib3(22);
 perPartnerHpv= HPV_calib3(23);
 lambdaMultImm = HPV_calib3(24 : 39);
+=======
+>>>>>>> b8b4a28
 
+rImmuneHiv = HPV_calib3(10 : 13);
+c3c2Mults = HPV_calib3(14 : 17);
+c2c1Mults = HPV_calib3(18 : 21);
+artHpvMult = HPV_calib3(22);
+perPartnerHpv= HPV_calib3(23);
+lambdaMultImm = HPV_calib3(24 : 39);
 %%%%%
 
 c = fix(clock);
@@ -273,7 +282,11 @@ parfor n = 1 : nTests
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
+<<<<<<< HEAD
     filename = [num2str(vaxRate) , '_wane_' , ...
+=======
+    filename = ['Vax_' , num2str(vaxRate) , '_wane_' , ...
+>>>>>>> b8b4a28
         num2str(k_wane) , '.mat']; %sprintf('test_output%d.mat' , n);
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
@@ -286,4 +299,4 @@ parfor n = 1 : nTests
 end
 disp('Done')
 %%
-simVaxResultOut()
+simVaxResultOut_AgeStand()

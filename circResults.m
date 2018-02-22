@@ -68,7 +68,7 @@ artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates, ...
     1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
 figure()
 plot(tVec , sum(baseCirc.popVec(: , hivInds) , 2) ./ sum(baseCirc.popVec(: , allInds) , 2) * 100 ,...
-    tVec , sum(circHigh.popVec(: , hivInds) , 2) ./ sum(circHigh.popVec(: , allInds) , 2))
+    tVec , sum(circHigh.popVec(: , hivInds) , 2) ./ sum(circHigh.popVec(: , allInds) , 2) * 100)
 legend('Base', '90% 16-29 YO Males circumcised' , ...
     'Location' , 'northeastoutside')
 title('HIV Prevalence')
@@ -81,7 +81,7 @@ allMInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates
     1 : periods , 1 , 1 :  age , 1 : risk))];
 figure()
 plot(tVec , sum(baseCirc.popVec(: , circInds) , 2) ./ sum(baseCirc.popVec(: , allMInds) , 2) * 100 ,...
-    tVec , sum(circHigh.popVec(: , circInds) , 2) ./ sum(circHigh.popVec(: , allMInds) , 2))
+    tVec , sum(circHigh.popVec(: , circInds) , 2) ./ sum(circHigh.popVec(: , allMInds) , 2) * 100)
 legend('Base', '90% 16-29 YO Males circumcised' , ...
     'Location' , 'northeastoutside')
 title('Circumcision')
