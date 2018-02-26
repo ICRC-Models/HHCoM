@@ -237,37 +237,39 @@ perPartnerHpv = 0.1;%HPV_calib(9 * age + 14);
 % maxRateM_vec = [0.25 , 0.35];
 % maxRateF_vec = [0.35 , 0.5];
 circProtect = 0.6;
-maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95]};
-maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95]};
-tits = {'all90' , 'art70_90' , 'art70_95'};
-testParams = [0.4 , 0.9];
-circAgerArray = cell(2 , 1);
-for n = 1 : length(testParams)
-    circAger = ager;
-    circRate = testParams(n);
-    at = @(x , y) sort(prod(dim)*(y-1) + x);
-    fromAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
-        1 , 3 : 6 , 1 : risk));
-    toAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
-        1 , 3 : 6 , 1 : risk));
-    toAgeCircd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
-        1 , 3 : 6 , 1 : risk));
-    circAger(at(toAge , fromAge)) = (1 - circRate) * ager(at(toAge , fromAge));
-    circAger(at(toAgeCircd , fromAge)) = circRate * ager(at(toAge , fromAge)) ;
-    circAgerArray{n} = circAger;
-end
-tits = {'baseCirc' , 'circHigh'};
+maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
+maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
+tits = {'all90' , 'art70_90' , 'art70_95' , 'all70'};
+% testParams = [0.4 , 0.9];
+% circAgerArray = cell(2 , 1);
+% for n = 1 : length(testParams)
+%     for a = 3 : 6
+%         circAger = ager;
+%         circRate = testParams(n);
+%         at = @(x , y) sort(prod(dim)*(y-1) + x);
+%         fromAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+%             1 , a , 1 : risk));
+%         toAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+%             1 , a + 1 , 1 : risk));
+%         toAgeCircd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
+%             1 , a + 1 , 1 : risk));
+%         circAger(at(toAge , fromAge)) = (1 - circRate) * ager(at(toAge , fromAge));
+%         circAger(at(toAgeCircd , fromAge)) = circRate * ager(at(toAge , fromAge)) ;
+%         circAgerArray{n} = circAger;
+%     end
+% end
+% tits = {'baseCirc' , 'circHigh'};
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
-disp([num2str(length(circAgerArray)) , ' simulation(s) running...'])
+disp([num2str(length(maxRateM_arr)) , ' simulation(s) running...'])
 disp(' ')
 % progressbar('Simulation Progress')
-parfor sim = 1 : size(circAgerArray , 1) %length(maxRateM_arr)
+parfor sim = 1 : length(maxRateM_arr)
 % Gender and age specific max ART rates to test
-    maxRateM_vec = [0.9 , 0.9];%maxRateM_arr{sim};
-    maxRateF_vec = [0.9 , 0.9];%maxRateF_arr{sim};
+    maxRateM_vec = maxRateM_arr{sim};
+    maxRateF_vec = maxRateF_arr{sim};
 
     maxRateM1 = 1 - exp(-maxRateM_vec(1));
     maxRateM2 = 1 - exp(-maxRateM_vec(2));
@@ -275,7 +277,7 @@ parfor sim = 1 : size(circAgerArray , 1) %length(maxRateM_arr)
     maxRateF2 = 1 - exp(-maxRateF_vec(2));
     
     baseCirc = sim == 1;
-    circAger = circAgerArray{sim};
+    circAger = ager;%circAgerArray{sim};
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
@@ -427,7 +429,7 @@ disp('Simulation complete.')
 % hivSimResults() % for multiple scenario runs
 % ageGenderResults()
 
-% ageResults()
-circResults()
+ageResults()
+% circResults()
 %% Convert results to CSV
 % resultOut()
