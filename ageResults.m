@@ -39,8 +39,8 @@ wVec = zeros(age , 1);
 wVec(5 : age) = [0.188 , 0.18 , 0.159 , 0.121 , 0.088 , 0.067 , 0.054 , ...
     0.046 , 0.038 , 0.029 , 0.017 , 0.013]; 
 figure()
-newHiv_Arr = {all70.newHiv , all90.newHiv , art70_90.newHiv , art70_95.newHiv};
-popVec_Arr = {all70.popVec , all90.popVec , art70_90.popVec , art70_95.popVec};
+newHiv_Arr = {all70.newHiv , art70_90.newHiv , art70_95.newHiv , all90.newHiv};
+popVec_Arr = {all70.popVec , art70_90.popVec , art70_95.popVec , all90.popVec};
 incMat = zeros(age , size(all90.popVec , 1) / stepsPerYear);
 
 inc = {incMat , incMat , incMat , incMat};
@@ -72,7 +72,8 @@ xlabel('Year'); ylabel('Incidence per 100'); title('HIV Incidence')
 % Women aged 30+: 60% on treatment (55% suppressed)
 % Men aged 16-29: 25% on treatment (20% suppressed)
 % Men aged 30+: 50% on treatment (40% suppressed).
-legend('70/70' , '90/90' , '70/90' , '70/95', ...
+legend('70% ART coverage in all ages' , '70% in 15-29 year olds; 90% in 30+' , ...
+    '70% in 15-29 year olds; 95% in 30+', '90% ART coverage in all ages' , ... 
     'Location' , 'northeastoutside')
 %% Difference in Age-standardized Disease Incidence
 % relative to base case, i.e. 70% coverage for all
@@ -109,7 +110,8 @@ title('Difference in HIV Incidence (vs Base Case)')
 % Women aged 30+: 60% on treatment (55% suppressed)
 % Men aged 16-29: 25% on treatment (20% suppressed)
 % Men aged 30+: 50% on treatment (40% suppressed).
-legend('90/90' , '70/90' , '70/95', ...
+legend('70% in 15-29 year olds; 90% in 30+' , ...
+    '70% in 15-29 year olds; 95% in 30+', '90% ART coverage in all ages' , ...
     'Location' , 'northeastoutside')
 
 %% Non Age-standardized Disease Incidence
