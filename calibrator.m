@@ -156,8 +156,8 @@ vaxStartYear = 2017;
 % kCC_Cin3_Mults = initParams(7 : 9);
 
 for i = 1 : 3
-    kCin2_Cin3(: , i) = initParams(i) .* kCin2_Cin3(: , i);
-    kCin3_Cin2(: , i) = initParams(3 + i) .* kCin3_Cin2(: , i);
+    kCin1_Inf(: , i) = initParams(i) .* kCin1_Inf(: , i);
+    kInf_Cin1(: , i) = initParams(3 + i) .* kInf_Cin1(: , i);
     kCC_Cin3(: , i) = initParams(6 + i) .* kCC_Cin3(: , i);
 end
 
@@ -167,7 +167,8 @@ c2c1Mults = initParams(18 : 21);
 artHpvMult = initParams(22);
 perPartnerHpv= initParams(23);
 lambdaMultImm = initParams(24 : 39);
-
+hpv_hivClear = initParams(40 : 43);
+hpvClearMult = initParams(44 : 47);
 %% Simulation variable preparation
 OMEGA(1 : 3) = 0;
 OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
@@ -213,7 +214,7 @@ for i = 2 : length(s) - 1
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
             kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
-            rNormal_Inf , hpv_hivClear , c3c2Mults , ...
+            rNormal_Inf , hpv_hivClear , c3c2Mults , hpvClearMult , ...
             c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
             rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
         popIn = pop(end , :);

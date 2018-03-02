@@ -8,7 +8,7 @@ function[dPop , extraOut] = hpv(t , pop , immuneInds , infInds , cin1Inds , ...
     cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
     kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
-    rNormal_Inf , hpv_hivClear , c3c2Mults , ...
+    rNormal_Inf , hpv_hivClear , c3c2Mults , hpvClearMult , ...
     c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
     rImmuneHiv , vaccinated , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,8 +41,8 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpv_hivClear(d - 2); % Regression multiplier
-        rHivHpv_Clear = 0.1; % Infection clearance multiplier
+        rHivHpvMult = hpvClearMult(d - 2); % Regression multiplier
+        rHivHpv_Clear = 0.1 .* hpv_hivClear(d - 2); % Infection clearance multiplier
         deathCC = muCC(d - 2 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
     elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
@@ -50,8 +50,8 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpv_hivClear(1); % Regression multiplier
-        rHivHpv_Clear = 0.25; % Infection clearance multiplier
+        rHivHpvMult = hpvClearMult(1); % Regression multiplier
+        rHivHpv_Clear = 1; % Infection clearance multiplier
         deathCC = muCC(5 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
@@ -92,7 +92,7 @@ for d = 1 : disease
                     * rHivHpv_Clear) .* pop(infF); % infF -> immuneF
                  
                 
-                dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpvMult * pop(infM); % regression to immune from infected males
+                dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpvMult * pop(infM); % regression to normal from infected males
 
                 % Infection and CIN progression in females only
                 % kCin_Inf(stage , hpvType , age group)

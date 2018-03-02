@@ -38,12 +38,12 @@ treat(6 , : , : , 4 : end, :) = 0; % ART coverage
 kOn = ones(6 , 1);
 kOn(6) = 0;
 
-if year < 2018
-    maxRateM1 = 1 - exp(-0.25);
-    maxRateM2 = 1 - exp(-0.35);
-    maxRateF1 = 1 - exp(-0.35);
-    maxRateF2 = 1 - exp(-0.5);
-end
+% if year < 2018
+maxRateM1 = 0.42;%1 - exp(-0.25);
+maxRateM2 = 0.42;%1 - exp(-0.35);
+maxRateF1 = 0.42;%1 - exp(-0.35);
+maxRateF2 = 0.42;%1 - exp(-0.5);
+% end
 
 % CD4 > 200 from 2013 to 2020
 if year >= 2013
@@ -186,7 +186,7 @@ prepOut = 0; % for now
 
 
 for g = 1 : gender
-    for a = 1 : age
+    for a = 4 : age
         for r = 1 : risk
             % HIV Negative, uncircumcised (d = 1)
             hivNegative = hivInds(1 , 1 , g , a , r , :);  %allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r)

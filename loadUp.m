@@ -1,4 +1,5 @@
-% Load parameters and other input data
+% Load parameters and other input data. Accepts steps per year as an
+% argument
 function[] = loadUp(stepsPerYear)
 load('settings')
 %% import and save population parameters
@@ -17,8 +18,8 @@ actsPer = xlsread(file , 'Demographics' , 'AI2:AK3'); % [gender x risk]; acts pe
 epsA = xlsread(file , 'Demographics' , 'AO2:AO4'); % [year] <1998 , 2003 , >2010 ; force of infection mixing
 epsR = xlsread(file , 'Demographics' , 'AP2:AP4'); % [year] <1998 , 2003 , >2010
 yr = xlsread(file , 'Demographics' , 'AN2:AN4'); % years
-
-save('popData' , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
+savdir = [pwd , '\HHCoM_Config']; 
+save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
     'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'yr');
 
 %% import and save HIV parameters
@@ -66,7 +67,7 @@ toPrep = 0; % initially
 prepOut = xlsread(file , 'Disease Data' , 'B3');
 artOut = xlsread(file , 'Disease Data' , 'C3');
 
-save('HIVParams') % save HIV parameters to a workspace file
+save(fullfile(savdir , 'HIVParams')) % save HIV parameters to a workspace file
 
 %% save general parameters
 disease = 10;
@@ -90,7 +91,7 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
 sumall = @(x) sum(x(:));
 modelYr1 = 1980;
 modelYrLast = endYear;
-save('general', 'disease' , 'viral' , 'hpvTypes' , 'hpvStates' , 'periods' ,...
+save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates' , 'periods' ,...
     'gender' , 'age' , 'risk' , 'modelYr1' , ...
     'dim' , 'k' , 'sumall' , 'toInd' , 'circ' , ...
     'condUse' , 'stepsPerYear'); % save general model parameters to a workspace file
@@ -109,7 +110,7 @@ for i = 1 : size(yr , 1) - 1
 end
 modelYrLast = endYear;
 
-save('mixInfectParams'  , 'epsA_vec' , ...
+save(fullfile(savdir , 'mixInfectParams')  , 'epsA_vec' , ...
     'epsR_vec' , 'yr' , 'modelYr1' , 'modelYrLast' , ...
     'circProtect' , 'condProtect')
 
@@ -139,7 +140,7 @@ for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
 end
-save('vlBeta' , 'betaHIVF2M' , 'betaHIVM2F')
+save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F')
 %% Load indices
 % prompt = {'Calculate Indices? (1 = yes, 0 = no)'};
 % tit = 'Calculate Indices?';
@@ -229,7 +230,7 @@ hpv_hivMult = flipud(xlsread(file , 'HPV' , 'B21 : D24'));
 hpv_hivClear = xlsread(file , 'CIN Transition' , 'D68 : D71');
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B75 : B78');
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B81 : B84');
-save('hpvData' , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
+save(fullfile(savdir , 'hpvData') , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
     'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'kRL' , 'kDR' , 'detCC' , 'hivCC' , ...
     'kPap' , 'hpvSens' , 'cytoSens' , 'leep' , 'screenFreq' , 'ageStart' , 'ageEnd',...
     'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'kCin2_Cin1', ...
@@ -253,6 +254,7 @@ disp(' ')
 %% Retrieve calibration data
 % dimensions = [pos , N]
 clear
+savdir = [pwd , '\HHCoM_Config']; 
 cinPos2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
 cinNeg2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
 hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
@@ -263,5 +265,5 @@ hpv_hivNeg_obs = xlsread('config.xlsx' , 'Calibration' , 'D153 : F161');
 
 hivPrevM_obs = xlsread('config.xlsx' , 'Calibration' , 'D60 : F101');
 hivPrevF_obs = xlsread('config.xlsx' , 'Calibration' , 'D102 : F143');
-save('calibData')
+save(fullfile(savdir , 'calibData'))
 clear

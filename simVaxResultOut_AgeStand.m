@@ -7,6 +7,10 @@ o50 = load('H:\HHCoM_Results\Vax_0.5_wane_0.mat'); % 50% coverage
 oNo = load('H:\HHCoM_Results\Vax_0_wane_0.mat'); % No vaccine
 tVec = o90.tVec;
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+midMat = zeros(stepsPerYear , size(o90.popVec , 1) / stepsPerYear);
+midMat(1 , :) = 1;
+midMat(end , :) = 1;
+midAnn = @(x) sum(midMat .* reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) / 2;
 %% Plot Settings
 
 % colors = [241, 90, 90;
@@ -290,8 +294,8 @@ for i = 1 : length(inds)
     v50_Mort = sum(bsxfun(@times , v50_MortAge , wVec));
     
     figure()
-    plot(tVec(1 : stepsPerYear : end) , vNo_Mort , tVec(1 : stepsPerYear : end) , v90_Mort , ...
-        tVec(1 : stepsPerYear : end) , v70_Mort , tVec(1 : stepsPerYear : end) , v50_Mort)
+    plot(tVec(1 : stepsPerYear : end - 1) , vNo_Mort , tVec(1 : stepsPerYear : end - 1) , v90_Mort , ...
+        tVec(1 : stepsPerYear : end - 1) , v70_Mort , tVec(1 : stepsPerYear : end - 1) , v50_Mort)
     title([plotTits{i} , ' Mortality'])
     xlabel('Year'); ylabel('Mortality per 100,000')
     legend('No vaccination' , '90% coverage' , '70% coverage' , ...
@@ -302,14 +306,14 @@ for i = 1 : length(inds)
     v50_Red = (v50_Mort - vNo_Mort) ./ vNo_Mort * 100;
     
     figure()
-    plot(tVec(1 : stepsPerYear : end) , v90_Red , tVec(1 : stepsPerYear : end) , v70_Red , ...
-        tVec(1 : stepsPerYear : end) , v50_Red)
+    plot(tVec(1 : stepsPerYear : end - 1) , v90_Red , tVec(1 : stepsPerYear : end - 1) , v70_Red , ...
+        tVec(1 : stepsPerYear : end - 1) , v50_Red)
     title([plotTits{i} , ' Mortality Reduction'])
     xlabel('Year'); ylabel('Reduction (%)')
     legend('90% coverage' , '70% coverage' , '50% coverage')
     axis([tVec(2) tVec(end) -100 0])
     
-    T = table(tVec(1 : stepsPerYear : end)' , v90_Mort' , v70_Mort' , v50_Mort' , ...
+    T = table(tVec(1 : stepsPerYear : end - 1)' , v90_Mort' , v70_Mort' , v50_Mort' , ...
         v90_Red' , v70_Red' , v50_Red');
     writetable(T , [files{i} , '_stand.csv'] , 'Delimiter' , ',')
 end

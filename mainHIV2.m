@@ -159,54 +159,7 @@ load('hpvData')
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
-circAger = ager;
-
-
-
-% Test (Weighted 4 age group moving average of CIN progression rates)
-w = ones(4 , 1) ./ 4;
-kCC_Cin3_Orig = kCC_Cin3;
-kCin2_Cin3_Orig = kCin2_Cin3;
-kCin2_Cin1_Orig = kCin2_Cin1;
-kCin1_Cin2_Orig = kCin1_Cin2;
-kCin3_Cin2_Orig = kCin3_Cin2;
-rNormal_Inf_Orig = rNormal_Inf;
-
-for i = 1 : 3
-    rNormal_Inf(: , i) = conv(rNormal_Inf_Orig(: , i) , w , 'same');
-    rNormal_Inf(end - 1 : end , i) = conv(rNormal_Inf_Orig(end - 1 : end , i) , w , 'same');
-    kCC_Cin3(: , i) = conv(kCC_Cin3_Orig(: , i) , w , 'same');
-    kCC_Cin3(end - 1 : end , i) = kCC_Cin3_Orig(end - 1 : end , i);
-    %     kCin2_Cin3(: , i) = conv(kCin2_Cin3_Orig(: , i) , w , 'same');
-    %     kCin2_Cin3(end - 1 : end , i) = kCin3_Cin2_Orig(end - 1 : end , i);
-    kCin3_Cin2(: , i) = conv(kCin3_Cin2_Orig(: , i) , w , 'same');
-    kCin3_Cin2(end - 1 : end , i) = kCin3_Cin2_Orig(end - 1 : end , i);
-    kCin1_Cin2(: , i) = conv(kCin1_Cin2_Orig(: , i) , w , 'same');
-    kCin1_Cin2(end - 1 : end , i) = kCin1_Cin2_Orig(end - 1 : end , i);
-    kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
-    kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
-end
-% rNormal_Inf(: , 1) = rNormal_Inf(: , 1) .* 1.2;
-% rNormal_Inf(: , 2) = rNormal_Inf(: , 2) .* 0.8;
-% rNormal_Inf(: , 3) = rNormal_Inf(: , 3) .* 0.9;
-rNormal_Inf = rNormal_Inf .* 0.85;
-% c2c1Mults = 1.5 .* c2c1Mults;
-% kCin1_Cin2(1 : end , :) = 1.2 * kCin1_Cin2(1 : end , :);
-kCin2_Cin1(6 : end , :) = 1.25 * kCin2_Cin1(6 : end , :);
-kCin3_Cin2(10 : end , :) = 2.8 * kCin3_Cin2(10 : end , :);
-kCin2_Cin3 = 0.5 .* kCin2_Cin3;
-kCC_Cin3(7 : end , :) = 4 .* kCC_Cin3(7 : end , :);
-muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from yearly to monthly
-%     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-artHpvMult = hpv_hivMult(1 , :) * 0.25;
-perPartnerHpv = 0.1; % high risk HPV transmission risk per month
-rImmuneHiv = 3 ./ hpv_hivClear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-lambdaMultImm(1 : 4) = 1 - 0.01;
-lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
-lambdaMultImm(11 : age) = lambdaMultImm(10);
-lambdaMultVax = ones(age , 2);
-
 % profile on
 disp(' ')
 % Initialize vectors
@@ -219,7 +172,7 @@ runtimes = zeros(size(s , 2) - 2 , 1);
 
 
 %% use calibrated parameters
-% load('HPV_calib.dat')
+load('calibInitParams')
 % kCin2_Cin3(: , 1) = HPV_calib(1 : age);
 % kCin3_Cin2(: , 1) = HPV_calib(age + 1 : 2 * age);
 % kCC_Cin3(: , 1) = HPV_calib(2 * age + 1 : 3 * age);
@@ -259,6 +212,9 @@ tits = {'all90' , 'art70_90' , 'art70_95' , 'all70'};
 %     end
 % end
 % tits = {'baseCirc' , 'circHigh'};
+circAger = ager;
+% startYear = 2016;
+endYear = 2050;
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
