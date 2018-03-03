@@ -6,7 +6,8 @@ toInd = @(x)(x(:,8)-1)*k(7)+(x(:,7)-1)*k(6)+(x(:,6)-1)*k(5)+(x(:,5)-1)*k(4)+(x(:
 %% CIN2/3 prevalence by HIV status
 cinPos2014 = zeros(10 , 1);
 cinNeg2014 = cinPos2014;
-load('general')
+% paramDir = [pwd , '\Params\'];
+% load([paramDir, 'general'])
 for a = 4 : 13 % 15-19 -> 60-64
     % HIV+
     cinInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 3 : 4, ...

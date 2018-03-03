@@ -13,27 +13,29 @@ popIn = load('H:\HHCoM_Results\to2017');
 currPop = popIn.popLast;
 
 % load variables
-load('general');
-load('settings');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('vaxer')
-load('mixInfectParams');
-load('hpvData')
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('vaxInds')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
 %%%%%%%
-load('calibParams')
+load([paramDir , 'calibParams'])
 w = ones(4 , 1) ./ 4;
 kCC_Cin3_Orig = kCC_Cin3;
 kCin2_Cin3_Orig = kCin2_Cin3;
@@ -78,8 +80,8 @@ lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 %%%%%
 
-load('calibInitParams')
-% load('HPV_calib3.dat')
+load([paramDir , 'calibInitParams'])
+% load([paramDir , 'HPV_calib3.dat'])
 % for i = 1 : 3
 %     kCin2_Cin3(: , i) = HPV_calib3(i) .* kCin2_Cin3(: , i);
 %     kCin3_Cin2(: , i) = HPV_calib3(3 + i) .* kCin3_Cin2(: , i);

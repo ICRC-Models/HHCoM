@@ -1,7 +1,8 @@
 function[] = showResults()
 %%
-load('actual')
-load('calibData')
+paramDir = [pwd , '\Params\'];
+load([paramDir,'actual'])
+load([paramDir,'calibData'])
 % load('C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results\to2017')
 load('H:\HHCoM_Results\to2017')
 %% Plot Settings

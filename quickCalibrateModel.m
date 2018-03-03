@@ -1,27 +1,29 @@
 function quickCalibrateModel()
 close all; clear all; clc
-load('popData')
-load('general');
-load('settings');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('vaxer')
-load('mixInfectParams');
-load('hpvData')
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('calibData')
-load('calibParams')
-load('vaxInds')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
+load([paramDir,'calibData'])
+load([paramDir,'calibInitParams'])
+import java.util.LinkedList
 
 w = ones(4 , 1) ./ 4;
 kCC_Cin3_Orig = kCC_Cin3;
@@ -107,4 +109,5 @@ options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
 x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 %%
 file = 'HPV_calib4.dat';
-csvwrite(file , x)
+paramDir = [pwd , '\Params\'];
+csvwrite([paramDir, file] , x)

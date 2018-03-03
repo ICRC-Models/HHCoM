@@ -32,10 +32,11 @@ endYear = 2050; %currYear;
 years = endYear - startYear;
 save('settings' , 'years' , 'startYear' , 'endYear')
 % Load parameters and constants for main
-load('general')
+paramDir = [pwd , '\Params\'];
+load([paramDir,'general'])
 %% Initial population
-load('popData')
-load('hpvData')
+load([paramDir,'popData'])
+load([paramDir,'hpvData'])
 % load('initPop')
 % simulation
 mInit = popInit(: , 1);
@@ -134,29 +135,31 @@ vaxStartYear = 2100;
 
 %% Simulation
 disp('Start up')
-load('general');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('vaxer')
-load('mixInfectParams');
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('calibParams')
-load('vaxInds')
-load('settings')
-load('hpvData')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
+vaxerAger = ager;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 % profile on
 disp(' ')
@@ -170,7 +173,7 @@ runtimes = zeros(size(s , 2) - 2 , 1);
 
 
 %% use calibrated parameters
-load('calibInitParams')
+load([paramDir , 'calibInitParams'])
 % load('HPV_calib3.dat')
 % for i = 1 : 3
 %     kCin2_Cin3(: , i) = HPV_calib3(i) .* kCin2_Cin3(: , i);
@@ -215,7 +218,7 @@ for n = 1 : length(testParams)
             2 , a + 1 , 1 : risk));
         dapAger(at(toAge , fromAge)) = (1 - dapCover) * ager(at(toAge , fromAge));
         dapAger(at(toAge , fromAgeDapd)) = (1 - dapCover) * ager(at(toAge , fromAgeDapd));
-        dapAger(at(toAgeDapd , fromAge)) = dapCover * ager(at(toAge , fromAge));
+        dapAger(at(toAgeDapd , fromAge)) = dapCover * ager(at(toAgeDapd , fromAge));
         dapAger(at(toAgeDapd , fromAgeDapd)) = dapCover * ager(at(toAgeDapd , fromAgeDapd));
         dapAgerArray{n} = dapAger;
     end
@@ -385,24 +388,4 @@ disp('Simulation complete.')
 
 % profile viewer
 %%
-% figure()
-% plot(1 : size(runtimes , 1) , runtimes)
-% xlabel('Step'); ylabel('Time(s)')
-% title('Runtimes')
-% %%
-% avgRuntime = mean(runtimes); % seconds
-% stdRuntime = std(runtimes); % seconds
-% disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
-% disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
-% disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
-% figure()
-% h = histogram(runtimes);
-% title('Runtimes')
-% ylabel('Frequency')
-% xlabel('Times (s)')
-% % %% load target values
-% % load('targetVals')
-% %% Show results
 dapResults()
-%% Convert results to CSV
-% resultOut()

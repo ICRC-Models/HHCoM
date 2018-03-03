@@ -1,8 +1,9 @@
 noDap = load('H:\HHCoM_Results\noDap.mat');
 dap10 = load('H:\HHCoM_Results\dap10.mat');
 dap20 = load('H:\HHCoM_Results\dap20.mat');
-load('general')
-load('settings')
+paramDir = [pwd , '\Params\'];
+load([paramDir , 'general'])
+load([paramDir , 'settings'])
 c = fix(clock);
 currYear = c(1); % get the current year
 yearNow = round((currYear - startYear) * stepsPerYear);

@@ -3,8 +3,10 @@ close all; clear all; clc
 % loadUp(6);
 %% Initialize pop vector
 disp('Building matrices')
-load('popData')
-load('general')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir , 'popData'])
+savdir = [pwd , '\Params']; 
 pop = spalloc(prod(dim) , 1 , prod(dim));
 at = @(x , y) sort(prod(dim)*(y-1) + x); 
 %% aging and risk assortment
@@ -41,11 +43,11 @@ for g = 1 : gender
         end
     end
 end
-save('riskSorter' , 'riskSorter');
+save(fullfile(savedir , 'riskSorter') , 'riskSorter');
 
 disp('Combining age and risk sorting matrices')
 ageRiskSorter = riskSorter * ageIn;
-save('ageRiskSorter' , 'ageRiskSorter')
+save(fullfile(savedir , 'ageRiskSorter') , 'ageRiskSorter')
 ageOut = spalloc(numel(pop) , numel(pop) , numel(pop));
 for g = 1 : gender
     for a = 1 : age
@@ -56,14 +58,14 @@ for g = 1 : gender
         end
     end
 end
-save('ageOut' , 'ageOut')
+save(fullfile(savedir ,'ageOut') , 'ageOut')
 ager = riskSorter * ageIn + ageOut;
-save('ager' , 'ager')
+save(fullfile(savedir ,'ager') , 'ager')
 disp('Finished building age and risk matrices')
 %% hiv
 % produces hivTrans, hivDeathMat, artMat, and prepMat
 
-load('HIVParams')
+load([paramDir , 'HIVParams'])
 disp('Building HIV CD4 progression matrix')
 % cd4 progression
 % Time dependent components: ART uptake/dropout (artIn, artOut) , PrEP
@@ -161,14 +163,14 @@ for g = 1 : gender
     end
 end
 
-save('hivTrans' , 'hivTrans')
-save('hivDeathMat' , 'hivDeathMat')
-save('artMat' , 'artMat')
-save('prepMat' , 'prepMat')
+save(fullfile(savedir , 'hivTrans') , 'hivTrans')
+save(fullfile(savedir , 'hivDeathMat') , 'hivDeathMat')
+save(fullfile(savedir , 'artMat') , 'artMat')
+save(fullfile(savedir , 'prepMat') , 'prepMat')
 disp('Finished building HIV matrices.')
 %% Viral load progression (by CD4 count)
 disp('Building viral load progression matrix')
-load('HIVParams')
+load([paramDir , 'HIVParams'])
 vlAdvancer = spalloc(numel(pop) , numel(pop) , numel(pop));
 
 for g = 1 : gender
@@ -202,7 +204,7 @@ for g = 1 : gender
     end
 end
 
-save('vlAdvancer' , 'vlAdvancer')
+save(fullfile(savedir ,'vlAdvancer') , 'vlAdvancer')
 disp('Finished building viral load progression matrix')
 
 %% hpv
@@ -301,9 +303,9 @@ for d = 1 : disease
     end
 end
 %% hpv screening and treatment
-load('hpvData')
-load('hpvIndices')
-load('hpvTreatIndices')
+load([paramDir , 'hpvData'])
+load([paramDir , 'hpvIndices'])
+load([paramDir , 'hpvTreatIndices'])
 disp('Building screening and treatment matrix for pre-2015')
 screenTreater = spalloc(numel(pop) , numel(pop) , numel(pop));
 screenTreater2015 = spalloc(numel(pop) , numel(pop) , numel(pop));
@@ -392,11 +394,11 @@ for v = 1 : viral
         end
     end
 end
-save('screenTreatMats' , 'screenTreater' , 'screenTreater2015')
+save(fullfile(savedir ,'screenTreatMats') , 'screenTreater' , 'screenTreater2015')
 disp('Finished building HPV screening and treatment matrix')
 %% bornDie
-load('popData')
-load('HIVParams')
+load([paramDir ,'popData'])
+load([paramDir ,'HIVParams'])
 fertMat = spalloc(numel(pop) , numel(pop) , numel(pop));
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
@@ -441,8 +443,8 @@ for d = 2 : 6 % hiv infected
 end
 
 %fertMat = fertMat + hivFertMat; 
-save('fertMat' , 'fertMat')
-save('hivFertMats' , 'hivFertPosBirth' , 'hivFertNegBirth')
+save(fullfile(savedir ,'fertMat') , 'fertMat')
+save(fullfile(savedir ,'hivFertMats') , 'hivFertPosBirth' , 'hivFertNegBirth')
  
 % Background deaths
 disp('Building death matrix')
@@ -453,7 +455,7 @@ for a = 1 : age
     deathMat(at(males , males)) = - mue(a , 1);
     deathMat(at(females , females)) = - mue(a , 2);
 end
-save('deathMat' , 'deathMat')
+save(fullfile(savedir ,'deathMat') , 'deathMat')
 disp('Death matrix complete')
 %%
 % Vaccination (model time dependent). Activate when vax year begins.
@@ -475,7 +477,7 @@ V = zeros(gender , age);
 % %     vaxer(vaxdMale , susMale) = V(2 , a);
 % %     vaxer(susMale , susMale) = -V(2 , a);
 % end
-save('vaxer' , 'vaxer')
+save(fullfile(savedir ,'vaxer') , 'vaxer')
 disp('Vaccination matrix complete')
 %% Make circumcision matrix (use when circumcision begins in model)
 disp('Building circumcision matrix')
@@ -483,7 +485,7 @@ negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 circMat = spalloc(numel(pop) , numel(pop) , 2);
 circMat(at(negCircMaleBirth , negMaleBirth)) = circ(1);
 circMat(at(negMaleBirth , negMaleBirth)) = - circ(1);
-save('circMat' , 'circMat')
+save(fullfile(savedir ,'circMat') , 'circMat')
 disp('Circumcision matrix complete')
 
 %% Make circumcision matrix for HIV-only scenarios (use when circumcision begins in model)
@@ -497,7 +499,7 @@ for d = 1 : disease
     circMat2(at(circMale16_29 , male16_29)) = 0.9;
     circMat2(at(male16_29 , male16_29)) = -0.9;
 end
-save('circMat2' , 'circMat2')
+save(fullfile(savedir ,'circMat2') , 'circMat2')
 disp('Circumcision matrix 2 complete')
 
 disp('Building circumcision matrix 2B')
@@ -511,7 +513,7 @@ for d = 1 : disease
     circMat2B(at(circMale16_29 , male16_29)) = 0.4;
     circMat2B(at(male16_29 , male16_29)) = -0.4;   
 end
-save('circMat2B' , 'circMat2B')
+save(fullfile(savedir ,'circMat2B') , 'circMat2B')
 disp('Circumcision matrix 2B complete')
 disp(' ')
 disp('Matrix construction complete')

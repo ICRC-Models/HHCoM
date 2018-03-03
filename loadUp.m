@@ -3,7 +3,7 @@
 function[] = loadUp(stepsPerYear)
 load('settings')
 %% import and save population parameters
-file = 'PopData.xlsx';
+file = [pwd , '\Config\PopData.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
@@ -18,12 +18,12 @@ actsPer = xlsread(file , 'Demographics' , 'AI2:AK3'); % [gender x risk]; acts pe
 epsA = xlsread(file , 'Demographics' , 'AO2:AO4'); % [year] <1998 , 2003 , >2010 ; force of infection mixing
 epsR = xlsread(file , 'Demographics' , 'AP2:AP4'); % [year] <1998 , 2003 , >2010
 yr = xlsread(file , 'Demographics' , 'AN2:AN4'); % years
-savdir = [pwd , '\HHCoM_Config']; 
+savdir = [pwd , '\Params']; 
 save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
     'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'yr');
 
 %% import and save HIV parameters
-file = 'HIVParameters.xlsx';
+file = [pwd , '\Config\HIVParameters.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 
@@ -130,7 +130,7 @@ betaHIV_M2F = bsxfun(@ times , [7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04] , transM);
 
-file = 'PopData.xlsx';
+file = [pwd , '\Config\PopData.xlsx'];
 
 maleActs = xlsread(file , 'Demographics' , 'AJ10 : AL25');
 femaleActs = xlsread(file , 'Demographics' , 'AJ32 : AL47');
@@ -156,7 +156,7 @@ save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F')
 %% Import HPV data
 disp(' ')
 disp('Importing HPV data...')
-file = 'HPVData.xlsx';
+file = [pwd , '\Config\HPVData.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
@@ -254,16 +254,17 @@ disp(' ')
 %% Retrieve calibration data
 % dimensions = [pos , N]
 clear
-savdir = [pwd , '\HHCoM_Config']; 
-cinPos2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D2 : F11');
-cinNeg2014_obs = xlsread('config.xlsx' , 'Calibration' , 'D12 : F21');
-hpv_hiv_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D32 : F41');
-hpv_hivNeg_2008_obs = xlsread('config.xlsx' , 'Calibration' , 'D42 : F51');
+file = [pwd , '\Config\CalibrationTargets.xlsx'];
+savdir = [pwd , '\Params']; 
+cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11');
+cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21');
+hpv_hiv_2008_obs = xlsread(file , 'Calibration' , 'D32 : F41');
+hpv_hivNeg_2008_obs = xlsread(file , 'Calibration' , 'D42 : F51');
 
-hpv_hiv_obs = xlsread('config.xlsx' , 'Calibration' , 'D144 : F152');
-hpv_hivNeg_obs = xlsread('config.xlsx' , 'Calibration' , 'D153 : F161');
+hpv_hiv_obs = xlsread(file , 'Calibration' , 'D144 : F152');
+hpv_hivNeg_obs = xlsread(file , 'Calibration' , 'D153 : F161');
 
-hivPrevM_obs = xlsread('config.xlsx' , 'Calibration' , 'D60 : F101');
-hivPrevF_obs = xlsread('config.xlsx' , 'Calibration' , 'D102 : F143');
+hivPrevM_obs = xlsread(file , 'Calibration' , 'D60 : F101');
+hivPrevF_obs = xlsread(file , 'Calibration' , 'D102 : F143');
 save(fullfile(savdir , 'calibData'))
 clear

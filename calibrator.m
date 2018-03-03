@@ -2,29 +2,29 @@ function negSumLogL = calibrator(initParams)
 hpvOn = 1;
 hivOn = 1;
 % Load up parameters and data
-load('popData')
-load('general');
-load('settings');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('vaxer')
-load('mixInfectParams');
-load('hpvData')
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('calibData')
-load('calibParams')
-load('vaxInds')
-load('calibInitParams')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
+load([paramDir,'calibData'])
+load([paramDir,'calibInitParams'])
 import java.util.LinkedList
 vaxerAger = ager;
 vaxRate = 0;

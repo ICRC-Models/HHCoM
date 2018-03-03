@@ -32,10 +32,11 @@ endYear = currYear;
 years = endYear - startYear;
 save('settings' , 'years' , 'startYear' , 'endYear')
 % Load parameters and constants for main
-load('general')
+paramDir = [pwd , '\Params\'];
+load([paramDir,'general'])
 %% Initial population
-load('popData')
-load('hpvData')
+load([paramDir , 'popData'])
+load([paramDir , 'hpvData'])
 % load('initPop')
 % simulation
 mInit = popInit(: , 1);
@@ -134,26 +135,27 @@ vaxStartYear = 2017;
 
 %% Simulation
 disp('Start up')
-load('general');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('vaxer')
-load('mixInfectParams');
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('calibParams')
-load('vaxInds')
-load('settings')
-load('hpvData')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
@@ -188,22 +190,7 @@ k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 
 %% use calibrated parameters
-% load('HPV_calib.dat')
-% kCin2_Cin3(: , 1) = HPV_calib(1 : age);
-% kCin3_Cin2(: , 1) = HPV_calib(age + 1 : 2 * age);
-% kCC_Cin3(: , 1) = HPV_calib(2 * age + 1 : 3 * age);
-% kCin2_Cin3(: , 2) = HPV_calib(3 * age + 1 : 4 * age);
-% kCin3_Cin2(: , 2) = HPV_calib(4 * age + 1 : 5 * age);
-% kCC_Cin3(: , 2) = HPV_calib(5 * age + 1 : 6 * age);
-% kCin2_Cin3(: , 3) = HPV_calib(6 * age + 1 : 7 * age);
-% kCin3_Cin2(: , 3) = HPV_calib(7 * age + 1 : 8 * age);
-% kCC_Cin3(: , 3) = HPV_calib(8 * age + 1 : 9 * age);
-% rImmuneHiv = HPV_calib(9 * age + 1 : 9 * age + 1 + 3);
-% c3c2Mults = HPV_calib(9 * age + 5 : 9 * age + 8);
-% c2c1Mults = HPV_calib(9 * age + 9 : 9 * age + 12);
-% artHpvMult = HPV_calib(9 * age + 13);
-% perPartnerHpv = 0.1;%HPV_calib(9 * age + 14);
-load('calibInitParams')
+load([paramDir,'calibInitParams'])
 % load('HPV_calib3.dat')
 % for i = 1 : 3
 %     kCin2_Cin3(: , i) = HPV_calib3(i) .* kCin2_Cin3(: , i);
@@ -222,7 +209,7 @@ load('calibInitParams')
 kCin2_Cin1 = 0.8 .* kCin2_Cin1;
 hpv_hivClear = 1.5 .* hpv_hivClear;
 rImmuneHiv = 2 ./ hpv_hivClear; 
-%%
+%% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
@@ -329,7 +316,7 @@ disp(' ')
 disp('Simulation complete.')
 
 profile viewer
-%%
+%% Runtimes
 figure()
 plot(1 : size(runtimes , 1) , runtimes)
 xlabel('Step'); ylabel('Time(s)')
@@ -345,9 +332,5 @@ h = histogram(runtimes);
 title('Runtimes')
 ylabel('Frequency')
 xlabel('Times (s)')
-% %% load target values
-% load('targetVals')
 %% Show results
 showResults()
-%% Convert results to CSV
-% resultOut()
