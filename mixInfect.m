@@ -265,10 +265,12 @@ for g = 1 : gender
         for j = 1 : risk
             for ii = 1 : age
                 for jj = 1 : risk
-                    lambda(g , i , j , :) = ...
-                        squeeze(lambda(g , i , j , :))...
-                        + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
-                        * squeeze(beta(gg , ii , jj , :)); % [3 x 1]
+                    for s = 1 : states
+                        lambda(g , i , j , s) = ...
+                            lambda(g , i , j , s)...
+                            + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
+                            * beta(gg , ii , jj , s); % [3 x 1]
+                    end
                 end
             end
         end
@@ -396,28 +398,28 @@ beta = zeros(gender , age , age , risk , risk);
 
 % infection probability by viral load
 for a = 1 : age
-  for aa = 1 : age
-    for r = 1 : risk
-        for rr = 1 : risk
-            if popSum(1 , a , r) ~= 0
-                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(1 , a , aa , r , rr) = beta(1 , a , aa , r , rr) - log(1 - betaHIVM2F(aa , rr , v)) ...
-                      * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
+    for aa = 1 : age
+        for r = 1 : risk
+%             for rr = 1 : risk
+                if popSum(1 , a , r) ~= 0
+                    for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                        beta(1 , a , aa , r , :) = beta(1 , a , aa , r , :) - log(1 - betaHIVM2F(aa , : , v)) ...
+                            * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
+                    end
+                    beta(1 , a , aa , r , :) = beta(1 , a , aa , r , :) - log(1 - betaHIVM2F(aa , : , 6)) ...
+                        * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
                 end
-                beta(1 , a , aa , r , rr) = beta(1 , a , aa , r , rr) - log(1 - betaHIVM2F(aa , rr , 6)) ...
-                * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
-            end
-            if popSum(2 , a , r) ~= 0
-                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(2 , a , aa , r , rr) = beta(2 , a , aa , r , rr) - log(1 - betaHIVF2M(aa , rr , v))...
-                      * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
+                if popSum(2 , a , r) ~= 0
+                    for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                        beta(2 , a , aa , r , :) = beta(2 , a , aa , r , :) - log(1 - betaHIVF2M(aa , : , v))...
+                            * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
+                    end
+                    beta(2 , a , aa , r , :) = beta(2 , a , aa , r , :) - log(1 -   betaHIVF2M(aa , : , 6))...
+                        * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
                 end
-                beta(2 , a , aa , r , rr) = beta(2 , a , aa , r , rr) - log(1 -   betaHIVF2M(aa , rr , 6))...
-                  * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
-            end
+%             end
         end
     end
-  end
 end
 
 % lambda
