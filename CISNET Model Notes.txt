@@ -24,8 +24,8 @@ For d:
 5 - CD4 350-200 cells/uL
 6 - CD4 <= 200 cells/uL
 7 - HIV-negative, circumcised, and no PrEP (if g = 1) ; HIV-negative, dapivirine ring (if g = 2)
-8 - HIV-negative, circumcised and on PrEP
-9 - HIV-negative, uncircumcised, and on PrEP
+8 - HIV-negative, circumcised and on PrEP (if g = 1); HIV-negative, dapivirine ring & PrEP (if g = 2)
+9 - HIV-negative, uncircumcised, and on PrEP (if g = 1); HIV-negative & PrEP (if g = 2)
 10 - HIV-positive on ART
 
 For v:
