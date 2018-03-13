@@ -54,50 +54,54 @@ For s:
 9 - Vaccinated
 10 - Immune
 
-Relevant constants
-kappa(h, s, g, a, r) - progression rate to next HPV state/cervical cancer
-eta(h, s, g, a, r) - natural regression rate
-zeta(h, s, g, a, r) - screening and treatment rate
-omega(h, s, g, a, r) - hysterectomy rate
+For p:
+1 - 
+2- 
+3-
 
-add back screened and treated to susceptible population
-once vaccinated, change HPV status to vaccinated
+For g:
+1 - Male
+2 - Female
+
+For a:
+1 - 0-4 age group
+2- 5-9 age group
+...
+16- 74-79 age group
+
+For r:
+1 - Low risk
+2 - Medium risk
+3 - High risk
+*risk is defined by the number of partners per year
+
+
 hysterectomy --> not susceptible to infection
 
-What p refers to changes depending on value of s
+How to retrive values for each compartment
+toInd(allcomb(d , v , h , s , p , g , a , r))
+Each of the above variables can be a single number, e.g. "3", or a range of numbers, e.g. "2:5"
 
-When s moves from 3, 4 (CIN) to 5-7 (Cervical cancer), p is reset to 1
-For s = 5:7
-p 
-1 - Year 1
-2 - Years 2-3
-3 - Years 4-20
-_________________________________________________________________________________
-For s = 1, 2, 8, 9
-p = null
+Scripts used for every model run:
+mixInfect.m
+hiv.m
+hpv.m
+bornAgeDie.m
 
-For s = 3, 4 (Precancer)
-p
-1 - Years 1-5
-2 - Years 6-10
-3 - Years 11-20
-4 - Years 21-29
-5 - Years 30-34
-6 - Years 35-39
-7 - Years 40-44
-8 - Years 45-49
-9 - Years 50+
+main.m - natural history up to current year
+simVax.m - vaccination scenarios
 
-For h = 2-4 , s = 1 (HPV infection)
-p
-1 - Months 1-15
-2 - Months 16-27
-3 - Months 28-39
-4 - Months 40-51
-5 - Months 52+
-6 - null
-7 - null
-8 - null
-9 - null
+showResults.m - displays results form main.m
+simVaxResultOut_ageStand - displays age standardized results from simVax.m. Also exports them as .csv files.
+
+Scripts used to load and prepare parameters for the model:
+loadUp.m - imports data from Excel spreadsheets and saves them as .mat files
+makeMat.m - creates transition matrices using data form Excel spreadsheets
+*if data used in transition matrices changes, makeMat.m must be ran again
+
+
+
+
+
 
 
