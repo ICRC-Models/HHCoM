@@ -69,7 +69,7 @@ c(2 , : , :) = partnersF;
 % protection from circumcision
 %circProtect
 %condProtect
-prepProtect = 0.75; % Ying et al. HIV Home HTC supplementary appendix
+prepProtect = 0.70; % Ying et al. HIV Home HTC supplementary appendix
 artProtect = 0.96; % Ying et al. HIV Home HTC supplementary appendix. change to 0.93?
 %% MixInfect
 % Mixing matrix
@@ -196,6 +196,7 @@ cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = (1 - circProtect) .* cond;
 psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond;
+psi(9) = (1 - prepProtect);
 dPop = zeros(size(pop));
 newHiv = zeros(gender , age , risk); % incidence tally by gender
 
@@ -265,10 +266,12 @@ for g = 1 : gender
         for j = 1 : risk
             for ii = 1 : age
                 for jj = 1 : risk
-                    lambda(g , i , j , :) = ...
-                        squeeze(lambda(g , i , j , :))...
-                        + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
-                        * squeeze(beta(gg , ii , jj , :)); % [3 x 1]
+                    for s = 1 : states
+                        lambda(g , i , j , s) = ...
+                            lambda(g , i , j , s)...
+                            + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
+                            * beta(gg , ii , jj , s); % [3 x 1]
+                    end
                 end
             end
         end
@@ -392,32 +395,32 @@ newInfs{3} = newVaxHpv;
 
 %% HIV Infection
 % HIV average betas
-beta = zeros(gender , age , age , risk , risk);
+beta = zeros(risk , age , gender , age , risk);
 
 % infection probability by viral load
 for a = 1 : age
-  for aa = 1 : age
-    for r = 1 : risk
-        for rr = 1 : risk
-            if popSum(1 , a , r) ~= 0
-                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(1 , a , aa , r , rr) = beta(1 , a , aa , r , rr) - log(1 - betaHIVM2F(aa , rr , v)) ...
-                      * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
+%     for aa = 1 : age
+        for r = 1 : risk
+%             for rr = 1 : risk
+                if popSum(1 , a , r) ~= 0
+                    for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                        beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , v)) ...
+                            * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
+                    end
+                    beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , 6)) ...
+                        * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
                 end
-                beta(1 , a , aa , r , rr) = beta(1 , a , aa , r , rr) - log(1 - betaHIVM2F(aa , rr , 6)) ...
-                * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
-            end
-            if popSum(2 , a , r) ~= 0
-                for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                    beta(2 , a , aa , r , rr) = beta(2 , a , aa , r , rr) - log(1 - betaHIVF2M(aa , rr , v))...
-                      * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
+                if popSum(2 , a , r) ~= 0
+                    for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
+                        beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 - betaHIVF2M(: , : , v))...
+                            * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
+                    end
+                    beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 -   betaHIVF2M(: , : , 6))...
+                        * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
                 end
-                beta(2 , a , aa , r , rr) = beta(2 , a , aa , r , rr) - log(1 -   betaHIVF2M(aa , rr , 6))...
-                  * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
-            end
+%             end
         end
-    end
-  end
+%     end
 end
 
 % lambda
@@ -432,9 +435,9 @@ for g = 1 : gender
             for ii = 1 : age
                 for jj = 1 : risk
                     lambda(g , i , j) = ...
-                        squeeze(lambda(g , i , j))...
+                        lambda(g , i , j)...
                         + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
-                        * beta(gg , ii , i , jj , j);
+                        * beta(j , i , gg , ii , jj);
                 end
             end
         end

@@ -194,63 +194,112 @@ rImmuneHiv = 3 ./ hpv_hivClear;
 perPartnerHpv = 0.1;%HPV_calib(9 * age + 14);
 % maxRateM_vec = [0.25 , 0.35];
 % maxRateF_vec = [0.35 , 0.5];
-
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 circProtect = 0.6;
 dapProtect = zeros(age , 1);
 dapProtect(4) = 0.27;
 dapProtect(5 : age) = 0.5;
 % maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
 % maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
-testParams = [0 , 0.10 , 0.20];
-dapAgerArray = cell(3 , 1);
-for n = 1 : length(testParams)
+dapCoverVec = [0 , 0.1 , 0.2];
+prepCoverVec = [0 , 0.25];
+vmmcCoverVec = [0 , 0.50];
+testParams = allcomb(dapCoverVec, prepCoverVec, vmmcCoverVec);
+agerIntArray = cell(size(testParams , 1) , 1);
+tits = cell(size(testParams , 1) , 1);
+for n = 1 : size(testParams , 1)
+    agerInt = ager;
     for a = 3 : 8
-        dapAger = ager;
-        dapCover = testParams(n);
+        dapCover = testParams(n , 1);
+        prepCover = testParams(n , 2);
+        pVmmc = testParams(n , 3);
+        
         at = @(x , y) sort(prod(dim)*(y-1) + x);
+        
+        % female aging indices
         fromAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
             2 , a , 1 : risk));
-        fromAgeDapd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
-            2 , a , 1 : risk));
         toAge = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
-            2 , a + 1 , 1 : risk));
+            2 , a + 1 , 1 : risk)); % females aging
+        
+        % female dap indices
+        fromAgeDapd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
+            2 , a , 1 : risk)); 
         toAgeDapd = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
-            2 , a + 1 , 1 : risk));
-        dapAger(at(toAge , fromAge)) = (1 - dapCover) * ager(at(toAge , fromAge));
-        dapAger(at(toAge , fromAgeDapd)) = (1 - dapCover) * ager(at(toAge , fromAgeDapd));
-        dapAger(at(toAgeDapd , fromAge)) = dapCover * ager(at(toAgeDapd , fromAge));
-        dapAger(at(toAgeDapd , fromAgeDapd)) = dapCover * ager(at(toAgeDapd , fromAgeDapd));
-        dapAgerArray{n} = dapAger;
+            2 , a + 1 , 1 : risk)); % females aging and going on dapivirine ring
+        
+        % female PrEP indices
+        fromAgePrep = toInd(allcomb(9 , 1 , 1 , 1 , 1 : periods , ...
+            2 , a , 1 : risk)); 
+        toAgePrep = toInd(allcomb(9 , 1 , 1 , 1 , 1 : periods , ...
+            2 , a + 1 , 1 : risk)); 
+        
+        % male aging indices
+        fromAgeM = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+            1 , a , 1 : risk)); % uncircumcised males
+        toAgeM = toInd(allcomb(1 , 1 , 1 , 1 , 1 : periods , ...
+            1 , a + 1 , 1 : risk)); % males aging into next group
+        
+        % male circumcision indices
+        toAgeCirc = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
+            1 , a + 1, 1 : risk)); % males aging and getting circumcised
+        fromAgeCirc = toInd(allcomb(7 , 1 , 1 , 1 , 1 : periods , ...
+            1 , a , 1 : risk));
+        
+        % dapivirine ring coverage
+        agerInt(at(toAge , fromAge)) = (1 - dapCover - prepCover) * ager(at(toAge , fromAge));
+        agerInt(at(toAge , fromAgeDapd)) = (1 - dapCover - prepCover) * ager(at(toAge , fromAge));
+        agerInt(at(toAgeDapd , fromAge)) = dapCover * ager(at(toAge , fromAge));
+        agerInt(at(toAgeDapd , fromAgeDapd)) = dapCover * ager(at(toAge , fromAge));
+        agerInt(at(toAgePrep , fromAgeDapd)) = prepCover * ager(at(toAge , fromAge));
+        
+        % female PrEP coverage
+        agerInt(at(toAge , fromAge)) = (1 - prepCover - dapCover) * ager(at(toAge , fromAge));
+        agerInt(at(toAge , fromAgePrep)) = (1 - prepCover - dapCover) * ager(at(toAge , fromAge));
+        agerInt(at(toAgePrep , fromAge)) = prepCover * ager(at(toAge , fromAge));
+        agerInt(at(toAgePrep , fromAgePrep)) = prepCover * ager(at(toAge , fromAge));
+        agerInt(at(toAgeDapd , fromAgePrep)) = dapCover * ager(at(toAge , fromAge));
+        
+        % circumcision coverage
+        agerInt(at(toAgeCirc , fromAgeM)) = pVmmc * ager(at(toAgeM , fromAgeM));
+        agerInt(at(toAgeCirc , fromAgeCirc)) = pVmmc * ager(at(toAgeM , fromAgeM));
+        agerInt(at(toAgeM , fromAgeM)) = (1 - pVmmc) * ager(at(toAgeM , fromAgeM));
+        agerInt(at(toAgeM , fromAgeCirc)) = (1 - pVmmc) * ager(at(toAgeM , fromAgeM));
+        agerIntArray{n} = agerInt;
+        tits{n} = (['dap_' , num2str(dapCover) , '_prep_' ,  num2str(prepCover) ,...
+            '_pVmmc_' , num2str(pVmmc) , '.mat']);
     end
 end
-tits = {'noDap' ,'dap10' , 'dap20'};
-% startYear = 2013;
+startYear = currYear;
 endYear = 2050;
 % dapAger = ager;
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
-disp([num2str(length(testParams)) , ' simulation(s) running...'])
+disp([num2str(size(testParams , 1)) , ' simulation(s) running...'])
 disp(' ')
 % progressbar('Simulation Progress')
-parfor sim = 1 : length(testParams)
+tic
+parfor sim = 1 : size(testParams , 1)
     %%
 % Gender and age specific max ART rates to test
     maxRateM_vec = [0.7 , 0.7];% maxRateM_arr{sim};
     maxRateF_vec = [0.7 , 0.7];% maxRateF_arr{sim};
 
-    maxRateM1 = 1 - exp(-maxRateM_vec(1));
-    maxRateM2 = 1 - exp(-maxRateM_vec(2));
-    maxRateF1 = 1 - exp(-maxRateF_vec(1));
-    maxRateF2 = 1 - exp(-maxRateF_vec(2));
+    maxRateM1 = 0.42;%1 - exp(-maxRateM_vec(1));
+    maxRateM2 = 0.42;%1 - exp(-maxRateM_vec(2));
+    maxRateF1 = 0.42;%1 - exp(-maxRateF_vec(1));
+    maxRateF2 = 0.42;%1 - exp(-maxRateF_vec(2));
     
     baseCirc = 1;
-    dapAger = dapAgerArray{sim};
+    agerInt = agerIntArray{sim};
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
-    popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
+    currPop = load('H:\HHCoM_Results\toNow_Hiv.mat');
+    popIn = currPop.popVec(end , :);%reshape(initPop , prod(dim) , 1); % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
     newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
     newImmHpv = newHpv;
@@ -270,7 +319,7 @@ parfor sim = 1 : length(testParams)
         tic
         year = startYear + s(i) - 1;
 %         disp(num2str(year))
-        currStep = round(s(i) * stepsPerYear);
+        currStep = round((s(i) + currYear - 1975) * stepsPerYear);
         %         disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
         %             num2str(length(s) - i) ' time steps remaining until year ' ...
         %             num2str(endYear) ')'])
@@ -354,7 +403,7 @@ parfor sim = 1 : length(testParams)
         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDieDap(t , pop ,...
             ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
             hivFertNegBirth , deathMat , baseCirc , circMat , ...
-            dapAger , MTCTRate , circStartYear , vaxStartYear , ...
+            agerInt , MTCTRate , circStartYear , vaxStartYear , ...
             vaxRate , startYear , endYear, currYear , stepsPerYear) , tspan , pop(end , :));
         
         if any(pop(end , :) < 0)
@@ -385,7 +434,8 @@ end
 disp(' ')
 
 disp('Simulation complete.')
+toc
 
 % profile viewer
 %%
-dapResults()
+dapIntResults()

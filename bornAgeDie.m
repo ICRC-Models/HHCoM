@@ -48,17 +48,6 @@ end
 births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
 deaths = deathMat * pop;
-% vaxed = pop * 0;
-% vaxStartYear = 2017;
-% vaxRate = 0.9;
-% targetYear = 2025;
-% vaxRate = linspace(0 , 0.9 , (targetYear - vaxStartYear) * stepsPerYear); % linear scale-up of vaccination rate
-% vaxRate = [vaxRate , ones(length((endYear - targetYear) * stepsPerYear) , 1) .* vaxRate(end)];
-% yrs = vaxStartYear : 1 / stepsPerYear : endYear;
-% ind = yrs == year;
-% if year >= vaxStartYear
-%     vaxed = vaxer .* vaxRate * pop;
-% end
 
 circBirths = births * 0;
 if year > circStartYear
@@ -68,8 +57,11 @@ end
 %% aging
 
 % aged = ager * pop;
-aged_vaxed = vaxerAger * pop;
+aged_vaxed = vaxerAger * pop; % ages and vaccinates population
+
+% Vaccination costs
+% vaxCost = sumall(vaxPick .* pop) * vaxPrice;
 
 extraOut{1} = abs(deaths);
-% extraOut{2} = vaxed;
+%extraOut{2} = vaxCost;
 dPop = circBirths + births + hivBirths + deaths + aged_vaxed;

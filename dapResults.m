@@ -36,82 +36,82 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 set(0, 'DefaultAxesFontSize',16)
 %% Age-standardized Disease Incidence
-wVec = zeros(age , 1);
-wVec(5 : age) = [0.188 , 0.18 , 0.159 , 0.121 , 0.088 , 0.067 , 0.054 , ...
-    0.046 , 0.038 , 0.029 , 0.017 , 0.013]; 
-figure()
-% tVec = noDap.tVec;
-tVec = linspace(startYear , endYear , size(noDap.popVec , 1));
+% wVec = zeros(age , 1);
+% wVec(5 : age) = [0.188 , 0.18 , 0.159 , 0.121 , 0.088 , 0.067 , 0.054 , ...
+%     0.046 , 0.038 , 0.029 , 0.017 , 0.013]; 
+% figure()
+% % tVec = noDap.tVec;
+tVec = noDap.tVec; %linspace(startYear , endYear , size(noDap.popVec , 1));
 newHiv_Arr = {noDap.newHiv , dap10.newHiv , dap20.newHiv};
 popVec_Arr = {noDap.popVec , dap10.popVec , dap20.popVec};
-incMat = zeros(age , length(tVec) / stepsPerYear);
-
-inc = {incMat , incMat , incMat , incMat};
-for i = 1 : length(newHiv_Arr)
-    for a = 4 : age
-        newHiv = sum(sum(sum(newHiv_Arr{i}(1 : end , 1 : gender , a , :)...
-            ,2),3),4);
-        popVec = popVec_Arr{i};
-        hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
-        1 : periods , 1 : gender , a , 1 : risk)); ...
-        toInd(allcomb(7 : 9 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
-        1 : periods , 1 : gender , a , 1 : risk))];
-        hivSus = sum(popVec(1 : end , hivSusInds) , 2);
-        hivSus_Year = sum(reshape(hivSus , stepsPerYear , size(hivSus , 1) ...
-            / stepsPerYear)) ./ stepsPerYear; % average susceptible population size per year
-        newHiv_Year = sum(reshape(newHiv , stepsPerYear , size(newHiv , 1) ...
-            /stepsPerYear)); % total new HIV infections per year
-        inc{i}(a , :) = newHiv_Year ./ hivSus_Year .* 100;
-    end
-end
-
-for i = 1 : length(newHiv_Arr)
-    incAS = sum(bsxfun(@times , inc{i} , wVec));
-    plot(tVec(1 : stepsPerYear : end) , incAS)
-    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
-    hold on
-end
-xlabel('Year'); ylabel('Incidence per 100'); title('HIV Incidence')
-% Women aged 16-29:  35% on treatment (30% suppressed)
-% Women aged 30+: 60% on treatment (55% suppressed)
-% Men aged 16-29: 25% on treatment (20% suppressed)
-% Men aged 30+: 50% on treatment (40% suppressed).
-legend('Base' , '10% Dapivirine coverage' , ...
-    '20% Dapivirine coverage' , ... 
-    'Location' , 'northeastoutside')
-%% Difference in Age-standardized Disease Incidence
-% relative to base case, i.e. 70% coverage for all
-figure()
-for i = 2 : length(newHiv_Arr)
-    incAS = sum(bsxfun(@times , inc{i} , wVec)) ...
-        - sum(bsxfun(@times , inc{1} , wVec));
-    plot(tVec(1 : stepsPerYear : end) , incAS)
-    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
-    hold on
-end
-xlabel('Year'); ylabel('Difference in Incidence per 100'); 
-title('Difference in HIV Incidence (vs Base Case)')
-legend('10% Dapivirine coverage' , ...
-    '20% Dapivirine coverage' , ... 
-    'Location' , 'northeastoutside')
-
-% percentage form
-figure()
-for i = 2 : length(newHiv_Arr)
-    incAS = (sum(bsxfun(@times , inc{i} , wVec)) ...
-        - sum(bsxfun(@times , inc{1} , wVec))) ...
-        ./ sum(bsxfun(@times , inc{1} , wVec)) * 100;
-    plot(tVec(1 : stepsPerYear : end) , incAS)
-    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
-    hold on
-end
-xlabel('Year'); ylabel('Difference in Incidence (%)'); 
-title('Difference in HIV Incidence (vs Base Case)')
-legend('10% Dapivirine coverage' , ...
-    '20% Dapivirine coverage' , ... 
-    'Location' , 'northeastoutside')
-
-
+incMat = zeros(age , length(tVec) / stepsPerYear - 1);
+% 
+% inc = {incMat , incMat , incMat , incMat};
+% for i = 1 : length(newHiv_Arr)
+%     for a = 4 : age
+%         newHiv = sum(sum(sum(newHiv_Arr{i}(1 : end , 1 : gender , a , :)...
+%             ,2),3),4);
+%         popVec = popVec_Arr{i};
+%         hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
+%         1 : periods , 1 : gender , a , 1 : risk)); ...
+%         toInd(allcomb(7 : 9 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
+%         1 : periods , 1 : gender , a , 1 : risk))];
+%         hivSus = sum(popVec(1 : end , hivSusInds) , 2);
+%         hivSus_Year = sum(reshape(hivSus , stepsPerYear , size(hivSus , 1) ...
+%             / stepsPerYear)) ./ stepsPerYear; % average susceptible population size per year
+%         newHiv_Year = sum(reshape(newHiv , stepsPerYear , size(newHiv , 1) ...
+%             /stepsPerYear)); % total new HIV infections per year
+%         inc{i}(a , :) = newHiv_Year ./ hivSus_Year .* 100;
+%     end
+% end
+% 
+% for i = 1 : length(newHiv_Arr)
+%     incAS = sum(bsxfun(@times , inc{i} , wVec));
+%     plot(tVec(1 : stepsPerYear : end) , incAS)
+%     xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+%     hold on
+% end
+% xlabel('Year'); ylabel('Incidence per 100'); title('HIV Incidence')
+% % Women aged 16-29:  35% on treatment (30% suppressed)
+% % Women aged 30+: 60% on treatment (55% suppressed)
+% % Men aged 16-29: 25% on treatment (20% suppressed)
+% % Men aged 30+: 50% on treatment (40% suppressed).
+% legend('Base' , '10% Dapivirine coverage' , ...
+%     '20% Dapivirine coverage' , ... 
+%     'Location' , 'northeastoutside')
+% %% Difference in Age-standardized Disease Incidence
+% % relative to base case, i.e. 70% coverage for all
+% figure()
+% for i = 2 : length(newHiv_Arr)
+%     incAS = sum(bsxfun(@times , inc{i} , wVec)) ...
+%         - sum(bsxfun(@times , inc{1} , wVec));
+%     plot(tVec(1 : stepsPerYear : end) , incAS)
+%     xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+%     hold on
+% end
+% xlabel('Year'); ylabel('Difference in Incidence per 100'); 
+% title('Difference in HIV Incidence (vs Base Case)')
+% legend('10% Dapivirine coverage' , ...
+%     '20% Dapivirine coverage' , ... 
+%     'Location' , 'northeastoutside')
+% 
+% % percentage form
+% figure()
+% for i = 2 : length(newHiv_Arr)
+%     incAS = (sum(bsxfun(@times , inc{i} , wVec)) ...
+%         - sum(bsxfun(@times , inc{1} , wVec))) ...
+%         ./ sum(bsxfun(@times , inc{1} , wVec)) * 100;
+%     plot(tVec(1 : stepsPerYear : end) , incAS)
+%     xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+%     hold on
+% end
+% xlabel('Year'); ylabel('Difference in Incidence (%)'); 
+% title('Difference in HIV Incidence (vs Base Case)')
+% legend('10% Dapivirine coverage' , ...
+%     '20% Dapivirine coverage' , ... 
+%     'Location' , 'northeastoutside')
+% 
+% 
 %% Non Age-standardized Disease Incidence
 inc = {incMat , incMat , incMat , incMat};
 newHiv_Year = zeros(length(newHiv_Arr) , length(tVec) / stepsPerYear);
@@ -128,16 +128,16 @@ for i = 1 : length(newHiv_Arr)
         / stepsPerYear)) ./ stepsPerYear; % average susceptible population size per year
     newHiv_Year(i , :) = sum(reshape(newHiv , stepsPerYear , size(newHiv , 1) ...
         /stepsPerYear)); % total new HIV infections per year
-    inc{i} = newHiv_Year(i , :) ./ hivSus_Year .* 100;
+    inc{i} = newHiv_Year(i , 2 : end) ./ hivSus_Year(2 : end) .* 100;
 end
 
 figure()
 for i = 1 : length(newHiv_Arr)
-    plot(tVec(1 : stepsPerYear : end) , inc{i})
-    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+    plot(tVec(1 + stepsPerYear : stepsPerYear : end) , inc{i})
+    xlim([tVec(2) , tVec(end)])
     hold on
 end
-xlabel('Year'); ylabel('Non-Age-Standardized Incidence per 100'); title('HIV Incidence')
+xlabel('Year'); ylabel('Incidence per 100'); title('HIV Incidence')
 legend('Base' , '10% Dapivirine coverage' , ...
     '20% Dapivirine coverage' , ... 
     'Location' , 'northeastoutside')
@@ -145,8 +145,8 @@ legend('Base' , '10% Dapivirine coverage' , ...
 
 figure()
 for i = 1 : length(newHiv_Arr)
-    plot(tVec(1 : stepsPerYear : end) , newHiv_Year(i , :))
-    xlim([tVec(yearNow - stepsPerYear) , tVec(end)])
+    plot(tVec(1 + stepsPerYear : stepsPerYear : end) , newHiv_Year(i , 2 : end))
+    xlim([tVec(2) , tVec(end)])
     hold on
 end
 xlabel('Year'); ylabel('New HIV Cases'); title('New HIV Cases Per Year')

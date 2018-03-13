@@ -65,19 +65,19 @@ deaths = deathMat * pop;
 % end
 
 circBirths = births * 0;
-if year > currYear && baseCirc
+if year > currYear% && baseCirc
     circBirths = 4 .* circMat * births;
-elseif year > circStartYear && year < currYear
-    circBirths = circMat * births;
-elseif year > circStartYear && ~baseCirc
-    circBirths = 9 .* circMat * births;
+% elseif year > circStartYear && year < currYear
+%     circBirths = circMat * births;
+% elseif year > circStartYear && ~baseCirc
+%     circBirths = 9 .* circMat * births;
 end
 
 %% aging
 aged_circd = ager * pop;
-if year > currYear
-    aged_circd = circAger * pop;
-end
+% if year > currYear
+%     aged_circd = circAger * pop;
+% end
 
 extraOut{1} = abs(deaths);
 % extraOut{2} = vaxed;

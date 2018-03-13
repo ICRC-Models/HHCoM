@@ -32,10 +32,11 @@ endYear = 2050; %currYear;
 years = endYear - startYear;
 save('settings' , 'years' , 'startYear' , 'endYear')
 % Load parameters and constants for main
-load('general')
+paramDir = [pwd , '\Params\'];
+load([paramDir,'general'])
 %% Initial population
-load('popData')
-load('hpvData')
+load([paramDir , 'popData'])
+load([paramDir , 'hpvData'])
 % load('initPop')
 % simulation
 mInit = popInit(: , 1);
@@ -134,33 +135,32 @@ vaxStartYear = 2100;
 
 %% Simulation
 disp('Start up')
-load('general');
-load('mixInfectIndices')
-load('vlAdvancer')
-load('fertMat')
-load('hivFertMats')
-load('deathMat')
-load('circMat')
-load('circMat2')
-load('circMat2B')
-load('vaxer')
-load('mixInfectParams');
-load('popData')
-load('HIVParams')
-load('hivIndices')
-load('hpvIndices')
-load('ager')
-load('vlBeta')
-load('hpvTreatIndices')
-load('calibParams')
-load('vaxInds')
-load('settings')
-load('hpvData')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'vaxer'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ager'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'calibParams'])
+load([paramDir,'vaxInds'])
+load([paramDir,'settings'])
+load([paramDir,'hpvData'])
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-% profile on
+profile on
 disp(' ')
 % Initialize vectors
 timeStep = 1 / stepsPerYear;
@@ -172,7 +172,7 @@ runtimes = zeros(size(s , 2) - 2 , 1);
 
 
 %% use calibrated parameters
-load('calibInitParams')
+load([paramDir,'calibInitParams'])
 % kCin2_Cin3(: , 1) = HPV_calib(1 : age);
 % kCin3_Cin2(: , 1) = HPV_calib(age + 1 : 2 * age);
 % kCC_Cin3(: , 1) = HPV_calib(2 * age + 1 : 3 * age);
@@ -190,8 +190,8 @@ perPartnerHpv = 0.1;%HPV_calib(9 * age + 14);
 % maxRateM_vec = [0.25 , 0.35];
 % maxRateF_vec = [0.35 , 0.5];
 circProtect = 0.6;
-maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
-maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
+maxRateM_arr = {[0.95 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95] , [0.75 , 0.70]};
+maxRateF_arr = {[0.95 , 0.9] , [0.75, 0.9] , [0.75 , 0.95] , [0.75 , 0.70]};
 tits = {'all90' , 'art70_90' , 'art70_95' , 'all70'};
 % testParams = [0.4 , 0.9];
 % circAgerArray = cell(2 , 1);
@@ -212,14 +212,17 @@ tits = {'all90' , 'art70_90' , 'art70_95' , 'all70'};
 %     end
 % end
 % tits = {'baseCirc' , 'circHigh'};
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 circAger = ager;
 % startYear = 2016;
-endYear = 2050;
+endYear = currYear; %2050;
+years = endYear - startYear; 
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
-disp([num2str(length(maxRateM_arr)) , ' simulation(s) running...'])
+% disp([num2str(length(maxRateM_arr)) , ' simulation(s) running...'])
 disp(' ')
 % progressbar('Simulation Progress')
 parfor sim = 1 : length(maxRateM_arr)
@@ -232,7 +235,7 @@ parfor sim = 1 : length(maxRateM_arr)
     maxRateF1 = 1 - exp(-maxRateF_vec(1));
     maxRateF2 = 1 - exp(-maxRateF_vec(2));
     
-    baseCirc = sim == 1;
+    baseCirc = 1;%  sim == 1;
     circAger = ager;%circAgerArray{sim};
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
@@ -351,17 +354,23 @@ parfor sim = 1 : length(maxRateM_arr)
     %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
     %     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
     % For cluster runs
-    filename = tits{sim};
+    savdir = 'H:\HHCoM_Results';
+    
+    filename = fullfile(savdir , tits{sim});
     parsaveHIV(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , ...
         hivDeaths , ccDeath , newCC , artTreatTracker , startYear ,...
         endYear , popLast);
+    
+    %     save(fullfile(savdir , 'toNow_Hiv') , 'tVec' ,  'popVec' , 'newHiv' ,...
+%     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
+%     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 end
 disp(' ')
 
 disp('Simulation complete.')
 
-% profile viewer
+profile viewer
 %%
 % figure()
 % plot(1 : size(runtimes , 1) , runtimes)

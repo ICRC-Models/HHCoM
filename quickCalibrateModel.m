@@ -22,7 +22,7 @@ load([paramDir,'vaxInds'])
 load([paramDir,'settings'])
 load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
-load([paramDir,'calibInitParams'])
+% load([paramDir,'calibInitParams'])
 import java.util.LinkedList
 
 w = ones(4 , 1) ./ 4;
@@ -67,47 +67,73 @@ lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 
 artHpvMult = hpv_hivMult(1 , 1);
-perPartnerHpv = 0.08;
+perPartnerHpv = 0.09;
+perPartnerHpv_lr = 0.1;
+perPartnerHpv_nonV = 0.1;
 rImmuneHiv = 2 ./ hpv_hivClear;
 
-save('calibInitParams');
-
-kCin1_Inf_Mults = [1 ; 1 ; 1];
+save([paramDir , 'calibInitParams']);
+%%
+kCin1_Inf_Mults = [1 ; 1; 1];
 kInf_Cin1_Mults = [1 ; 1 ; 1];
 kCC_Cin3_Mults = [1 ; 1 ; 1];
+kCin3_Cin2_Mults = [1 ; 1 ; 1];
 hpvClearMult = 0.1 .* hpv_hivClear;
+%% Continue from last calibration
+load([paramDir,'calibInitParams'])
+load([paramDir,'HPV_calib5.dat'])
 
+% for i = 1 : 3
+% %     kCin1_Inf_Mults(i) = HPV_calib5(i);
+%     kInf_Cin1_Mults(i) = HPV_calib5(3 + i);
+% %     kCC_Cin3_Mults(i) = HPV_calib5(6 + i);
+% end
 
+rImmuneHiv = HPV_calib5(10 : 13);
+c3c2Mults = HPV_calib5(14 : 17);
+c2c1Mults = max(1 , HPV_calib5(18 : 21));
+artHpvMult = HPV_calib5(22);
+perPartnerHpv= HPV_calib5(23);
+lambdaMultImm = HPV_calib5(24 : 39);
+hpv_hivClear = HPV_calib5(40 : 43);
+hpvClearMult = HPV_calib5(44 : 47);
+%%
 initParams = [kCin1_Inf_Mults;
     kInf_Cin1_Mults;
-    kCC_Cin3_Mults
+    kCC_Cin3_Mults;
     rImmuneHiv; % HPV immunity clearance multiplier for HIV+
     c3c2Mults; % CIN2 to CIN3 progression multiplier for HIV+
     c2c1Mults; % CIN1 to CIN2 progression multiplier for HIV+
     artHpvMult; % HPV acquisition multiplier for HIV+
     perPartnerHpv;
-    lambdaMultImm';
+    lambdaMultImm;
     hpv_hivClear;
-    hpvClearMult];
+    hpvClearMult;
+    perPartnerHpv_lr;
+    perPartnerHpv_nonV;
+    kCin3_Cin2_Mults];
 
 lb = initParams .* 0.5;
-ub = initParams .* 1.5; 
+ub = initParams .* 2; 
 
 % max transition rate between CC to CIN is 0.5
 for i = 1 : 3
-    ub(i) = min(0.3 / max(kCin1_Inf(: , i)) , 1.5);
-    ub(3 + i) = min(0.8 / max(kInf_Cin1(: , i)) ,  1.5);
-    ub(6 + i) = min(0.5 / max(kCC_Cin3(: , i)) ,  1.5);
+    ub(i) = min(0.3 / max(kCin1_Inf(: , i)) , 2);
+    ub(3 + i) = min(0.8 / max(kInf_Cin1(: , i)) ,  2);
+    ub(6 + i) = min(0.5 / max(kCC_Cin3(: , i)) ,  2);
+    ub(49 + i) = min(0.6 / max(kCin3_Cin2(: , i)) , 2);
 end
+lb(14 : 21) = 1; % CIN progression multiplier for HIV+ >=1
 lb(22) = 1; % HPV acquisition multiplier for HIV+ on ART >= 1
 ub(22) = max(hpv_hivMult(1 , :)); % max HPV acquisition multiplier for HIV+ on ART <= max acquisition multiplier for HIV+
 ub(23) = 0.1; % max per partner transmission probability for HPV
 ub(40 : 47) = 1; % HPV clearance multipliers <= 1 for HIV-positive
+ub(48 : 49) = 0.1; % max per partner transmission probability for HPV
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
     'Display','iter','PlotFcn',@psplotbestf);
 x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 %%
-file = 'HPV_calib4.dat';
+file = 'HPV_calib5.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , x)

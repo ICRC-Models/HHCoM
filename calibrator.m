@@ -26,6 +26,8 @@ load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
 load([paramDir,'calibInitParams'])
 import java.util.LinkedList
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 vaxerAger = ager;
 vaxRate = 0;
 %% Initial population
@@ -159,6 +161,7 @@ for i = 1 : 3
     kCin1_Inf(: , i) = initParams(i) .* kCin1_Inf(: , i);
     kInf_Cin1(: , i) = initParams(3 + i) .* kInf_Cin1(: , i);
     kCC_Cin3(: , i) = initParams(6 + i) .* kCC_Cin3(: , i);
+    kCin3_Cin2(: , i) = initParams(49 + i) .* kCin3_Cin2(: , i);
 end
 
 rImmuneHiv = initParams(10 : 13);
@@ -169,6 +172,8 @@ perPartnerHpv= initParams(23);
 lambdaMultImm = initParams(24 : 39);
 hpv_hivClear = initParams(40 : 43);
 hpvClearMult = initParams(44 : 47);
+perPartnerHpv_lr = initParams(48);
+perPartnerHpv_nonV = initParams(49);
 %% Simulation variable preparation
 OMEGA(1 : 3) = 0;
 OMEGA(4 : age) = logspace(-log(1 - 0.05) , - log(1 - 0.4) , age - 3);
@@ -190,7 +195,7 @@ newHiv = zeros(length(s) - 1 , gender , age , risk);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
-newCC = zeros(length(s) - 1 , disease , viral , hpvTypes , age);
+newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
 ccDeath = newCC;
 hivDeaths = zeros(length(s) - 1 , age);
 deaths = popVec;
@@ -208,7 +213,7 @@ for i = 2 : length(s) - 1
         
     if hpvOn
         hystOption = 'on';
-        [~ , pop , newCC(i , : , : , : , :) , ccDeath(i , : , : , : , :)] ...
+        [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpv(t , pop , immuneInds , infInds , cin1Inds , ...
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
@@ -227,7 +232,8 @@ for i = 2 : length(s) - 1
     [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
         newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
         ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
-        gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
+        gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , ...
+        lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
         hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
         hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...

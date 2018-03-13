@@ -30,9 +30,9 @@ disp(' ');
 startYear = 1975;
 endYear = currYear;
 years = endYear - startYear;
-save('settings' , 'years' , 'startYear' , 'endYear')
-% Load parameters and constants for main
 paramDir = [pwd , '\Params\'];
+save([paramDir , 'settings'] , 'years' , 'startYear' , 'endYear')
+% Load parameters and constants for main
 load([paramDir,'general'])
 %% Initial population
 load([paramDir , 'popData'])
@@ -179,7 +179,7 @@ newHiv = zeros(length(s) - 1 , gender , age , risk);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
-newCC = zeros(length(s) - 1 , disease , viral , hpvTypes , age);
+newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
 ccDeath = newCC;
 hivDeaths = zeros(length(s) - 1 , age);
 deaths = popVec;
@@ -188,27 +188,31 @@ popVec(1 , :) = popIn;
 tVec = linspace(startYear , endYear , size(popVec , 1));
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-
 %% use calibrated parameters
 load([paramDir,'calibInitParams'])
-% load('HPV_calib3.dat')
-% for i = 1 : 3
-%     kCin2_Cin3(: , i) = HPV_calib3(i) .* kCin2_Cin3(: , i);
-%     kCin3_Cin2(: , i) = HPV_calib3(3 + i) .* kCin3_Cin2(: , i);
-%     kCC_Cin3(: , i) = HPV_calib3(6 + i) .* kCC_Cin3(: , i);
-% end
-% 
-% rImmuneHiv = HPV_calib3(10 : 13);
-% rImmuneHiv(1) = 1;
-% c3c2Mults = max(1 , HPV_calib3(14 : 17));
-% c2c1Mults = max(1 , HPV_calib3(18 : 21));
-% artHpvMult = 1;%HPV_calib3(22);
-% perPartnerHpv= HPV_calib3(23);
-% lambdaMultImm = HPV_calib3(24 : 39);
-% kCin1_Inf = 0.8 .* kCin1_Inf;
-kCin2_Cin1 = 0.8 .* kCin2_Cin1;
-hpv_hivClear = 1.5 .* hpv_hivClear;
-rImmuneHiv = 2 ./ hpv_hivClear; 
+load([paramDir,'HPV_calib5.dat'])
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+for i = 1 : 3
+    kCin1_Inf(: , i) = HPV_calib5(i) .* kCin1_Inf(: , i);
+    kInf_Cin1(: , i) = HPV_calib5(3 + i) .* kInf_Cin1(: , i);
+    kCC_Cin3(: , i) = HPV_calib5(6 + i) .* kCC_Cin3(: , i);
+end
+
+rImmuneHiv = HPV_calib5(10 : 13);
+c3c2Mults = HPV_calib5(14 : 17);
+c2c1Mults = max(1 , HPV_calib5(18 : 21));
+artHpvMult = HPV_calib5(22);
+perPartnerHpv= HPV_calib5(23);
+lambdaMultImm = HPV_calib5(24 : 39);
+hpv_hivClear = HPV_calib5(40 : 43);
+hpvClearMult = HPV_calib5(44 : 47);
+% kCin2_Cin1 = 0.8 .* kCin2_Cin1;
+% hpv_hivClear = 1.5 .* hpv_hivClear;
+% rImmuneHiv = 2 ./ hpv_hivClear; 
+perPartnerHpv_lr = 0.1;
+perPartnerHpv_nonV = 0.1;
+load([paramDir , 'settings'])
 %% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
@@ -229,7 +233,7 @@ for i = 2 : length(s) - 1
         
     if hpvOn
         hystOption = 'on';
-        [~ , pop , newCC(i , : , : , : , :) , ccDeath(i , : , : , : , :)] ...
+        [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpv(t , pop , immuneInds , infInds , cin1Inds , ...
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
@@ -254,7 +258,8 @@ for i = 2 : length(s) - 1
     [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
         newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
         ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
-        gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
+        gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , ...
+        lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
         hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
         hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
@@ -309,7 +314,7 @@ popVec = sparse(popVec); % compress population vectors
 %     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 % For cluster runs
 savdir = 'H:\HHCoM_Results'; 
-save(fullfile(savdir , 'to2017') , 'tVec' ,  'popVec' , 'newHiv' ,...
+save(fullfile(savdir , 'toNow') , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
     'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
 disp(' ')

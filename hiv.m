@@ -256,6 +256,28 @@ end
 
 dPop = dPop + vlAdvanced;
 
+
+%% costs (lags by one time step)
+% cost of ART treatment
+% artCost = sumall(pop(hivPositiveArt)) * artPrice;
+% cd4Cost = zeros(1 , 5); % cost for cd4>500, 350-500, 200-350, <200 , on ART
+% % cost of hospitalization by CD4 count
+% for d = 3 : 6
+%     for v = 1 : viral
+%         for g = 1 : gender
+%             for a = 1 : age
+%                 for r = 1 : risk
+%                     cd4Group = hivInds(d , v , g , a , r , :);
+%                     cd4Cost(d - 2) = sumall(pop(cd4Group)) * hospPrice(d);
+%                 end
+%             end
+%         end
+%     end
+% end
+% cd4Cost(5) = sumall(pop(artCost)) * hospPrice(5);
+
 extraOuts{1} = hivDeaths;
 extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
+%extraOuts{3} = artCost;
+%extraOuts{4} = cd4Cost;
 dPop = sparse(dPop);

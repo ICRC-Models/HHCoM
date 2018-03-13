@@ -5,7 +5,8 @@
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , currStep , ...
-        gar , perPartnerHpv , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
+        gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , ...
+        lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
         hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
         hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
@@ -203,9 +204,6 @@ newHiv = zeros(gender , age , risk); % incidence tally by gender
 %% HPV Infection
 % HPV parameters
 % for 4V analysis
-perPartnerHpv_lr = perPartnerHpv; 
-perPartnerHpv_nonV = perPartnerHpv_lr;
-
 beta_hrHPV_F2M = 1 - (1 - perPartnerHpv) ^ 12; % per year per partner probability
 beta_hrHPV_M2F = 1 - (1 - perPartnerHpv) ^ 12; %
 
@@ -310,7 +308,7 @@ for d = 1 : disease
 
                         lambdaMult = 1;
                         if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
-                            lambdaMult = hpv_hivMult(d - 2 , h);
+                            lambdaMult = hpv_hivMult(d - 2 , hTo - 1);
                         elseif d == 10
                             lambdaMult = artHpvMult;                            
                         end
@@ -394,32 +392,32 @@ newInfs{3} = newVaxHpv;
 
 %% HIV Infection
 % HIV average betas
-beta = zeros(gender , age , age , risk , risk);
+beta = zeros(risk , age , gender , age , risk);
 
 % infection probability by viral load
 for a = 1 : age
-    for aa = 1 : age
+%     for aa = 1 : age
         for r = 1 : risk
 %             for rr = 1 : risk
                 if popSum(1 , a , r) ~= 0
                     for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                        beta(1 , a , aa , r , :) = beta(1 , a , aa , r , :) - log(1 - betaHIVM2F(aa , : , v)) ...
+                        beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , v)) ...
                             * sumall(pop(mCurr(a , r , v , :))) ./ popSum(1 , a , r);
                     end
-                    beta(1 , a , aa , r , :) = beta(1 , a , aa , r , :) - log(1 - betaHIVM2F(aa , : , 6)) ...
+                    beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , 6)) ...
                         * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
                 end
                 if popSum(2 , a , r) ~= 0
                     for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
-                        beta(2 , a , aa , r , :) = beta(2 , a , aa , r , :) - log(1 - betaHIVF2M(aa , : , v))...
+                        beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 - betaHIVF2M(: , : , v))...
                             * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
                     end
-                    beta(2 , a , aa , r , :) = beta(2 , a , aa , r , :) - log(1 -   betaHIVF2M(aa , : , 6))...
+                    beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 -   betaHIVF2M(: , : , 6))...
                         * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
                 end
 %             end
         end
-    end
+%     end
 end
 
 % lambda
@@ -434,9 +432,9 @@ for g = 1 : gender
             for ii = 1 : age
                 for jj = 1 : risk
                     lambda(g , i , j) = ...
-                        squeeze(lambda(g , i , j))...
+                        lambda(g , i , j)...
                         + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
-                        * beta(gg , ii , i , jj , j);
+                        * beta(j , i , gg , ii , jj);
                 end
             end
         end

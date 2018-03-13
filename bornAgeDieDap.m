@@ -19,7 +19,7 @@
 function [dPop , extraOut] = bornAgeDieDap(t , pop ,...
             ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
             hivFertNegBirth , deathMat , baseCirc , circMat , ...
-            dapAger , MTCTRate , circStartYear , vaxStartYear , ...
+            agerInt , MTCTRate , circStartYear , vaxStartYear , ...
             vaxRate , startYear , endYear, currYear , stepsPerYear)
         
 %% births and deaths
@@ -65,20 +65,17 @@ deaths = deathMat * pop;
 % end
 
 circBirths = births * 0;
-if year > currYear && baseCirc
-    circBirths = 4 .* circMat * births;
-elseif year > circStartYear && year < currYear
+ 
+if year > circStartYear
     circBirths = circMat * births;
-elseif year > circStartYear && ~baseCirc
-    circBirths = 9 .* circMat * births;
 end
 
-%% aging
-aged_dapd = ager * pop;
+%% Aging and VMMC
+agedInt = ager * pop;
 if year > currYear
-    aged_dapd = dapAger * pop;
+    agedInt = agerInt * pop;
 end
 
 extraOut{1} = abs(deaths);
 % extraOut{2} = vaxed;
-dPop = circBirths + births + hivBirths + deaths + aged_dapd;
+dPop = circBirths + births + hivBirths + deaths + agedInt;
