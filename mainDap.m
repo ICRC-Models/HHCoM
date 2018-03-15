@@ -27,10 +27,10 @@ currYear = c(1); % get the current year
 disp('Initializing. Standby...')
 disp(' ');
 
-startYear = 1975;
-endYear = 2050; %currYear;
-years = endYear - startYear;
-save('settings' , 'years' , 'startYear' , 'endYear')
+% startYear = 1975;
+% endYear = 2050; %currYear;
+% years = endYear - startYear;
+% save('settings' , 'years' , 'startYear' , 'endYear')
 % Load parameters and constants for main
 paramDir = [pwd , '\Params\'];
 load([paramDir,'general'])
@@ -163,13 +163,7 @@ vaxerAger = ager;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 % profile on
 disp(' ')
-% Initialize vectors
-timeStep = 1 / stepsPerYear;
-years = endYear - startYear;
-s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
-artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
-%performance tracking
-runtimes = zeros(size(s , 2) - 2 , 1);
+
 
 
 %% use calibrated parameters
@@ -203,8 +197,8 @@ dapProtect(5 : age) = 0.5;
 % maxRateM_arr = {[0.9 , 0.9] , [0.75 , 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
 % maxRateF_arr = {[0.9 , 0.9] , [0.75, 0.9] , [0.75 , 0.95] , [0.75 , 0.75]};
 dapCoverVec = [0 , 0.1 , 0.2];
-prepCoverVec = [0 , 0.25];
-vmmcCoverVec = [0 , 0.50];
+prepCoverVec = [0 , 0.3];
+vmmcCoverVec = [0 , 0.5];
 testParams = allcomb(dapCoverVec, prepCoverVec, vmmcCoverVec);
 agerIntArray = cell(size(testParams , 1) , 1);
 tits = cell(size(testParams , 1) , 1);
@@ -271,9 +265,17 @@ for n = 1 : size(testParams , 1)
             '_pVmmc_' , num2str(pVmmc) , '.mat']);
     end
 end
+%%
+currPop = load('H:\HHCoM_Results\toNow_Hiv.mat');
+% Initialize vectors
+timeStep = 1 / stepsPerYear;
 startYear = currYear;
-endYear = 2050;
-% dapAger = ager;
+endYear = 2031;
+years = endYear - startYear;
+s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
+artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
+%performance tracking
+runtimes = zeros(size(s , 2) - 2 , 1);
 %%
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
@@ -284,6 +286,13 @@ disp(' ')
 tic
 parfor sim = 1 : size(testParams , 1)
     %%
+    currPop = load('H:\HHCoM_Results\toNow_Hiv.mat');
+    % Initialize vectors
+    timeStep = 1 / stepsPerYear;
+    startYear = currYear;
+    endYear = 2031;
+    years = endYear - startYear;
+    s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
 % Gender and age specific max ART rates to test
     maxRateM_vec = [0.7 , 0.7];% maxRateM_arr{sim};
     maxRateF_vec = [0.7 , 0.7];% maxRateF_arr{sim};
@@ -297,8 +306,8 @@ parfor sim = 1 : size(testParams , 1)
     agerInt = agerIntArray{sim};
     % vectors to track specific pop changes
     %     artDistList = LinkedList();
+    years = endYear - startYear;
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
-    currPop = load('H:\HHCoM_Results\toNow_Hiv.mat');
     popIn = currPop.popVec(end , :);%reshape(initPop , prod(dim) , 1); % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
     newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
