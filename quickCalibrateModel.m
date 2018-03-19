@@ -81,22 +81,22 @@ kCin3_Cin2_Mults = [1 ; 1 ; 1];
 hpvClearMult = 0.1 .* hpv_hivClear;
 %% Continue from last calibration
 load([paramDir,'calibInitParams'])
-load([paramDir,'HPV_calib5.dat'])
-
-% for i = 1 : 3
-% %     kCin1_Inf_Mults(i) = HPV_calib5(i);
-%     kInf_Cin1_Mults(i) = HPV_calib5(3 + i);
-% %     kCC_Cin3_Mults(i) = HPV_calib5(6 + i);
-% end
-
-rImmuneHiv = HPV_calib5(10 : 13);
-c3c2Mults = HPV_calib5(14 : 17);
-c2c1Mults = max(1 , HPV_calib5(18 : 21));
-artHpvMult = HPV_calib5(22);
-perPartnerHpv= HPV_calib5(23);
-lambdaMultImm = HPV_calib5(24 : 39);
-hpv_hivClear = HPV_calib5(40 : 43);
-hpvClearMult = HPV_calib5(44 : 47);
+% load([paramDir,'HPV_calib5.dat'])
+% 
+% % for i = 1 : 3
+% % %     kCin1_Inf_Mults(i) = HPV_calib5(i);
+% %     kInf_Cin1_Mults(i) = HPV_calib5(3 + i);
+% % %     kCC_Cin3_Mults(i) = HPV_calib5(6 + i);
+% % end
+% 
+% rImmuneHiv = HPV_calib5(10 : 13);
+% c3c2Mults = HPV_calib5(14 : 17);
+% c2c1Mults = max(1 , HPV_calib5(18 : 21));
+% artHpvMult = HPV_calib5(22);
+% perPartnerHpv= HPV_calib5(23);
+% lambdaMultImm = HPV_calib5(24 : 39);
+% hpv_hivClear = HPV_calib5(40 : 43);
+% hpvClearMult = HPV_calib5(44 : 47);
 %%
 initParams = [kCin1_Inf_Mults;
     kInf_Cin1_Mults;
@@ -106,7 +106,7 @@ initParams = [kCin1_Inf_Mults;
     c2c1Mults; % CIN1 to CIN2 progression multiplier for HIV+
     artHpvMult; % HPV acquisition multiplier for HIV+
     perPartnerHpv;
-    lambdaMultImm;
+    lambdaMultImm';
     hpv_hivClear;
     hpvClearMult;
     perPartnerHpv_lr;
@@ -129,11 +129,23 @@ ub(22) = max(hpv_hivMult(1 , :)); % max HPV acquisition multiplier for HIV+ on A
 ub(23) = 0.1; % max per partner transmission probability for HPV
 ub(40 : 47) = 1; % HPV clearance multipliers <= 1 for HIV-positive
 ub(48 : 49) = 0.1; % max per partner transmission probability for HPV
+
+A = zeros(length(initParams));
+for i = 0 : 2
+    A(i + 1 , 14 + i) = 1;
+    A(i + 1 , 15 + i) = -1;
+    
+    A(i + 4 , 18 + i) = 1;
+    A(i + 4 , 19 + i) = -1;
+end
+
+b = zeros(length(initParams) , 1);
+
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
     'Display','iter','PlotFcn',@psplotbestf);
-x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+x = patternsearch(@calibrator, initParams , A , b , [] , [] , lb , ub , [] , options);
 %%
-file = 'HPV_calib5.dat';
+file = 'HPV_calib6.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , x)

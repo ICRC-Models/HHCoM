@@ -251,6 +251,19 @@ disp(' ')
 % save('actual')
 % disp('Actual data loaded')
 % disp(' ')
+%% Weights and costs
+clear
+disp('Retrieving weights and costs...')
+file = [pwd , '\Config\WeightsCosts.xlsx'];
+savdir = [pwd , '\Params']; 
+hivTreatCost = xlsread(file , 'Costs' , 'B3 : B6');
+artTreatCost = xlsread(file , 'Costs' , 'B7');
+kCCDet = xlsread(file , 'Costs' , 'B23:B25');
+vaxPrice = xlsread(file , 'Costs' , 'B17');
+ccCost = xlsread(file , 'Costs' , 'B12:B14');
+hivTreatCost = flipud(hivTreatCost);
+save(fullfile(savdir , 'cost_weights'))
+disp('Done')
 %% Retrieve calibration data
 % dimensions = [pos , N]
 clear

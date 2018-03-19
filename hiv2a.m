@@ -39,10 +39,10 @@ kOn = ones(6 , 1);
 kOn(6) = 0;
 
 % if year < 2018
-maxRateM1 = 0.42;%1 - exp(-0.25);
-maxRateM2 = 0.42;%1 - exp(-0.35);
-maxRateF1 = 0.42;%1 - exp(-0.35);
-maxRateF2 = 0.42;%1 - exp(-0.5);
+% maxRateM1 = 0.42;%1 - exp(-0.25);
+% maxRateM2 = 0.42;%1 - exp(-0.35);
+% maxRateF1 = 0.42;%1 - exp(-0.35);
+% maxRateF2 = 0.42;%1 - exp(-0.5);
 % end
 
 % CD4 > 200 from 2013 to 2020

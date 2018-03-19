@@ -6,10 +6,11 @@
 % to HPV progression.
 function[dPop , extraOut] = hpv(t , pop , immuneInds , infInds , cin1Inds , ...
     cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
-    kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+    ccTreatedInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
     rNormal_Inf , hpv_hivClear , c3c2Mults , hpvClearMult , ...
-    c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
+    c2c1Mults , fImm , kRL , kDR , muCC , kCCDet , ...
+    disease , viral , age , hpvTypes , ...
     rImmuneHiv , vaccinated , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sumall = @(x) sum(x(:));
@@ -19,6 +20,7 @@ if strcmp(hystOption , 'on')
 end
 ccInc = zeros(disease , hpvTypes , age);
 ccDeath = ccInc;
+ccTreated = zeros(disease , hpvTypes , age , 3); % 3 for cancer stages - local, regional, distant
 % constants
 % see model notes for index values
 % leep (effective treatment rate by leep)
@@ -116,18 +118,24 @@ for d = 1 : disease
             
             % CC group
             ccLoc = ccInds(d , h , a , :);
+            locTreat = kCCDet(1) * pop(ccLoc);
             dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
                 - kRL * pop(ccLoc)... % local -> regional
-                - deathCC(1) * pop(ccLoc); % local CC mortality
+                - deathCC(1) * pop(ccLoc)... % local CC mortality
+                - locTreat; % detect local CC -> treat
             
             ccReg = ccRegInds(d , h , a , :);
+            regTreat = kCCDet(2) * pop(ccReg);
             dPop(ccReg) = dPop(ccReg) + kRL * pop(ccLoc)...  % local -> regional
                 - kDR * pop(ccReg)... % regional -> distant
-                - deathCC(2) * pop(ccReg); % regional CC mortality
+                - deathCC(2) * pop(ccReg)... % regional CC mortality
+                - regTreat; % detect regional CC -> treat
             
             ccDist = ccDistInds(d , h , a , :);
+            distTreat = kCCDet(3) * pop(ccDist);
             dPop(ccDist) = dPop(ccDist) + kDR * pop(ccReg) ... % regional -> distant
-                - deathCC(3) * pop(ccDist); % distant CC mortality
+                - deathCC(3) * pop(ccDist)... % distant CC mortality
+                - distTreat; % detect distant CC -> treat
             
             % CC incidence tracker
             ccInc(d , h , a) = sum(kCC_Cin3(a , h - 1) .* pop(cin3));
@@ -135,15 +143,19 @@ for d = 1 : disease
             % CC death tracker
             ccDeath(d , h , a) = sum(deathCC(1) * pop(ccLoc) ...
                 + deathCC(2) * pop(ccReg) + deathCC(3) * pop(ccDist));
+            
+            % CC treated tracker
+            ccTreated(d , h , a , 1) = sum(locTreat);
+            ccTreated(d , h , a , 2) = sum(regTreat);
+            ccTreated(d , h , a , 3) = sum(distTreat);
+            
+            hyst = ccTreatedInds(d , h , a , :);
+            dPop(hyst) = dPop(hyst) + sum(locTreat) + sum(regTreat) ...
+                + sum(distTreat);
         end
     end
 end
 
-
-% vaccine waning
-% dPop(vaccinated) = -k_wane * pop(vaccinated);
-% dPop(waned) = dPop(waned) + k_wane * pop(vaccinated);
-
 extraOut{1} = ccInc;
 extraOut{2} = ccDeath;
-%extraOut{3} = ccTreatCost;
+extraOut{3} = ccTreated;

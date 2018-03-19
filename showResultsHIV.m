@@ -1,43 +1,44 @@
 function[] = showResultsHIV()
 %%
-load('actual')
-load('calibData')
+paramDir = [pwd , '\Params\'];
+load([paramDir,'actual'])
+load([paramDir,'calibData'])
 % load('C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results\to2017')
-load('H:\HHCoM_Results\ART_gender_age')
+load('H:\HHCoM_Results\toNow_Hiv')
 c = fix(clock);
 currYear = c(1); % get the current year
 yearNow = round((currYear - startYear) * stepsPerYear);
 %% Plot Settings
 
-colors = [241, 90, 90;
-          240, 196, 25;
-          78, 186, 111;
-          45, 149, 191;
-          149, 91, 165]/255;
-
-set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
-set(groot, 'DefaultFigureInvertHardcopy', 'off');
-set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
-set(groot, 'DefaultAxesColorOrder', colors);
-set(groot, 'DefaultLineLineWidth', 3);
-set(groot, 'DefaultTextColor', [1, 1, 1]);
-set(groot, 'DefaultAxesXColor', [1, 1, 1]);
-set(groot, 'DefaultAxesYColor', [1, 1, 1]);
-set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
-set(0,'defaultAxesFontSize',14)
-ax = gca;
-ax.XGrid = 'on';
-ax.XMinorGrid = 'on';
-ax.YGrid = 'on';
-ax.YMinorGrid = 'on';
-ax.GridColor = [1, 1, 1];
-ax.GridAlpha = 0.4;
-% reset(0)
-% set(0 , 'defaultlinelinewidth' , 2)
+% colors = [241, 90, 90;
+%           240, 196, 25;
+%           78, 186, 111;
+%           45, 149, 191;
+%           149, 91, 165]/255;
+% 
+% set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
+% set(groot, 'DefaultFigureInvertHardcopy', 'off');
+% set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
+% set(groot, 'DefaultAxesColorOrder', colors);
+% set(groot, 'DefaultLineLineWidth', 3);
+% set(groot, 'DefaultTextColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesXColor', [1, 1, 1]);
+% set(groot, 'DefaultAxesYColor', [1, 1, 1]);
+% set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
+% set(0,'defaultAxesFontSize',14)
+% ax = gca;
+% ax.XGrid = 'on';
+% ax.XMinorGrid = 'on';
+% ax.YGrid = 'on';
+% ax.YMinorGrid = 'on';
+% ax.GridColor = [1, 1, 1];
+% ax.GridAlpha = 0.4;
+reset(0)
+set(0 , 'defaultlinelinewidth' , 2)
 %% Plot results
 % gropInds();
-% load('groupedInds');u
+% load('groupedInds');
 % Total HIV positive
 hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
     1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
@@ -45,7 +46,7 @@ hivPop = sum(popVec(: , hivInds) , 2);
 artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates, ...
     1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
 art = sum(popVec(: , artInds) , 2);
-% Compared to Africa Center data
+% Compared to Africa Center data (calibration years)
 overallHivPrev_KZN_AC(1 , :) = 1990 : 2009;
 overallHivPrev_KZN_AC(2 , :) = [0.464072571
     0.985438052
@@ -67,12 +68,45 @@ overallHivPrev_KZN_AC(2 , :) = [0.464072571
     27.2380043
     27.42134161
     28.44974934];
+
+% Compared to Africa Center (validation years)
+prevValYrs = 2010 : 2016;
+prevVal = [0.290
+0.290
+0.293
+0.312
+0.338
+0.338
+0.344
+] .* 100;
+
+upper_prevVal = [0.30
+0.30
+0.31
+0.32
+0.35
+0.35
+0.36
+] .* 100;
+
+lower_prevVal = [0.27
+0.27
+0.27
+0.29
+0.32
+0.32
+0.33] .* 100;
+
 figure()
 popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
     1 : 2 , 4 : 10, 1 : risk)));
 plot(tVec , (hivPop + art) ./ sum(popTot , 2) * 100 , overallHivPrev_KZN_AC(1 , :) , overallHivPrev_KZN_AC(2 , :) , '*')
+hold on 
+yPosError = abs(upper_prevVal - prevVal);
+yNegError = abs(lower_prevVal - prevVal);
+errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
-legend('Model' , 'KZN Actual (Africa Center Data)')
+legend('Model' , 'Calibration set: KZN Actual (Africa Center Data)' , 'Validation set: KZN Actual (Africa Center Data)')
 %% HIV status by age
 % hivAge = zeros(age , length(tVec));
 ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...

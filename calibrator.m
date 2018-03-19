@@ -25,6 +25,7 @@ load([paramDir,'settings'])
 load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
 load([paramDir,'calibInitParams'])
+load([paramDir ,'cost_weights'])
 import java.util.LinkedList
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
@@ -197,15 +198,18 @@ newImmHpv = newHpv;
 newVaxHpv = newHpv;
 newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
 ccDeath = newCC;
+ccTreatCost = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
+vaxd = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , age);
 deaths = popVec;
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
 popVec(1 , :) = popIn;
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-
+vaxMat = ager .* 0;
 %% Simulation
 for i = 2 : length(s) - 1
+    tic
     year = startYear + s(i) - 1;
     currStep = round(s(i) * stepsPerYear);
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
@@ -213,20 +217,23 @@ for i = 2 : length(s) - 1
         
     if hpvOn
         hystOption = 'on';
-        [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
+        [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :) , ...
+            ccTreatCost(i , : , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpv(t , pop , immuneInds , infInds , cin1Inds , ...
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
-            kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+            ccTreatedInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , hpvClearMult , ...
-            c2c1Mults , fImm , kRL , kDR , muCC , disease , viral , age , hpvTypes , ...
+            c2c1Mults , fImm , kRL , kDR , muCC , kCCDet , ...
+            disease , viral , age , hpvTypes , ...
             rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
         popIn = pop(end , :);
         if any(pop(end , :) <  0)
             disp('After hpv')
             break
         end
+        
     end
     
     [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
@@ -258,10 +265,11 @@ for i = 2 : length(s) - 1
     end
     
     
-    [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) bornAgeDie(t , pop , ...
-        ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-        hivFertNegBirth , deathMat , circMat , vaxerAger , MTCTRate , circStartYear , ...
-        vaxStartYear , vaxRate , startYear , endYear , stepsPerYear) , tspan , pop(end , :));
+    [~ , pop , deaths(i , :) , vaxd(i , :)] = ode4xtra(@(t , pop) ...
+        bornAgeDie(t , pop , ager , year , currStep , age , fertility , ...
+        fertMat , hivFertPosBirth , hivFertNegBirth , deathMat , circMat ,...
+        vaxerAger , vaxMat , MTCTRate , circStartYear , vaxStartYear , ...
+        vaxRate , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
     if any(pop(end , :) < 0)
         disp('After bornAgeDie')
         break

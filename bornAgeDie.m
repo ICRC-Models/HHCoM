@@ -17,7 +17,8 @@
 % to aging.
 
 function [dPop , extraOut] = bornAgeDie(t , pop , ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-    hivFertNegBirth , deathMat , circMat , vaxerAger , MTCTRate , circStartYear , vaxStartYear , vaxRate , startYear , endYear, stepsPerYear)
+    hivFertNegBirth , deathMat , circMat , vaxerAger , vaxMat , ...
+    MTCTRate , circStartYear , vaxStartYear , vaxRate , startYear , endYear, stepsPerYear)
 %% births and deaths
 %fertility = zeros(age , 6);
 kHiv = MTCTRate(1); % year <= 2004
@@ -59,9 +60,9 @@ end
 % aged = ager * pop;
 aged_vaxed = vaxerAger * pop; % ages and vaccinates population
 
-% Vaccination costs
-% vaxCost = sumall(vaxPick .* pop) * vaxPrice;
+% Vaccinated
+vaxd = sum(vaxMat * pop);
 
 extraOut{1} = abs(deaths);
-%extraOut{2} = vaxCost;
+extraOut{2} = vaxd;
 dPop = circBirths + births + hivBirths + deaths + aged_vaxed;

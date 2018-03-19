@@ -294,13 +294,13 @@ parfor sim = 1 : size(testParams , 1)
     years = endYear - startYear;
     s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
 % Gender and age specific max ART rates to test
-    maxRateM_vec = [0.7 , 0.7];% maxRateM_arr{sim};
-    maxRateF_vec = [0.7 , 0.7];% maxRateF_arr{sim};
+    maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
+    maxRateF_vec = [0.65 , 0.65];% maxRateF_arr{sim};
 
-    maxRateM1 = 0.42;%1 - exp(-maxRateM_vec(1));
-    maxRateM2 = 0.42;%1 - exp(-maxRateM_vec(2));
-    maxRateF1 = 0.42;%1 - exp(-maxRateF_vec(1));
-    maxRateF2 = 0.42;%1 - exp(-maxRateF_vec(2));
+    maxRateM1 = 1 - exp(-maxRateM_vec(1));
+    maxRateM2 = 1 - exp(-maxRateM_vec(2));
+    maxRateF1 = 1 - exp(-maxRateF_vec(1));
+    maxRateF2 = 1 - exp(-maxRateF_vec(2));
     
     baseCirc = 1;
     agerInt = agerIntArray{sim};

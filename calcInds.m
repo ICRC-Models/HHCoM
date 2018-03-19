@@ -239,6 +239,15 @@ for d = 1 : disease
     end
 end
 
+ccTreatedInds = zeros(disease , hpvTypes , age , viral * risk * periods);
+for d = 1 : disease
+    for h = 2 : hpvTypes
+        for a = 1 : age
+            ccTreatedInds(d , h , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 8 , 1 : periods , 2 , a , 1 : risk)));
+        end
+    end
+end
+
 screen35PlusInds = zeros(disease , hpvTypes , (age - 8 + 1) * risk * periods * viral);
 screen25_35Inds = zeros(disease , hpvTypes , 2 * risk , periods * viral);
 
@@ -288,7 +297,8 @@ for g = 1 : gender
 end
 
 save('hpvIndices' , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , 'normalInds' , ...
-    'ccRInds' , 'screen35PlusInds' , 'screen25_35Inds' , 'ccInds' , 'ccRegInds' , 'ccDistInds' ,'immuneInds')
+    'ccRInds' , 'screen35PlusInds' , 'screen25_35Inds' , 'ccInds' , 'ccRegInds' , ...
+    'ccDistInds' ,'immuneInds' , 'ccTreatedInds')
 disp('hpv indices loaded')
 %% hpvTreat.m indices
 ccRInds = zeros(disease , viral , hpvTypes , hpvStates , periods , age , risk);
