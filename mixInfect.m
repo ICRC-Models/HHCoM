@@ -328,7 +328,7 @@ for d = 1 : disease
 
                         % vaccinated susceptibles
                         hVax = 1;
-                        if hTo ~= 2 && hTo ~= 4
+                        if hTo == 3
                             hVax = 2;
                         end
                         

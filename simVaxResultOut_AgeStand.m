@@ -1,6 +1,7 @@
 function simVaxResultOut_AgeStand()
 %%
-load('general')
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'])
 o90 = load('H:\HHCoM_Results\Vax_0.9_wane_0.mat'); % 90% coverage
 o70 = load('H:\HHCoM_Results\Vax_0.7_wane_0.mat'); % 70% coverage
 o50 = load('H:\HHCoM_Results\Vax_0.5_wane_0.mat'); % 50% coverage
@@ -11,6 +12,8 @@ midMat = zeros(stepsPerYear , size(o90.popVec , 1) / stepsPerYear);
 midMat(1 , :) = 1;
 midMat(end , :) = 1;
 midAnn = @(x) sum(midMat .* reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) / 2;
+c = fix(clock);
+currYear = c(1); % get the current year
 %% Plot Settings
 
 % colors = [241, 90, 90;
@@ -57,9 +60,8 @@ vNo_HpvAge = zeros(ageGroups , length(tVec) / stepsPerYear);
 v90_HpvAge = vNo_HpvAge;
 v70_HpvAge = vNo_HpvAge;
 v50_HpvAge = vNo_HpvAge;
-fac = 10 ^ 5;
 for i = 1 : length(inds)
-    for a = 1 : age
+    for a = 4 : age
         % general
         allF = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 : hpvStates , ...
             1 : periods , 2 , a , 1 : risk));
@@ -271,19 +273,19 @@ for i = 1 : length(inds)
         genArray = {allF , allHivF , hivNeg};
         
         vNo_MortAge(a , :) = ...
-            annlz(sum(sum(sum(oNo.ccDeath(: , inds{i} , : , : , a),2),3),4)) ./ ...
+            annlz(sum(sum(sum(oNo.ccDeath(: , inds{i} , : , a),2),3),4)) ./ ...
             (annlz(sum(oNo.popVec(: , genArray{i}) , 2)) ./ stepsPerYear) * fac;
         
         v90_MortAge(a , :) = ...
-            annlz(sum(sum(sum(o90.ccDeath(: , inds{i} , : , : , a),2),3),4)) ./ ...
+            annlz(sum(sum(sum(o90.ccDeath(: , inds{i} , : , a),2),3),4)) ./ ...
             (annlz(sum(o90.popVec(: , genArray{i}) , 2)) ./ stepsPerYear) * fac;
         
         v70_MortAge(a , :) = ...
-            annlz(sum(sum(sum(o70.ccDeath(: , inds{i} , : , : , a),2),3),4)) ./ ...
+            annlz(sum(sum(sum(o70.ccDeath(: , inds{i} , : , a),2),3),4)) ./ ...
             (annlz(sum(o70.popVec(: , genArray{i}) , 2)) ./ stepsPerYear) * fac;
         
         v50_MortAge(a , :) = ...
-            annlz(sum(sum(sum(o50.ccDeath(:, inds{i} , : , : , a),2),3),4)) ./ ...
+            annlz(sum(sum(sum(o50.ccDeath(:, inds{i} , : , a),2),3),4)) ./ ...
             (annlz(sum(o50.popVec(:, genArray{i}) , 2)) ./ stepsPerYear) * fac;
     end
     
@@ -333,19 +335,19 @@ for d = 1 : length(dVec)
             9 : 10 , 1 : periods , 2 , 4 : age , 1 : risk))];
 
         vNo_wNoMortAge(a , :) = ...
-            annlz(sum(sum(sum(sum(oNo.ccDeath(:, dVec(d) , : , : , :),2),3),4),5)) ./ ...
+            annlz(sum(sum(sum(sum(oNo.ccDeath(:, dVec(d) , : , :),2),3),4),5)) ./ ...
             (annlz(sum(oNo.popVec(: , hiv_ccSusAge) , 2)) ./ stepsPerYear) * fac;
 
         v90_MortAge(a , :) = ...
-            annlz(sum(sum(sum(sum(o90.ccDeath(: , dVec(d) , : , : , :),2),3),4),5)) ./ ...
+            annlz(sum(sum(sum(sum(o90.ccDeath(: , dVec(d) , : , :),2),3),4),5)) ./ ...
             (annlz(sum(o90.popVec(: , hiv_ccSusAge) , 2)) ./ stepsPerYear) * fac;
 
         v70_MortAge(a , :) = ...
-            annlz(sum(sum(sum(sum(o70.ccDeath(: , dVec(d) , : , : , :),2),3),4),5)) ./ ...
+            annlz(sum(sum(sum(sum(o70.ccDeath(: , dVec(d) , : , :),2),3),4),5)) ./ ...
             (annlz(sum(o70.popVec(: , hiv_ccSusAge) , 2)) ./ stepsPerYear) * fac;
 
         v50_MortAge(a , :) = ...
-            annlz(sum(sum(sum(sum(o50.ccDeath(: , dVec(d) , : , : , :),2),3),4),5)) ./ ...
+            annlz(sum(sum(sum(sum(o50.ccDeath(: , dVec(d) , : , :),2),3),4),5)) ./ ...
             (annlz(sum(o50.popVec(: , hiv_ccSusAge) , 2)) ./ stepsPerYear) * fac;
     end
     
@@ -414,10 +416,10 @@ genCC70Age = genCC90Age;
 genCC50Age = genCC90Age;
 genCCNoAge = genCC90Age;
 for a = 1 : age
-    genCC90Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_90(: , : ,: , a) , 2),3),4)));
-    genCC70Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_70(: , : ,: , a) , 2),3),4)));
-    genCC50Age(a , :)  = annlz(squeeze(sum(sum(sum(newCC_50(: , : ,: , a) , 2),3),4)));
-    genCCNoAge(a , :) = annlz(squeeze(sum(sum(sum(newCC_0(: , : ,: , a) , 2),3),4)));
+    genCC90Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_90(: , : , : , a) , 2),3),4)));
+    genCC70Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_70(: , : , : , a) , 2),3),4)));
+    genCC50Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_50(: , : , : , a) , 2),3),4)));
+    genCCNoAge(a , :) = annlz(squeeze(sum(sum(sum(newCC_0(: , : , : , a) , 2),3),4)));
 end
 %%
 % incidence
@@ -447,7 +449,16 @@ legend('90% coverage' , '70% coverage' , '50% coverage')
 T = table(tVec(1 : stepsPerYear : end)' , i_gen90' , i_gen70' , i_gen50' , i_genNo' , genRelRed_90' , ...
     genRelRed_70' , genRelRed_50');
 writetable(T , 'General_Incidence_stand.csv' , 'Delimiter' , ',')
-
+%% Cervical cancer incidence type distribution
+newCCTotal = sum(sum(sum(o90.newCC(: , : , : , :) , 2) , 3) , 4);
+newCCType = zeros(size(o90.newCC , 1) , 3);
+for h = 2 : hpvTypes
+    newCCType(: , h - 1) = sum(sum(o90.newCC(: , : , h  , :) , 2) , 4) ...
+        ./ newCCTotal;
+end
+figure(); area(tVec , newCCType)
+legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV')
+title('Cervical Cancer Incidence Type Distribution (90% Coverage)')
 %% HIV specific incidence
 %% By CD4
 % incidence
@@ -477,10 +488,10 @@ for i = 1 : length(hiv_vec)
         hivSus = [toInd(allcomb(d , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
             2 , a , 1 : risk)) ; toInd(allcomb(d , 1 : viral , 1 : hpvTypes , ...
             9 : 10 , 1 : periods , 2 , a , 1 : risk))];
-        pop90_susHiv(a , :) = annlz(sum(pop90(: , hivSus) , 2)) ./ stepsPerYear;
-        pop70_susHiv(a , :) = annlz(sum(pop70(: , hivSus) , 2)) ./ stepsPerYear;
-        pop50_susHiv(a , :) = annlz(sum(pop50(: , hivSus) , 2)) ./ stepsPerYear;
-        popNo_susHiv(a , :) = annlz(sum(popNo(: , hivSus) , 2)) ./ stepsPerYear;
+        pop90_susHiv(a , :) = max(annlz(sum(pop90(: , hivSus) , 2)) , 1) ./ stepsPerYear;
+        pop70_susHiv(a , :) = max(annlz(sum(pop70(: , hivSus) , 2)) , 1) ./ stepsPerYear;
+        pop50_susHiv(a , :) = max(annlz(sum(pop50(: , hivSus) , 2)) , 1)./ stepsPerYear;
+        popNo_susHiv(a , :) = max(annlz(sum(popNo(: , hivSus) , 2)) , 1)./ stepsPerYear;
     end
     
     % Perform age standardization
@@ -514,10 +525,10 @@ for i = 1 : length(hiv_vec)
         hivSus = [toInd(allcomb(d , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
             2 , a , 1 : risk)) ; toInd(allcomb(d , 1 : viral , 1 : hpvTypes , ...
             9 : 10 , 1 : periods , 2 , a , 1 : risk))];
-        pop90_susHiv(a , :) = annlz(sum(pop90(: , hivSus) , 2)) ./ stepsPerYear;
-        pop70_susHiv(a , :) = annlz(sum(pop70(: , hivSus) , 2)) ./ stepsPerYear;
-        pop50_susHiv(a , :) = annlz(sum(pop50(: , hivSus) , 2)) ./ stepsPerYear;
-        popNo_susHiv(a , :) = annlz(sum(popNo(: , hivSus) , 2)) ./ stepsPerYear;
+        pop90_susHiv(a , :) = max(annlz(sum(pop90(: , hivSus) , 2)) , 1) ./ stepsPerYear;
+        pop70_susHiv(a , :) = max(annlz(sum(pop70(: , hivSus) , 2)) , 1) ./ stepsPerYear;
+        pop50_susHiv(a , :) = max(annlz(sum(pop50(: , hivSus) , 2)) , 1)./ stepsPerYear;
+        popNo_susHiv(a , :) = max(annlz(sum(popNo(: , hivSus) , 2)) , 1)./ stepsPerYear;
     end
     h_gen90 = sum(bsxfun(@times , hivCC90 ./ pop90_susHiv , wVec)).* fac;
     h_gen70 = sum(bsxfun(@times , hivCC70 ./ pop70_susHiv , wVec)) .* fac;
@@ -593,10 +604,10 @@ for a = 1 : age
     hivSus = [toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
         2 , a , 1 : risk)) ; toInd(allcomb(vec , 1 : viral , 1 : hpvTypes , ...
         9 : 10 , 1 : periods , 2 , a , 1 : risk))];
-    pop90_susHiv(a , :) = annlz(sum(pop90(: , hivSus) , 2));
-    pop70_susHiv(a , :) = annlz(sum(pop70(: , hivSus) , 2));
-    pop50_susHiv(a , :) = annlz(sum(pop50(: , hivSus) , 2));
-    popNo_susHiv(a , :) = annlz(sum(popNo(: , hivSus) , 2));
+    pop90_susHiv(a , :) = max(annlz(sum(pop90(: , hivSus) , 2)) , 1);
+    pop70_susHiv(a , :) = max(annlz(sum(pop70(: , hivSus) , 2)) , 1);
+    pop50_susHiv(a , :) = max(annlz(sum(pop50(: , hivSus) , 2)) , 1);
+    popNo_susHiv(a , :) = max(annlz(sum(popNo(: , hivSus) , 2)) , 1);
 end
 
 h_gen90 = sum(bsxfun(@times , hivCC90 ./ pop90_susHiv , wVec)) .* fac;
@@ -623,14 +634,15 @@ hivAllCC90 = zeros(age , length(tVec) / stepsPerYear);
 hivAllCC70 = hivAllCC90;
 hivAllCC50 = hivAllCC90;
 hivAllCCNo = hivAllCC90;
+dVec = [2 : 6 , 10];
 for a = 1 : age
-    hivAllCC90(a , :) = annlz(sum(sum(sum(newCC_90(: , 2 : 6 , : , a),2),3),4));
-    hivAllCC70(a , :) = annlz(sum(sum(sum(newCC_70(: , 2 : 6 , : , a),2),3),4));
-    hivAllCC50(a , :) = annlz(sum(sum(sum(newCC_50(: , 2 : 6 , : , a),2),3),4));
-    hivAllCCNo(a , :) = annlz(sum(sum(sum(newCC_0(: , 2 : 6 , : , a),2),3),4));
+    hivAllCC90(a , :) = annlz(sum(sum(sum(newCC_90(: , dVec , : , a),2),3),4));
+    hivAllCC70(a , :) = annlz(sum(sum(sum(newCC_70(: , dVec , : , a),2),3),4));
+    hivAllCC50(a , :) = annlz(sum(sum(sum(newCC_50(: , dVec , : , a),2),3),4));
+    hivAllCCNo(a , :) = annlz(sum(sum(sum(newCC_0(: , dVec , : , a),2),3),4));
     
-    hivAllSus = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
-        2 , a , 1 : risk)); toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes ,...
+    hivAllSus = [toInd(allcomb(dVec , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+        2 , a , 1 : risk)); toInd(allcomb(dVec , 1 : viral , 1 : hpvTypes ,...
         8 : 10 , 1 : periods , 2 , a , 1 : risk))];
     pop90_susHiv(a , :) = annlz(sum(pop90(: , hivAllSus) , 2)) ./ stepsPerYear;
     pop70_susHiv(a , :) = annlz(sum(pop70(: , hivAllSus) , 2)) ./ stepsPerYear;
@@ -818,23 +830,23 @@ for d = 1 : length(dVec)
 
     vNo_wNoMortAge(a , :) = ...
         annlz(sum(sum(sum(v0_w0.ccDeath(: , dVec(d) , : , a),2),3),4)) ./ ...
-        (annlz(sum(v0_w0.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+        (max(annlz(sum(v0_w0.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
 
     v90_w20MortAge(a , :) = ...
         annlz(sum(sum(sum(v90_w20.ccDeath(: , dVec(d) , : , a),2),3),4)) ./ ...
-        (annlz(sum(v90_w20.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+        (max(annlz(sum(v90_w20.popVec(: , hiv_ccSus) , 2)) , 1)./ stepsPerYear) * fac;
 
     v90_w15MortAge(a , :) = ...
         annlz(sum(sum(sum(v90_w15.ccDeath(: , dVec(d) , : , a),2),3),4)) ./ ...
-        (annlz(sum(v90_w15.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+        (max(annlz(sum(v90_w15.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
 
     v90_w10MortAge(a , :) = ...
         annlz(sum(sum(sum(v90_w10.ccDeath(:, dVec(d) , : , a),2),3),4)) ./ ...
-        (annlz(sum(v90_w10.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+        (max(annlz(sum(v90_w10.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
 
     v90_wNoMortAge(a , :) = ...
         annlz(sum(sum(sum(v90_w0.ccDeath(: , dVec(d) , : , a),2),3),4)) ./ ...
-        (annlz(sum(v90_w0.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+        (max(annlz(sum(v90_w0.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
     end
     vNo_wNoMort = sum(bsxfun(@times , vNo_wNoMortAge , wVec));
     v90_w20Mort = sum(bsxfun(@times , v90_w20MortAge , wVec));
@@ -1103,15 +1115,15 @@ for d = 1 : length(dVec)
             2 , a , 1 : risk)) ; toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , ...
             9 : 10 , 1 : periods , 2 , a , 1 : risk))];
         v90_wNo_incCD4(a , :)  = annlz(sum(sum(v90_w0.newCC(: , dVec(d) , : , a)...
-            ,3),4)) ./ (annlz(sum(v90_w0.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+            ,3),4)) ./ (max(annlz(sum(v90_w0.popVec(: , hiv_ccSus) , 2)), 1) ./ stepsPerYear) * fac;
         v90_w20_incCD4(a , :)  = annlz(sum(sum(v90_w20.newCC(: , dVec(d) , : , a)...
-            ,3),4)) ./ (annlz(sum(v90_w20.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+            ,3),4)) ./ (max(annlz(sum(v90_w20.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
         v90_w15_incCD4(a , :)  = annlz(sum(sum(v90_w15.newCC(: , dVec(d) , : , a)...
-            ,3),4)) ./ (annlz(sum(v90_w15.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+            ,3),4)) ./ (max(annlz(sum(v90_w15.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
         v90_w10_incCD4(a , :)  = annlz(sum(sum(v90_w10.newCC(: , dVec(d) , : , a)...
-            ,3),4)) ./ (annlz(sum(v90_w10.popVec(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+            ,3),4)) ./ (max(annlz(sum(v90_w10.popVec(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
         hivCCNo(a , :) = annlz(sum(sum(newCC_0(: , dVec(d) , : , a),3),4)) ...
-            ./ (annlz(sum(popNo(: , hiv_ccSus) , 2)) ./ stepsPerYear) * fac;
+            ./ (max(annlz(sum(popNo(: , hiv_ccSus) , 2)) , 1) ./ stepsPerYear) * fac;
         
     end
     
@@ -1207,7 +1219,7 @@ legend('No waning' , '20 years' , '15 years' , '10 years' , ...
     'Location' , 'northeastoutside')
 % Export general incidence/reduction as csv
 T = table(tVec(1 : stepsPerYear : end)' , v90_wNo_incCD4' , v90_w20_incCD4' , ...
-    v90_w15_incCD4' , v90_w10_incCD4' , wNoRedCD4 , w20RedCD4 , w15RedCD4 , ...
-    w10RedCD4);
+    v90_w15_incCD4' , v90_w10_incCD4' , wNoRedCD4' , w20RedCD4' , w15RedCD4' , ...
+    w10RedCD4');
 writetable(T , [filename , '_Waning_stand.csv'] , 'Delimiter' , ',')
 

@@ -40,25 +40,50 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 %%%%%
 %% use calibrated parameters
 load([paramDir,'calibInitParams'])
-load([paramDir,'HPV_calib5.dat'])
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+load([paramDir,'HPV_calib12.dat'])
 for i = 1 : 3
-    kCin1_Inf(: , i) = HPV_calib5(i) .* kCin1_Inf(: , i);
-    kInf_Cin1(: , i) = HPV_calib5(3 + i) .* kInf_Cin1(: , i);
-    kCC_Cin3(: , i) = HPV_calib5(6 + i) .* kCC_Cin3(: , i);
+    kCin1_Inf(: , i) = HPV_calib12(i) .* kCin1_Inf(: , i);
+    rNormal_Inf(: , i) = HPV_calib12(3 + i) .* rNormal_Inf(: , i);
+    kCC_Cin3(: , i) = HPV_calib12(6 + i) .* kCC_Cin3(: , i);
+    kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
 end
 
-rImmuneHiv = HPV_calib5(10 : 13);
-c3c2Mults = HPV_calib5(14 : 17);
-c2c1Mults = max(1 , HPV_calib5(18 : 21));
-artHpvMult = HPV_calib5(22);
-perPartnerHpv= HPV_calib5(23);
-lambdaMultImm = HPV_calib5(24 : 39);
-hpv_hivClear = HPV_calib5(40 : 43);
-hpvClearMult = HPV_calib5(44 : 47);
-perPartnerHpv_lr = 0.1;
-perPartnerHpv_nonV = 0.1;
+% rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
+
+for i = 0 : 2
+    maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
+    femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib12(56 + i);
+end
+
+for a = 1 : age
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+rImmuneHiv = HPV_calib12(10 : 13);
+c3c2Mults = HPV_calib12(14 : 17);
+c2c1Mults = HPV_calib12(18 : 21);
+artHpvMult = HPV_calib12(22);
+perPartnerHpv= HPV_calib12(23);
+lambdaMultImm = HPV_calib12(24 : 39);
+hpv_hivClear = HPV_calib12(40 : 43);
+hpvClearMult = HPV_calib12(44 : 47);
+perPartnerHpv_lr = HPV_calib12(48);%0.1;
+perPartnerHpv_nonV = HPV_calib12(49); %0.1;
+
+vaxMat = ager .* 0;
+maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
+maxRateF_vec = [0.65 , 0.65];% maxRateF_arr{sim};
+
+maxRateM1 = 1 - exp(-maxRateM_vec(1));
+maxRateM2 = 1 - exp(-maxRateM_vec(2));
+maxRateF1 = 1 - exp(-maxRateF_vec(1));
+maxRateF2 = 1 - exp(-maxRateF_vec(2));
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
 load([paramDir , 'settings']) 
 
 %%%%%
@@ -70,17 +95,19 @@ t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
 lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
     zeros(age , 2)};
-% 20 year waning
-lambdaMultVax_Arr{1}(3 : 6 , 1) = vaxEff;
-lambdaMultVax_Arr{1}(7 : 10 , 1) = vaxEff + k_wane * (5 : 5 : t_linearWane);
-% 15 year waning
-lambdaMultVax_Arr{2}(3 : 5 , 1) = vaxEff;
-lambdaMultVax_Arr{2}(6 : 9 , 1) = vaxEff + k_wane * (5 : 5 : t_linearWane);
-% 10 year waning
-lambdaMultVax_Arr{3}(3 : 4 , 1) = vaxEff;
-lambdaMultVax_Arr{3}(5 : 8 , 1) = vaxEff + k_wane * (5 : 5 : t_linearWane);
-% 0 year waning
-lambdaMultVax_Arr{4}(3 : age , 1) = vaxEff;
+for h = 1 %: 2
+    % 20 year waning
+    lambdaMultVax_Arr{1}(3 : 6 , h) = vaxEff;
+    lambdaMultVax_Arr{1}(7 : 10 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
+    % 15 year waning
+    lambdaMultVax_Arr{2}(3 : 5 , h) = vaxEff;
+    lambdaMultVax_Arr{2}(6 : 9 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
+    % 10 year waning
+    lambdaMultVax_Arr{3}(3 : 4 , h) = vaxEff;
+    lambdaMultVax_Arr{3}(5 : 8 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
+    % 0 year waning
+    lambdaMultVax_Arr{4}(3 : age , h) = vaxEff;
+end
 
 k_wane_d = [20 , 15 , 10 , 0];
 vaxCover = [0 , 0.5 , 0.7, 0.9];
@@ -164,7 +191,7 @@ parfor n = 1 : nTests
     newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
     ccDeath = newCC;
     ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-    hivDeaths = zeros(length(s) - 1 , age);
+    hivDeaths = zeros(length(s) - 1 , gender , age);
     deaths = zeros(size(popVec));
     vaxd = zeros(length(s) - 1 , 1);
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
@@ -221,9 +248,10 @@ parfor n = 1 : nTests
         end
         
         if hivOn
-            [~ , pop , hivDeaths(i , :) , artTreat] =...
-                ode4xtra(@(t , pop) hiv(t , pop , vlAdvancer , artDist , muHIV , ...
-                kCD4 , disease , viral , gender , age , risk , k , hivInds , ...
+            [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+                ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
+                kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
+                viral , gender , age , risk , k , hivInds , ...
                 stepsPerYear , year) , tspan , pop(end , :));
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;
             if any(pop(end , :) < 0)
@@ -242,7 +270,8 @@ parfor n = 1 : nTests
         
         [~ , pop , deaths(i , :) , vaxd(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDie(t , pop , ager , year , currStep , age , fertility , ...
-            fertMat , hivFertPosBirth ,hivFertNegBirth , deathMat , circMat , ...
+            fertMat , fertMat2 , hivFertPosBirth ,hivFertNegBirth , hivFertPosBirth2 , ...
+            hivFertNegBirth2 , deathMat , circMat , ...
             vaxerAger , vaxMat , MTCTRate , circStartYear , vaxStartYear ,...
             vaxRate , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
         if any(pop(end , :) < 0)

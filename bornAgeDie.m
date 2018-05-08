@@ -16,8 +16,9 @@
 % derivatives that describes the change in the population's subgroups due
 % to aging.
 
-function [dPop , extraOut] = bornAgeDie(t , pop , ager , year , currStep , age , fertility , fertMat , hivFertPosBirth ,...
-    hivFertNegBirth , deathMat , circMat , vaxerAger , vaxMat , ...
+function [dPop , extraOut] = bornAgeDie(t , pop , ager , year , currStep ,...
+    age , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
+    hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , vaxerAger , vaxMat , ...
     MTCTRate , circStartYear , vaxStartYear , vaxRate , startYear , endYear, stepsPerYear)
 %% births and deaths
 %fertility = zeros(age , 6);
@@ -38,6 +39,22 @@ elseif year > 2004
     kHiv = mtctVec(ind);
 end
 
+if year > 1995 && year <= 2005
+    dt = (year - 1995) * stepsPerYear;
+    dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
+        ./ ((2005 - 1995) * stepsPerYear);
+    hivFertPosBirth = hivFertPosBirth + dFertPos .* dt;
+    dFertNeg = (hivFertNegBirth2 - hivFertNegBirth) ...
+        ./ ((2005 - 1995) * stepsPerYear);
+    hivFertNegBirth = hivFertNegBirth + dFertNeg .* dt;
+    dFertMat = (fertMat2 - fertMat) ...
+        ./ ((2005 - 1995) * stepsPerYear);
+    fertMat = fertMat + dFertMat .* dt;
+elseif year >= 2005
+    fertMat = fertMat2;
+    hivFertPosBirth = hivFertPosBirth2;
+    hivFertNegBirth = hivFertNegBirth2;
+end
 
 hivFertPosBirth = hivFertPosBirth .* kHiv;
 hivFertNegBirth = hivFertNegBirth .* (1 - kHiv);

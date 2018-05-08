@@ -43,8 +43,8 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpvClearMult(d - 2); % Regression multiplier
-        rHivHpv_Clear = 0.1 .* hpv_hivClear(d - 2); % Infection clearance multiplier
+        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier
+        rHivHpv_Clear = hpv_hivClear(d - 2); % Infection clearance multiplier
         deathCC = muCC(d - 2 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
     elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
@@ -52,7 +52,7 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpvClearMult(1); % Regression multiplier
+        rHivHpvMult = hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier
         rHivHpv_Clear = 1; % Infection clearance multiplier
         deathCC = muCC(5 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
@@ -71,14 +71,12 @@ for d = 1 : disease
             normalF = normalInds(d , 2 , a , :);
             % to immune from HPV infected, CIN1, CIN2, CIN3 (remove immunity for now)
             
-            dPop(normalF) = dPop(normalF) + rImmune * rHiv * pop(immuneF) ... % immuneF -> normalF
-                + rNormal_Inf(a , h - 1) * (1 - fImm(a)) * rHivHpvMult .* pop(infF); % infF -> normalF
+            dPop(normalF) = dPop(normalF) + rImmune * rHiv * pop(immuneF); % immuneF -> normalF
             
-            dPop(normalM) = dPop(normalM) + rImmune * pop(immuneM) ...% immuneM -> normalM
-                + rNormal_Inf(a , h - 1) * rHivHpvMult .* pop(infM);  % infM -> normalM
+            dPop(normalM) = dPop(normalM) + rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infM);  % infM -> normalM
             
             dPop(immuneF) = dPop(immuneF)...
-                + rNormal_Inf(a , h - 1) * fImm(a) * rHivHpv_Clear .* pop(infF)... % infF -> immuneF
+                + rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF)... % infF -> immuneF
                 - rImmune * rHiv * pop(immuneF); % immuneF -> normalF
             
             %                 dPop(immuneM) = dPop(immuneM) + rNormal_Inf(a) ...
@@ -93,7 +91,7 @@ for d = 1 : disease
                 * rHivHpv_Clear) .* pop(infF); % infF -> immuneF
             
             
-            dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpvMult * pop(infM); % regression to normal from infected males
+            dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpv_Clear * pop(infM); % regression to normal from infected males
             
             % Infection and CIN progression in females only
             % kCin_Inf(stage , hpvType , age group)
@@ -118,21 +116,21 @@ for d = 1 : disease
             
             % CC group
             ccLoc = ccInds(d , h , a , :);
-            locTreat = kCCDet(1) * pop(ccLoc);
+            locTreat = 0*kCCDet(1) * pop(ccLoc);
             dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
                 - kRL * pop(ccLoc)... % local -> regional
                 - deathCC(1) * pop(ccLoc)... % local CC mortality
                 - locTreat; % detect local CC -> treat
             
             ccReg = ccRegInds(d , h , a , :);
-            regTreat = kCCDet(2) * pop(ccReg);
+            regTreat = 0*kCCDet(2) * pop(ccReg);
             dPop(ccReg) = dPop(ccReg) + kRL * pop(ccLoc)...  % local -> regional
                 - kDR * pop(ccReg)... % regional -> distant
                 - deathCC(2) * pop(ccReg)... % regional CC mortality
                 - regTreat; % detect regional CC -> treat
             
             ccDist = ccDistInds(d , h , a , :);
-            distTreat = kCCDet(3) * pop(ccDist);
+            distTreat = 0*kCCDet(3) * pop(ccDist);
             dPop(ccDist) = dPop(ccDist) + kDR * pop(ccReg) ... % regional -> distant
                 - deathCC(3) * pop(ccDist)... % distant CC mortality
                 - distTreat; % detect distant CC -> treat

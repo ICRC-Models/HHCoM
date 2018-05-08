@@ -12,6 +12,7 @@ riskDistM = xlsread(file , 'Demographics' , 'G3:I18'); % [age x risk]
 riskDistF = xlsread(file , 'Demographics' , 'J3:L18');
 mue = xlsread(file , 'Demographics' , 'P4:Q19'); % [age x gender]; background mortality
 fertility = xlsread(file , 'Demographics' , 'R4:W19'); % [age x disease]
+fertility2 = xlsread(file , 'Demographics' , 'R29:W44');
 partnersM = xlsread(file , 'Demographics' , 'Z3:AB18'); % [age x risk]; male partnerships per year
 partnersF = xlsread(file , 'Demographics' , 'AC3:AE18'); % [age x risk]; female partnerships per year
 actsPer = xlsread(file , 'Demographics' , 'AI2:AK3'); % [gender x risk]; acts per partnership
@@ -20,7 +21,7 @@ epsR = xlsread(file , 'Demographics' , 'AP2:AP4'); % [year] <1998 , 2003 , >2010
 yr = xlsread(file , 'Demographics' , 'AN2:AN4'); % years
 savdir = [pwd , '\Params']; 
 save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
-    'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'yr');
+    'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
 
 %% import and save HIV parameters
 file = [pwd , '\Config\HIVParameters.xlsx'];
@@ -140,7 +141,8 @@ for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
 end
-save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F')
+save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F' , 'betaHIV_F2M' , 'betaHIV_M2F' , ...
+    'maleActs', 'femaleActs')
 %% Load indices
 % prompt = {'Calculate Indices? (1 = yes, 0 = no)'};
 % tit = 'Calculate Indices?';
