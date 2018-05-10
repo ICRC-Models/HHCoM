@@ -181,32 +181,6 @@ tVec = linspace(startYear , endYear , size(popVec , 1));
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 %% use calibrated parameters
-% load([paramDir,'calibInitParams'])
-% load([paramDir,'HPV_calib9.dat'])
-% for i = 1 : 3
-%     kCin1_Inf(: , i) = HPV_calib9(i) .* kCin1_Inf(: , i);
-%     kInf_Cin1(: , i) = HPV_calib9(3 + i) .* kInf_Cin1(: , i);
-%     kCC_Cin3(: , i) = HPV_calib9(6 + i) .* kCC_Cin3(: , i);
-%     kCin3_Cin2(: , i) = HPV_calib9(49 + i) .* kCin3_Cin2(: , i); 
-% end
-% rNormal_Inf(: , 2 : 3) = 0.65 .* rNormal_Inf(: , 2 : 3);
-% 
-% for i = 0 : 2
-%     maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib9(53 + i);
-%     femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib9(56 + i);
-% end
-% 
-% rImmuneHiv = HPV_calib9(10 : 13);
-% c3c2Mults = HPV_calib9(14 : 17);
-% c2c1Mults = HPV_calib9(18 : 21);
-% artHpvMult = HPV_calib9(22);
-% perPartnerHpv= HPV_calib9(23);
-% lambdaMultImm = HPV_calib9(24 : 39);
-% hpv_hivClear = HPV_calib9(40 : 43);
-% hpvClearMult = HPV_calib9(44 : 47); 
-% perPartnerHpv_lr = HPV_calib9(48);%0.1;
-% perPartnerHpv_nonV = HPV_calib9(49); %0.1;
-
 load([paramDir,'calibInitParams'])
 load([paramDir,'HPV_calib12.dat'])
 for i = 1 : 3
@@ -215,7 +189,9 @@ for i = 1 : 3
     kCC_Cin3(: , i) = HPV_calib12(6 + i) .* kCC_Cin3(: , i);
     kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
 end
-
+kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
+kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
+kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
 % rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
 
 for i = 0 : 2

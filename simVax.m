@@ -48,7 +48,9 @@ for i = 1 : 3
     kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
 end
 
-% rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
+kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
+kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
+kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
 
 for i = 0 : 2
     maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
@@ -95,7 +97,7 @@ t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
 lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
     zeros(age , 2)};
-for h = 1 %: 2
+for h = 1 : 2
     % 20 year waning
     lambdaMultVax_Arr{1}(3 : 6 , h) = vaxEff;
     lambdaMultVax_Arr{1}(7 : 10 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
