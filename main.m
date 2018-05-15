@@ -86,12 +86,12 @@ if hivOn
             initPop(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.3 .* ...
                 initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
     
-            for h = 2 : 4
+            for h = 2
                 % females
-                initPop(3 , 2 , h , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.7 / 3 .* ...
+                initPop(3 , 2 , h , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.7 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 1 : 3);
                % males
-                initPop(3 , 2 , h , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.7 / 3 .* ...
+                initPop(3 , 2 , h , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.7 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
             end
         end
@@ -104,15 +104,7 @@ if hpvOn
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected;
 
     % HPV 16/18
-    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = 0.7 .* infected;
-    
-    % 4v and oHR
-    for h = 3 : 4
-        for s = 2 : 4
-            initPop(1 , 1 , h , s , 1 , : , 4 : 9 , :) = 0.3 / 6 * infected; % in CIN1 - CIN 3 states
-        end
-    end
-%     initPop = max(initPop , 0);
+    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = infected;
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
@@ -189,9 +181,9 @@ for i = 1 : 3
     kCC_Cin3(: , i) = HPV_calib12(6 + i) .* kCC_Cin3(: , i);
     kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
 end
-kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
-kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
-kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
+% kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
+% kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
+% kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
 % rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
 
 for i = 0 : 2
@@ -206,15 +198,27 @@ end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 rImmuneHiv = HPV_calib12(10 : 13);
-c3c2Mults = HPV_calib12(14 : 17);
-c2c1Mults = HPV_calib12(18 : 21);
+% c3c2Mults = HPV_calib12(14 : 17);
+% c2c1Mults = HPV_calib12(18 : 21);
 perPartnerHpv= HPV_calib12(23);
 lambdaMultImm = HPV_calib12(24 : 39);
 hpv_hivClear = HPV_calib12(40 : 43);
 hpvClearMult = HPV_calib12(44 : 47);
 perPartnerHpv_lr = HPV_calib12(48);%0.1;
 perPartnerHpv_nonV = HPV_calib12(49); %0.1;
-artHpvMult = HPV_calib12(22);
+% artHpvMult = HPV_calib12(22);
+
+% Weight HPV transitions according to type distribution
+
+distWeight = [0.6 , 0.3 , 0.1];
+kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
+kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
+kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
+kCin2_Cin1 = sum(bsxfun(@times , kCin2_Cin1 , distWeight) , 2);
+kCin3_Cin2 = sum(bsxfun(@times , kCin3_Cin2 , distWeight) , 2);
+kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
+kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
+rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
 vaxMat = ager .* 0;
 maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
@@ -231,9 +235,8 @@ load([paramDir,'hivFertMats2'])
 lambdaMultVax = ones(age , 2);
 
 artHpvMult = hpv_hivMult(1,1);
-for h = 2 : 3
-    hpv_hivMult(: , h) = hpv_hivMult(: , 1);
-end
+hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
+
 %% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])

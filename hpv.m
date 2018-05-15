@@ -57,7 +57,7 @@ for d = 1 : disease
         deathCC = muCC(5 , :); % HIV+ CC death rate
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
-    for h = 2 : hpvTypes % infected onwards
+    for h = 2 % infected onwards
         for a = 1 : age
             % Infected group
             immuneM = immuneInds(d , h , 1 , a , :);

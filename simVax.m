@@ -48,9 +48,9 @@ for i = 1 : 3
     kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
 end
 
-kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
-kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
-kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
+% kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
+% kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
+% kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
 
 for i = 0 : 2
     maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
@@ -64,9 +64,9 @@ end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 rImmuneHiv = HPV_calib12(10 : 13);
-c3c2Mults = HPV_calib12(14 : 17);
-c2c1Mults = HPV_calib12(18 : 21);
-artHpvMult = HPV_calib12(22);
+% c3c2Mults = HPV_calib12(14 : 17);
+% c2c1Mults = HPV_calib12(18 : 21);
+% artHpvMult = HPV_calib12(22);
 perPartnerHpv= HPV_calib12(23);
 lambdaMultImm = HPV_calib12(24 : 39);
 hpv_hivClear = HPV_calib12(40 : 43);
@@ -74,6 +74,15 @@ hpvClearMult = HPV_calib12(44 : 47);
 perPartnerHpv_lr = HPV_calib12(48);%0.1;
 perPartnerHpv_nonV = HPV_calib12(49); %0.1;
 
+distWeight = [0.6 , 0.3 , 0.1];
+kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
+kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
+kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
+kCin2_Cin1 = sum(bsxfun(@times , kCin2_Cin1 , distWeight) , 2);
+kCin3_Cin2 = sum(bsxfun(@times , kCin3_Cin2 , distWeight) , 2);
+kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
+kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
+rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 vaxMat = ager .* 0;
 maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
 maxRateF_vec = [0.65 , 0.65];% maxRateF_arr{sim};
@@ -89,37 +98,25 @@ load([paramDir,'hivFertMats2'])
 load([paramDir , 'settings']) 
 
 artHpvMult = hpv_hivMult(1,1);
-for h = 2 : 3
-    hpv_hivMult(: , h) = hpv_hivMult(: , 1);
-end
+hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
 
 %%%%%
 
 c = fix(clock);
 currYear = c(1); % get the current year
-vaxEff = 0.8;
+vaxEff = [0.9 * 0.7 , 0.7 , 0.9]; % 90% efficacy against 70% of CC types, 100% efficacy against 70% of types, 100% efficacy against 90% of types
 t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
-lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
-    zeros(age , 2)};
-for h = 1% : 2
-    % 20 year waning
-    lambdaMultVax_Arr{1}(3 : 6 , h) = vaxEff;
-    lambdaMultVax_Arr{1}(7 : 10 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
-    % 15 year waning
-    lambdaMultVax_Arr{2}(3 : 5 , h) = vaxEff;
-    lambdaMultVax_Arr{2}(6 : 9 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
-    % 10 year waning
-    lambdaMultVax_Arr{3}(3 : 4 , h) = vaxEff;
-    lambdaMultVax_Arr{3}(5 : 8 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
-    % 0 year waning
-    lambdaMultVax_Arr{4}(3 : age , h) = vaxEff;
+
+lambdaMultVax = zeros(age , 3);
+
+for s = 1 : length(vaxEff)
+    % No waning
+    lambdaMultVax_Arr{4}(3 : age , s) = vaxEff(s);
 end
 
-k_wane_d = [20 , 15 , 10 , 0];
-vaxCover = [0 , 0.5 , 0.7, 0.9];
-testParams = allcomb(vaxCover , 1 : length(lambdaMultVax_Arr));
-% titles = {'noVax' , 'vax50' , 'vax70' , 'vax90'};
+vaxCover = [0.7 , 0.9];
+testParams = allcomb(vaxCover , vaxEff);
 nTests = size(testParams , 1);
 %%%%%%%
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
@@ -149,7 +146,7 @@ vaxerAgerArray = cell(3 , 1);
 %     vaxer(at(susFemale , susFemale)) = 1 - vaxRate .* 1/5;
 %     vaxerArray{n} = vaxer;
 % end
-for n = 1 : size(testParams , 1)
+for n = 1 : size(testParams , 1) % vaccinates
     vaxerAger = ager;
     vaxRate = testParams(n , 1);
     at = @(x , y) sort(prod(dim)*(y-1) + x);
@@ -169,7 +166,7 @@ end
 %     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
 %     vaxer(vaxdMale , susMale) = V(2 , a);
 %     vaxer(susMale , susMale) = -V(2 , a);
-vaxMatArray = cell(3 , 1);
+vaxMatArray = cell(3 , 1); % counts number vaccinated 
 for n = 1 : size(testParams , 1)
     vaxMat = ager .* 0;
     vaxRate = testParams(n , 1);

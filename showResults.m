@@ -1044,7 +1044,7 @@ for y = 1 : length(ccIncYears)
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-o' , 1 : length(ccAgeNegRel(: , y)) , ...
         ccAgeNegRel(: , y) , '-o' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , : , y) , '-o' , ...
         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-o');
-    xlabel('Age Group'); ylabel('Incidence per 100,000')hpv
+    xlabel('Age Group'); ylabel('Incidence per 100,000')
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
 %     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest');
