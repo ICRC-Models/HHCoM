@@ -20,6 +20,7 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
 sumall = @(x) sum(x(:));
 % Indices
 %% Load indices
+paramDir = [pwd , '\Params\'];
 disp('Preparing indices...')
 disp('This may take a while...')
 %% mixInfect.m indices
@@ -90,7 +91,7 @@ for d = 1 : disease
     end
 end
 
-hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral * 7);
+hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral);
 hpvImm = zeros(disease , hpvTypes , gender , age , risk , viral);
 hpvVaxd = zeros(disease , hpvTypes , gender , age , risk , viral);
 hpvVaxd2 = hpvVaxd;
@@ -100,13 +101,13 @@ for d = 1 : disease
             for r = 1 : risk
                 for h = 1 : hpvTypes
                     hpvSus(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 , g , a , r)));
                     hpvImm(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 10 , 1 , g , a , r)));
                     hpvVaxd(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 9 , 1 , g , a , r)));
                     hpvVaxd2(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 9 , 2 , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 2 , g , a , r)));
                 end
             end
         end
@@ -123,9 +124,10 @@ for g = 1 : gender
     end
 end
 
-toHpv = zeros(disease , hpvTypes , gender , age , risk , viral * 7);
+toHpv = zeros(disease , hpvTypes , gender , age , risk , viral);
 toHpv_ImmVax = zeros(size(hpvVaxd));
 toHpv_Imm = zeros(size(toHpv_ImmVax));
+toHpv_ImmVaxNonV = toHpv_Imm;
 
 for d = 1 : disease
     for g = 1 : gender
@@ -133,11 +135,13 @@ for d = 1 : disease
             for h = 1 : hpvTypes
                 for r = 1 : risk
                     toHpv(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 : 7 , 1 , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 , g , a , r)));
                     toHpv_Imm(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 1 , 1 , g , a , r)));
                     toHpv_ImmVax(d , h , g , a , r , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 2 , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 2 , g , a , r))); % vaccinated -> vaccine type infection
+                    toHpv_ImmVaxNonV(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 1 , 3 , g , a , r))); % vaccinated -> non-vaccine type infection
                 end
             end
         end
@@ -167,8 +171,9 @@ for g = 1 : gender
     end
 end
 
-save('mixInfectIndices' , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
-    'toHpv' , 'toHpv_ImmVax' , 'toHpv_Imm' , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
+save([paramDir , 'mixInfectIndices'] , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
+    'toHpv' , 'toHpv_ImmVax' , 'toHpv_ImmVaxNonV' , 'toHpv_Imm' , ...
+    'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
     'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd' , 'hpvVaxd2')
 disp('mixInfect indices loaded')
 %% hiv.m , treatDist.m indices
@@ -191,7 +196,7 @@ for d = 1 : disease
     end
 end
 
-save('hivIndices' , 'hivInds')
+save([paramDir , 'hivIndices'] , 'hivInds')
 disp('treatDist indices loaded')
 %% vlAdv.m indices
 % vlInds(d , v , g) = makeVec(d , v , 1 : hpvTypes , 1 : hpvStates , ...
@@ -296,7 +301,7 @@ for g = 1 : gender
     end
 end
 
-save('hpvIndices' , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , 'normalInds' , ...
+save([paramDir , 'hpvIndices'] , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , 'normalInds' , ...
     'ccRInds' , 'screen35PlusInds' , 'screen25_35Inds' , 'ccInds' , 'ccRegInds' , ...
     'ccDistInds' ,'immuneInds' , 'ccTreatedInds')
 disp('hpv indices loaded')
@@ -337,7 +342,7 @@ for a = 1 : age
         1 : periods , 2 , a , 1 : risk));
 end
 
-save('hpvTreatIndices' , 'ccRInds' , 'ccSusInds' , 'getHystPopInds' , 'hystPopInds')
+save([paramDir , 'hpvTreatIndices'] , 'ccRInds' , 'ccSusInds' , 'getHystPopInds' , 'hystPopInds')
 disp('hpvTreatIndices loaded')
 %% cinAdv.m indices
 % inf1 = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : hpvStates ,...
@@ -426,7 +431,7 @@ vaccinated = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , 1 : gender , ..
 waned = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , 1 : gender , ...
     1 : age , 1 : risk));
 
-save('vaxInds' , 'waned' , 'vaccinated')
+save([paramDir , 'vaxInds'] , 'waned' , 'vaccinated')
 disp('Done')
 disp('All indices loaded.')
 disp(' ')

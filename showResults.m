@@ -1044,7 +1044,7 @@ for y = 1 : length(ccIncYears)
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-o' , 1 : length(ccAgeNegRel(: , y)) , ...
         ccAgeNegRel(: , y) , '-o' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , : , y) , '-o' , ...
         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-o');
-    xlabel('Age Group'); ylabel('Incidence per 100,000')
+    xlabel('Age Group'); ylabel('Incidence per 100,000')hpv
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
 %     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest');
@@ -1077,7 +1077,7 @@ for y = 1 : length(ccIncYears)
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
 end
-%% Cervical cancer incidence type distribution
+%% Cervical cancer incidence type distributione
 newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
 newCCType = zeros(size(newCC , 1) , 3);
 for h = 2 : hpvTypes
@@ -1284,10 +1284,10 @@ ages = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
 % 
 figure()
 for g = 1 : 2
-    hpvSusInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 , ...
-        1 : periods , g , 1 : age , 1 : risk));
+    hpvSusInds = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , ...
+        1 : periods , g , 4 : 10 , 1 : risk));
     hpvSus = annlz(sum(popVec(: , hpvSusInds) , 2)) ./ stepsPerYear;
-    plot(tVec(1 : stepsPerYear : end) , annlz(sum(sum(sum(newHpv(: , g , : , : , :) ...
+    plot(tVec(1 : stepsPerYear : end) , annlz(sum(sum(sum(newHpv(: , g , : , 4 : 10 , :) ...
         , 3) , 4) , 5)) ./ hpvSus * 100)
     axis([startYear , endYear , 0 , 100])    
     hold on

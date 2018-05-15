@@ -9,7 +9,7 @@ function [dPop , newInfs] = mixInfect(t , pop , currStep , ...
         lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
         hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
-        hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
+        toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
         betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
         hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year)
 sumall = @(x) sum(x(:));
@@ -281,9 +281,6 @@ for d = 1 : disease
     for h = 1% : hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 : states
             hTo = toState + 1;
-%             if h > 1 && h ~= hTo % if pre-existing infection present
-%                 hTo = 4; % HPV coinfection
-%             end
             for a = 1 : age
                 for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
                     if lambda(1 , a , r , toState) > 10 ^ -6 || lambda(2 , a , r , toState) > 10 ^ -6 ... % only evaluate if lambda is non-zero
@@ -298,13 +295,17 @@ for d = 1 : disease
 %                         mSusImm = hpvImm(d , h , 1 , a , r , :);
                         mSusVax = hpvVaxd(d , h , 1 , a , r , :);
                         mSusVax2 = hpvVaxd2(d , h , 1 , a , r , :);
+                        mSusVax3 = toHpv_ImmVaxNonV(d , h , 1 , a , r , :);
                         fSusImm = hpvImm(d , h , 2 , a , r , :);
                         fSusVax = hpvVaxd(d , h , 2 , a , r , :);
                         fSusVax2 = hpvVaxd2(d , h , 2 , a , r , :);
+                        fSusVax3 = toHpv_ImmVaxNonV(d , h , 2 , a , r , :);
 %                         mToImm = toHpv_Imm(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
-                        mToVax = toHpv_ImmVax(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
-                        fToImm = toHpv_Imm(d , hTo , 2 , a , r , :);
-                        fToVax = toHpv_ImmVax(d , hTo , 2 , a , r , :);
+                        mToVax = toHpv_ImmVax(d , hTo , 1 , a , r , :); % males vaccinated and infected with vaccine type
+                        fToImm = toHpv_Imm(d , hTo , 2 , a , r , :); % females with natural immunity getting infected
+                        fToVax = toHpv_ImmVax(d , hTo , 2 , a , r , :);% females vaccinated and infected with vaccine type
+                        mToVax2 = toHpv_ImmVaxNonV(d , hTo , 1 , a , r , :); % males vaccinated getting infected by non-vaccine type, no vaccine-type infection history
+                        fToVax2 = toHpv_ImmVaxNonV(d , hTo , 2 , a , r , :); % females vaccinated getting infected with non-vaccine type, no vaccine-type infection history
 
                         lambdaMult = 1;
                         if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
@@ -340,6 +341,11 @@ for d = 1 : disease
                         fInfVax = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
                             .* psi(d) , 0.999 * vaxProtect) .* pop(fSusVax);
                         
+                        mInfVax3 = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
+                            .* psi(d) , 0.999 * vaxProtect) .* pop(mSusVax3);
+                        fInfVax3 = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
+                            .* psi(d) , 0.999 * vaxProtect) .* pop(fSusVax3);
+                        
                         mInfVax2 = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
                             .* psi(d) , 0.999 * 0.8 * vaxProtect) .* pop(mSusVax2);
                         fInfVax2 = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
@@ -356,8 +362,10 @@ for d = 1 : disease
                         newImmHpv(2 , d , a , r) = newImmHpv(2 , d , a , r) + sumall(fInfImm);
 
                         % vaccinated
-                        newVaxHpv(1 , d , a , r) = newVaxHpv(1 , d , a , r) + sumall(mInfVax) + sumall(mInfVax2);
-                        newVaxHpv(2 , d , a , r) = newVaxHpv(2 , d , a , r) + sumall(fInfVax) + sumall(fInfVax2);
+                        newVaxHpv(1 , d , a , r) = newVaxHpv(1 , d , a , r) ...
+                            + sumall(mInfVax) + sumall(mInfVax2) + sumall(mInfVax3);
+                        newVaxHpv(2 , d , a , r) = newVaxHpv(2 , d , a , r)...
+                            + sumall(fInfVax) + sumall(fInfVax2) + sumall(fInfVax3);
 
                         % normal
                         dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
@@ -374,11 +382,25 @@ for d = 1 : disease
                         dPop(fToImm) = dPop(fToImm) + fInfImm;
 
                         %vaccinated
-                        dPop(mSusVax) = dPop(mSusVax) - mInfVax - mInfVax2;
-                        dPop(fSusVax) = dPop(fSusVax) - fInfVax - fInfVax2;
-
-                        dPop(mToVax) = dPop(mToVax) + mInfVax + mInfVax2;
-                        dPop(fToVax) = dPop(fToVax) + fInfVax + fInfVax2;
+                        dPop(mSusVax) = dPop(mSusVax) - mInfVax;
+                        dPop(fSusVax) = dPop(fSusVax) - fInfVax;
+                        
+                        dPop(mSusVax2) = dPop(mSusVax2) - mInfVax2;
+                        dPop(fSusVax2) = dPop(fSusVax2) - fInfVax2;
+                        
+                        dPop(mSusVax3) = dPop(mSusVax3) - mInfVax3;
+                        dPop(fSusVax3) = dPop(fSusVax3) - fInfVax3;
+                        
+                        if hTo ~= 4 % vaccinated and acquiring vaccine type
+                            dPop(mToVax) = dPop(mToVax) + mInfVax + mInfVax2 + mInfVax3;
+                            dPop(fToVax) = dPop(fToVax) + fInfVax + fInfVax2 + mInfVax3;
+                        else % vaccinated and acquiring non-vaccine type
+                            dPop(mToVax2) = dPop(mToVax2) + mInfVax + mInfVax3; % male: no previous vaccine-type infection history
+                            dPop(fToVax2) = dPop(fToVax2) + fInfVax + fInfVax3; % female: no previous vaccine-type infection history
+                            
+                            dPop(mToVax) = dPop(mToVax) + mInfVax2; % male: previous vaccine-type infection history
+                            dPop(fToVax) = dPop(fToVax) + fInfVax2; % female: previous vaccine-type infection history
+                        end
                     end
                 end
             end

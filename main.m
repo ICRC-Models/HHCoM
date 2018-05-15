@@ -208,13 +208,13 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 rImmuneHiv = HPV_calib12(10 : 13);
 c3c2Mults = HPV_calib12(14 : 17);
 c2c1Mults = HPV_calib12(18 : 21);
-artHpvMult = HPV_calib12(22);
 perPartnerHpv= HPV_calib12(23);
 lambdaMultImm = HPV_calib12(24 : 39);
 hpv_hivClear = HPV_calib12(40 : 43);
 hpvClearMult = HPV_calib12(44 : 47);
 perPartnerHpv_lr = HPV_calib12(48);%0.1;
 perPartnerHpv_nonV = HPV_calib12(49); %0.1;
+artHpvMult = HPV_calib12(22);
 
 vaxMat = ager .* 0;
 maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
@@ -230,6 +230,10 @@ load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 lambdaMultVax = ones(age , 2);
 
+artHpvMult = hpv_hivMult(1,1);
+for h = 2 : 3
+    hpv_hivMult(: , h) = hpv_hivMult(: , 1);
+end
 %% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
@@ -281,7 +285,7 @@ for i = 2 : length(s) - 1
         lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
         hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
-        hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
+        toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
         betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
         hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
     popIn = pop(end , :); % for next mixing and infection module

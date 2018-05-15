@@ -4,7 +4,7 @@
 % function simVax(lastYear , nTests, testParams , currPop)
 
 close all; clear all; clc
-lastYear = 2100;
+lastYear = 2080;
 
 
 disp('Start up')
@@ -88,6 +88,11 @@ load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 load([paramDir , 'settings']) 
 
+artHpvMult = hpv_hivMult(1,1);
+for h = 2 : 3
+    hpv_hivMult(: , h) = hpv_hivMult(: , 1);
+end
+
 %%%%%
 
 c = fix(clock);
@@ -97,7 +102,7 @@ t_linearWane = 20; % pick a multiple of 5
 k_wane = - vaxEff / t_linearWane;
 lambdaMultVax_Arr = {zeros(age , 2) , zeros(age , 2) , zeros(age , 2) , ...
     zeros(age , 2)};
-for h = 1 : 2
+for h = 1% : 2
     % 20 year waning
     lambdaMultVax_Arr{1}(3 : 6 , h) = vaxEff;
     lambdaMultVax_Arr{1}(7 : 10 , h) = (vaxEff + k_wane * (5 : 5 : t_linearWane))';
@@ -169,11 +174,11 @@ for n = 1 : size(testParams , 1)
     vaxMat = ager .* 0;
     vaxRate = testParams(n , 1);
     at = @(x , y) sort(prod(dim)*(y-1) + x);
-    fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , ...
+    fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
         2 , 2 , 1 : risk));
-    toAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , ...
+    toAge = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
         2 , 3 , 1 : risk));
-    toAgeVaxd = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 : periods , ...
+    toAgeVaxd = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
         2 , 3 , 1 : risk));
     vaxMat(at(toAge , fromAge)) = (1 - vaxRate) * ager(at(toAge , fromAge));
     vaxMat(at(toAgeVaxd , fromAge)) = vaxRate * ager(at(toAge , fromAge)) ;
@@ -240,7 +245,7 @@ parfor n = 1 : nTests
             lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
             circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
             hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
-            hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
+            toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
             betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
             hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
         popIn = pop(end , :); % for next mixing and infection module

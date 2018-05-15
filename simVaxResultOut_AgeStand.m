@@ -393,7 +393,7 @@ newCC_0 = oNo.newCC;
 %% populations
 pop90 = o90.popVec;
 pop70 = o70.popVec;
-pop50 = o50.popVec;
+pop50 = o50.popVec; 
 popNo = oNo.popVec;
 %%
 % General Incidence
@@ -459,6 +459,27 @@ end
 figure(); area(tVec , newCCType)
 legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV')
 title('Cervical Cancer Incidence Type Distribution (90% Coverage)')
+
+%% Cervical cancer incidence by type
+genCC90Age_Type = zeros(hpvTypes, age , length(tVec) / stepsPerYear);
+genCCNoAge_Type = zeros(hpvTypes, age , length(tVec) / stepsPerYear);
+for h = 2 : hpvTypes
+    for a = 1 : age
+        genCC90Age_Type(h , a , :) = annlz(squeeze(sum(sum(sum(newCC_90(: , : , h , a) , 2),3),4)));
+        genCCNoAge_Type(h , a , :) = annlz(squeeze(sum(sum(sum(newCC_0(: , : , h , a) , 2),3),4)));
+    end
+end
+i_gen90Type = zeros(hpvTypes - 1, length(tVec) / stepsPerYear);
+i_genNoType = i_gen90Type;
+for h = 2 : hpvTypes
+    i_gen90Type(h - 1 , :) = sum(bsxfun(@times , squeeze(genCC90Age_Type(h , : , :)) ./ pop90_susGen , wVec)) .* fac;
+    i_genNoType(h - 1 , :) = sum(bsxfun(@times , squeeze(genCCNoAge_Type(h , : , :)) ./ popNo_susGen , wVec)) .* fac;
+end
+figure(); plot(tVec(1 : stepsPerYear : end) , i_gen90Type , ...
+    tVec(1 : stepsPerYear : end) , i_genNoType)
+legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV')
+title('Cervical Cancer Incidence Type Distribution (90% Coverage)')
+xlabel('Year'); ylabel('Incidence per 100,000')
 %% HIV specific incidence
 %% By CD4
 % incidence
