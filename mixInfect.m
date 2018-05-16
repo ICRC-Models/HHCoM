@@ -347,9 +347,9 @@ for d = 1 : disease
                             .* psi(d) , 0.999 * vaxProtect) .* pop(fSusVax3);
                         
                         mInfVax2 = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.999 * 0.8 * vaxProtect) .* pop(mSusVax2);
+                            .* psi(d) , 0.8 * 0.999 * vaxProtect) .* pop(mSusVax2);
                         fInfVax2 = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.999 * 0.8 * vaxProtect) .* pop(fSusVax2);
+                            .* psi(d) , 0.8 * 0.999 * vaxProtect) .* pop(fSusVax2);
                         
                         
                         % incidence tracker

@@ -4,7 +4,7 @@
 % function simVax(lastYear , nTests, testParams , currPop)
 
 close all; clear all; clc
-lastYear = 2065;
+lastYear = 2100;
 
 disp('Start up')
 
@@ -289,7 +289,7 @@ parfor n = 1 : nTests
         end
         
         fracVaxd = sum(pop(end , toV) , 2) / (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
-        if fracVaxd < vaxRate
+        if fracVaxd < vaxRate && year < 2029 % Vaccinate for 10 years only
             vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd));
             pop(end , toV) = pop(end , toV) + pop(end , fromNonV) .* vaxCover;
             pop(end , fromNonV) = pop(end , fromNonV) .* (1 - vaxCover);
@@ -301,7 +301,7 @@ parfor n = 1 : nTests
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
-    filename = ['VaxCover_' , num2str(vaxRate) , '_Eff_' , ...
+    filename = ['CEA_VaxCover_' , num2str(vaxRate) , '_Eff_' , ...
         num2str(vaxEff) , '.mat']; %sprintf('test_output%d.mat' , n);
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
@@ -315,4 +315,4 @@ parfor n = 1 : nTests
 end
 disp('Done')
 %%
-omniSimVaxResultOut
+% omniSimVaxResultOut

@@ -351,7 +351,7 @@ for d = 1 : length(dVec)
             (annlz(sum(o50.popVec(: , hiv_ccSusAge) , 2)) ./ stepsPerYear) * fac;
     end
     
-%     hiv_ccSus = sum(bsxfun(@times , hiv_ccSusAge , wVec));
+%     hiv_ccSus = sum(bsxfun(@times , hiv_ccSusAge , wVec));f
     vNo_wNoMort = sum(bsxfun(@times , vNo_wNoMortAge , wVec));
     v90_Mort = sum(bsxfun(@times , v90_MortAge , wVec));
     v70_Mort = sum(bsxfun(@times , v70_MortAge , wVec));
@@ -416,10 +416,10 @@ genCC70Age = genCC90Age;
 genCC50Age = genCC90Age;
 genCCNoAge = genCC90Age;
 for a = 1 : age
-    genCC90Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_90(: , : , : , a) , 2),3),4)));
-    genCC70Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_70(: , : , : , a) , 2),3),4)));
-    genCC50Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_50(: , : , : , a) , 2),3),4)));
-    genCCNoAge(a , :) = annlz(squeeze(sum(sum(sum(newCC_0(: , : , : , a) , 2),3),4)));
+    genCC90Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_90(: , : , 2 : 4 , a) , 2),3),4)));
+    genCC70Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_70(: , : , 2 : 4 , a) , 2),3),4)));
+    genCC50Age(a , :) = annlz(squeeze(sum(sum(sum(newCC_50(: , : , 2 : 4  , a) , 2),3),4)));
+    genCCNoAge(a , :) = annlz(squeeze(sum(sum(sum(newCC_0(: , : , 2 : 4 , a) , 2),3),4)));
 end
 %%
 % incidence
@@ -477,7 +477,8 @@ for h = 2 : hpvTypes
 end
 figure(); plot(tVec(1 : stepsPerYear : end) , i_gen90Type , ...
     tVec(1 : stepsPerYear : end) , i_genNoType)
-legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV')
+legend('HPV 16/18' , 'Non-4v HPV' , 'Non-Vaccine HPV' , ...
+    'HPV 16/18 (No Vax)' , 'Non-4v HPV (No Vax)' , 'Non-Vaccine HPV (No Vax)')
 title('Cervical Cancer Incidence Type Distribution (90% Coverage)')
 xlabel('Year'); ylabel('Incidence per 100,000')
 %% HIV specific incidence
