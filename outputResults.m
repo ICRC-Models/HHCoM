@@ -112,10 +112,10 @@ xlswrite(filename, [(startYear : endYear - 1)' , hpvInc])
 gen = {'Male' , 'Female'};
 for g = 1 : gender
     hpvInds = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 9, ...
-        1 : periods , g , 4 : 10, 1 : risk));
+        1 : periods , g , 4 : age, 1 : risk));
     popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , ...
         1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-        g , 4 : 10, 1 : risk)));
+        g , 4 : age, 1 : risk)));
     hpvPrev = sum(popVec(: , hpvInds) , 2) ./ sum(popTot , 2) * 100;
     sheet = gen{g};
     filename = 'Gender Specific HPV Prevalence.xlsx';
@@ -126,17 +126,17 @@ end
 gen = {'Male' , 'Female'};
 hpvAgeRel = zeros(age , length(tVec));
 for g = 1 : gender
-    for a = 4 : 10
-        hpvAgeInds = [toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+    for a = 4 : age
+        hpvAgeInds = [toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 9 , 1 : periods , ...
             g , a , 1 : risk))];
         ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk));
-        hpvAge(a , :) = sum(popVec(: , hivAgeInds) , 2);
+        hpvAge(a , :) = sum(popVec(: , hpvAgeInds) , 2);
         hpvAgeRel(a , :) = bsxfun(@rdivide , hpvAge(a , :)' , sum(popVec(: , ageInds) , 2)) * 100;
-        sheet = [gen{g}];
-        filename = 'Age Specific HPV Prevalence.xlsx';
-        xlswrite(filename, [tVec(1 : stepsPerYear : end)' , hpvAgeRel(: , 1 : stepsPerYear : end)'] , sheet)
     end
+    sheet = [gen{g}];
+    filename = 'Age Specific HPV Prevalence.xlsx';
+    xlswrite(filename, [tVec(1 : stepsPerYear : end)' , hpvAgeRel(: , 1 : stepsPerYear : end)'] , sheet)
 end
 
 %% HIV Prevalence by HPV status and Gender
@@ -282,9 +282,11 @@ dArr = {[1 , 7 : 9] , [2 : 6 , 10]};
 for d = 1 : length(dArr)
     for g = 1 : 2
         hpvSusInds = [toInd(allcomb(dArr{d} , 1 : viral , 1 , 1 , ...
+            1 : periods , g , 4 : 10, 1 : risk)); ...
+            toInd(allcomb(dArr{d} , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
             1 : periods , g , 4 : 10, 1 : risk))];
         hpvSus = annlz(sum(popVec(: , hpvSusInds) , 2)) ./ stepsPerYear;
-        hpvInc(: , g) = annlz(sum(sum(sum(newHpv(: , g , dArr{d} , 4 : 10, :) ...
+        hpvInc(: , g) = annlz(sum(sum(sum(newHpv(: , g , dArr{d} , 4 : 10 , :) ...
             , 3) , 4), 5)) ./ hpvSus * 100;
         tit = hivStat{1};
         if d == 2
@@ -293,4 +295,23 @@ for d = 1 : length(dArr)
     end
     filename = ['HPV Incidence Per 100 in ' , tit , '.xlsx'];
     xlswrite(filename, [(startYear : endYear - 1)' , hpvInc])
+end
+%% HPV incidence by Gender and Age
+for g = 1 : 2
+    hpvInc = zeros(yrs , age);
+    for a = 1 : age
+        hpvSusInds = [toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , ...
+            1 : periods , g , a , 1 : risk)); ...
+            toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , g , a , 1 : risk))];
+        hpvSus = annlz(sum(popVec(: , hpvSusInds) , 2)) ./ stepsPerYear;
+        hpvInc(: , a) = annlz(sum(sum(sum(newHpv(: , g , : , a , :) ...
+            , 3) , 4), 5)) ./ hpvSus * 100;
+        sheet = gen{1};
+        if g == 2
+            sheet = gen{2};
+        end
+    end
+    filename = ['HPV Incidence Per 100 by Age' , '.xlsx'];
+    xlswrite(filename, [(startYear : endYear - 1)' , hpvInc] , sheet)
 end

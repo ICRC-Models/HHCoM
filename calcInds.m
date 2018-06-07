@@ -418,9 +418,23 @@ disp('hpvTreatIndices loaded')
 % save('ageIndices' , 'genPrevInds' , 'prepPrevInds' , 'artPrevInds' , 'genNextInds' , 'prepNextInds' ,...
 %     'artNextInds' , 'genLastInds' , 'prepLastInds' , 'artLastInds');
 
-%% calcDist.m indices
-% N/A
+%% ageRisk.m indices
 
+ageInd = zeros(gender , age , disease * viral * hpvTypes * hpvStates * periods * risk);
+riskInd = zeros(gender , age , risk , disease * viral * hpvTypes * hpvStates * periods);
+
+for g = 1 : gender
+    for a = 1 : age
+        ageInd(g , a , :) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+            1 : hpvStates, 1 : periods , g , a , 1 : risk));   
+        for r = 1 : risk
+            riskInd(g , a , r , :) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+                1 : hpvStates, 1 : periods , g , a , r));
+        end
+    end
+end
+
+save([paramDir , 'ageRiskInds'] , 'ageInd' , 'riskInd')
 %% Vaccinated group indices
 
 vaccinated = zeros(age , disease * viral * gender * risk);

@@ -36,29 +36,36 @@ else % assortativity in last year
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
 
+epsA = 0.4;
+epsR = 0.4;
+
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times
 deltaR = eye(3 , 3);
 % if currStep <= (2005 - modelYr1) * int
+% original
 deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
 
 % after 2005
-if currStep > (2000 - modelYr1) * stepsPerYear
-    deltaAF = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , 1);
-    deltaAM = eye(16) .* 0.7 + diag(ones(15 , 1) .* 0.3 , -1);
-    deltaR = eye(3);
-    deltaAM(5 , 4) = 0.6;
-    deltaAM(5 , 5) = 0.4;
-end
-deltaAF(4 , 4) = 0.8;
+% if currStep > (2000 - modelYr1) * stepsPerYear
+%     deltaAF = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , 1);
+%     deltaAM = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , -1);
+%     deltaR = eye(3);
+% %     deltaAM(5 , 4) = 0.6;
+% %     deltaAM(5 , 5) = 0.4;
+% end
+deltaAF(4 , 4) = 1;
 deltaAF(3 , 4) = 0;
-deltaAF(4 , 5) = 0.2;
+deltaAF(4 , 5) = 0;
 deltaAF(3 , 3) = 1;
-
-deltaAM(4 , 4) = 0.8;
-deltaAM(4 , 5) = 0.2;
+% 
+deltaAM(4 , 4) = 1;
 deltaAM(4 , 3) = 0;
+deltaAM(3 , 2) = 0;
+deltaAM(3 , 3) = 1;
+
+
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk]
 % rate of partner change (contact)
@@ -102,7 +109,7 @@ ageFraction_F = bsxfun(@times , ageFraction(2 , : , :) , ones(age , age));
 riskFraction_M = zeros(age, risk, risk); % [a x r x r]
 riskFraction_F = riskFraction_M;
 % prepare matrices containing risk info associated with age
-for i = 1 : age % create square risk fraction x risk fraction matrices for each age group
+for i = 3 : age % create square risk fraction x risk fraction matrices for each age group
     riskFraction_M(i , : , :) = bsxfun(@times , squeeze(riskFraction(1 , i , :)) , ones(risk , risk))'; % [r x r](age)
     riskFraction_F(i , : , :) = bsxfun(@times , squeeze(riskFraction(2 , i , :)) , ones(risk , risk))'; % [r x r](age)
 end
@@ -113,7 +120,7 @@ rhoAgeM = epsA .* ageFraction_F + (1 - epsA) .* deltaAM; % [a x a]
 rhoRiskM = zeros(age , risk , risk);
 rhoRiskF = rhoRiskM;
 
-for i = 1 : age
+for i = 3 : age
     rhoRiskF(i , : , :) = squeeze(epsR .* riskFraction_M(i , : , :))...
         + (1 - epsR) .* deltaR; % [a(i) x r x r] + [r x r] -> [a x r x r]
     rhoRiskM(i , : , :) = squeeze(epsR .* riskFraction_F(i , : , :))...
@@ -124,8 +131,8 @@ end
 % Intialize rho matrices for males and females
 rhoM = zeros(age, age, risk, risk);
 rhoF = rhoM;
-for i = 1 : age
-    for ii = 1 : age
+for i = 3 : age
+    for ii = 3 : age
         for j = 1 : risk
             for jj = 1 : risk
                 rhoM(i , ii , j , jj) = rhoAgeM(i , ii) * rhoRiskM(ii , j , jj);
@@ -139,11 +146,11 @@ rho(2 , : , : , : , :) = rhoF;
 
 % calculate discrepancy between male and female reported contacts
 mfRatio = zeros(age , age , risk , risk);
-for aa = 1 : age
+for aa = 3 : age
     for rr = 1 : risk
         if popSum(2 , aa , rr) ~= 0
-            mfRatio(: , aa , : , rr) = ...
-                max(popSum(1 , : , :) ./ popSum(2 , aa ,rr) , 0);
+            mfRatio(3 : age , aa , : , rr) = ...
+                max(popSum(1 , 3 : age , :) ./ popSum(2 , aa ,rr) , 0);
         end
     end
 end
@@ -151,8 +158,8 @@ end
 B = zeros(age , age , risk , risk);
 cMale = partnersM; % [age x risk]
 cFemale = partnersF; % [age x risk]
-for i = 1 : age
-    for ii = 1: age
+for i = 3 : age
+    for ii = 3: age
         for j = 1 : risk
             for jj = 1: risk
                 B(i, ii , j , jj) = cMale(i , j) * rhoM(i , ii , j , jj) ...
@@ -165,16 +172,20 @@ end
 B(isnan(B)) = 0; % 0/0 , 1/0 -> 0
 B(isinf(B)) = 0;
 % adjust c to account for discrepancy in reporting
-theta = 0.5; % assume adjusted contact rate is mostly compensating for female under-report
+theta = 0.5; 
 cAdjMale = zeros(age , age , risk , risk);
 cAdjFemale = cAdjMale;
-for i = 1 : age
+for i = 3 : age
     for j = 1 : risk
-        cAdjMale(i , : , j , :) = cMale(i , j)...
-            * B(i , : , j , :) .^ -(1 - theta);
-
-        cAdjFemale(: , i , : , j) = cFemale(: , :)...
-            .* squeeze(B(i , : , j , :)) .^ theta;
+        cAdjMale(i , 3 : age , j , :) = cMale(i , j) ...
+            .* rhoM(i , 3 : age , j , :)...
+            .* B(i , 3 : age , j , :) .^ -(1 - theta) ...
+            .* mfRatio(i , 3 : age , j , 1 : risk) .^ theta;
+        
+        cAdjFemale(3 : age , i , : , j) = cFemale(3 : age , :) ...
+            .* squeeze(rhoF(3 : age , i , : , j)) ...
+            .* squeeze(B(i , 3 : age , j , :)) .^ theta ...
+            .* squeeze(mfRatio(i , 3 : age , j , 1 : risk)) .^ -(1 - theta);
     end
 end
 cAdj(1 , : , : , : , :) = cAdjMale;
@@ -183,7 +194,7 @@ cAdj(isnan(cAdj)) = 0;
 cAdj(isinf(cAdj)) = 0;
 
 peakYear = 2000;
-condStart = 1988;
+condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year >= peakYear
@@ -196,7 +207,7 @@ end
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = (1 - circProtect) .* cond;
-psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond;
+psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond; % no one on PrEP for now
 dPop = zeros(size(pop));
 newHiv = zeros(gender , age , risk); % incidence tally by gender
 
@@ -214,18 +225,18 @@ beta_nonV_HPV_F2M = 1 - (1 - perPartnerHpv_nonV) ^ 12;
 beta_nonV_HPV_M2F = 1 - (1 - perPartnerHpv_nonV) ^ 12; %
 
 % Per partnership beta
-beta_hrHPV(1 , 1 : 3) = beta_hrHPV_F2M;  % HPV(-) males [g x r]
-beta_hrHPV(2 , 1 : 3) = beta_hrHPV_M2F; % HPV(-) females [g x r]
-beta_lrHPV(1 , 1 : 3) = beta_lrHPV_F2M; % HPV(-) males [g x r]
-beta_lrHPV(2 , 1 : 3) = beta_lrHPV_M2F; % HPV(-) females [g x r]
-beta_nonV_HPV(1 , 1 : 3) = beta_nonV_HPV_F2M; % HPV(-) males [g x r]
-beta_nonV_HPV(2 , 1 : 3) = beta_nonV_HPV_M2F; % HPV(-) females [g x r]
+beta_hrHPV(2 , 1 : 3) = beta_hrHPV_F2M;  % HPV(-) males [g x r]
+beta_hrHPV(1 , 1 : 3) = beta_hrHPV_M2F; % HPV(-) females [g x r]
+beta_lrHPV(2 , 1 : 3) = beta_lrHPV_F2M; % HPV(-) males [g x r]
+beta_lrHPV(1 , 1 : 3) = beta_lrHPV_M2F; % HPV(-) females [g x r]
+beta_nonV_HPV(2 , 1 : 3) = beta_nonV_HPV_F2M; % HPV(-) males [g x r]
+beta_nonV_HPV(1 , 1 : 3) = beta_nonV_HPV_M2F; % HPV(-) females [g x r]
 sexPop = zeros(2 , 1);
 sexPop(1) = sumall(popSum(1 , 3 : age , :)); % total sexually active males in population
 sexPop(2) = sumall(popSum(2 , 3 : age , :)); % total sexually active females in population
 beta = zeros(gender , age , risk , 3);
 for g = 1 : gender
-    for a = 1 : age
+    for a = 3 : age
         for r = 1 : risk
             hrSum = 0;
             lrSum = 0;
@@ -259,14 +270,14 @@ for g = 1 : gender
     if g == 2
         gg = 1;
     end
-    for i = 1 : age
+    for i = 3 : age
         for j = 1 : risk
-            for ii = 1 : age
+            for ii = 3 : age
                 for jj = 1 : risk
                     for s = 1 : states
                         lambda(g , i , j , s) = ...
                             lambda(g , i , j , s)...
-                            + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
+                            + cAdj(g , i , ii , j , jj)...
                             * beta(gg , ii , jj , s); % [3 x 1]
                     end
                 end
@@ -281,7 +292,7 @@ for d = 1 : disease
     for h = 1% : hpvTypes - 1 % coinfected compartments cannot acquire more infections
         for toState = 1 % only 1 HPV type
             hTo = toState + 1;
-            for a = 1 : age
+            for a = 3 : age
                 for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
                     if lambda(1 , a , r , toState) > 10 ^ -6 || lambda(2 , a , r , toState) > 10 ^ -6 ... % only evaluate if lambda is non-zero
                             && hTo ~= h % and if not acquiring pre-existing infection
@@ -292,11 +303,11 @@ for d = 1 : disease
                         fTo = toHpv(d , hTo , 2 , a , r , :);
 
                         % vaccinated, naturally immune
-%                         mSusImm = hpvImm(d , h , 1 , a , r , :);
+%                         mSusImm = hpvImm(d , hTo , 1 , a , r , :);
                         mSusVax = hpvVaxd(d , h , 1 , a , r , :);
                         mSusVax2 = hpvVaxd2(d , h , 1 , a , r , :);
                         mSusVax3 = toHpv_ImmVaxNonV(d , h , 1 , a , r , :);
-                        fSusImm = hpvImm(d , h , 2 , a , r , :);
+                        fSusImm = hpvImm(d , hTo , 2 , a , r , :);
                         fSusVax = hpvVaxd(d , h , 2 , a , r , :);
                         fSusVax2 = hpvVaxd2(d , h , 2 , a , r , :);
                         fSusVax3 = toHpv_ImmVaxNonV(d , h , 2 , a , r , :);
@@ -308,25 +319,25 @@ for d = 1 : disease
                         fToVax2 = toHpv_ImmVaxNonV(d , hTo , 2 , a , r , :); % females vaccinated getting infected with non-vaccine type, no vaccine-type infection history
 
                         lambdaMult = 1;
-                        if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
+                        if g == 2 && d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2 , hTo - 1);
-                        elseif d == 10
+                        elseif g == 2 && d == 10
                             lambdaMult = artHpvMult;                            
                         end
 
                         % normal susceptibles
                         % infection rate capped at 0.99
                         mInfected = min(lambdaMult * lambda(1 , a , r , toState)...
-                            .* psi(d) , 0.999) .* pop(mSus); % infected males
+                            , 0.999) .* pop(mSus); % infected males
                         fInfected = min(lambdaMult * lambda(2 , a , r , toState)...
-                            .* psi(d) , 0.999) .* pop(fSus); % infected females
+                            , 0.999) .* pop(fSus); % infected females
 
                         % naturally immune
 %                         mInfImm = min(lambdaMult * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
-%                         .* psi(d) , 0.99) .* pop(mSusImm);
+%                           , 0.999) .* pop(mSusImm);
                         fInfImm = min(lambdaMult * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
-                        .* psi(d) , 0.99) .* pop(fSusImm);
-
+                            , 0.999) .* pop(fSusImm);
+                        
                         % vaccinated susceptibles
                         hVax = 1;
                         if hTo == 3
@@ -337,19 +348,19 @@ for d = 1 : disease
                             .* 1); % oHR has no vaccine protection
                         
                         mInfVax = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.999 * vaxProtect) .* pop(mSusVax);
+                            , 0.999 * vaxProtect) .* pop(mSusVax);
                         fInfVax = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.999 * vaxProtect) .* pop(fSusVax);
+                            , 0.999 * vaxProtect) .* pop(fSusVax);
                         
                         mInfVax3 = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.999 * vaxProtect) .* pop(mSusVax3);
+                            , 0.999 * vaxProtect) .* pop(mSusVax3);
                         fInfVax3 = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.999 * vaxProtect) .* pop(fSusVax3);
+                            , 0.999 * vaxProtect) .* pop(fSusVax3);
                         
                         mInfVax2 = min(lambdaMult * vaxProtect * lambda(1 , a , r , toState) ...
-                            .* psi(d) , 0.8 * 0.999 * vaxProtect) .* pop(mSusVax2);
+                            , 0.8 * 0.999 * vaxProtect) .* pop(mSusVax2);
                         fInfVax2 = min(lambdaMult * vaxProtect * lambda(2 , a , r , toState) ...
-                            .* psi(d) , 0.8 * 0.999 * vaxProtect) .* pop(fSusVax2);
+                            , 0.8 * 0.999 * vaxProtect) .* pop(fSusVax2);
                         
                         
                         % incidence tracker
@@ -434,7 +445,7 @@ for a = 1 : age
                         beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 - betaHIVF2M(: , : , v))...
                             * sumall(pop(fCurr(a , r , v , :))) ./ popSum(2 , a , r);
                     end
-                    beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 -   betaHIVF2M(: , : , 6))...
+                    beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 - betaHIVF2M(: , : , 6))...
                         * sumall(pop(fCurrArt(a , r , 1 , :))) ./ popSum(2 , a , r);
                 end
 %             end
@@ -449,13 +460,13 @@ for g = 1 : gender
     if g == 2
         gg = 1;
     end
-    for i = 1 : age
+    for i = 3 : age
         for j = 1 : risk
-            for ii = 1 : age
+            for ii = 3 : age
                 for jj = 1 : risk
                     lambda(g , i , j) = ...
                         lambda(g , i , j)...
-                        + cAdj(g , i , ii , j , jj) * rho(g , i , ii , j , jj)...
+                        + cAdj(g , i , ii , j , jj) ...
                         * beta(j , i , gg , ii , jj);
                 end
             end
@@ -463,7 +474,7 @@ for g = 1 : gender
     end
 end
 dVec = [1 , 7 : 9];
-for a = 1 : age
+for a = 3 : age
     for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
         if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero
             for i = 1 : length(dVec)
