@@ -86,9 +86,6 @@ kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
 kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
 rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
-vaxMat = ager .* 0;
-maxRateM_vec = [0.60 , 0.60];% maxRateM_arr{sim};
-maxRateF_vec = [0.70 , 0.70];% maxRateF_arr{sim};
 
 maxRateM1 = 1 - exp(-maxRateM_vec(1));
 maxRateM2 = 1 - exp(-maxRateM_vec(2));
