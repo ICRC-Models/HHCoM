@@ -10,6 +10,15 @@ c70_9vFull = load('H:\HHCoM_Results\CEA_VaxCover_0.7_Eff_0.9.mat');
 c70_2vPartial = load('H:\HHCoM_Results\CEA_VaxCover_0.7_Eff_0.63.mat');
 c90_9vFull = load('H:\HHCoM_Results\CEA_VaxCover_0.9_Eff_0.9.mat'); 
 c90_2vPartial = load('H:\HHCoM_Results\CEA_VaxCover_0.9_Eff_0.63.mat');
+
+% noV = load('H:\HHCoM_Results\VaxCover_0_Eff_0.9.mat');
+% c90_2vFull = load('H:\HHCoM_Results\VaxCover_0.9_Eff_0.7.mat'); 
+% c70_2vFull = load('H:\HHCoM_Results\VaxCover_0.7_Eff_0.7.mat'); 
+% c70_9vFull = load('H:\HHCoM_Results\VaxCover_0.7_Eff_0.9.mat'); 
+% c70_2vPartial = load('H:\HHCoM_Results\VaxCover_0.7_Eff_0.63.mat');
+% c90_9vFull = load('H:\HHCoM_Results\VaxCover_0.9_Eff_0.9.mat'); 
+% c90_2vPartial = load('H:\HHCoM_Results\VaxCover_0.9_Eff_0.63.mat');
+
 tVec = c90_2vFull.tVec;
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; 
@@ -128,11 +137,12 @@ plot(tVec(1 : stepsPerYear : end) , annlz(c90_9vFull.vaxd))
 title('Vaccinated with 9v'); xlabel('Year'); ylabel('Number vaccinated')
 %% CC incidence reduction
 
-inds = {':' , [2 : 6 , 10] , 1 , 10};
+inds = {':' , [2 : 6 , 10] , [2 : 6] , 1 , 10};
 files = {'CEA CC_General_Hpv_VaxCover' , 'CEA CC_HivAll_Hpv_VaxCover' , ...
-    'CEA CC_HivNeg_Hpv_VaxCover' , 'CEA CC_ART_HPV_VaxCover'};
-plotTits = {'General' , 'HIV-Positive' , 'HIV-Negative' , ...
-    'HIV-Positive on ART'};
+    'CEA CC_HivNoART_Hpv_VaxCover' , 'CEA CC_HivNeg_Hpv_VaxCover' ,...
+    'CEA CC_ART_HPV_VaxCover'};
+plotTits = {'General' , 'HIV-Positive' , 'HIV-Positive (No ART)' , ....
+    'HIV-Negative' , 'HIV-Positive on ART'};
 fac = 10 ^ 5;
 noV_Hpv = zeros(1 , length(tVec) / stepsPerYear);
 % c70_2vPartial_Inc = noV_Hpv;
@@ -154,6 +164,11 @@ for i = 1 : length(inds)
             1 : periods , 2 , 4 : age , 1 : risk)); ...
             toInd(allcomb(10 , 6 , 1 : hpvTypes , 9 : 10 , ...
             1 : periods , 2 , 4 : age , 1 : risk))];
+        % HIV-positive women not on ART
+        hivNoARTF = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 4 : age , 1 : risk)); ...
+            toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 4 : age , 1 : risk))];
         % All HIV-negative women
         hivNeg = [toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
             2 , 4 : age , 1 : risk)); ...
@@ -165,7 +180,7 @@ for i = 1 : length(inds)
             toInd(allcomb(10 , 6 , 1 : hpvTypes , 9 : 10 , ...
             1 : periods , 2 , 4 : age , 1 : risk))];
         
-        genArray = {allF , allHivF , hivNeg , artF};
+        genArray = {allF , allHivF , hivNoARTF , hivNeg , artF};
         
         noV_Hpv = ...
             annlz(sum(sum(sum(noV.newCC(: , inds{i} , : , 4 : age),2),3),4)) ./ ...

@@ -7,8 +7,8 @@
 % go on ART in the current time step.
 % Returns artDist, a matrix describing the distribution of individuals who
 % went on ART averaged over the past 20 time steps.
-function[artDist] = calcDist(artDistList)
-load('general')
+function[artDist] = calcDist(artDistList , disease , viral , gender , age , ...
+    risk)
 s = zeros(prod([disease , viral , gender , age , risk]) , 1); % initialize sum variable
 sumall = @(x) sum(x(:)); % helper function
 for i = 0 : size(artDistList) - 1 % Note: Java uses 0-based indexing

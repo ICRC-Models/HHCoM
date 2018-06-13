@@ -180,46 +180,17 @@ artDist = zeros(disease , viral , gender , age , risk); % initial distribution o
 %% use calibrated parameters
 load([paramDir,'calibInitParams'])
 load([paramDir,'HPV_calib12.dat'])
-for i = 1 : 3
-    kCin1_Inf(: , i) = HPV_calib12(i) .* kCin1_Inf(: , i);
-    rNormal_Inf(: , i) = HPV_calib12(3 + i) .* rNormal_Inf(: , i);
-    kCC_Cin3(: , i) = HPV_calib12(6 + i) .* kCC_Cin3(: , i);
-    kCin3_Cin2(: , i) = HPV_calib12(49 + i) .* kCin3_Cin2(: , i); 
-end
-% kCC_Cin3(: , 2) = kCC_Cin3(: , 3);
-% kCin3_Cin2(: , 3) = 1.5 .* kCin3_Cin2(: , 3);
-% kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
-% rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
+rImmuneHiv = 1 ./ hpv_hivClear; 
 
-%commented out for testing
-% for i = 0 : 2
-%     maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
-%     femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib12(56 + i);
-% end
-
-% maleActs = maleActs .* 1.5;
-% femaleActs = femaleActs .* 1.5;
-% 
-% for a = 1 : age
-%     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-%     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-% end
-% betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-% betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
-rImmuneHiv = HPV_calib12(10 : 13);
-% c3c2Mults = HPV_calib12(14 : 17);
-% c2c1Mults = HPV_calib12(18 : 21);
-perPartnerHpv= HPV_calib12(23);
 lambdaMultImm = HPV_calib12(24 : 39);
 hpv_hivClear = HPV_calib12(40 : 43);
 hpvClearMult = HPV_calib12(44 : 47);
 perPartnerHpv_lr = HPV_calib12(48);%0.1;
 perPartnerHpv_nonV = HPV_calib12(49); %0.1;
-% artHpvMult = HPV_calib12(22);
 
 % Weight HPV transitions according to type distribution
 
-distWeight = [0.6 , 0.3 , 0.1];
+distWeight = [0.7 , 0.2 , 0.1];
 kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
 kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
 kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
@@ -230,8 +201,8 @@ kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
 rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
 vaxMat = ager .* 0;
-maxRateM_vec = [0.60 , 0.60];% maxRateM_arr{sim};
-maxRateF_vec = [0.70 , 0.70];% maxRateF_arr{sim};
+maxRateM_vec = [0.40 , 0.40];% maxRateM_arr{sim};
+maxRateF_vec = [0.60 , 0.60];% maxRateF_arr{sim};
 
 maxRateM1 = 1 - exp(-maxRateM_vec(1));
 maxRateM2 = 1 - exp(-maxRateM_vec(2));
@@ -243,26 +214,14 @@ load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 lambdaMultVax = ones(age , 2);
 
-% load([paramDir , 'HIV_calib.dat'])
-% for i = 1 : risk
-%     maleActs(: , i) = HIV_calib(97 + age * (i - 1) : 97 + age * i - 1);
-%     femaleActs(: , i) = HIV_calib(145 + age * (i - 1) : 145 + age * i - 1);
-%     partnersM(: , i) = HIV_calib(1 + age * (i - 1) : age * i);
-%     partnersF(: , i) = HIV_calib(49 + age * (i - 1) : 49 + age * i - 1);
-% end
-% partnersM(3 , :) = 10^-3;
-% partnersF(3 , :) = 10^-3;
+
 partnersM(4 , :) = partnersM(4 , :) .* [1.25 , 1.75 , 1.75];
 partnersF(4 , :) = partnersF(4 , :) .* [1.25 , 1.75 , 1.75];
 partnersM(5 , :) = partnersM(5 , :) .* [1.25 , 1.5 , 1.75];
 partnersF(5 , :) = partnersF(5 , :) .* [1.25 , 1.5 , 1.75];
-% partnersM(6 , :) = partnersM(6 , :) .* [1.1 , 1.3 , 1.3];
-% partnersF(6 , :) = partnersF(6 , :) .* [1.1 , 1.3 , 1.3];
-% for i = 7 : 10
-%     partnersM(i , :) = partnersM(i , :) .* [1.4 , 1.5 , 1.5];
-% end
-% partnersM(: , 1) = min(0.99 , partnersM(: , 1));
-femaleActs(4 : 5 , :) = femaleActs(4 : 5 , :) .* 2;
+
+femaleActs(4 : 5 , :) = femaleActs(4 : 5 , :) .* 1.2 ;
+femaleActs(6 : 10 , :) = femaleActs(6 : 10 , :) .* 0.9;
 maleActs(4 : 5 , :) = maleActs(4 : 5 , :);
 for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
@@ -271,42 +230,16 @@ end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-hpv_hivMult = flipud([1.79763199
-1.673266906
-1.548901821
-1.414536737]) .* 1.5;
-
-
-
-artHpvMult = hpv_hivMult(1,1);
+artHpvMult = 1;
 hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
-
-
 %% test!!!!
-% partnersM(:, 2 : 3) = partnersM(: , 2 : 3) .* 10;
-% riskDistM = (riskDistM + riskDistF) ./ 2;
-% partnersM = (partnersM + partnersF) ./ 2;
-% riskDistF = riskDistM;
-% riskDistM(2 : end) = riskDistF(1 : end - 1);
-% partnersM(2 : end) = partnersF(1 : end - 1);
-% partnersM(: , 2 : 3) = partnersM(: , 2 : 3) .* 1.5;
-% partnersF(: , 2 : 3) = partnersF(: , 2 : 3) .* 1.5;
-% partnersM(: , 1) = partnersM(: , 1) .* 1.2;
-% partnersF(: , 1) = partnersF(: , 1) .* 1.2;
+
 riskDistF = riskDistM;
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
-% riskDistF = riskDistM;
-% % riskDistF(1 : end - 1) = riskDistM(2 : end);
 partnersF = partnersM;
-% partnersM(: , 2 : 3) = 1.3 .* partnersF(: , 2 : 3);
-% partnersM(4 : 6 , 1) = 0.8 .* partnersM(4 : 6 , 1);
-% partnersM(9 , 1) = 0.8 .* partnersM(9 , 1);
-% partnersF(8 : 9 , 2 : 3) = partnersF(8 : 9 , 2 : 3) .* 0.5;
-% partnersF(1 : end - 1) = partnersM(2 : end);
-% partnersF(2 : 3) = partnersF(2 : 3) .* 0.7;
 startYear = 1980;
-perPartnerHpv = 0.010;
+perPartnerHpv = 0.015;
 %% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
@@ -334,7 +267,7 @@ for i = 2 : length(s) - 1
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
             ccTreatedInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
-            rNormal_Inf , hpv_hivClear , c3c2Mults , hpvClearMult , ...
+            rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , kCCDet , ...
             disease , viral , age , hpvTypes , ...
             rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
@@ -374,11 +307,18 @@ for i = 2 : length(s) - 1
             viral , gender , age , risk , k , hivInds , ...
             stepsPerYear , year) , tspan , pop(end , :));
         artTreatTracker(i , : , : , : , :  ,:) = artTreat;
+        if size(artDist) >= stepsPerYear * 5
+            artDistList.remove();
+        else
+            artDistList.add(artTreat);
+        end
+        artDist = calcDist(artDistList , disease , viral , gender , age , ...
+            risk);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
         end
-        %             [~ , artTreat] = ode4x(@(t , artDist) treatDist(t , popCopy(end , :) , year) , tspan , artDist);
+        %             [~ , artTreat] = ode4xtra(@(t , artDist) treatDist(t , popCopy(end , :) , year) , tspan , artDist);
         %             if size(artDistList) >= 20
         %                 artDistList.remove(); % remove earlier artDist matrix more than "20 time steps old"
         %             else

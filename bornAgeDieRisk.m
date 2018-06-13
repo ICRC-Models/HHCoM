@@ -135,8 +135,8 @@ for g = 1 : gender
             % start with moving from risk 3 to risk 2
             if riskAvail(3) > 0
                 riskFrac3 = min(min(riskDiff(2) , riskAvail(3)) / popR3Tot , 1);
-                dPop(r3To) = dPop(r3To) - pop(r3) .* riskFrac3;
-                dPop(r2To) = dPop(r2To) + pop(r3) .* riskFrac3;
+                dPop(r3To) = dPop(r3To) - pop(r3) .* 0.99 .* riskFrac3;
+                dPop(r2To) = dPop(r2To) + pop(r3) .* 0.99 .* riskFrac3;
             end
             % if needed, move from risk 1 to risk 2
             if riskDiff(2) / riskAvail(3) > 1

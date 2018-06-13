@@ -18,12 +18,12 @@ function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load constants and parameters
 %%%
-artOut = 0; % for testing
+artOut = 0.05; % %5% dropout
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
     + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
-% artDist = reshape(artDist, [disease , viral , gender , age , risk]);
+artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 % disease related mortality
 %
 % pie [d x v x g x a x r]
@@ -62,7 +62,7 @@ if year >= 2013
                 linspace(-log(1 - maxRateF) , -log(1 - maxRateF) , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = sum(pop(hivPositiveArt));
+                onArt = (1 - artOut) .* sum(pop(hivPositiveArt));
                 totHivPos = 0;
                 for d = 2 : 5
                     for v = 1 : 5
@@ -103,7 +103,7 @@ if year >= 2006 % to 2013
                 linspace(-log(1 - 0) , -log(1 - maxRateF) , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = sum(pop(hivPositiveArt));
+                onArt = (1 - artOut) .* sum(pop(hivPositiveArt));
                 totHivPos = 0;
                 for d = 2 : 5
                     for v = 1 : 5
@@ -140,7 +140,7 @@ if year >= 2004
             maxCover = {linspace(-log(1 - 0) , -log(1 - maxRateM) , length(yrs)) ,...
                 linspace(-log(1 - 0) , -log(1 - maxRateF) , length(yrs))};
             for r = 1 : risk
-                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));             
+                onArt = (1 - artOut) .* sum(pop(hivInds(10 , 6 , g , a , r , :)));             
                 totBelow200 = 0;
                     for v = 1 : 5
                         below200 = sum(pop(hivInds(6 , v , g , a , r , :)));

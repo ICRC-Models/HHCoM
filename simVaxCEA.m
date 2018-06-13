@@ -4,7 +4,7 @@
 % function simVax(lastYear , nTests, testParams , currPop)
 
 close all; clear all; clc
-lastYear = 2100;
+lastYear = 2065;
 
 disp('Start up')
 
@@ -13,8 +13,6 @@ paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'])
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'vlAdvancer'])
-load([paramDir,'fertMat'])
-load([paramDir,'hivFertMats'])
 load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'vaxer'])
@@ -24,13 +22,18 @@ load([paramDir,'HIVParams'])
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ager'])
-load([paramDir,'vlBeta'])
 load([paramDir,'hpvTreatIndices'])
 load([paramDir,'calibParams'])
 load([paramDir,'vaxInds'])
 load([paramDir,'settings'])
 load([paramDir,'hpvData'])
 load([paramDir ,'cost_weights'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
+load([paramDir , 'ageRiskInds'])
+load([paramDir,'vlBeta'])
 
 % load population
 popIn = load('H:\HHCoM_Results\toNow');
@@ -52,17 +55,21 @@ end
 % kCC_Cin3(: , 2 : 3) = kCC_Cin3(: , 2 : 3) .* 1.25;
 % rNormal_Inf(: , 2 : 3) = 0.5 .* rNormal_Inf(: , 2 : 3);
 
-for i = 0 : 2
-    maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
-    femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib12(56 + i);
-end
+%commented out for testing
+% for i = 0 : 2
+%     maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib12(53 + i);
+%     femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib12(56 + i);
+% end
 
-for a = 1 : age
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-end
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+% maleActs = maleActs .* 1.5;
+% femaleActs = femaleActs .* 1.5;
+% 
+% for a = 1 : age
+%     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+%     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+% end
+% betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+% betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 rImmuneHiv = HPV_calib12(10 : 13);
 % c3c2Mults = HPV_calib12(14 : 17);
 % c2c1Mults = HPV_calib12(18 : 21);
@@ -87,23 +94,42 @@ kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
 rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
 vaxMat = ager .* 0;
-maxRateM_vec = [0.45 , 0.45];% maxRateM_arr{sim};
-maxRateF_vec = [0.65 , 0.65];% maxRateF_arr{sim};
+maxRateM_vec = [0.60 , 0.60];% maxRateM_arr{sim};
+maxRateF_vec = [0.70 , 0.70];% maxRateF_arr{sim};
 
 maxRateM1 = 1 - exp(-maxRateM_vec(1));
 maxRateM2 = 1 - exp(-maxRateM_vec(2));
 maxRateF1 = 1 - exp(-maxRateF_vec(1));
 maxRateF2 = 1 - exp(-maxRateF_vec(2));
-
 load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
 load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 lambdaMultVax = ones(age , 2);
+partnersM(4 , :) = partnersM(4 , :) .* [1.25 , 1.75 , 1.75];
+partnersF(4 , :) = partnersF(4 , :) .* [1.25 , 1.75 , 1.75];
+partnersM(5 , :) = partnersM(5 , :) .* [1.25 , 1.5 , 1.75];
+partnersF(5 , :) = partnersF(5 , :) .* [1.25 , 1.5 , 1.75];
 
-artHpvMult = hpv_hivMult(1,1);
+femaleActs(4 : 5 , :) = femaleActs(4 : 5 , :) .* 2;
+maleActs(4 : 5 , :) = maleActs(4 : 5 , :);
+for a = 1 : age
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+artHpvMult = 1;
 hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
+%% test!!!!
 
+riskDistF = riskDistM;
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
+
+partnersF = partnersM;
+perPartnerHpv = 0.010;
 %%%%%
 
 c = fix(clock);
@@ -184,6 +210,8 @@ fromNonV = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
     2 , 3 , 1 : risk));
 toV = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
     2 , 3 , 1 : risk));
+import java.util.LinkedList
+artDistList = LinkedList();
 %%
 parfor n = 1 : nTests
     vaxerAger = ager;% vaxerAgerArray{n};
@@ -263,6 +291,13 @@ parfor n = 1 : nTests
                 viral , gender , age , risk , k , hivInds , ...
                 stepsPerYear , year) , tspan , pop(end , :));
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;
+            if size(artDist) >= stepsPerYear * 5
+                artDistList.remove();
+            else
+                artDistList.add(artTreat);
+            end
+            artDist = calcDist(artDistList , disease , viral , gender , age , ...
+                risk);
             if any(pop(end , :) < 0)
                 disp('After hiv')
                 break
@@ -277,19 +312,19 @@ parfor n = 1 : nTests
         end
         
         
-        [~ , pop , deaths(i , :) , ~] = ode4xtra(@(t , pop) ...
-            bornAgeDie(t , pop , ager , year , currStep , age , fertility , ...
+        [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
+            bornAgeDieRisk(t , pop , ager , year , currStep , gender , age , risk , fertility , ...
             fertMat , fertMat2 , hivFertPosBirth ,hivFertNegBirth , hivFertPosBirth2 , ...
             hivFertNegBirth2 , deathMat , circMat , ...
-            vaxerAger , vaxMat , MTCTRate , circStartYear , vaxStartYear ,...
-            vaxRate , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
+            vaxerAger , vaxMat , MTCTRate , circStartYear , ageInd ,...
+            riskInd , riskDist , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
         if any(pop(end , :) < 0)
-            disp('After bornAgeDie')
+            disp('After bornAgeDieRisk')
             break
         end
         
         fracVaxd = sum(pop(end , toV) , 2) / (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
-        if fracVaxd < vaxRate && year < 2029 % Vaccinate for 10 years only
+        if fracVaxd < vaxRate
             vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd));
             pop(end , toV) = pop(end , toV) + pop(end , fromNonV) .* vaxCover;
             pop(end , fromNonV) = pop(end , fromNonV) .* (1 - vaxCover);

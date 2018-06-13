@@ -56,8 +56,8 @@ lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
 lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 
-artHpvMult = hpv_hivMult(1 , 1);
-perPartnerHpv = 0.08;
+artHpvMult = 1;%hpv_hivMult(1 , 1);
+perPartnerHpv = 0.015;
 perPartnerHpv_lr = 0.08;
 perPartnerHpv_nonV = 0.08;
 rImmuneHiv = 2 ./ hpv_hivClear;
@@ -65,46 +65,73 @@ rImmuneHiv = 2 ./ hpv_hivClear;
 save([paramDir , 'calibInitParams']);
 %% Continue from last calibration
 load([paramDir,'calibInitParams'])
-load([paramDir,'HPV_calib9.dat'])
-for i = 1 : 3
-    kCin1_Inf(: , i) = HPV_calib9(i) .* kCin1_Inf(: , i);
-%     kInf_Cin1(: , i) = HPV_calib9(3 + i) .* kInf_Cin1(: , i);
-    kCC_Cin3(: , i) = HPV_calib9(6 + i) .* kCC_Cin3(: , i);
-    kCin3_Cin2(: , i) = HPV_calib9(49 + i) .* kCin3_Cin2(: , i); 
-end
-for i = 0 : 2
-    maleActs(: , i + 1) = maleActs(: , i + 1) .* HPV_calib9(53 + i);
-    femaleActs(: , i + 1) = femaleActs(: , i + 1) .* HPV_calib9(56 + i);
-end
+load([paramDir,'HPV_calib12.dat'])
+rImmuneHiv = 1 ./ hpv_hivClear; 
 
+lambdaMultImm = HPV_calib12(24 : 39);
+hpv_hivClear = HPV_calib12(40 : 43);
+hpvClearMult = HPV_calib12(44 : 47);
+perPartnerHpv_lr = HPV_calib12(48);%0.1;
+perPartnerHpv_nonV = HPV_calib12(49); %0.1;
+
+% Weight HPV transitions according to type distribution
+
+distWeight = [0.7 , 0.2 , 0.1];
+kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
+kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
+kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
+kCin2_Cin1 = sum(bsxfun(@times , kCin2_Cin1 , distWeight) , 2);
+kCin3_Cin2 = sum(bsxfun(@times , kCin3_Cin2 , distWeight) , 2);
+kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
+kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
+rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
+
+vaxMat = ager .* 0;
+maxRateM_vec = [0.60 , 0.60];% maxRateM_arr{sim};
+maxRateF_vec = [0.70 , 0.70];% maxRateF_arr{sim};
+
+maxRateM1 = 1 - exp(-maxRateM_vec(1));
+maxRateM2 = 1 - exp(-maxRateM_vec(2));
+maxRateF1 = 1 - exp(-maxRateF_vec(1));
+maxRateF2 = 1 - exp(-maxRateF_vec(2));
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
+lambdaMultVax = ones(age , 2);
+
+
+partnersM(4 , :) = partnersM(4 , :) .* [1.25 , 1.75 , 1.75];
+partnersF(4 , :) = partnersF(4 , :) .* [1.25 , 1.75 , 1.75];
+partnersM(5 , :) = partnersM(5 , :) .* [1.25 , 1.5 , 1.75];
+partnersF(5 , :) = partnersF(5 , :) .* [1.25 , 1.5 , 1.75];
+
+femaleActs(4 : 5 , :) = femaleActs(4 : 5 , :) .* 1.2 ;
+femaleActs(6 : 10 , :) = femaleActs(6 : 10 , :) .* 0.9;
+maleActs(4 : 5 , :) = maleActs(4 : 5 , :);
 for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
 end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
-rImmuneHiv = HPV_calib9(10 : 13);
-c3c2Mults = HPV_calib9(14 : 17);
-c2c1Mults = HPV_calib9(18 : 21);
-artHpvMult = HPV_calib9(22);
-perPartnerHpv= HPV_calib9(23);
-lambdaMultImm = HPV_calib9(24 : 39);
-hpv_hivClear = HPV_calib9(40 : 43);
-hpvClearMult = HPV_calib9(44 : 47); 
-perPartnerHpv_lr = 0.08;%HPV_calib9(48);%0.1;
-perPartnerHpv_nonV = 0.08;%HPV_calib9(49); %0.1;
+
+artHpvMult = 1;
+hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
 %%
-kCin1_Inf_Mults = [1 ; 1; 1];
-rNormal_InfMults = [1 ; 0.5 ; 0.5];
-kCC_Cin3_Mults = [1 ; 1 ; 1];
-kCin3_Cin2_Mults = [1 ; 1 ; 1];
-maleActsMult = [1 ; 1 ; 0.8];
-femaleActsMult = [1 ; 1; 0.8];
+kCin1_Inf_Mult = 1;
+rNormal_InfMult = 1;
+kCC_Cin3_Mult = 1;
+kCin3_Cin2_Mult = 1;
+maleActsMult = [1 ; 1 ; 1];
+femaleActsMult = [1 ; 1; 1];
+partnersM_Mult = [1; 1; 1];
+partnersF_Mult = [1; 1; 1];
 hpvClearMult = 0.1 .* hpv_hivClear;
 
-initParams = [kCin1_Inf_Mults;
-    rNormal_InfMults;
-    kCC_Cin3_Mults;
+initParams = [kCin1_Inf_Mult;
+    rNormal_InfMult;
+    kCC_Cin3_Mult;
     rImmuneHiv; % HPV immunity clearance multiplier for HIV+
     c3c2Mults; % CIN2 to CIN3 progression multiplier for HIV+
     c2c1Mults; % CIN1 to CIN2 progression multiplier for HIV+
@@ -112,52 +139,50 @@ initParams = [kCin1_Inf_Mults;
     perPartnerHpv;
     lambdaMultImm;
     hpv_hivClear;
-    hpvClearMult;
-    perPartnerHpv_lr;
-    perPartnerHpv_nonV;
-    kCin3_Cin2_Mults;
+    kCin3_Cin2_Mult;
     maleActsMult;
-    femaleActsMult];
+    femaleActsMult
+    partnersM_Mult;
+    partnersF_Mult];
 
 lb = initParams .* 0.5;
 ub = initParams .* 1.5; 
 
 % max transition rate between CC to CIN is 0.5
-for i = 1 : 3
-    ub(i) = min(0.3 / max(kCin1_Inf(: , i)) , 1.5);
-    ub(3 + i) = min(0.8 / max(kInf_Cin1(: , i)) ,  1.5);
-    ub(6 + i) = min(0.5 / max(kCC_Cin3(: , i)) ,  1.5);
-    ub(49 + i) = min(0.6 / max(kCin3_Cin2(: , i)) , 1.5);
-end
-lb(14 : 21) = 1; % CIN progression multiplier for HIV+ >=1
-lb(22) = 1; % HPV acquisition multiplier for HIV+ on ART >= 1
+
+ub(1) = min(0.3 / max(kCin1_Inf) , 1.5);
+ub(2) = min(0.8 / max(kInf_Cin1) ,  1.5);
+ub(3) = min(0.5 / max(kCC_Cin3) ,  1.5);
+ub(4) = min(0.6 / max(kCin3_Cin2) , 1.5);
+
+lb(5 : 6) = 1; % CIN progression multiplier for HIV+ >=1
+lb(7) = 1; % HPV acquisition multiplier for HIV+ on ART >= 1
 % ub(22) = max(hpv_hivMult(1 , :)); % max HPV acquisition multiplier for HIV+ on ART <= max acquisition multiplier for HIV+
-ub(23) = 0.1; % max per partner transmission probability for HPV
-ub(40 : 47) = 1; % HPV clearance multipliers <= 1 for HIV-positive
-ub(48 : 49) = 0.1; % max per partner transmission probability for HPV
+ub(18) = 1.5; % max per partner transmission probability multiplier for HPV
+ub(35 : 38) = 1; % HPV clearance multipliers <= 1 for HIV-positive
 
-A = zeros(length(initParams));
-for i = 0 : 2
-    A(i + 1 , 14 + i) = 1;
-    A(i + 1 , 15 + i) = -1;
+% A = zeros(length(initParams));
+% for i = 0 : 2
+%     A(i + 1 , 14 + i) = 1;
+%     A(i + 1 , 15 + i) = -1;
+% %     
+% %     A(i + 4 , 18 + i) = 1;
+% %     A(i + 4 , 19 + i) = -1;
 %     
-%     A(i + 4 , 18 + i) = 1;
-%     A(i + 4 , 19 + i) = -1;
-    
-    A(i + 7 , 10 + i) = 1;
-    A(i + 7 , 11 + i) = -1;
-    
-    A(i + 10 , 40 + i) = -1;
-    A(i + 10 , 41 + i) = 1;
-end
-
-b = zeros(length(initParams) , 1);
+%     A(i + 7 , 10 + i) = 1;
+%     A(i + 7 , 11 + i) = -1;
+%     
+%     A(i + 10 , 40 + i) = -1;
+%     A(i + 10 , 41 + i) = 1;
+% end
+% 
+% b = zeros(length(initParams) , 1);
 
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
     'Display','iter','PlotFcn',@psplotbestf);
-x = patternsearch(@calibrator, initParams , A , b , [] , [] , lb , ub , [] , options);
+x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 %%
-file = 'HPV_calib12.dat';
+file = 'HPV_calib13.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , x)
