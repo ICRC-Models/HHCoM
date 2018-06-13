@@ -66,7 +66,7 @@ save([paramDir , 'calibInitParams']);
 %% Continue from last calibration
 load([paramDir,'calibInitParams'])
 load([paramDir,'HPV_calib12.dat'])
-rImmuneHiv = 1 ./ hpv_hivClear; 
+rImmuneHiv = 1 ./ hpv_hivClear;
 
 lambdaMultImm = HPV_calib12(24 : 39);
 hpv_hivClear = HPV_calib12(40 : 43);
@@ -132,6 +132,7 @@ hpvClearMult = 0.1 .* hpv_hivClear;
 initParams = [kCin1_Inf_Mult;
     rNormal_InfMult;
     kCC_Cin3_Mult;
+    kCin3_Cin2_Mult;
     rImmuneHiv; % HPV immunity clearance multiplier for HIV+
     c3c2Mults; % CIN2 to CIN3 progression multiplier for HIV+
     c2c1Mults; % CIN1 to CIN2 progression multiplier for HIV+
@@ -139,14 +140,13 @@ initParams = [kCin1_Inf_Mult;
     perPartnerHpv;
     lambdaMultImm;
     hpv_hivClear;
-    kCin3_Cin2_Mult;
     maleActsMult;
     femaleActsMult
     partnersM_Mult;
     partnersF_Mult];
 
 lb = initParams .* 0.5;
-ub = initParams .* 1.5; 
+ub = initParams .* 1.5;
 
 % max transition rate between CC to CIN is 0.5
 
@@ -165,17 +165,17 @@ ub(35 : 38) = 1; % HPV clearance multipliers <= 1 for HIV-positive
 % for i = 0 : 2
 %     A(i + 1 , 14 + i) = 1;
 %     A(i + 1 , 15 + i) = -1;
-% %     
+% %
 % %     A(i + 4 , 18 + i) = 1;
 % %     A(i + 4 , 19 + i) = -1;
-%     
+%
 %     A(i + 7 , 10 + i) = 1;
 %     A(i + 7 , 11 + i) = -1;
-%     
+%
 %     A(i + 10 , 40 + i) = -1;
 %     A(i + 10 , 41 + i) = 1;
 % end
-% 
+%
 % b = zeros(length(initParams) , 1);
 
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
