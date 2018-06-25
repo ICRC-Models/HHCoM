@@ -48,8 +48,8 @@ for i = 1 : 3
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
 muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
+muCC_det = min(muCC_det .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-perPartnerHpv = 0.08; % high risk HPV transmission risk per month
 rImmuneHiv = 1 ./ hpv_hivClear;
 lambdaMultImm(1 : 4) = 1 - 0.01;
 lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
@@ -60,7 +60,19 @@ artHpvMult = 1;%hpv_hivMult(1 , 1);
 perPartnerHpv = 0.015;
 perPartnerHpv_lr = 0.08;
 perPartnerHpv_nonV = 0.08;
-rImmuneHiv = 2 ./ hpv_hivClear;
+rImmuneHiv = 1 ./ hpv_hivClear;
+
+% Weight HPV transitions according to type distribution
+
+distWeight = [0.7 , 0.2 , 0.1];
+kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
+kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
+kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
+kCin2_Cin1 = sum(bsxfun(@times , kCin2_Cin1 , distWeight) , 2);
+kCin3_Cin2 = sum(bsxfun(@times , kCin3_Cin2 , distWeight) , 2);
+kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
+kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
+rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
 save([paramDir , 'calibInitParams']);
 %% Continue from last calibration

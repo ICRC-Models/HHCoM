@@ -47,7 +47,7 @@ kOn(6) = 0;
 
 % CD4 > 200 from 2013 to 2020
 if year >= 2013
-    yrs = 2013 : 1 / stepsPerYear : 2020; % assuming 90-90-90 target reached by 2020
+    yrs = 2013 : 1 / stepsPerYear : 2065; % assuming 90-90-90 target reached by 2020
     ind = yrs == year;
     
     for g = 1 : gender
@@ -58,11 +58,11 @@ if year >= 2013
                 maxRateM = maxRateM2;
                 maxRateF = maxRateF2;
             end
-            maxCover = {linspace(-log(1 - maxRateM) , -log(1 - maxRateM) , length(yrs)) ,...
-                linspace(-log(1 - maxRateF) , -log(1 - maxRateF) , length(yrs))};
+            maxCover = {linspace(maxRateM , 0.9 , length(yrs)) ,...
+                linspace(maxRateF , 0.9 , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = (1 - artOut) .* sum(pop(hivPositiveArt));
+                onArt = sum(pop(hivPositiveArt));
                 totHivPos = 0;
                 for d = 2 : 5
                     for v = 1 : 5
@@ -99,11 +99,11 @@ if year >= 2006 % to 2013
                 maxRateF = maxRateF2;
                 maxRateM = maxRateM2;
             end
-            maxCover = {linspace(-log(1 - 0) , -log(1 - maxRateM) , length(yrs)) , ...
-                linspace(-log(1 - 0) , -log(1 - maxRateF) , length(yrs))};
+            maxCover = {linspace(0 , maxRateM , length(yrs)) , ...
+                linspace(0 , maxRateF , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = (1 - artOut) .* sum(pop(hivPositiveArt));
+                onArt = sum(pop(hivPositiveArt));
                 totHivPos = 0;
                 for d = 2 : 5
                     for v = 1 : 5
@@ -137,10 +137,10 @@ if year >= 2004
                 maxRateM = maxRateM2;
                 maxRateF = maxRateF2;
             end
-            maxCover = {linspace(-log(1 - 0) , -log(1 - maxRateM) , length(yrs)) ,...
-                linspace(-log(1 - 0) , -log(1 - maxRateF) , length(yrs))};
+            maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
+                linspace(0 , maxRateF , length(yrs))};
             for r = 1 : risk
-                onArt = (1 - artOut) .* sum(pop(hivInds(10 , 6 , g , a , r , :)));             
+                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));             
                 totBelow200 = 0;
                     for v = 1 : 5
                         below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
@@ -159,12 +159,12 @@ if year >= 2004
                 if year >= 2017 && year < 2020 
                     yrs = 2017 : 1 / stepsPerYear : 2020; % assuming 90-90-90 target reached by 2020
                     ind = yrs == year;
-                    maxCover = {linspace(-log(1 - maxRateM) , -log(1 - maxRateM) , length(yrs)) , ...
-                        linspace(-log(1 - maxRateF) , -log(1 - maxRateF) , length(yrs))};
+                    maxCover = {linspace(maxRateM , 0.8 , length(yrs)) , ...
+                        linspace(maxRateF , maxRateF , length(yrs))};
                     if fracART < maxCover{g}(ind) && year < 2020
                         cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                    elseif year >= 2020 && fracART < -log(1 - 0.46)
+                    elseif year >= 2020 && fracART < 0.8
                         cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
                         treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                     end
