@@ -20,7 +20,7 @@ load([paramDir,'vlBeta'])
 load([paramDir,'hpvTreatIndices'])
 load([paramDir,'calibParams'])
 load([paramDir,'vaxInds'])
-load([paramDir,'settings'])
+% load([paramDir,'settings'])
 load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
 load([paramDir,'calibInitParams'])
@@ -109,6 +109,8 @@ for a = 1 : age
 end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+kCCDet = min(kCCDet .* 12 , 0.99); % convert monthly to yearly rate
 
 riskDistF = riskDistM;
 riskDist(: , : , 1) = riskDistM;

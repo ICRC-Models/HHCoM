@@ -221,7 +221,7 @@ for i = 2 : length(s) - 1
         artTreatTracker(i , : , : , : , :  ,:) = artTreat;
         artDistList.add(artTreat);
         if size(artDist) >= stepsPerYear * 2
-            artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 5 years ago
+            artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
             risk);

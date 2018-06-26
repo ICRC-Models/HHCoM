@@ -58,7 +58,7 @@ if year >= 2013
                 maxRateM = maxRateM2;
                 maxRateF = maxRateF2;
             end
-            maxCover = {linspace(maxRateM , 0.9 , length(yrs)) ,...
+            maxCover = {linspace(maxRateM , 0.8 , length(yrs)) ,...
                 linspace(maxRateF , 0.9 , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);

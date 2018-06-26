@@ -58,7 +58,7 @@ ccCost = [2617 , 8533 ,8570]; % local, regional, distant
 for i = 1 : length(tVec)
     a = min(max(round((tVec(i) - yrIntStart) / 5) , 1) , age);
     ageCounted = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-        1 : periods , 1 : gender , a : age , 1 : risk));
+        1 : periods , 2 , a : age , 1 : risk));
     
 
     % No intervention case
@@ -171,10 +171,27 @@ for i = 1 : length(ceThresholds)
     % places the 9v vaccine right at the cost-effectiveness threshold
     % specified by ceThresholds(i)
     ce9v = @(x) abs(pvvar(annlz(c90_9vFull.vaxd) * x - annlz(c90_2vFull.vaxd) .* cost2v ...
-        + annAvg((c90_9vFull.ccCosts)) - annAvg((c90_2vFull.ccCosts)) , discountRate) ...
-        / pvvar(annAvg(c90_9vFull.lys) - annAvg(c90_2vFull.lys) , discountRate) - ceThresholds(i));
+        + annlz((c90_9vFull.ccCosts)) - annlz((c90_2vFull.ccCosts)) , discountRate) ...
+        / pvvar(annlz(c90_9vFull.lys) - annlz(c90_2vFull.lys) , discountRate) - ceThresholds(i));
     priceThreshold_9v = fminsearch(ce9v , priceGuess);
-    disp(['Considering only CC costs, with a cost-effectiveness threshold of ' , num2str(ceThresholds(i)) , ' USD, ' ,...
+    disp(['9v vs 2v: Considering only CC costs, with a cost-effectiveness threshold of ' , num2str(ceThresholds(i)) , ' USD, ' ,...
+        'the unit cost of 9v vaccine must be less than or equal to ' , ...
+        num2str(round(priceThreshold_9v , 2)),' USD.']) 
+end
+
+% 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS
+ceThreshold = 1540; % USD per LYS
+ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
+for i = 1 : length(ceThresholds)
+    priceGuess = 27; % Enter a price guess for 2v to seed the search process
+    % ce9v is an anonymous function that finds the vaccine price that
+    % places the 9v vaccine right at the cost-effectiveness threshold
+    % specified by ceThresholds(i)
+    ce9v = @(x) abs(pvvar(annlz(c90_2vFull.vaxd) * x ...
+        + annlz((c90_2vFull.ccCosts)) - annlz((noV.ccCosts)) , discountRate) ...
+        / pvvar(annlz(c90_2vFull.lys) , discountRate) - ceThresholds(i));
+    priceThreshold_9v = fminsearch(ce9v , priceGuess);
+    disp(['2v vs No Vaccine: Considering only CC costs, with a cost-effectiveness threshold of ' , num2str(ceThresholds(i)) , ' USD, ' ,...
         'the unit cost of 9v vaccine must be less than or equal to ' , ...
         num2str(round(priceThreshold_9v , 2)),' USD.']) 
 end

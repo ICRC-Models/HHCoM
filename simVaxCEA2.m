@@ -37,7 +37,7 @@ load([paramDir,'ager'])
 load([paramDir,'hpvTreatIndices'])
 load([paramDir,'calibParams'])
 load([paramDir,'vaxInds'])
-load([paramDir,'settings'])
+% load([paramDir,'settings'])
 load([paramDir,'hpvData'])
 load([paramDir ,'cost_weights'])
 load([paramDir,'fertMat'])
@@ -48,7 +48,7 @@ load([paramDir , 'ageRiskInds'])
 load([paramDir,'vlBeta'])
 
 % load population
-popIn = load('H:\HHCoM_Results\toNow');
+popIn = load([pwd , '\HHCoM_Results\toNow']);
 currPop = popIn.popLast;
 %%%%%%%
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -59,28 +59,28 @@ load([paramDir , 'popData'])
 load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
-vaxCover = [0 , 0.3 , 0.6 , 0.9];
-vaxEff = [0.7 , 0.9];
+vaxCover = [0.4 , 0.6 , 0.8];
+vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
 vaxAge = 3;
 waning = 0;
 
 maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim};
 maxRateF_vec = [0.5 , 0.5];% maxRateF_arr{sim};
 % 
-maxRateM1 = 1 - exp(-maxRateM_vec(1));
-maxRateM2 = 1 - exp(-maxRateM_vec(2));
-maxRateF1 = 1 - exp(-maxRateF_vec(1));
-maxRateF2 = 1 - exp(-maxRateF_vec(2));
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
 
 c = fix(clock);
 currYear = c(1); % get the current year
 % 90% efficacy against 70% of CC types, 100% efficacy against 70% of types, ...
 % 100% efficacy against 90% of types
 % vaxEff = [0.9 * 0.7 , 0.7 , 0.9]; 
-t_linearWane = 20; % pick a multiple of 5
 % vaxCover = [0 , 0.7 , 0.9];
-testParams = allcomb(vaxCover , vaxEff);
-nTests = size(testParams , 1);
+testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of vaccine coverage and efficacy
+testParams = [testParams ; [0 , 0]]; % Append no vaccine scenario to test scenarios
+nTests = size(testParams , 1); % counts number of scenarios to test
 %%%%%%%
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 % run analyses
@@ -97,10 +97,10 @@ hpvOn = 1;
 circStartYear = 1990;
 vaxStartYear = currYear;
 
-lambdaMultVaxMat = zeros(age , nTests);
+lambdaMultVaxMat = zeros(age , nTests - 1);
 % waning = 0;
-vaxEffInd = repmat(1 : length(vaxEff) , 1 , nTests/length(vaxEff));
-for n = 1 : nTests
+vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests - 1) /length(vaxEff));
+for n = 1 : nTests - 1
     % No waning
     lambdaMultVaxMat(3 : age , n) = vaxEff(vaxEffInd(n));
     
@@ -115,6 +115,7 @@ for n = 1 : nTests
     end
 end
 
+lambdaMultVaxMat = [lambdaMultVaxMat , zeros(age , 1)]; % append 0 vaccine protection for no vaccine scenario
 
 disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
@@ -126,6 +127,7 @@ import java.util.LinkedList
 artDistList = LinkedList();
 %%
 parfor n = 1 : nTests
+    simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
     vaxRate = testParams(n , 1);
@@ -147,7 +149,6 @@ parfor n = 1 : nTests
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
     %%
-    discrepCount = 0;
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;
         currStep = round(s(i) * stepsPerYear);
@@ -155,6 +156,10 @@ parfor n = 1 : nTests
         popIn = popVec(i - 1 , :);
         if hpvOn
             hystOption = 'on';
+            
+            % Progression/regression from initial HPV infection to
+            % precancer stages and cervical cancer. Differential CC
+            % detection by CC stage and HIV status/CD4 count.
             [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :) , ...
                 ccTreated(i , : , : , : , :)] ...
                 = ode4xtra(@(t , pop) ...
@@ -174,6 +179,8 @@ parfor n = 1 : nTests
             end
         end
         
+        % HIV and HPV mixing and infection module. Protective effects of condom
+        % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
         [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
             newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
             ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
@@ -190,6 +197,8 @@ parfor n = 1 : nTests
             break
         end
         
+        % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
+        % excess HIV mortality
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
@@ -198,18 +207,18 @@ parfor n = 1 : nTests
                 stepsPerYear , year) , tspan , pop(end , :));
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;
             artDistList.add(artTreat);
-            if size(artDist) >= stepsPerYear * 5
-                artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 5 years ago
+            if size(artDist) >= stepsPerYear * 2
+                artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
             end
             artDist = calcDist(artDistList , disease , viral , gender , age , ...
-                risk);
+                risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
             if any(pop(end , :) < 0)
                 disp('After hiv')
                 break
             end
         end
         
-        
+        % birth, aging, risk redistribution module
         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , currStep ,...
             gender , age , risk , fertility , fertMat , fertMat2 ,...
@@ -223,42 +232,31 @@ parfor n = 1 : nTests
         end
         
         popSize = sum(pop(end , :) , 2);
-        fracVaxd = sum(pop(end , toV) , 2) / (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
-        if fracVaxd < vaxRate
-            vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd));
+        fracVaxd = sum(pop(end , toV) , 2) / ... % find proportion of population that is currently vaccinated
+            (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
+        if fracVaxd < vaxRate % when proportion vaccinated is below target vaccination level
+            vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
             vaxdGroup = vaxCover .* pop(end , fromNonV);
             dPop = zeros(size(pop(end , :)));
             dPop(fromNonV) = -vaxdGroup;
             dPop(toV) = vaxdGroup;
-            pop(end , :) = dPop + pop(end , :);
-%             pop(end , toV) = pop(end , toV) + pop(end , fromNonV) .* vaxCover;
-%             pop(end , fromNonV) = pop(end , fromNonV) .* (1 - vaxCover);
-%             vaxd(i , :) = sumall(pop(end , fromNonV).* vaxCover);
-            vaxd(i , :) = sumall(vaxdGroup);
+            pop(end , :) = dPop + pop(end , :); 
+            vaxd(i , :) = sumall(vaxdGroup); % count number of people vaccinated at current time step
         end
-        if sum(pop(end ,:), 2) < popSize
-%             disp(['Population size decreased by' ...
-%                 num2str(sum(pop(end , : ), 2) - popSize)])
-            discrepCount = discrepCount + sum(pop(end , : ), 2) - popSize;
-        end
-
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
-    filename = ['CEA_VaxCover_' , num2str(vaxRate) , '_Eff_' , ...
-        num2str(vaxEff) , '.mat']; %sprintf('test_output%d.mat' , n);
+    filename = ['vaxSimResult' , num2str(simNum)];
     if waning
-        filename = ['CEA_VaxCover_' , num2str(vaxRate) , '_Eff_' , ...
-        num2str(vaxEff) , '_Wane_' , num2str(vaxEff(n)) , '.mat']; %sprintf('test_output%d.mat' , n);
+        filename = ['vaxWaneSimResult' , num2str(simNum)];
     end
-    disp(['Total missing due to vaccination: ' , num2str(discrepCount)])
-            
+    
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
         newCC , artTreatTracker , vaxd , ccTreated , ...
-        currYear , lastYear , popLast);
+        currYear , lastYear , vaxRate , vaxEff , popLast);
 end
 disp('Done')
 %%
