@@ -18,7 +18,7 @@ function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % load constants and parameters
 %%%
-artOut = 0.05; % %5% dropout
+artOut = 0;%0.03; % 3% dropout
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
     + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
     + (x(: , 2) - 1) * k(1) + x(: , 1);
@@ -48,17 +48,17 @@ kOn(6) = 0;
 % CD4 > 200 from 2013 to 2020
 if year >= 2013
     yrs = 2013 : 1 / stepsPerYear : 2065; % assuming 90-90-90 target reached by 2020
-    ind = yrs == year;
+    ind = round(yrs , 4) == round(year , 4);
     
     for g = 1 : gender
-        for a = 1 : age
+        for a = 4 : age
             maxRateM = maxRateM1;
             maxRateF = maxRateF1;
             if a > 6
                 maxRateM = maxRateM2;
                 maxRateF = maxRateF2;
             end
-            maxCover = {linspace(maxRateM , 0.8 , length(yrs)) ,...
+            maxCover = {linspace(maxRateM , 0.9 , length(yrs)) ,...
                 linspace(maxRateF , 0.9 , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
@@ -70,11 +70,11 @@ if year >= 2013
                         totHivPos = totHivPos + sum(pop(hivPositive));
                     end
                 end
-                fracART = onArt / (onArt + totHivPos);
-                if year < 2020 && fracART < maxCover{g}(ind)
+                fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+                if year < 2065 && fracART < maxCover{g}(ind)
                     cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2020 && fracART < maxCover{g}(end)
+                elseif year >= 2065 && fracART < maxCover{g}(end)
                     cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
@@ -84,15 +84,11 @@ if year >= 2013
 end
 
 %CD4 > 200 from 2006 to 2013
-if year >= 2006 % to 2013
+if year >= 2006 && year < 2013
     yrs = 2006 : 1/ stepsPerYear : 2013;
-    ind = yrs == year;
-    
-%     if year >= 2013 % to 2020
-%         maxCover = 0.42;
-%     end
+    ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-        for a = 1 : age
+        for a = 4 : age
             maxRateM = maxRateM1;
             maxRateF = maxRateF1;
             if a > 6
@@ -111,7 +107,7 @@ if year >= 2006 % to 2013
                         totHivPos = totHivPos + sum(pop(hivPositive));
                     end
                 end
-                fracART = onArt / (onArt + totHivPos);
+                fracART = onArt * (1 - artOut) / (onArt + totHivPos);
                 if year < 2013 && fracART < maxCover{g}(ind)
                     %                             hivPositive = toInd(hivInds(d , v , g , a , r));
                     %                             hivPos = sum(pop(hivPositive));
@@ -128,9 +124,9 @@ end
 % CD4 <= 200
 if year >= 2004
     yrs = 2004 : 1 / stepsPerYear : 2006;
-    ind = (yrs == year);
+    ind = (round(yrs , 4) == round(year , 4));
     for g = 1 : gender
-        for a = 1 : age
+        for a = 4 : age
             maxRateM = maxRateM1;
             maxRateF = maxRateF1;
             if a > 6
@@ -140,13 +136,13 @@ if year >= 2004
             maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
                 linspace(0 , maxRateF , length(yrs))};
             for r = 1 : risk
-                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));             
+                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
                 totBelow200 = 0;
-                    for v = 1 : 5
-                        below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
-                        totBelow200 = totBelow200 + below200;
-                    end
-                fracART = onArt / (onArt + totBelow200);
+                for v = 1 : 5
+                    below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
+                    totBelow200 = totBelow200 + below200;
+                end
+                fracART = onArt * (1 - artOut) / (onArt + totBelow200);
                 if year < 2006 && fracART < maxCover{g}(ind)
                     %                             hivPositive = toInd(hivInds(d , v , g , a , r));
                     %                             hivPos = sum(pop(hivPositive));
@@ -156,18 +152,18 @@ if year >= 2004
                     cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
                     treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
-                if year >= 2017 && year < 2020 
-                    yrs = 2017 : 1 / stepsPerYear : 2020; % assuming 90-90-90 target reached by 2020
-                    ind = yrs == year;
-                    maxCover = {linspace(maxRateM , 0.8 , length(yrs)) , ...
-                        linspace(maxRateF , maxRateF , length(yrs))};
-                    if fracART < maxCover{g}(ind) && year < 2020
-                        cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-                        treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                    elseif year >= 2020 && fracART < 0.8
-                        cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-                        treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                    end
+            end
+            if year >= 2017
+                yrs = 2017 : 1 / stepsPerYear : 2060; % assuming 90-90-90 target reached by 2020
+                ind = round(yrs , 4) == round(year , 4);
+                maxCover = {linspace(maxRateM , 0.9 , length(yrs)) , ...
+                    linspace(maxRateF , 0.9 , length(yrs))};
+                if year < 2060 && fracART < maxCover{g}(ind)
+                    cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
+                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
+                elseif year >= 2060 && fracART < 0.9
+                    cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
+                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
             end
         end
@@ -204,9 +200,13 @@ for g = 1 : gender
                 acuteInf = hivInds(2 , v , g , a , r , :); %allcomb(2 , v , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r));
                 
                 dPop(acuteInf) = dPop(acuteInf) ...
-                    - (muHIV(a , 2) + kCD4(g , v , 1)) ... % out: disease related mortality, ART coverage, CD4 progression. removed pie(2 , v , g , a , r)
-                    .* pop(acuteInf);
+                    - (muHIV(a , 2) + kCD4(g , v , 1) + treat(2 , v , g , a , r)) ... % out: disease related mortality, ART coverage, CD4 progression. removed pie(2 , v , g , a , r)
+                    .* pop(acuteInf) + artOut * artDist(2 , v , g , a , r) ... % Distributed dropouts from ART
+                    .* pop(hivPositiveArt);
                 hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
+                
+                artTreat(2 , v , g , a , r) = treat(2 , v , g , a , r) ... % keep track of distribution of people going on ART
+                        .* sumall(pop(acuteInf)); % going on ART
                 
                 %                 artTreat(2 , v , g , a , r) = pie(2 , v , g , a , r) ... % keep track of distribution of people going on ART
                 %                         .* sumall(pop(acuteInf)); % going on ART
@@ -272,7 +272,8 @@ for g = 1 : gender
             % Dropout from ART (d = 10)
             dPop(hivPositiveArt) = ...
                 dPop(hivPositiveArt)...
-                - artOut .* pop(hivPositiveArt); % artOut to d = 2:6 as determined by distribution matrix
+                - artOut .* pop(hivPositiveArt) ... % artOut to d = 2:6 as determined by distribution matrix
+                + treat(2 , v , g , a , r) * pop(acuteInf); 
         end
     end
 end

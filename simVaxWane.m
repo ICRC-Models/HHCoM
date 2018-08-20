@@ -12,7 +12,7 @@ close all;clear all;clc
 % addOptional(p , 't_wane' , 0);
 % parse(p , endYear, vaxCover , vaxEff, vaxAge , varargin{:})
 % close all; clear all; clc
-lastYear = 2097; %endYear;
+lastYear = 2040; %endYear;
 % if nargin
 %     origEffVec = varargin{1};
 %     t_wane = varargin{2};
@@ -62,9 +62,9 @@ load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
 vaxCover = [0.4 , 0.6 , 0.8];
-vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
+vaxEff = [0.8 * 0.9 , 0.85 * 0.9];
 vaxAge = 3;
-waning = 0;
+waning = 1;
 
 maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
 maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
@@ -130,7 +130,7 @@ import java.util.LinkedList
 artDistList = popIn.artDistList;
 
 %%
-for n = 1 : nTests
+parfor n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);

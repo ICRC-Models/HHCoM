@@ -14,6 +14,7 @@ function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds ,
     disease , viral , age , hpvTypes , ...
     rImmuneHiv , vaccinated , hystOption)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% kCCDet = kCCDet .* 0 ; %TESTING!
 sumall = @(x) sum(x(:));
 hyst = 0;
 if strcmp(hystOption , 'on')
@@ -150,9 +151,9 @@ for d = 1 : disease
                 ccLocDet = ccLocDetInds(d , h , a , :);
                 ccRegDet = ccRegDetInds(d , h , a , :);
                 ccDistDet = ccDistDetInds(d , h , a , :);
-                dPop(ccLocDet) = dPop(ccLocDet) + sum(locDet);
-                dPop(ccRegDet) = dPop(ccRegDet) + sum(regDet);
-                dPop(ccDistDet) = dPop(ccDistDet) + sum(distDet);
+                dPop(ccLocDet) = dPop(ccLocDet) + locDet;
+                dPop(ccRegDet) = dPop(ccRegDet) + regDet;
+                dPop(ccDistDet) = dPop(ccDistDet) + distDet;
                 
                 % CC incidence tracker
                 ccInc(d , h , a) = ccInc(d , h , a) + sum(kCC_Cin3(a , h - 1) .* pop(cin3));

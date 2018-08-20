@@ -49,16 +49,16 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 yrIntStart = 2018;
 for n = 1 : length(vaxResult)
-    vaxResult{n}.ly = zeros((length(tVec) - length(curr.tVec)) + 1 , 1);
-    vaxResult{n}.daly = zeros((length(tVec) - length(curr.tVec)) + 1 , 1);
+    vaxResult{n}.ly = zeros((length(tVec) - length(curr.tVec)) , 1);
+    vaxResult{n}.daly = zeros((length(tVec) - length(curr.tVec)) , 1);
 end
-noV.ly = zeros((length(tVec) - length(curr.tVec)) + 1 , 1);
-noV.daly = zeros((length(tVec) - length(curr.tVec)) + 1 , 1);
+noV.ly = zeros((length(tVec) - length(curr.tVec)) , 1);
+noV.daly = zeros((length(tVec) - length(curr.tVec)) , 1);
 %% CC Costs
 ccCost = [2617 , 8533 , 8570]; % local, regional, distant
 ccDalyWeight = 1 - [0.288 , 0.288 , 0.288]; % corresponds to local, regional, distant CC
 
-for i = 1 : (length(tVec) - length(curr.tVec)) + 1
+for i = 1 : (length(tVec) - length(curr.tVec))
     % If y = current year, count benefits and CC treatment costs for women aged
         % >= y - B, where B = last year eligible for inclusion
         % Since 5 year age groups are being used, at each year y, count benefits
@@ -134,7 +134,7 @@ end
 
 figure()
 for n = 1 : length(vaxResult)
-    plot(tVec(length(curr.tVec) : end) , vaxResult{n}.lys , ...
+    plot(tVec(length(curr.tVec) + 1 : end) , vaxResult{n}.lys , ...
         'DisplayName' , ['Vaccine Efficacy: ' , ...
         num2str(round(vaxResult{n}.vaxEff * 100)) ,'%, ' , ...
         'Vaccine Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) ,'%'])
@@ -144,8 +144,8 @@ end
 
 figure()
 for n = 1 : length(vaxResult)
-    plot(tVec(length(curr.tVec) : end) , sum(vaxResult{n}.popVec(length(curr.tVec):end , :) , 2)...
-        -sum(noV.popVec(length(curr.tVec):end,:),2), ...
+    plot(tVec(length(curr.tVec) + 1 : end) , sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end , :) , 2)...
+        -sum(noV.popVec(length(curr.tVec) + 1 : end , :),2), ...
         'DisplayName' , ['Vaccine Efficacy: ' , ...
         num2str(round(vaxResult{n}.vaxEff * 100)) ,'%, ' , ...
         'Vaccine Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) ,'%'])
@@ -221,7 +221,7 @@ for i = 1 : length(ceThresholds)
     % specified by ceThresholds(i)
     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.lys') - annAvg(vaxResult{maxRate2vSim}.lys') , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
+        / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
     priceThreshold_9v = fminsearch(ce9v , priceGuess);
     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
@@ -239,7 +239,7 @@ for i = 1 : length(ceThresholds)
     % specified by ceThresholds(i)
     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.daly') - annAvg(vaxResult{maxRate2vSim}.daly') , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
+        / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
     priceThreshold_9v = fminsearch(ce9v , priceGuess);
     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
@@ -322,7 +322,16 @@ for i = 1 : length(inds)
             plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
                 ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
                 'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+            fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
             hold on
+            if exist(fname , 'file') == 2
+                dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccInc'] , ...
+                    '-append' , 'coffset' , 1)
+            else
+                csvwrite(fname , [tVec(1 : stepsPerYear : end)' , ...
+                    vaxResult{n}.ccInc'] , 0 , i)
+            end
         end
         title([plotTits{i} , ' Cervical Cancer Incidence'])
         xlabel('Year'); ylabel('Incidence per 100,000')
@@ -332,26 +341,30 @@ for i = 1 : length(inds)
         for n = 1 : length(vaxResult)
             vaxResult{n}.ccRed = (vaxResult{n}.ccInc - noV.ccInc) ./ noV.ccInc * 100;
             plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , 'DisplayName' , ...
-                ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-                'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+                ['Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
+                'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
             legend('-DynamicLegend')
             hold on
+            fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+            if exist(fname , 'file') == 2
+                dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccRed'] , ...
+                    0 , 3 * length(inds) + i)
+            else
+                csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccRed']...
+                    , 0 , length(inds) + i)
+            end
             title([plotTits{i} , ' Cervical Cancer Incidence Reduction'])
             xlabel('Year'); ylabel('Reduction (%)')
         end
         
         hold off
-            %     axis([tVec(2) tVec(end) -100 0])
-            %
-            %     T = table(tVec(1 : stepsPerYear : end)' , c30_2vFull_Inc' , ...
-%         c90_9vFullInc' , c60_2vFullInc' , ...
-%         c90_2vFull_Red' , c60_9vFull_Red' , c70_2vPartial_Red');
-%     writetable(T , [files{i} , '.csv'] , 'Delimiter' , ',')
+    
 end
 % %%
 
 %% CC Mortality 
-%% CC incidence reduction
+%% CC mortality reduction
  
 inds = {':' , [2 : 6 , 10] , [2 : 6] , 1 , 10};
 files = {'CEA CC_General_Hpv_VaxCover' , 'CEA CC_HivAll_Hpv_VaxCover' , ...
@@ -367,87 +380,112 @@ files = {'CEA CC_General_Hpv_VaxCover' , 'CEA CC_HivAll_Hpv_VaxCover' , ...
 % % v90_2vFullInc = noV_HpvAge;
 figure()
 for i = 1 : length(inds)
-        % general
-        allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-            1 : periods , 2 , 4 : age , 1 : risk));
-        % All HIV-positive women
-        allHivF = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-            1 : periods , 2 , 4 : age , 1 : risk)); ...
-            toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-            1 : periods , 2 , 4 : age , 1 : risk))];
-        % HIV-positive women not on ART
-        hivNoARTF = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-            1 : periods , 2 , 4 : age , 1 : risk));
-        % All HIV-negative women
-        hivNeg = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-            2 , 4 : age , 1 : risk));
-        % Women on ART
-        artF = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-            1 : periods , 2 , 4 : age , 1 : risk));
-        
-        genArray = {allF , allHivF , hivNoARTF , hivNeg , artF};
-        
-        noV.ccMort = ...
-            annlz(sum(sum(sum(noV.ccDeath(: , inds{i} , : , 4 : age),2),3),4)) ./ ...
-            (annlz(sum(noV.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac;
-        
-        figure()
-        
-        plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , noV.ccMort ,'DisplayName' , ...
+    % general
+    allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , 4 : age , 1 : risk));
+    % All HIV-positive women
+    allHivF = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , 4 : age , 1 : risk)); ...
+        toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , 4 : age , 1 : risk))];
+    % HIV-positive women not on ART
+    hivNoARTF = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , 4 : age , 1 : risk));
+    % All HIV-negative women
+    hivNeg = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        2 , 4 : age , 1 : risk));
+    % Women on ART
+    artF = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , 4 : age , 1 : risk));
+    
+    genArray = {allF , allHivF , hivNoARTF , hivNeg , artF};
+    
+    noV.ccMort = ...
+        annlz(sum(sum(sum(noV.ccDeath(: , inds{i} , : , 4 : age),2),3),4)) ./ ...
+        (annlz(sum(noV.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac;
+    
+    figure()
+    
+    plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , noV.ccMort ,'DisplayName' , ...
+        ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
+        'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+    legend('-DynamicLegend')
+    
+    hold on
+    
+    for n = 1 : length(vaxResult)
+        vaxResult{n}.ccMort = ...
+            annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , : , 4 : age),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear)) * fac;
+        plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , vaxResult{n}.ccMort , 'DisplayName' , ...
+            ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
+            'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+        hold on
+        fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+        if exist(fname , 'file') == 2
+            dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMort'] , ...
+                0 , 3 * length(inds) + i)
+        else
+            csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMort'] , 0 , ...
+                2 * length(inds) + i)
+        end
+    end
+    title([plotTits{i} , ' Cervical Cancer Mortality'])
+    xlabel('Year'); ylabel('Mortality per 100,000')
+    hold off
+    % Reduction
+    figure()
+    for n = 1 : length(vaxResult)
+        vaxResult{n}.ccMortRed = (vaxResult{n}.ccMort - noV.ccMort) ./ noV.ccMort * 100;
+        plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end)  , vaxResult{n}.ccMortRed , 'DisplayName' , ...
             ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
         legend('-DynamicLegend')
-        
         hold on
-        
-        for n = 1 : length(vaxResult)
-            vaxResult{n}.ccMort = ...
-            annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , : , 4 : age),2),3),4)) ./ ...
-            (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear)) * fac;
-            plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , vaxResult{n}.ccMort , 'DisplayName' , ...
-                ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-                'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-            hold on
+        title([plotTits{i} , ' Cervical Cancer Mortality Reduction'])
+        xlabel('Year'); ylabel('Reduction (%)')
+        fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+        if exist(fname , 'file') == 2
+            dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMortRed'] , ...
+                0 , 3 * length(inds) + i)
+        else
+            csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMortRed'] , ...
+                0 , 3 * length(inds) + i)
         end
-        title([plotTits{i} , ' Cervical Cancer Mortality'])
-        xlabel('Year'); ylabel('Mortality per 100,000')
-        hold off
-        % Reduction
-        figure()
-        for n = 1 : length(vaxResult)
-            vaxResult{n}.ccMortRed = (vaxResult{n}.ccMort - noV.ccMort) ./ noV.ccMort * 100;
-            plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end)  , vaxResult{n}.ccMortRed , 'DisplayName' , ...
-                ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-                'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-            legend('-DynamicLegend')
-            hold on
-            title([plotTits{i} , ' Cervical Cancer Mortality Reduction'])
-            xlabel('Year'); ylabel('Reduction (%)')
-        end
-        
-        hold off
-            %     axis([tVec(2) tVec(end) -100 0])
-            %
-            %     T = table(tVec(1 : stepsPerYear : end)' , c30_2vFull_Inc' , ...
-%         c90_9vFullInc' , c60_2vFullInc' , ...
-%         c90_2vFull_Red' , c60_9vFull_Red' , c70_2vPartial_Red');
-%     writetable(T , [files{i} , '.csv'] , 'Delimiter' , ',')
+    end
+    hold off
 end
-% figure()
-% for g = 1 : 2
-%     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     artPop = sum(noV.popVec(: , artInds) , 2);
-%     hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     hivPop = sum(noV.popVec(: , hivInds) , 2);
-%     plot(tVec , 100 * artPop ./ (hivPop + artPop))
-%     hold on
-% end
-% xlabel('Year')
-% ylabel('Proportion of HIV Population')
-% title('Proportion on ART')
-% legend('Model (Male)' , 'Model (Female)')
+
+%% Population Size
+figure()
+for n = 1 : length(vaxResult)
+    plot(tVec , sum(vaxResult{n}.popVec , 2) , 'DisplayName' , ...
+        ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
+        'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+    legend('-DynamicLegend')
+    hold on
+end
+title('Population Size')
+xlabel('Year'); ylabel('Individuals')
+hold off
+%%
+figure()
+for g = 1 : 2
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , g , 4 : 10 , 1 : risk));
+    artPop = sum(noV.popVec(: , artInds) , 2);
+    hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , g , 4 : 10 , 1 : risk));
+    hivPop = sum(noV.popVec(: , hivInds) , 2);
+    plot(tVec , 100 * artPop ./ (hivPop + artPop))
+    hold on
+end
+xlabel('Year')
+ylabel('Proportion of HIV Population')
+title('Proportion on ART')
+legend('Model (Male)' , 'Model (Female)')
 % 
 % %%
 % figure()

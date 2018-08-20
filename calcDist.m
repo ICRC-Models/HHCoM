@@ -11,13 +11,13 @@ function[artDist] = calcDist(artDistList , disease , viral , gender , age , ...
     risk)
 s = zeros(prod([disease , viral , gender , age , risk]) , 1); % initialize sum variable
 sumall = @(x) sum(x(:)); % helper function
-for i = 0 : size(artDistList) - 1 % Note: Java uses 0-based indexing
+for i = 0 : artDistList.size() - 1 % Note: Java uses 0-based indexing
     dist = reshape(artDistList.get(i) , size(s));
     if sumall(dist) ~= 0
         s = s + dist ./ sumall(dist(:));
     end
 end
-artDist = s ./ (size(artDistList)); % size(artDistList) <= 20
+artDist = s ./ artDistList.size(); % size(artDistList) <= 20
 % timeSteps = size(artTreat , 6);
 % artDist = sum(artTreat , timeSteps) / timeSteps;
 % artDist = reshape(artTreat , [prod(dim) , 1]);

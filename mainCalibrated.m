@@ -220,7 +220,7 @@ for i = 2 : length(s) - 1
             stepsPerYear , year) , tspan , pop(end , :));
         artTreatTracker(i , : , : , : , :  ,:) = artTreat;
         artDistList.add(artTreat);
-        if size(artDist) >= stepsPerYear * 2
+        if artDistList.size() >= stepsPerYear * 2
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
@@ -263,7 +263,8 @@ popVec = sparse(popVec); % compress population vectors
 savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
 save(fullfile(savdir , 'toNow') , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
-    'deaths' , 'newCC' , 'artTreatTracker' , 'startYear' , 'endYear' , 'popLast');
+    'deaths' , 'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')
 
