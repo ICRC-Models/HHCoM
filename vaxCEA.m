@@ -41,7 +41,7 @@ for n = 1 : nSims
 end
 noV = vaxResult{noVaxInd};
 tVec = noV.tVec;
-
+tVecYr = tVec(1 : stepsPerYear : end);
 %%
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
@@ -326,8 +326,11 @@ for i = 1 : length(inds)
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
             hold on
             if exist(fname , 'file') == 2
-                dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccInc'] , ...
-                    '-append' , 'coffset' , 1)
+                M = csvread(fname);
+                M = padcat([tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                csvwrite(fname , M)
+%                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , ...
+%                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
             else
                 csvwrite(fname , [tVec(1 : stepsPerYear : end)' , ...
                     vaxResult{n}.ccInc'] , 0 , i)
@@ -348,10 +351,13 @@ for i = 1 : length(inds)
             fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
             if exist(fname , 'file') == 2
-                dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccRed'] , ...
-                    0 , 3 * length(inds) + i)
+                M = csvread(fname);
+                M = padcat([tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , M);
+                csvwrite(fname , M)
+%                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , ...
+%                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
             else
-                csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccRed']...
+                csvwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed']...
                     , 0 , length(inds) + i)
             end
             title([plotTits{i} , ' Cervical Cancer Incidence Reduction'])
@@ -424,10 +430,13 @@ for i = 1 : length(inds)
         fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
         if exist(fname , 'file') == 2
-            dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMort'] , ...
-                0 , 3 * length(inds) + i)
+            M = csvread(fname);
+            M = padcat([tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+            csvwrite(fname , M)
+%             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , ...
+%                 '-append' , 'delimiter' , ',' , 'coffset' , 1)
         else
-            csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMort'] , 0 , ...
+            csvwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , 0 , ...
                 2 * length(inds) + i)
         end
     end
@@ -448,10 +457,13 @@ for i = 1 : length(inds)
         fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
         if exist(fname , 'file') == 2
-            dlmwrite([tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMortRed'] , ...
-                0 , 3 * length(inds) + i)
+            M = csvread(fname);
+            M = padcat([tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , M);
+            csvwrite(fname , M)
+%             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
+%                 '-append' , 'delimiter' , ',' ,'coffset' , 1)
         else
-            csvwrite(fname , [tVec(1 : stepsPerYear : end)' ; vaxResult{n}.ccMortRed'] , ...
+            csvwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
                 0 , 3 * length(inds) + i)
         end
     end
