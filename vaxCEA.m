@@ -327,7 +327,7 @@ for i = 1 : length(inds)
             hold on
             if exist(fname , 'file') == 2
                 M = csvread(fname);
-                M = padcat([tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
                 csvwrite(fname , M)
 %                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , ...
 %                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
@@ -352,7 +352,7 @@ for i = 1 : length(inds)
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
             if exist(fname , 'file') == 2
                 M = csvread(fname);
-                M = padcat([tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , M);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , M);
                 csvwrite(fname , M)
 %                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , ...
 %                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
@@ -431,7 +431,7 @@ for i = 1 : length(inds)
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
         if exist(fname , 'file') == 2
             M = csvread(fname);
-            M = padcat([tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+            M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
             csvwrite(fname , M)
 %             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , ...
 %                 '-append' , 'delimiter' , ',' , 'coffset' , 1)
@@ -458,7 +458,7 @@ for i = 1 : length(inds)
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
         if exist(fname , 'file') == 2
             M = csvread(fname);
-            M = padcat([tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , M);
+            M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , M);
             csvwrite(fname , M)
 %             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
 %                 '-append' , 'delimiter' , ',' ,'coffset' , 1)
