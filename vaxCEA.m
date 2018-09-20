@@ -323,17 +323,17 @@ for i = 1 : length(inds)
                 ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
                 'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
             fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
             hold on
             if exist(fname , 'file') == 2
-                M = csvread(fname);
+                M = xlsread(fname);
                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-                csvwrite(fname , M)
+                xlswrite(fname , M , 'CC Incidence')
 %                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , ...
 %                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
             else
-                csvwrite(fname , [tVec(1 : stepsPerYear : end)' , ...
-                    vaxResult{n}.ccInc'] , 0 , i)
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , ...
+                    vaxResult{n}.ccInc'] , 'CC Incidence')
             end
         end
         title([plotTits{i} , ' Cervical Cancer Incidence'])
@@ -349,16 +349,16 @@ for i = 1 : length(inds)
             legend('-DynamicLegend')
             hold on
             fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
             if exist(fname , 'file') == 2
-                M = csvread(fname);
+                M = xlsread(fname);
                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , M);
-                csvwrite(fname , M)
+                xlswrite(fname , M , 'CC Reduction')
 %                 dlmwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , ...
 %                     '-append' , 'delimiter' , ',' , 'coffset' , 1)
             else
-                csvwrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed']...
-                    , 0 , length(inds) + i)
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed']...
+                    , 'CC Reduction')
             end
             title([plotTits{i} , ' Cervical Cancer Incidence Reduction'])
             xlabel('Year'); ylabel('Reduction (%)')
@@ -428,16 +428,15 @@ for i = 1 : length(inds)
             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
         hold on
         fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
         if exist(fname , 'file') == 2
-            M = csvread(fname);
+            M = xlsread(fname);
             M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
-            csvwrite(fname , M)
+            xlswrite(fname , M , 'CC Mortality')
 %             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , ...
 %                 '-append' , 'delimiter' , ',' , 'coffset' , 1)
         else
-            csvwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , 0 , ...
-                2 * length(inds) + i)
+            xlswrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , 'CC Mortality')
         end
     end
     title([plotTits{i} , ' Cervical Cancer Mortality'])
@@ -455,16 +454,16 @@ for i = 1 : length(inds)
         title([plotTits{i} , ' Cervical Cancer Mortality Reduction'])
         xlabel('Year'); ylabel('Reduction (%)')
         fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.csv'];
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
         if exist(fname , 'file') == 2
-            M = csvread(fname);
+            M = xlsread(fname);
             M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , M);
-            csvwrite(fname , M)
+            xlswrite(fname , M , 'CC Mortality Reduction')
 %             dlmwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
 %                 '-append' , 'delimiter' , ',' ,'coffset' , 1)
         else
-            csvwrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
-                0 , 3 * length(inds) + i)
+            xlswrite(fname , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , ...
+                'CC Mortality Reduction')
         end
     end
     hold off
