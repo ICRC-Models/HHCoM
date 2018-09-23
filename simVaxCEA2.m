@@ -128,7 +128,9 @@ toV = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
 import java.util.LinkedList
 % artDistList = LinkedList();
 artDistList = popIn.artDistList;
-
+if ~ exist([pwd , '\HHCoM_Results\Vaccine\'])
+    mkdir \HHCoM_Results\Vaccine\
+end
 %%
 for n = 1 : nTests
     simNum = n;

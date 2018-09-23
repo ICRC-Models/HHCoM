@@ -260,6 +260,10 @@ popLast = popVec(end , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
+if ~ exist([pwd , '\HHCoM_Results\'])
+    mkdir HHCoM_Results
+end
+
 savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
 save(fullfile(savdir , 'toNow') , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
