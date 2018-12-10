@@ -114,20 +114,21 @@ for n = 1 : nTests - 1
         % to 0% over time period specificed by 'wanePeriod'
         % To make waning rate equal in all scenarios, the linear rate of 
         % waning is based on the least effective initial vaccine efficacy scenario.        
-        kWane = min(vaxEff) / (round(wanePeriod / 5));     
+        kWane = min(vaxEff) / round(wanePeriod / 5);     
         vaxInit = vaxEff(vaxEffInd(n));
-        lambdaMultVaxMat(round(effPeriod / 5) + vaxAge : age , n) = ...
+        lambdaMultVaxMat(round(effPeriod / 5) + vaxAge - 1 : age , n) = ...
             max(0 , linspace(vaxInit , ...
-            vaxInit - kWane * (age + 1 - (round(effPeriod / 5) + vaxAge)),...
-            age + 1 - (round(effPeriod / 5) + vaxAge))'); % ensures vaccine efficacy is >= 0
+            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + vaxAge)) ,...
+            age - (round(wanePeriod / 5) + vaxAge) + 2)'); % ensures vaccine efficacy is >= 0
     end
 end
 
-% uncomment the lines below to visualize vaccine efficacy by age group (proxy for waning post-vaccination) 
-% figure(); plot(lambdaMultVaxMat * 100); 
-% title('Vaccine Waning'); xlabel('Age Group'); ylabel('Vaccine Protection (%)')
-
 lambdaMultVaxMat = [lambdaMultVaxMat , zeros(age , 1)]; % append 0 vaccine protection for no vaccine scenario
+
+% uncomment the lines below to visualize vaccine efficacy by age group (proxy for waning post-vaccination) 
+figure(); plot(lambdaMultVaxMat * 100); 
+title('Vaccine Waning'); xlabel('Age Group'); ylabel('Vaccine Protection (%)')
+
 
 disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
