@@ -192,13 +192,13 @@ for n = 1 : length(vaxResult)
         vaxResult{n}.vax2vCost = annlz(vaxResult{n}.vaxd) * cost2v;
         vaxResult{n}.vax2vCostNPV = pvvar(vaxResult{n}.vax2vCost , discountRate); % NPV of vaccination cost
     end
-    if vaxResult{n}.vaxEff == 0.85
+    if vaxResult{n}.vaxEff == 0.90
         full9v.add(n);
         if vaxResult{n}.vaxRate > maxRate9v
             maxRate9vSim = n;
             maxRate9v = vaxResult{n}.vaxRate;
         end
-    elseif vaxResult{n}.vaxEff == 0.65
+    elseif vaxResult{n}.vaxEff == 0.70
         full2v.add(n);
         if vaxResult{n}.vaxRate > maxRate2v
             maxRate2vSim = n;
@@ -207,45 +207,45 @@ for n = 1 : length(vaxResult)
     end
 end
 
-% %% Find price threshold for 9v (CC costs only)
-% % 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
-% ceThreshold = 1540; % USD per LYS
-% ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
-% 
-% % Using Life years
-% % High coverage scenario (9v vs 2v)
-% for i = 1 : length(ceThresholds)
-%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
-%     % ce9v is an anonymous function that finds the vaccine price that
-%     % places the 9v vaccine right at the cost-effectiveness threshold
-%     % specified by ceThresholds(i)
-%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-%         / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
-%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
-%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
-%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-%         num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
-% end
-% 
-% disp(' ')
-% % Using DALYs
-% % High coverage scenario (9v vs 2v)
-% for i = 1 : length(ceThresholds)
-%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
-%     % ce9v is an anonymous function that finds the vaccine price that
-%     % places the 9v vaccine right at the cost-effectiveness threshold
-%     % specified by ceThresholds(i)
-%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-%         / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
-%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
-%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
-%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-%         num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
-% end
+%% Find price threshold for 9v (CC costs only)
+% 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
+ceThreshold = 6161; % USD per LYS
+ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
+
+% Using Life years
+% High coverage scenario (9v vs 2v)
+for i = 1 : length(ceThresholds)
+    priceGuess = 100; % Enter a price guess for 9v to seed the search process
+    % ce9v is an anonymous function that finds the vaccine price that
+    % places the 9v vaccine right at the cost-effectiveness threshold
+    % specified by ceThresholds(i)
+    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+        / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
+    priceThreshold_9v = fminsearch(ce9v , priceGuess);
+    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
+        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+        num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
+end
+
+disp(' ')
+% Using DALYs
+% High coverage scenario (9v vs 2v)
+for i = 1 : length(ceThresholds)
+    priceGuess = 100; % Enter a price guess for 9v to seed the search process
+    % ce9v is an anonymous function that finds the vaccine price that
+    % places the 9v vaccine right at the cost-effectiveness threshold
+    % specified by ceThresholds(i)
+    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+        / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
+    priceThreshold_9v = fminsearch(ce9v , priceGuess);
+    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
+        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+        num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
+end
 
 %% YLS
 
@@ -289,7 +289,27 @@ for i = 1 : length(inds)
             1 : periods , 2 , 4 : age , 1 : risk)); ...
             toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
             1 : periods , 2 , 4 : age , 1 : risk))];
-        % All HIV-negative women
+        % HIV-positive women CD4<200
+        under200Inds = [toInd(allcomb(6 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 4 : age , 1 : risk)); ...
+            toInd(allcomb(6 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 4 : age , 1 : risk))];
+       % HIV-positive women CD4 200-350
+        cd200_350Inds = [toInd(allcomb(5 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 4 : age , 1 : risk)); ...
+            toInd(allcomb(5 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 4 : age , 1 : risk))];
+       % HIV-positive women CD4 350-500
+        cd350_500Inds = [toInd(allcomb(4 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 4 : age , 1 : risk)); ...
+            toInd(allcomb(4 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 4 : age , 1 : risk))];
+        % HIV-positive women CD4 >500 and acute
+        above500Inds = [toInd(allcomb(2:3 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 4 : age , 1 : risk)); ...
+            toInd(allcomb(2 : 3 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 4 : age , 1 : risk))];
+    % All HIV-negative women
         hivNeg = [toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
             2 , 4 : age , 1 : risk)); ...
             toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 9 : 10 , 1 : periods , ...
@@ -300,7 +320,7 @@ for i = 1 : length(inds)
             toInd(allcomb(10 , 6 , 1 : hpvTypes , 9 : 10 , ...
             1 : periods , 2 , 4 : age , 1 : risk))];
         
-        genArray = {allF , allHivF , hivNoARTF , hivNeg , artF};
+        genArray = {allF , allHivF , hivNoARTF ,under200Inds, cd200_350Inds, cd350_500Inds, above500Inds, hivNeg , artF};
         
         noV.ccInc = ...
             annlz(sum(sum(sum(noV.newCC(: , inds{i} , : , 4 : age),2),3),4)) ./ ...

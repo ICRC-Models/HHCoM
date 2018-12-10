@@ -47,7 +47,7 @@ kOn(6) = 0;
 
 % CD4 > 200 from 2013 to 2020
 if year >= 2013
-    yrs = 2013 : 1 / stepsPerYear : 2065; % assuming 90-90-90 target reached by 2020
+    yrs = 2013 : 1 / stepsPerYear : 2035; % assuming 90-90-90 target reached by 2020 **change 2065 to 2040
     ind = round(yrs , 4) == round(year , 4);
     
     for g = 1 : gender
@@ -58,8 +58,8 @@ if year >= 2013
                 maxRateM = maxRateM2;
                 maxRateF = maxRateF2;
             end
-            maxCover = {linspace(maxRateM , 0.9 , length(yrs)) ,...
-                linspace(maxRateF , 0.9 , length(yrs))};
+            maxCover = {linspace(maxRateM , 0.75 , length(yrs)) ,...
+                linspace(maxRateF , 0.75 , length(yrs))};
             for r = 1 : risk
                 hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
                 onArt = sum(pop(hivPositiveArt));
@@ -71,10 +71,10 @@ if year >= 2013
                     end
                 end
                 fracART = onArt * (1 - artOut) / (onArt + totHivPos);
-                if year < 2065 && fracART < maxCover{g}(ind)
+                if year < 2035 && fracART < maxCover{g}(ind)%%change 2065 to 2040
                     cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2065 && fracART < maxCover{g}(end)
+                elseif year >= 2035 && fracART < maxCover{g}(end)%%change 2065 to 2040
                     cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
                     treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
@@ -154,14 +154,14 @@ if year >= 2004
                 end
             end
             if year >= 2017
-                yrs = 2017 : 1 / stepsPerYear : 2060; % assuming 90-90-90 target reached by 2020
+                yrs = 2017 : 1 / stepsPerYear : 2035; % assuming 90-90-90 target reached by 2020 * change 2060 to 2040
                 ind = round(yrs , 4) == round(year , 4);
-                maxCover = {linspace(maxRateM , 0.9 , length(yrs)) , ...
-                    linspace(maxRateF , 0.9 , length(yrs))};
-                if year < 2060 && fracART < maxCover{g}(ind)
+                maxCover = {linspace(maxRateM , 0.75 , length(yrs)) , ...
+                    linspace(maxRateF , 0.75 , length(yrs))};
+                if year < 2035 && fracART < maxCover{g}(ind)% change 2060 to 2040
                     cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
                     treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2060 && fracART < 0.9
+                elseif year >= 2035 && fracART < 0.75 % change 2060 to 2040
                     cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
                     treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
                 end
