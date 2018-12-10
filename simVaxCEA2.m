@@ -66,7 +66,7 @@ load([paramDir , 'calibratedParams'])
 vaxCover = [0.6];
 vaxEff = [0.7 0.9];
 vaxAge = 3;
-waning = 1;
+waning = 1; % turn waning on or off
 
 maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
 maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
