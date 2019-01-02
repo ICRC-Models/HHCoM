@@ -31,12 +31,11 @@ rImmune = 0.024; % for HPV16, Johnson
 dPop = zeros(size(pop));
 for d = 1 : disease
     c3c2Mult = c3c2Mults(1); % multiplier used for CIN2 -> CIN3 in HIV infecteds
-    c2c1Mult = c2c1Mults(1); % multiplier
-    %multiplier used for CIN1 -> CIN2 in HIV infecteds
+    c2c1Mult = c2c1Mults(1); % multiplier used for CIN1 -> CIN2 in HIV infecteds
     c1c2Mult = 1; % CIN2 -> CIN1 regression multiplier
     c2c3Mult = 1; % CIN3 -> CIN2 regression multiplier
     rHivHpvMult = 1; % for HIV negative
-    deathCC = muCC(6 , :); % HIV negative
+    deathCC = muCC(6 , :); % HIV negative undetected CC mortality
     deathCC_det = muCC_det(6 , :); % HIV negative detected CC mortality
     rHiv = 1; % Multiplier for immunity clearance for HIV+
     rHivHpv_Clear = 1;
