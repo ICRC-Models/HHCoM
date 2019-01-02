@@ -140,7 +140,7 @@ import java.util.LinkedList
 % artDistList = LinkedList();
 artDistList = popIn.artDistList;
 if ~ exist([pwd , '\HHCoM_Results\Vaccine\'])
-    mkdir \HHCoM_Results\Vaccine\
+    mkdir ([pwd, '\HHCoM_Results\Vaccine\'])
 end
 %%
 for n = 1 : nTests

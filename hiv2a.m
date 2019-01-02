@@ -34,7 +34,7 @@ treat(2 , : , : , 4 : end , :) = 0; % ART coverage
 treat(3 , : , : , 4 : end , :) = 0; % ART coverage
 treat(4 , : , : , 4 : end , :) = 0; % ART coverage
 treat(5 , : , : , 4 : end , :) = 0; % ART coverage
-treat(6 , : , : , 4 : end, :) = 0; % ART coverage
+treat(6 , : , : , 4 : end , :) = 0; % ART coverage
 kOn = ones(6 , 1);
 kOn(6) = 0;
 

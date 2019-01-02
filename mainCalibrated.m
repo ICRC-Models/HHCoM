@@ -34,7 +34,7 @@ load([paramDir , 'popData'])
 load([paramDir , 'General'])
 %% use calibrated parameters
 load([paramDir , 'calibratedParams'])
-maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim};
+maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim}; % Maximum ART coverage
 maxRateF_vec = [0.5 , 0.5];% maxRateF_arr{sim};
 
 maxRateM1 = maxRateM_vec(1);
@@ -43,9 +43,9 @@ maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
 
 %% Initial Population 
-mInit = popInit(: , 1);
+mInit = popInit(: , 1); % initial male population size by age
 
-fInit = popInit(: , 2);
+fInit = popInit(: , 2); % initial female population size by age
 % use male risk distribution for both genders
 riskDistF = riskDistM;
 % partnersF = partnersM;
@@ -54,7 +54,7 @@ riskDistF = riskDistM;
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
 
-mPop = zeros(age , risk);
+mPop = zeros(age , risk); % distribute initial population size by gender, age risk
 fPop = mPop;
 
 for i = 1 : age
@@ -64,12 +64,12 @@ end
 
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 initPop = zeros(dim);
-initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop;
-initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop;
+initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, male
+initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
 initPop_0 = initPop;
 if hivOn
     initPop(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3) = 0.005 / 2 .* ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3); % initial HIV infected male (% prevalence)
+        initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3); % initial HIV infected male (age groups 4-6, med-high risk) (% prevalence)
     initPop(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3) .* (1 - 0.005 / 2); % moved to HIV infected
     initPop(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 2 : 3) = 0.005 / 2 .*...
@@ -79,7 +79,7 @@ if hivOn
 
         if hpvOn
             initPopHiv_0 = initPop;
-            % HPV infected HIV+
+            % HIV+ not infected by HPV
             % females
             initPop(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.3 .* ...
                 initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 1 : 3);
@@ -89,10 +89,11 @@ if hivOn
                 initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
 
             for h = 2
+                % HIV+ infected by HPV
                 % females
                 initPop(3 , 2 , h , 1 , 1 , 2 , 4 : 6 , 1 : 3) = 0.7 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 4 : 6 , 1 : 3);
-               % males
+                % males
                 initPop(3 , 2 , h , 1 , 1 , 1 , 4 : 6 , 1 : 3) = 0.7 .* ...
                     initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 1 : 3);
             end
@@ -101,12 +102,12 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HIV infections.')
 
 if hpvOn
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * 0.20; % 20% intial HPV prevalence among age groups 4 - 9 (sexually active)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * 0.20; % 20% intial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected;
+        initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV-
 
     % Omni-HPV type (transition rates weighted by estimated prevalence in population)
-    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = infected;
+    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = infected; % moved to HPV+
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
