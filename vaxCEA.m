@@ -18,7 +18,7 @@ vaxResult = cell(nSims , 1);
 
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine\vaxSimResult' ,...
+    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine\vaxWaneSimResult' ,...
         num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to 2018 to population
     % matrices for years past 2018

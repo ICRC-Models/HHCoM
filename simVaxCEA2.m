@@ -12,7 +12,7 @@ close all;clear all;clc
 % addOptional(p , 't_wane' , 0);
 % parse(p , endYear, vaxCover , vaxEff, vaxAge , varargin{:})
 % close all; clear all; clc
-lastYear = 2097; %endYear;
+lastYear = 2022; %2097; %endYear;
 % if nargin
 %     origEffVec = varargin{1};
 %     t_wane = varargin{2};

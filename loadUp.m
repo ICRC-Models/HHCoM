@@ -256,11 +256,11 @@ clear
 disp('Retrieving weights and costs...')
 file = [pwd , '\Config\Weights_costs.xlsx'];
 savdir = [pwd , '\Params']; 
-hivTreatCost = xlsread(file , 'Costs' , 'B4 : B7'); % [inc CD4 count]; average HIV hositalization costs (not currently used)
-artTreatCost = xlsread(file , 'Costs' , 'B8'); % HIV hospitalization costs on ART  (not currently used)
+hivTreatCost = xlsread(file , 'Costs' , 'B4 : B7'); % [inc CD4 count]; average HIV hositalization costs (not currently used, hard-coded in vaxCEA analysis)
+artTreatCost = xlsread(file , 'Costs' , 'B8'); % HIV hospitalization costs on ART  (not currently used, hard-coded in vaxCEA analysis)
 kCCDet = xlsread(file , 'Costs' , 'B17:B19'); %(local, regional, distant); probability of symptom detection
-vaxPrice = xlsread(file , 'Costs' , 'B267'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used)
-ccCost = xlsread(file , 'Costs' , 'B34:B36'); % (local, regional, distant); CC costs
+vaxPrice = xlsread(file , 'Costs' , 'B267'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used, hard-coded into vaxCEA analysis)
+ccCost = xlsread(file , 'Costs' , 'B34:B36'); % (local, regional, distant); CC costs (later re-defined in vaxCEA analysis)
 hivTreatCost = flipud(hivTreatCost); % (not currently used)
 save(fullfile(savdir , 'cost_weights'))
 disp('Done')
