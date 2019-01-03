@@ -188,13 +188,9 @@ Run model:
      vaxCEA.m 
 
 Calibrate model:
+1) 
+prepCalibParams.m
 
-?) prepCalibParams.m
-   - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
-   - loads parameters from the \Params directory previously imported from Excel files  
-   - loads calibrated paramters from .dat file
-   - saves parameters in the \Params directory as .mat file
-     \Params\calibratedParams
 
 ???simVaxResultOut_ageStand - displays age standardized results from simVax.m. Also exports them as .csv files.
 

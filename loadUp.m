@@ -2,46 +2,61 @@
 % argument
 function[] = loadUp(stepsPerYear)
 load('settings')
+
 %% import and save population parameters
-file = [pwd , '\Config\PopData.xlsx'];
+file = [pwd , '\Config\Population_data.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
-popInit = xlsread(file , 'Demographics' , 'B2:C17'); % [age x gender]; initial population
-riskDistM = xlsread(file , 'Demographics' , 'G3:I18'); % [age x risk]; male risk distribution
-riskDistF = xlsread(file , 'Demographics' , 'J3:L18'); % [age x risk]; female risk distribution
-mue = xlsread(file , 'Demographics' , 'P4:Q19'); % [age x gender]; background mortality
-fertility = xlsread(file , 'Demographics' , 'R4:W19'); % [age x disease]; fertility
-fertility2 = xlsread(file , 'Demographics' , 'R29:W44'); % [age x disease]; fertility/2
-partnersM = xlsread(file , 'Demographics' , 'Z3:AB18'); % [age x risk]; male partnerships per year
-partnersF = xlsread(file , 'Demographics' , 'AC3:AE18'); % [age x risk]; female partnerships per year
-actsPer = xlsread(file , 'Demographics' , 'AI2:AK3'); % [gender x risk]; acts per partnership
-epsA = xlsread(file , 'Demographics' , 'AO2:AO4'); % [year] <1998 , 2003 , >2010; force of infection mixing by age
-epsR = xlsread(file , 'Demographics' , 'AP2:AP4'); % [year] <1998 , 2003 , >2010; force of infection mixing by sexual risk
-yr = xlsread(file , 'Demographics' , 'AN2:AN4'); % years
+popInit = xlsread(file , 'Demographics' , 'B3:C18'); % [age x gender]; initial population size
+riskDistM = xlsread(file , 'Demographics' , 'B54:D69'); % [age x risk]; male risk distribution
+riskDistF = xlsread(file , 'Demographics' , 'E54:G69'); % [age x risk]; female risk distribution
+mue = xlsread(file , 'Demographics' , 'B84:C99'); % [age x gender]; background mortality
+fertility = xlsread(file , 'Demographics' , 'B112:G127'); % [age x disease]; fertility rate per year before 1995
+fertility2 = xlsread(file , 'Demographics' , 'B133:G148'); % [age x disease]; fertility rate/2 for 2005 onwards
+partnersM = xlsread(file , 'Demographics' , 'B160:D175'); % [age x risk]; male partnerships per year
+partnersF = xlsread(file , 'Demographics' , 'E160:G175'); % [age x risk]; female partnerships per year
+%actsPer = xlsread(file , 'Demographics' , 'B240:D241'); % [gender x risk]; acts per partnership (not currently used)
+epsA = xlsread(file , 'Demographics' , 'B185:B187'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
+epsR = xlsread(file , 'Demographics' , 'C185:C187'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
+yr = xlsread(file , 'Demographics' , 'A185:A187'); % years
 savdir = [pwd , '\Params']; 
 save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
     'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
 
 %% import and save HIV parameters
-file = [pwd , '\Config\HIVParameters.xlsx'];
+file = [pwd , '\Config\HIV_parameters.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 
 % protection data
-circ = xlsread(file , 'Protection' , 'Q18 : R18'); % Circumcision rate [1 x year] <2009, 2012>
-circProtect = xlsread(file , 'Protection' , 'R3'); % Protection conferred by circumcision
-condProtect = xlsread(file , 'Protection' , 'R4'); % Protection conferred by condom use
-condUse = xlsread(file , 'Protection' , 'R10'); % Average proportion of population using condoms
+circ = xlsread(file , 'Protection' , 'B4 : C4'); % Circumcision rate [1 x year] <2009, 2012>
+circProtect = xlsread(file , 'Protection' , 'B18'); % Protection conferred by circumcision
+condProtect = xlsread(file , 'Protection' , 'B19'); % Protection conferred by condom use
+%condUse = xlsread(file , 'Protection' , 'B25'); % Average proportion of population using condoms (not currently used, reset in mixInfect.m)
 % disease data
-MTCTRate = xlsread(file , 'Disease Data' , 'Q2:Q4'); % <2004, 2005 , >2008; mother to child transmission rate
-muHIV = xlsread(file , 'Disease Data' , 'BA3 : BF18'); %[Age x cd4], [12 x 6]; HIV mortality
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8'); % <2004, 2005 , >2008; mother to child transmission rate
 mtctVec = linspace(MTCTRate(1) , MTCTRate(end) , size(MTCTRate , 1) * 4);
-kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'AP30:AS34'); % [gender x vl x cd4]; male cd4 progression by vl
-kCD4(2 , : , :) = xlsread(file , 'Disease Data' , 'AV30:AY34'); % [gender x vl x cd4]; female cd4 progression by vl
+muHIV = xlsread(file , 'Disease Data' , 'B20 : G35'); %[Age x cd4], [12 x 6]; HIV mortality
+kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'B44:E48'); % [gender x vl x cd4]; male cd4 progression by vl
+kCD4(2 , : , :) = xlsread(file , 'Disease Data' , 'B52:E56'); % [gender x vl x cd4]; female cd4 progression by vl
 % viral load progression by CD4 count
-kVl(1 , : , :) = xlsread(file , 'Disease Data' , 'AP39 : AS43'); % [gender x cd4 x vl]; male vl progression by cd4
-kVl(2 , : , :) = xlsread(file , 'Disease Data' , 'AV39 : AY43'); % [gender x cd4 x vl]; female vl progression by cd4
+kVl(1 , : , :) = xlsread(file , 'Disease Data' , 'B65 : E69'); % [gender x cd4 x vl]; male vl progression by cd4
+kVl(2 , : , :) = xlsread(file , 'Disease Data' , 'B73 : E77'); % [gender x cd4 x vl]; female vl progression by cd4
+
+%% Actual data
+% disp('Retrieving actual data')
+% overallHivPrev_SA = xlsread('HIVParameters.xlsx' , 'Actual' , 'A22 : B32');
+% overallHivPrev_KZN = xlsread('HIVParameters.xlsx' , 'Actual' , 'A33 : B43');
+% overallHivPrev_KZN_2 = xlsread('HIVParameters.xlsx' , 'Actual' , 'E33 : H36');
+% overallHivPrev_KZN_3 = xlsread('HIVParameters.xlsx' , 'Actual' , 'E22 : H27');
+% overallHivPrev_KZN_3 = [overallHivPrev_KZN_3 ; xlsread('HIVParameters.xlsx' , 'Actual' , 'E33 : H36')];
+% HivPrevWomen = xlsread('HIVParameters.xlsx' , 'Actual' , 'J5 : Q11'); %  age group (15 - 19 to 45 - 49) x year (2004-2011)
+% HivPrevMen = xlsread('HIVParameters.xlsx' , 'Actual' , 'U5 : AB11');
+% prevYears = xlsread('HIVParameters.xlsx' , 'Actual' , 'U4 : AB4');
+% save('actual')
+% disp('Actual data loaded')
+% disp(' ')
 
 %%
 % Treatment intiation rates
@@ -65,8 +80,8 @@ toPrep = 0; % initially
 % end
 
 % Treatment dropout rates
-prepOut = xlsread(file , 'Disease Data' , 'B3');
-artOut = xlsread(file , 'Disease Data' , 'C3');
+prepOut = xlsread(file , 'Disease Data' , 'B85');
+artOut = xlsread(file , 'Disease Data' , 'C85');
 
 save(fullfile(savdir , 'HIVParams')) % save HIV parameters to a workspace file
 
@@ -117,9 +132,9 @@ save(fullfile(savdir , 'mixInfectParams')  , 'epsA_vec' , ...
 
 analProp = [0 , 0;
     0.5111 , 0.4266;
-    0.5111 , 0.4266]; % risk x gender
+    0.5111 , 0.4266]; % [risk x gender]; proportion practicing anal sex
 analProp = analProp .* 0; % no anal transmission for now
-analTrans = [138 ; 11] ./ 10 ^ 4; % gender x 1
+analTrans = [138 ; 11] ./ 10 ^ 4; % [gender x 1]; anal transmission probability
 vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 transM = vagTransM .* (1 - analProp(: , 1)) + analTrans(1) * analProp(: , 1);
@@ -131,10 +146,9 @@ betaHIV_M2F = bsxfun(@ times , [7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04] , transM);
 
-file = [pwd , '\Config\PopData.xlsx'];
-
-maleActs = xlsread(file , 'Demographics' , 'AJ10 : AL25'); % [age x risk]; male acts
-femaleActs = xlsread(file , 'Demographics' , 'AJ32 : AL47'); % [age x risk]; female acts
+file = [pwd , '\Config\Population_data.xlsx'];
+maleActs = xlsread(file , 'Demographics' , 'D199 : F215'); % [age x risk]; male acts
+femaleActs = xlsread(file , 'Demographics' , 'D220 : F236'); % [age x risk]; female acts
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -143,6 +157,7 @@ for a = 1 : age % calculate per-partnership probability of HIV transmission
 end
 save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F' , 'betaHIV_F2M' , 'betaHIV_M2F' , ...
     'maleActs', 'femaleActs')
+
 %% Load indices
 % prompt = {'Calculate Indices? (1 = yes, 0 = no)'};
 % tit = 'Calculate Indices?';
@@ -155,84 +170,78 @@ save(fullfile(savdir , 'vlBeta') , 'betaHIVF2M' , 'betaHIVM2F' , 'betaHIV_F2M' ,
 % else
 %     disp('Skipped index calculation')
 % end
-%% Import HPV data
+
+%% import and save HPV parameters
 disp(' ')
 disp('Importing HPV data...')
-file = [pwd , '\Config\HPVData.xlsx'];
+file = [pwd , '\Config\HPV_parameters.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
+
 % demographic data
-beta_hrHPV_val = xlsread(file , 'HPV' , 'B13'); % per-parnership probability of HPV transmission (common vaccine types 16/18/31/33)
-beta_lrHPV_val = xlsread(file , 'HPV' , 'B14'); % oncogenic non-vaccine type
+%beta_hrHPV_val = xlsread(file , 'HPV' , 'B4'); % per-parnership probability of HPV transmission (common vaccine types 16/18/31/33) (not currently used, calibrated)
+%beta_lrHPV_val = xlsread(file , 'HPV' , 'B5'); % oncogenic non-vaccine type (not currently used, calibrated)
+%rHivHpv = xlsread(file , 'HPV' , 'B20 : D23'); % HIV multipliers (<= 1) for HPV regression rate (not currently used, calibrated)
+%hivCin2 = xlsread(file , 'HPV' , 'B34 : B36'); % HIV multipliers for precancer progression (not currently used, calibrated)
+%hivCin3 = hivCin2; % (not currently used, calibrated)
 
-%pCinSize =  xlsread(file , 'HPV' , 'I3 : I11'); % [group size x 1]
+muCC = xlsread(file , 'Cervical Cancer' , 'B6 : D11'); % undetected CC mortality
+muCC_det = xlsread(file , 'Cervical Cancer' , 'B20 : D25'); % detected CC mortality
+kRL = xlsread(file , 'Cervical Cancer' , 'B33'); % local -> regional  progression
+kDR = xlsread(file , 'Cervical Cancer' , 'B34'); % regional -> distant progression
+%detCC = xlsread(file , 'Cervical Cancer' , 'B42 : B44'); % [region x 1] detection probability (not currently used)
+%kCC = xlsread(file , 'Cervical Cancer' , 'B54 : B62'); % [period] group size (not currently used)
+%hivCC = xlsread(file , 'Cervical Cancer' , 'B74 : B77'); % HIV multipliers (HR) for cervical cancer mortality rate (not currently used)
+%hivCC(end) = 1;
 
-rHivHpv = xlsread(file , 'HPV' , 'R12 : T15'); % HIV multipliers (<= 1) for HPV regression rate
-hivCin2 = xlsread(file , 'HPV' , 'R21 : R23'); % HIV multipliers for precancer progression
-hivCin3 = hivCin2;
-
-
-muCC = xlsread(file , 'Cervical Cancer' , 'B24 : D29'); % undetected CC mortality
-muCC_det = xlsread(file , 'Cervical Cancer' , 'F24 : H29'); % detected CC mortality
-kRL = xlsread(file , 'Cervical Cancer' , 'H2'); % local -> regional  progression
-kDR = xlsread(file , 'Cervical Cancer' , 'H3'); % regional -> distant progression
-detCC = xlsread(file , 'Cervical Cancer' , 'K2 : K4'); % [region x 1] detection probability
-kCC = xlsread(file , 'Cervical Cancer' , 'B3 : B11'); % [period] group size
-hivCC = xlsread(file , 'Cervical Cancer' , 'O3 : O6'); % HIV multipliers (HR) for cervical cancer mortality rate
-hivCC(end) = 1;
-
-kPap = xlsread(file , 'Screening and Treatment' , 'N3'); % pap smear rate
-hpvSens = xlsread(file , 'Screening and Treatment' , 'T4 : U4'); % [1 x Cin] 2 , 3; HPV primary screening sensitivity
-cytoSens = xlsread(file , 'Screening and Treatment' , 'T5 : U5'); % [1 x Cin] 2 , 3; Cytology ASC-US or worse primary screening sensitivity
-leep = 1- xlsread(file , 'Screening and Treatment' , 'Z2'); % rate of recurrence/persistence with LEEP
-screenFreq = xlsread(file , 'Screening and Treatment' , 'Z7 : AA8'); % [Test x HIV status] (2 x 2); screening frequency
-screenCover = xlsread(file , 'Screening and Treatment' , 'Z16'); % screening coverage
-ageStart = xlsread(file , 'Screening and Treatment' , 'Z12'); % screening age start
-ageEnd = xlsread(file , 'Screening and Treatment' , 'Z13'); % screening age end
-
+% Currently no screening in model
+%kPap = xlsread(file , 'Screening and Treatment' , 'B4'); % pap smear rate (not currently used)
+%hpvSens = xlsread(file , 'Screening and Treatment' , 'B17 : C17'); % [1 x Cin] 2 , 3; HPV primary screening sensitivity (not currently used)
+%cytoSens = xlsread(file , 'Screening and Treatment' , 'B18 : C18'); % [1 x Cin] 2 , 3; Cytology ASC-US or worse primary screening sensitivity (not currently used)
+%leep = 1- xlsread(file , 'Screening and Treatment' , 'A29'); % rate of recurrence/persistence with LEEP (not currently used)
+%screenFreq = xlsread(file , 'Screening and Treatment' , 'B39 : C40'); % [Test x HIV status] (2 x 2); screening frequency (not currently used)
+%screenCover = xlsread(file , 'Screening and Treatment' , 'B48'); % screening coverage (not currently used)
+%ageStart = xlsread(file , 'Screening and Treatment' , 'B56'); % screening age start (not currently used)
+%ageEnd = xlsread(file , 'Screening and Treatment' , 'B57'); % screening age end (not currently used)
 
 % CIN transition data
 %HPV 16/18/Vaccine type ohr
-kCin1_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'B47 : B62'); % HPV to CIN1
-kCin2_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'C47 : C62'); % CIN1 to CIN2
-kCin3_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'D47 : D62'); %CIN2 to CIN3
-kCC_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'E47 : E62'); % CIN3 to undLocaliseed
+kCin1_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'B5 : B20'); % HPV to CIN1
+kCin2_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'C5 : C20'); % CIN1 to CIN2
+kCin3_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'D5 : D20'); %CIN2 to CIN3
+kCC_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'E5 : E20'); % CIN3 to undLocaliseed
 
-rNormal_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'F47 : F62'); % HPV to Well (natural immunity)
-kInf_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'G47 : G62'); % CIN1 to HPV
-kCin1_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'H47 : H62'); % CIN2 to CIN1
-kCin2_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'I47 : I62'); % CIN3 to CIN2
+rNormal_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'F5 : F20'); % HPV to Well (natural immunity)
+kInf_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'G5 : G20'); % CIN1 to HPV
+kCin1_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'H5 : H20'); % CIN2 to CIN1
+kCin2_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'I5 : I20'); % CIN3 to CIN2
 
 % 9v type ohr
-kCin1_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'M47 : M62');
-kCin2_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'N47 : N62');
-kCin3_Cin2(: , 2) = xlsread(file , 'CIN Transition' , 'O47 : O62');
-kCC_Cin3(: , 2) = xlsread(file , 'CIN Transition' , 'P47 : P62');
+kCin1_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'B25 : B40');
+kCin2_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'C25 : C40');
+kCin3_Cin2(: , 2) = xlsread(file , 'CIN Transition' , 'D25 : D40');
+kCC_Cin3(: , 2) = xlsread(file , 'CIN Transition' , 'E25 : E40');
 
-rNormal_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'Q47 : Q62');
-kInf_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'R47 : R62');
-kCin1_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'S47 : S62');
-kCin2_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'T47 : T62');
+rNormal_Inf(: , 2) = xlsread(file , 'CIN Transition' , 'F25 : F40');
+kInf_Cin1(: , 2) = xlsread(file , 'CIN Transition' , 'G25 : G40');
+kCin1_Cin2(: , 2) = xlsread(file , 'CIN Transition', 'H25 : H40');
+kCin2_Cin3(: , 2) = xlsread(file , 'CIN Transition', 'I25 : I40');
 
 %Non-vaccine type ohr
-kCin1_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'W47 : W62');
-kCin2_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'X47 : X62');
-kCin3_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'Y47 : Y62');
-kCC_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'Z47 : Z62');
+kCin1_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'B45 : B60');
+kCin2_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'C45 : C60');
+kCin3_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'D45 : D60');
+kCC_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'E45 : E60');
 
-rNormal_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'AA47 : AA62');
-kInf_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'AB47 : AB62');
-kCin1_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'AC47 : AC62');
-kCin2_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'AD47 : AD62');
+rNormal_Inf(: , 3) = xlsread(file , 'CIN Transition' , 'F45 : F60');
+kInf_Cin1(: , 3) = xlsread(file , 'CIN Transition' , 'G45 : G60');
+kCin1_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'H45 : H60');
+kCin2_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'I45 : I60');
 
-
-
-
-
-hpv_hivMult = flipud(xlsread(file , 'HPV' , 'B21 : D24')); % [inc CD4 count x vaccine type]; HPV incidence multiplier by type and CD4 count
-hpv_hivClear = xlsread(file , 'CIN Transition' , 'D68 : D71'); % [dec CD4 count]; HPV clearance multipliers
-c3c2Mults = xlsread(file , 'CIN Transition' , 'B75 : B78'); % [dec CD4 count]; CIN2 to CIN3 multipliers
-c2c1Mults = xlsread(file , 'CIN Transition' , 'B81 : B84'); % [dec CD4 count]; CIN1 to CIN2 multipliers
+hpv_hivMult = flipud(xlsread(file , 'HPV' , 'B46 : D49')); % [inc CD4 count x vaccine type]; HPV incidence multiplier by type and CD4 count
+hpv_hivClear = xlsread(file , 'CIN Transition' , 'B73 : B76'); % [dec CD4 count]; HPV clearance multipliers
+c3c2Mults = xlsread(file , 'CIN Transition' , 'B85 : B88'); % [dec CD4 count]; CIN2 to CIN3 multipliers
+c2c1Mults = xlsread(file , 'CIN Transition' , 'B97 : B100'); % [dec CD4 count]; CIN1 to CIN2 multipliers
 save(fullfile(savdir , 'hpvData') , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' , ...
     'rHivHpv' , 'hivCin2' , 'hivCin3' , 'muCC' , 'muCC_det' , 'kRL' , 'kDR' , 'detCC' , 'hivCC' , ...
     'kPap' , 'hpvSens' , 'cytoSens' , 'leep' , 'screenFreq' , 'ageStart' , 'ageEnd',...
@@ -241,36 +250,25 @@ save(fullfile(savdir , 'hpvData') , 'beta_hrHPV_val' , 'beta_lrHPV_val' , 'kCC' 
     'c3c2Mults' , 'c2c1Mults' , 'hpv_hivMult' , 'screenCover')
 disp('HPV data loaded.')
 disp(' ')
-%% Actual data
-% disp('Retrieving actual data')
-% overallHivPrev_SA = xlsread('HIVParameters.xlsx' , 'Actual' , 'A22 : B32');
-% overallHivPrev_KZN = xlsread('HIVParameters.xlsx' , 'Actual' , 'A33 : B43');
-% overallHivPrev_KZN_2 = xlsread('HIVParameters.xlsx' , 'Actual' , 'E33 : H36');
-% overallHivPrev_KZN_3 = xlsread('HIVParameters.xlsx' , 'Actual' , 'E22 : H27');
-% overallHivPrev_KZN_3 = [overallHivPrev_KZN_3 ; xlsread('HIVParameters.xlsx' , 'Actual' , 'E33 : H36')];
-% HivPrevWomen = xlsread('HIVParameters.xlsx' , 'Actual' , 'J5 : Q11'); %  age group (15 - 19 to 45 - 49) x year (2004-2011)
-% HivPrevMen = xlsread('HIVParameters.xlsx' , 'Actual' , 'U5 : AB11');
-% prevYears = xlsread('HIVParameters.xlsx' , 'Actual' , 'U4 : AB4');
-% save('actual')
-% disp('Actual data loaded')
-% disp(' ')
-%% Weights and costs
+
+%% import and save weights and costs
 clear
 disp('Retrieving weights and costs...')
-file = [pwd , '\Config\WeightsCosts.xlsx'];
+file = [pwd , '\Config\Weights_costs.xlsx'];
 savdir = [pwd , '\Params']; 
-hivTreatCost = xlsread(file , 'Costs' , 'B3 : B6'); % [inc CD4 count]; average HIV hositalization costs
-artTreatCost = xlsread(file , 'Costs' , 'B7'); % HIV hospitalization costs on ART
-kCCDet = xlsread(file , 'Costs' , 'B23:B25'); %(local, regional, distant); probability of symptom detection
-vaxPrice = xlsread(file , 'Costs' , 'B17'); % bivalent HPV vaccine costs per vaccinated girl
-ccCost = xlsread(file , 'Costs' , 'B12:B14'); % (local, regional, distant); CC costs
-hivTreatCost = flipud(hivTreatCost);
+%hivTreatCost = xlsread(file , 'Costs' , 'B4 : B7'); % [inc CD4 count]; average HIV hositalization costs (not currently used)
+%artTreatCost = xlsread(file , 'Costs' , 'B8'); % HIV hospitalization costs on ART  (not currently used)
+kCCDet = xlsread(file , 'Costs' , 'B17:B19'); %(local, regional, distant); probability of symptom detection
+%vaxPrice = xlsread(file , 'Costs' , 'B267'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used)
+ccCost = xlsread(file , 'Costs' , 'B34:B36'); % (local, regional, distant); CC costs
+%hivTreatCost = flipud(hivTreatCost); % (not currently used)
 save(fullfile(savdir , 'cost_weights'))
 disp('Done')
-%% Retrieve calibration data
+
+%% import and save calibration data
 % dimensions = [pos , N]
 clear
-file = [pwd , '\Config\CalibrationTargets.xlsx'];
+file = [pwd , '\Config\Calibration_targets.xlsx'];
 savdir = [pwd , '\Params']; 
 cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2014, by age
 cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2014, by age
@@ -280,7 +278,8 @@ hpv_hivNeg_2008_obs = xlsread(file , 'Calibration' , 'D42 : F51'); % HPV Prevale
 hpv_hiv_obs = xlsread(file , 'Calibration' , 'D144 : F152'); % HPV Prevalence in HIV+ Women (All) 2014, by age
 hpv_hivNeg_obs = xlsread(file , 'Calibration' , 'D153 : F161'); % HPV Prevalence in HIV- Women (All) 2014, by age
 
-hivPrevM_obs = xlsread(file , 'Calibration' , 'D60 : F101'); % HIV Prevalence in Men 2003, by age
-hivPrevF_obs = xlsread(file , 'Calibration' , 'D102 : F143'); % HIV Prevalence in Women 2003, by age
+hivPrevM_obs = xlsread(file , 'Calibration' , 'D60 : F101'); % HIV Prevalence in Men 2003,2005,2006,2007,2008,2009, by age
+hivPrevF_obs = xlsread(file , 'Calibration' , 'D102 : F143'); % HIV Prevalence in Women 2003,2005,2006,2007,2008,2009, by age
 save(fullfile(savdir , 'calibData'))
 clear
+
