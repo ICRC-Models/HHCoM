@@ -26,7 +26,7 @@ ccTreated = zeros(disease , hpvTypes , age , 3); % 3 for cancer stages - local, 
 % constants
 % see model notes for index values
 % leep (effective treatment rate by leep)
-rImmune = 0.024; % for HPV16, Johnson
+rImmune = 0.024; % for HPV16, Johnson (2012)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dPop = zeros(size(pop));
 for d = 1 : disease
@@ -75,14 +75,15 @@ for d = 1 : disease
                 normalF = normalInds(d , 2 , a , p , :);
                 % to immune from HPV infected, CIN1, CIN2, CIN3 (remove immunity for now)
                 
-                dPop(normalF) = dPop(normalF) + rImmune * rHiv * pop(immuneF); % immuneF -> normalF
+                dPop(normalF) = dPop(normalF) + fImm(a) * rImmune * rHiv * pop(immuneF)... % if fImm(a)=1, immuneF -> normalF 
+                    + (1 - fImm(a)) * rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF); % if fImm(a)=0, infF -> normalF
                 
                 dPop(normalM) = dPop(normalM) + rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infM);  % infM -> normalM
                 
                 dPop(immuneF) = dPop(immuneF)...
-                    + rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF)... % infF -> immuneF
-                    - rImmune * rHiv * pop(immuneF); % immuneF -> normalF
-                
+                    + fImm(a) * rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF)... % if fImm(a)=1, infF -> immuneF
+                    - fImm(a) * rImmune * rHiv * pop(immuneF); % if fImm(a)=1, immuneF -> normalF
+                                
                 %                 dPop(immuneM) = dPop(immuneM) + rNormal_Inf(a) ...
                 %                     * fImm(a) * rHivHpvMult * pop(infM)...; % infected -> immune
                 %                     - rImmune * pop(immuneM); % immune -> normal
@@ -91,8 +92,7 @@ for d = 1 : disease
                 dPop(infF) = dPop(infF) ...
                     + kInf_Cin1(a , h - 1) * pop(cin1)... % CIN1 -> infF
                     - (kCin1_Inf(a , h - 1) + ... % infF -> CIN1
-                    rNormal_Inf(a , h - 1) ...
-                    * rHivHpv_Clear) .* pop(infF); % infF -> immuneF
+                    rNormal_Inf(a , h - 1) * rHivHpv_Clear) .* pop(infF); % infF -> immuneF or normalF
                 
                 dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpv_Clear * pop(infM); % regression to normal from infected males
                 
