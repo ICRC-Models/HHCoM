@@ -102,7 +102,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HIV infections.')
 
 if hpvOn
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * 0.20; % 20% intial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * 0.20; % 20% initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV-
 

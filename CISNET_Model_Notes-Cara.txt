@@ -122,6 +122,15 @@ Load and prepare parameters for the model (only need to run when input parameter
      \Params\hpvData
      \Params\cost_weights
      \Params\calibData
+   - if uncommented, calculates indices using the following function
+     calcInds.m
+     and saves parameters in the \Params directory as .mat files
+     mixInfectIndices.mat
+     hivIndices.mat
+     hpvIndices.mat
+     hpvTreatIndices.mat
+     ageRiskInds.mat
+     vaxInds.mat
      
 2) makeMat.m** 
    - creates transition matrices using data from Excel spreadsheets             ????
