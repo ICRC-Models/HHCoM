@@ -33,7 +33,6 @@ for a = 4 : 13 % 15-19 -> 60-64
         ./ (sum(popVec((2014 - startYear) * stepsPerYear , ageNegInds))) * 100;
 end
 
-
 pPos = [cinPos2014; cinNeg2014];
 N = [cinPos2014_obs(: , 3) ; cinNeg2014_obs(: , 3)];
 nPos = [cinPos2014_obs(: , 2) ; cinNeg2014_obs(: , 2)];

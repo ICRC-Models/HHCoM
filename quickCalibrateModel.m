@@ -33,6 +33,7 @@ kCin1_Cin2_Orig = kCin1_Cin2;
 kCin3_Cin2_Orig = kCin3_Cin2;
 rNormal_Inf_Orig = rNormal_Inf;
 
+% Decreasing transition rates for young ages
 for i = 1 : 3
     rNormal_Inf(: , i) = conv(rNormal_Inf_Orig(: , i) , w , 'same');
     rNormal_Inf(end - 1 : end , i) = rNormal_Inf_Orig(end - 1 : end , i);
@@ -47,6 +48,7 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
+
 muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
 muCC_det = min(muCC_det .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
@@ -60,10 +62,8 @@ artHpvMult = 1;%hpv_hivMult(1 , 1);
 perPartnerHpv = 0.015;
 perPartnerHpv_lr = 0.08;
 perPartnerHpv_nonV = 0.08;
-rImmuneHiv = 1 ./ hpv_hivClear;
 
 % Weight HPV transitions according to type distribution
-
 distWeight = [0.7 , 0.2 , 0.1];
 kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
 kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
@@ -87,7 +87,6 @@ perPartnerHpv_lr = HPV_calib12(48);%0.1;
 perPartnerHpv_nonV = HPV_calib12(49); %0.1;
 
 % Weight HPV transitions according to type distribution
-
 distWeight = [0.7 , 0.2 , 0.1];
 kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
 kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
@@ -98,7 +97,6 @@ kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
 kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
 rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
-
 maxRateM1 = 1 - exp(-maxRateM_vec(1));
 maxRateM2 = 1 - exp(-maxRateM_vec(2));
 maxRateF1 = 1 - exp(-maxRateF_vec(1));
@@ -108,7 +106,6 @@ load([paramDir,'hivFertMats'])
 load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 lambdaMultVax = ones(age , 2);
-
 
 partnersM(4 , :) = partnersM(4 , :) .* [1.25 , 1.75 , 1.75];
 partnersF(4 , :) = partnersF(4 , :) .* [1.25 , 1.75 , 1.75];

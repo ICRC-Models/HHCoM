@@ -42,7 +42,6 @@ mInit = popInit(: , 1);
 
 fInit = popInit(: , 2);
 
-
 % test!!!!
 riskDistF = riskDistM;
 partnersF = partnersM;
@@ -109,6 +108,7 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infe
 % Intervention start years
 circStartYear = 1990;
 vaxStartYear = 2017;
+
 %% calibration parameters
 distWeight = [0.7 , 0.2 , 0.1];
 kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
@@ -130,7 +130,6 @@ kCin1_Inf = initParams(1) .* kCin1_Inf;
 rNormal_Inf = initParams(2) .* rNormal_Inf;
 kCC_Cin3 = initParams(3) .* kCC_Cin3;
 kCin3_Cin2 = initParams(4) .* kCin3_Cin2;
-
 
 rImmuneHiv = initParams(5 : 8);
 c3c2Mults = initParams(9 : 12);
@@ -165,13 +164,12 @@ for a = 1 : age
 end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
 %% Simulation variable preparation
-
-
-
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 lambdaMultVax = ones(age , 2);
+
 % Initialize vectors
 timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
@@ -185,7 +183,7 @@ newImmHpv = newHpv;
 newVaxHpv = newHpv;
 newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
 ccDeath = newCC;
-ccTreatCost = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
+ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
 vaxd = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec;
@@ -210,11 +208,12 @@ for i = 2 : length(s) - 1
     if hpvOn
         hystOption = 'on';
         [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :) , ...
-            ccTreatCost(i , : , : , : , :)] ...
+            ccTreated(i , : , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpvCCdet(t , pop , immuneInds , infInds , cin1Inds , ...
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
-            ccTreatedInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+            ccTreatedInds , ccLocDetInds , ccRegDetInds , ccDistDetInds ,...
+            kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , kCCDet , ...
@@ -258,13 +257,13 @@ for i = 2 : length(s) - 1
     end
 
     [~ , pop , deaths(i , :) , vaxd(i , :)] = ode4xtra(@(t , pop) ...
-        bornAgeDieRisk(t , pop , ager , year , currStep , age , fertility , ...
-        fertMat , fertMat2 , hivFertPosBirth ,hivFertNegBirth , hivFertPosBirth2 , ...
-        hivFertNegBirth2 , deathMat , circMat , ...
-        vaxerAger , vaxMat , MTCTRate , circStartYear , vaxStartYear ,...
-        vaxRate , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
+        bornAgeDieRisk(t , pop , year , currStep ,...
+        gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
+        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , ...
+        MTCTRate , circStartYear , ageInd , riskInd , riskDist , startYear , ...
+        endYear, stepsPerYear) , tspan , pop(end , :));
     if any(pop(end , :) < 0)
-        disp('After bornAgeDie')
+        disp('After bornAgeDieRisk')
         break
     end
     % add results to population vector

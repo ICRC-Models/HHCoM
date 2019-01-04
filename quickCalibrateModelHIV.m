@@ -33,6 +33,7 @@ kCin1_Cin2_Orig = kCin1_Cin2;
 kCin3_Cin2_Orig = kCin3_Cin2;
 rNormal_Inf_Orig = rNormal_Inf;
 
+% Decreasing transition rates for young ages
 for i = 1 : 3
     rNormal_Inf(: , i) = conv(rNormal_Inf_Orig(: , i) , w , 'same');
     rNormal_Inf(end - 1 : end , i) = rNormal_Inf_Orig(end - 1 : end , i);
@@ -47,20 +48,21 @@ for i = 1 : 3
     kCin2_Cin1(: , i) = conv(kCin2_Cin1_Orig(: , i) , w , 'same');
     kCin2_Cin1(end - 1 : end , i) = kCin2_Cin1_Orig(end - 1 : end , i);
 end
+
 muCC = min(muCC .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
+muCC_det = min(muCC_det .* 12 , 0.99); % convert cervical cancer mortality rate from monthly to yearly
 %     fImm(4 : age) = 1; % RR(0.75; 0.5 , 0.92) fraction fully protected by immunity based on RR of natural immunity (Beachler, 2017)
-perPartnerHpv = 0.08; % high risk HPV transmission risk per month
 rImmuneHiv = 1 ./ hpv_hivClear;
+rImmuneHiv = 2 ./ hpv_hivClear;
 lambdaMultImm(1 : 4) = 1 - 0.01;
 lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
 lambdaMultImm(11 : age) = lambdaMultImm(10);
 lambdaMultVax = ones(age , 2);
 
 artHpvMult = hpv_hivMult(1 , 1);
-perPartnerHpv = 0.08;
+perPartnerHpv = 0.08; % high risk HPV transmission risk per month
 perPartnerHpv_lr = 0.08;
 perPartnerHpv_nonV = 0.08;
-rImmuneHiv = 2 ./ hpv_hivClear;
 
 save([paramDir , 'calibInitParams']);
 %% Continue from last calibration

@@ -124,7 +124,7 @@ Load and prepare parameters for the model (only need to run when input parameter
      \Params\calibData
    - if uncommented, calculates indices using the following function
      calcInds.m
-     and saves parameters in the \Params directory as .mat files
+     which saves parameters in the \Params directory as .mat files
      mixInfectIndices.mat
      hivIndices.mat
      hpvIndices.mat
@@ -197,6 +197,25 @@ Run model:
      vaxCEA.m 
 
 Calibrate model:
+?) quickCalibrateModel.m
+   - uses the following functions
+     calibrator.m
+     - uses the following functions
+       hpvCCdet.m
+       mixInfect.m
+       hiv2a.m
+       bornAgeDieRisk.m
+       likeFun.m
+
+?) quickCalibrateModelHIV.m
+   - uses the following functions
+     calibratorHIV.m
+     - uses the following functions
+       hpvCCdet.m
+       mixInfect.m
+       hiv2a.m
+       bornAgeDieRisk.m
+       likeFun.m
 
 ?) prepCalibParams.m
    - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
