@@ -270,8 +270,11 @@ disp('Done')
 clear
 file = [pwd , '\Config\Calibration_targets.xlsx'];
 savdir = [pwd , '\Params']; 
-cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2014, by age
-cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2014, by age
+%cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2014, by age
+%cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2014, by age
+cinPos2014_obs = xlsread(file , 'Calibration' , 'D182 : F190'); %CIN2/CIN3 Prevalence HPV16 (HIV+) 2014, by age
+cinNeg2014_obs = xlsread(file , 'Calibration' , 'D191 : F199'); %CIN2/CIN3 Prevalence HPV16 (HIV-) 2014, by age
+
 hpv_hiv_2008_obs = xlsread(file , 'Calibration' , 'D32 : F41'); % HPV Prevalence in HIV+ Women (no CIN2/3) 2008, by age
 hpv_hivNeg_2008_obs = xlsread(file , 'Calibration' , 'D42 : F51'); % HPV Prevalence in HIV- Women (no CIN2/3) 2008, by age
 

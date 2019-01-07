@@ -97,6 +97,8 @@ kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
 kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
 rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
 
+maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim}; % Maximum ART coverage
+maxRateF_vec = [0.5 , 0.5];% maxRateF_arr{sim};
 maxRateM1 = 1 - exp(-maxRateM_vec(1));
 maxRateM2 = 1 - exp(-maxRateM_vec(2));
 maxRateF1 = 1 - exp(-maxRateF_vec(1));
@@ -189,6 +191,6 @@ options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'Display','iter','PlotFcn',@psplotbestf);
 x = patternsearch(@calibrator, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 %%
-file = 'HPV_calib13.dat';
+file = 'HPV_calib_HPV16CConly.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , x)
