@@ -6,10 +6,6 @@ paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'])
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'vlAdvancer'])
-load([paramDir,'fertMat'])
-load([paramDir,'hivFertMats'])
-load([paramDir,'fertMat2'])
-load([paramDir,'hivFertMats2'])
 load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'vaxer'])
@@ -19,7 +15,6 @@ load([paramDir,'HIVParams'])
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ager'])
-load([paramDir,'vlBeta'])
 load([paramDir,'hpvTreatIndices'])
 load([paramDir,'calibParams'])
 load([paramDir,'vaxInds'])
@@ -28,14 +23,19 @@ load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
 load([paramDir,'calibInitParams'])
 load([paramDir ,'cost_weights'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
+load([paramDir,'ageRiskInds'])
+load([paramDir,'vlBeta'])
 import java.util.LinkedList
 vaxerAger = ager;
 vaxRate = 0;
 startYear = 1980;
 endYear = 2015; % run to 2015 for calibration
 %% Initial population
-load([paramDir , 'popData'])
-load([paramDir , 'hpvData'])
+
 % load('initPop')
 % simulation
 mInit = popInit(: , 1);
@@ -44,6 +44,8 @@ fInit = popInit(: , 2);
 
 % test!!!!
 riskDistF = riskDistM;
+riskDist = riskDistM;
+riskDist(:,:,2) = riskDistF;
 partnersF = partnersM;
 
 MpopStruc = riskDistM;
@@ -216,7 +218,7 @@ for i = 2 : length(s) - 1
             kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
-            c2c1Mults , fImm , kRL , kDR , muCC , kCCDet , ...
+            c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
             disease , viral , age , hpvTypes , ...
             rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
         popIn = pop(end , :);
@@ -256,7 +258,7 @@ for i = 2 : length(s) - 1
         end
     end
 
-    [~ , pop , deaths(i , :) , vaxd(i , :)] = ode4xtra(@(t , pop) ...
+    [~ , pop , deaths(i , :) ] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , currStep ,...
         gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , ...

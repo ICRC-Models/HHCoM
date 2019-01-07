@@ -44,7 +44,7 @@ load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
 load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
-load([paramDir , 'ageRiskInds'])
+load([paramDir,'ageRiskInds'])
 load([paramDir,'vlBeta'])
 
 % load population
