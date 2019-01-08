@@ -61,12 +61,14 @@ load([paramDir , 'popData'])
 load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
-% vaxCover = [0.4 , 0.6 , 0.8];
-% vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
+%vaxCover = [0.4 , 0.6 , 0.8];
+%vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
 vaxCover = [0.6];
-vaxEff = [0.7 0.9];
+vaxEff = [0.6 , 0.85];
 vaxAge = 3;
 waning = 1; % turn waning on or off
+vaxLimit = 0;
+vaxRemain = 1000000;
 
 maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
 maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
@@ -105,7 +107,7 @@ lambdaMultVaxMat = zeros(age , nTests - 1);
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests - 1) /length(vaxEff));
 for n = 1 : nTests - 1
     % No waning
-    lambdaMultVaxMat(3 : age , n) = vaxEff(vaxEffInd(n));
+    lambdaMultVaxMat(vaxAge : age , n) = vaxEff(vaxEffInd(n));
     effPeriod = 20; % number of years that initial efficacy level is retained
     wanePeriod = 20; % number of years over which initial efficacy level wanes
     if waning 
@@ -254,6 +256,19 @@ for n = 1 : nTests
         if vaxRate - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
             vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
             vaxdGroup = vaxCover .* pop(end , fromNonV);
+            if vaxLimit    % if there is a limited total number vaccines
+                if vaxRemain >= 1    % when vaccines remain
+                    if (vaxRemain >= sumall(vaxdGroup))    % remaining vaccines >= targeted coverage
+                        usedVax = sumall(vaxdGroup);
+                    else    % less vaccines than targeted coverage
+                        usedVax = min(sumall(vaxdGroup), vaxRemain);    
+                        vaxdGroup = (usedVax ./ size(toV,1)) + pop(end , fromNonV);    % evenly divide available vaccines across compartments
+                    end
+                    vaxRemain = vaxRemain - usedVax;
+                else 
+                    vaxdGroup = vaxdGroup .* 0;    % vaccines depleted
+                end
+            end
             dPop = zeros(size(pop(end , :)));
             dPop(fromNonV) = -vaxdGroup;
             dPop(toV) = vaxdGroup;
