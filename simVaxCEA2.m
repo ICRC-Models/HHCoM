@@ -1,6 +1,7 @@
 % Accepts end year of analysis, number of tests, and population vector from
 % calibrated model as inputs
 close all;clear all;clc
+%profile clear;
 % function simVaxCEA2(endYear, vaxCover , vaxEff, vaxAge , waning , varargin)
 % p = inputParser;
 % addRequired(p , 'endYear');
@@ -12,7 +13,7 @@ close all;clear all;clc
 % addOptional(p , 't_wane' , 0);
 % parse(p , endYear, vaxCover , vaxEff, vaxAge , varargin{:})
 % close all; clear all; clc
-lastYear = 2022; %2097; %endYear;
+lastYear = 2097; %endYear;
 % if nargin
 %     origEffVec = varargin{1};
 %     t_wane = varargin{2};
@@ -61,14 +62,12 @@ load([paramDir , 'popData'])
 load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
-%vaxCover = [0.4 , 0.6 , 0.8];
-%vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
-vaxCover = [0.6];
-vaxEff = [0.6 , 0.85];
+vaxCover = [0.4 , 0.6 , 0.8];
+vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
 vaxAge = 3;
 waning = 1; % turn waning on or off
 vaxLimit = 0;
-vaxRemain = 1000000;
+vaxRemain = 500000;
 
 maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
 maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
@@ -93,12 +92,16 @@ dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 stepsPerYear = 6;
 c = fix(clock);
 currYear = c(1); % get the current year
+
 % Initialize vectors
 timeStep = 1 / stepsPerYear;
 years = lastYear - currYear;
 s = 1 : timeStep : years + 1;
 hivOn = 1;
 hpvOn = 1;
+
+%profile on
+
 % Intervention start years
 circStartYear = 1990;
 vaxStartYear = currYear;
@@ -144,6 +147,7 @@ artDistList = popIn.artDistList;
 if ~ exist([pwd , '\HHCoM_Results\Vaccine\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine\'])
 end
+
 %%
 for n = 1 : nTests
     simNum = n;
@@ -262,7 +266,8 @@ for n = 1 : nTests
                         usedVax = sumall(vaxdGroup);
                     else    % less vaccines than targeted coverage
                         usedVax = min(sumall(vaxdGroup), vaxRemain);    
-                        vaxdGroup = (usedVax ./ size(toV,1)) + pop(end , fromNonV);    % evenly divide available vaccines across compartments
+                        vaxdGroup = (usedVax .* (pop(end , fromNonV) ./ sum(pop(end , fromNonV))))...
+                            .* (pop(end , fromNonV) > 0);    % proportionately divide available vaccines across compartments
                     end
                     vaxRemain = vaxRemain - usedVax;
                 else 
@@ -291,5 +296,8 @@ for n = 1 : nTests
         currYear , lastYear , vaxRate , vaxEff , popLast);
 end
 disp('Done')
+
+%profile viewer
+
 %%
 vaxCEA
