@@ -147,8 +147,8 @@ betaHIV_M2F = bsxfun(@ times , [7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04] , transM);
 
 file = [pwd , '\Config\Population_data.xlsx'];
-maleActs = xlsread(file , 'Demographics' , 'D199 : F215'); % [age x risk]; male acts
-femaleActs = xlsread(file , 'Demographics' , 'D220 : F236'); % [age x risk]; female acts
+maleActs = xlsread(file , 'Demographics' , 'D199 : F214'); % [age x risk]; male acts
+femaleActs = xlsread(file , 'Demographics' , 'D219 : F234'); % [age x risk]; female acts
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -259,7 +259,7 @@ savdir = [pwd , '\Params'];
 hivTreatCost = xlsread(file , 'Costs' , 'B4 : B7'); % [inc CD4 count]; average HIV hositalization costs (not currently used, hard-coded in vaxCEA analysis)
 artTreatCost = xlsread(file , 'Costs' , 'B8'); % HIV hospitalization costs on ART  (not currently used, hard-coded in vaxCEA analysis)
 kCCDet = xlsread(file , 'Costs' , 'B17:B19'); %(local, regional, distant); probability of symptom detection
-vaxPrice = xlsread(file , 'Costs' , 'B267'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used, hard-coded into vaxCEA analysis)
+vaxPrice = xlsread(file , 'Costs' , 'B26'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used, hard-coded into vaxCEA analysis)
 ccCost = xlsread(file , 'Costs' , 'B34:B36'); % (local, regional, distant); CC costs (later re-defined in vaxCEA analysis)
 hivTreatCost = flipud(hivTreatCost); % (not currently used)
 save(fullfile(savdir , 'cost_weights'))
