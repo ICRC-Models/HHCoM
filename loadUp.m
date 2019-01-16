@@ -8,7 +8,7 @@ file = [pwd , '\Config\Population_data.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
-popInit = xlsread(file , 'Demographics' , 'B3:C21'); % [age x gender]; initial population size
+popInit = xlsread(file , 'Demographics' , 'B6:C21'); % [age x gender]; initial population size
 riskDistM = xlsread(file , 'Demographics' , 'B54:D69'); % [age x risk]; male risk distribution
 riskDistF = xlsread(file , 'Demographics' , 'E54:G69'); % [age x risk]; female risk distribution
 mue = xlsread(file , 'Demographics' , 'B84:C99'); % [age x gender]; background mortality
@@ -16,7 +16,7 @@ fertility = xlsread(file , 'Demographics' , 'B112:G127'); % [age x disease]; fer
 fertility2 = xlsread(file , 'Demographics' , 'B133:G148'); % [age x disease]; fertility rate/2 for 2005 onwards
 partnersM = xlsread(file , 'Demographics' , 'B160:D175'); % [age x risk]; male partnerships per year
 partnersF = xlsread(file , 'Demographics' , 'E160:G175'); % [age x risk]; female partnerships per year
-actsPer = xlsread(file , 'Demographics' , 'B240:D241'); % [gender x risk]; acts per partnership (not currently used)
+actsPer = xlsread(file , 'Demographics' , 'B238:D239'); % [gender x risk]; acts per partnership (not currently used)
 epsA = xlsread(file , 'Demographics' , 'B185:B187'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
 epsR = xlsread(file , 'Demographics' , 'C185:C187'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
 yr = xlsread(file , 'Demographics' , 'A185:A187'); % years
