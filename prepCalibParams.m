@@ -1,6 +1,6 @@
 close all;clear all;clc
-paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
+paramDir = [pwd,'\Params\'];
+load([paramDir,'general'])
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -24,14 +24,15 @@ load([paramDir,'vaxInds'])
 load([paramDir,'hpvData'])
 load([paramDir,'calibData'])
 load([paramDir,'calibInitParams'])
-load([paramDir , 'ageRiskInds'])
-load([paramDir ,'cost_weights'])
+load([paramDir,'ageRiskInds'])
+load([paramDir,'cost_weights'])
 import java.util.LinkedList
 vaxerAger = ager;
 vaxRate = 0;
 startYear = 1980;
+
 %% Initial population
-load([paramDir , 'popData'])
+load([paramDir,'popData'])
 load([paramDir,'calibInitParams'])
 % load('initPop')
 % simulation

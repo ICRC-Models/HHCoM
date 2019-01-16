@@ -447,8 +447,8 @@ end
 save([paramDir , 'ageRiskInds'] , 'ageInd' , 'riskInd')
 %% Vaccinated group indices
 
-vaccinated = zeros(age , disease * viral * gender * risk);
-waned = vaccinated;
+vaccinated = zeros(age , disease * viral * gender * risk);    % currently not used
+waned = vaccinated;    % currently not used
 
 vaccinated = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , 1 : gender , ...
     1 : age , 1 : risk));
