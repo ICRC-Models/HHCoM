@@ -1,7 +1,8 @@
 function[] = showResults()
 %%
 paramDir = [pwd , '\Params\'];
-load([paramDir,'actual'])
+%load([paramDir , 'actual'])
+load([paramDir , 'calibratedParams'])
 load([paramDir,'calibData'])
 % load('C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results\to2017')
 resultsDir = [pwd , '\HHCoM_Results\'];
