@@ -55,8 +55,8 @@ For s:
 
 For p:
 1 - 
-2- 
-3-
+2 - vaccinated -> vaccine type infection
+3 - vaccinated -> non-vaccine type infection
 
 For g:
 1 - Male
@@ -102,40 +102,6 @@ Each of the above variables can be a single number, e.g. "3", or a range of numb
 SCRIPTS AND FUNCTIONS USED TO PREPARE AND RUN THE MODEL:
 _________________________________________________________________________
 
-Load and prepare parameters for the model (only need to run when input parameters are changed):
-1) loadUp.m 
-   - imports data from the following Excel spreadsheets in \Config directory 
-     (data imported into model is highlighted in yellow)
-     \Config\Population_data.xlsx (Demographics)
-     \Config\HIV_parameters.xlsx (Protection, Disease Data)
-     \Config\HPV_parameters.xlsx (HPV, Cervical Cancer, Screening and Treatment, CIN Transition
-     \Config\Weights_costs.xlsx (Costs)
-     \Config\Calibration_targets (Calibration)
-   - imports data from the following .mat file 
-     settings.mat
-   - saves parameters in the \Params directory as .mat files
-     \Params\popData
-     \Params\HIVParams
-     \Params\general
-     \Params\mixInfectParams
-     \Params\vlBeta
-     \Params\hpvData
-     \Params\cost_weights
-     \Params\calibData
-   - if uncommented, calculates indices using the following function
-     calcInds.m
-     which saves parameters in the \Params directory as .mat files
-     mixInfectIndices.mat
-     hivIndices.mat
-     hpvIndices.mat
-     hpvTreatIndices.mat
-     ageRiskInds.mat
-     vaxInds.mat
-     
-2) makeMat.m** 
-   - creates transition matrices using data from Excel spreadsheets             ????
-   **if data used in transition matrices changes, makeMat.m must be ran again
-
 Run model:
 1) mainCalibrated.m 
    - natural history up to current year
@@ -153,6 +119,10 @@ Run model:
      hiv2a.m
      bornAgeDieRisk.m
      showResults.m
+     - loads parameters 
+       \Params\calibratedParams
+       \Params\calibData
+       \HHCoM_Results\toNow
 
 2) simVaxCEA2.m 
    - vaccination scenarios & cost analysis
@@ -196,6 +166,47 @@ Run model:
      parsave.m
      vaxCEA.m 
 
+Load and prepare parameters for the model (only need to run when input parameters are changed):
+1) loadUp.m 
+   - imports data from the following Excel spreadsheets in \Config directory 
+     (data imported into model is highlighted in yellow)
+     \Config\Population_data.xlsx (Demographics)
+     \Config\HIV_parameters.xlsx (Protection, Disease Data)
+     \Config\HPV_parameters.xlsx (HPV, Cervical Cancer, Screening and Treatment, CIN Transition
+     \Config\Weights_costs.xlsx (Costs)
+     \Config\Calibration_targets (Calibration)
+   - imports data from the following .mat file 
+     settings.mat
+   - saves parameters in the \Params directory as .mat files
+     \Params\popData
+     \Params\HIVParams
+     \Params\general
+     \Params\mixInfectParams
+     \Params\vlBeta
+     \Params\hpvData
+     \Params\cost_weights
+     \Params\calibData
+   - if uncommented, calculates indices using the following function
+     calcInds.m
+     - which saves parameters in the \Params directory as .mat files
+       mixInfectIndices.mat
+       hivIndices.mat
+       hpvIndices.mat
+       hpvTreatIndices.mat
+       ageRiskInds.mat
+       vaxInds.mat
+     
+2) makeMat.m** 
+   - creates transition matrices using data from Excel spreadsheets             ????
+   **if data used in transition matrices changes, makeMat.m must be ran again
+
+3) prepCalibParams.m
+   - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
+   - loads parameters from the \Params directory previously imported from Excel files  
+   - loads calibrated paramters from .dat file
+   - saves parameters in the \Params directory as .mat file
+     \Params\calibratedParams
+
 Calibrate model:
 ?) quickCalibrateModel.m
    - uses the following functions
@@ -217,17 +228,6 @@ Calibrate model:
        bornAgeDieRisk.m
        likeFun.m
 
-?) prepCalibParams.m
-   - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
-   - loads parameters from the \Params directory previously imported from Excel files  
-   - loads calibrated paramters from .dat file
-   - saves parameters in the \Params directory as .mat file
-     \Params\calibratedParams
+
 
 ???simVaxResultOut_ageStand - displays age standardized results from simVax.m. Also exports them as .csv files.
-
-
-
-
-
-
