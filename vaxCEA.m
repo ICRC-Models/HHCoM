@@ -1,9 +1,9 @@
-% function vaxCEA()
+function vaxCEA(pathModifier)
 
 %% load results
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'])
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine\*.mat']) , 1);
+nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to 2018
 
 % helper functions
@@ -18,7 +18,7 @@ vaxResult = cell(nSims , 1);
 
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine\vaxWaneSimResult' ,...
+    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult' ,...
         num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to 2018 to population
     % matrices for years past 2018
@@ -322,8 +322,8 @@ for i = 1 : length(inds)
             plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
                 ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
                 'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-            fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
+            fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_' , pathModifier , '.xlsx'];
             hold on
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
@@ -348,8 +348,8 @@ for i = 1 : length(inds)
                 'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
             legend('-DynamicLegend')
             hold on
-            fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
+            fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_' , pathModifier , '.xlsx'];
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed'] , M);
@@ -427,8 +427,8 @@ for i = 1 : length(inds)
             ['Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
         hold on
-        fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
+        fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_' , pathModifier , '.xlsx'];
         if exist(fname , 'file') == 2
             M = xlsread(fname);
             M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
@@ -453,8 +453,8 @@ for i = 1 : length(inds)
         hold on
         title([plotTits{i} , ' Cervical Cancer Mortality Reduction'])
         xlabel('Year'); ylabel('Reduction (%)')
-        fname = ['Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
+        fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+            'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_' , pathModifier , '.xlsx'];
         if exist(fname , 'file') == 2
             M = xlsread(fname);
             M = catpad(2 , [tVec(length(curr.tVec) + 1 : stepsPerYear : end)' , vaxResult{n}.ccMortRed'] , M);
@@ -561,3 +561,5 @@ legend('Model (Male)' , 'Model (Female)')
 %         , 3) , 4)) ./ hivSusNo * 100 )
 % end
 % legend('Male' , 'Female' , 'Male No Vax' , 'Female No vax')
+
+vaxCEA_CISNETvaxCompare(pathModifier)

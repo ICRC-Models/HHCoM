@@ -1,7 +1,5 @@
 % Accepts end year of analysis, number of tests, and population vector from
 % calibrated model as inputs
-close all;clear all;clc
-%profile clear;
 % function simVaxCEA2(endYear, vaxCover , vaxEff, vaxAge , waning , varargin)
 % p = inputParser;
 % addRequired(p , 'endYear');
@@ -12,7 +10,16 @@ close all;clear all;clc
 % addOptional(p , 'origEffVec' , []);
 % addOptional(p , 't_wane' , 0);
 % parse(p , endYear, vaxCover , vaxEff, vaxAge , varargin{:})
-% close all; clear all; clc
+
+close all;clear all;clc
+%profile clear;
+
+% Directory to save results
+pathModifier = 'folderName';
+if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
+    mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
+end
+
 lastYear = 2097; %endYear;
 % if nargin
 %     origEffVec = varargin{1};
@@ -40,7 +47,7 @@ load([paramDir,'calibParams'])
 load([paramDir,'vaxInds'])
 % load([paramDir,'settings'])
 load([paramDir,'hpvData'])
-load([paramDir ,'cost_weights'])
+load([paramDir,'cost_weights'])
 load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
 load([paramDir,'fertMat2'])
@@ -57,21 +64,43 @@ artDistList = popIn.artDistList;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 %%%%%
 
-%% Use calibrated parameters
+% Use calibrated parameters
 load([paramDir , 'popData'])
 load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
-vaxCover = [0.4 , 0.6 , 0.8];
-vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
-vaxAge = 3;
-waning = 1; % turn waning on or off
-vaxLimit = 0;
-vaxRemain = 500000;
+%% Vacination
 
-maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
-maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
-% 
+%vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
+vaxEff = [0.7];    % used for all vaccine regimens present
+
+%Parameters for school-based vaccination regimen
+vaxAge = 3;
+%vaxCover = [0.4 , 0.6 , 0.8];
+vaxCover = [0.8];
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+
+% Parameters for catch-up vaccination regimen
+vaxCU = 1;    % turn catch-up vaccination on or off
+vaxAgeCU = [4,5];    % ages catch-up vaccinated
+vaxCoverCU = [0.7,0.7];    % coverage for catch-up vaccination by ages catch-up vaccinated
+vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
+
+% Parameters for vaccination during limited-vaccine years
+vaxLimit = 0;    % turn vaccine limit on or off
+vaxLimitYrs = 5;    % number years for which vaccines are limited
+vaxLimitPerYr = 20000;    % total vaccines available per year for all interventions
+vaxRemain = vaxLimitPerYr;
+vaxAgeL = 5;
+vaxCoverL = 0.7;
+vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
+
+waning = 0;    % turn waning on or off
+
+%%
+maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a.
+maxRateF_vec = [0.5 , 0.5];    % as of 2013. Scales up from this value in hiv2a.
+
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -86,7 +115,7 @@ currYear = c(1); % get the current year
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of vaccine coverage and efficacy
 testParams = [testParams ; [0 , 0]]; % Append no vaccine scenario to test scenarios
 nTests = size(testParams , 1); % counts number of scenarios to test
-%%%%%%%
+
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 % run analyses
 stepsPerYear = 6;
@@ -110,7 +139,7 @@ lambdaMultVaxMat = zeros(age , nTests - 1);
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests - 1) /length(vaxEff));
 for n = 1 : nTests - 1
     % No waning
-    lambdaMultVaxMat(vaxAge : age , n) = vaxEff(vaxEffInd(n));
+    lambdaMultVaxMat(3 : age , n) = vaxEff(vaxEffInd(n));
     effPeriod = 20; % number of years that initial efficacy level is retained
     wanePeriod = 20; % number of years over which initial efficacy level wanes
     if waning 
@@ -127,26 +156,39 @@ for n = 1 : nTests - 1
             age - (round(wanePeriod / 5) + vaxAge) + 2)'); % ensures vaccine efficacy is >= 0
     end
 end
-
 lambdaMultVaxMat = [lambdaMultVaxMat , zeros(age , 1)]; % append 0 vaccine protection for no vaccine scenario
 
 % uncomment the lines below to visualize vaccine efficacy by age group (proxy for waning post-vaccination) 
 figure(); plot(lambdaMultVaxMat * 100); 
 title('Vaccine Waning'); xlabel('Age Group'); ylabel('Vaccine Protection (%)')
 
-
 disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
     ' with ' num2str(stepsPerYear), ' steps per year.'])
-fromNonV = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
-    2 , vaxAge , 1 : risk));
+
+% Create vaccine indices
+fromNonV = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ... 
+    min(vaxG):max(vaxG) , vaxAge , 1 : risk)); 
 toV = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
-    2 , vaxAge , 1 : risk));
+    min(vaxG):max(vaxG) , vaxAge , 1 : risk));
+if vaxCU    % if present, add indices for catch-up vaccination regimen
+    for aV = 1:length(vaxAgeCU)
+        a = vaxAgeCU(aV);
+        fromNonVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
+            min(vaxGCU):max(vaxGCU) , a , 1 : risk)); 
+        toVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
+            min(vaxGCU):max(vaxGCU) , a , 1 : risk));
+    end
+end
+if vaxLimit    % if present, add indices for vaccination during limited-vaccine years
+    fromNonVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
+        vaxGL , vaxAgeL , 1 : risk)); 
+    toVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
+        vaxGL , vaxAgeL , 1 : risk));
+end
+
 import java.util.LinkedList
 % artDistList = LinkedList();
 artDistList = popIn.artDistList;
-if ~ exist([pwd , '\HHCoM_Results\Vaccine\'])
-    mkdir ([pwd, '\HHCoM_Results\Vaccine\'])
-end
 
 %%
 for n = 1 : nTests
@@ -154,6 +196,10 @@ for n = 1 : nTests
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
     vaxRate = testParams(n , 1);
+    if ((vaxRate == 0.0) && (vaxEff == 0.0))
+        vaxCoverCU = vaxCoverCU .* 0.0;
+        vaxCoverL = vaxCoverL .* 0.0;
+    end
     popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
@@ -254,32 +300,71 @@ for n = 1 : nTests
             break
         end
         
+        % Vaccinate
         popSize = sum(pop(end , :) , 2);
-        fracVaxd = sum(pop(end , toV) , 2) / ... % find proportion of population that is currently vaccinated
-            (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
-        if vaxRate - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
-            vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
-            vaxdGroup = vaxCover .* pop(end , fromNonV);
-            if vaxLimit    % if there is a limited total number vaccines
+        
+        % If within first vaxLimitYrs-many vaccine-limited years
+        if vaxLimit && ((year - currYear) <= vaxLimitYrs)
+            if rem(year,1) == 0.0    % reset vaxRemain at start of each new year to the number of available vaccines per year
+                vaxRemain = vaxLimitPerYr;
+            end
+            fracVaxd = sum(pop(end , toVL) , 2) / ... % find proportion of population that is currently vaccinated
+                (sum(pop(end , fromNonVL) , 2) + sum(pop(end , toVL) , 2));
+            if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
+                vaxCover = max(0 , (vaxCoverL - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
+                vaxdGroup = vaxCover .* pop(end , fromNonVL);
                 if vaxRemain >= 1    % when vaccines remain
-                    if (vaxRemain >= sumall(vaxdGroup))    % remaining vaccines >= targeted coverage
+                    if (vaxRemain >= sumall(vaxdGroup))    % when remaining vaccines >= targeted coverage
                         usedVax = sumall(vaxdGroup);
-                    else    % less vaccines than targeted coverage
+                    else    % when remaining vaccines < targeted coverage
                         usedVax = min(sumall(vaxdGroup), vaxRemain);    
-                        vaxdGroup = (usedVax .* (pop(end , fromNonV) ./ sum(pop(end , fromNonV))))...
-                            .* (pop(end , fromNonV) > 0);    % proportionately divide available vaccines across compartments
+                        vaxdGroup = (usedVax .* (pop(end , fromNonVL) ./ sum(pop(end , fromNonVL))))...
+                            .* (pop(end , fromNonVL) > 0);    % proportionately divide available vaccines across compartments
                     end
                     vaxRemain = vaxRemain - usedVax;
                 else 
-                    vaxdGroup = vaxdGroup .* 0;    % vaccines depleted
+                    vaxdGroup = pop(end , fromNonVL) .* 0;    % when vaccines are depleted
                 end
             end
             dPop = zeros(size(pop(end , :)));
-            dPop(fromNonV) = -vaxdGroup;
-            dPop(toV) = vaxdGroup;
+            dPop(fromNonVL) = -vaxdGroup;
+            dPop(toVL) = vaxdGroup;
             pop(end , :) = dPop + pop(end , :); 
-            vaxd(i , :) = sumall(vaxdGroup); % count number of people vaccinated at current time step
+            vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroup); % count number of people vaccinated at current time step
+        
+        % If vaccines are not limited
+        else
+            % Apply school-based vaccination regimen
+            fracVaxd = sum(pop(end , toV) , 2) / ... % find proportion of population that is currently vaccinated
+                    (sum(pop(end , fromNonV) , 2) + sum(pop(end , toV) , 2));
+            if vaxRate - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
+                vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
+                vaxdGroup = vaxCover .* pop(end , fromNonV);
+                dPop = zeros(size(pop(end , :)));
+                dPop(fromNonV) = -vaxdGroup;
+                dPop(toV) = vaxdGroup;
+                pop(end , :) = dPop + pop(end , :); 
+                vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroup); % count number of people vaccinated at current time step
+            end
+            
+            % If present, apply catch-up vaccination regimen
+            if vaxCU
+                for aV = 1:length(vaxAgeCU)    % apply appropriate coverage rate for each age group catch-up vaccinated
+                    fracVaxd = sum(pop(end , toVCU(:,aV)) , 2) / ... % find proportion of population that is currently vaccinated
+                        (sum(pop(end , fromNonVCU(:,aV)) , 2) + sum(pop(end , toVCU(:,aV)) , 2));
+                    if vaxCoverCU(aV) - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
+                        vaxCover = max(0 , (vaxCoverCU(aV) - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
+                        vaxdGroup = vaxCover .* pop(end , fromNonVCU(:,aV));
+                        dPop = zeros(size(pop(end , :)));
+                        dPop(fromNonVCU(:,aV)) = -vaxdGroup;
+                        dPop(toVCU(:,aV)) = vaxdGroup;
+                        pop(end , :) = dPop + pop(end , :); 
+                        vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroup); % count number of people vaccinated at current time step
+                    end
+                end
+            end
         end
+ 
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
@@ -293,11 +378,11 @@ for n = 1 : nTests
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
         newCC , artTreatTracker , vaxd , ccTreated , ...
-        currYear , lastYear , vaxRate , vaxEff , popLast);
+        currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
 
 %profile viewer
 
 %%
-vaxCEA
+vaxCEA(pathModifier)

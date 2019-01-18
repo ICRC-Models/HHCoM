@@ -1,10 +1,11 @@
+function vaxCEA_CISNETvaxCompare(pathModifier)
 % modifying function vaxCEA() to produce outputs for CISNET vaxination
 % scenario comparison model runs
 
 %% load results
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'])
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine\*.mat']) , 1);
+nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to 2018
 
 % helper functions
@@ -19,7 +20,7 @@ vaxResult = cell(nSims , 1);
 
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine\vaxWaneSimResult' ,...
+    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult' ,...
         num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to 2018 to population
     % matrices for years past 2018
