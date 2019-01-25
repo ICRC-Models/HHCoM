@@ -2,8 +2,10 @@ function negSumLogL = likeFun(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,
     hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
     hivPrevM_obs , hivPrevF_obs , disease , viral , gender , age , risk , ...
     hpvTypes , hpvStates , periods , startYear , stepsPerYear)
+
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 toInd = @(x)(x(:,8)-1)*k(7)+(x(:,7)-1)*k(6)+(x(:,6)-1)*k(5)+(x(:,5)-1)*k(4)+(x(:,4)-1)*k(3)+(x(:,3)-1)*k(2)+(x(:,2)-1)*k(1)+x(:,1);
+
 %% CIN2/3 prevalence by HIV status
 cinPos2014 = zeros(10 , 1);
 cinNeg2014 = cinPos2014;
@@ -111,6 +113,7 @@ nPos = [nPos ; hpv_hivNeg_obs(: , 2)];
 
 
 hpv_hiv = zeros(9 , 1);
+
 %% HPV prevalence in HIV+ women (including CIN)
 for a = 4 : 11 % 15-19 -> 50-54
     hpvInds = [toInd(allcomb(2 : 6 , 1 : viral , 2 : 4 , 1 : 4, ...
@@ -160,6 +163,7 @@ nPos = [nPos ; hpv_hiv_obs(: , 2)];
 %         ./ sum(popVec((2008 - startYear) * stepsPerYear , ageInds)) * 100;
 %     end
 % end
+
 %% Cervical cancer incidence type distribution
 % newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
 % newCCType = zeros(size(newCC , 1) , 3);
@@ -170,6 +174,7 @@ nPos = [nPos ; hpv_hiv_obs(: , 2)];
 % pPos = [pPos; mean(newCCType(: , 1)); mean(newCCType(: , 2));  mean(newCCType(: , 3))];
 % nPos = [nPos ; 70 ; 20 ; 10];
 % N =  [N ; 100 ; 100 ; 100];
+
 %% HIV
 hivYearVec = unique(hivPrevM_obs(: ,1));
 hivAgeM = zeros(7 , length(hivYearVec));
@@ -199,6 +204,7 @@ end
 pPos = [pPos; hivAgeM(:) ; hivAgeF(:)];
 nPos = [nPos ; hivPrevM_obs(: , 2) ; hivPrevF_obs(: , 2)];
 N =  [N ;  hivPrevM_obs(: , 3) ; hivPrevF_obs(: , 3)];
+
 %% Likelihood function
 pPos = pPos ./ 100; % scale percent probabilities to decimals
 logL = nPos .* log(pPos) + (N - nPos) .* log(1 - pPos); % log likelihoods for binomial events

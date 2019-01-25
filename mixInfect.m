@@ -36,8 +36,8 @@ else % assortativity in last year
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
 
-epsA = 0.4;
-epsR = 0.4;
+%epsA = 0.4;
+%epsR = 0.4;
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times

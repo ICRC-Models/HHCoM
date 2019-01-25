@@ -26,8 +26,6 @@ load([paramDir,'vaxer'])
 load([paramDir,'circMat'])
 load([paramDir,'deathMat'])
 
-import java.util.LinkedList
-
 hyst = 'off';
 hpvOn = 1;
 hivOn = 1;
@@ -108,53 +106,34 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infe
 epsA = initParams(1:3); 
 epsR = initParams(4:6); 
 prepOut = initParams(7);
-%(8):       artOut, [1x1], (0.0 to 1.0), reset in hiv2a to 0
-%(9:56):    maleActs, [age,risk], (0.0 to 365) 
-%(57:104):  femaleActs, [age,risk], (0.0 to 365)
-%(105):     perPartnerHpv, [1x1], (0.0 to 1.0)
-%(106):     perPartnerHpv_lr, val, (0.0 to 1.0)
-%(107):     perPartnerHpv_nonV, val, (0.0 to 1.0)
-%(108:111): hpv_hivMult, [CD4x1], (0.0 to 1.0) 
-%(112:127): kCin1_Inf, [agex1], init, (/10 to x10) or (0.0 to 1.0)
-%(128:143): kCin2_Cin1, [agex1], init, (/10 to x10)
-%(144:159): kCin3_Cin2, [agex1], init, (/10 to x10)
-%(160:175): kCC_Cin3, [agex1], init, (/10 to x10)
-%(176:191): rNormal_Inf, [agex1], init, (/10 to x10)
-%(192:207): kInf_Cin1, [agex1], init, (/10 to x10)
-%(208:223): kCin1_Cin2, [agex1], init, (/10 to x10)
-%(224:239): kCin2_Cin3, [agex1], init, (/10 to x10)
-%(240:243): hpv_hivClear, [CD4x1], (0.0 to 1.0)
-%(244:247): rImmuneHiv, [CD4x1], (0.0 to 1.0)
-%(248:251): c3c2Mults, [CD4x1], init, (all ones to x10)
-%(252:255): c2c1Mults, [CD4x1], init, (all ones to x10)
-%(256:271): lambdaMultImm, [agex1], (0.0 to 1.0)
-%(272):     kRL, [1x1], (0.0 to 1.0)
-%(273):     kDR, [1x1], (0.0 to 1.0)
-%(274:276): kCCDet, [3x1], (0.0 to 1.0)
-%(277:308): kCD4, [genderxvlxcd4], (0.0 to 10.0)
-%(309:340): kVL, [genderxcd4xvl], (0.0 to 10.0)
-%(341:342): maxRateM_vec,[2x1], (0.0 to 1.0), reset in mainCalibrated
-%(343:344): maxRateF_vec, [2x1], (0.0 to 1.0), reset in mainCalibrated
-%(345):     artHpvMult, [1x1], (1.0 to x10)
-
-partnersM(4 , :) = partnersM(4 , :) .* [1.25 , 1.75 , 1.75];
-partnersF(4 , :) = partnersF(4 , :) .* [1.25 , 1.75 , 1.75];
-partnersM(5 , :) = partnersM(5 , :) .* [1.25 , 1.5 , 1.75];
-partnersF(5 , :) = partnersF(5 , :) .* [1.25 , 1.5 , 1.75];
-
-femaleActs(4 : 5 , :) = femaleActs(4 : 5 , :) .* 1.2 ;
-femaleActs(6 : 10 , :) = femaleActs(6 : 10 , :) .* 0.9;
-maleActs(4 : 5 , :) = maleActs(4 : 5 , :);
-
-for i = 0 : 2
-    maleActs(: , i + 1) = maleActs(: , i + 1) .* initParams(39 + i);
-    femaleActs(: , i + 1) = femaleActs(: , i + 1) .* initParams(42 + i);
-end
-
-for i = 0 : 2
-    partnersM(: , i + 1) = partnersM(: , i + 1) .* initParams(45 + i);
-    partnersF(: , i + 1) = partnersF(: , i + 1) .* initParams(48 + i);
-end
+artOut = initParams(8); 
+maleActs = initParams(9:56);
+femaleActs = initParams(57:104);
+perPartnerHpv = initParams(105);
+perPartnerHpv_lr = initParams(106);
+perPartnerHpv_nonV = initParams(107);
+hpv_hivMult = initParams(108:111);
+kCin1_Inf = initParams(112:127);
+kCin2_Cin1 = initParams(128:143);
+kCin3_Cin2 = initParams(144:159);
+kCC_Cin3 = initParams(160:175);
+rNormal_Inf = initParams(176:191);
+kInf_Cin1 = initParams(192:207);
+kCin1_Cin2 = initParams(208:223);
+kCin2_Cin3 = initParams(224:239);
+hpv_hivClear = initParams(240:243);
+rImmuneHiv = initParams(244:247);
+c3c2Mults = initParams(248:251);
+c2c1Mults = initParams(252:255);
+lambdaMultImm = initParams(256:271);
+kRL = initParams(272);
+kDR = initParams(273);
+kCCDet = initParams(274:276);
+kCD4 = initParams(277:308);
+kVL = initParams(309:340);
+maxRateM_vec = initParams(341:342);
+maxRateF_vec = initParams(343:344);
+artHpvMult = initParams(345);
 
 for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
@@ -163,28 +142,33 @@ end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
 
-
-
-
-
-
-
-
-
-
-
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : step : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : step : yr(i + 1));
+end
 
 %% Simulation parameters
-fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-
 lambdaMultVax = ones(age , 2);
+k_wane = 0;
+vaxRate = 0;
+fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize vectors
 timeStep = 1 / stepsPerYear;
-
 s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
 artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
+import java.util.LinkedList
+artDistList = LinkedList();
 popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 newHiv = zeros(length(s) - 1 , gender , age , risk);
@@ -201,16 +185,6 @@ artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
 popVec(1 , :) = popIn;
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-
-
-vaxRate = 0;
-
-
-
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
 
 %% Simulation
 for i = 2 : length(s) - 1
@@ -265,6 +239,12 @@ for i = 2 : length(s) - 1
             viral , gender , age , risk , k , hivInds , ...
             stepsPerYear , year) , tspan , pop(end , :));
         artTreatTracker(i , : , : , : , :  ,:) = artTreat;
+        artDistList.add(artTreat);
+        if artDistList.size() >= stepsPerYear * 2
+            artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
+        end
+        artDist = calcDist(artDistList , disease , viral , gender , age , ...
+            risk);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
@@ -285,7 +265,6 @@ for i = 2 : length(s) - 1
     popVec(i , :) = pop(end , :)';
 end
 popLast = popVec(end , :);
-
 popVec = sparse(popVec); % compress population vectors
 
 negSumLogL = likeFun(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,...

@@ -1,6 +1,8 @@
 function quickCalibrateModel()
 
 close all; clear all; clc
+profile clear
+profile on
 
 %% Load parameters
 paramDir = [pwd ,'\Params\'];
@@ -31,10 +33,8 @@ load([paramDir,'deathMat'])
 import java.util.LinkedList
 
 %% Set parameter upper and lower bounds 
-
 lb = zeros(345,1);
 ub = ones(345,1);
-
 ub(9:104) = 365.0;
 lb(112:127) = kCin1_Inf ./ 10;
 lb(128:143) = kCin2_Cin1 ./ 10;
@@ -59,8 +59,8 @@ ub(277:340) = 10.0;
 lb(345) = 1.0;
 ub(345) = 10.0;
 
-%(1:3):     epsA, [3x1], (0.0 to 1.0), reset in mixInfect
-%(4:6):     epsR, [3x1], (0.0 to 1.0), reset in mixInfect
+%(1:3):     epsA, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
+%(4:6):     epsR, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
 %(7):       prepOut, [1x1], (0.0 to 1.0), reset in hiv2a to 0
 %(8):       artOut, [1x1], (0.0 to 1.0), reset in hiv2a to 0
 %(9:56):    maleActs, [age,risk], (0.0 to 365) 
@@ -110,7 +110,9 @@ for i = 1 : numStartPts
         'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
         'Display','iter','PlotFcn',@psplotbestf);
     x(:,i) = patternsearch(@calibratorAll, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+    profile viewer
 end
+
 %% Save calibrated parameters
 file = 'HPV_calib_23Jan19.dat';
 paramDir = [pwd , '\Params\'];
