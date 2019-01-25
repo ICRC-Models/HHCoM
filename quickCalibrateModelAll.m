@@ -13,6 +13,7 @@ load([paramDir,'general'])
 load([paramDir,'mixInfectParams'])
 load([paramDir,'vlBeta'])
 load([paramDir,'hpvData'])
+load([paramDir,'cost_weights'])
 load([paramDir,'calibData'])
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'hivIndices'])
@@ -33,8 +34,8 @@ load([paramDir,'deathMat'])
 import java.util.LinkedList
 
 %% Set parameter upper and lower bounds 
-lb = zeros(345,1);
-ub = ones(345,1);
+lb = zeros(361,1);
+ub = ones(361,1);
 ub(9:104) = 365.0;
 lb(112:127) = kCin1_Inf ./ 10;
 lb(128:143) = kCin2_Cin1 ./ 10;
@@ -55,9 +56,9 @@ ub(224:239) = kCin2_Cin3 .* 10;
 lb(248:255) = 1.0;
 ub(248:251) = c3c2Mults .* 10;
 ub(252:255) = c2c1Mults .* 10;
-ub(277:340) = 10.0;
-lb(345) = 1.0;
-ub(345) = 10.0;
+ub(277:356) = 10.0;
+lb(361) = 1.0;
+ub(361) = 10.0;
 
 %(1:3):     epsA, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
 %(4:6):     epsR, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
@@ -85,11 +86,11 @@ ub(345) = 10.0;
 %(272):     kRL, [1x1], (0.0 to 1.0)
 %(273):     kDR, [1x1], (0.0 to 1.0)
 %(274:276): kCCDet, [3x1], (0.0 to 1.0)
-%(277:308): kCD4, [genderxvlxcd4], (0.0 to 10.0)
-%(309:340): kVL, [genderxcd4xvl], (0.0 to 10.0)
-%(341:342): maxRateM_vec,[2x1], (0.0 to 1.0), reset in mainCalibrated
-%(343:344): maxRateF_vec, [2x1], (0.0 to 1.0), reset in mainCalibrated
-%(345):     artHpvMult, [1x1], (1.0 to x10)
+%(277:316): kCD4, [genderxvlxcd4], (0.0 to 10.0)
+%(317:356): kVl, [genderxcd4xvl], (0.0 to 10.0)
+%(357:358): maxRateM_vec,[2x1], (0.0 to 1.0), reset in mainCalibrated
+%(359:360): maxRateF_vec, [2x1], (0.0 to 1.0), reset in mainCalibrated
+%(361):     artHpvMult, [1x1], (1.0 to x10)
 
 %% Set parameter constraints
 % max HPV acquisition multiplier for HIV+ on ART <= max acquisition multiplier for HIV+
@@ -103,14 +104,65 @@ ub(345) = 10.0;
 numStartPts = 10;
 x = zeros(length(lb),numStartPts);
 
-for i = 1 : numStartPts
-    initParams = lb + rand(size(lb)).*(ub - lb);
+initParams = [epsA;
+              epsR;
+              prepOut;
+              artOut;
+              maleActs(:,1);
+              maleActs(:,2);
+              maleActs(:,3);
+              femaleActs(:,1);
+              femaleActs(:,2);
+              femaleActs(:,3);
+              beta_hrHPV_val;
+              beta_lrHPV_val;
+              beta_lrHPV_val;
+              hpv_hivMult;
+              kCin1_Inf;
+              kCin2_Cin1;
+              kCin3_Cin2;
+              kCC_Cin3;
+              rNormal_Inf;
+              kInf_Cin1;
+              kCin1_Cin2;
+              kCin2_Cin3;
+              hpv_hivClear;
+              hpv_hivClear;
+              c3c2Mults;
+              c2c1Mults;
+              ones(age,1);
+              kRL;
+              kDR;
+              kCCDet;
+              kCD4(1,:,1)';
+              kCD4(1,:,2)';
+              kCD4(1,:,3)';
+              kCD4(1,:,4)';
+              kCD4(2,:,1)';
+              kCD4(2,:,2)';
+              kCD4(2,:,3)';
+              kCD4(2,:,4)';
+              kVl(1,:,1)';
+              kVl(1,:,2)';
+              kVl(1,:,3)';
+              kVl(1,:,4)';
+              kVl(2,:,1)';
+              kVl(2,:,2)';
+              kVl(2,:,3)';
+              kVl(2,:,4)';
+              [0.4 ; 0.4];
+              [0.5 ; 0.5];
+              1.0];
 
+for i = 1 : numStartPts  
     options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
         'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
         'Display','iter','PlotFcn',@psplotbestf);
     x(:,i) = patternsearch(@calibratorAll, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+    disp('Pattern search iteration' , i)
     profile viewer
+    
+    initParams = lb + rand(size(lb)).*(ub - lb);
 end
 
 %% Save calibrated parameters

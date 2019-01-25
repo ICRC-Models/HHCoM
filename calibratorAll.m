@@ -1,6 +1,7 @@
 function negSumLogL = calibratorAll(initParams)
 
 %% Load parameters
+tic
 paramDir = [pwd ,'\Params\'];
 load([paramDir,'settings'])
 load([paramDir,'popData'])
@@ -33,6 +34,7 @@ hivOn = 1;
 startYear = 1980;
 endYear = 2015; % run to 2015 for calibration
 years = endYear - startYear;
+timeStep = 1 / stepsPerYear;
 circStartYear = 1990;
 vaxStartYear = 2017;
 
@@ -40,7 +42,9 @@ vaxStartYear = 2017;
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
 
-riskDistF = riskDistM;
+%riskDistF = riskDistM;
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
 
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
@@ -107,8 +111,8 @@ epsA = initParams(1:3);
 epsR = initParams(4:6); 
 prepOut = initParams(7);
 artOut = initParams(8); 
-maleActs = initParams(9:56);
-femaleActs = initParams(57:104);
+maleActs = [initParams(9:24) , initParams(25:40) , initParams(41:56)];
+femaleActs = [initParams(57:72) , initParams(73:88) , initParams(89:104)];
 perPartnerHpv = initParams(105);
 perPartnerHpv_lr = initParams(106);
 perPartnerHpv_nonV = initParams(107);
@@ -129,11 +133,13 @@ lambdaMultImm = initParams(256:271);
 kRL = initParams(272);
 kDR = initParams(273);
 kCCDet = initParams(274:276);
-kCD4 = initParams(277:308);
-kVL = initParams(309:340);
-maxRateM_vec = initParams(341:342);
-maxRateF_vec = initParams(343:344);
-artHpvMult = initParams(345);
+kCD4(1,:,:) = [initParams(277:281) , initParams(282:286) , initParams(287:291) , initParams(292:296)];
+kCD4(2,:,:) = [initParams(297:301) , initParams(302:306) , initParams(307:311) , initParams(312:316)];
+kVl(1,:,:) = [initParams(317:321) , initParams(322:326) , initParams(327:331) , initParams(332:336)];
+kVl(2,:,:) = [initParams(337:341) , initParams(342:346) , initParams(347:351) , initParams(352:356)];
+maxRateM_vec = initParams(357:358);
+maxRateF_vec = initParams(359:360);
+artHpvMult = initParams(361);
 
 for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
@@ -152,9 +158,9 @@ epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
     period = [yr(i) , yr(i + 1)];
     epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
+        yr(i) : timeStep : yr(i + 1));
     epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
+        yr(i) : timeStep : yr(i + 1));
 end
 
 %% Simulation parameters
@@ -164,7 +170,6 @@ vaxRate = 0;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize vectors
-timeStep = 1 / stepsPerYear;
 s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
 artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
 import java.util.LinkedList
@@ -188,7 +193,6 @@ artDist = zeros(disease , viral , gender , age , risk); % initial distribution o
 
 %% Simulation
 for i = 2 : length(s) - 1
-    tic
     year = startYear + s(i) - 1;
     currStep = round(s(i) * stepsPerYear);
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
@@ -271,3 +275,5 @@ negSumLogL = likeFun(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,...
     hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
 	hivPrevM_obs , hivPrevF_obs , disease , viral , gender , age , risk , ...
 	hpvTypes , hpvStates , periods , startYear , stepsPerYear);
+toc
+
