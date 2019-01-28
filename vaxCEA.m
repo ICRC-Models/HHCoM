@@ -2,7 +2,8 @@ function vaxCEA(pathModifier)
 
 %% load results
 paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
+load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to 2018
 
@@ -18,7 +19,7 @@ vaxResult = cell(nSims , 1);
 
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult' ,...
+    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult' ,...
         num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to 2018 to population
     % matrices for years past 2018
@@ -208,44 +209,44 @@ for n = 1 : length(vaxResult)
 end
 
 %% Find price threshold for 9v (CC costs only)
-% 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
-ceThreshold = 1540; % USD per LYS
-ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
-
-% Using Life years
-% High coverage scenario (9v vs 2v)
-for i = 1 : length(ceThresholds)
-    priceGuess = 100; % Enter a price guess for 9v to seed the search process
-    % ce9v is an anonymous function that finds the vaccine price that
-    % places the 9v vaccine right at the cost-effectiveness threshold
-    % specified by ceThresholds(i)
-    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
-    priceThreshold_9v = fminsearch(ce9v , priceGuess);
-    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
-        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-        num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
-end
-
-disp(' ')
-% Using DALYs
-% High coverage scenario (9v vs 2v)
-for i = 1 : length(ceThresholds)
-    priceGuess = 100; % Enter a price guess for 9v to seed the search process
-    % ce9v is an anonymous function that finds the vaccine price that
-    % places the 9v vaccine right at the cost-effectiveness threshold
-    % specified by ceThresholds(i)
-    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
-    priceThreshold_9v = fminsearch(ce9v , priceGuess);
-    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
-        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-        num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
-end
+% % 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
+% ceThreshold = 1540; % USD per LYS
+% ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
+% 
+% % Using Life years
+% % High coverage scenario (9v vs 2v)
+% for i = 1 : length(ceThresholds)
+%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
+%     % ce9v is an anonymous function that finds the vaccine price that
+%     % places the 9v vaccine right at the cost-effectiveness threshold
+%     % specified by ceThresholds(i)
+%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+%         / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
+%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
+%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
+%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+%         num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
+% end
+% 
+% disp(' ')
+% % Using DALYs
+% % High coverage scenario (9v vs 2v)
+% for i = 1 : length(ceThresholds)
+%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
+%     % ce9v is an anonymous function that finds the vaccine price that
+%     % places the 9v vaccine right at the cost-effectiveness threshold
+%     % specified by ceThresholds(i)
+%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+%         / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
+%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
+%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
+%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+%         num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
+%end
 
 %% YLS
 
@@ -498,7 +499,7 @@ ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
 % 
-% %%
+%%
 % figure()
 % for g = 1 : 2
 %     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
@@ -532,8 +533,8 @@ legend('Model (Male)' , 'Model (Female)')
 %     hold on
 % end
 % legend('Male' , 'Female' , 'Male Vax' , 'Female Vax')
-% 
-% %%
+
+%%
 % figure()    
 % for g = 1 : 2
 %     hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...

@@ -101,8 +101,8 @@ ub(361) = 10.0;
 % loop over multiple start points, then compare local optima to find global
 % optimum
 
-numStartPts = 10;
-x = zeros(length(lb),numStartPts);
+%numStartPts = 10;
+%x = zeros(length(lb),numStartPts);
 
 initParams = [epsA;
               epsR;
@@ -154,18 +154,19 @@ initParams = [epsA;
               [0.5 ; 0.5];
               1.0];
 
-for i = 1 : numStartPts  
-    options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
-        'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
-        'Display','iter','PlotFcn',@psplotbestf);
-    x(:,i) = patternsearch(@calibratorAll, initParams , [] , [] , [] , [] , lb , ub , [] , options);
-    disp('Pattern search iteration' , i)
-    profile viewer
+%for i = 1 : numStartPts  
+options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
+    'CacheTol' , 0.1 , 'CompletePoll' , 'on' , 'TolMesh' , 0.1, ...
+    'Display','iter','PlotFcn',@psplotbestf);
+%x(:,i) = patternsearch(@calibratorAll, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+x = patternsearch(@calibratorAll, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+%disp('Pattern search iteration' , i)
+profile viewer
     
-    initParams = lb + rand(size(lb)).*(ub - lb);
-end
+    %initParams = lb + rand(size(lb)).*(ub - lb);
+%end
 
 %% Save calibrated parameters
-file = 'HPV_calib_23Jan19.dat';
+file = 'HPV_calib_28Jan19.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , x)
