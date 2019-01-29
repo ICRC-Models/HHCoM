@@ -3,40 +3,52 @@
 % user.
 close all; clear all; clc
 profile clear;
+
 % [~ , startYear , endYear , stepsPerYr , IntSteps] = Menu();
 % disp('Done with input')
+
 %%
-% Get parameter values and load model
 disp('Initializing. Standby...')
 disp(' ');
+
+% Load parameters
 paramDir = [pwd , '\Params\'];
-%% Model Specs
-% choose whether to model hysterectomy
+load([paramDir , 'popData'])
+load([paramDir , 'General'])
+
+% Model specs
+% choose whether to model hysterectomy (not currently implemented)
 hyst = 'off';
 % choose whether to model HIV
 hivOn = 1;
-% Choose whether to model HPV
+% choose whether to model HPV
 hpvOn = 1;
 if hpvOn
     disp('HPV module activated.')
 end
-
 if hivOn
     disp('HIV module activated')
 end
+
+% Use calibrated parameters
+load([paramDir , 'calibratedParams'])
+
+% Time
 c = fix(clock);
 currYear = c(1); % get the current year
 startYear = 1980;
 endYear = currYear;
 years = endYear - startYear;
 
-load([paramDir , 'popData'])
-load([paramDir , 'General'])
-%% use calibrated parameters
-load([paramDir , 'calibratedParams'])
+% Intervention start years
+circStartYear = 1990;
+vaxStartYear = 2017;
+
+% ART
+import java.util.LinkedList
+artDistList = LinkedList();
 maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim}; % Maximum ART coverage
 maxRateF_vec = [0.5 , 0.5];% maxRateF_arr{sim};
-
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -44,13 +56,11 @@ maxRateF2 = maxRateF_vec(2);
 
 %% Initial Population 
 mInit = popInit(: , 1); % initial male population size by age
-
 fInit = popInit(: , 2); % initial female population size by age
+
 % use male risk distribution for both genders
 riskDistF = riskDistM;
-% partnersF = partnersM;
 
-% use male partners for both genders
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
 
@@ -111,29 +121,24 @@ if hpvOn
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
-% Intervention start years
-circStartYear = 1990;
-vaxStartYear = 2017;
-
 %% Simulation
 disp('Start up')
+profile on
+disp(' ')
+
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 k_wane = 0;
 vaxRate = 0;
-vaxerAger = ager;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
-profile on
-disp(' ')
-% Initialize vectors
+% Initialize time vectors
 timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
 s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
-artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
-%performance tracking
+
+% Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
-import java.util.LinkedList
-artDistList = LinkedList();
+% Initialize other vectors
 popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 newHiv = zeros(length(s) - 1 , gender , age , risk);
@@ -172,6 +177,9 @@ for i = 2 : length(s) - 1
 
     if hpvOn
         hystOption = 'on';
+        % Progression/regression from initial HPV infection to
+        % precancer stages and cervical cancer. Differential CC
+        % detection by CC stage and HIV status/CD4 count.
         [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :) , ...
             ccTreated(i , : , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
@@ -197,6 +205,8 @@ for i = 2 : length(s) - 1
         %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
     end
 
+    % HIV and HPV mixing and infection module. Protective effects of condom
+    % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
     [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
         newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
         ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
@@ -213,6 +223,8 @@ for i = 2 : length(s) - 1
         break
     end
 
+    % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
+    % excess HIV mortality
     if hivOn
         [~ , pop , hivDeaths(i , : , :) , artTreat] =...
             ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
@@ -232,16 +244,7 @@ for i = 2 : length(s) - 1
         end
     end
     
-    %         [~ , pop , deaths(i , :) , vaxd(i , :)] = ode4xtra(@(t , pop) ...
-    %             bornAgeDie(t , pop , ager , year , currStep , age , fertility , ...
-    %             fertMat , fertMat2 , hivFertPosBirth ,hivFertNegBirth , hivFertPosBirth2 , ...
-    %             hivFertNegBirth2 , deathMat , circMat , ...
-    %             vaxerAger , vaxMat , MTCTRate , circStartYear , vaxStartYear ,...
-    %             vaxRate , startYear , endYear, stepsPerYear) , tspan , pop(end , :));
-    %         if any(pop(end , :) < 0)
-    %             disp('After bornAgeDie')
-    %             break
-    %         end
+    % Birth, aging, risk redistribution module
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , currStep ,...
         gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
@@ -274,6 +277,7 @@ disp(' ')
 disp('Simulation complete.')
 
 profile viewer
+
 %% Runtimes
 figure()
 plot(1 : size(runtimes , 1) , runtimes)
@@ -290,5 +294,6 @@ h = histogram(runtimes);
 title('Runtimes')
 ylabel('Frequency')
 xlabel('Times (s)')
+
 %% Show results
 showResults()

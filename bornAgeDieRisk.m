@@ -1,10 +1,10 @@
-% Births, deaths, vaccination module
-% Simulates births, non-disease related deaths, and vaccination in a
+% Births and deaths module
+% Simulates births and non-disease related deaths in a
 % population.
 % More comments about births here....
 % Accepts a population matrix as input and returns dPop, a matrix of
 % derivatives that describes the change in the population's subgroups due
-% to births, deaths, and vaccinations.
+% to births and deaths.
 
 % Aging module
 % Ages population.

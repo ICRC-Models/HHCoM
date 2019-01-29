@@ -1,27 +1,33 @@
 function vaxCEA(pathModifier)
 
-%% load results
-paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to 2018
+waning = 0;    % turn waning on or off
 
-% helper functions
+%% Load parameters
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+% Load results
+nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to current year
+
+% Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
-% time
+% Time
 c = fix(clock); % get time
 currYear = c(1); % get the current year from time
 
 vaxResult = cell(nSims , 1);
-
+resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+if waning
+    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
+end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult' ,...
-        num2str(n), '.mat']);
-    % concatenate vectors/matrices of population up to 2018 to population
-    % matrices for years past 2018
+    vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+    % concatenate vectors/matrices of population up to current year to population
+    % matrices for years past current year
     vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec];
     vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :) ; vaxResult{n}.newHpv];
     vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :) ; vaxResult{n}.newImmHpv];
@@ -42,11 +48,12 @@ end
 noV = vaxResult{noVaxInd};
 tVec = noV.tVec;
 tVecYr = tVec(1 : stepsPerYear : end);
-%%
+
+%% Plot settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
-%% Calculate life years saved
 
+%% Calculate life years saved
 yrIntStart = 2018;
 for n = 1 : length(vaxResult)
     vaxResult{n}.ly = zeros((length(tVec) - length(curr.tVec)) , 1);
@@ -54,6 +61,7 @@ for n = 1 : length(vaxResult)
 end
 noV.ly = zeros((length(tVec) - length(curr.tVec)) , 1);
 noV.daly = zeros((length(tVec) - length(curr.tVec)) , 1);
+
 %% CC Costs
 ccCost = [2617 , 8533 , 8570]; % local, regional, distant
 ccDalyWeight = 1 - [0.288 , 0.288 , 0.288]; % corresponds to local, regional, distant CC
@@ -127,7 +135,8 @@ for i = 1 : (length(tVec) - length(curr.tVec))
         sum(sum(sum(noV.ccTreated(i , : , : , a : age , 2) , 2) , 3) , 4) .* ccCost(2) + ...
         sum(sum(sum(noV.ccTreated(i , : , : , a : age , 3) , 2) , 3) , 4) .* ccCost(3);
 end
-%% 
+
+%%
 for n = 1 : length(vaxResult)
     vaxResult{n}.lys = vaxResult{n}.ly - noV.ly;
 end
@@ -156,6 +165,7 @@ end
 for n = 1 : length(vaxResult)
     vaxResult{n}.dalyPlus = vaxResult{n}.daly - noV.daly;
 end
+
 %% Calculate annual costs
 % HIV Costs (Not used in ICER calculation. Included for completeness)
 hospCost = [117 , 56 , 38 , 38]; % <200 , 200-350, >350 , on ART
@@ -163,7 +173,6 @@ artCost = 260;
 
 % CC Costs (Incurred once per person at time of cervical cancer detection)
 ccCost = [2617 , 8533 ,8570]; % local, regional, distant
-
 
 % HIV Indices (Not used)
 % above350Inds = toInd(allcomb(4 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
@@ -175,7 +184,7 @@ ccCost = [2617 , 8533 ,8570]; % local, regional, distant
 % artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
 %     1 : gender , 1 : age , 1 : risk));
 
-% Vaccination
+%% Vaccination
 discountRate = 0.03; % discount rate of 3% per annum
 cost2v = 27; % cost of 2 doses of bivalent vaccine
 import java.util.LinkedList
@@ -208,44 +217,44 @@ for n = 1 : length(vaxResult)
 end
 
 %% Find price threshold for 9v (CC costs only)
-% 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
-ceThreshold = 1540; % USD per LYS
-ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
-
-% Using Life years
-% High coverage scenario (9v vs 2v)
-for i = 1 : length(ceThresholds)
-    priceGuess = 100; % Enter a price guess for 9v to seed the search process
-    % ce9v is an anonymous function that finds the vaccine price that
-    % places the 9v vaccine right at the cost-effectiveness threshold
-    % specified by ceThresholds(i)
-    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
-    priceThreshold_9v = fminsearch(ce9v , priceGuess);
-    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
-        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-        num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
-end
-
-disp(' ')
-% Using DALYs
-% High coverage scenario (9v vs 2v)
-for i = 1 : length(ceThresholds)
-    priceGuess = 100; % Enter a price guess for 9v to seed the search process
-    % ce9v is an anonymous function that finds the vaccine price that
-    % places the 9v vaccine right at the cost-effectiveness threshold
-    % specified by ceThresholds(i)
-    ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
-        + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
-        / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
-    priceThreshold_9v = fminsearch(ce9v , priceGuess);
-    fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
-        ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
-        ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
-        num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
-end
+% % 3 thresholds: 0.5x GDP , 1x GDP , 500 USD per LYS (BMGF)
+% ceThreshold = 1540; % USD per LYS
+% ceThresholds = [0.5 * ceThreshold , ceThreshold , 500];
+% 
+% % Using Life years
+% % High coverage scenario (9v vs 2v)
+% for i = 1 : length(ceThresholds)
+%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
+%     % ce9v is an anonymous function that finds the vaccine price that
+%     % places the 9v vaccine right at the cost-effectiveness threshold
+%     % specified by ceThresholds(i)
+%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+%         / pvvar(annAvg(vaxResult{maxRate9vSim}.lys) - annAvg(vaxResult{maxRate2vSim}.lys) , discountRate) - ceThresholds(i)); % difference in LYS for 9v vs 2v scenario
+%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
+%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per LYS, ' ,...
+%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+%         num2str(round(priceThreshold_9v , 2)),' USD. \n']) 
+% end
+% 
+% disp(' ')
+% % Using DALYs
+% % High coverage scenario (9v vs 2v)
+% for i = 1 : length(ceThresholds)
+%     priceGuess = 100; % Enter a price guess for 9v to seed the search process
+%     % ce9v is an anonymous function that finds the vaccine price that
+%     % places the 9v vaccine right at the cost-effectiveness threshold
+%     % specified by ceThresholds(i)
+%     ce9v = @(x) abs(pvvar(annlz(vaxResult{maxRate9vSim}.vaxd) * x - annlz(vaxResult{maxRate2vSim}.vaxd) .* cost2v ... % difference in vaccine cost for 9v vs 2v 
+%         + annlz(vaxResult{maxRate9vSim}.ccCosts') - annlz(vaxResult{maxRate2vSim}.ccCosts') , discountRate) ... % difference in CC cost for 9v vs 2v scenario
+%         / pvvar(annAvg(vaxResult{maxRate9vSim}.daly) - annAvg(vaxResult{maxRate2vSim}.daly) , discountRate) - ceThresholds(i)); % difference in DALYs for 9v vs 2v scenario
+%     priceThreshold_9v = fminsearch(ce9v , priceGuess);
+%     fprintf(['\n 9v vs 2v: Considering only CC costs, with a cost-effectiveness \n' , ...
+%         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
+%         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
+%         num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
+% end
 
 %% YLS
 
@@ -253,9 +262,7 @@ end
 % plot(tVec(1 : stepsPerYear : end) , annlz(c90_9vFull.vaxd))
 % title('Vaccinated with 9v'); xlabel('Year'); ylabel('Number vaccinated')
 
-
-%% CC incidence reduction
- 
+%% CC incidence and incidence reduction
 inds = {':' , [2 : 6 , 10] , [2 : 6] , 1 , 10};
 files = {'CEA CC_General_Hpv_VaxCover' , 'CEA CC_HivAll_Hpv_VaxCover' , ...
      'CEA CC_HivNoART_Hpv_VaxCover' , 'CEA CC_HivNeg_Hpv_VaxCover' ,...
@@ -367,11 +374,8 @@ for i = 1 : length(inds)
         hold off
     
 end
-% %%
 
-%% CC Mortality 
-%% CC mortality reduction
- 
+%% CC mortality and mortality reduction
 inds = {':' , [2 : 6 , 10] , [2 : 6] , 1 , 10};
 files = {'CEA CC_General_Hpv_VaxCover' , 'CEA CC_HivAll_Hpv_VaxCover' , ...
      'CEA CC_HivNoART_Hpv_VaxCover' , 'CEA CC_HivNeg_Hpv_VaxCover' ,...
@@ -481,6 +485,7 @@ end
 title('Population Size')
 xlabel('Year'); ylabel('Individuals')
 hold off
+
 %%
 figure()
 for g = 1 : 2
