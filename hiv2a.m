@@ -15,18 +15,18 @@ function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
     kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
     viral , gender , age , risk , k , hivInds , ...
     stepsPerYear , year)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% load constants and parameters
-%%%
-artOut = 0;%0.03; % 3% dropout
+
+%% Load constants and parameters
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
     + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
+
+artOut = 0;%0.03; % 3% dropout
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
-% disease related mortality
-%
+
 % pie [d x v x g x a x r]
+
 % values obtained from k4_mat in MainMain.m of HIV model.
 treat = zeros(disease , viral , gender , age ,risk);
 treat(1 , : , : , 4 : end , :) = 0; % rate of going on PrEP
@@ -171,15 +171,13 @@ if year >= 2004
 end
 
 % see model notes for index values
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 dPop = zeros(size(pop));
 artTreat = zeros(disease , viral , gender , age , risk);
 hivDeaths = zeros(gender , age , 1);
 
 % Dropout from PrEP
 prepOut = 0; % for now
-
-
 
 for g = 1 : gender
     for a = 4 : age
@@ -278,7 +276,7 @@ for g = 1 : gender
     end
 end
 
-% Advance viral load
+%% Advance viral load
 if size(pop , 1) ~= size(vlAdvancer , 2)
     pop = pop';
 end

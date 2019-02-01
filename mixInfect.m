@@ -12,14 +12,13 @@ function [dPop , newInfs] = mixInfect(t , pop , currStep , ...
         toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
         betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
         hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year)
+    
 sumall = @(x) sum(x(:));
-%% mixInfect Constants
-% load workspace and get constants
+%% Process mixInfect constants
 
-% process constants
+% epsAge and epsRisk - extent of assortative mixing
 dataYr1 = yr(1);
 dataYrLast = yr(size(yr , 1));
-% epsAge and epsRisk - extent of assortative mixing
 now = currStep / stepsPerYear + modelYr1;
 baseYrInd = max(find(now >= yr , 1, 'last') , 1); % get index of first year <= current year
 baseYr = yr(baseYrInd);
@@ -35,9 +34,8 @@ else % assortativity in last year
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
-
-%epsA = 0.4;
-%epsR = 0.4;
+epsA = 0.4;
+epsR = 0.4;
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times
@@ -46,7 +44,6 @@ deltaR = eye(3 , 3);
 % original
 deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
 deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
-
 % after 2005
 % if currStep > (2000 - modelYr1) * stepsPerYear
 %     deltaAF = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , 1);
@@ -59,26 +56,25 @@ deltaAF(4 , 4) = 1;
 deltaAF(3 , 4) = 0;
 deltaAF(4 , 5) = 0;
 deltaAF(3 , 3) = 1;
-% 
 deltaAM(4 , 4) = 1;
 deltaAM(4 , 3) = 0;
 deltaAM(3 , 2) = 0;
 deltaAM(3 , 3) = 1;
 
+acts = actsPer; % acts per partnership, from loaded workspace [gender x risk] (not currently used)
 
-
-acts = actsPer; % acts per partnership, from loaded workspace [gender x risk]
-% rate of partner change (contact)
+% Rate of partner change (contact)
 % males
 c(1 , : , :) = partnersM;
 % females
 c(2 , : , :) = partnersF;
 
-% protection from circumcision
+% Protection from circumcision
 %circProtect
 %condProtect
 prepProtect = 0.75; % Ying et al. HIV Home HTC supplementary appendix
 artProtect = 0.96; % Ying et al. HIV Home HTC supplementary appendix. change to 0.93?
+
 %% MixInfect
 % Mixing matrix
 popSum = zeros(gender , age , risk);
@@ -126,7 +122,6 @@ for i = 3 : age
     rhoRiskM(i , : , :) = squeeze(epsR .* riskFraction_F(i , : , :))...
         + (1 - epsR) .* deltaR; % [a(i) x r x r] + [r x r] -> [a x r x r]
 end
-
 
 % Intialize rho matrices for males and females
 rhoM = zeros(age, age, risk, risk);
@@ -210,7 +205,6 @@ psi(7) = (1 - circProtect) .* cond;
 psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond; % no one on PrEP for now
 dPop = zeros(size(pop));
 newHiv = zeros(gender , age , risk); % incidence tally by gender
-
 
 %% HPV Infection
 % HPV parameters

@@ -13,7 +13,8 @@ function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds ,
     c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
     disease , viral , age , hpvTypes , ...
     rImmuneHiv , vaccinated , hystOption)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Set constants and initialize vectors
 % kCCDet = kCCDet .* 0 ; %TESTING!
 sumall = @(x) sum(x(:));
 hyst = 0;
@@ -23,11 +24,11 @@ end
 ccInc = zeros(disease , hpvTypes , age);
 ccDeath = ccInc;
 ccTreated = zeros(disease , hpvTypes , age , 3); % 3 for cancer stages - local, regional, distant
-% constants
-% see model notes for index values
+
 % leep (effective treatment rate by leep)
 rImmune = 0.024; % for HPV16, Johnson (2012)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%
 dPop = zeros(size(pop));
 for d = 1 : disease
     c3c2Mult = c3c2Mults(1); % multiplier used for CIN2 -> CIN3 in HIV infecteds

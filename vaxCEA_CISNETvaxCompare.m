@@ -2,28 +2,34 @@ function vaxCEA_CISNETvaxCompare(pathModifier)
 % modifying function vaxCEA() to produce outputs for CISNET vaxination
 % scenario comparison model runs
 
-%% load results
-paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to 2018
+waning = 0;    % turn waning on or off
 
-% helper functions
+%% Load parameters
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+% Load results
+nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to current year
+
+% Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
-% time
+% Time
 c = fix(clock); % get time
 currYear = c(1); % get the current year from time
 
 vaxResult = cell(nSims , 1);
-
+resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+if waning
+    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
+end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult' ,...
-        num2str(n), '.mat']);
-    % concatenate vectors/matrices of population up to 2018 to population
-    % matrices for years past 2018
+    vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+    % concatenate vectors/matrices of population up to current year to population
+    % matrices for years past current year
     vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec];
     vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :) ; vaxResult{n}.newHpv];
     vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :) ; vaxResult{n}.newImmHpv];
