@@ -25,7 +25,7 @@ disp('Start up')
 paramDir = [pwd , '\Params\'];
 load([paramDir,'popData'])
 load([paramDir,'HIVParams'])
-load([paramDir, 'general'])
+load([paramDir,'general'])
 load([paramDir,'mixInfectParams'])
 load([paramDir,'vlBeta'])
 load([paramDir,'hpvData'])
@@ -61,7 +61,7 @@ currYear = c(1); % get the current year
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = 'fileName3NoWaneCUL';
+pathModifier = 'fileName';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -100,13 +100,19 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [0 , 0]]; % Append no vaccine school-based scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test
+
+
 if vaxCU
     vaxCoverCUmat = ones(nTests,2) .* vaxCoverCU;
     vaxCoverCUmat(end,:) = 0.0;
+else
+    vaxCoverCUmat = zeros(nTests,2);    % have to declare these even if vaxCU=0 because parfor is dumb
 end
 if vaxLimit
     vaxCoverLmat = ones(nTests,1) .* vaxCoverL;
     vaxCoverLmat(end,1) = 0.0;
+else
+    vaxCoverLmat = zeros(nTests,1);    % have to declare these even if vaxLimit=0 because parfor is dumb
 end
 
 % Parameters for waning
@@ -156,12 +162,18 @@ if vaxCU    % if present, add indices for catch-up vaccination regimen
         toVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
             min(vaxGCU):max(vaxGCU) , a , 1 : risk));
     end
+else 
+    fromNonVCU = [];    % have to declare these even if vaxCU=0 because parfor is dumb
+    toVCU = [];
 end
 if vaxLimit    % if present, add indices for vaccination during limited-vaccine years
     fromNonVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
         vaxGL , vaxAgeL , 1 : risk)); 
     toVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
         vaxGL , vaxAgeL , 1 : risk));
+else
+    fromNonVL = [];    % have to declare these even if vaxLimit=0 because parfor is dumb
+    toVL = [];
 end
 
 %% Initialize fixed parameters
