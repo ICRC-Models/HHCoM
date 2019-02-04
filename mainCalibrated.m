@@ -36,14 +36,12 @@ load([paramDir , 'calibratedParams'])
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
-startYear = 1980; %1920
+startYear = 1980; %1900
 endYear = currYear;
-years = endYear - startYear;
 
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
-vaxStartYear = 2017;
 
 % ART
 import java.util.LinkedList
@@ -75,8 +73,8 @@ if startYear >= 1980;
     end
 else
     for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (9*1.12);
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (9*1.12);
+        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (15*1.12);
+        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (15*1.12);
     end
 end
 
@@ -128,7 +126,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.1 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.05 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 
@@ -197,10 +195,10 @@ for i = 2 : length(s) - 1
         popIn_init = popIn;
         
         % Create indices
-        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 4:age , 2:3))); 
-        toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 4:age , 2:3)));
-        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:age , 1:3))); 
-        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:age , 1:3)));
+        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 4:6 , 2:3))); 
+        toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 4:6 , 2:3)));
+        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:6 , 1:3))); 
+        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:6 , 1:3)));
 
         % Distribute HIV infections (HPV-)        
         popIn(fromNonHivNonHpv) = (1 - 0.001) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
