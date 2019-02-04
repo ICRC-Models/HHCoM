@@ -31,35 +31,20 @@ load([paramDir,'vaxer'])
 load([paramDir,'circMat'])
 load([paramDir,'deathMat'])
 
-import java.util.LinkedList
-
 %% Set parameter upper and lower bounds 
-lb = zeros(361,1);
-ub = ones(361,1);
+lb = zeros(241,1);
+ub = ones(241,1);
 ub(9:104) = 365.0;
-lb(112:127) = kCin1_Inf ./ 10;
-lb(128:143) = kCin2_Cin1 ./ 10;
-lb(144:159) = kCin3_Cin2 ./ 10;
-lb(160:175) = kCC_Cin3 ./ 10;
-lb(176:191) = rNormal_Inf ./ 10;
-lb(192:207) = kInf_Cin1 ./ 10;
-lb(208:223) = kCin1_Cin2 ./ 10;
-lb(224:239) = kCin2_Cin3 ./ 10;
-ub(112:127) = kCin1_Inf .* 10;
-ub(128:143) = kCin2_Cin1 .* 10;
-ub(144:159) = kCin3_Cin2 .* 10;
-ub(160:175) = kCC_Cin3 .* 10;
-ub(176:191) = rNormal_Inf .* 10;
-ub(192:207) = kInf_Cin1 .* 10;
-ub(208:223) = kCin1_Cin2 .* 10;
-ub(224:239) = kCin2_Cin3 .* 10;
-lb(248:255) = 1.0;
-ub(248:251) = c3c2Mults .* 10;
-ub(252:255) = c2c1Mults .* 10;
-ub(277:356) = 10.0;
-lb(361) = 1.0;
-ub(361) = 10.0;
+lb(112:119) = 0.001;
+ub(112:119) = 20.0;
+lb(128:135) = 1.0;
+ub(128:131) = c3c2Mults .* 10;
+ub(132:135) = c2c1Mults .* 10;
+%ub(157:236) = 10.0;
+lb(241) = 1.0;
+ub(241) = 10.0;
 
+% KEY
 %(1:3):     epsA, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
 %(4:6):     epsR, [3x1], (0.0 to 1.0), XXXreset in mixInfectXXX
 %(7):       prepOut, [1x1], (0.0 to 1.0), reset in hiv2a to 0
@@ -67,30 +52,30 @@ ub(361) = 10.0;
 %(9:56):    maleActs, [age,risk], (0.0 to 365) 
 %(57:104):  femaleActs, [age,risk], (0.0 to 365)
 %(105):     perPartnerHpv, [1x1], (0.0 to 1.0)
-%(106):     perPartnerHpv_lr, val, (0.0 to 1.0)
-%(107):     perPartnerHpv_nonV, val, (0.0 to 1.0)
+%(106):     perPartnerHpv_lr, [1x1], (0.0 to 1.0)
+%(107):     perPartnerHpv_nonV, [1x1], (0.0 to 1.0)
 %(108:111): hpv_hivMult, [CD4x1], (0.0 to 1.0) 
-%(112:127): kCin1_Inf, [agex1], init, (/10 to x10) or (0.0 to 1.0)
-%(128:143): kCin2_Cin1, [agex1], init, (/10 to x10)
-%(144:159): kCin3_Cin2, [agex1], init, (/10 to x10)
-%(160:175): kCC_Cin3, [agex1], init, (/10 to x10)
-%(176:191): rNormal_Inf, [agex1], init, (/10 to x10)
-%(192:207): kInf_Cin1, [agex1], init, (/10 to x10)
-%(208:223): kCin1_Cin2, [agex1], init, (/10 to x10)
-%(224:239): kCin2_Cin3, [agex1], init, (/10 to x10)
-%(240:243): hpv_hivClear, [CD4x1], (0.0 to 1.0)
-%(244:247): rImmuneHiv, [CD4x1], (0.0 to 1.0)
-%(248:251): c3c2Mults, [CD4x1], init, (all ones to x10)
-%(252:255): c2c1Mults, [CD4x1], init, (all ones to x10)
-%(256:271): lambdaMultImm, [agex1], (0.0 to 1.0)
-%(272):     kRL, [1x1], (0.0 to 1.0)
-%(273):     kDR, [1x1], (0.0 to 1.0)
-%(274:276): kCCDet, [3x1], (0.0 to 1.0)
-%(277:316): kCD4, [genderxvlxcd4], (0.0 to 10.0)
-%(317:356): kVl, [genderxcd4xvl], (0.0 to 10.0)
-%(357:358): maxRateM_vec,[2x1], (0.0 to 1.0), reset in mainCalibrated
-%(359:360): maxRateF_vec, [2x1], (0.0 to 1.0), reset in mainCalibrated
-%(361):     artHpvMult, [1x1], (1.0 to x10)
+%(112): kCin1_Inf, [1x1], (0.001 to 20)
+%(113): kCin2_Cin1, [1x1], (0.001 to 20)
+%(114): kCin3_Cin2, [1x1], (0.001 to 20)
+%(115): kCC_Cin3, [1x1], (0.001 to 20)
+%(116): rNormal_Inf, [1x1], (0.001 to 20)
+%(117): kInf_Cin1, [1x1], (0.001 to 20)
+%(118): kCin1_Cin2, [1x1], (0.001 to 20)
+%(119): kCin2_Cin3, [1x1], (0.001 to 20)
+%(120:123): hpv_hivClear, [CD4x1], (0.0 to 1.0)
+%(124:127): rImmuneHiv, [CD4x1], (0.0 to 1.0)
+%(128:131): c3c2Mults, [CD4x1], init, (all ones to x10)
+%(132:135): c2c1Mults, [CD4x1], init, (all ones to x10)
+%(136:151): lambdaMultImm, [agex1], (0.0 to 1.0)
+%(152):     kRL, [1x1], (0.0 to 1.0)
+%(153):     kDR, [1x1], (0.0 to 1.0)
+%(154:156): kCCDet, [3x1], (0.0 to 1.0)
+%(157:196): kCD4, [genderxvlxcd4], (0.0 to 10.0)
+%(197:236): kVl, [genderxcd4xvl], (0.0 to 10.0)
+%(237:238): maxRateM_vec,[2x1], (0.0 to 1.0), reset in mainCalibrated
+%(239:240): maxRateF_vec, [2x1], (0.0 to 1.0), reset in mainCalibrated
+%(241):     artHpvMult, [1x1], (1.0 to x10)
 
 %% Set parameter constraints
 % max HPV acquisition multiplier for HIV+ on ART <= max acquisition multiplier for HIV+
@@ -118,14 +103,14 @@ initParams = [epsA;
               beta_lrHPV_val;
               beta_lrHPV_val;
               hpv_hivMult;
-              kCin1_Inf;
-              kCin2_Cin1;
-              kCin3_Cin2;
-              kCC_Cin3;
-              rNormal_Inf;
-              kInf_Cin1;
-              kCin1_Cin2;
-              kCin2_Cin3;
+              1.0;
+              1.0;
+              1.0;
+              1.0;
+              1.0;
+              1.0;
+              1.0;
+              1.0;
               hpv_hivClear;
               hpv_hivClear;
               c3c2Mults;
