@@ -106,11 +106,9 @@ for g = 1 : gender
         riskNeed = riskTarget - 4/5 .* [sumall(prosPop(r1To)) , sumall(prosPop(r2To)) , sumall(prosPop(r3To))]; % numbers needed to fill risk groups
         riskAvail = 1/5 .* [popR1Tot , popR2Tot , popR3Tot];
         riskDiff = riskNeed - riskAvail; % difference between numbers needed and available for each risk group
-
         riskFrac1 = 0;
         riskFrac2 = 0;
         riskFrac3 = 0;
-
         
         % find fraction of every compartment that must be moved to maintain
         % risk group distribution
@@ -174,12 +172,30 @@ for g = 1 : gender
         
         dPop(r1) = dPop(r1) - 1/5 .* pop(r1);
         dPop(r2) = dPop(r2) - 1/5 .* pop(r2);
-        dPop(r3) = dPop(r3) - 1/5 .* pop(r3);
+        dPop(r3) = dPop(r3) - 1/5 .* pop(r3);    
     end
     % age last age group
     dPop(r1To) = dPop(r1To) - 1/5 .* pop(r1To);
     dPop(r2To) = dPop(r2To) - 1/5 .* pop(r2To);
     dPop(r3To) = dPop(r3To) - 1/5 .* pop(r3To);
+
+% For debugging
+%     if any(dPop(r1To)<0) || any(dPop(r2To)<0) || any(dPop(r3To)<0) || any(dPop(r1)<0) || any(dPop(r2)<0) || any(dPop(r3)<0)
+%         %if popR1Tot<0 || popR2Tot<0 || popR3Tot <0    
+%         %any(dPop(r1)<0)
+%         %any(dPop(r2)<0)
+%         %any(dPop(r3)<0)
+%         %error = 1;
+%         find(dPop(r1To)<0)
+%         find(dPop(r2To)<0)
+%         find(dPop(r3To)<0)
+%         find(dPop(r1)<0)
+%         find(dPop(r2)<0)
+%         find(dPop(r3)<0)
+%         error = 1;
+%         %break
+%     end
+    
 end
 
 extraOut{1} = abs(deaths);

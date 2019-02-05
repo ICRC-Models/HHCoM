@@ -10,6 +10,7 @@ load([paramDir,'general'])
 load([paramDir,'mixInfectParams'])
 load([paramDir,'vlBeta'])
 load([paramDir,'hpvData'])
+load([paramDir,'cost_weights'])
 load([paramDir,'calibData'])
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'hivIndices'])
@@ -39,7 +40,6 @@ timeStep = 1 / stepsPerYear;
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
-vaxStartYear = 2017;
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -49,7 +49,9 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
 
-%riskDistF = riskDistM;
+
+riskDistM(3:end,:) = [paramSet(100:113) , paramSet(114:127) , paramSet(128:141)];
+riskDistF(3:end,:) = [paramSet(142:155) , paramSet(156:169) , paramSet(170:183)];
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
 
@@ -66,8 +68,8 @@ if startYear >= 1980;
     end
 else
     for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (9*1.12);
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (9*1.12);
+        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (15*1.12);
+        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (15*1.12);
     end
 end
 
@@ -128,49 +130,61 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 %% Calibration parameters
-epsA = paramSet(1:3); 
-epsR = paramSet(4:6); 
-prepOut = paramSet(7);
-artOut = paramSet(8); 
-maleActs = [paramSet(9:24) , paramSet(25:40) , paramSet(41:56)];
-femaleActs = [paramSet(57:72) , paramSet(73:88) , paramSet(89:104)];
-perPartnerHpv = paramSet(105);
-perPartnerHpv_lr = paramSet(106);
-perPartnerHpv_nonV = paramSet(107);
-hpv_hivMult = paramSet(108:111);
-
-kCin1_Inf_orig = kCin1_Inf;
-kCin2_Cin1_orig = kCin2_Cin1;
-kCin3_Cin2_orig = kCin3_Cin2;
-kCC_Cin3_orig = kCC_Cin3;
-rNormal_Inf_orig = rNormal_Inf;
-kInf_Cin1_orig = kInf_Cin1;
-kCin1_Cin2_orig = kCin1_Cin2;
-kCin2_Cin3_orig = kCin2_Cin3;
-kCin1_Inf = paramSet(112) .* kCin1_Inf_orig;
-kCin2_Cin1 = paramSet(113) .* kCin2_Cin1_orig;
-kCin3_Cin2 = paramSet(114) .* kCin3_Cin2_orig;
-kCC_Cin3 = paramSet(115) .* kCC_Cin3_orig;
-rNormal_Inf = paramSet(116) .* rNormal_Inf_orig;
-kInf_Cin1 = paramSet(117) .* kInf_Cin1_orig;
-kCin1_Cin2 = paramSet(118) .* kCin1_Cin2_orig;
-kCin2_Cin3 = paramSet(119) .* kCin2_Cin3_orig;
-
-hpv_hivClear = paramSet(120:123);
-rImmuneHiv = paramSet(124:127);
-c3c2Mults = paramSet(128:131);
-c2c1Mults = paramSet(132:135);
-lambdaMultImm = paramSet(136:151);
-kRL = paramSet(152);
-kDR = paramSet(153);
-kCCDet = paramSet(154:156);
-kCD4(1,:,:) = [paramSet(157:161) , paramSet(162:166) , paramSet(167:171) , paramSet(172:176)];
-kCD4(2,:,:) = [paramSet(177:181) , paramSet(182:186) , paramSet(187:191) , paramSet(192:196)];
-kVl(1,:,:) = [paramSet(197:201) , paramSet(202:206) , paramSet(207:211) , paramSet(212:216)];
-kVl(2,:,:) = [paramSet(217:221) , paramSet(222:226) , paramSet(227:231) , paramSet(232:236)];
-maxRateM_vec = paramSet(237:238);
-maxRateF_vec = paramSet(239:240);
-artHpvMult = paramSet(241);
+maleActs = [paramSet(1:16) , paramSet(17:32) , paramSet(33:48)];
+femaleActs = [paramSet(49:64) , paramSet(65:80) , paramSet(81:96)];
+perPartnerHpv = paramSet(97);
+perPartnerHpv_lr = paramSet(98);
+perPartnerHpv_nonV = paramSet(99);
+partnersM = [paramSet(184:199) , paramSet(200:215) , paramSet(216:231)];
+partnersF = [paramSet(232:247) , paramSet(248:263) , paramSet(264:279)];
+muCC = [paramSet(280:285) , paramSet(286:291) , paramSet(292:297)];
+muCC_det = [paramSet(298:303) , paramSet(304:309) , paramSet(310:315)];
+% epsA = paramSet(1:3); 
+% epsR = paramSet(4:6); 
+% prepOut = paramSet(7);
+% artOut = paramSet(8); 
+% maleActs = [paramSet(9:24) , paramSet(25:40) , paramSet(41:56)];
+% femaleActs = [paramSet(57:72) , paramSet(73:88) , paramSet(89:104)];
+% perPartnerHpv = paramSet(105);
+% perPartnerHpv_lr = paramSet(106);
+% perPartnerHpv_nonV = paramSet(107);
+% hpv_hivMult = paramSet(108:111);
+% kCin1_Inf_orig = kCin1_Inf;
+% kCin2_Cin1_orig = kCin2_Cin1;
+% kCin3_Cin2_orig = kCin3_Cin2;
+% kCC_Cin3_orig = kCC_Cin3;
+% rNormal_Inf_orig = rNormal_Inf;
+% kInf_Cin1_orig = kInf_Cin1;
+% kCin1_Cin2_orig = kCin1_Cin2;
+% kCin2_Cin3_orig = kCin2_Cin3;
+% kCin1_Inf = paramSet(112) .* kCin1_Inf_orig;
+% kCin2_Cin1 = paramSet(113) .* kCin2_Cin1_orig;
+% kCin3_Cin2 = paramSet(114) .* kCin3_Cin2_orig;
+% kCC_Cin3 = paramSet(115) .* kCC_Cin3_orig;
+% rNormal_Inf = paramSet(116) .* rNormal_Inf_orig;
+% kInf_Cin1 = paramSet(117) .* kInf_Cin1_orig;
+% kCin1_Cin2 = paramSet(118) .* kCin1_Cin2_orig;
+% kCin2_Cin3 = paramSet(119) .* kCin2_Cin3_orig;
+% hpv_hivClear = paramSet(120:123);
+% rImmuneHiv = paramSet(124:127);
+% c3c2Mults = paramSet(128:131);
+% c2c1Mults = paramSet(132:135);
+% lambdaMultImm = paramSet(136:151);
+% kRL = paramSet(152);
+% kDR = paramSet(153);
+% kCCDet = paramSet(154:156);
+% kCD4(1,:,:) = [paramSet(157:161) , paramSet(162:166) , paramSet(167:171) , paramSet(172:176)];
+% kCD4(2,:,:) = [paramSet(177:181) , paramSet(182:186) , paramSet(187:191) , paramSet(192:196)];
+% kVl(1,:,:) = [paramSet(197:201) , paramSet(202:206) , paramSet(207:211) , paramSet(212:216)];
+% kVl(2,:,:) = [paramSet(217:221) , paramSet(222:226) , paramSet(227:231) , paramSet(232:236)];
+% maxRateM_vec = paramSet(237:238);
+% maxRateF_vec = paramSet(239:240);
+% artHpvMult = paramSet(241);
+maxRateM_vec = [0.4 , 0.4];
+maxRateF_vec = [0.5 , 0.5];
+rImmuneHiv = hpv_hivClear;
+lambdaMultImm = ones(age,1);
+artHpvMult = 1.0;
 
 for a = 1 : age
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
@@ -339,7 +353,7 @@ allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
         1 : periods , 2 , 4 : age , 1 : risk)); ...
         toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
         1 : periods , 2 , 4 : age , 1 : risk))];
-if error || ~(isreal(size(sum(popVec(end,allF),2)))) || ~(isreal(size(sum(sum(sum(newCC(end,':',:,4:age),2),3),4))))
+if error
     negSumLogL = -1;
     ccInc = -1;
 else
