@@ -66,7 +66,7 @@ if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
 
-lastYear = 2100; %endYear;
+lastYear = 2099; %endYear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 %% Vacination
@@ -100,7 +100,6 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [0 , 0]]; % Append no vaccine school-based scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test
-
 
 if vaxCU
     vaxCoverCUmat = ones(nTests,2) .* vaxCoverCU;

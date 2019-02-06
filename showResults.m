@@ -1126,56 +1126,56 @@ for y = 1 : length(ccIncYears)
 end
 
 %% CC Cumulative Probability of Incidence- early years
-ccIncYears = [1980,1990,2000,2010];
-ccAgeCI = zeros(1 , length(ccIncYears));
-
-fScale = 10^5;
-ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
-    '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
-ccYrs = ((ccIncYears - startYear) * stepsPerYear :...
-    (ccIncYears + 1 - startYear) * stepsPerYear);
-
-for y = 1 : length(ccIncYears)
-    for a = 1 : age
-        % Year
-        yr_start = (ccIncYears(y) - 1 - startYear)  .* stepsPerYear;
-        yr_end = (ccIncYears(y) - startYear) .* stepsPerYear - 1;
-        % Total population
-        ageInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
-            2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , ...
-            2 , a , 1 : risk))];
-        ccAgeCI(1 , y) = ccAgeCI(1 , y) + (-1) .* annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
-            1 : disease , 1 : hpvTypes , a) , 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ...
-            ./ stepsPerYear) ;
-    end
-    ccAgeCI(1 , y) = 1 - exp(ccAgeCI(1 , y));
-end
-
-forouzanfar =[4.7
-4.3
-3.9
-3.4] ./ 100;
-
-forouzanfar_ub = [6.1
-5.5
-5.7
-5.3] ./ 100;
-
-forouzanfar_lb = [3.0
-2.7
-3.0
-2.5] ./ 100;
-
-figure()
-plot(ccIncYears, ccAgeCI(: , y) , '-o');
-xlabel('Year'); ylabel('Cumulative Probability of Incidence')
-title(['Cumulative Probability of Incidence'])
-hold on
-% globocan data
-plot(ccIncYears , forouzanfar , '-' , ccIncYears , forouzanfar_ub , 'r--' , ccIncYears , forouzanfar_lb , 'r--')
+% ccIncYears = [1980,1990,2000,2010];
+% ccAgeCI = zeros(1 , length(ccIncYears));
+% 
+% fScale = 10^5;
+% ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+%     '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
+%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+% ccYrs = ((ccIncYears - startYear) * stepsPerYear :...
+%     (ccIncYears + 1 - startYear) * stepsPerYear);
+% 
+% for y = 1 : length(ccIncYears)
+%     for a = 1 : age
+%         % Year
+%         yr_start = (ccIncYears(y) - 1 - startYear)  .* stepsPerYear;
+%         yr_end = (ccIncYears(y) - startYear) .* stepsPerYear - 1;
+%         % Total population
+%         ageInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+%             2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , ...
+%             2 , a , 1 : risk))];
+%         ccAgeCI(1 , y) = ccAgeCI(1 , y) + (-1) .* annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             1 : disease , 1 : hpvTypes , a) , 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ...
+%             ./ stepsPerYear) ;
+%     end
+%     ccAgeCI(1 , y) = 1 - exp(ccAgeCI(1 , y));
+% end
+% 
+% forouzanfar =[4.7
+% 4.3
+% 3.9
+% 3.4] ./ 100;
+% 
+% forouzanfar_ub = [6.1
+% 5.5
+% 5.7
+% 5.3] ./ 100;
+% 
+% forouzanfar_lb = [3.0
+% 2.7
+% 3.0
+% 2.5] ./ 100;
+% 
+% figure()
+% plot(ccIncYears, ccAgeCI(: , y) , '-o');
+% xlabel('Year'); ylabel('Cumulative Probability of Incidence')
+% title(['Cumulative Probability of Incidence'])
+% hold on
+% % globocan data
+% plot(ccIncYears , forouzanfar , '-' , ccIncYears , forouzanfar_ub , 'r--' , ccIncYears , forouzanfar_lb , 'r--')
 
 %% Cervical cancer incidence type distribution
 newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
