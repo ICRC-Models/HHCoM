@@ -397,7 +397,7 @@ disp('Finished building viral load progression matrix')
 % save(fullfile(savedir ,'screenTreatMats') , 'screenTreater' , 'screenTreater2015')
 % disp('Finished building HPV screening and treatment matrix')
 %% bornDie
-%% Fertility prior to 2010
+%% Fertility prior to 1995
 load([paramDir ,'HIVParams'])
 load([paramDir ,'popData'])
 fertMat = spalloc(numel(pop) , numel(pop) , numel(pop));
@@ -446,7 +446,7 @@ end
 %fertMat = fertMat + hivFertMat; 
 save(fullfile(savedir ,'fertMat') , 'fertMat')
 save(fullfile(savedir ,'hivFertMats') , 'hivFertPosBirth' , 'hivFertNegBirth')
-%% Fertility from 2010 onwards
+%% Fertility from 2005 onwards
 load([paramDir ,'HIVParams'])
 load([paramDir ,'popData'])
 fertMat2 = spalloc(numel(pop) , numel(pop) , numel(pop));
@@ -454,7 +454,7 @@ negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
 
 % fertility matrix accounting for uninfected mothers
-disp('Building fertility matrix for uninfected mothers for 2010 onwards')
+disp('Building fertility matrix for uninfected mothers for 2005 onwards')
 for a = 1 : age
     hivUninf = toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates ,...
         1 : periods , 2 , a , 1 : risk));
@@ -469,7 +469,7 @@ end
 % fertility matrix accounting for infected mothers
 % time dependent terms: kHiv, update with term in MTCTRate corresponding to
 % year
-disp('Building fertility matrix for HIV-infected mothers for 2010 onwards')
+disp('Building fertility matrix for HIV-infected mothers for 2005 onwards')
 hivFertPosBirth2 = spalloc(numel(pop) , numel(pop) , numel(pop));
 hivFertNegBirth2 = hivFertPosBirth2;
 posMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
@@ -530,7 +530,7 @@ V = zeros(gender , age);
 % end
 save(fullfile(savedir ,'vaxer') , 'vaxer')
 disp('Vaccination matrix complete')
-%% Make circumcision matrix (use when circumcision begins in model)
+%% Make circumcision matrix before current year (use when circumcision begins in model)
 disp('Building circumcision matrix')
 negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 circMat = spalloc(numel(pop) , numel(pop) , 2);
@@ -538,6 +538,16 @@ circMat(at(negCircMaleBirth , negMaleBirth)) = circ(1);
 circMat(at(negMaleBirth , negMaleBirth)) = - circ(1);
 save(fullfile(savedir ,'circMat') , 'circMat')
 disp('Circumcision matrix complete')
+
+%% Make circumcision matrix after 2030 
+disp('Building circumcision matrix after 2030')
+negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+circMat2 = spalloc(numel(pop) , numel(pop) , 2);
+circMat2(at(negCircMaleBirth , negMaleBirth)) = 0.70;
+circMat2(at(negMaleBirth , negMaleBirth)) = - 0.70;
+save(fullfile(savedir ,'circMat2') , 'circMat2')
+disp('Circumcision matrix after 2030 complete')
 
 %% Make circumcision matrix for HIV-only scenarios (use when circumcision begins in model)
 disp('Building circumcision matrix 2')

@@ -503,25 +503,25 @@ ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
 % 
-% %%
-% figure()
-% for g = 1 : 2
-%     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     artPop = sum(noV.popVec(: , artInds) , 2);
-%     hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-%         1 : periods , g , 4 : 10 , 1 : risk)); 
-%     hivPop = sum(noV.popVec(: , hivInds) , 2);
-%     allPop = sum(noV.popVec(: , allInds) , 2);
-%     plot(tVec , 100 * (hivPop + artPop) ./ allPop)
-%     hold on
-% end
-% xlabel('Year')
-% ylabel('Prevalence')
-% title('HIV Prevalence')
-% %%
+%%
+figure()
+for g = 1 : 2
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , g , 4 : 10 , 1 : risk));
+    artPop = sum(noV.popVec(: , artInds) , 2);
+    hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , g , 4 : 10 , 1 : risk));
+    allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , g , 4 : 10 , 1 : risk)); 
+    hivPop = sum(noV.popVec(: , hivInds) , 2);
+    allPop = sum(noV.popVec(: , allInds) , 2);
+    plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+    hold on
+end
+xlabel('Year')
+ylabel('Prevalence')
+title('HIV Prevalence')
+%%
 % hold on
 % for g = 1 : 2
 %     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
@@ -567,4 +567,4 @@ legend('Model (Male)' , 'Model (Female)')
 % end
 % legend('Male' , 'Female' , 'Male No Vax' , 'Female No vax')
 
-vaxCEA_CISNETvaxCompare(pathModifier)
+%vaxCEA_CISNETvaxCompare(pathModifier)

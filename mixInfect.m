@@ -188,6 +188,7 @@ cAdj(2 , : , : , : , :) = cAdjFemale;
 cAdj(isnan(cAdj)) = 0;
 cAdj(isinf(cAdj)) = 0;
 
+% Protection due to condom usage and circumcision
 peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
@@ -198,7 +199,7 @@ if year < peakYear && year > condStart
     condUse = condUseVec(yrInd);
 elseif year >= peakYear
     condUse = condUseVec(end);
-end     
+end
 cond = 1-(condProtect * condUse); % condom usage and condom protection rates
 psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
 psi(7) = (1 - circProtect) .* cond;
