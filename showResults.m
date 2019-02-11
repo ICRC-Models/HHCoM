@@ -930,7 +930,7 @@ title('Cervical Cancer Prevalence in 2017')
 legend('HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
 
 %% Incidence
-ccIncYears = [2017 , 2003];
+ccIncYears = [2017 , 2003 , 1994];
 ccAgeRel = zeros(age , length(ccIncYears));
 ccAgeNegRel = ccAgeRel;
 ccAgePosRel = zeros(age , 4 , length(ccIncYears));
@@ -1125,7 +1125,59 @@ for y = 1 : length(ccIncYears)
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
 end
 
-%% Cervical cancer incidence type distributione
+%% CC Cumulative Probability of Incidence- early years
+% ccIncYears = [1980,1990,2000,2010];
+% ccAgeCI = zeros(1 , length(ccIncYears));
+% 
+% fScale = 10^5;
+% ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+%     '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
+%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+% ccYrs = ((ccIncYears - startYear) * stepsPerYear :...
+%     (ccIncYears + 1 - startYear) * stepsPerYear);
+% 
+% for y = 1 : length(ccIncYears)
+%     for a = 1 : age
+%         % Year
+%         yr_start = (ccIncYears(y) - 1 - startYear)  .* stepsPerYear;
+%         yr_end = (ccIncYears(y) - startYear) .* stepsPerYear - 1;
+%         % Total population
+%         ageInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+%             2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 8 : 10 , 1 : periods , ...
+%             2 , a , 1 : risk))];
+%         ccAgeCI(1 , y) = ccAgeCI(1 , y) + (-1) .* annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             1 : disease , 1 : hpvTypes , a) , 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ...
+%             ./ stepsPerYear) ;
+%     end
+%     ccAgeCI(1 , y) = 1 - exp(ccAgeCI(1 , y));
+% end
+% 
+% forouzanfar =[4.7
+% 4.3
+% 3.9
+% 3.4] ./ 100;
+% 
+% forouzanfar_ub = [6.1
+% 5.5
+% 5.7
+% 5.3] ./ 100;
+% 
+% forouzanfar_lb = [3.0
+% 2.7
+% 3.0
+% 2.5] ./ 100;
+% 
+% figure()
+% plot(ccIncYears, ccAgeCI(: , y) , '-o');
+% xlabel('Year'); ylabel('Cumulative Probability of Incidence')
+% title(['Cumulative Probability of Incidence'])
+% hold on
+% % globocan data
+% plot(ccIncYears , forouzanfar , '-' , ccIncYears , forouzanfar_ub , 'r--' , ccIncYears , forouzanfar_lb , 'r--')
+
+%% Cervical cancer incidence type distribution
 newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
 newCCType = zeros(size(newCC , 1) , 3);
 for h = 2 : hpvTypes
@@ -1419,7 +1471,6 @@ end
 legend('Male' , 'Female')
 
 %% CC incidence
- 
 inds = {':' , [2 : 6 , 10] , [2 : 6] , 1 , 10};
 files = {'CEA CC_General_Hpv' , 'CEA CC_HivAll_Hpv' , ...
      'CEA CC_HivNoART_Hpv' , 'CEA CC_HivNeg_Hpv' ,...
@@ -1473,6 +1524,69 @@ for i = 1 : length(inds)
         title([plotTits{i} , ' Cervical Cancer Incidence'])
         xlabel('Year'); ylabel('Incidence per 100,000')
 end
+
+%% General CC incidence validation
+fac = 10 ^ 5;
+% general
+allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+    1 : periods , 2 , 4 : age , 1 : risk)); ...
+    toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+    1 : periods , 2 , 4 : age , 1 : risk))];
+ccInc = annlz(sum(sum(sum(newCC(: , : , : , 4 : age),2),3),4)) ./ ...
+    (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear))* fac;
+
+olorunfemi = [1994.0648457561042, 22.241027817219138;
+    1994.4057758035783, 22.48378323297575;
+    1994.7466755440043, 22.735208485009384;
+    1995.08512041352, 23.68889047548178;
+    1995.4213831755596, 25.266800677899745;
+    1995.7576762446477, 26.83604104404069;
+    1996.0971212467564, 27.503618437371372;
+    1996.4385058999546, 27.616326308972656;
+    1996.7799208602014, 27.720364344296918;
+    1997.1203659949033, 28.101837140485877;
+    1997.4603868309293, 28.604687644553138;
+    1997.800589509245, 29.055519130958274;
+    1998.1458534646226, 28.058487959100766;
+    1998.4929964569938, 26.52392693806791;
+    1998.8399576070751, 25.04138493469718;
+    1999.1845245003426, 24.243759997211175;
+    1999.5283034103547, 23.671550802927737;
+    1999.8720217062705, 23.116681281198343;
+    2000.2147398695931, 22.847916356610668;
+    2000.5572458835777, 22.639840285962144;
+    2000.8996306693693, 22.466443560421705;
+    2001.2412274719056, 22.518462578083838;
+    2001.5827333532973, 22.596491104577034;
+    2001.9247847615577, 22.518462578083838;
+    2002.2689576631976, 21.833545512199112;
+    2002.6134336353202, 21.061930083544173;
+    2002.956818553705, 20.60242876086202;
+    2003.2965060121999, 21.200647463976523;
+    2003.6358297861154, 21.90290420241529;
+    2003.9758203150932, 22.414424542759576;
+    2004.3175080387743, 22.440434051590643;
+    2004.6592866836004, 22.440434051590643;
+    2005.0006410297506, 22.561811759468945;
+    2005.3409649362593, 22.977963900765992;
+    2005.681288842768, 23.39411604206304;
+    2006.0226734959665, 23.506823913664324;
+    2006.3654522733857, 23.220719316522604;
+    2006.7083219719495, 22.90860521054982;
+    2007.0505552224997, 22.77855766639449;
+    2007.3919398756982, 22.891265537995775;
+    2007.7333851429933, 22.986633737043014;
+    2008.0747697961915, 23.0993416086443;
+    2008.4162150634866, 23.194709807691538;
+    2008.7576603307816, 23.290078006738778];
+
+figure()
+plot(tVec(1 : stepsPerYear : end) , ccInc)
+hold on;
+plot(olorunfemi(:,1),olorunfemi(:,2))
+title('General Cervical Cancer Incidence')
+xlabel('Year'); ylabel('Incidence per 100,000')
+legend('Model' , 'Olorunfemi Validation')
 
 %% New infections
 figure()

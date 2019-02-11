@@ -18,9 +18,9 @@
 
 function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , currStep ,...
         gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , ...
+        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , startYear , ...
-        endYear, stepsPerYear)
+        endYear, stepsPerYear , currYear)
 sumall = @(x)sum(x(:));
 
 %% births and deaths
@@ -71,8 +71,16 @@ hivBirths = hivFertPosBirth * pop;
 deaths = deathMat * pop;
 
 circBirths = births * 0;
-if year > circStartYear
+if (year > circStartYear) && (year <= currYear)
     circBirths = circMat * births;
+elseif (year > currYear) && (year <= 2030)
+    dt = (year - currYear) * stepsPerYear;
+    dCircMat = (circMat2 - circMat) ...
+        ./ ((2030 - currYear) * stepsPerYear);
+    circMat = circMat + dCircMat .* dt;
+    circBirths = circMat * births;
+elseif year > 2030
+    circBirths = circMat2 * births;
 end
 
 %% aging

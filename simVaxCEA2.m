@@ -45,6 +45,7 @@ load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
 load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
+load([paramDir,'circMat2'])
 
 % Load population
 popIn = load([pwd , '\HHCoM_Results\toNow']);
@@ -66,10 +67,13 @@ if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
 
-lastYear = 2100; %endYear;
+lastYear = 2099; %endYear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
-%% Vacination
+%% Screening
+hpvScreen = 0;    % turn on HPV DNA testing
+
+%% Vaccination
 
 %vaxEff = [0.7 , 0.9];
 vaxEff = [0.9];    % used for all vaccine regimens present
@@ -100,7 +104,6 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [0 , 0]]; % Append no vaccine school-based scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test
-
 
 if vaxCU
     vaxCoverCUmat = ones(nTests,2) .* vaxCoverCU;
@@ -197,8 +200,8 @@ vaxStartYear = currYear;
 % ART
 import java.util.LinkedList
 artDistList = popIn.artDistList;
-maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a.
-maxRateF_vec = [0.5 , 0.5];    % as of 2013. Scales up from this value in hiv2a.
+maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateF_vec = [0.5 , 0.5];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -312,9 +315,9 @@ parfor n = 1 : nTests
             bornAgeDieRisk(t , pop , year , currStep ,...
             gender , age , risk , fertility , fertMat , fertMat2 ,...
             hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , ...
-            hivFertNegBirth2 , deathMat , circMat , ...
+            hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
             MTCTRate , circStartYear , ageInd , riskInd , riskDist ,...
-            startYear , endYear, stepsPerYear) , tspan , pop(end , :));
+            startYear , endYear, stepsPerYear , currYear) , tspan , pop(end , :));
         if any(pop(end , :) < 0)
             disp('After bornAgeDieRisk')
             break
