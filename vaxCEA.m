@@ -26,10 +26,6 @@ if waning
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult' ,...
-        num2str(n), '.mat']);
-    % concatenate vectors/matrices of population up to 2018 to population
-    % matrices for years past 2018
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to current year to population
     % matrices for years past current year
@@ -510,24 +506,6 @@ title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
 % 
 %%
-% figure()
-% for g = 1 : 2
-%     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     artPop = sum(noV.popVec(: , artInds) , 2);
-%     hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-%         1 : periods , g , 4 : 10 , 1 : risk));
-%     allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-%         1 : periods , g , 4 : 10 , 1 : risk)); 
-%     hivPop = sum(noV.popVec(: , hivInds) , 2);
-%     allPop = sum(noV.popVec(: , allInds) , 2);
-%     plot(tVec , 100 * (hivPop + artPop) ./ allPop)
-%     hold on
-% end
-% xlabel('Year')
-% ylabel('Prevalence')
-% title('HIV Prevalence')
-% %%
 figure()
 for g = 1 : 2
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
@@ -545,6 +523,7 @@ end
 xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence')
+
 %%
 % hold on
 % for g = 1 : 2
