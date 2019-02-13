@@ -11,7 +11,7 @@ load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
 % Load results
 >>>>>>> ae21195dac065caa93cd75f34fcd8b0cc90e0019
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_021319.mat']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values

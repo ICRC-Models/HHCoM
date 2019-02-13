@@ -1,11 +1,13 @@
-function[] = showResults()
+function[] = showResults(pathModifier)
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
+kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
+rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
 load([paramDir,'calibData'])
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow'])
+load([resultsDir , pathModifier])
 
 %% Plot Settings
 % colors = [241, 90, 90;

@@ -33,11 +33,16 @@ end
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
+kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
+rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
+
+% Directory to save results
+pathModifier = 'toNow_021319';
 
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
-startYear = 1980; %1900
+startYear = 1910; %1980
 endYear = currYear;
 
 % Intervention start years
@@ -74,8 +79,8 @@ if startYear >= 1980;
     end
 else
     for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (15*1.12);
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (15*1.12);
+        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12);
+        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
     end
 end
 
@@ -127,7 +132,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.05 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 
@@ -202,12 +207,12 @@ for i = 2 : length(s) - 1
         toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:6 , 1:3)));
 
         % Distribute HIV infections (HPV-)        
-        popIn(fromNonHivNonHpv) = (1 - 0.001) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
-        popIn(toHivNonHpv) = (0.001) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
+        popIn(fromNonHivNonHpv) = (1 - 0.007) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
+        popIn(toHivNonHpv) = (0.007) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
 
         % Distribute HIV infections (HPV+)
-        popIn(fromNonHivHpv) = (1 - 0.002) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
-        popIn(toHivHpv) = (0.002) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
+        popIn(fromNonHivHpv) = (1 - 0.006) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
+        popIn(toHivHpv) = (0.006) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
     end
 
     if hpvOn
@@ -304,7 +309,7 @@ if ~ exist([pwd , '\HHCoM_Results\'])
 end
 
 savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
-save(fullfile(savdir , 'toNow') , 'tVec' ,  'popVec' , 'newHiv' ,...
+save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
     'deaths' , 'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
     'startYear' , 'endYear' , 'popLast');
@@ -331,4 +336,4 @@ ylabel('Frequency')
 xlabel('Times (s)')
 
 %% Show results
-showResults()
+showResults(pathModifier)

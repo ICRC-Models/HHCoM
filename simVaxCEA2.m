@@ -48,13 +48,15 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow']);
+popIn = load([pwd , '\HHCoM_Results\toNow_021319']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
+kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
+rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
 
 c = fix(clock);
 currYear = c(1); % get the current year
