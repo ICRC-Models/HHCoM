@@ -3,8 +3,6 @@ function[] = showResults(pathModifier)
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
-kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
-rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
 load([paramDir,'calibData'])
 resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
@@ -1585,7 +1583,7 @@ olorunfemi = [1994.0648457561042, 22.241027817219138;
 figure()
 plot(tVec(1 : stepsPerYear : end) , ccInc)
 hold on;
-plot(olorunfemi(:,1),olorunfemi(:,2))
+scatter(olorunfemi(:,1),olorunfemi(:,2))
 title('General Cervical Cancer Incidence')
 xlabel('Year'); ylabel('Incidence per 100,000')
 legend('Model' , 'Olorunfemi Validation')

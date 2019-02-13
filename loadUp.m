@@ -37,7 +37,7 @@ condUse = xlsread(file , 'Protection' , 'B25'); % Average proportion of populati
 % disease data
 MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8'); % <2004, 2005 , >2008; mother to child transmission rate
 mtctVec = linspace(MTCTRate(1) , MTCTRate(end) , size(MTCTRate , 1) * 4);
-muHIV = xlsread(file , 'Disease Data' , 'B20 : G35'); %[Age x cd4], [12 x 6]; HIV mortality
+muHIV = xlsread(file , 'Disease Data' , 'B20 : G35'); %[age x cd4], [12 x 6]; HIV mortality
 kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'B44:E48'); % [gender x vl x cd4]; male cd4 progression by vl
 kCD4(2 , : , :) = xlsread(file , 'Disease Data' , 'B52:E56'); % [gender x vl x cd4]; female cd4 progression by vl
 % viral load progression by CD4 count
@@ -211,7 +211,7 @@ ageEnd = xlsread(file , 'Screening and Treatment' , 'B57'); % screening age end 
 kCin1_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'B5 : B20'); % HPV to CIN1
 kCin2_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'C5 : C20'); % CIN1 to CIN2
 kCin3_Cin2(: , 1) = xlsread(file , 'CIN Transition', 'D5 : D20'); %CIN2 to CIN3
-kCC_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'E5 : E20'); % CIN3 to undLocaliseed
+kCC_Cin3(: , 1) = xlsread(file , 'CIN Transition', 'E5 : E20'); % CIN3 to unlocalized
 
 rNormal_Inf(: , 1) = xlsread(file , 'CIN Transition' , 'F5 : F20'); % HPV to Well (natural immunity)
 kInf_Cin1(: , 1) = xlsread(file , 'CIN Transition' , 'G5 : G20'); % CIN1 to HPV

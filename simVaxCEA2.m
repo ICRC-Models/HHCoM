@@ -55,8 +55,18 @@ artDistList = popIn.artDistList;
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
-kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
-rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
+epsA = [0.3; 0.3; 0.2];
+epsR = [0.3; 0.3; 0.2];
+step = 1 / stepsPerYear;
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : step : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : step : yr(i + 1));
+end
 
 c = fix(clock);
 currYear = c(1); % get the current year
