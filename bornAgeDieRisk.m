@@ -186,23 +186,6 @@ for g = 1 : gender
     dPop(r1To) = dPop(r1To) - 1/5 .* pop(r1To);
     dPop(r2To) = dPop(r2To) - 1/5 .* pop(r2To);
     dPop(r3To) = dPop(r3To) - 1/5 .* pop(r3To);
-
-% For debugging
-%     if any(dPop(r1To)<0) || any(dPop(r2To)<0) || any(dPop(r3To)<0) || any(dPop(r1)<0) || any(dPop(r2)<0) || any(dPop(r3)<0)
-%         %if popR1Tot<0 || popR2Tot<0 || popR3Tot <0    
-%         %any(dPop(r1)<0)
-%         %any(dPop(r2)<0)
-%         %any(dPop(r3)<0)
-%         %error = 1;
-%         find(dPop(r1To)<0)
-%         find(dPop(r2To)<0)
-%         find(dPop(r3To)<0)
-%         find(dPop(r1)<0)
-%         find(dPop(r2)<0)
-%         find(dPop(r3)<0)
-%         error = 1;
-%         %break
-%     end
     
 end
 

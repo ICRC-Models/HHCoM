@@ -6,10 +6,8 @@ waning = 0;    % turn waning on or off
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
     'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
-<<<<<<< HEAD
-=======
+
 % Load results
->>>>>>> ae21195dac065caa93cd75f34fcd8b0cc90e0019
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow_021319.mat']); % Population up to current year
 
@@ -28,16 +26,13 @@ if waning
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-<<<<<<< HEAD
     vaxResult{n} = load([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult' ,...
         num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to 2018 to population
     % matrices for years past 2018
-=======
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to current year to population
     % matrices for years past current year
->>>>>>> ae21195dac065caa93cd75f34fcd8b0cc90e0019
     vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec];
     vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :) ; vaxResult{n}.newHpv];
     vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :) ; vaxResult{n}.newImmHpv];
@@ -264,11 +259,8 @@ end
 %         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
 %         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
 %         num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
-<<<<<<< HEAD
 %end
-=======
 % end
->>>>>>> ae21195dac065caa93cd75f34fcd8b0cc90e0019
 
 %% YLS
 
@@ -518,7 +510,6 @@ title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
 % 
 %%
-<<<<<<< HEAD
 % figure()
 % for g = 1 : 2
 %     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
@@ -537,7 +528,6 @@ legend('Model (Male)' , 'Model (Female)')
 % ylabel('Prevalence')
 % title('HIV Prevalence')
 % %%
-=======
 figure()
 for g = 1 : 2
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
@@ -556,7 +546,6 @@ xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence')
 %%
->>>>>>> origin/master
 % hold on
 % for g = 1 : 2
 %     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
