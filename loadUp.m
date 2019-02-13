@@ -80,8 +80,8 @@ toPrep = 0; % initially
 % end
 
 % Treatment dropout rates
-prepOut = xlsread(file , 'Disease Data' , 'B85');
-artOut = xlsread(file , 'Disease Data' , 'C85');
+prepOut = xlsread(file , 'Disease Data' , 'B85');  %not currently used (reset in hiv2a)
+artOut = xlsread(file , 'Disease Data' , 'C85');  %not currently used (reset in hiv2a)
 
 save(fullfile(savdir , 'HIVParams')) % save HIV parameters to a workspace file
 
@@ -110,7 +110,7 @@ modelYrLast = endYear;
 save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates' , 'periods' ,...
     'gender' , 'age' , 'risk' , 'modelYr1' , ...
     'dim' , 'k' , 'sumall' , 'toInd' , 'circ' , ...
-    'condUse' , 'stepsPerYear'); % save general model parameters to a workspace file
+    'condUse' , 'kCD4' , 'kVl' , 'stepsPerYear'); % save general model parameters to a workspace file
 
 %% save parameters for mixInfect
 load('settings')
@@ -186,7 +186,9 @@ hivCin2 = xlsread(file , 'HPV' , 'B34 : B36'); % HIV multipliers for precancer p
 hivCin3 = hivCin2; % (not currently used, calibrated)
 
 muCC = xlsread(file , 'Cervical Cancer' , 'B6 : D11'); % undetected CC mortality
+muCC = min(muCC .* 12 , 0.99); % convert undetected CC mortality rate from monthly to yearly
 muCC_det = xlsread(file , 'Cervical Cancer' , 'B20 : D25'); % detected CC mortality
+muCC_det = min(muCC_det .* 12 , 0.99); % convert detected CC mortality rate from monthly to yearly
 kRL = xlsread(file , 'Cervical Cancer' , 'B33'); % local -> regional  progression
 kDR = xlsread(file , 'Cervical Cancer' , 'B34'); % regional -> distant progression
 detCC = xlsread(file , 'Cervical Cancer' , 'B42 : B44'); % [region x 1] detection probability (not currently used)
@@ -239,6 +241,19 @@ kCin1_Cin2(: , 3) = xlsread(file , 'CIN Transition', 'H45 : H60');
 kCin2_Cin3(: , 3) = xlsread(file , 'CIN Transition', 'I45 : I60');
 
 hpv_hivMult = flipud(xlsread(file , 'HPV' , 'B46 : D49')); % [inc CD4 count x vaccine type]; HPV incidence multiplier by type and CD4 count
+
+% Weight HPV transitions and HPV incidence multiplier according to type distribution
+distWeight = [0.7 , 0.2 , 0.1];
+kCin1_Inf = sum(bsxfun(@times , kCin1_Inf , distWeight) , 2);
+kCin2_Cin1 = sum(bsxfun(@times , kCin2_Cin1 , distWeight) , 2);
+kCin3_Cin2 = sum(bsxfun(@times , kCin3_Cin2 , distWeight) , 2);
+kCC_Cin3 = sum(bsxfun(@times , kCC_Cin3 , distWeight) , 2);
+rNormal_Inf = sum(bsxfun(@times , rNormal_Inf , distWeight) , 2);
+kInf_Cin1 = sum(bsxfun(@times , kInf_Cin1 , distWeight) , 2);
+kCin1_Cin2 = sum(bsxfun(@times , kCin1_Cin2 , distWeight) , 2);
+kCin2_Cin3 = sum(bsxfun(@times , kCin2_Cin3 , distWeight) , 2);
+hpv_hivMult = sum(bsxfun(@times , hpv_hivMult , distWeight) , 2);
+
 hpv_hivClear = xlsread(file , 'CIN Transition' , 'B73 : B76'); % [dec CD4 count]; HPV clearance multipliers
 c3c2Mults = xlsread(file , 'CIN Transition' , 'B85 : B88'); % [dec CD4 count]; CIN2 to CIN3 multipliers
 c2c1Mults = xlsread(file , 'CIN Transition' , 'B97 : B100'); % [dec CD4 count]; CIN1 to CIN2 multipliers
@@ -259,6 +274,7 @@ savdir = [pwd , '\Params'];
 hivTreatCost = xlsread(file , 'Costs' , 'B4 : B7'); % [inc CD4 count]; average HIV hositalization costs (not currently used, hard-coded in vaxCEA analysis)
 artTreatCost = xlsread(file , 'Costs' , 'B8'); % HIV hospitalization costs on ART  (not currently used, hard-coded in vaxCEA analysis)
 kCCDet = xlsread(file , 'Costs' , 'B17:B19'); %(local, regional, distant); probability of symptom detection
+kCCDet = min(kCCDet .* 12 , 0.99); % convert monthly to yearly rate
 vaxPrice = xlsread(file , 'Costs' , 'B26'); % bivalent HPV vaccine costs per vaccinated girl  (not currently used, hard-coded into vaxCEA analysis)
 ccCost = xlsread(file , 'Costs' , 'B34:B36'); % (local, regional, distant); CC costs (later re-defined in vaxCEA analysis)
 hivTreatCost = flipud(hivTreatCost); % (not currently used)

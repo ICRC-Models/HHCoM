@@ -1,75 +1,64 @@
-% Main
-% Runs simulation over the time period and time step specified by the
-% user.
-close all; clear all; clc
-profile clear;
+function [negSumLogL , ccInc] = calibratorAll(paramSet)
 
-% [~ , startYear , endYear , stepsPerYr , IntSteps] = Menu();
-% disp('Done with input')
+%% Load parameters
+tic
+paramDir = [pwd ,'\Params\'];
+load([paramDir,'settings'])
+load([paramDir,'popData'])
+load([paramDir,'HIVParams'])
+load([paramDir,'general'])
+load([paramDir,'mixInfectParams'])
+load([paramDir,'vlBeta'])
+load([paramDir,'hpvData'])
+load([paramDir,'cost_weights'])
+load([paramDir,'calibData'])
+load([paramDir,'mixInfectIndices'])
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'hpvTreatIndices'])
+load([paramDir,'ageRiskInds'])
+load([paramDir,'vaxInds'])
+load([paramDir,'ager'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
+load([paramDir,'vaxer'])
+load([paramDir,'circMat'])
+load([paramDir,'deathMat'])
 
-%%
-disp('Initializing. Standby...')
-disp(' ');
-
-% Load parameters
-paramDir = [pwd , '\Params\'];
-load([paramDir , 'popData'])
-load([paramDir , 'General'])
-load([paramDir , 'circMat2'])
-
-% Model specs
-% choose whether to model hysterectomy (not currently implemented)
 hyst = 'off';
-% choose whether to model HIV
-hivOn = 1;
-% choose whether to model HPV
 hpvOn = 1;
-if hpvOn
-    disp('HPV module activated.')
-end
-if hivOn
-    disp('HIV module activated')
-end
+hivOn = 1;
 
-% Use calibrated parameters
-load([paramDir , 'calibratedParams'])
-kCin3_Cin2 = 0.5 .* kCin3_Cin2;    % CJB: change to match cal/val data
-rNormal_Inf = rNormal_Inf .* 0.75;    % CJB: change to match cal/val data
-
-% Directory to save results
-pathModifier = 'toNow_021319';
-
-% Time
-c = fix(clock);
-currYear = c(1); % get the current year
-startYear = 1910; %1980
-endYear = currYear;
+startYear = 1980;
+endYear = 2015; % run to 2015 for calibration
+years = endYear - startYear;
+timeStep = 1 / stepsPerYear;
 
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
 
-% ART
-import java.util.LinkedList
-artDistList = LinkedList();
-maxRateM_vec = [0.4 , 0.4];% maxRateM_arr{sim}; % Maximum ART coverage
-maxRateF_vec = [0.5 , 0.5];% maxRateF_arr{sim};
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
+% Helper functions
+annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
+annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
-%% Initial Population 
-mInit = popInit(: , 1); % initial male population size by age
-fInit = popInit(: , 2); % initial female population size by age
+%% Initial population
+mInit = popInit(: , 1);
+fInit = popInit(: , 2);
 
-% use male risk distribution for both genders
-riskDistF = riskDistM;
+
+riskDistM(3:end,:) = [paramSet(100:113) , paramSet(114:127) , paramSet(128:141)];
+riskDistF(3:end,:) = [paramSet(142:155) , paramSet(156:169) , paramSet(170:183)];
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
 
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
 
-mPop = zeros(age , risk); % distribute initial population size by gender, age risk
+mPop = zeros(age , risk);
 fPop = mPop;
 
 if startYear >= 1980;
@@ -79,8 +68,8 @@ if startYear >= 1980;
     end
 else
     for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12);
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
+        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (15*1.12);
+        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (15*1.12);
     end
 end
 
@@ -89,8 +78,7 @@ initPop = zeros(dim);
 initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, male
 initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
 initPop_0 = initPop;
-
-if (hivOn && (hivStartYear == startYear))
+if hivOn
     initPop(3 , 2 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3) = 0.005 / 2 .* ...
         initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3); % initial HIV infected male (age groups 4-6, med-high risk) (% prevalence)
     initPop(1 , 1 , 1 , 1 , 1 , 1 , 4 : 6 , 2 : 3) = ...
@@ -132,7 +120,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.1 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 
@@ -141,24 +129,96 @@ if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
-%% Simulation
-disp('Start up')
-profile on
-disp(' ')
+%% Calibration parameters
+maleActs = [paramSet(1:16) , paramSet(17:32) , paramSet(33:48)];
+femaleActs = [paramSet(49:64) , paramSet(65:80) , paramSet(81:96)];
+perPartnerHpv = paramSet(97);
+perPartnerHpv_lr = paramSet(98);
+perPartnerHpv_nonV = paramSet(99);
+partnersM = [paramSet(184:199) , paramSet(200:215) , paramSet(216:231)];
+partnersF = [paramSet(232:247) , paramSet(248:263) , paramSet(264:279)];
+muCC = [paramSet(280:285) , paramSet(286:291) , paramSet(292:297)];
+muCC_det = [paramSet(298:303) , paramSet(304:309) , paramSet(310:315)];
+% epsA = paramSet(1:3); 
+% epsR = paramSet(4:6); 
+% prepOut = paramSet(7);
+% artOut = paramSet(8); 
+% maleActs = [paramSet(9:24) , paramSet(25:40) , paramSet(41:56)];
+% femaleActs = [paramSet(57:72) , paramSet(73:88) , paramSet(89:104)];
+% perPartnerHpv = paramSet(105);
+% perPartnerHpv_lr = paramSet(106);
+% perPartnerHpv_nonV = paramSet(107);
+% hpv_hivMult = paramSet(108:111);
+% kCin1_Inf_orig = kCin1_Inf;
+% kCin2_Cin1_orig = kCin2_Cin1;
+% kCin3_Cin2_orig = kCin3_Cin2;
+% kCC_Cin3_orig = kCC_Cin3;
+% rNormal_Inf_orig = rNormal_Inf;
+% kInf_Cin1_orig = kInf_Cin1;
+% kCin1_Cin2_orig = kCin1_Cin2;
+% kCin2_Cin3_orig = kCin2_Cin3;
+% kCin1_Inf = paramSet(112) .* kCin1_Inf_orig;
+% kCin2_Cin1 = paramSet(113) .* kCin2_Cin1_orig;
+% kCin3_Cin2 = paramSet(114) .* kCin3_Cin2_orig;
+% kCC_Cin3 = paramSet(115) .* kCC_Cin3_orig;
+% rNormal_Inf = paramSet(116) .* rNormal_Inf_orig;
+% kInf_Cin1 = paramSet(117) .* kInf_Cin1_orig;
+% kCin1_Cin2 = paramSet(118) .* kCin1_Cin2_orig;
+% kCin2_Cin3 = paramSet(119) .* kCin2_Cin3_orig;
+% hpv_hivClear = paramSet(120:123);
+% rImmuneHiv = paramSet(124:127);
+% c3c2Mults = paramSet(128:131);
+% c2c1Mults = paramSet(132:135);
+% lambdaMultImm = paramSet(136:151);
+% kRL = paramSet(152);
+% kDR = paramSet(153);
+% kCCDet = paramSet(154:156);
+% kCD4(1,:,:) = [paramSet(157:161) , paramSet(162:166) , paramSet(167:171) , paramSet(172:176)];
+% kCD4(2,:,:) = [paramSet(177:181) , paramSet(182:186) , paramSet(187:191) , paramSet(192:196)];
+% kVl(1,:,:) = [paramSet(197:201) , paramSet(202:206) , paramSet(207:211) , paramSet(212:216)];
+% kVl(2,:,:) = [paramSet(217:221) , paramSet(222:226) , paramSet(227:231) , paramSet(232:236)];
+% maxRateM_vec = paramSet(237:238);
+% maxRateF_vec = paramSet(239:240);
+% artHpvMult = paramSet(241);
+maxRateM_vec = [0.4 , 0.4];
+maxRateF_vec = [0.5 , 0.5];
+rImmuneHiv = hpv_hivClear;
+lambdaMultImm = ones(age,1);
+artHpvMult = 1.0;
 
-at = @(x , y) sort(prod(dim)*(y-1) + x);
+for a = 1 : age
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
+
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+end
+
+%% Simulation parameters
+lambdaMultVax = ones(age , 2);
 k_wane = 0;
 vaxRate = 0;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
-% Initialize time vectors
-timeStep = 1 / stepsPerYear;
-years = endYear - startYear;
+% Initialize vectors
 s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
-
-% Initialize performance tracking vector
-runtimes = zeros(size(s , 2) - 2 , 1);
-% Initialize other vectors
+artDistMat = zeros(size(prod(dim) , 20)); % initialize artDistMat to track artDist over past 20 time steps
+import java.util.LinkedList
+artDistList = LinkedList();
 popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 newHiv = zeros(length(s) - 1 , gender , age , risk);
@@ -170,28 +230,17 @@ ccDeath = newCC;
 ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
 vaxd = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , gender , age);
-deaths = popVec; 
+deaths = popVec;
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
 popVec(1 , :) = popIn;
-tVec = linspace(startYear , endYear , size(popVec , 1));
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 
-%% Main body of simulation
-disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
-    ' with ' num2str(stepsPerYear), ' steps per year.'])
-disp(' ')
-disp('Simulation running...')
-disp(' ')
-
-progressbar('Simulation Progress')
+%% Simulation
+error = 0;
 for i = 2 : length(s) - 1
-    tic
     year = startYear + s(i) - 1;
     currStep = round(s(i) * stepsPerYear);
-    disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
-        num2str(length(s) - i) ' time steps remaining until year ' ...
-        num2str(endYear) ')'])
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
     
@@ -201,18 +250,18 @@ for i = 2 : length(s) - 1
         popIn_init = popIn;
         
         % Create indices
-        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 4:6 , 2:3))); 
-        toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 4:6 , 2:3)));
-        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:6 , 1:3))); 
-        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:6 , 1:3)));
+        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 4:age , 2:3))); 
+        toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 4:age , 2:3)));
+        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:age , 1:3))); 
+        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 4:age , 1:3)));
 
         % Distribute HIV infections (HPV-)        
-        popIn(fromNonHivNonHpv) = (1 - 0.007) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
-        popIn(toHivNonHpv) = (0.007) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
+        popIn(fromNonHivNonHpv) = (1 - 0.001) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
+        popIn(toHivNonHpv) = (0.001) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
 
         % Distribute HIV infections (HPV+)
-        popIn(fromNonHivHpv) = (1 - 0.006) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
-        popIn(toHivHpv) = (0.006) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
+        popIn(fromNonHivHpv) = (1 - 0.002) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
+        popIn(toHivHpv) = (0.002) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
     end
 
     if hpvOn
@@ -225,7 +274,7 @@ for i = 2 : length(s) - 1
             = ode4xtra(@(t , pop) ...
             hpvCCdet(t , pop , immuneInds , infInds , cin1Inds , ...
             cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
-            ccTreatedInds , ccLocDetInds , ccRegDetInds , ccDistDetInds , ...
+            ccTreatedInds , ccLocDetInds , ccRegDetInds , ccDistDetInds ,...
             kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
@@ -235,14 +284,10 @@ for i = 2 : length(s) - 1
         popIn = pop(end , :);
         if any(pop(end , :) <  0)
             disp('After hpv')
+            error = 1;
             break
         end
 
-        %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
-        %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
-        %                     hystPopInds , screenFreq , screenCover , hpvSens , ccTreat , ...
-        %                     cytoSens , cin1Inds , cin2Inds , cin3Inds ,  normalInds , getHystPopInds ,...
-        %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
     end
 
     % HIV and HPV mixing and infection module. Protective effects of condom
@@ -260,6 +305,7 @@ for i = 2 : length(s) - 1
     popIn = pop(end , :); % for next mixing and infection module
     if any(pop(end , :) < 0)
         disp('After mixInfect')
+        error = 1;
         break
     end
 
@@ -280,60 +326,45 @@ for i = 2 : length(s) - 1
             risk);
         if any(pop(end , :) < 0)
             disp('After hiv')
+            error = 1;
             break
         end
     end
-    
+
     % Birth, aging, risk redistribution module
-    [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
+    [~ , pop , deaths(i , :) ] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , currStep ,...
         gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
+        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , startYear , ...
-        endYear, stepsPerYear , currYear) , tspan , pop(end , :));
+        endYear, stepsPerYear) , tspan , pop(end , :));
     if any(pop(end , :) < 0)
         disp('After bornAgeDieRisk')
+        error = 1;
         break
     end
     % add results to population vector
     popVec(i , :) = pop(end , :)';
-    runtimes(i) = toc;
-    progressbar(i/(length(s) - 1))
 end
 popLast = popVec(end , :);
-disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
-if ~ exist([pwd , '\HHCoM_Results\'])
-    mkdir HHCoM_Results
+allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+        1 : periods , 2 , 4 : age , 1 : risk)); ...
+        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+        1 : periods , 2 , 4 : age , 1 : risk))];
+if error
+    negSumLogL = -1;
+    ccInc = -1;
+else
+    negSumLogL = likeFun(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,...
+        hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
+        hivPrevM_obs , hivPrevF_obs , disease , viral , gender , age , risk , ...
+        hpvTypes , hpvStates , periods , startYear , stepsPerYear);
+
+    ccInc = annlz(sum(sum(sum(newCC(end , ':' , : , 4 : age),2),3),4)) ./ ...
+        (annlz(sum(popVec(end , allF) , 2) ./ stepsPerYear))* (10 ^ 5);
 end
 
-savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
-save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
-    'deaths' , 'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
-    'startYear' , 'endYear' , 'popLast');
-disp(' ')
-disp('Simulation complete.')
+toc
 
-profile viewer
-
-%% Runtimes
-figure()
-plot(1 : size(runtimes , 1) , runtimes)
-xlabel('Step'); ylabel('Time(s)')
-title('Runtimes')
-%%
-avgRuntime = mean(runtimes); % seconds
-stdRuntime = std(runtimes); % seconds
-disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
-disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
-disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
-figure()
-h = histogram(runtimes);
-title('Runtimes')
-ylabel('Frequency')
-xlabel('Times (s)')
-
-%% Show results
-showResults(pathModifier)

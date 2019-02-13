@@ -6,9 +6,10 @@ waning = 0;    % turn waning on or off
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
     'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow.mat']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_021319.mat']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -254,6 +255,7 @@ end
 %         ' threshold of ' , num2str(ceThresholds(i)) , ' USD per DALY, ' ,...
 %         ' the unit cost of 9v vaccine must be less than or equal to \n ' , ...
 %         num2str(round(priceThreshold_9v , 2)),' USD.\n']) 
+%end
 % end
 
 %% YLS
@@ -521,6 +523,7 @@ end
 xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence')
+
 %%
 % hold on
 % for g = 1 : 2
@@ -537,8 +540,8 @@ title('HIV Prevalence')
 %     hold on
 % end
 % legend('Male' , 'Female' , 'Male Vax' , 'Female Vax')
-% 
-% %%
+
+%%
 % figure()    
 % for g = 1 : 2
 %     hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
