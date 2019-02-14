@@ -55,18 +55,6 @@ artDistList = popIn.artDistList;
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
-epsA = [0.4; 0.4; 0.2];
-epsR = [0.4; 0.4; 0.2];
-step = 1 / stepsPerYear;
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
-for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-    period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
-    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
-end
 
 c = fix(clock);
 currYear = c(1); % get the current year
@@ -92,13 +80,13 @@ vaxEff = [0.9];    % used for all vaccine regimens present
 
 %Parameters for school-based vaccination regimen
 vaxAge = 3;
-vaxCover = [0.6 , 0.8 , 0.9];
+vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off
 vaxAgeCU = [4,5];    % ages catch-up vaccinated
-vaxCoverCU = [0.8,0.5];    % coverage for catch-up vaccination by ages catch-up vaccinated
+vaxCoverCU = [0.6,0.5];    % coverage for catch-up vaccination by ages catch-up vaccinated
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

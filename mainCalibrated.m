@@ -33,18 +33,6 @@ end
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
-epsA = [0.4; 0.4; 0.2];
-epsR = [0.4; 0.4; 0.2];
-step = 1 / stepsPerYear;
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
-for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-    period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
-    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : step : yr(i + 1));
-end
 
 % Directory to save results
 pathModifier = 'toNow_021319';
