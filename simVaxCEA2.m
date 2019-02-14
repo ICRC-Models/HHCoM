@@ -55,8 +55,8 @@ artDistList = popIn.artDistList;
 
 % Use calibrated parameters
 load([paramDir , 'calibratedParams'])
-epsA = [0.3; 0.3; 0.2];
-epsR = [0.3; 0.3; 0.2];
+epsA = [0.4; 0.4; 0.2];
+epsR = [0.4; 0.4; 0.2];
 step = 1 / stepsPerYear;
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
