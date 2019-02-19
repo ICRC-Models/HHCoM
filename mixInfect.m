@@ -8,7 +8,7 @@ function [dPop , newInfs] = mixInfect(t , pop , currStep , ...
         gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , ...
         lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
         circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-        hpv_hivMult , hiv_hpvMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
+        hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , toHpv , toHpv_ImmVax , ...
         toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
         betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
         hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year)
@@ -193,7 +193,7 @@ peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
-condUse = condUseVec(1); % year <= condStart
+condUse = condUseVec(1); % year >= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
     condUse = condUseVec(yrInd);
@@ -314,7 +314,7 @@ for d = 1 : disease
                         fToVax2 = toHpv_ImmVaxNonV(d , hTo , 2 , a , r , :); % females vaccinated getting infected with non-vaccine type, no vaccine-type infection history
 
                         lambdaMult = 1;
-                        if g == 2 && d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200   % CJB note: don't think g==2 should be here. Coincidence from above that g==2 and model runs.
+                        if g == 2 && d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
                             lambdaMult = hpv_hivMult(d - 2 , hTo - 1);
                         elseif g == 2 && d == 10
                             lambdaMult = artHpvMult;                            
@@ -467,32 +467,17 @@ for g = 1 : gender
         end
     end
 end
-
 dVec = [1 , 7 : 9];
 for a = 3 : age
     for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
         if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero
             for i = 1 : length(dVec)
-                %for h = 1 : hpvTypes
                 d = dVec(i);
-                %mSus = hivSus(d , 1 , a , r , h , :);
-                %fSus = hivSus(d , 2 , a , r , h , :);
-                %mTo = toHiv(1 , a , r , h , :); % set disease state = 2 (acute)
-                %fTo = toHiv(2 , a , r , h , :);
                 mSus = hivSus(d , 1 , a , r , :);
                 fSus = hivSus(d , 2 , a , r , :);
                 mTo = toHiv(1 , a , r , :); % set disease state = 2 (acute)
                 fTo = toHiv(2 , a , r , :);
 
-                %lambdaMult = 1;
-                %if h >= 2
-                %    lambdaMult = hiv_hpvMult;                            
-                %end
-
-                %mInfected = min(lambda(1 , a , r)...
-                %    .* psi(d) .* lambdaMult , 0.999) .* pop(mSus); % infected males
-                %fInfected = min(lambda(2 , a , r)...
-                %    .* psi(d) .* lambdaMult , 0.999) .* pop(fSus); % infected females
                 mInfected = min(lambda(1 , a , r)...
                     .* psi(d) , 0.999) .* pop(mSus); % infected males
                 fInfected = min(lambda(2 , a , r)...
@@ -507,12 +492,10 @@ for a = 3 : age
 
                 dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
                 dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
-                %end
             end
         end
     end
 end
-
 
 newInfs{4} = newHiv;
 % Convert to column vector for output to ODE solver
