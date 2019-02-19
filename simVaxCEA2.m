@@ -48,7 +48,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow']);
+popIn = load([pwd , '\HHCoM_Results\toNow_021319']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -80,13 +80,13 @@ vaxEff = [0.9];    % used for all vaccine regimens present
 
 %Parameters for school-based vaccination regimen
 vaxAge = 3;
-vaxCover = [0.6 , 0.8 , 0.9];
+vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off
 vaxAgeCU = [4,5];    % ages catch-up vaccinated
-vaxCoverCU = [0.8,0.5];    % coverage for catch-up vaccination by ages catch-up vaccinated
+vaxCoverCU = [0.6,0.5];    % coverage for catch-up vaccination by ages catch-up vaccinated
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

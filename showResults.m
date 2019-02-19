@@ -1,11 +1,12 @@
-function[] = showResults()
+function[] = showResults(pathModifier)
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 load([paramDir,'calibData'])
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow'])
+load([resultsDir , pathModifier])
+annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 %% Plot Settings
 % colors = [241, 90, 90;
@@ -162,7 +163,7 @@ for g = 1 : gender
         hivPrevs2 = hivPrevF_val;
     end
     figure()
-    for a = 4 : 10
+    for a = 4 : 15
         hivAgeInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk)); toInd(allcomb(10, 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk))];
@@ -170,9 +171,13 @@ for g = 1 : gender
             g , a , 1 : risk));
         hivAge(: , a) = sum(popVec(: , hivAgeInds) , 2);
         hivAgeRel = bsxfun(@rdivide , hivAge(: , a) , sum(popVec(: , ageInds) , 2)) * 100;
-        subplot(4 , 2 , a - 3)
-        plot(tVec , hivAgeRel , prevYears , hivPrevs((a - 3) : 7 : end) ,'o' , ...
-            prevYears2 , hivPrevs2((a - 3) : 7 : end) , 'bo');
+        subplot(4 , 3 , a - 3)
+        if a <= 10
+            plot(tVec , hivAgeRel , prevYears , hivPrevs((a - 3) : 7 : end) ,'o' , ...
+                prevYears2 , hivPrevs2((a - 3) : 7 : end) , 'bo');
+        else
+            plot(tVec , hivAgeRel);
+        end
         xlabel('Year'); ylabel('% HIV'); title([gen{g} , ' Age group ' , ageGroup{a} , ' HIV Prevalence'])
     end
     legend('Model' , 'Africa Center Data (Calibration)' , 'Africa Center Data (Validation)')
@@ -485,8 +490,8 @@ set(gca , 'xtick' , 1 : length(hpvNegObs) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('hrHPV Immunity Prevalence in 2017')
 
-%% HIV-HPV Prevalence by Age in 2017
-yearPrev = 2017;
+%% HIV-HPV Prevalence by Age in 2014
+yearPrev = 2014;
 hpvHivPosInd = [toInd(allcomb(2 : 6 , 1 : viral , 2 : hpvTypes , 1 : 4 , ...
     1 : periods , 2 , 4 : 13 , 1 : risk)); toInd(allcomb(10, 6 ,...
     2 : hpvTypes , 1 : 4 , 1 : periods , 2 , 4 : 13 , 1 : risk))];
@@ -1443,7 +1448,7 @@ end
 legend('Male' , 'Female')
 xlabel('Year'); ylabel('Rate Per 100'); title('HPV Incidence Among HIV-Negative')
  
-%% HIV+ HPV incidence
+%% HIV+ HPV incidence by age
 figure()
 for g = 1 : 2
     for a = 1 : age
@@ -1467,6 +1472,66 @@ for g = 1 : 2
         xlabel('Year'); ylabel('Rate Per 100'); title([' Age group ' , ages{a} , ' HPV Incidence in HIV+'])
         axis([startYear , endYear , 0 , 100])
     end
+end
+legend('Male' , 'Female')
+
+%% HIV+ HPV incidence
+figure()
+for g = 1 : 2
+    hpvHivSusInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 , 1 : hpvStates , ...
+          1 : periods , g , 4 : 10 , 1 : risk)); ...
+        toInd(allcomb(2 : 6 , 1 : viral , 2 : hpvTypes , 10 , ...
+          1 : periods , g , 4 : 10 , 1 : risk)); ...
+        toInd(allcomb(10 , 6 , 1 , 1 : hpvStates , ...
+          1 : periods , g , 4 : 10 , 1 : risk));...
+        toInd(allcomb(10 , 6 , 2 : hpvTypes , 10 , ...
+          1 : periods , g , 4 : 10 , 1 : risk))];
+    hpvHivSus = annlz(sum(popVec(: , hpvHivSusInds) , 2)) ./ stepsPerYear;
+    plot(tVec(1 : stepsPerYear : end) , ...
+        annlz(sum(sum(sum(newHpv(: , g , 2 : 6 , 4 : 10 , :) ...
+        + newHpv(: , g , 10 , 4 : 10 , :) ...
+        + newImmHpv(: , g , 2 : 6 , 4 : 10 , :) ...
+        + newImmHpv(: , g , 10 , 4 : 10 , :)...
+        , 3), 4), 5)) ./ hpvHivSus * 100)
+    hold on
+    xlabel('Year'); ylabel('Rate Per 100'); title([' HPV Incidence in HIV+'])
+    axis([startYear , endYear , 0 , 100])
+end
+legend('Male' , 'Female')
+
+%% HIV+ HPV incidence no ART
+figure()
+for g = 1 : 2
+    hpvHivSusInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 , 1 : hpvStates , ...
+          1 : periods , g , 4 : 10 , 1 : risk)); ...
+        toInd(allcomb(2 : 6 , 1 : viral , 2 : hpvTypes , 10 , ...
+          1 : periods , g , 4 : 10 , 1 : risk))];
+    hpvHivSus = annlz(sum(popVec(: , hpvHivSusInds) , 2)) ./ stepsPerYear;
+    plot(tVec(1 : stepsPerYear : end) , ...
+        annlz(sum(sum(sum(newHpv(: , g , 2 : 6 , 4 : 10 , :) ...
+        + newImmHpv(: , g , 2 : 6 , 4 : 10 , :) ...
+        , 3), 4), 5)) ./ hpvHivSus * 100)
+    hold on
+    xlabel('Year'); ylabel('Rate Per 100'); title([' HPV Incidence in HIV+ , no ART'])
+    axis([startYear , endYear , 0 , 100])
+end
+legend('Male' , 'Female')
+
+%% HIV+ HPV incidence on ART
+figure()
+for g = 1 : 2
+    hpvHivSusInds = [toInd(allcomb(10 , 1 : viral , 1 , 1 : hpvStates , ...
+          1 : periods , g , 4 : 10 , 1 : risk)); ...
+        toInd(allcomb(10 , 1 : viral , 2 : hpvTypes , 10 , ...
+          1 : periods , g , 4 : 10 , 1 : risk))];
+    hpvHivSus = annlz(sum(popVec(: , hpvHivSusInds) , 2)) ./ stepsPerYear;
+    plot(tVec(1 : stepsPerYear : end) , ...
+        annlz(sum(sum(sum(newHpv(: , g , 10 , 4 : 10 , :) ...
+        + newImmHpv(: , g , 10 , 4 : 10 , :) ...
+        , 3), 4), 5)) ./ hpvHivSus * 100)
+    hold on
+    xlabel('Year'); ylabel('Rate Per 100'); title([' HPV Incidence in HIV+ , on ART'])
+    axis([startYear , endYear , 0 , 100])
 end
 legend('Male' , 'Female')
 
@@ -1583,7 +1648,7 @@ olorunfemi = [1994.0648457561042, 22.241027817219138;
 figure()
 plot(tVec(1 : stepsPerYear : end) , ccInc)
 hold on;
-plot(olorunfemi(:,1),olorunfemi(:,2))
+scatter(olorunfemi(:,1),olorunfemi(:,2))
 title('General Cervical Cancer Incidence')
 xlabel('Year'); ylabel('Incidence per 100,000')
 legend('Model' , 'Olorunfemi Validation')
