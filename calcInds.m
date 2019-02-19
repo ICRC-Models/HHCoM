@@ -78,14 +78,19 @@ for h = 1 : hpvTypes
     end
 end
 
-hivSus = zeros(disease , gender , age , risk , hpvStates * hpvTypes * periods);
+hivSus = zeros(disease , gender , age , risk , hpvTypes * hpvStates * periods);
+%hivSus = zeros(disease , gender , age , risk , hpvTypes , hpvStates * periods);
 
 for d = 1 : disease
     for g = 1 : gender
         for a = 1 : age
             for r = 1 : risk
+                %for h = 1 : hpvTypes
+                %hivSus(d , g , a , r , h , :) =...
+                %    sort(toInd(allcomb(d , 1 , h , 1 : hpvStates , 1 : periods , g , a , r)));
                 hivSus(d , g , a , r , :) =...
                     sort(toInd(allcomb(d , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r)));
+                %end
             end
         end
     end
@@ -114,12 +119,17 @@ for d = 1 : disease
     end
 end
 
+%toHiv = zeros(gender , age , risk , hpvTypes , hpvStates * periods);
 toHiv = zeros(gender , age , risk , hpvTypes * hpvStates * periods);
 for g = 1 : gender
     for a = 1 : age
         for r = 1 : risk
+            %for h = 1 : hpvTypes
+                %toHiv(g , a , r , h , :) = ...
+                %    sort(toInd(allcomb(2 , 1 , h , 1 : hpvStates , 1 : periods , g , a , r)));
             toHiv(g , a , r , :) = ...
                 sort(toInd(allcomb(2 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r)));
+            %end
         end
     end
 end
