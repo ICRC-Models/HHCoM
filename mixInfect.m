@@ -34,8 +34,8 @@ else % assortativity in last year
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
-epsA = 0.2;
-epsR = 0.2;
+% epsA = 0.2;
+% epsR = 0.2;
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times
@@ -192,7 +192,8 @@ cAdj(isinf(cAdj)) = 0;
 peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+%condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year >= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
