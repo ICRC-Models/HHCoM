@@ -37,9 +37,9 @@ For v:
 
 For h:
 1 - HPV Susceptible
-2 - Infected with hr HPV
-3 - Infected with lr HPV
-4 - Infected with hr and lr HPV
+2 - Infected with vaccine type hrHPV (16/18) (currently includes all hrHPV types)
+3 - Infected with vaccine type hrHPV (non-16/18 or non-4v, 9v covered) (not currently used)
+4 - Infected non-vaccine type hrHPV (other high risk) (not currently used)
 
 For s:
 1 - No precancer(h = 1) , infected (h >= 2)
@@ -54,12 +54,12 @@ For s:
 10 - Immune
 
 For p:
-1 - non-vaccinated
+1 - non-vaccinated (s = 1-8,10) , vaccinated and uninfected (s = 9)
 2 - vaccinated, with subsequent vaccine type infection
 3 - vaccinated, with subsequent non-vaccine type infection (not currently used)
 4 - vaccinated, with vaccine type infection, and screened
 5 - vaccinated, with non-vaccine type infection (not currently used), and screened
-6 - non-vaccinated, and screened
+6 - non-vaccinated or vaccinated and uninfected, and screened
 
 For g:
 1 - Male

@@ -65,7 +65,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = 'test_02252019';
+pathModifier = 'test_02262019_baseline';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -74,7 +74,7 @@ lastYear = 2099; %endYear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 %% Screening
-hpvScreen = 1;    % turn HPV DNA testing on or off
+hpvScreen = 0;    % turn HPV DNA testing on or off
 dnaTestYrs = [2023; 2030; 2045];
 dnaTestCover = [0.45; 0.45; 0.45];
 
