@@ -54,9 +54,12 @@ For s:
 10 - Immune
 
 For p:
-1 - 
-2 - vaccinated -> vaccine type infection
-3 - vaccinated -> non-vaccine type infection
+1 - non-vaccinated
+2 - vaccinated, with subsequent vaccine type infection
+3 - vaccinated, with subsequent non-vaccine type infection (not currently used)
+4 - vaccinated, with vaccine type infection, and screened
+5 - vaccinated, with non-vaccine type infection (not currently used), and screened
+6 - non-vaccinated, and screened
 
 For g:
 1 - Male

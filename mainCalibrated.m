@@ -41,6 +41,7 @@ pathModifier = 'toNow_021319';
 c = fix(clock);
 currYear = c(1); % get the current year
 startYear = 1910; %1980
+modelYr1 = startYear; % for calculating sexual mixing (this could be streamlined)
 endYear = currYear;
 
 % Intervention start years
@@ -145,8 +146,6 @@ profile on
 disp(' ')
 
 at = @(x , y) sort(prod(dim)*(y-1) + x);
-k_wane = 0;
-vaxRate = 0;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize time vectors

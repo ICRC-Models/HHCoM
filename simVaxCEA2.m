@@ -58,11 +58,14 @@ load([paramDir , 'calibratedParams'])
 
 c = fix(clock);
 currYear = c(1); % get the current year
+modelYr1 = startYear; % for calculating sexual mixing (this could be streamlined)
+stepsPerYear = 6;
+timeStep = 1 / stepsPerYear;
 
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = 'fileName';
+pathModifier = 'test_02252019';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -71,7 +74,33 @@ lastYear = 2099; %endYear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 %% Screening
-hpvScreen = 0;    % turn on HPV DNA testing
+hpvScreen = 1;    % turn HPV DNA testing on or off
+dnaTestYrs = [2023; 2030; 2045];
+dnaTestCover = [0.45; 0.45; 0.45];
+
+dnaTestCover_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+for i = 1 : size(dnaTestYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+    period = [dnaTestYrs(i) , dnaTestYrs(i + 1)];
+    dnaTestCover_vec{i} = interp1(period , dnaTestCover(i : i + 1 , 1) , ...
+        dnaTestYrs(i) : timeStep : dnaTestYrs(i + 1));
+end
+
+% Create screening indices
+if hpvScreen    % if present, add indices for screening
+    fromNonVaxS = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 4 , 1 , ... 
+        2 , [8,10] , 1 : risk)); 
+    toNonVaxS = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 6 , ...
+        2 , [8,10] , 1 : risk));
+    fromVaxS = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 4 , 2 , ... 
+        2 , [8,10] , 1 : risk)); 
+    toVaxS = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 4 , ...
+        2 , [8,10] , 1 : risk));
+else
+    fromNonVaxS = [];    % have to declare these even if hpvScreen=0 because parfor is dumb
+    toNonVaxS = [];
+    fromVaxS = [];
+    toVaxS = [];
+end
 
 %% Vaccination
 
@@ -182,8 +211,6 @@ end
 %% Initialize fixed parameters
 
 % Initialize time vectors
-stepsPerYear = 6;
-timeStep = 1 / stepsPerYear;
 years = lastYear - currYear;
 s = 1 : timeStep : years + 1;
 
@@ -191,11 +218,11 @@ s = 1 : timeStep : years + 1;
 hivOn = 1;
 hpvOn = 1;
 
-dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
+dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 
 % Intervention start years
 circStartYear = 1990;
-vaxStartYear = currYear;
+vaxStartYear = currYear;    % (not currently used)
 
 % ART
 import java.util.LinkedList
@@ -210,7 +237,7 @@ maxRateF2 = maxRateF_vec(2);
 %% Run simulation
 
 %profile on
-parfor n = 1 : nTests
+for n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -235,6 +262,7 @@ parfor n = 1 : nTests
     hivDeaths = zeros(length(s) - 1 , gender , age);
     deaths = zeros(size(popVec));
     vaxd = zeros(length(s) - 1 , 1);
+    screend = zeros(length(s) - 1 , 1);
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
     popVec(1 , :) = popIn;
     tVec = linspace(currYear , lastYear , size(popVec , 1));
@@ -323,8 +351,43 @@ parfor n = 1 : nTests
             break
         end
         
-        % Vaccinate
-        popSize = sum(pop(end , :) , 2);
+        % Screen for HPV
+        if hpvScreen
+            % Get screening level based on year
+            dataYr1 = dnaTestYrs(1);
+            dataYrLast = dnaTestYrs(size(dnaTestYrs , 1));
+            now = currStep / stepsPerYear + currYear;
+            baseYrInd = max(find(now >= dnaTestYrs , 1, 'last') , 1);    % get index of first year <= current year
+            baseYr = dnaTestYrs(baseYrInd);
+            if currStep < (dataYr1 - currYear) * stepsPerYear    % screening before first year
+                screenRate = dnaTestCover_vec{1}(1);
+            elseif currStep < (dataYrLast - currYear) * stepsPerYear    % screening between 1st and last year
+                screenRate = dnaTestCover_vec{baseYrInd}(currStep - (baseYr - currYear) * stepsPerYear + 1);
+            else    % screening after last year
+                lastInd = size(dnaTestCover_vec , 1);
+                screenRate = dnaTestCover_vec{lastInd}(size(dnaTestCover_vec{lastInd} , 2));
+            end
+            % Apply screening
+            fracScreen = (sum(pop(end , toNonVaxS) , 2) + sum(pop(end , toVaxS) , 2)) / ... % find proportion of population that is currently screened
+                    (sum(pop(end , fromNonVaxS) , 2) + sum(pop(end , toNonVaxS) , 2) + sum(pop(end , fromVaxS) , 2) + sum(pop(end , toVaxS) , 2));
+            if screenRate - fracScreen > 10 ^ -6 % when proportion screened is below target screening level
+                screenCover = max(0 , (screenRate - fracScreen) ./ (1 - fracScreen)); % screen enough people in age group to reach target
+                screenGroupNonVax = screenCover .* pop(end , fromNonVaxS);
+                screenGroupVax = screenCover .* pop(end , fromVaxS);
+                dPop = zeros(size(pop(end , :)));
+                dPop(fromNonVaxS) = -screenGroupNonVax;
+                dPop(fromVaxS) = -screenGroupVax;
+                dPop(toNonVaxS) = screenGroupNonVax;
+                dPop(toVaxS) = screenGroupVax;
+                pop(end , :) = dPop + pop(end , :); 
+                screend(i , :) = screend(i , :) + sumall(screenGroupNonVax) + sumall(screenGroupVax); % count number of people screened at current time step
+            end
+        end
+         
+    
+    
+    
+        % Vaccinate for HPV
         
         % If within first vaxLimitYrs-many vaccine-limited years
         if vaxLimit && ((year - currYear) <= vaxLimitYrs)
@@ -400,7 +463,7 @@ parfor n = 1 : nTests
     
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
-        newCC , artTreatTracker , vaxd , ccTreated , ...
+        newCC , artTreatTracker , vaxd , screend , ccTreated , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
