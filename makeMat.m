@@ -530,6 +530,7 @@ V = zeros(gender , age);
 % end
 save(fullfile(savedir ,'vaxer') , 'vaxer')
 disp('Vaccination matrix complete')
+
 %% Make circumcision matrix before current year (use when circumcision begins in model)
 disp('Building circumcision matrix')
 negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
@@ -538,6 +539,8 @@ circMat(at(negCircMaleBirth , negMaleBirth)) = circ(1);
 circMat(at(negMaleBirth , negMaleBirth)) = - circ(1);
 save(fullfile(savedir ,'circMat') , 'circMat')
 disp('Circumcision matrix complete')
+
+disp('Vaccination matrix complete')
 
 %% Make circumcision matrix after 2030 
 disp('Building circumcision matrix after 2030')

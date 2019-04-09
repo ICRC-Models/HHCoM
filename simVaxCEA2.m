@@ -32,7 +32,7 @@ load([paramDir,'hpvData'])
 load([paramDir,'cost_weights'])
 % Load indices
 load([paramDir,'mixInfectIndices'])
-load([paramDir , 'mixInfectIndices2']) % to load hpvImmVaxd2
+load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'hpvTreatIndices'])
