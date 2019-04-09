@@ -22,6 +22,9 @@ if strcmp(hystOption , 'on')
     hyst = 1;
 end
 ccInc = zeros(disease , hpvTypes , age);
+% cin1Inc = ccInc;
+% cin2Inc = ccInc;
+% cin3Inc = ccInc;
 ccDeath = ccInc;
 ccTreated = zeros(disease , hpvTypes , age , 3); % 3 for cancer stages - local, regional, distant
 
@@ -45,7 +48,7 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
         c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
         c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier
+        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
         rHivHpv_Clear = hpv_hivClear(d - 2); % Infection clearance multiplier
         deathCC = muCC(d - 2 , :); % HIV+ CC death rate
         deathCC_det = muCC_det(d - 2 , :);
@@ -53,12 +56,12 @@ for d = 1 : disease
     elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
         c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 multiplier
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 multiplier
-        c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
-        c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier
-        rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier
+        c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier, (same as high CD4)
+        c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier, (same as high CD4)
+        rHivHpvMult = hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier, (same as high CD4), compounds c1c2Mult
+        rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier, (same as high CD4)
         deathCC_det = muCC_det(5 , :);
-        deathCC = muCC(5 , :); % HIV+ CC death rate
+        deathCC = muCC(5 , :); % HIV+ CC death rate, (same as high CD4)
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
     for h = 2 % infected onwards
@@ -123,40 +126,42 @@ for d = 1 : disease
 %                 deathCC = deathCC .* 0; % TESTING!!!
                 
                 ccLoc = ccInds(d , h , a , p , :);
-                locDet = kCCDet(1) * pop(ccLoc);
+                %locDet = kCCDet(1) * pop(ccLoc);
                 dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
                     - kRL * pop(ccLoc)... % local -> regional
-                    - deathCC(1) * pop(ccLoc)... % local CC mortality
-                    - locDet; % detect local CC -> treat
+                    - deathCC(1) * pop(ccLoc);%... % local CC mortality
+                    %- locDet; % detect local CC -> treat
                 
                 ccReg = ccRegInds(d , h , a , p , :);
-                regDet = kCCDet(2) * pop(ccReg);
+                %regDet = kCCDet(2) * pop(ccReg);
                 dPop(ccReg) = dPop(ccReg) + kRL * pop(ccLoc)...  % local -> regional
                     - kDR * pop(ccReg)... % regional -> distant
-                    - deathCC(2) * pop(ccReg)... % regional CC mortality
-                    - regDet; % detect regional CC -> treat
+                    - deathCC(2) * pop(ccReg);%... % regional CC mortality
+                    %- regDet; % detect regional CC -> treat
                 
                 ccDist = ccDistInds(d , h , a , p , :);
-                distDet = kCCDet(3) * pop(ccDist);
+                %distDet = kCCDet(3) * pop(ccDist);
                 dPop(ccDist) = dPop(ccDist) + kDR * pop(ccReg) ... % regional -> distant
-                    - deathCC(3) * pop(ccDist)... % distant CC mortality
-                    - distDet; % detect distant CC -> treat
-                
+                    - deathCC(3) * pop(ccDist);... % distant CC mortality
+                    %- distDet; % detect distant CC -> treat
                 
                 % CC treated tracker
-                ccTreated(d , h , a , 1) = sum(locDet);
-                ccTreated(d , h , a , 2) = sum(regDet);
-                ccTreated(d , h , a , 3) = sum(distDet);
+%                 ccTreated(d , h , a , 1) = sum(locDet);
+%                 ccTreated(d , h , a , 2) = sum(regDet);
+%                 ccTreated(d , h , a , 3) = sum(distDet);
                 
-                ccLocDet = ccLocDetInds(d , h , a , :);
-                ccRegDet = ccRegDetInds(d , h , a , :);
-                ccDistDet = ccDistDetInds(d , h , a , :);
-                dPop(ccLocDet) = dPop(ccLocDet) + locDet;
-                dPop(ccRegDet) = dPop(ccRegDet) + regDet;
-                dPop(ccDistDet) = dPop(ccDistDet) + distDet;
+%                 ccLocDet = ccLocDetInds(d , h , a , :);
+%                 ccRegDet = ccRegDetInds(d , h , a , :);
+%                 ccDistDet = ccDistDetInds(d , h , a , :);
+%                 dPop(ccLocDet) = dPop(ccLocDet) + locDet;
+%                 dPop(ccRegDet) = dPop(ccRegDet) + regDet;
+%                 dPop(ccDistDet) = dPop(ccDistDet) + distDet;
                 
                 % CC incidence tracker
                 ccInc(d , h , a) = ccInc(d , h , a) + sum(kCC_Cin3(a , h - 1) .* pop(cin3));
+%                 cin1Inc(d , h , a) = cin1Inc(d , h , a) + sum(kCin1_Inf(a , h - 1) .* pop(infF));
+%                 cin2Inc(d , h , a) = cin2Inc(d , h , a) + sum(kCin2_Cin1(a , h - 1) * c2c1Mult * pop(cin1));
+%                 cin3Inc(d , h , a) = cin3Inc(d , h , a) + sum(kCin3_Cin2(a , h - 1) * c3c2Mult .* pop(cin2));
                 
                 % CC death tracker
                 ccDeath(d , h , a) = ccDeath(d , h , a) + ...
@@ -165,18 +170,18 @@ for d = 1 : disease
             end
             
             % Detected CC deaths and transitions
-            dPop(ccLocDet) = dPop(ccLocDet) - kRL * pop(ccLocDet) ...
-                - deathCC_det(1) * pop(ccLocDet);
-            dPop(ccRegDet) = dPop(ccRegDet) + kRL * pop(ccLocDet) ...
-                - kDR * pop(ccRegDet) - deathCC_det(2) * pop(ccRegDet);
-            dPop(ccDistDet) = dPop(ccDistDet) + kDR * pop(ccRegDet) ...
-                - deathCC_det(3) * pop(ccDistDet);
+%             dPop(ccLocDet) = dPop(ccLocDet) - kRL * pop(ccLocDet) ...
+%                 - deathCC_det(1) * pop(ccLocDet);
+%             dPop(ccRegDet) = dPop(ccRegDet) + kRL * pop(ccLocDet) ...
+%                 - kDR * pop(ccRegDet) - deathCC_det(2) * pop(ccRegDet);
+%             dPop(ccDistDet) = dPop(ccDistDet) + kDR * pop(ccRegDet) ...
+%                 - deathCC_det(3) * pop(ccDistDet);
             
             % Add detected CC deaths to CC death tracker
-            ccDeath(d , h , a) = ccDeath(d , h , a) + ...
-                sum(deathCC_det(1) * pop(ccLocDet) ...
-                + deathCC_det(2) * pop(ccRegDet)...
-                + deathCC_det(3) * pop(ccDistDet));
+%             ccDeath(d , h , a) = ccDeath(d , h , a) + ...
+%                 sum(deathCC_det(1) * pop(ccLocDet) ...
+%                 + deathCC_det(2) * pop(ccRegDet)...
+%                 + deathCC_det(3) * pop(ccDistDet));
         end
     end
 end
