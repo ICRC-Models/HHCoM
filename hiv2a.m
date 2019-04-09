@@ -27,14 +27,9 @@ artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 
 % pie [d x v x g x a x r]
 
-% values obtained from k4_mat in MainMain.m of HIV model.
 treat = zeros(disease , viral , gender , age ,risk);
-treat(1 , : , : , 4 : end , :) = 0; % rate of going on PrEP
-treat(2 , : , : , 4 : end , :) = 0; % ART coverage
-treat(3 , : , : , 4 : end , :) = 0; % ART coverage
-treat(4 , : , : , 4 : end , :) = 0; % ART coverage
-treat(5 , : , : , 4 : end , :) = 0; % ART coverage
-treat(6 , : , : , 4 : end , :) = 0; % ART coverage
+% treat(1 , : , : , 4 : end , :) = 0; % rate of going on PrEP
+% treat(2 : 6 , : , : , 4 : end , :) = 0; % ART coverage
 kOn = ones(6 , 1);
 kOn(6) = 0;
 
@@ -45,153 +40,189 @@ kOn(6) = 0;
 % maxRateF2 = 0.42;%1 - exp(-0.5);
 % end
 
-% CD4 > 200, from 2013 to 2030
-if year >= 2013
-    yrs = 2013 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
-    ind = round(yrs , 4) == round(year , 4);
-    
-    for g = 1 : gender
-        for a = 4 : age
-            maxRateM = maxRateM1;
-            maxRateF = maxRateF1;
-            if a > 6
-                maxRateM = maxRateM2;
-                maxRateF = maxRateF2;
-            end
-            maxCover = {linspace(maxRateM , 0.70 , length(yrs)) ,...
-                linspace(maxRateF , 0.70 , length(yrs))};
-            for r = 1 : risk
-                hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = sum(pop(hivPositiveArt));
-                totHivPos = 0;
-                for d = 2 : 5
-                    for v = 1 : 5
-                        hivPositive = hivInds(d , v , g , a , r , :);
-                        totHivPos = totHivPos + sum(pop(hivPositive));
-                    end
-                end
-                fracART = onArt * (1 - artOut) / (onArt + totHivPos);
-                if year < 2030 && fracART < maxCover{g}(ind)
-                    cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-                    treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2030 && fracART < maxCover{g}(end)
-                    cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
-                    treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                end
-            end
-        end
-    end
-end
-
 %CD4 > 200, from 2006 to 2013
 if year >= 2006 && year < 2013
     yrs = 2006 : 1/ stepsPerYear : 2013;
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-        for a = 4 : age
-            maxRateM = maxRateM1;
-            maxRateF = maxRateF1;
-            if a > 6
-                maxRateF = maxRateF2;
-                maxRateM = maxRateM2;
-            end
-            maxCover = {linspace(0 , maxRateM , length(yrs)) , ...
-                linspace(0 , maxRateF , length(yrs))};
-            for r = 1 : risk
-                hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-                onArt = sum(pop(hivPositiveArt));
-                totHivPos = 0;
-                for d = 2 : 5
-                    for v = 1 : 5
-                        hivPositive = hivInds(d , v , g , a , r , :);
-                        totHivPos = totHivPos + sum(pop(hivPositive));
-                    end
-                end
-                fracART = onArt * (1 - artOut) / (onArt + totHivPos);
-                if year < 2013 && fracART < maxCover{g}(ind)
-                    %                             hivPositive = toInd(hivInds(d , v , g , a , r));
-                    %                             hivPos = sum(pop(hivPositive));
-                    cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-                    treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2013 && fracART < maxCover{g}(end)
-                    cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-                    treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-                end
+%         for a = 3 : age
+        maxRateM = maxRateM1;
+        maxRateF = maxRateF1;
+%         if a > 6
+%             maxRateF = maxRateF2;
+%             maxRateM = maxRateM2;
+%         end
+        maxCover = {linspace(0 , maxRateM , length(yrs)) , ...
+            linspace(0 , maxRateF , length(yrs))};
+%         for r = 1 : risk
+%         hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
+        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
+        onArt = sumall(pop(hivPositiveArt));
+        totHivPos = 0;
+        for d = 2 : 5
+            for v = 1 : 5
+%                 hivPositive = hivInds(d , v , g , a , r , :);
+                hivPositive = hivInds(d , v , g , 3 : age , : , :);
+                totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
+        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        if year < 2013 && fracART < maxCover{g}(ind)
+            cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
+            %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(2 : 5 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        elseif year >= 2013 && fracART < maxCover{g}(end)
+            cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
+            %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(2 : 5 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        end
+%         end
+%         end
     end
 end
+
 % CD4 <= 200, from 2004 to 2006
-if year >= 2004
+if year >= 2004 && year < 2013
     yrs = 2004 : 1 / stepsPerYear : 2006;
     ind = (round(yrs , 4) == round(year , 4));
     for g = 1 : gender
-        for a = 4 : age
-            maxRateM = maxRateM1;
-            maxRateF = maxRateF1;
-            if a > 6
-                maxRateM = maxRateM2;
-                maxRateF = maxRateF2;
+%         for a = 3 : age
+        maxRateM = maxRateM1;
+        maxRateF = maxRateF1;
+%         if a > 6
+%             maxRateM = maxRateM2;
+%             maxRateF = maxRateF2;
+%         end
+        maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
+            linspace(0 , maxRateF , length(yrs))};
+%         for r = 1 : risk
+%         onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
+        onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
+        totBelow200 = 0;
+        for v = 1 : 5
+%             below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
+            below200 = sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
+            totBelow200 = totBelow200 + below200;
+        end
+        fracART = onArt * (1 - artOut) / (onArt + totBelow200);
+        if year < 2006 && fracART < maxCover{g}(ind)
+            cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
+%             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        elseif year >= 2006 && fracART < maxCover{g}(end)
+            cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
+%             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        end
+%         end
+%         end
+    end
+end
+
+% CD4 >= 200, from 2013 to 2015
+if year >= 2013 && year < 2015
+    for g = 1 : gender  
+        maxRateM = maxRateM1;
+        maxRateF = maxRateF1;
+        maxCover = {maxRateM , maxRateF};
+
+        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
+        onArt = sumall(pop(hivPositiveArt));
+        totHivPos = 0;
+        for d = 2 : 6
+            for v = 1 : 5
+                hivPositive = hivInds(d , v , g , 3 : age , : , :);
+                totHivPos = totHivPos + sumall(pop(hivPositive));
             end
-            maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
-                linspace(0 , maxRateF , length(yrs))};
-            for r = 1 : risk
-                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
-                totBelow200 = 0;
-                for v = 1 : 5
-                    below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
-                    totBelow200 = totBelow200 + below200;
-                end
-                fracART = onArt * (1 - artOut) / (onArt + totBelow200);
-                if year < 2006 && fracART < maxCover{g}(ind)
-                    %                             hivPositive = toInd(hivInds(d , v , g , a , r));
-                    %                             hivPos = sum(pop(hivPositive));
-                    cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2006 && fracART < maxCover{g}(end)
-                    cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                end
-            end
+        end
+        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        if fracART < maxCover{g}
+            cover = (maxCover{g} - fracART) ./ (1 - fracART);
+            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
         end
     end
 end
 
-% CD4 <= 200, from 2017 to 2030
-if year >= 2017
-    yrs = 2017 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
+% CD4 >= 200, from 2015 to 2030
+if year >= 2015
+    yrs = 2015 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
     ind = round(yrs , 4) == round(year , 4);
+    
     for g = 1 : gender
-        for a = 4 : age
-            maxRateM = maxRateM1;
-            maxRateF = maxRateF1;
-            if a > 6
-                maxRateM = maxRateM2;
-                maxRateF = maxRateF2;
-            end
-            maxCover = {linspace(maxRateM , 0.70 , length(yrs)) , ...
-                linspace(maxRateF , 0.70 , length(yrs))};
-            for r = 1 : risk
-                onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
-                totBelow200 = 0;
-                for v = 1 : 5
-                    below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
-                    totBelow200 = totBelow200 + below200;
-                end
-                fracART = onArt * (1 - artOut) / (onArt + totBelow200);
-                if year < 2030 && fracART < maxCover{g}(ind)
-                    cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                elseif year >= 2030 && fracART < 0.70
-                    cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-                    treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-                end
+%         for a = 3 : age
+        maxRateM = maxRateM1;
+        maxRateF = maxRateF1;
+%         if a > 6
+%             maxRateM = maxRateM2;
+%             maxRateF = maxRateF2;
+%         end
+        maxCover = {linspace(maxRateM , 0.70 , length(yrs)) ,...
+           linspace(maxRateF , 0.70 , length(yrs))};
+%         for r = 1 : risk
+%         hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
+        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
+        onArt = sumall(pop(hivPositiveArt));
+        totHivPos = 0;
+        for d = 2 : 6
+            for v = 1 : 5
+%                 hivPositive = hivInds(d , v , g , a , r , :);
+                hivPositive = hivInds(d , v , g , 3 : age , : , :);
+                totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
+        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        if year < 2030 && fracART < maxCover{g}(ind)
+            cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
+%             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        elseif year >= 2030 && fracART < maxCover{g}(end)
+            cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
+%             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
+            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+        end
+%         end
+%         end
     end
 end
 
-% see model notes for index values
+% % CD4 <= 200, from 2017 to 2030
+% if year >= 2017
+%     yrs = 2017 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
+%     ind = round(yrs , 4) == round(year , 4);
+%     for g = 1 : gender
+% %         for a = 3 : age
+%         maxRateM = maxRateM1;
+%         maxRateF = maxRateF1;
+% %             if a > 6
+% %                 maxRateM = maxRateM2;
+% %                 maxRateF = maxRateF2;
+% %             end
+%         maxCover = {linspace(maxRateM , 0.70 , length(yrs)) , ...
+%            linspace(maxRateF , 0.70 , length(yrs))};
+% %         for r = 1 : risk
+% %         onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
+%         onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
+%         totBelow200 = 0;
+%         for v = 1 : 5
+% %             below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
+%                 below200 = sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
+%             totBelow200 = totBelow200 + below200;
+%         end
+%         fracART = onArt * (1 - artOut) / (onArt + totBelow200);
+%         if year < 2030 && fracART < maxCover{g}(ind)
+%             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
+% %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
+%             treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+%         elseif year >= 2030 && fracART < 0.70
+%             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
+% %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
+%             treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+%         end
+% %         end
+% %         end
+%     end
+% end
+
 %%
 dPop = zeros(size(pop));
 artTreat = zeros(disease , viral , gender , age , risk);
@@ -201,17 +232,8 @@ hivDeaths = zeros(gender , age , 1);
 prepOut = 0; % for now
 
 for g = 1 : gender
-    for a = 4 : age
+    for a = 3 : age
         for r = 1 : risk
-            % HIV Negative, uncircumcised (d = 1)
-            hivNegative = hivInds(1 , 1 , g , a , r , :);  %allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r)
-            
-            hivNegativePrEP = hivInds(9 , 1 , g , a , r , :); % allcomb(9 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r))
-            
-            dPop(hivNegative) = prepOut... % rate of PrEP dropout
-                .* (pop(hivNegativePrEP)) ... % PrEP dropouts from d = 9 (HIV-negative, uncircumcised and on PrEP)
-                - treat(1 , 1 , g , a , r)... % rate of going on PrEP
-                .* pop(hivNegative);
             
             hivPositiveArt = hivInds(10 , 6 , g , a , r , :); % allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r))
             
@@ -226,6 +248,12 @@ for g = 1 : gender
                 
                 artTreat(2 , v , g , a , r) = treat(2 , v , g , a , r) ... % keep track of distribution of people going on ART
                         .* sumall(pop(acuteInf)); % going on ART
+                    
+                % HIV-positive going on ART (d = 10)
+                dPop(hivPositiveArt) = ...
+                    dPop(hivPositiveArt)...
+                    + treat(2 , v , g , a , r)... % rate of going on ART
+                    .* pop(acuteInf); % going on ART    
                 
                 %                 artTreat(2 , v , g , a , r) = pie(2 , v , g , a , r) ... % keep track of distribution of people going on ART
                 %                         .* sumall(pop(acuteInf)); % going on ART
@@ -267,6 +295,16 @@ for g = 1 : gender
                 end
             end
             
+            % HIV Negative, uncircumcised (d = 1)
+            hivNegative = hivInds(1 , 1 , g , a , r , :);  %allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r)
+            
+            hivNegativePrEP = hivInds(9 , 1 , g , a , r , :); % allcomb(9 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r))
+            
+            dPop(hivNegative) = prepOut... % rate of PrEP dropout
+                .* (pop(hivNegativePrEP)) ... % PrEP dropouts from d = 9 (HIV-negative, uncircumcised and on PrEP)
+                - treat(1 , 1 , g , a , r)... % rate of going on PrEP
+                .* pop(hivNegative);
+            
             % HIV-negative, circumcised, and no PrEP (d = 7)
             hivNegCirc = hivInds(7 , 1 , g , a , r , :); % allcomb(7 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , g , a , r))
             
@@ -282,7 +320,6 @@ for g = 1 : gender
                 * pop(hivNegCircPrep); % prepOut to d = 1
             
             % HIV-negative, uncircumcised and on PrEP (d = 9)
-            
             dPop(hivNegativePrEP) = treat(1 , 1 , g , a ,r)...
                 * pop(hivNegative) - prepOut ...
                 * pop(hivNegativePrEP); % prepOut to d = 1
@@ -291,8 +328,7 @@ for g = 1 : gender
             % Dropout from ART (d = 10)
             dPop(hivPositiveArt) = ...
                 dPop(hivPositiveArt)...
-                - artOut .* pop(hivPositiveArt) ... % artOut to d = 2:6 as determined by distribution matrix
-                + treat(2 , v , g , a , r) * pop(acuteInf); 
+                - artOut .* pop(hivPositiveArt); % artOut to d = 2:6 as determined by distribution matrix
         end
     end
 end
