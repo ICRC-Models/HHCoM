@@ -11,8 +11,8 @@ function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds ,
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , ...
     rNormal_Inf , hpv_hivClear , c3c2Mults , ...
     c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
-    disease , viral , age , hpvTypes , ...
-    rImmuneHiv , vaccinated , hystOption)
+    disease , age , hpvTypes , ...
+    rImmuneHiv , hystOption)
 
 %% Set constants and initialize vectors
 % kCCDet = kCCDet .* 0 ; %TESTING!
@@ -66,7 +66,7 @@ for d = 1 : disease
     end
     for h = 2 % infected onwards
         for a = 1 : age
-            for p = 1 : 2
+            for p = [1:2,4,6]
                 % Infected group
                 immuneM = immuneInds(d , h , 1 , a , p , :);
                 immuneF = immuneInds(d , h , 2 , a , p , :);
