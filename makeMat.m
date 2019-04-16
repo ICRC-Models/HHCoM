@@ -509,27 +509,27 @@ end
 save(fullfile(savedir ,'deathMat') , 'deathMat')
 disp('Death matrix complete')
 %%
-% Vaccination (model time dependent). Activate when vax year begins.
-% ALPHA version: assumes vaccination rate is dependent on age. Female
-% vaccination only.
-disp('Building vaccination matrix')
-vaxer = speye(numel(pop) , numel(pop));
-V = zeros(gender , age);
-% V(2 , 3) = 1; % turn on vaccination for females in 10 - 14 age group
-% for a = 1 : age
-%     susFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 2 , a , 1 : risk));
-%     vaxdFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 10 , 1 : periods , 2 , a , 1 : risk));
-%     vaxer(at(vaxdFemale , susFemale)) = V(2 , a);
-%     vaxer(at(susFemale , susFemale)) = -V(2 , a);
-%     
-%     % for males (future version?)
-% %     susMale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 1 , a , 1 : risk));
-% %     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
-% %     vaxer(vaxdMale , susMale) = V(2 , a);
-% %     vaxer(susMale , susMale) = -V(2 , a);
-% end
-save(fullfile(savedir ,'vaxer') , 'vaxer')
-disp('Vaccination matrix complete')
+% % Vaccination (model time dependent). Activate when vax year begins.
+% % ALPHA version: assumes vaccination rate is dependent on age. Female
+% % vaccination only.
+% disp('Building vaccination matrix')
+% vaxer = speye(numel(pop) , numel(pop));
+% V = zeros(gender , age);
+% % V(2 , 3) = 1; % turn on vaccination for females in 10 - 14 age group
+% % for a = 1 : age
+% %     susFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 2 , a , 1 : risk));
+% %     vaxdFemale = toInd(allcomb(1 : disease , 1 : viral , 1 , 10 , 1 : periods , 2 , a , 1 : risk));
+% %     vaxer(at(vaxdFemale , susFemale)) = V(2 , a);
+% %     vaxer(at(susFemale , susFemale)) = -V(2 , a);
+% %     
+% %     % for males (future version?)
+% % %     susMale = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 : periods , 1 , a , 1 : risk));
+% % %     vaxdMale = toInd(allcomb(1 : disease , 1 : viral , 5 , 6 , 1 : periods , 1 , a , 1 : risk));
+% % %     vaxer(vaxdMale , susMale) = V(2 , a);
+% % %     vaxer(susMale , susMale) = -V(2 , a);
+% % end
+% save(fullfile(savedir ,'vaxer') , 'vaxer')
+% disp('Vaccination matrix complete')
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
 disp('Building circumcision matrix')
@@ -553,34 +553,34 @@ save(fullfile(savedir ,'circMat2') , 'circMat2')
 disp('Circumcision matrix after 2030 complete')
 
 %% Make circumcision matrix for HIV-only scenarios (use when circumcision begins in model)
-disp('Building circumcision matrix 2')
-negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-circMale16_29 = toInd(allcomb(7 , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % circumcised
-circMat2 = spalloc(numel(pop) , numel(pop) , 2);
-for d = 1 : disease
-    male16_29 = toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % all
-    circMat2(at(circMale16_29 , male16_29)) = 0.9;
-    circMat2(at(male16_29 , male16_29)) = -0.9;
-end
-save(fullfile(savedir ,'circMat2') , 'circMat2')
-disp('Circumcision matrix 2 complete')
-
-disp('Building circumcision matrix 2B')
-negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-circMale16_29 = toInd(allcomb(7 , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % circumcised
-circMat2B = spalloc(numel(pop) , numel(pop) , 2);
-
-for d = 1 : disease
-    male16_29 = toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % all
-    circMat2B(at(circMale16_29 , male16_29)) = 0.4;
-    circMat2B(at(male16_29 , male16_29)) = -0.4;   
-end
-save(fullfile(savedir ,'circMat2B') , 'circMat2B')
-disp('Circumcision matrix 2B complete')
-disp(' ')
-disp('Matrix construction complete')
-disp('All matrices saved to current directory')
+% disp('Building circumcision matrix 2')
+% negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+% negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+% circMale16_29 = toInd(allcomb(7 , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % circumcised
+% circMat2 = spalloc(numel(pop) , numel(pop) , 2);
+% for d = 1 : disease
+%     male16_29 = toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % all
+%     circMat2(at(circMale16_29 , male16_29)) = 0.9;
+%     circMat2(at(male16_29 , male16_29)) = -0.9;
+% end
+% save(fullfile(savedir ,'circMat2') , 'circMat2')
+% disp('Circumcision matrix 2 complete')
+% 
+% disp('Building circumcision matrix 2B')
+% negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+% negCircMaleBirth = toInd(allcomb(7 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+% circMale16_29 = toInd(allcomb(7 , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % circumcised
+% circMat2B = spalloc(numel(pop) , numel(pop) , 2);
+% 
+% for d = 1 : disease
+%     male16_29 = toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 1 , 4 : 6 , 1 : risk)); % all
+%     circMat2B(at(circMale16_29 , male16_29)) = 0.4;
+%     circMat2B(at(male16_29 , male16_29)) = -0.4;   
+% end
+% save(fullfile(savedir ,'circMat2B') , 'circMat2B')
+% disp('Circumcision matrix 2B complete')
+% disp(' ')
+% disp('Matrix construction complete')
+% disp('All matrices saved to current directory')
 
 
