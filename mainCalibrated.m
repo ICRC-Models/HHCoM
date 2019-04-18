@@ -11,12 +11,28 @@ profile clear;
 disp('Initializing. Standby...')
 disp(' ');
 
-% Load parameters
+% Use calibrated parameters
 paramDir = [pwd , '\Params\'];
-load([paramDir , 'popData'])
-load([paramDir , 'General'])
-load([paramDir , 'circMat2'])
-load([paramDir , 'mixInfectIndices2']) % to load hpvImmVaxd2
+load([paramDir , 'calibratedParams'])
+perPartnerHpv = 0.0045;
+% Load parameters
+load([paramDir,'general'])
+% Load indices
+load([paramDir,'mixInfectIndices'])
+% load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
+load([paramDir,'hivIndices'])
+load([paramDir,'hpvIndices'])
+load([paramDir,'ageRiskInds'])
+% Load matrices
+load([paramDir,'ager'])
+load([paramDir,'vlAdvancer'])
+load([paramDir,'fertMat'])
+load([paramDir,'hivFertMats'])
+load([paramDir,'fertMat2'])
+load([paramDir,'hivFertMats2'])
+load([paramDir,'deathMat'])
+load([paramDir,'circMat'])
+load([paramDir,'circMat2'])
 
 % Model specs
 % choose whether to model hysterectomy (not currently implemented)
@@ -32,19 +48,15 @@ if hivOn
     disp('HIV module activated')
 end
 
-% Use calibrated parameters
-load([paramDir , 'calibratedParams'])
-perPartnerHpv = 0.0045;
-
 % Directory to save results
-pathModifier = 'toNow_040919';
+pathModifier = 'toNow_041819';
 
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
 startYear = 1910; %1980
-modelYr1 = startYear; % for calculating sexual mixing (this could be streamlined)
 endYear = currYear;
+timeStep = 1 / stepsPerYear;
 
 % Intervention start years
 hivStartYear = 1980;
@@ -59,6 +71,87 @@ maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
+
+%% Screening
+screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
+hpvScreenStartYear = screenYrs(1);
+cytoSens = 0.58;
+hpvSens = 1.0; % 100 percent efficacy for WHO scenario; 0.89;
+cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy effectiveness by HIV status
+
+nhScreenParams = 1;
+screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; %[0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
+screenAge = [8];
+testSens = cytoSens;
+% cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
+colpoRetain = 0.72;
+cinTreatRetain = 0.51;
+cinTreatHpvPersist = 0.28;
+ccTreatRetain = 0.40;
+
+screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+    period = [screenYrs(i) , screenYrs(i + 1)];
+    screenCover_vec{i} = interp1(period , screenCover(i : i + 1 , 1) , ...
+        screenYrs(i) : timeStep : screenYrs(i + 1));
+end
+
+% Create screening indices
+screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAge) , risk);
+screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAge) , risk);
+noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAge) , risk);
+noVaxToScreen = noVaxNoScreen;
+vaxNoScreen = noVaxNoScreen;
+vaxToScreen = noVaxNoScreen;
+noVaxToScreenTreatImm = zeros(disease , viral , length(screenAge) , risk);
+vaxToScreenTreatImm = noVaxToScreenTreatImm;
+noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
+vaxToScreenTreatHpv = noVaxToScreenTreatImm;
+noVaxToScreenHyst = noVaxToScreenTreatImm;
+vaxToScreenHyst = noVaxToScreenTreatImm;
+noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , length(screenAge));
+noVaxXscreen = noVaxScreen;
+vaxScreen = noVaxScreen;
+vaxXscreen = noVaxScreen;
+for aS = 1 : length(screenAge)
+    a = screenAge(aS);
+    
+    for d = 1 : disease
+        for v = 1 : viral
+            for h = 1 : hpvTypes
+                for s = 1 : hpvStates
+                    for r = 1 : risk
+                        screenAgeAll(d,v,h,s,:,aS,r) = toInd(allcomb(d , v , h , s , 1 : periods , 2 , a , r)); 
+                        screenAgeS(d,v,h,s,:,aS,r) = toInd(allcomb(d , v , h , s , [4,6] , 2 , a , r));
+
+                        noVaxNoScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 1 , 2 , a , r)));
+                        noVaxToScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 6 , 2 , a , r)));
+                        vaxNoScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 2 , 2 , a , r)));
+                        vaxToScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 4 , 2 , a , r)));
+
+                        noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 1 , 10 , 6 , 2 , a , r));
+                        vaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 1 , 10 , 4 , 2 , a , r));
+                        noVaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 1 , 6 , 2 , a , r));
+                        vaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 1 , 4 , 2 , a , r));
+                        noVaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 1 , 8 , 6 , 2 , a , r));
+                        vaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 1 , 8 , 4 , 2 , a , r));
+                    end
+                end
+            end
+        end
+
+    end
+
+    % Create indices for removing screening status as people age out of screened age groups
+    noVaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 6 , ... 
+        2 , a+1 , 1 : risk));
+    noVaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 , ... 
+        2 , a+1 , 1 : risk));
+    vaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 4 , ... 
+        2 , a+1 , 1 : risk));
+    vaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 2 , ... 
+        2 , a+1 , 1 : risk));
+end
 
 %% Initial Population 
 mInit = popInit(: , 1); % initial male population size by age
@@ -151,7 +244,6 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize time vectors
-timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
 s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
 
@@ -170,6 +262,7 @@ newCin2 = newCC;
 newCin3 = newCC;
 ccDeath = newCC;
 ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
+newScreen = zeros(length(s) - 1 , hpvTypes , hpvStates);
 vaxd = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec; 
@@ -190,7 +283,7 @@ progressbar('Simulation Progress')
 for i = 2 : length(s) - 1
     tic
     year = startYear + s(i) - 1;
-    currStep = round(s(i) * stepsPerYear);
+%     currStep = round(s(i) * stepsPerYear);
     disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
         num2str(length(s) - i) ' time steps remaining until year ' ...
         num2str(endYear) ')'])
@@ -232,14 +325,31 @@ for i = 2 : length(s) - 1
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
-            disease , viral , age , hpvTypes , ...
-            rImmuneHiv , vaccinated , hystOption) , tspan , popIn);
+            disease , age , hpvTypes , ...
+            rImmuneHiv , hystOption) , tspan , popIn);
         popIn = pop(end , :);
         if any(pop(end , :) <  0)
             disp('After hpv')
             break
         end
-
+        
+        if (year >= hpvScreenStartYear)
+            [~ , pop , newScreen(i , : , :)] ...
+                = ode4xtra(@(t , pop) ...
+                hpvScreen(t , pop , disease , viral , hpvTypes , hpvStates , risk , ...
+                screenYrs , screenCover_vec , testSens , screenAge , ...
+                year , stepsPerYear , screenAgeAll , screenAgeS , ...
+                noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
+                noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
+                vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
+                colpoRetain , cinTreatRetain , cinTreatEff , cinTreatHpvPersist , ...
+                ccTreatRetain , nhScreenParams) , tspan , popIn);
+            popIn = pop(end , :);
+            if any(pop(end , :) <  0)
+                disp('After hpv screen')
+                break
+            end
+        end
         %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
         %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
         %                     hystPopInds , screenFreq , screenCover , hpvSens , ccTreat , ...
@@ -251,14 +361,16 @@ for i = 2 : length(s) - 1
     % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
     [~ , pop , newHpv(i , : , : , : , :) , newImmHpv(i , : , : , : , :) , ...
         newVaxHpv(i , : , : , : , :) , newHiv(i , : , : , :)] = ...
-        ode4xtra(@(t , pop) mixInfect(t , pop , currStep , ...
-        gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , maleActs , femaleActs , ...
-        lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , epsR_vec , yr , modelYr1 , ...
-        circProtect , condProtect , condUse , actsPer , partnersM , partnersF , ...
-        hpv_hivMult , hpvSus , hpvImm , toHpv_Imm , hpvVaxd , hpvVaxd2 , hpvImmVaxd2 , toHpv , toHpv_ImmVax , ...
-        toHpv_ImmVaxNonV , hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , ...
-        betaHIVF2M , betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-        hrInds , lrInds , hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
+        ode4xtra(@(t , pop) mixInfect(t , pop , ...
+        gar , perPartnerHpv , perPartnerHpv_lr , perPartnerHpv_nonV , maleActs , ...
+        femaleActs , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , ...
+        epsR_vec , yr , circProtect , condProtect , condUse , actsPer , ...
+        partnersM , partnersF , hpv_hivMult , hpvSus , hpvImm , hpvVaxd , ...
+        hpvVaxdScreen , hpvVaxd2 , hpvImmVaxd2 , toHpv , toHpv_Imm , toHpv_Vax , ...
+        toHpv_VaxScreen , toHpv_VaxNonV , toHpv_VaxNonVScreen , hivSus , toHiv , ...
+        mCurr , fCurr , mCurrArt , fCurrArt , betaHIVF2M , betaHIVM2F , disease , ...
+        viral , gender , age , risk , hpvStates , hpvTypes , hrInds , lrInds , ...
+        hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
     popIn = pop(end , :); % for next mixing and infection module
     if any(pop(end , :) < 0)
         disp('After mixInfect')
@@ -289,11 +401,12 @@ for i = 2 : length(s) - 1
     
     % Birth, aging, risk redistribution module
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
-        bornAgeDieRisk(t , pop , year , currStep ,...
-        gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
+        bornAgeDieRisk(t , pop , year , ...
+        gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
-        MTCTRate , circStartYear , ageInd , riskInd , riskDist , startYear , ...
-        endYear, stepsPerYear , currYear) , tspan , popIn);
+        MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
+        stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
+        vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     if any(pop(end , :) < 0)
         disp('After bornAgeDieRisk')
         break

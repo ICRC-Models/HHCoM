@@ -4,6 +4,7 @@ function[] = showResults(pathModifier)
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 load([paramDir,'calibData'])
+load([paramDir,'general'])
 resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
@@ -2187,6 +2188,58 @@ for i = 2 : length(inds)
     xlabel('Year'); ylabel('Incidence per 100,000')
     hold all;
 end   
+
+%% Population by "p"
+figure();
+for d = 1 : disease
+for p = 1 : periods
+    subplot(3,4,d);
+    % General
+    inds = toInd(allcomb(d , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+         p , 1 : gender , 8 , 1 : risk));
+    pop = sum(popVec(: , inds) , 2);
+    popTot = popVec(: , toInd(allcomb(d , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+         1 : periods , 1 : gender , 8 , 1 : risk)));
+    plot(tVec , 100 * pop ./ sum(popTot , 2),'o')
+    xlabel('Year'); ylabel('Proportion (%)'); title(' p Proportion')
+    legend('1' , '2' , '3' , '4' , '5' , '6')
+    hold all;
+end
+end
+
+%% Screened proportion by HIV group
+figure();
+linStyle = {'--' , '-' , ':'};
+for a = 8
+    for r = 1 : risk
+    % HIV+
+    vaxHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 4 : 6 , 2 , a , r));
+    vaxHivPop = sum(popVec(: , vaxHivInds) , 2);
+    popHivTot = popVec(: , toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        2 , a , r)));
+    %ART
+    vaxArtInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 4 : 6 , 2 , a , r));
+    vaxArtPop = sum(popVec(: , vaxArtInds) , 2);
+    popArtTot = popVec(: , toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        2 , a , r)));
+    %HIV-
+    vaxHivNegInds = toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 4 : 6 , 2 , a , r));
+    vaxHivNegPop = sum(popVec(: , vaxHivNegInds) , 2);
+    popHivNegTot = popVec(: , toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        2 , a , r)));
+
+%     subplot(4,4,a)
+    plot(tVec , 100 * vaxHivNegPop ./ sum(popHivNegTot , 2) , linStyle{r})
+    hold all
+    plot(tVec , 100 * vaxHivPop ./ sum(popHivTot , 2) , linStyle{r})
+    hold all
+    plot(tVec , 100 * vaxArtPop ./ sum(popArtTot , 2) , linStyle{r})
+    xlabel('Year'); ylabel('Proportion (%)'); title('Screened Proportion')
+    
+    hold all;
+    end
+end
+legend('HIV- lr' , 'HIV+ noART lr' , 'ART lr' , 'HIV- mr' , 'HIV+ noART mr' , 'ART mr' , 'HIV- hr' , 'HIV+ noART hr' , 'ART hr')
 
 %%
 % reset(gca)
