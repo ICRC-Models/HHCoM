@@ -195,11 +195,11 @@ end
 %% Remove screened status as people age out of screened age groups
 if (year >= hpvScreenStartYear)
     for aOut = 1 : length(screenAge)
-        noVaxScreend = pop(noVaxScreen(:,aOut));
+        noVaxScreend = dPop(noVaxScreen(:,aOut));
         dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
         dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
 
-        vaxScreend = pop(vaxScreen(:,aOut));
+        vaxScreend = dPop(vaxScreen(:,aOut));
         dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
         dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
     end
