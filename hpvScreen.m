@@ -1,10 +1,11 @@
 % HPV screening and treatment
-function[dPop , extraOut] = hpvScreen(t , pop , disease , hpvTypes , hpvStates , ...
+function[dPop , extraOut] = hpvScreen(t , pop , disease , viral , hpvTypes , hpvStates , risk , ...
     screenYrs , screenCover_vec , testSens , screenAge , ...
     year , stepsPerYear , screenAgeAll , screenAgeS , ...
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
     noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
-    vaxToScreenTreatHpv , cryoEff , cryoElig , cryoHpvClear)
+    vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
+    colpoRetain , cinTreatRetain , cinTreatEff , cinTreatHpvPersist , ccTreatRetain , nhScreenParams)
 
 %% Set constants and initialize vectors
 sumall = @(x) sum(x(:));
@@ -27,39 +28,84 @@ end
 screenRate = screenRate * 0.20; % find 1/5 of age group (represents 35 year olds, only)
 
 for aS = 1 : length(screenAge)
-    fracScreend = (sumall(pop(screenAgeS(:,aS))) / sumall(pop(screenAgeAll(:,aS)))); % find proportion of population that is currently screened
-    if screenRate - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
-        screenCover = max(0 , (screenRate - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
-
-        for d = 1 : disease
+    for d = 1 : disease
+        for v = 1 : viral
             for h = 1 : 2
-                for s = [1 , 8 : 10]
-                    noVaxScreend = screenCover .* pop(noVaxNoScreen(d,h,s,:,aS));
-                    dPop(noVaxNoScreen(d,h,s,:,aS)) = dPop(noVaxNoScreen(d,h,s,:,aS)) - noVaxScreend;
-                    dPop(noVaxToScreen(d,h,s,:,aS)) = dPop(noVaxToScreen(d,h,s,:,aS)) + noVaxScreend;
+                for s = 1 : hpvStates
+                    for r = 1 : risk
+                        fracScreend = (sumall(pop(screenAgeS(d,v,h,s,:,aS,r))) / sumall(pop(screenAgeAll(d,v,h,s,:,aS,r)))); % find proportion of population that is currently screened
+                        if screenRate - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
+                            screenCover = max(0 , (screenRate - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
+                            
+                            if nhScreenParams
+                                % NH screening algorithm
+                                if any(s == [1 : 2 , 8 : 10])
+                                    toScreenMult = 1.0;
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = 0.0;
+                                elseif any(s == [3 : 4]) 
+                                    toScreenMult = ((1-testSens) + (testSens * (1 - colpoRetain)) + ...
+                                        (testSens * colpoRetain * (1 - cinTreatRetain)) + ...
+                                        (testSens * colpoRetain * cinTreatRetain * (1-cinTreatEff(d))));
+                                    toScreenTreatImmMult = testSens * colpoRetain * cinTreatRetain * cinTreatEff(d) * ...
+                                        (1.0-((cinTreatHpvPersist - (1-cinTreatEff(d)))/cinTreatEff(d)));
+                                    toScreenTreatHpvMult = testSens * colpoRetain * cinTreatRetain * cinTreatEff(d) * ...
+                                        ((cinTreatHpvPersist - (1-cinTreatEff(d)))/cinTreatEff(d));
+                                    toScreenTreatHystMult = 0.0;
+                                elseif s == 5
+                                    toScreenMult = ((1-testSens) + (testSens * (1 - colpoRetain)) + ...
+                                        (testSens * colpoRetain * (1 - ccTreatRetain)));
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = testSens * colpoRetain * ccTreatRetain;
+                                elseif any(s == [6 : 7])
+                                    toScreenMult = 1.0;
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = 0.0;
+                                end
+                            else
+                                % WHO screening algorithm
+                                if any(s == [5 : 10]) || (s==1 && h==1)
+                                    toScreenMult = 1.0;
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = 0.0;
+                                elseif any(s == [2 : 4]) 
+                                    toScreenMult = ((1-testSens) + (testSens * (1 - colpoRetain)) + ...
+                                        (testSens * colpoRetain * (1 - cinTreatRetain)) + ...
+                                        (testSens * colpoRetain * cinTreatRetain * (1-cinTreatEff(d))));
+                                    toScreenTreatImmMult = testSens * colpoRetain * cinTreatRetain * cinTreatEff(d) * ...
+                                        (1.0-((cinTreatHpvPersist - (1-cinTreatEff(d)))/cinTreatEff(d)));
+                                    toScreenTreatHpvMult = testSens * colpoRetain * cinTreatRetain * cinTreatEff(d) * ...
+                                        ((cinTreatHpvPersist - (1-cinTreatEff(d)))/cinTreatEff(d));
+                                    toScreenTreatHystMult = 0.0;
+                                elseif (s == 1 && h == 2)
+                                    toScreenMult = ((1-testSens) + (testSens * (1 - colpoRetain)) + ...
+                                        (testSens * colpoRetain * (1 - cinTreatRetain)));
+                                    toScreenTreatImmMult = testSens * colpoRetain * cinTreatRetain * (1.0-cinTreatHpvPersist);
+                                    toScreenTreatHpvMult = testSens * colpoRetain * cinTreatRetain * cinTreatHpvPersist;
+                                    toScreenTreatHystMult = 0.0;
+                                end
+                            end
+                            
+                            noVaxScreend = screenCover .* pop(noVaxNoScreen(d,v,h,s,aS,r));
+                            dPop(noVaxNoScreen(d,v,h,s,aS,r)) = dPop(noVaxNoScreen(d,v,h,s,aS,r)) - noVaxScreend;
+                            dPop(noVaxToScreen(d,v,h,s,aS,r)) = dPop(noVaxToScreen(d,v,h,s,aS,r)) + toScreenMult .* noVaxScreend;
+                            dPop(noVaxToScreenTreatImm(d,v,aS,r)) = dPop(noVaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* noVaxScreend;
+                            dPop(noVaxToScreenTreatHpv(d,v,aS,r)) = dPop(noVaxToScreenTreatHpv(d,v,aS,r)) + toScreenTreatHpvMult .* noVaxScreend;
+                            dPop(noVaxToScreenHyst(d,v,aS,r)) = dPop(noVaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* noVaxScreend;
 
-                    vaxScreend = screenCover .* pop(vaxNoScreen(d,h,s,:,aS));
-                    dPop(vaxNoScreen(d,h,s,:,aS)) = dPop(vaxNoScreen(d,h,s,:,aS)) - vaxScreend;
-                    dPop(vaxToScreen(d,h,s,:,aS)) = dPop(vaxToScreen(d,h,s,:,aS)) + vaxScreend;
-                end
-                for s = 2 : 7
-                    noVaxScreend = screenCover .* pop(noVaxNoScreen(d,h,s,:,aS));
-                    dPop(noVaxNoScreen(d,h,s,:,aS)) = dPop(noVaxNoScreen(d,h,s,:,aS)) - noVaxScreend;
-                    dPop(noVaxToScreen(d,h,s,:,aS)) = dPop(noVaxToScreen(d,h,s,:,aS)) + ...
-                        ((1-testSens) + (testSens * (1 - cryoElig(s-1))) + (testSens * cryoElig(s-1) * (1-cryoEff(d)))) .* noVaxScreend;
-                    dPop(noVaxToScreenTreatImm(d,:,aS)) = dPop(noVaxToScreenTreatImm(d,:,aS)) + ...
-                        testSens * cryoElig(s-1) * cryoEff(d) * (1.0-((cryoHpvClear - (1-cryoEff(d)))/cryoEff(d))) .* noVaxScreend;
-                    dPop(noVaxToScreenTreatHpv(d,:,aS)) = dPop(noVaxToScreenTreatHpv(d,:,aS)) + ...
-                        testSens * cryoElig(s-1) * cryoEff(d) * ((cryoHpvClear - (1-cryoEff(d)))/cryoEff(d)) .* noVaxScreend;
-
-                    vaxScreend = screenCover .* pop(vaxNoScreen(d,h,s,:,aS));
-                    dPop(vaxNoScreen(d,h,s,:,aS)) = dPop(vaxNoScreen(d,h,s,:,aS)) - vaxScreend;
-                    dPop(vaxToScreen(d,h,s,:,aS)) = dPop(vaxToScreen(d,h,s,:,aS)) + ...
-                        ((1-testSens) + (testSens * (1 - cryoElig(s-1))) + (testSens * cryoElig(s-1) * (1-cryoEff(d)))) .* vaxScreend;
-                    dPop(vaxToScreenTreatImm(d,:,aS)) = dPop(vaxToScreenTreatImm(d,:,aS)) + ...
-                        testSens * cryoElig(s-1) * cryoEff(d) * (1.0-((cryoHpvClear - (1-cryoEff(d)))/cryoEff(d))) .* vaxScreend;
-                    dPop(vaxToScreenTreatHpv(d,:,aS)) = dPop(vaxToScreenTreatHpv(d,:,aS)) + ...
-                        testSens * cryoElig(s-1) * cryoEff(d) * ((cryoHpvClear - (1-cryoEff(d)))/cryoEff(d)) .* vaxScreend;
+                            vaxScreend = screenCover .* pop(vaxNoScreen(d,v,h,s,aS,r));
+                            dPop(vaxNoScreen(d,v,h,s,aS,r)) = dPop(vaxNoScreen(d,v,h,s,aS,r)) - vaxScreend;
+                            dPop(vaxToScreen(d,v,h,s,aS,r)) = dPop(vaxToScreen(d,v,h,s,aS,r)) + toScreenMult .* vaxScreend;
+                            dPop(vaxToScreenTreatImm(d,v,aS,r)) = dPop(vaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* vaxScreend;
+                            dPop(vaxToScreenTreatHpv(d,v,aS,r)) = dPop(vaxToScreenTreatHpv(d,v,aS,r)) + toScreenTreatHpvMult .* vaxScreend;
+                            dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
+                            
+                        end
+                    end
                 end
             end
         end
