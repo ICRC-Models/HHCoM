@@ -64,13 +64,13 @@ plotTits2 = {'80% coverage: Total female population' , '90% coverage'  , ...
     '80% coverage: HIV-Positive ART' , '90% coverage' , ...
     '80% coverage: HIV-Positive all' , '90% coverage'};
 fac = 10 ^ 5;
-plotTitsS = {'No Screening' , 'Screen- NH baseline' , 'Screen- WHO35' , 'Screen- WHO3545'};
-linStyle = {'-' , '--' , '-.' , ':'};
+plotTitsS = {'No Screening' , 'Screen- NH baseline' , 'Screen- WHO35' , 'Screen- WHO3545' , 'Screen- WHO45'};
+linStyle = {'-' , '--' , '-.' , ':' , '--'};
 linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
 
-set(gca,'ColorOrderIndex',1)
 % figure();
 subplot(1,2,1);
+set(gca,'ColorOrderIndex',1)
 
 for i = 2 : length(inds)-1
 %     plotTits = {plotTits2{(i*2-1):(i*2)}};
@@ -138,14 +138,14 @@ for i = 2 : length(inds)-1
     
 % %     noV.ccInc = noV.ccIncRef ./ (annlz(sum(noV.popVec(: , allhivNegFAge) , 2) ./ stepsPerYear));
     noV.ccInc = noV.ccIncRef;
-    plot(tVec(1 : stepsPerYear : end) , noV.ccInc , 'LineStyle' , linStyle{4} , 'DisplayName' , ...
+    plot(tVec(1 : stepsPerYear : end) , noV.ccInc , 'LineStyle' , linStyle{5} , 'LineWidth' ,0.5, 'DisplayName' , ...
          [plotTits1{i} , ': Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
     %legend('-DynamicLegend');
     hold all;
     for n = 1 : length(vaxResult)-1
 % %         vaxResult{n}.ccInc = vaxResult{n}.ccIncRef ./ (annlz(sum(vaxResult{n}.popVec(: , allhivNegFAge) , 2) ./ stepsPerYear));
         vaxResult{n}.ccInc = vaxResult{n}.ccIncRef;
-        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'LineStyle' , linStyle{4} , 'DisplayName' , ...
+        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'LineStyle' , linStyle{5} , 'LineWidth' ,0.5, 'DisplayName' , ...
             [plotTits1{i} , ': Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%']);
         
         % Reduction
@@ -344,7 +344,7 @@ hold off
 subplot(1,2,2);
 
 plotTitsS = {'No Screening' , 'Screen- NH baseline' , 'Screen- WHO35' , 'Screen- WHO3545'};
-linStyle = {'-' , '--' , '-.' , ':'};
+linStyle = {'-' , '--' , '-.' , ':' , '--'};
 
 % HIV+
 hpvHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 2 , 3 : 4 , ...
@@ -366,11 +366,11 @@ popHivNegTot = noV.popVec(: , toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpv
     2 , 3 : age , 1 : risk)));
 
 set(gca,'ColorOrderIndex',1)
-plot(tVec , 100 * hpvHivNegPop ./ sum(popHivNegTot , 2),linStyle{4})
+plot(tVec , 100 * hpvHivNegPop ./ sum(popHivNegTot , 2),linStyle{5},'LineWidth' ,0.5)
 hold all
-plot(tVec , 100 * hpvHivPop ./ sum(popHivTot , 2),linStyle{4})
+plot(tVec , 100 * hpvHivPop ./ sum(popHivTot , 2),linStyle{5},'LineWidth' ,0.5)
 hold all
-plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2),linStyle{4})
+plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2),linStyle{5},'LineWidth' ,0.5)
 xlabel('Year'); ylabel('Prevalence (%)'); title(' CIN2+ Prevalence')
 %legend('HIV-' , 'HIV+ noART' , 'HIV+ ART')
 
