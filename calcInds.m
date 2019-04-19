@@ -1,4 +1,4 @@
-% Calculates indices
+%% Calculates indices
 function calcInds()
 % Compartment parameters
 disease = 10;
@@ -95,6 +95,7 @@ hpvSus = zeros(disease, hpvTypes , gender , age , risk , viral);
 hpvImm = zeros(disease , hpvTypes , gender , age , risk , viral);
 hpvVaxd = zeros(disease , hpvTypes , gender , age , risk , viral);
 hpvVaxd2 = hpvVaxd;
+hpvImmVaxd2 = hpvVaxd;
 for d = 1 : disease
     for g = 1 : gender
         for a = 1 : age
@@ -108,6 +109,8 @@ for d = 1 : disease
                         sort(toInd(allcomb(d , 1 : viral , h , 9 , 1 , g , a , r)));
                     hpvVaxd2(d , h , g , a , r , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , h , 1 , 2 , g , a , r)));
+                    hpvImmVaxd2(d , h , g , a , r , :) = ...
+                        sort(toInd(allcomb(d , 1 : viral , h , 10 , 2 , g , a , r)));
                 end
             end
         end
@@ -174,7 +177,7 @@ end
 save([paramDir , 'mixInfectIndices'] , 'naive' , 'coInf' , 'hivSus' , 'hpvSus' , 'toHiv' , ...
     'toHpv' , 'toHpv_ImmVax' , 'toHpv_ImmVaxNonV' , 'toHpv_Imm' , ...
     'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , 'gar' , 'hrInds' , ...
-    'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd' , 'hpvVaxd2')
+    'lrInds' , 'hrlrInds' , 'hpvImm' , 'hpvVaxd' , 'hpvVaxd2' , 'hpvImmVaxd2')
 disp('mixInfect indices loaded')
 %% hiv.m , treatDist.m indices
 % hivInds(d , v , g , a , r) = makeVec('d' , 'v' , 1 : hpvTypes , 1 : hpvStates , ...

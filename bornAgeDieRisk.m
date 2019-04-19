@@ -46,18 +46,18 @@ elseif year > 2004
     kHiv = mtctVec(ind);
 end
 
-if year > 1995 && year <= 2005
-    dt = (year - 1995) * stepsPerYear;
+if year > 1990 && year <= 2015
+    dt = (year - 1990) * stepsPerYear;
     dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
-        ./ ((2005 - 1995) * stepsPerYear);
+        ./ ((2015 - 1990) * stepsPerYear);
     hivFertPosBirth = hivFertPosBirth + dFertPos .* dt;
     dFertNeg = (hivFertNegBirth2 - hivFertNegBirth) ...
-        ./ ((2005 - 1995) * stepsPerYear);
+        ./ ((2015 - 1990) * stepsPerYear);
     hivFertNegBirth = hivFertNegBirth + dFertNeg .* dt;
     dFertMat = (fertMat2 - fertMat) ...
-        ./ ((2005 - 1995) * stepsPerYear);
+        ./ ((2015 - 1990) * stepsPerYear);
     fertMat = fertMat + dFertMat .* dt;
-elseif year >= 2005
+elseif year >= 2015
     fertMat = fertMat2;
     hivFertPosBirth = hivFertPosBirth2;
     hivFertNegBirth = hivFertNegBirth2;
@@ -152,6 +152,7 @@ for g = 1 : gender
                 riskFrac3 = min(min(riskDiff(2) , riskAvail(3)) / popR3Tot , 1);
                 dPop(r3To) = dPop(r3To) - pop(r3) .* 0.99 .* riskFrac3;
                 dPop(r2To) = dPop(r2To) + pop(r3) .* 0.99 .* riskFrac3;
+
             end
             % if needed, move from risk 1 to risk 2
             if riskDiff(2) / riskAvail(3) > 1
