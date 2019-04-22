@@ -14,7 +14,7 @@ disp(' ');
 % Load parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'popData'])
-load([paramDir , 'General'])
+load([paramDir , 'general'])
 load([paramDir , 'circMat2'])
 load([paramDir , 'mixInfectIndices2']) % to load hpvImmVaxd2
 

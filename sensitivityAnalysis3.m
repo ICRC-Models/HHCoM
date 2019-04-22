@@ -2,42 +2,26 @@
 %function sensitivityAnalysis()
 
 close all; clear all; clc
-profile clear
-profile on
 
 %loadUp(6);
 
 %% Load parameters
-tic
 paramDir = [pwd ,'\Params\'];
 load([paramDir,'settings'])
-load([paramDir,'popData'])
-load([paramDir,'HIVParams'])
 load([paramDir,'general'])
-load([paramDir,'mixInfectParams'])
-load([paramDir,'vlBeta'])
-load([paramDir,'hpvData'])
-load([paramDir,'cost_weights'])
-load([paramDir,'calibData'])
-load([paramDir,'mixInfectIndices'])
-load([paramDir,'hivIndices'])
-load([paramDir,'hpvIndices'])
-load([paramDir,'hpvTreatIndices'])
-load([paramDir,'ageRiskInds'])
-load([paramDir,'vaxInds'])
-load([paramDir,'ager'])
-load([paramDir,'vlAdvancer'])
-load([paramDir,'fertMat'])
-load([paramDir,'hivFertMats'])
-load([paramDir,'fertMat2'])
-load([paramDir,'hivFertMats2'])
-load([paramDir,'vaxer'])
-load([paramDir,'circMat'])
-load([paramDir,'deathMat'])
+
+%% Cluster information
+% Create a local cluster object
+myCluster = parcluster('local'); 
+% Set the JobStorageLocation to the temporary directory that was created in your slurm script
+myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
+numCores = feature('numcores')
+parpool(numCores);
+
 
 %% Latin hypercube sampling of parameter space
-nSets = 100;    % number of parameter sets to sample
-p = 398;    % number of parameters
+nSets = 48; %100;    % number of parameter sets to sample
+p = 84; %398;    % number of parameters
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 
 %% Rescale sample values to correct parameter ranges and apply bounds
@@ -46,21 +30,21 @@ sampleNorm = sampleNorm';
 lb = ones(p,nSets).*0.001;
 ub = ones(p,nSets);
 ub(1:84,:) = 180;
-lb(85:98,:) = 0.5;
-lb(127:140,:) = 0.5;
-lb(169,:) = 0.01;
-ub(169,:) = 0.9;
-lb(170:175) = 0.1;
-lb(176:259) = 1;
-ub(176:259) = 365;
-lb(263:294) = 0.25;
-ub(263:294) = 4;
-ub(295:297) = 0.5;
-lb(314:315) = 0.2;
-ub(314:315) = 0.7;
-lb(318) = 0.25;
-ub(318) = 4;
-ub(319:398) = 10;
+% lb(85:98,:) = 0.5;
+% lb(127:140,:) = 0.5;
+% lb(169,:) = 0.01;
+% ub(169,:) = 0.9;
+% lb(170:175) = 0.1;
+% lb(176:259) = 1;
+% ub(176:259) = 365;
+% lb(263:294) = 0.25;
+% ub(263:294) = 4;
+% ub(295:297) = 0.5;
+% lb(314:315) = 0.2;
+% ub(314:315) = 0.7;
+% lb(318) = 0.25;
+% ub(318) = 4;
+% ub(319:398) = 10;
 
 % KEY
 %(1:42):     partnersM, [3:age x risk], (0.001 to 180)
@@ -96,16 +80,16 @@ sample(15:28,:) = (sample(29:42,:)-lb(15:28,:))./2.0 + sampleNorm(15:28,:) .* (s
 sample(57:70,:) = (sample(71:84,:)-lb(57:70,:))./2.0 + sampleNorm(57:70,:) .* (sample(71:84,:) - ((sample(71:84,:)-lb(57:70,:))./2.0));
 sample(1:14,:) = lb(1:14,:) + sampleNorm(1:14,:) .* (sample(15:28,:) - lb(1:14,:));
 sample(43:56,:) = lb(43:56,:) + sampleNorm(43:56,:) .* (sample(57:70,:) - lb(43:56,:));
-% riskDistM, riskDistF
-sample(99:112,:) = (1.0 - sample(85:98,:))./2.0 + sampleNorm(99:112,:) .* ((1.0 - sample(85:98,:)) - ((1.0 - sample(85:98,:))./2.0));
-sample(141:154,:) = (1.0 - sample(127:140,:))./2.0 + sampleNorm(141:154,:) .* ((1.0 - sample(127:140,:)) - ((1.0 - sample(127:140,:))./2.0));
-sample(113:126,:) = 1.0 - sample(85:98,:) - sample(99:112,:);
-sample(155:168,:) = 1.0 - sample(127:140,:) - sample(141:154,:);
-% maleActs, femaleActs
-sample(190:203,:) = (sample(176:189,:)-lb(190:203,:))./2.0 + sampleNorm(190:203,:) .* (sample(176:189,:) - ((sample(176:189,:)-lb(190:203,:))./2.0));
-sample(204:217,:) = lb(204:217,:) + sampleNorm(204:217,:) .* (sample(190:203,:) - lb(204:217,:));
-sample(232:245,:) = (sample(218:231,:)-lb(232:245,:))./2.0 + sampleNorm(232:245,:) .* (sample(218:231,:) - ((sample(218:231,:)-lb(232:245,:))./2.0));
-sample(246:259,:) = lb(246:259,:) + sampleNorm(246:259,:) .* (sample(232:245,:) - lb(246:259,:));
+% % riskDistM, riskDistF
+% sample(99:112,:) = (1.0 - sample(85:98,:))./2.0 + sampleNorm(99:112,:) .* ((1.0 - sample(85:98,:)) - ((1.0 - sample(85:98,:))./2.0));
+% sample(141:154,:) = (1.0 - sample(127:140,:))./2.0 + sampleNorm(141:154,:) .* ((1.0 - sample(127:140,:)) - ((1.0 - sample(127:140,:))./2.0));
+% sample(113:126,:) = 1.0 - sample(85:98,:) - sample(99:112,:);
+% sample(155:168,:) = 1.0 - sample(127:140,:) - sample(141:154,:);
+% % maleActs, femaleActs
+% sample(190:203,:) = (sample(176:189,:)-lb(190:203,:))./2.0 + sampleNorm(190:203,:) .* (sample(176:189,:) - ((sample(176:189,:)-lb(190:203,:))./2.0));
+% sample(204:217,:) = lb(204:217,:) + sampleNorm(204:217,:) .* (sample(190:203,:) - lb(204:217,:));
+% sample(232:245,:) = (sample(218:231,:)-lb(232:245,:))./2.0 + sampleNorm(232:245,:) .* (sample(218:231,:) - ((sample(218:231,:)-lb(232:245,:))./2.0));
+% sample(246:259,:) = lb(246:259,:) + sampleNorm(246:259,:) .* (sample(232:245,:) - lb(246:259,:));
 
 % indsC1 = any(([sample(132:147,:)<sample(116:131,:)<sample(100:115,:)] < 1) , 1) .* [1:1:nSets];
 % sample(:,indsC1) = [];
@@ -115,29 +99,28 @@ sample(246:259,:) = lb(246:259,:) + sampleNorm(246:259,:) .* (sample(232:245,:) 
 % end
 
 %% Obtain model output for each set of sampled parameters
-ccIncSet = zeros(nSets,1);
-negSumLogLSet = zeros(nSets,1);
-parfor n = 1 : nSets
-    paramSet = sample(:,n);
-    %[negSumLogL , ccInc] = calibratorAll3(paramSet);
-    [negSumLogL] = calibratorAll3(paramSet);
-    negSumLogLSet(n,1) = negSumLogL;
-    %ccIncSet(n,1) = ccInc;
-end
-
-figure
-%subplot(1,2,1);
-plot(negSumLogLSet,'o');
-title('negSumLogL');
-% subplot(1,2,2);
-% plot(ccIncSet);
-% title('CC Incidence');
+% ccIncSet = zeros(nSets,1);
+% negSumLogLSet = zeros(nSets,1);
+% parfor n = 1 : nSets
+%     paramSet = sample(:,n);
+%     %[negSumLogL , ccInc] = calibratorAll3(paramSet);
+%     [negSumLogL] = calibratorAll3(paramSet);
+%     negSumLogLSet(n,1) = negSumLogL;
+%     %ccIncSet(n,1) = ccInc;
+% end
+% 
+% figure
+% %subplot(1,2,1);
+% plot(negSumLogLSet,'o');
+% title('negSumLogL');
+% % subplot(1,2,2);
+% % plot(ccIncSet);
+% % title('CC Incidence');
 
 %% Save parameter sets and negSumLogL values
-file = 'params_calib_25Feb19.dat';
+file = 'paramSets_calib_22Apr19.dat';
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , sample)
-file = 'negSumLogL_calib_25Feb19.dat';
-paramDir = [pwd , '\Params\'];
-csvwrite([paramDir, file] , negSumLogLSet)
-toc
+% file = 'negSumLogL_calib_25Feb19.dat';
+% paramDir = [pwd , '\Params\'];
+% csvwrite([paramDir, file] , negSumLogLSet)
