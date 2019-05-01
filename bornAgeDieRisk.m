@@ -207,3 +207,4 @@ end
 
 extraOut{1} = abs(deaths);
 dPop = dPop + circBirths + births + hivBirths + deaths;
+dPop = sparse(dPop);
