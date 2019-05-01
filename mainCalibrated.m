@@ -49,7 +49,7 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_041819';
+pathModifier = 'toNow_050119';
 
 % Time
 c = fix(clock);
@@ -61,6 +61,7 @@ timeStep = 1 / stepsPerYear;
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
+vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
@@ -152,6 +153,40 @@ for aS = 1 : length(screenAge)
     vaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 2 , ... 
         2 , a+1 , 1 : risk));
 end
+
+%% Vaccination
+vaxEff = 0.7;    % bivalent vaccine
+
+%Parameters for school-based vaccination regimen
+vaxAge = 2;
+vaxRate = 0.86*0.20;
+vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+
+% Parameters for waning
+waning = 0;    % turn waning on or off
+
+lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
+
+% No waning
+lambdaMultVaxMat(3 : age) = vaxEff;
+
+% Waning
+effPeriod = 20; % number of years that initial efficacy level is retained
+wanePeriod = 20; % number of years over which initial efficacy level wanes
+if waning 
+    % Following a period (in years) where original efficacy is retained, 
+    % specified by 'effPeriod' , linearly scale down vaccine efficacy 
+    % to 0% over time period specificed by 'wanePeriod'
+    % To make waning rate equal in all scenarios, the linear rate of 
+    % waning is based on the least effective initial vaccine efficacy scenario.        
+    kWane = vaxEff / round(wanePeriod / 5);     
+    vaxInit = vaxEff;
+    lambdaMultVaxMat(round(effPeriod / 5) + vaxAge - 1 : age) = ...
+        max(0 , linspace(vaxInit , ...
+        vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + vaxAge)) ,...
+        age - (round(wanePeriod / 5) + vaxAge) + 2)'); % ensures vaccine efficacy is >= 0
+end
+lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Initial Population 
 mInit = popInit(: , 1); % initial male population size by age
@@ -262,8 +297,11 @@ newCin2 = newCC;
 newCin3 = newCC;
 ccDeath = newCC;
 ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-newScreen = zeros(length(s) - 1 , hpvTypes , hpvStates);
-vaxd = zeros(length(s) - 1 , 1);
+newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , risk , 2);
+newTreatImm = newScreen;
+newTreatHpv = newScreen;
+newTreatHyst = newScreen;
+vaxdSchool = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec; 
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
@@ -327,24 +365,27 @@ for i = 2 : length(s) - 1
             c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
             disease , age , hpvTypes , ...
             rImmuneHiv , hystOption) , tspan , popIn);
-        popIn = pop(end , :);
+        popIn = pop(end , :); % for next module
         if any(pop(end , :) <  0)
             disp('After hpv')
             break
         end
         
         if (year >= hpvScreenStartYear)
-            [~ , pop , newScreen(i , : , :)] ...
-                = ode4xtra(@(t , pop) ...
-                hpvScreen(t , pop , disease , viral , hpvTypes , hpvStates , risk , ...
+            [dPop , newScreen(i , : , : , : , : , : , :) , ...
+                newTreatImm(i , : , : , : , : , : , :) , ...
+                newTreatHpv(i , : , : , : , : , : , :) , ...
+                newTreatHyst(i , : , : , : , : , : , :)] ...
+                = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates , risk , ...
                 screenYrs , screenCover_vec , testSens , screenAge , ...
                 year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                 noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                 vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
                 colpoRetain , cinTreatRetain , cinTreatEff , cinTreatHpvPersist , ...
-                ccTreatRetain , nhScreenParams) , tspan , popIn);
-            popIn = pop(end , :);
+                ccTreatRetain , nhScreenParams);
+            pop(end , :) = pop(end , :) + dPop;
+            popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
                 disp('After hpv screen')
                 break
@@ -371,7 +412,7 @@ for i = 2 : length(s) - 1
         mCurr , fCurr , mCurrArt , fCurrArt , betaHIVF2M , betaHIVM2F , disease , ...
         viral , gender , age , risk , hpvStates , hpvTypes , hrInds , lrInds , ...
         hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
-    popIn = pop(end , :); % for next mixing and infection module
+    popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
         disp('After mixInfect')
         break
@@ -407,10 +448,23 @@ for i = 2 : length(s) - 1
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
+    popIn = pop(end , :);
     if any(pop(end , :) < 0)
         disp('After bornAgeDieRisk')
         break
     end 
+    
+    if (year >= vaxStartYear)
+        % HPV vaccination module- school-based vaccination regimen
+        [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , k , ...
+            disease , viral , risk , hpvTypes , hpvStates , ...
+            periods , vaxG , vaxAge , vaxRate);
+        pop(end , :) = pop(end , :) + dPop;
+        if any(pop(end , :) < 0)
+            disp('After hpvVaxSchool')
+            break
+        end
+    end
 
     % add results to population vector
     popVec(i , :) = pop(end , :)';
@@ -427,8 +481,9 @@ end
 
 savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
-    'deaths' , 'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
+    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
     'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')

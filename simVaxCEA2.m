@@ -45,7 +45,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_041819']);
+popIn = load([pwd , '\HHCoM_Results\toNow_050119']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -58,7 +58,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = '041819_nhScreen';
+pathModifier = '050119_baselineScreen';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -161,7 +161,7 @@ end
 %% Vaccination
 
 %vaxEff = [0.7 , 0.9];
-vaxEff = [0.9];    % used for all vaccine regimens present
+vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 
 %Parameters for school-based vaccination regimen
 vaxAge = 3;
@@ -248,27 +248,27 @@ disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
 %     min(vaxG):max(vaxG) , vaxAge , 1 : risk));
 % allVNonV = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 :hpvStates , 1 : periods , ... 
 %     min(vaxG):max(vaxG) , vaxAge , 1 : risk)); 
-if vaxCU    % if present, add indices for catch-up vaccination regimen
-    for aV = 1:length(vaxAgeCU)
-        a = vaxAgeCU(aV);
-        fromNonVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
-            min(vaxGCU):max(vaxGCU) , a , 1 : risk)); 
-        toVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
-            min(vaxGCU):max(vaxGCU) , a , 1 : risk));
-    end
-else 
-    fromNonVCU = [];    % have to declare these even if vaxCU=0 because parfor is dumb
-    toVCU = [];
-end
-if vaxLimit    % if present, add indices for vaccination during limited-vaccine years
-    fromNonVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
-        vaxGL , vaxAgeL , 1 : risk)); 
-    toVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
-        vaxGL , vaxAgeL , 1 : risk));
-else
-    fromNonVL = [];    % have to declare these even if vaxLimit=0 because parfor is dumb
-    toVL = [];
-end
+% if vaxCU    % if present, add indices for catch-up vaccination regimen
+%     for aV = 1:length(vaxAgeCU)
+%         a = vaxAgeCU(aV);
+%         fromNonVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
+%             min(vaxGCU):max(vaxGCU) , a , 1 : risk)); 
+%         toVCU(:,aV) = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
+%             min(vaxGCU):max(vaxGCU) , a , 1 : risk));
+%     end
+% else 
+%     fromNonVCU = [];    % have to declare these even if vaxCU=0 because parfor is dumb
+%     toVCU = [];
+% end
+% if vaxLimit    % if present, add indices for vaccination during limited-vaccine years
+%     fromNonVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 1 , ...
+%         vaxGL , vaxAgeL , 1 : risk)); 
+%     toVL = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
+%         vaxGL , vaxAgeL , 1 : risk));
+% else
+%     fromNonVL = [];    % have to declare these even if vaxLimit=0 because parfor is dumb
+%     toVL = [];
+% end
 
 %% Initialize fixed parameters
 
@@ -284,7 +284,7 @@ dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 
 % Intervention start years
 circStartYear = 1990;
-vaxStartYear = currYear;    % (not currently used)
+vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
@@ -325,11 +325,15 @@ parfor n = 1 : nTests
     ccDeath = newCC;
     ccDeath = newCC;
     ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-    newScreen = zeros(length(s) - 1 , hpvTypes , hpvStates);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , risk , 2);
+    newTreatImm = newScreen;
+    newTreatHpv = newScreen;
+    newTreatHyst = newScreen;
     hivDeaths = zeros(length(s) - 1 , gender , age);
     deaths = zeros(size(popVec));
-    vaxd = zeros(length(s) - 1 , 1);
-    screend = zeros(length(s) - 1 , 1);
+    vaxdLmtd = zeros(length(s) - 1 , 1);
+    vaxdSchool = vaxdLmtd;
+    vaxdCU = vaxdLmtd;
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
     popVec(1 , :) = popIn;
     tVec = linspace(currYear , lastYear , size(popVec , 1));
@@ -358,24 +362,27 @@ parfor n = 1 : nTests
                 c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
                 disease , age , hpvTypes , ...
                 rImmuneHiv , hystOption) , tspan , popIn);
-            popIn = pop(end , :);
+            popIn = pop(end , :);  % for next module
             if any(pop(end , :) <  0)
                 disp('After hpv')
                 break
             end
             
             if (year >= hpvScreenStartYear)
-                [~ , pop , newScreen(i , : , :)] ...
-                    = ode4xtra(@(t , pop) ...
-                    hpvScreen(t , pop , disease , viral , hpvTypes , hpvStates , risk , ...
+                [dPop , newScreen(i , : , : , : , : , : , :) , ...
+                    newTreatImm(i , : , : , : , : , : , :) , ...
+                    newTreatHpv(i , : , : , : , : , : , :) , ...
+                    newTreatHyst(i , : , : , : , : , : , :)] ...
+                    = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates , risk , ...
                     screenYrs , screenCover_vec , testSens , screenAge , ...
                     year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                     noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                     vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
                     colpoRetain , cinTreatRetain , cinTreatEff , cinTreatHpvPersist , ...
-                    ccTreatRetain , nhScreenParams) , tspan , popIn);
-                popIn = pop(end , :);
+                    ccTreatRetain , nhScreenParams);
+                pop(end , :) = pop(end , :) + dPop;
+                popIn = pop(end , :);  % for next module
                 if any(pop(end , :) <  0)
                     disp('After hpv screen')
                     break
@@ -397,7 +404,7 @@ parfor n = 1 : nTests
             fCurr , mCurrArt , fCurrArt , betaHIVF2M , betaHIVM2F , disease , ...
             viral , gender , age , risk , hpvStates , hpvTypes , hrInds , lrInds , ...
             hrlrInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
-        popIn = pop(end , :); % for next mixing and infection module
+        popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After mixInfect')
             break
@@ -410,7 +417,7 @@ parfor n = 1 : nTests
                 ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
                 kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
                 viral , gender , age , risk , k , hivInds , ...
-                stepsPerYear , year) , tspan , pop(end , :));
+                stepsPerYear , year) , tspan , popIn);
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;
             artDistList.add(artTreat);
             if artDistList.size() >= stepsPerYear * 2
@@ -418,6 +425,7 @@ parfor n = 1 : nTests
             end
             artDist = calcDist(artDistList , disease , viral , gender , age , ...
                 risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
+            popIn = pop(end , :);
             if any(pop(end , :) < 0)
                 disp('After hiv')
                 break
@@ -432,92 +440,50 @@ parfor n = 1 : nTests
             hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
             MTCTRate , circStartYear , ageInd , riskInd , riskDist ,...
             stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
-            vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , pop(end , :));
+            vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
+        popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After bornAgeDieRisk')
             break
         end
         
-        % Vaccinate for HPV
-        
-        % If within first vaxLimitYrs-many vaccine-limited years
-        if vaxLimit && ((year - currYear) <= vaxLimitYrs)
-            if rem(year,1) == 0.0    % reset vaxRemain at start of each new year to the number of available vaccines per year
-                vaxRemain = vaxLimitPerYr;
-            end
-            fracVaxd = sum(pop(end , toVL) , 2) / ... % find proportion of population that is currently vaccinated
-                (sum(pop(end , fromNonVL) , 2) + sum(pop(end , toVL) , 2));
-            if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
-                vaxCover = max(0 , (vaxCoverL - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
-                vaxdGroup = vaxCover .* pop(end , fromNonVL);
-                if vaxRemain >= 1    % when vaccines remain
-                    if (vaxRemain >= sumall(vaxdGroup))    % when remaining vaccines >= targeted coverage
-                        usedVax = sumall(vaxdGroup);
-                    else    % when remaining vaccines < targeted coverage
-                        usedVax = min(sumall(vaxdGroup), vaxRemain);    
-                        vaxdGroup = (usedVax .* (pop(end , fromNonVL) ./ sum(pop(end , fromNonVL))))...
-                            .* (pop(end , fromNonVL) > 0);    % proportionately divide available vaccines across compartments
-                    end
-                    vaxRemain = vaxRemain - usedVax;
-                else 
-                    vaxdGroup = pop(end , fromNonVL) .* 0;    % when vaccines are depleted
+        if (year >= vaxStartYear)
+            % If within first vaxLimitYrs-many vaccine-limited years
+            if vaxLimit && ((year - currYear) <= vaxLimitYrs)
+                % HPV vaccination module- vaccine limited years
+                [dPop , vaxdLmtd(i , :) , vaxRemain] = hpvVaxLmtd(popIn , k , ...
+                    year , vaxLimitPerYr , disease , viral , risk , hpvTypes , ...
+                    hpvStates , periods , vaxCoverL , vaxRemain , vaxGL);
+                pop(end , :) = pop(end , :) + dPop;
+                popIn = pop(end , :);
+                if any(pop(end , :) < 0)
+                    disp('After hpvVaxLmtd')
+                    break
                 end
-                dPop = zeros(size(pop(end , :)));
-                dPop(fromNonVL) = -vaxdGroup;
-                dPop(toVL) = vaxdGroup;
-                pop(end , :) = dPop + pop(end , :); 
-                vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroup); % count number of people vaccinated at current time step
-            end
-        
-        % If vaccines are not limited
-        else
-            % Apply school-based vaccination regimen
-            for d = 1 : disease
-                for v = 1 : viral
-                    for g = min(vaxG) : max(vaxG) 
-                        for r = 1 : risk
-                            fromNonVSus = toInd(allcomb(d , v , 1 , 1 , 1 , ... 
-                                g , vaxAge , r));
-                            fromNonVImm = toInd(allcomb(d , v , 2 , 10 , 1 , ... 
-                                g , vaxAge , r));
-                            toV = toInd(allcomb(d , v , 1 , 9 , 1 , ...
-                                g , vaxAge , r));
-                            otherV = toInd(allcomb(d , v , 1 : hpvTypes , [1:8,10] , 2:3 , ...
-                                g , vaxAge , r));
-                            allVNonV = toInd(allcomb(d , v , 1 : hpvTypes , 1 :hpvStates , 1 : periods , ... 
-                                g , vaxAge , r)); 
-
-                            fracVaxd = (sum(pop(end , toV) , 2) + sum(pop(end , otherV) , 2)) / ... % find proportion of population that is currently vaccinated
-                                    (sum(pop(end , allVNonV) , 2));
-                            if vaxRate - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
-                                vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
-                                vaxdGroupSus = vaxCover .* pop(end , fromNonVSus);
-                                vaxdGroupImm = vaxCover .* pop(end , fromNonVImm);
-                                dPop = zeros(size(pop(end , :)));
-                                dPop(fromNonVSus) = -vaxdGroupSus;
-                                dPop(fromNonVImm) = -vaxdGroupImm;
-                                dPop(toV) = vaxdGroupSus + vaxdGroupImm;
-                                pop(end , :) = dPop + pop(end , :); 
-                                vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
-                            end
-                        end
-                    end
-                end
-            end
             
-            % If present, apply catch-up vaccination regimen
-            if vaxCU
-                for aV = 1:length(vaxAgeCU)    % apply appropriate coverage rate for each age group catch-up vaccinated
-                    fracVaxd = sum(pop(end , toVCU(:,aV)) , 2) / ... % find proportion of population that is currently vaccinated
-                        (sum(pop(end , fromNonVCU(:,aV)) , 2) + sum(pop(end , toVCU(:,aV)) , 2));
-                    if vaxCoverCU(aV) - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
-                        vaxCover = max(0 , (vaxCoverCU(aV) - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
-                        vaxdGroup = vaxCover .* pop(end , fromNonVCU(:,aV));
-                        dPop = zeros(size(pop(end , :)));
-                        dPop(fromNonVCU(:,aV)) = -vaxdGroup;
-                        dPop(toVCU(:,aV)) = vaxdGroup;
-                        pop(end , :) = dPop + pop(end , :); 
-                        vaxd(i , :) = vaxd(i , :) + sumall(vaxdGroup); % count number of people vaccinated at current time step
+            % If vaccines are not limited
+            else
+                % HPV vaccination module- school-based vaccination regimen
+                [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , k , ...
+                    disease , viral , risk , hpvTypes , hpvStates , ...
+                    periods , vaxG , vaxAge , vaxRate);
+                pop(end , :) = pop(end , :) + dPop;
+                popIn = pop(end , :);
+                if any(pop(end , :) < 0)
+                    disp('After hpvVaxSchool')
+                    break
+                end
+                
+                % If present, apply catch-up vaccination regimen
+                if vaxCU
+                    % HPV vaccination module- catch-up vaccination regimen
+                    [dPop , vaxdCU(i , :)] = hpvVaxCU(popIn , k , disease , ...
+                        viral , risk , hpvTypes , hpvStates , periods , ...
+                        vaxAgeCU , vaxCoverCU , vaxGCU);
+                    pop(end , :) = pop(end , :) + dPop;
+                    if any(pop(end , :) < 0)
+                        disp('After hpvVaxCU')
+                        break
                     end
                 end
             end
@@ -535,8 +501,8 @@ parfor n = 1 : nTests
     
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
-        newCC , artTreatTracker , vaxd , screend , ccTreated , ...
-        currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
+        newCC , artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , newTreatImm , newTreatHpv , newTreatHyst , ...
+        ccTreated , currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
 

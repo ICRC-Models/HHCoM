@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_041819']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_050119']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -720,19 +720,19 @@ legend('HIV- lr' , 'HIV+ noART lr' , 'ART lr' , 'HIV- mr' , 'HIV+ noART mr' , 'A
 % for a = 1 : age
 %     for r = 1 : risk
 %         % HIV+
-%         hpvHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 2 : 4 , 2, ...
+%         hpvHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 2 : 4 , 1:7, ...
 %              1 : periods , 2 , a , r));
 %         hpvHivPop = sum(noV.popVec(: , hpvHivInds) , 2);
 %         popHivTot = noV.popVec(: , toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates ,  1 : periods , ...
 %             2 , a , r)));
 %         %ART
-%         hpvArtInds = toInd(allcomb(10 , 6 , 2 : 4 , 2, ...
+%         hpvArtInds = toInd(allcomb(10 , 6 , 2 : 4 , 1:7, ...
 %              1 : periods , 2 , a , r));
 %         hpvArtPop = sum(noV.popVec(: , hpvArtInds) , 2);
 %         popArtTot = noV.popVec(: , toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
 %             2 , a , r)));
 %         %HIV-
-%         hpvHivNegInds = toInd(allcomb([1,7:9] , 1 , 2 : 4 , 2 , ...
+%         hpvHivNegInds = toInd(allcomb([1,7:9] , 1 , 2 : 4 , 1:7 , ...
 %              1 : periods , 2 , a , r));
 %         hpvHivNegPop = sum(noV.popVec(: , hpvHivNegInds) , 2);
 %         popHivNegTot = noV.popVec(: , toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates ,  1 : periods , ...
@@ -863,23 +863,23 @@ legend('HIV-','ART','Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 ce
 figure()
 for r = 1 : risk
     %HIV-
-    vaxHivNegInds = [toInd(allcomb([1,7:9] , 1 , 1 , 9 , [1,6] , 2 , 6 , r)); ...
-    toInd(allcomb([1,7:9] , 1 , 2 : 4 , 1 : hpvStates , [2,4] , 2 , 6 , r))];
+    vaxHivNegInds = [toInd(allcomb([1,7:9] , 1 , 1 , 9 , [1,6] , 2 , 3 , r)); ...
+    toInd(allcomb([1,7:9] , 1 , 2 : 4 , 1 : hpvStates , [2,4] , 2 , 3 , r))];
     vaxHivNegPop = sum(vaxResult{1}.popVec(: , vaxHivNegInds) , 2);
     popHivNegTot = vaxResult{1}.popVec(: , toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-        2 , 6 , r)));
+        2 , 3 , r)));
     % HIV+
-    vaxHivInds = [toInd(allcomb(2 : 6 , 1 : 5 , 1 , 9 , [1,6] , 2 , 6 , r)); ...
-        toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , [2,4] , 2 , 6 , r))];
+    vaxHivInds = [toInd(allcomb(2 : 6 , 1 : 5 , 1 , 9 , [1,6] , 2 , 3 , r)); ...
+        toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , [2,4] , 2 , 3 , r))];
     vaxHivPop = sum(vaxResult{1}.popVec(: , vaxHivInds) , 2);
     popHivTot = vaxResult{1}.popVec(: , toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-        2 , 6 , r)));
+        2 , 3 , r)));
     %ART
-    vaxArtInds = [toInd(allcomb(10, 6 , 1 , 9 , [1,6] , 2 , 6 , r)); ...
-        toInd(allcomb(10, 6 , 2 : 4 , 1 : hpvStates , [2,4] , 2 , 6 , r))];
+    vaxArtInds = [toInd(allcomb(10, 6 , 1 , 9 , [1,6] , 2 , 3 , r)); ...
+        toInd(allcomb(10, 6 , 2 : 4 , 1 : hpvStates , [2,4] , 2 , 3 , r))];
     vaxArtPop = sum(vaxResult{1}.popVec(: , vaxArtInds) , 2);
     popArtTot = vaxResult{1}.popVec(: , toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-        2 , 6 , r)));
+        2 , 3 , r)));
 
     plot(tVec , 100 * vaxHivNegPop ./ sum(popHivNegTot , 2),'o')
     hold all
@@ -1540,5 +1540,34 @@ legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
 %     xlabel('Age'); ylabel('Age Proportion')
 % end
 % legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
+
+%% Screened by risk and HIV group
+figure();
+% for r = 1 : risk
+    for v = 1 : 2
+        for i = 1 : (length(vaxResult{1}.tVec) - length(curr.tVec))
+        %HIV-
+        rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v ));
+
+        %HIV+
+        rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
+
+        %ART
+        rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
+        end
+
+        subplot(1,3,1)
+        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivNegTot)
+        hold all
+        subplot(1,3,2)
+        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivTot)
+        hold all
+        subplot(1,3,3)
+        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopArtTot)
+        xlabel('Year'); ylabel('Count'); title('Number')
+        hold all;
+    end
+% end
+legend('1','2','3','4','5','6','7','8','9','10')
 
 %vaxCEA_CISNETvaxCompare(pathModifier)
