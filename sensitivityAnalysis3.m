@@ -1,5 +1,5 @@
 % Parameter estimation and sensitivity analysis
-%function sensitivityAnalysis()
+function sensitivityAnalysis3(nSets)
 
 close all; clear all; clc
 
@@ -20,7 +20,7 @@ load([paramDir,'general'])
 
 
 %% Latin hypercube sampling of parameter space
-nSets = 48; %100;    % number of parameter sets to sample
+%nSets = 48; %100;    % number of parameter sets to sample
 p = 84; %398;    % number of parameters
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 

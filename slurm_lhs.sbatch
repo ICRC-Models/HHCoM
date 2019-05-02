@@ -15,6 +15,12 @@
 #SBATCH –-output=/gscratch/csde/carajb/HHCoM/SlurmOut/%j.out      # Standard output
 #SBATCH –-error=/gscratch/csde/carajb/HHCoM/SlurmOut/%j.err       # Standard error
 
+NSETS = 48    # nSets
+echo "${NSETS}" 
+export NSETS
+
+>>>>>>> origin/autoCalibrate
+
 pwd; hostname; date
 
 echo “Running MATLAB script to get LHS parameter sets.”
@@ -22,6 +28,6 @@ echo “Running MATLAB script to get LHS parameter sets.”
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r sensitivityAnalysis3
+matlab -nodisplay -nosplash -r sensitivityAnalysis3(NSETS)
 
 date

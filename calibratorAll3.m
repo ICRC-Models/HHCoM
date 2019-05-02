@@ -2,7 +2,7 @@ function [negSumLogL] = calibratorAll3(paramSet)
 %function [negSumLogL , ccInc] = calibratorAll(paramSet)
 
 %% Load parameters
-paramDir = [pwd ,'\Params\'];
+paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings'])
 load([paramDir,'popData'])
 load([paramDir,'HIVParams'])
