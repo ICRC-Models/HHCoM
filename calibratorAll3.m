@@ -1,9 +1,7 @@
-function [negSumLogL] = calibratorAll(paramSet)
-%function [negSumLogL] = calibratorAll
+function [negSumLogL] = calibratorAll3(paramSet)
 %function [negSumLogL , ccInc] = calibratorAll(paramSet)
 
 %% Load parameters
-tic
 paramDir = [pwd ,'\Params\'];
 load([paramDir,'settings'])
 load([paramDir,'popData'])
@@ -19,24 +17,25 @@ load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'hpvTreatIndices'])
 load([paramDir,'ageRiskInds'])
-load([paramDir,'vaxInds'])
-load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
 load([paramDir,'fertMat2'])
 load([paramDir,'hivFertMats2'])
-load([paramDir,'vaxer'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 load([paramDir,'deathMat'])
-%load([paramDir,'calibratedParams'])
-%paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
-%paramSet = paramSetMatrix(:,985);
 
+% Model specs
 hyst = 'off';
 hpvOn = 1;
 hivOn = 1;
+
+% Use calibrated parameters
+load([paramDir,'calibratedParams'])
+perPartnerHpv = 0.0045;
+%paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
+%paramSet = paramSetMatrix(:,985);
 
 % Time
 c = fix(clock);
@@ -58,62 +57,62 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
 
-% riskDistM([1:9,11:age],1) = ones(15,1).*0.60;
-% riskDistM([1:9,11:age],2) = ones(15,1).*0.30;
-% riskDistM([1:9,11:age],3) = ones(15,1).*0.10;
-% riskDistM(10,1) = 0.967361111111111;     
-% riskDistM(10,1) = 0.023096547067901;
-% riskDistM(10,1) = 0.009542341820988;
-% riskDistF([1:9,11:age],1) = ones(15,1).*0.60;
-% riskDistF([1:9,11:age],2) = ones(15,1).*0.30;
-% riskDistF([1:9,11:age],3) = ones(15,1).*0.10;
-% riskDistF(10,1) = 0.967361111111111;
-% riskDistF(10,1) = 0.023096547067901;
-% riskDistF(10,1) = 0.009542341820988;
-% riskDistM = [1.000000000000000                   0                   0;
-%    1.000000000000000                   0                   0;
-%    0.850000000000000   0.147500000000000   0.002500000000000;
-%    0.883333333333333   0.083611111111111   0.033055555555556;
-%    0.716666666666667   0.221944444444444   0.061388888888889;
-%    0.583333333333333   0.312500000000000   0.104166666666667;
-%    0.583333333333333   0.243055555555556   0.173611111111111;
-%    0.883333333333333   0.064166666666667   0.052500000000000;
-%    0.816666666666667   0.100833333333333   0.082500000000000;
-%    0.983333333333333   0.016388888888889   0.000277777777778;
-%    0.550000000000000   0.232500000000000   0.217500000000000;
-%    0.916666666666667   0.076388888888889   0.006944444444444;
-%    0.783333333333333   0.184166666666667   0.032500000000000;
-%    0.616666666666667   0.300277777777778   0.083055555555556;
-%    0.816666666666667   0.149722222222222   0.033611111111111;
-%    0.983333333333333   0.009722222222222   0.006944444444444];
+% % riskDistM([1:9,11:age],1) = ones(15,1).*0.60;
+% % riskDistM([1:9,11:age],2) = ones(15,1).*0.30;
+% % riskDistM([1:9,11:age],3) = ones(15,1).*0.10;
+% % riskDistM(10,1) = 0.967361111111111;     
+% % riskDistM(10,1) = 0.023096547067901;
+% % riskDistM(10,1) = 0.009542341820988;
+% % riskDistF([1:9,11:age],1) = ones(15,1).*0.60;
+% % riskDistF([1:9,11:age],2) = ones(15,1).*0.30;
+% % riskDistF([1:9,11:age],3) = ones(15,1).*0.10;
+% % riskDistF(10,1) = 0.967361111111111;
+% % riskDistF(10,1) = 0.023096547067901;
+% % riskDistF(10,1) = 0.009542341820988;
+% % riskDistM = [1.000000000000000                   0                   0;
+% %    1.000000000000000                   0                   0;
+% %    0.850000000000000   0.147500000000000   0.002500000000000;
+% %    0.883333333333333   0.083611111111111   0.033055555555556;
+% %    0.716666666666667   0.221944444444444   0.061388888888889;
+% %    0.583333333333333   0.312500000000000   0.104166666666667;
+% %    0.583333333333333   0.243055555555556   0.173611111111111;
+% %    0.883333333333333   0.064166666666667   0.052500000000000;
+% %    0.816666666666667   0.100833333333333   0.082500000000000;
+% %    0.983333333333333   0.016388888888889   0.000277777777778;
+% %    0.550000000000000   0.232500000000000   0.217500000000000;
+% %    0.916666666666667   0.076388888888889   0.006944444444444;
+% %    0.783333333333333   0.184166666666667   0.032500000000000;
+% %    0.616666666666667   0.300277777777778   0.083055555555556;
+% %    0.816666666666667   0.149722222222222   0.033611111111111;
+% %    0.983333333333333   0.009722222222222   0.006944444444444];
+% % 
+% % riskDistF = [1.000000000000000                   0                   0;
+% %    1.000000000000000                   0                   0;
+% %    0.783333333333333   0.126388888888889   0.090277777777778;
+% %    0.683333333333333   0.216388888888889   0.100277777777778;
+% %    0.850000000000000   0.142500000000000   0.007500000000000;
+% %    0.916666666666667   0.059722222222222   0.023611111111111;
+% %    0.550000000000000   0.382500000000000   0.067500000000000;
+% %    0.916666666666667   0.070833333333333   0.012500000000000;
+% %    0.550000000000000   0.427500000000000   0.022500000000000;
+% %    0.750000000000000   0.195833333333333   0.054166666666667;
+% %    0.516666666666667   0.410833333333333   0.072500000000000;
+% %    0.883333333333333   0.087500000000000   0.029166666666667;
+% %    0.716666666666667   0.221944444444444   0.061388888888889;
+% %    0.883333333333333   0.083611111111111   0.033055555555556;
+% %    0.650000000000000   0.239166666666667   0.110833333333333;
+% %    0.916666666666667   0.056944444444444   0.026388888888889];
+% % riskDistM(3:6 , 1:risk) = [paramSet(85:88) , paramSet(99:102) , paramSet(113:116)];
+% % riskDistF(3:6 , 1:risk) = [paramSet(127:130) , paramSet(141:144) , paramSet(155:158)];
+% % riskDistM(16 , 1:risk) = [paramSet(98) , paramSet(112) , paramSet(126)];
+% % riskDistF(16 , 1:risk) = [paramSet(140) , paramSet(154) , paramSet(168)];
+% riskDistM(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
+% riskDistF(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
+% riskDistM(3:age , 1:risk) = [paramSet(85:98) , paramSet(99:112) , paramSet(113:126)];
+% riskDistF(3:age , 1:risk) = [paramSet(127:140) , paramSet(141:154) , paramSet(155:168)];
 % 
-% riskDistF = [1.000000000000000                   0                   0;
-%    1.000000000000000                   0                   0;
-%    0.783333333333333   0.126388888888889   0.090277777777778;
-%    0.683333333333333   0.216388888888889   0.100277777777778;
-%    0.850000000000000   0.142500000000000   0.007500000000000;
-%    0.916666666666667   0.059722222222222   0.023611111111111;
-%    0.550000000000000   0.382500000000000   0.067500000000000;
-%    0.916666666666667   0.070833333333333   0.012500000000000;
-%    0.550000000000000   0.427500000000000   0.022500000000000;
-%    0.750000000000000   0.195833333333333   0.054166666666667;
-%    0.516666666666667   0.410833333333333   0.072500000000000;
-%    0.883333333333333   0.087500000000000   0.029166666666667;
-%    0.716666666666667   0.221944444444444   0.061388888888889;
-%    0.883333333333333   0.083611111111111   0.033055555555556;
-%    0.650000000000000   0.239166666666667   0.110833333333333;
-%    0.916666666666667   0.056944444444444   0.026388888888889];
-% riskDistM(3:6 , 1:risk) = [paramSet(85:88) , paramSet(99:102) , paramSet(113:116)];
-% riskDistF(3:6 , 1:risk) = [paramSet(127:130) , paramSet(141:144) , paramSet(155:158)];
-% riskDistM(16 , 1:risk) = [paramSet(98) , paramSet(112) , paramSet(126)];
-% riskDistF(16 , 1:risk) = [paramSet(140) , paramSet(154) , paramSet(168)];
-riskDistM(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
-riskDistF(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
-riskDistM(3:age , 1:risk) = [paramSet(85:98) , paramSet(99:112) , paramSet(113:126)];
-riskDistF(3:age , 1:risk) = [paramSet(127:140) , paramSet(141:154) , paramSet(155:168)];
-
-riskDist(: , : , 1) = riskDistM;
-riskDist(: , : , 2) = riskDistF;
+% riskDist(: , : , 1) = riskDistM;
+% riskDist(: , : , 2) = riskDistF;
 
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
@@ -197,62 +196,62 @@ partnersM(3:age , 1:risk) = [paramSet(1:14) , paramSet(15:28) , paramSet(29:42)]
 partnersF(3:age , 1:risk) = [paramSet(43:56) , paramSet(57:70) , paramSet(71:84)];
 partnersM(10:age , 3) = ones(7 , 1);
 partnersF(10:age , 3) = ones(7 , 1);
-condUse = paramSet(169);
-epsA = paramSet(170:172);
-epsR = paramSet(173:175);
-maleActs(1:2 , 1:risk) = zeros(2 , risk);
-femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-maleActs(3:age , 1:risk) = [paramSet(176:189) , paramSet(190:203) , paramSet(204:217)];
-femaleActs(3:age , 1:risk) = [paramSet(218:231) , paramSet(232:245) , paramSet(246:259)];
-perPartnerHpv = paramSet(260);
-perPartnerHpv_lr = paramSet(261);
-perPartnerHpv_nonV = paramSet(262);
-hpv_hivMult = paramSet(263:266) .* 2.0;
-rNormal_Inf_orig = rNormal_Inf;
-rNormal_Inf = paramSet(267) .* rNormal_Inf_orig;
-hpv_hivClear = paramSet(283:286) .* 0.5;
-c3c2Mults = paramSet(287:290) .* 2.0;
-c2c1Mults = paramSet(291:294) .* 2.0;
-kCCDet = paramSet(295:297);
-lambdaMultImm = paramSet(298:313);
-maxRateM_vec = paramSet(314:315);
-maxRateF_vec = paramSet(316:317);
-artHpvMult = paramSet(318) .* 2.0;
-kCD4(1,:,:) = [paramSet(319:323) , paramSet(324:328) , paramSet(329:333) , paramSet(334:338)];
-kCD4(2,:,:) = [paramSet(339:343) , paramSet(344:348) , paramSet(349:353) , paramSet(354:358)];
-kVl(1,:,:) = [paramSet(359:363) , paramSet(364:368) , paramSet(369:373) , paramSet(374:378)];
-kVl(2,:,:) = [paramSet(379:383) , paramSet(384:388) , paramSet(389:393) , paramSet(394:398)];
-
-% maxRateM_vec = [0.4 , 0.4];
-% maxRateF_vec = [0.5 , 0.5];
-rImmuneHiv = hpv_hivClear;
-% lambdaMultImm = ones(age,1);
-% artHpvMult = 1.0;
-
-for a = 1 : age
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-end
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+% condUse = paramSet(169);
+% epsA = paramSet(170:172);
+% epsR = paramSet(173:175);
+% maleActs(1:2 , 1:risk) = zeros(2 , risk);
+% femaleActs(1:2 , 1:risk) = zeros(2 , risk);
+% maleActs(3:age , 1:risk) = [paramSet(176:189) , paramSet(190:203) , paramSet(204:217)];
+% femaleActs(3:age , 1:risk) = [paramSet(218:231) , paramSet(232:245) , paramSet(246:259)];
+% perPartnerHpv = paramSet(260);
+% perPartnerHpv_lr = paramSet(261);
+% perPartnerHpv_nonV = paramSet(262);
+% hpv_hivMult = paramSet(263:266) .* 2.0;
+% rNormal_Inf_orig = rNormal_Inf;
+% rNormal_Inf = paramSet(267) .* rNormal_Inf_orig;
+% hpv_hivClear = paramSet(283:286) .* 0.5;
+% c3c2Mults = paramSet(287:290) .* 2.0;
+% c2c1Mults = paramSet(291:294) .* 2.0;
+% kCCDet = paramSet(295:297);
+% lambdaMultImm = paramSet(298:313);
+% maxRateM_vec = paramSet(314:315);
+% maxRateF_vec = paramSet(316:317);
+% artHpvMult = paramSet(318) .* 2.0;
+% kCD4(1,:,:) = [paramSet(319:323) , paramSet(324:328) , paramSet(329:333) , paramSet(334:338)];
+% kCD4(2,:,:) = [paramSet(339:343) , paramSet(344:348) , paramSet(349:353) , paramSet(354:358)];
+% kVl(1,:,:) = [paramSet(359:363) , paramSet(364:368) , paramSet(369:373) , paramSet(374:378)];
+% kVl(2,:,:) = [paramSet(379:383) , paramSet(384:388) , paramSet(389:393) , paramSet(394:398)];
+% 
+% % maxRateM_vec = [0.4 , 0.4];
+% % maxRateF_vec = [0.5 , 0.5];
+% rImmuneHiv = hpv_hivClear;
+% % lambdaMultImm = ones(age,1);
+% % artHpvMult = 1.0;
+% 
+% for a = 1 : age
+%     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+%     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+% end
+% betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+% betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
 
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
-for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-    period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-end
+% epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+% epsR_vec = cell(size(yr , 1) - 1, 1);
+% for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+%     period = [yr(i) , yr(i + 1)];
+%     epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+%         yr(i) : timeStep : yr(i + 1));
+%     epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+%         yr(i) : timeStep : yr(i + 1));
+% end
 
 %% Simulation parameters
-lambdaMultVax = ones(age , 2);
+% lambdaMultVax = ones(age , 2);
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize vectors
@@ -416,6 +415,4 @@ end
 %     'startYear' , 'endYear' , 'popLast');
 % disp(' ')
 % disp('Simulation complete.')
-
-toc
 

@@ -11,12 +11,12 @@ load([paramDir,'settings'])
 load([paramDir,'general'])
 
 %% Cluster information
-%% Create a local cluster object
-%myCluster = parcluster('local'); 
-%% Set the JobStorageLocation to the temporary directory that was created in your slurm script
-%myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
-%numCores = feature('numcores')
-%parpool(numCores);
+% % Create a local cluster object
+% myCluster = parcluster('local'); 
+% % Set the JobStorageLocation to the temporary directory that was created in your slurm script
+% myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
+% numCores = feature('numcores')
+% parpool(numCores);
 
 
 %% Latin hypercube sampling of parameter space
