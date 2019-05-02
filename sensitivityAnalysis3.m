@@ -6,17 +6,17 @@ close all; clear all; clc
 %loadUp(6);
 
 %% Load parameters
-paramDir = [pwd ,'\Params\'];
+paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings'])
 load([paramDir,'general'])
 
 %% Cluster information
-% Create a local cluster object
-myCluster = parcluster('local'); 
-% Set the JobStorageLocation to the temporary directory that was created in your slurm script
-myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
-numCores = feature('numcores')
-parpool(numCores);
+%% Create a local cluster object
+%myCluster = parcluster('local'); 
+%% Set the JobStorageLocation to the temporary directory that was created in your slurm script
+%myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
+%numCores = feature('numcores')
+%parpool(numCores);
 
 
 %% Latin hypercube sampling of parameter space
@@ -118,9 +118,9 @@ sample(43:56,:) = lb(43:56,:) + sampleNorm(43:56,:) .* (sample(57:70,:) - lb(43:
 % % title('CC Incidence');
 
 %% Save parameter sets and negSumLogL values
-file = 'paramSets_calib_22Apr19.dat';
-paramDir = [pwd , '\Params\'];
+file = 'paramSets_calib_02May19.dat';
+paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 % file = 'negSumLogL_calib_25Feb19.dat';
 % paramDir = [pwd , '\Params\'];
-% csvwrite([paramDir, file] , negSumLogLSet)
+%csvwrite([paramDir, file] , negSumLogLSet)
