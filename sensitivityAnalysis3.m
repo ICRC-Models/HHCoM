@@ -1,12 +1,12 @@
 % Parameter estimation and sensitivity analysis
-%function sensitivityAnalysis()
+function sensitivityAnalysis3(nSets)
 
 close all; clear all; clc
 
 %loadUp(6);
 
 %% Load parameters
-paramDir = [pwd ,'\Params\'];
+paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings'])
 load([paramDir,'general'])
 
@@ -20,7 +20,7 @@ load([paramDir,'general'])
 
 
 %% Latin hypercube sampling of parameter space
-nSets = 48; %100;    % number of parameter sets to sample
+%nSets = 48; %100;    % number of parameter sets to sample
 p = 84; %398;    % number of parameters
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 
@@ -118,8 +118,8 @@ sample(43:56,:) = lb(43:56,:) + sampleNorm(43:56,:) .* (sample(57:70,:) - lb(43:
 % % title('CC Incidence');
 
 %% Save parameter sets and negSumLogL values
-file = 'paramSets_calib_22Apr19.dat';
-paramDir = [pwd , '\Params\'];
+file = 'paramSets_calib_02May19.dat';
+paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 % file = 'negSumLogL_calib_25Feb19.dat';
 % paramDir = [pwd , '\Params\'];
