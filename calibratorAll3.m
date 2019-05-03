@@ -1,5 +1,4 @@
-function [negSumLogL] = calibratorAll3(paramSet)
-%function [negSumLogL , ccInc] = calibratorAll(paramSet)
+function [negSumLogL] = calibratorAll3(pIdx , paramsSub , paramSet)
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
@@ -57,60 +56,10 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
 
-% % riskDistM([1:9,11:age],1) = ones(15,1).*0.60;
-% % riskDistM([1:9,11:age],2) = ones(15,1).*0.30;
-% % riskDistM([1:9,11:age],3) = ones(15,1).*0.10;
-% % riskDistM(10,1) = 0.967361111111111;     
-% % riskDistM(10,1) = 0.023096547067901;
-% % riskDistM(10,1) = 0.009542341820988;
-% % riskDistF([1:9,11:age],1) = ones(15,1).*0.60;
-% % riskDistF([1:9,11:age],2) = ones(15,1).*0.30;
-% % riskDistF([1:9,11:age],3) = ones(15,1).*0.10;
-% % riskDistF(10,1) = 0.967361111111111;
-% % riskDistF(10,1) = 0.023096547067901;
-% % riskDistF(10,1) = 0.009542341820988;
-% % riskDistM = [1.000000000000000                   0                   0;
-% %    1.000000000000000                   0                   0;
-% %    0.850000000000000   0.147500000000000   0.002500000000000;
-% %    0.883333333333333   0.083611111111111   0.033055555555556;
-% %    0.716666666666667   0.221944444444444   0.061388888888889;
-% %    0.583333333333333   0.312500000000000   0.104166666666667;
-% %    0.583333333333333   0.243055555555556   0.173611111111111;
-% %    0.883333333333333   0.064166666666667   0.052500000000000;
-% %    0.816666666666667   0.100833333333333   0.082500000000000;
-% %    0.983333333333333   0.016388888888889   0.000277777777778;
-% %    0.550000000000000   0.232500000000000   0.217500000000000;
-% %    0.916666666666667   0.076388888888889   0.006944444444444;
-% %    0.783333333333333   0.184166666666667   0.032500000000000;
-% %    0.616666666666667   0.300277777777778   0.083055555555556;
-% %    0.816666666666667   0.149722222222222   0.033611111111111;
-% %    0.983333333333333   0.009722222222222   0.006944444444444];
-% % 
-% % riskDistF = [1.000000000000000                   0                   0;
-% %    1.000000000000000                   0                   0;
-% %    0.783333333333333   0.126388888888889   0.090277777777778;
-% %    0.683333333333333   0.216388888888889   0.100277777777778;
-% %    0.850000000000000   0.142500000000000   0.007500000000000;
-% %    0.916666666666667   0.059722222222222   0.023611111111111;
-% %    0.550000000000000   0.382500000000000   0.067500000000000;
-% %    0.916666666666667   0.070833333333333   0.012500000000000;
-% %    0.550000000000000   0.427500000000000   0.022500000000000;
-% %    0.750000000000000   0.195833333333333   0.054166666666667;
-% %    0.516666666666667   0.410833333333333   0.072500000000000;
-% %    0.883333333333333   0.087500000000000   0.029166666666667;
-% %    0.716666666666667   0.221944444444444   0.061388888888889;
-% %    0.883333333333333   0.083611111111111   0.033055555555556;
-% %    0.650000000000000   0.239166666666667   0.110833333333333;
-% %    0.916666666666667   0.056944444444444   0.026388888888889];
-% % riskDistM(3:6 , 1:risk) = [paramSet(85:88) , paramSet(99:102) , paramSet(113:116)];
-% % riskDistF(3:6 , 1:risk) = [paramSet(127:130) , paramSet(141:144) , paramSet(155:158)];
-% % riskDistM(16 , 1:risk) = [paramSet(98) , paramSet(112) , paramSet(126)];
-% % riskDistF(16 , 1:risk) = [paramSet(140) , paramSet(154) , paramSet(168)];
 % riskDistM(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
 % riskDistF(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
 % riskDistM(3:age , 1:risk) = [paramSet(85:98) , paramSet(99:112) , paramSet(113:126)];
 % riskDistF(3:age , 1:risk) = [paramSet(127:140) , paramSet(141:154) , paramSet(155:168)];
-% 
 % riskDist(: , : , 1) = riskDistM;
 % riskDist(: , : , 2) = riskDistF;
 
@@ -190,12 +139,32 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 %% Calibration parameters (FEED FROM LHS)
-partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-partnersM(3:age , 1:risk) = [paramSet(1:14) , paramSet(15:28) , paramSet(29:42)];
-partnersF(3:age , 1:risk) = [paramSet(43:56) , paramSet(57:70) , paramSet(71:84)];
-partnersM(10:age , 3) = ones(7 , 1);
-partnersF(10:age , 3) = ones(7 , 1);
+if any(1 == [pIdx])
+    idx = find(1 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+    partnersM(3:age , 1:risk) = [paramSet(rl) , paramSet(rm) , paramSet(rh)];
+    partnersM(10:age , 3) = ones(7 , 1);
+end
+if any(2 == [pIdx])
+    idx = find(1 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+    partnersF(3:age , 1:risk) = [paramSet(rl) , paramSet(rm) , paramSet(rh)];
+    partnersF(10:age , 3) = ones(7 , 1);
+end
+% partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+% partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+% partnersM(3:age , 1:risk) = [paramSet(1:14) , paramSet(15:28) , paramSet(29:42)];
+% partnersF(3:age , 1:risk) = [paramSet(43:56) , paramSet(57:70) , paramSet(71:84)];
+% partnersM(10:age , 3) = ones(7 , 1);
+% partnersF(10:age , 3) = ones(7 , 1);
 % condUse = paramSet(169);
 % epsA = paramSet(170:172);
 % epsR = paramSet(173:175);
