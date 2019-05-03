@@ -1,6 +1,7 @@
 % Parameter estimation and sensitivity analysis
 function sensitivityAnalysis3(nSets)
 
+delete(gcp('nocreate')); 
 %loadUp(6);
 
 %% Load parameters
@@ -9,41 +10,117 @@ load([paramDir,'settings'])
 load([paramDir,'general'])
 
 %% Cluster information
-% % Create a local cluster object
-% myCluster = parcluster('local'); 
-% % Set the JobStorageLocation to the temporary directory that was created in your slurm script
-% myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
-% numCores = feature('numcores')
-% parpool(numCores);
+numCores = feature('numcores')
+parpool(numCores);
 
+%% Load structure of all potentially calibrated parameters
+[paramsAll] = genParamStruct();
 
 %% Latin hypercube sampling of parameter space
 %nSets = 48; %100;    % number of parameter sets to sample
-p = 84; %398;    % number of parameters
+%p = 84; 398;    % number of parameters
+
+pIdx = [1,2];    % indices in paramsAll cell array
+
+paramsSub = cell(length(pIdx),1);
+p = 0;
+startIdx = 1;
+lb = [];
+ub = [];
+for s = 1 : length(pIdx)
+    paramsSub{s} = paramsAll{pIdx};
+    p = p + paramsSub{s}.length
+    paramsSub{s}.inds = [(startIdx : (startIdx + paramsAll{s}.length - 1)) , 1];
+    startIdx = startIdx + paramsAll{s}.length;
+
+    lb = [lb; paramsSub{s}.lb];
+    ub = [ub; paramsSub{s}.ub];
+end
+
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 
 %% Rescale sample values to correct parameter ranges and apply bounds
 sampleNorm = sampleNorm';
 
-lb = ones(p,nSets).*0.001;
-ub = ones(p,nSets);
-ub(1:84,:) = 180;
-% lb(85:98,:) = 0.5;
-% lb(127:140,:) = 0.5;
-% lb(169,:) = 0.01;
-% ub(169,:) = 0.9;
-% lb(170:175) = 0.1;
-% lb(176:259) = 1;
-% ub(176:259) = 365;
-% lb(263:294) = 0.25;
-% ub(263:294) = 4;
-% ub(295:297) = 0.5;
-% lb(314:315) = 0.2;
-% ub(314:315) = 0.7;
-% lb(318) = 0.25;
-% ub(318) = 4;
-% ub(319:398) = 10;
+sample = lb + (sampleNorm .* (ub-lb));
 
+%% Apply parameter constraints
+
+% partnersM, partnersF
+if any(1 == pIdx)
+    idx = find(1 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
+    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
+end
+if any(2 == [pIdx])
+    idx = find(2 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
+    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
+end
+
+% riskDistM, riskDistF
+if any(3 == pIdx)
+    idx = find(3 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
+        ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
+    sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
+end
+if any(4 == pIdx)
+    idx = find(4 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
+        ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
+    sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
+end
+
+% maleActs, femaleActs
+if any(8 == pIdx)
+    idx = find(8 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
+end
+if any(9 == pIdx)
+    idx = find(9 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
+end
+
+%% Save parameter sets and negSumLogL values
+file = 'pIdx_calib_02May19.dat';
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , sample)
+
+file = 'paramSets_calib_02May19.dat';
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , sample)
+
+
+%%
 % KEY
 %(1:42):     partnersM, [3:age x risk], (0.001 to 180)
 %(43:84):    partnersF, [3:age x risk], (0.001 to 180)
@@ -70,24 +147,24 @@ ub(1:84,:) = 180;
 %(319:358):  kCD4, [g x vl x CD4], (0.01 to 10) --> ??constraints
 %(359:398):  kVL, [g x vl x CD4], (0.01 to 10) --> ??constraints
 
-sample = lb + (sampleNorm .* (ub-lb));
-
-%% Apply parameter constraints
-% partnersM, partnersF
-sample(15:28,:) = (sample(29:42,:)-lb(15:28,:))./2.0 + sampleNorm(15:28,:) .* (sample(29:42,:) - ((sample(29:42,:)-lb(15:28,:))./2.0));
-sample(57:70,:) = (sample(71:84,:)-lb(57:70,:))./2.0 + sampleNorm(57:70,:) .* (sample(71:84,:) - ((sample(71:84,:)-lb(57:70,:))./2.0));
-sample(1:14,:) = lb(1:14,:) + sampleNorm(1:14,:) .* (sample(15:28,:) - lb(1:14,:));
-sample(43:56,:) = lb(43:56,:) + sampleNorm(43:56,:) .* (sample(57:70,:) - lb(43:56,:));
-% % riskDistM, riskDistF
-% sample(99:112,:) = (1.0 - sample(85:98,:))./2.0 + sampleNorm(99:112,:) .* ((1.0 - sample(85:98,:)) - ((1.0 - sample(85:98,:))./2.0));
-% sample(141:154,:) = (1.0 - sample(127:140,:))./2.0 + sampleNorm(141:154,:) .* ((1.0 - sample(127:140,:)) - ((1.0 - sample(127:140,:))./2.0));
-% sample(113:126,:) = 1.0 - sample(85:98,:) - sample(99:112,:);
-% sample(155:168,:) = 1.0 - sample(127:140,:) - sample(141:154,:);
-% % maleActs, femaleActs
-% sample(190:203,:) = (sample(176:189,:)-lb(190:203,:))./2.0 + sampleNorm(190:203,:) .* (sample(176:189,:) - ((sample(176:189,:)-lb(190:203,:))./2.0));
-% sample(204:217,:) = lb(204:217,:) + sampleNorm(204:217,:) .* (sample(190:203,:) - lb(204:217,:));
-% sample(232:245,:) = (sample(218:231,:)-lb(232:245,:))./2.0 + sampleNorm(232:245,:) .* (sample(218:231,:) - ((sample(218:231,:)-lb(232:245,:))./2.0));
-% sample(246:259,:) = lb(246:259,:) + sampleNorm(246:259,:) .* (sample(232:245,:) - lb(246:259,:));
+% lb = ones(p,nSets).*0.001;
+% ub = ones(p,nSets);
+% ub(1:84,:) = 180;
+% lb(85:98,:) = 0.5;
+% lb(127:140,:) = 0.5;
+% lb(169,:) = 0.01;
+% ub(169,:) = 0.9;
+% lb(170:175) = 0.1;
+% lb(176:259) = 1;
+% ub(176:259) = 365;
+% lb(263:294) = 0.25;
+% ub(263:294) = 4;
+% ub(295:297) = 0.5;
+% lb(314:315) = 0.2;
+% ub(314:315) = 0.7;
+% lb(318) = 0.25;
+% ub(318) = 4;
+% ub(319:398) = 10;
 
 % indsC1 = any(([sample(132:147,:)<sample(116:131,:)<sample(100:115,:)] < 1) , 1) .* [1:1:nSets];
 % sample(:,indsC1) = [];
@@ -115,10 +192,7 @@ sample(43:56,:) = lb(43:56,:) + sampleNorm(43:56,:) .* (sample(57:70,:) - lb(43:
 % % plot(ccIncSet);
 % % title('CC Incidence');
 
-%% Save parameter sets and negSumLogL values
-file = 'paramSets_calib_02May19.dat';
-paramDir = [pwd , '/Params/'];
-csvwrite([paramDir, file] , sample)
+%%
 % file = 'negSumLogL_calib_25Feb19.dat';
 % paramDir = [pwd , '\Params\'];
 %csvwrite([paramDir, file] , negSumLogLSet)
