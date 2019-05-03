@@ -91,7 +91,7 @@ nPos = [cinPos2014_obs(: , 2) ; cinNeg2014_obs(: , 2)];
 yr = 2014;
 hpv_hivNeg = zeros(9 , 1);
 
-for a = 4 : 13 % 15-19 ->  55-65
+for a = 4 : 12 % 15-19 ->  55-65
     hpvInds = [toInd(allcomb(1 , 1 : viral , 2 : hpvTypes , 1 : 4, ...
         1 : periods , 2 , a , 1 : risk)); toInd(allcomb(7 : 9 , 1 : 5 , 2 : hpvTypes , 1 : 4, ...
         1 : periods , 2 , a , 1 : risk))];
@@ -109,7 +109,7 @@ nPos = [nPos ; hpv_hivNeg_obs(: , 2)];
 hpv_hiv = zeros(9 , 1);
 
 %% HPV prevalence in HIV+ women (including CIN)
-for a = 4 : 13 % 15-19 -> 55-65
+for a = 4 : 12 % 15-19 -> 55-65
     hpvInds = [toInd(allcomb(2 : 6 , 1 : viral , 2 : 4 , 1 : 4, ...
         1 : periods , 2 , a , 1 : risk)); toInd(allcomb(10 , 6 , 2 : 4 , 1 : 4, ...
         1 : periods , 2 , a , 1 : risk))];

@@ -1,8 +1,6 @@
 % Parameter estimation and sensitivity analysis
 function sensitivityAnalysis3_prt2(paramSetIdx)
 
-close all; clear all; clc
-
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings']);
@@ -12,10 +10,6 @@ nPrlSets = 16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets)];
 
 %% Cluster information
-% Create a local cluster object
-myCluster = parcluster('local'); 
-% Set the JobStorageLocation to the temporary directory that was created in your slurm script
-myCluster.JobStorageLocation = strcat('/gscratch/csde/carajb/', getenv('SLURM_JOB_ID')) ;
 numCores = feature('numcores');
 parpool(numCores);
 

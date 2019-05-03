@@ -1,8 +1,6 @@
 % Parameter estimation and sensitivity analysis
 function sensitivityAnalysis3(nSets)
 
-close all; clear all; clc
-
 %loadUp(6);
 
 %% Load parameters

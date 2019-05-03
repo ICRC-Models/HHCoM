@@ -1,8 +1,8 @@
-NSETS = 48    # nSets
+NSETS=48    # nSets
 echo "${NSETS}" 
 export NSETS
 
-for SETIDX in $(seq 1 16 NSETS); do 
+for SETIDX in $(seq 1 16 ${NSETS}); do 
 echo "${SETIDX}" 
 export SETIDX
 

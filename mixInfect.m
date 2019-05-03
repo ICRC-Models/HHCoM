@@ -17,25 +17,25 @@ sumall = @(x) sum(x(:));
 %% Process mixInfect constants
 
 % epsAge and epsRisk - extent of assortative mixing
-dataYr1 = yr(1);
-dataYrLast = yr(size(yr , 1));
-now = currStep / stepsPerYear + modelYr1;
-baseYrInd = max(find(now >= yr , 1, 'last') , 1); % get index of first year <= current year
-baseYr = yr(baseYrInd);
-if currStep < (dataYr1 - modelYr1) * stepsPerYear % assortativity in 1st year
-    epsA = epsA_vec{1}(1);
-    epsR = epsR_vec{1}(1);
-elseif currStep < (dataYrLast - modelYr1) * stepsPerYear % assortativity between 1st and last year
-    epsA = epsA_vec{baseYrInd}(currStep - (baseYr - modelYr1) * stepsPerYear + 1);
-    epsR = epsR_vec{baseYrInd}(currStep - (baseYr - modelYr1) * stepsPerYear + 1);
-else % assortativity in last year
-    lastIndA = size(epsA_vec , 1);
-    lastIndR = size(epsR_vec , 1);
-    epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
-    epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
-end
-% epsA = 0.3;
-% epsR = 0.3;
+%dataYr1 = yr(1);
+%dataYrLast = yr(size(yr , 1));
+%now = currStep / stepsPerYear + modelYr1;
+%baseYrInd = max(find(now >= yr , 1, 'last') , 1); % get index of first year <= current year
+%baseYr = yr(baseYrInd);
+%if currStep < (dataYr1 - modelYr1) * stepsPerYear % assortativity in 1st year
+%    epsA = epsA_vec{1}(1);
+%    epsR = epsR_vec{1}(1);
+%elseif currStep < (dataYrLast - modelYr1) * stepsPerYear % assortativity between 1st and last year
+%    epsA = epsA_vec{baseYrInd}(currStep - (baseYr - modelYr1) * stepsPerYear + 1);
+%    epsR = epsR_vec{baseYrInd}(currStep - (baseYr - modelYr1) * stepsPerYear + 1);
+%else % assortativity in last year
+%    lastIndA = size(epsA_vec , 1);
+%    lastIndR = size(epsR_vec , 1);
+%    epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
+%    epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
+%end
+epsA = 0.3;
+epsR = 0.3;
 
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
