@@ -25,4 +25,4 @@ end
 %% Save parameter sets and negSumLogL values
 file = 'negSumLogL_calib_02May19.dat';
 paramDir = [pwd , '/Params/'];
-csvwrite([paramDir, file] , negSumLogLSet,(paramSetIdx-1),0)
+dlmwrite([paramDir, file] , [paramSetIdx; negSumLogLSet] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')

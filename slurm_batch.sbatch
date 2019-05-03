@@ -23,4 +23,6 @@ module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
 matlab -nodisplay -nosplash -r "sensitivityAnalysis3_prt2(${SETIDX})"
 
+rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
+
 date
