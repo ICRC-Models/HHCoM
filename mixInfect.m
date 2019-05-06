@@ -34,8 +34,10 @@ sumall = @(x) sum(x(:));
 %    epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
 %    epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 %end
-epsA = 0.3;
-epsR = 0.3;
+%epsA = 0.3;
+%epsR = 0.3;
+epsA = epsA_vec(1);
+epsR = epsR_vec(1);
 
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)

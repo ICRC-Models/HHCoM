@@ -15,7 +15,7 @@
 #SBATCH –-output=./SlurmOut/%j.out      # Standard output
 #SBATCH –-error=./SlurmOut/%j.err       # Standard error
 
-NSETS=48    # nSets
+NSETS=1000    # nSets
 echo "${NSETS}" 
 export NSETS
 

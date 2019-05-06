@@ -139,7 +139,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 %% Calibration parameters (FEED FROM LHS)
-if any(1 == [pIdx])
+if any(1 == pIdx)
     idx = find(1 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -149,7 +149,7 @@ if any(1 == [pIdx])
     partnersM(3:age , 1:risk) = [paramSet(rl) , paramSet(rm) , paramSet(rh)];
     partnersM(10:age , 3) = ones(7 , 1);
 end
-if any(2 == [pIdx])
+if any(2 == pIdx)
     idx = find(1 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -166,12 +166,42 @@ end
 % partnersM(10:age , 3) = ones(7 , 1);
 % partnersF(10:age , 3) = ones(7 , 1);
 % condUse = paramSet(169);
+if any(6 == pIdx);
+    idx = find(6 == pIdx);
+    epsA = paramSet(paramsSub{idx}.inds(:));
+end
+if any(7 == pIdx);
+    idx = find(7 == pIdx);
+    epsR = paramSet(paramsSub{idx}.inds(:));
+end
 % epsA = paramSet(170:172);
 % epsR = paramSet(173:175);
+if any(8 == pIdx)
+    idx = find(8 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    maleActs(1:2 , 1:risk) = zeros(2 , risk);
+    maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm) , paramSet(rh)];
+end
+if any(9 == pIdx)
+    idx = find(9 == pIdx);
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    femaleActs(1:2 , 1:risk) = zeros(2 , risk);
+    femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm) , paramSet(rh)];
+end
 % maleActs(1:2 , 1:risk) = zeros(2 , risk);
 % femaleActs(1:2 , 1:risk) = zeros(2 , risk);
 % maleActs(3:age , 1:risk) = [paramSet(176:189) , paramSet(190:203) , paramSet(204:217)];
 % femaleActs(3:age , 1:risk) = [paramSet(218:231) , paramSet(232:245) , paramSet(246:259)];
+if any(10 == pIdx)
+    idx = find(10 == pIdx);
+    perPartnerHpv = paramSet(paramsSub{idx}.inds(:));
+end
 % perPartnerHpv = paramSet(260);
 % perPartnerHpv_lr = paramSet(261);
 % perPartnerHpv_nonV = paramSet(262);
@@ -218,6 +248,8 @@ maxRateF2 = maxRateF_vec(2);
 %     epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
 %         yr(i) : timeStep : yr(i + 1));
 % end
+epsA_vec = epsA;
+epsR_vec = epsR;
 
 %% Simulation parameters
 % lambdaMultVax = ones(age , 2);

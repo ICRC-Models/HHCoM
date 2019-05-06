@@ -1,4 +1,4 @@
-NSETS=48    # nSets
+NSETS=1000    # nSets
 echo "${NSETS}" 
 export NSETS
 

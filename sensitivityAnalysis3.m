@@ -1,7 +1,7 @@
 % Parameter estimation and sensitivity analysis
 function sensitivityAnalysis3(nSets)
 
-delete(gcp('nocreate')); 
+%delete(gcp('nocreate')); 
 %loadUp(6);
 
 %% Load parameters
@@ -10,8 +10,9 @@ load([paramDir,'settings'])
 load([paramDir,'general'])
 
 %% Cluster information
-numCores = feature('numcores')
-parpool(numCores);
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat(getenv('SCRATCH') , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE'))    % start the pool with max number workers
 
 %% Load structure of all potentially calibrated parameters
 [paramsAll] = genParamStruct();
@@ -20,7 +21,7 @@ parpool(numCores);
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
-pIdx = [1,2];    % indices in paramsAll cell array
+pIdx = [1,2,6,7,8,9,10];    % indices in paramsAll cell array
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -28,10 +29,10 @@ startIdx = 1;
 lb = [];
 ub = [];
 for s = 1 : length(pIdx)
-    paramsSub{s} = paramsAll{pIdx};
-    p = p + paramsSub{s}.length
-    paramsSub{s}.inds = [(startIdx : (startIdx + paramsAll{s}.length - 1)) , 1];
-    startIdx = startIdx + paramsAll{s}.length;
+    paramsSub{s} = paramsAll{pIdx(s)};
+    p = p + paramsSub{s}.length;
+    paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+    startIdx = startIdx + paramsSub{s}.length;
 
     lb = [lb; paramsSub{s}.lb];
     ub = [ub; paramsSub{s}.ub];
@@ -54,10 +55,10 @@ if any(1 == pIdx)
     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
-    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
+        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0)); % mr partners < hr partners, > lr partners
+    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:)); % lr partners < mr partners
 end
-if any(2 == [pIdx])
+if any(2 == pIdx)
     idx = find(2 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -97,7 +98,8 @@ if any(8 == pIdx)
     rl = paramsSub{idx}.inds(1:rowL);
     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
     sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
 end
 if any(9 == pIdx)
@@ -106,16 +108,17 @@ if any(9 == pIdx)
     rl = paramsSub{idx}.inds(1:rowL);
     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
     sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'pIdx_calib_02May19.dat';
+file = 'pIdx_calib_06May19.dat';
 paramDir = [pwd , '/Params/'];
-csvwrite([paramDir, file] , sample)
+csvwrite([paramDir, file] , pIdx)
 
-file = 'paramSets_calib_02May19.dat';
+file = 'paramSets_calib_06May19.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 
