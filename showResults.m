@@ -792,7 +792,7 @@ plot(1 : length(cinPos2017) , cinPos2017 ,'o-')
 hold on
 errorbar(1 : length(cinPosAct) , cinPosAct(: , 1) , yNegError , yPosError , 'rs')
 legend('HR HPV CIN 2/3' , 'McDonald 2014')
-set(gca , 'xtick' , 1 : length(cinPosAct) , 'xtickLabel' , ageGroup);
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age Specific CIN 2/3 Prevalence Among HIV+ in 2017')
 ylim([0 25])
@@ -838,7 +838,7 @@ yPosError = abs(cinNegAct(: , 3) - cinNegAct(: , 1));
 yNegError = abs(cinNegAct(: , 2) - cinNegAct(: , 1));
 errorbar(1 : length(cinNegAct) , cinNegAct(: , 1) , yNegError , yPosError , 'rs')
 legend('HR HPV CIN 2/3' , 'McDonald 2014')
-set(gca , 'xtick' , 1 : length(cinNegAct) , 'xtickLabel' , ageGroup);
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age Specific CIN 2/3 Prevalence Among HIV- in 2017')
 ylim([0 25])
@@ -1120,12 +1120,12 @@ for y = 1 : length(ccIncYears)
     legend('HIV-' , 'HIV+' , 'ART')
     
     figure()
-     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 1 , y) , '-kp' , 1 : size(ccNegPosArtTot, 1) , ...
+    plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 1 , y) , '-kp' , 1 : size(ccNegPosArtTot, 1) , ...
         ccNegPosArtTot(: , 2 , y) , '-k+' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 3 , y) , '-k^');
     hold on
-    plot(4 : age , globocan_ub , 'k--' , 4 : age , globocan_lb , 'k--')
+    plot(4 : age , globocan , 'r-' , 4 : age , globocan_ub , 'r--' , 4 : age , globocan_lb , 'r--')
     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
-    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'SA Upper Bound' , 'SA Lower Bound')
+    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Globocan SA' , 'Upper Bound' , 'Lower Bound')
     xlabel('Age Group'); ylabel('Incidence per 100,000')
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)])
@@ -1667,13 +1667,55 @@ end
 
 %% General CC incidence validation
 fac = 10 ^ 5;
-% general
-allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
-    1 : periods , 2 , 4 : age , 1 : risk)); ...
-    toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
-    1 : periods , 2 , 4 : age , 1 : risk))];
-ccInc = annlz(sum(sum(sum(newCC(: , : , : , 4 : age),2),3),4)) ./ ...
-    (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear))* fac;
+% ccInc = annlz(sum(sum(sum(newCC(: , : , : , 4 : age),2),3),4)) ./ ...
+%     (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear))* fac;
+
+worldStandard_Segi1964 = [12000 10000 9000 9000 8000 8000 6000 6000 6000 ...
+    6000 5000 4000 4000 3000 2000 1000 500 500];
+
+% General, all ages
+% allFAge = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+%     1 : periods , 2 , 4 : age , 1 : risk)); ...
+%     toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+%     1 : periods , 2 , 4 : age , 1 : risk))];
+ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
+for a = 4 : age
+    % General
+    allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+        1 : periods , 2 , a , 1 : risk)); ...
+        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+        1 : periods , 2 , a , 1 : risk))];
+
+    ccIncRefAge = ...
+        (annlz(sum(sum(newCC(: , : , : , a),2),3)) ./ ...
+        (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear))* fac) ...
+        .* (worldStandard_Segi1964(a));
+    ccIncRef = ccIncRef + ccIncRefAge; 
+      
+end
+ccInc = ccIncRef ./ (sum(worldStandard_Segi1964(4:age)));
+
+globocan = [1.0	3.4	17.1	20.2	34.0	59.4	50.4	104.1	87.0	96.7	57.3	70.0 70.0];	
+% [0
+% 2.646467154
+% 8.848389036
+% 45.1937379
+% 53.40682334
+% 63.4
+% 68.3
+% 70.7
+% 73
+% 77.4
+% 82.7
+% 88.6
+% 95.2];
+
+ccIncRef = 0;
+for a = 4 : age
+    ccIncRefAge = globocan(a-3) .* (worldStandard_Segi1964(a));
+    ccIncRef = ccIncRef + ccIncRefAge; 
+end
+ccIncGlobocan = ccIncRef ./ (sum(worldStandard_Segi1964(4:age)));
 
 olorunfemi = [1994.0648457561042, 22.241027817219138;
     1994.4057758035783, 22.48378323297575;
@@ -1724,9 +1766,11 @@ figure()
 plot(tVec(1 : stepsPerYear : end) , ccInc)
 hold on;
 scatter(olorunfemi(:,1),olorunfemi(:,2))
+hold all;
+scatter(2012,ccIncGlobocan)
 title('General Cervical Cancer Incidence')
 xlabel('Year'); ylabel('Incidence per 100,000')
-legend('Model' , 'Olorunfemi Validation')
+legend('Model' , 'Olorunfemi Validation' , 'Globocan Validation')
 
 %% New infections
 figure()
