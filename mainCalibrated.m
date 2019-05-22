@@ -15,6 +15,7 @@ disp(' ');
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+OMEGA = zeros(age , 1); % hysterectomy rate
 % Load parameters
 load([paramDir,'general'])
 % Load indices
@@ -35,8 +36,8 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Model specs
-% choose whether to model hysterectomy (not currently implemented)
-hyst = 'off';
+% choose whether to model hysterectomy
+hyst = 0;
 % choose whether to model HIV
 hivOn = 1;
 % choose whether to model HPV
@@ -49,7 +50,7 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_050119';
+pathModifier = 'toNow_052219';
 
 % Time
 c = fix(clock);
@@ -76,46 +77,49 @@ maxRateF2 = maxRateF_vec(2);
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
-cytoSens = 0.58;
-hpvSens = 1.0; % 100 percent efficacy for WHO scenario; 0.89;
-cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy effectiveness by HIV status
+cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
 
-nhScreenParams = 1;
-screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; %[0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-screenAge = [8];
-testSens = cytoSens;
+% Baseline screening algorithm
+baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenAge = 8;
+baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-colpoRetain = 0.72;
-cinTreatRetain = 0.51;
-cinTreatHpvPersist = 0.28;
-ccTreatRetain = 0.40;
+baseline.colpoRetain = 0.72;
+baseline.cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
+baseline.cinTreatRetain = 0.51;
+baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
+baseline.ccTreatRetain = 0.40;
 
-screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+screenAlgorithm = 1;
+screenAlgs{1} = baseline;
+screenAlgs{1}.diseaseInds = [1 : disease];
+
+screenAlgs{1}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
-    screenCover_vec{i} = interp1(period , screenCover(i : i + 1 , 1) , ...
+    screenAlgs{1}.screenCover_vec{i} = interp1(period , screenAlgs{1}.screenCover(i : i + 1 , 1) , ...
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
 
 % Create screening indices
-screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAge) , risk);
-screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAge) , risk);
-noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAge) , risk);
+screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAlgs{1}.screenAge) , risk);
+screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAlgs{1}.screenAge) , risk);
+noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAlgs{1}.screenAge) , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
 vaxToScreen = noVaxNoScreen;
-noVaxToScreenTreatImm = zeros(disease , viral , length(screenAge) , risk);
+noVaxToScreenTreatImm = zeros(disease , viral , length(screenAlgs{1}.screenAge) , risk);
 vaxToScreenTreatImm = noVaxToScreenTreatImm;
 noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
-noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , length(screenAge));
+noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , length(screenAlgs{1}.screenAge));
 noVaxXscreen = noVaxScreen;
 vaxScreen = noVaxScreen;
 vaxXscreen = noVaxScreen;
-for aS = 1 : length(screenAge)
-    a = screenAge(aS);
+for aS = 1 : length(screenAlgs{1}.screenAge)
+    a = screenAlgs{1}.screenAge(aS);
     
     for d = 1 : disease
         for v = 1 : viral
@@ -155,11 +159,13 @@ for aS = 1 : length(screenAge)
 end
 
 %% Vaccination
-vaxEff = 0.7;    % bivalent vaccine
+% actually bivalent vaccine, but to avoid adding additional compartments,
+% we use nonavalent vaccine and then reduce coverage
+vaxEff = 0.9;    
 
 %Parameters for school-based vaccination regimen
 vaxAge = 2;
-vaxRate = 0.86*0.20;
+vaxRate = 0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for waning
@@ -349,7 +355,6 @@ for i = 2 : length(s) - 1
     end
 
     if hpvOn
-        hystOption = 'on';
         % Progression/regression from initial HPV infection to
         % precancer stages and cervical cancer. Differential CC
         % detection by CC stage and HIV status/CD4 count.
@@ -364,7 +369,7 @@ for i = 2 : length(s) - 1
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
             disease , age , hpvTypes , ...
-            rImmuneHiv , hystOption) , tspan , popIn);
+            rImmuneHiv , hyst , hystInds , hystSusInds , OMEGA) , tspan , popIn);
         popIn = pop(end , :); % for next module
         if any(pop(end , :) <  0)
             disp('After hpv')
@@ -377,13 +382,11 @@ for i = 2 : length(s) - 1
                 newTreatHpv(i , : , : , : , : , : , :) , ...
                 newTreatHyst(i , : , : , : , : , : , :)] ...
                 = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates , risk , ...
-                screenYrs , screenCover_vec , testSens , screenAge , ...
-                year , stepsPerYear , screenAgeAll , screenAgeS , ...
+                screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                 noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                 vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                colpoRetain , cinTreatRetain , cinTreatEff , cinTreatHpvPersist , ...
-                ccTreatRetain , nhScreenParams);
+                screenAlgorithm);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
@@ -446,7 +449,7 @@ for i = 2 : length(s) - 1
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-        stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
+        stepsPerYear , currYear , screenAlgs{1}.screenAge , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     popIn = pop(end , :);
     if any(pop(end , :) < 0)
