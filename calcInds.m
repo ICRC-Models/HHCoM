@@ -323,9 +323,23 @@ for g = 1 : gender
     end
 end
 
+hystSusInds = zeros(disease , 9 , age , viral * hpvTypes * periods * risk);
+hystInds = zeros(disease , age , viral * hpvTypes * periods * risk);
+for a = 1 : age
+    for d = 1 : disease
+        for s = 1 : hpvStates
+            hystSusInds(d , s , a , :) = toInd(allcomb(d , 1 : viral , 1 : hpvTypes , ...
+                s , 1 : periods , 2 , a , 1 : risk));
+            hystInds(d , a , :) = toInd(allcomb(d , 1 : viral , 1 : hpvTypes , ...
+                8 , 1 : periods , 2 , a , 1 : risk));
+        end
+    end
+end
+
 save([paramDir , 'hpvIndices'] , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , 'normalInds' , ...
     'ccRInds' , 'screen35PlusInds' , 'screen25_35Inds' , 'ccInds' , 'ccRegInds' , ...
-    'ccDistInds' ,'immuneInds' , 'ccTreatedInds' , 'ccLocDetInds' , 'ccDistDetInds' , 'ccRegDetInds')
+    'ccDistInds' ,'immuneInds' , 'ccTreatedInds' , 'ccLocDetInds' , 'ccDistDetInds' , 'ccRegDetInds' , ...
+    'hystSusInds' , 'hystInds')
 disp('hpv indices loaded')
 
 %% hpvTreat.m indices
