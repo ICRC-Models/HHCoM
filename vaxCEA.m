@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_050119']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_050819_CISNET']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -44,12 +44,14 @@ parfor n = 1 : nSims
 end
 
 % Find no vaccine scenario
-noVaxInd = -1;
-for n = 1 : nSims
-    if vaxResult{n}.vaxEff == 0
-        noVaxInd = n;
-    end
-end
+% noVaxInd = -1;
+% for n = 1 : nSims
+%     if vaxResult{n}.vaxEff == 0
+%         noVaxInd = n;
+%     end
+% end
+noVaxInd = nSims;
+
 noV = vaxResult{noVaxInd};
 tVec = noV.tVec;
 tVecYr = tVec(1 : stepsPerYear : end);
@@ -1542,32 +1544,31 @@ legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
 % legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
 
 %% Screened by risk and HIV group
-figure();
-% for r = 1 : risk
-    for v = 1 : 2
-        for i = 1 : (length(vaxResult{1}.tVec) - length(curr.tVec))
-        %HIV-
-        rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v ));
+% figure();
+% % for r = 1 : risk
+%     for v = 1 : 2
+%         for i = 1 : (length(vaxResult{1}.tVec) - length(curr.tVec))
+%         %HIV-
+%         rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v ));
+% 
+%         %HIV+
+%         rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
+% 
+%         %ART
+%         rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
+%         end
+% 
+%         subplot(1,3,1)
+%         plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivNegTot)
+%         hold all
+%         subplot(1,3,2)
+%         plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivTot)
+%         hold all
+%         subplot(1,3,3)
+%         plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopArtTot)
+%         xlabel('Year'); ylabel('Count'); title('Number')
+%         hold all;
+%     end
+% % end
+% legend('1','2','3','4','5','6','7','8','9','10')
 
-        %HIV+
-        rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
-
-        %ART
-        rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : risk , v));
-        end
-
-        subplot(1,3,1)
-        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivNegTot)
-        hold all
-        subplot(1,3,2)
-        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopHivTot)
-        hold all
-        subplot(1,3,3)
-        plot([1:(length(vaxResult{1}.tVec)-length(curr.tVec))]' , rpopArtTot)
-        xlabel('Year'); ylabel('Count'); title('Number')
-        hold all;
-    end
-% end
-legend('1','2','3','4','5','6','7','8','9','10')
-
-%vaxCEA_CISNETvaxCompare(pathModifier)
