@@ -12,15 +12,12 @@ function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds ,
     rNormal_Inf , hpv_hivClear , c3c2Mults , ...
     c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
     disease , age , hpvTypes , ...
-    rImmuneHiv , hystOption)
+    rImmuneHiv , hyst , hystInds, hystSusInds, OMEGA)
 
 %% Set constants and initialize vectors
 % kCCDet = kCCDet .* 0 ; %TESTING!
 sumall = @(x) sum(x(:));
-hyst = 0;
-if strcmp(hystOption , 'on')
-    hyst = 1;
-end
+
 ccInc = zeros(disease , hpvTypes , age);
 % cin1Inc = ccInc;
 % cin2Inc = ccInc;
@@ -64,6 +61,20 @@ for d = 1 : disease
         deathCC = muCC(5 , :); % HIV+ CC death rate, (same as high CD4)
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
     end
+    
+    % Hysterectomy (age dependent rate)
+    if hyst
+        for a = 3 : age % can adjust age group range
+            for s = [1:7 , 9:10]
+                hystSusPop = hystSusInds(d , s , a , :);
+                hystPop = hystInds(d , a , :);
+                toHyst = pop(hystSusPop) .* OMEGA(a);        
+                dPop(hystSusPop) = dPop(hystSusPop) - toHyst;
+                dPop(hystPop) = dPop(hystPop) + toHyst;
+            end
+        end
+    end
+    
     for h = 2 % infected onwards
         for a = 1 : age
             for p = [1:2,4,6]
@@ -183,7 +194,7 @@ for d = 1 : disease
 %                 + deathCC_det(2) * pop(ccRegDet)...
 %                 + deathCC_det(3) * pop(ccDistDet));
         end
-    end
+    end   
 end
 
 extraOut{1} = ccInc;
