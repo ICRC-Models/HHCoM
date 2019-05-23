@@ -22,7 +22,7 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
 
-artOut = 0;%0.03; % 3% dropout
+artOut = 0; %0.0619; %0.03; % 3% dropout
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 
 % pie [d x v x g x a x r]
@@ -66,7 +66,7 @@ if year >= 2006 && year < 2013
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        fracART = onArt / (onArt + totHivPos); %* (1 - artOut)
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
@@ -104,7 +104,7 @@ if year >= 2004 && year < 2013
             below200 = sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
             totBelow200 = totBelow200 + below200;
         end
-        fracART = onArt * (1 - artOut) / (onArt + totBelow200);
+        fracART = onArt / (onArt + totBelow200); %* (1 - artOut) 
         if year < 2006 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
 %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
@@ -135,7 +135,7 @@ if year >= 2013 && year < 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
         if fracART < maxCover{g}
             cover = (maxCover{g} - fracART) ./ (1 - fracART);
             treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
@@ -170,7 +170,7 @@ if year >= 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt * (1 - artOut) / (onArt + totHivPos);
+        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
         if year < 2030 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
 %             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);

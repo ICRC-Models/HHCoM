@@ -16,11 +16,12 @@
 % derivatives that describes the change in the population's subgroups due
 % to aging.
 
-function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , currStep ,...
-        gender , age , risk , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
+function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
+        gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
-        MTCTRate , circStartYear , ageInd , riskInd , riskDist , startYear , ...
-        endYear, stepsPerYear , currYear)
+        MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
+        stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
+        vaxScreen , vaxXscreen , hpvScreenStartYear)
 sumall = @(x)sum(x(:));
 
 % if any(pop<0)
@@ -87,7 +88,7 @@ elseif year > 2030
     circBirths = circMat2 * births;
 end
 
-%% aging
+%% Aging and risk proportion redistribution
 
 % prospective population after accounting for births, circumcised births,
 % hiv births, and deaths
@@ -220,9 +221,23 @@ for g = 1 : gender
     
 end
 
+%% Remove screened status as people age out of screened age groups
+if (year >= hpvScreenStartYear)
+    for aOut = 1 : length(screenAge)
+        noVaxScreend = dPop(noVaxScreen(:,aOut));
+        dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
+        dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
+
+        vaxScreend = dPop(vaxScreen(:,aOut));
+        dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
+        dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
+    end
+end
+
 %extraOut{1} = abs(deaths);
 extraOut{1} = deaths;
 dPop = dPop + circBirths + births + hivBirths + deaths;
 % if any(dPop<0)
 %     find(dPop<0)
 % end
+dPop = sparse(dPop);
