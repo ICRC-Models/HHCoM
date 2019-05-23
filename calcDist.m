@@ -1,12 +1,12 @@
 % Calculates distribution of individuals who go on ART by disease and viral
 % load at time of therapy initiation. Obtained by averaging the
-% distribution over the past 20 time steps. When less than 20 time steps
+% distribution over the past stepsPerYear*2 time steps. When less than stepsPerYear*2 time steps
 % have elapsed, the distribution is obtained by averaging over all the 
 % elapsed time steps.
 % Accepts artTreat, a matrix describing the distrubiton of individuals who
 % go on ART in the current time step.
 % Returns artDist, a matrix describing the distribution of individuals who
-% went on ART averaged over the past 20 time steps.
+% went on ART averaged over the past stepsPerYear*2 time steps.
 function[artDist] = calcDist(artDistList , disease , viral , gender , age , ...
     risk)
 s = zeros(prod([disease , viral , gender , age , risk]) , 1); % initialize sum variable

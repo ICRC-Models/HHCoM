@@ -167,7 +167,7 @@ for i = 1 %2 : length(inds)-1
         
         % Reduction
         vaxResult{n}.ccRed = (vaxResult{n}.ccInc - noV.ccInc) ./ noV.ccInc * 100;
-        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , 'LineStyle' , linStyle{n} , 'Color' , linColor{3} , 'DisplayName' , plotTits{n})
+        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , 'LineStyle' , linStyle{n} , 'Color' , linColor{1} , 'DisplayName' , plotTits{n})
 %             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
 %             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
         grid on
