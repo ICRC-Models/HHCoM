@@ -13,6 +13,7 @@ paramDir = [pwd ,'/Params/'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
 OMEGA = zeros(age , 1); % hysterectomy rate
+paramDir = [pwd ,'/Params/'];
 % Load parameters
 load([paramDir,'general'])
 % Load indices
