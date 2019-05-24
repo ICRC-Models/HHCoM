@@ -22,6 +22,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE'))    % start the pool with max 
 %p = 84; 398;    % number of parameters
 
 pIdx = [1,2,6,7,8,9,10];    % indices in paramsAll cell array
+prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -47,8 +48,8 @@ sample = lb + (sampleNorm .* (ub-lb));
 
 %% Apply parameter constraints
 
-% partnersM, partnersF
-if any(1 == pIdx)
+% partnersM, partnersF (if calibrating actual values vs. multipliers)
+if (any(1 == pIdx) && ~prtnrActMults)
     idx = find(1 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -58,7 +59,7 @@ if any(1 == pIdx)
         (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0)); % mr partners < hr partners, > lr partners
     sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:)); % lr partners < mr partners
 end
-if any(2 == pIdx)
+if (any(2 == pIdx) && ~prtnrActMults) 
     idx = find(2 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -91,8 +92,8 @@ if any(4 == pIdx)
     sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
 end
 
-% maleActs, femaleActs
-if any(8 == pIdx)
+% maleActs, femaleActs (if calibrating actual values vs. multipliers)
+if (any(8 == pIdx) && ~prtnrActMults)
     idx = find(8 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -102,7 +103,7 @@ if any(8 == pIdx)
         (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
     sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
 end
-if any(9 == pIdx)
+if (any(9 == pIdx) && ~prtnrActMults)
     idx = find(9 == pIdx);
     rowL = paramsSub{idx}.length/3;
     rl = paramsSub{idx}.inds(1:rowL);
@@ -114,26 +115,26 @@ if any(9 == pIdx)
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'pIdx_calib_06May19.dat';
+file = 'pIdx_calib_24May19.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , pIdx)
 
-file = 'paramSets_calib_06May19.dat';
+file = 'paramSets_calib_24May19.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 
 
 %%
 % KEY
-%(1:42):     partnersM, [3:age x risk], (0.001 to 180)
-%(43:84):    partnersF, [3:age x risk], (0.001 to 180)
+%(1:42):     partnersM, [3:age x risk], (0.001 to 180), *or mults*
+%(43:84):    partnersF, [3:age x risk], (0.001 to 180), *or mults*
 %(85:126):   riskDistM, [3:age x risk], (0 to 1)
 %(127:168):  riskDistF, [3:age x risk], (0 to 1)
 %(169):      condUse, [1 x 1], (0.01 to 0.9)
 %(170:172):  epsA, [1 x 3], (0.1 to 1)
 %(173:175):  epsR, [1 x 3], (0.1 to 1)
-%(176:217):  maleActs, [3:age x risk], (1 to 365) --> 25-29 peak acts
-%(218:259):  femaleActs, [3:age x risk], (1 to 365) --> 25-29 peak acts
+%(176:217):  maleActs, [3:age x risk], (1 to 365) --> 25-29 peak acts, *or mults*
+%(218:259):  femaleActs, [3:age x risk], (1 to 365) --> 25-29 peak acts, *or mults*
 %(260):      perPartnerHpv, [1 x 1], (0.001 to 1.0)
 %(261):      perPartnerHpv_lr, [1 x 1], (0.001 to 1.0)
 %(262):      perPartnerHpv_nonV, [1 x 1], (0.001 to 1.0)

@@ -15,14 +15,14 @@
 #SBATCH –-output=./SlurmOut/%j.out      # Standard output
 #SBATCH –-error=./SlurmOut/%j.err       # Standard error
 
-NSETS=1000    # nSets
+NSETS=10000    # nSets
 echo "${NSETS}" 
 export NSETS
 
 
 pwd; hostname; date
 
-echo “Running MATLAB script to get LHS parameter sets.”
+echo “Running MATLAB script to get LHS parameter sets.�?
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
