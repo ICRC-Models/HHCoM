@@ -22,7 +22,7 @@ export NSETS
 
 pwd; hostname; date
 
-echo â€œRunning MATLAB script to get LHS parameter sets.â€?
+echo "Running MATLAB script to get LHS parameter sets."
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
