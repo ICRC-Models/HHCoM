@@ -50,12 +50,12 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_052219';
+pathModifier = 'toNow_052919';
 
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
-startYear = 1910; %1980
+startYear = 1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
 
@@ -267,7 +267,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.05 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 

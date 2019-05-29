@@ -39,7 +39,7 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 %% Plot results
 % gropInds();
-% load('groupedInds');u
+% load('groupedInds');
 % Total HIV positive
 hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
     1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
@@ -733,8 +733,8 @@ for a = 4 : age
     ageInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk))];
-    cinPos2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , cinInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    cinPos2017(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , cinInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
     
     cinNegInds = [toInd(allcomb(1, 1 : viral , 2 : hpvTypes , 3 : 4, ...
         1 : periods , 2 , a , 1 : risk));...
@@ -744,8 +744,8 @@ for a = 4 : age
         2 , a , 1 : risk));...
         toInd(allcomb(7 : disease , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk))];
-    cinNeg2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , cinNegInds)))...
-        ./ (sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds))) * 100;
+    cinNeg2017(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , cinNegInds)))...
+        ./ (sum(popVec((2015 - startYear) * stepsPerYear , ageNegInds))) * 100;
 end
 
 % McDonald 2014
@@ -937,7 +937,7 @@ legend('Male' , 'Female')
 
 %% Incidence
 %ccIncYears = [2017 , 2003 , 1994];
-ccIncYears = [2003 , 1994];
+ccIncYears = [2015 , 2003 , 1994];
 ccAgeRel = zeros(age , length(ccIncYears));
 ccAgeNegRel = ccAgeRel;
 ccAgePosRel = zeros(age , 4 , length(ccIncYears));
@@ -1696,20 +1696,20 @@ for a = 4 : age
 end
 ccInc = ccIncRef ./ (sum(worldStandard_Segi1964(4:age)));
 
-globocan = [1.0	3.4	17.1	20.2	34.0	59.4	50.4	104.1	87.0	96.7	57.3	70.0 70.0];	
-% [0
-% 2.646467154
-% 8.848389036
-% 45.1937379
-% 53.40682334
-% 63.4
-% 68.3
-% 70.7
-% 73
-% 77.4
-% 82.7
-% 88.6
-% 95.2];
+globocan = ...%[1.0	3.4	17.1	20.2	34.0	59.4	50.4	104.1	87.0	96.7	57.3	70.0 70.0];	
+[0
+2.646467154
+8.848389036
+45.1937379
+53.40682334
+63.4
+68.3
+70.7
+73
+77.4
+82.7
+88.6
+95.2];
 
 ccIncRef = 0;
 for a = 4 : age
