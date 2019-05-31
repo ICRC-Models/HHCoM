@@ -38,11 +38,13 @@ hpvOn = 1;
 hivOn = 1;
 
 % Use newly calibrated parameters
-% %paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
-% %paramSet = paramSetMatrix(:,985);
+% % paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
+% % paramSet = paramSetMatrix(:,985);
 % pIdx = [1,2,6,7,8,9,10];
-% paramSet = [8.9633; 6.7655; 0.50801; 0.79412; 0.84732; 0.70332; ...
-%     0.4964; 0.44682; 14.612; 1.2972; 0.52309];
+% % paramSet = [1.8411; 4.0835; 0.53808; 0.4379; 0.97412; 0.90392; ...
+% %    0.86324; 0.25287; 7.2289; 10.412; 0.13378];    % 1619
+% paramSet = [8.8545; 0.20803; 0.29426; 0.44916; 0.12885; 0.75506; ...
+%     0.83832; 0.82634; 8.4805; 4.3532; 0.13708];    % 3306
 % [paramsAll] = genParamStruct();
 % paramsSub = cell(length(pIdx),1);
 % startIdx = 1;
@@ -83,7 +85,7 @@ if any(1 == pIdx)
     partnersM(10:age , 3) = ones(7 , 1);
 end
 if any(2 == pIdx)
-    idx = find(1 == pIdx);
+    idx = find(2 == pIdx);
     partnersFmult = paramSet(paramsSub{idx}.inds(:));
     % rowL = paramsSub{idx}.length/3;
     % rl = paramsSub{idx}.inds(1:rowL);
@@ -593,7 +595,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_052919calib_baseline';
+% pathModifier = 'toNow_052919calib_3306';
 % savdir = [pwd , '/HHCoM_Results/'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
