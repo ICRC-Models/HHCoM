@@ -27,6 +27,6 @@ file = 'bestParamSets_calib_29May19.dat';
 paramDir = [pwd , '/Params/'];
 
 for i = 1:numSets
-    dlmwrite([paramDir , file] , [vals(i); inds(i); paramSetMatrix(:,i)] , 'delimiter' , ',' , ...
+    dlmwrite([paramDir , file] , [vals(i); inds(i); paramSetMatrix(:,inds(i))] , 'delimiter' , ',' , ...
     'roffset' , 1 , 'coffset' , 0 , '-append')
 end
