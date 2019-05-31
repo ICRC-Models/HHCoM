@@ -50,7 +50,7 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_052919_WHO';
+pathModifier = 'toNow_053119_noVax';
 
 % Time
 c = fix(clock);
@@ -165,7 +165,7 @@ vaxEff = 0.9;
 
 %Parameters for school-based vaccination regimen
 vaxAge = 2;
-vaxRate = 0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0; %0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for waning
@@ -457,7 +457,7 @@ for i = 2 : length(s) - 1
         break
     end 
     
-    if (year >= vaxStartYear)
+    if ((year >= vaxStartYear) && (vaxRate > 0))
         % HPV vaccination module- school-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , k , ...
             disease , viral , risk , hpvTypes , hpvStates , ...

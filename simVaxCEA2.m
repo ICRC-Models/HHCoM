@@ -46,7 +46,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_052219']);
+popIn = load([pwd , '\HHCoM_Results\toNow_053119_noVax']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -59,7 +59,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = '052219_baselineScreen';
+pathModifier = '053119_baselineScreen_noBaselineVax';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -85,7 +85,7 @@ baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 % CISNET
 cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cisnet.screenAge = [8]; % , 10];
+cisnet.screenAge = [8 , 10];
 cisnet.testSens = hpvSens;
 cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
@@ -201,7 +201,7 @@ vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 
 % Parameters for baseline vaccination regimen
 vaxAgeB = 2;
-vaxCoverB = 0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxCoverB = 0.0; %0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen
