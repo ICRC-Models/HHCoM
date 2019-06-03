@@ -1,5 +1,6 @@
 % Parameter estimation and sensitivity analysis
 function sensitivityAnalysis3_prt2(paramSetIdx)
+paramSetIdx = 81;
 
 %delete(gcp('nocreate')); 
 
@@ -9,7 +10,7 @@ load([paramDir,'settings']);
 load([paramDir,'general']);
 paramSetMatrix = load([paramDir,'paramSets_calib_29May19.dat']);
 nPrlSets = 16;
-subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets)];
+subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = load([paramDir,'pIdx_calib_29May19.dat']);
 
 [paramsAll] = genParamStruct();
