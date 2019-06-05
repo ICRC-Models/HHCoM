@@ -38,13 +38,11 @@ hpvOn = 1;
 hivOn = 1;
 
 % Use newly calibrated parameters
-% % paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
-% % paramSet = paramSetMatrix(:,985);
+% % % paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
+% % % paramSet = paramSetMatrix(:,985);
 % pIdx = [1,2,6,7,8,9,10];
-% % paramSet = [1.8411; 4.0835; 0.53808; 0.4379; 0.97412; 0.90392; ...
-% %    0.86324; 0.25287; 7.2289; 10.412; 0.13378];    % 1619
-% paramSet = [8.8545; 0.20803; 0.29426; 0.44916; 0.12885; 0.75506; ...
-%     0.83832; 0.82634; 8.4805; 4.3532; 0.13708];    % 3306
+% paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
+%    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
 % [paramsAll] = genParamStruct();
 % paramsSub = cell(length(pIdx),1);
 % startIdx = 1;
@@ -595,8 +593,8 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_052919calib_3306';
-% savdir = [pwd , '/HHCoM_Results/'];
+% pathModifier = 'toNow_053119calib_2179';
+% savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
 %     'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
