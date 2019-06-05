@@ -107,53 +107,60 @@ _________________________________________________________________________
 
 Run model:
 1) mainCalibrated.m 
-   - natural history up to current year
-   - loads parameters from the \Params directory
-     \Params\popData
-     \Params\general
-     \Params\calibratedParams                          <----previously calibrated??????
+   - historical trends up to current year
+   - loads parameters/indices/matrices from the \Params directory
+     \Params\calibratedParams (most recent calibration & all parameters after Nick)
+     \Params\general (this and below loaded due to changes since Nick)
+     \Params\mixInfectIndices
+     \Params\hivIndices
+     \Params\hpvIndices
+     \Params\ageRiskInds  
+     \Params\ager
+     \Params\vlAdvancer
+     \Params\fertMat
+     \Params\hivFertMats
+     \Params\fertMat2
+     \Params\hivFertMats2
+     \Params\deathMat
+     \Params\circMat
+     \Params\circMat2
    - saves outputs to the \HHCoM_Results directory
      \HHCoM_Results\toNow
    - uses the following functions
      progressbar.m
      ode4xtra.m    
-     hpvCCdet.m 
+     hpvCCdet.m
+     hpvScreen.m 
      mixInfect.m
      hiv2a.m
+     calcDist.m
      bornAgeDieRisk.m
+     hpvVaxSchool.m
      showResults.m
      - loads parameters 
        \Params\calibratedParams
-       \Params\calibData
+       \Params\calibData (probably not needed)
+       \Params\general
        \HHCoM_Results\toNow
 
 2) simVaxCEA2.m 
    - vaccination scenarios & cost analysis
    - loads parameters from the \Params directory
-     \Params\general
+     \Params\calibratedParams (most recent calibration & all parameters after Nick)
+     \Params\general (this and below loaded due to changes since Nick)
      \Params\mixInfectIndices
-     \Params\vlAdvancer
-     \Params\deathMat
-     \Params\circMat
-     \Params\vaxer                          
-     \Params\mixInfectParams
-     \Params\popData
-     \Params\HIVParams
      \Params\hivIndices
      \Params\hpvIndices
+     \Params\ageRiskInds  
      \Params\ager
-     \Params\hpvTreatIndices
-     \Params\calibParams
-     \Params\vaxInds
-     \Params\hpvData
-     \Params\cost_weights
+     \Params\vlAdvancer
      \Params\fertMat
      \Params\hivFertMats
      \Params\fertMat2
      \Params\hivFertMats2
-     \Params\ageRiskInds
-     \Params\vlBeta
-     \Params\calibratedParams
+     \Params\deathMat
+     \Params\circMat
+     \Params\circMat2
    - loads parameters from the \HHCoM_Results directory
      \HHCoM_Results\toNow
    - saves outputs to the \HHCoM_Results\Vaccine directory
@@ -162,15 +169,19 @@ Run model:
      allcomb.m
      ode4xtra.m   
      hpvCCdet.m 
+     hpvScreen.m 
      mixInfect.m
      hiv2a.m
      calcDist.m
      bornAgeDieRisk.m
+     hpvVaxLmtd.m
+     hpvVaxSchool.m
+     hpvVaxCU.m
      parsave.m
-     vaxCEA.m 
+     vaxCEA.m
 
-Load and prepare parameters for the model (only need to run when input parameters are changed):
-1) loadUp.m 
+Load and prepare parameters for the model (only need to run when input parameters or transition matrices are changed):
+1) loadUp.m*** 
    - imports data from the following Excel spreadsheets in \Config directory 
      (data imported into model is highlighted in yellow)
      \Config\Population_data.xlsx (Demographics)
@@ -198,19 +209,20 @@ Load and prepare parameters for the model (only need to run when input parameter
        hpvTreatIndices.mat
        ageRiskInds.mat
        vaxInds.mat
+   ***parameters in calibratedParams.m don't necessarily match those loaded in by loadUp.m so for now better just to change manually in code
      
 2) makeMat.m** 
    - creates transition matrices using data from Excel spreadsheets             ????
    **if data used in transition matrices changes, makeMat.m must be ran again
 
-3) prepCalibParams.m
+3) prepCalibParams.m (out of date)
    - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
    - loads parameters from the \Params directory previously imported from Excel files  
    - loads calibrated paramters from .dat file
    - saves parameters in the \Params directory as .mat file
      \Params\calibratedParams
 
-Calibrate model:
+Calibrate model: (out of date)
 ?) quickCalibrateModel.m
    - uses the following functions
      calibrator.m
@@ -230,7 +242,3 @@ Calibrate model:
        hiv2a.m
        bornAgeDieRisk.m
        likeFun.m
-
-
-
-???simVaxResultOut_ageStand - displays age standardized results from simVax.m. Also exports them as .csv files.

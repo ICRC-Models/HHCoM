@@ -1,6 +1,5 @@
 % HPV progression
-% Simulates progression through HPV states as well as HPV treatment and
-% hysterectomy.
+% Simulates progression through HPV states.
 % Accepts a population matrix as input and returns dPop, a vector of
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.

@@ -1,10 +1,10 @@
 % HIV Progression
 % Simulates progression through HIV states and takes treatments such as
-% ART, PrEP, etc. into account
+% ART, PrEP, etc. into account (currently no PrEP)
 % Accepts:
 % 1) Population matrix (pop)
 % 2) Matrix describing the distribution of individuals (by disease status,
-% viral load) that went on ART over the last 20 time steps as input (artDist).
+% viral load) that went on ART over the last stepsPerYear*2 time steps as input (artDist).
 % Returns:
 % 1) dPop, a matrix of derivatives that describes the change in the
 % population's subgroups due to HIV progression.

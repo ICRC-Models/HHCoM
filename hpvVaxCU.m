@@ -1,4 +1,4 @@
-% HPV vaccination
+% HPV catch-up vaccination
 function[dPop , hpvVaxd] = hpvVaxCU(pop , k , disease , viral , risk , ...
     hpvTypes , hpvStates , periods , vaxAgeCU , vaxCoverCU , vaxGCU)
 
