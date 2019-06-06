@@ -21,7 +21,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
-pIdx = [1,2,6,7,8,9,10];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10,19];    % indices in paramsAll cell array
 prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
@@ -115,11 +115,11 @@ if (any(9 == pIdx) && ~prtnrActMults)
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'pIdx_calib_29May19.dat';
+file = 'pIdx_calib_06June19.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , pIdx)
 
-file = 'paramSets_calib_29May19.dat';
+file = 'paramSets_calib_06June19.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 

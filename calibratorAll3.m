@@ -100,6 +100,10 @@ end
 % partnersF(3:age , 1:risk) = [paramSet(43:56) , paramSet(57:70) , paramSet(71:84)];
 % partnersM(10:age , 3) = ones(7 , 1);
 % partnersF(10:age , 3) = ones(7 , 1);
+if any(5 == pIdx);
+    idx = find(5 == pIdx);
+    condUse = paramSet(paramsSub{idx}.inds(:));
+end
 % condUse = paramSet(169);
 if any(6 == pIdx);
     idx = find(6 == pIdx);
@@ -151,6 +155,11 @@ end
 % c3c2Mults = paramSet(287:290) .* 2.0;
 % c2c1Mults = paramSet(291:294) .* 2.0;
 % kCCDet = paramSet(295:297);
+if any(19 == pIdx)
+    idx = find(19 == pIdx);
+    lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
+    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+end
 % lambdaMultImm = paramSet(298:313);
 % maxRateM_vec = paramSet(314:315);
 % maxRateF_vec = paramSet(316:317);
@@ -178,17 +187,17 @@ maxRateF2 = maxRateF_vec(2);
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % 
-% % epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-% % epsR_vec = cell(size(yr , 1) - 1, 1);
-% % for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-% %     period = [yr(i) , yr(i + 1)];
-% %     epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-% %         yr(i) : timeStep : yr(i + 1));
-% %     epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-% %         yr(i) : timeStep : yr(i + 1));
-% % end
-epsA_vec = epsA;
-epsR_vec = epsR;
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+end
+% epsA_vec = epsA;
+% epsR_vec = epsR;
 
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
