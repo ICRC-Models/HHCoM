@@ -679,6 +679,22 @@ xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence')
 
+figure()
+artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
+artPop = sum(noV.popVec(: , artInds) , 2);
+hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
+allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk)); 
+hivPop = sum(noV.popVec(: , hivInds) , 2);
+allPop = sum(noV.popVec(: , allInds) , 2);
+plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+
+xlabel('Year')
+ylabel('Prevalence')
+title('HIV Prevalence All')
+
 %% HPV prevalence by HIV group
 figure()
 linStyle = {'--' , '-' , ':'};
