@@ -40,9 +40,11 @@ hivOn = 1;
 % Use newly calibrated parameters
 % % % paramSetMatrix = load([paramDir,'params_calib_22Feb19.dat']);
 % % % paramSet = paramSetMatrix(:,985);
-% pIdx = [1,2,6,7,8,9,10];
-% paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
-%    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
+% pIdx = [1,2,5,6,7,8,9,10,19];
+% % paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
+% %    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
+% paramSet = [4.7022; 0.47332; 0.81494; 0.70898; 0.76744; 0.38557; 0.26816; ...
+% 0.75175; 0.37118; 8.7002; 13.258; 0.35454; 0.57692]; % 1.7591e+05; 857
 % [paramsAll] = genParamStruct();
 % paramsSub = cell(length(pIdx),1);
 % startIdx = 1;
@@ -602,7 +604,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_053119calib_2179';
+% pathModifier = 'toNow_060619calib_857';
 % savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
