@@ -3,8 +3,8 @@
 numSets = 25;
 
 paramDir = [pwd , '/Params/'];
-negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_29May19.dat']);
-paramSetMatrix = load([paramDir , 'paramSets_calib_29May19.dat']);
+negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_07June19.dat']);
+paramSetMatrix = load([paramDir , 'paramSets_calib_06June19.dat']);
 
 numSubsets = size(negSumLogLmatrix,1)/17;
 
@@ -25,7 +25,7 @@ negS_ordered = negS_format(:,firstRowOrder);
 negS_ordered_flatDat = reshape(negS_ordered(2:end,:),[16*(numSubsets+addC),1]);
 [vals,inds] = sort(negS_ordered_flatDat,'ascend');
 
-file = 'bestParamSets_calib_31May19.dat';
+file = 'bestParamSets_calib_07June19.dat';
 paramDir = [pwd , '/Params/'];
 
 for i = 1:numSets
