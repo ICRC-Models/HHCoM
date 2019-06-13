@@ -15,6 +15,9 @@ disp(' ');
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+% % rNormal_Inf = ones(age,1); % for VCLIR analysis
+% % hpv_hivClear = ones(4,1);
+% % kCIN1_Inf = zeros(age,1);
 OMEGA = zeros(age , 1); % hysterectomy rate
 % Load parameters
 load([paramDir,'general'])
@@ -50,7 +53,7 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_053119_noVax';
+pathModifier = 'toNow_061319_noVax';
 
 % Time
 c = fix(clock);
@@ -165,7 +168,7 @@ vaxEff = 0.9;
 
 %Parameters for school-based vaccination regimen
 vaxAge = 2;
-vaxRate = 0; %0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for waning

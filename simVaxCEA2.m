@@ -25,6 +25,9 @@ disp('Start up')
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+% % rNormal_Inf = ones(age,1); % for VCLIR analysis
+% % hpv_hivClear = ones(4,1);
+% % kCIN1_Inf = zeros(age,1);
 OMEGA = zeros(age , 1); % hysterectomy rate
 % Load parameters
 load([paramDir,'general'])
@@ -46,7 +49,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_053119_noVax']);
+popIn = load([pwd , '\HHCoM_Results\toNow_061319_noVax']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -59,7 +62,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = '053119_baselineScreen_noBaselineVax';
+pathModifier = '061319_baselineScreen_noBaselineVax';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -201,7 +204,7 @@ vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 
 % Parameters for baseline vaccination regimen
 vaxAgeB = 2;
-vaxCoverB = 0.0; %0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen
