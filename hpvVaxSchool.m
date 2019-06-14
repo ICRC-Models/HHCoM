@@ -1,4 +1,4 @@
-% HPV school-based vaccination
+% HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
 function[dPop , hpvVaxd] = hpvVaxSchool(pop , k , disease , viral , risk , ...
     hpvTypes , hpvStates , periods , vaxG , vaxAge , vaxRate)
 

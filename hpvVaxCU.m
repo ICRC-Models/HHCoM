@@ -1,6 +1,6 @@
 % HPV catch-up vaccination
 function[dPop , hpvVaxd] = hpvVaxCU(pop , k , disease , viral , risk , ...
-    hpvTypes , hpvStates , periods , vaxAgeCU , vaxCoverCU , vaxGCU)
+    hpvTypes , hpvStates , periods , vaxAgeCU , vaxCoverCU , vaxGCU , vaxDiseaseIndsCU)
 
 %% Set constants and initialize vectors
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
@@ -12,7 +12,8 @@ hpvVaxd = 0;
 dPop = zeros(size(pop));
 
 % Apply catch-up vaccination regimen
-for d = 1 : disease
+for dS = 1 : length(vaxDiseaseIndsCU)
+    d = vaxDiseaseIndsCU(dS);
     for v = 1 : viral
         for g = min(vaxGCU) : max(vaxGCU) 
             for r = 1 : risk

@@ -49,7 +49,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_061319_noVax']);
+popIn = load([pwd , '\HHCoM_Results\toNow_061319_WHOp2']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -62,7 +62,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = '061319_baselineScreen_noBaselineVax';
+pathModifier = '061319_WHOp2_SCE4';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -97,7 +97,7 @@ cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy
 cisnet.ccTreatRetain = 1.0;
 % WHO screening algorithm
 who.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
-who.screenAge = [8 , 10];
+who.screenAge = [6 , 8 , 10];
 who.testSens = hpvSensWHO;
 who.colpoRetain = 1.0;
 who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
@@ -105,8 +105,8 @@ who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
 
-hivPosScreen = 0; 
-screenAlgorithm = 1;
+hivPosScreen = 1; 
+screenAlgorithm = 3;
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
@@ -209,13 +209,19 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen
 vaxAge = 3;
-vaxCover = [0.8 , 0.9];
+vaxCover = [0.8]; % , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 0;    % turn catch-up vaccination on or off
-vaxAgeCU = [4,5];    % ages catch-up vaccinated
-vaxCoverCU = [0.6,0.5];    % coverage for catch-up vaccination by ages catch-up vaccinated
+vaxCU = 1;    % turn catch-up vaccination on or off
+hivPosVaxCU = 1; 
+if hivPosVaxCU
+    vaxDiseaseIndsCU = [2:6 , 10];
+else
+    vaxDiseaseIndsCU = [1 : disease];
+end
+vaxAgeCU = [4 : age]; %[4 , 5 , 6];     % ages catch-up vaccinated
+vaxCoverCU = ones(1,length(vaxAgeCU)).*0.5; %[0.5 , 0.5 , 0.5*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -239,10 +245,10 @@ testParams2(nTests,1) = {vaxAgeB};
 testParams2(nTests,2) = {vaxGB};
 
 if vaxCU
-    vaxCoverCUmat = ones(nTests,2) .* vaxCoverCU;
+    vaxCoverCUmat = ones(nTests,length(vaxAgeCU)) .* vaxCoverCU;
     vaxCoverCUmat(end,:) = 0.0;
 else
-    vaxCoverCUmat = zeros(nTests,2);    % have to declare these even if vaxCU=0 because parfor is dumb
+    vaxCoverCUmat = zeros(nTests,length(vaxAgeCU));    % have to declare these even if vaxCU=0 because parfor is dumb
 end
 if vaxLimit
     vaxCoverLmat = ones(nTests,1) .* vaxCoverL;
@@ -527,7 +533,7 @@ parfor n = 1 : nTests
                     % HPV vaccination module- catch-up vaccination regimen
                     [dPop , vaxdCU(i , :)] = hpvVaxCU(popIn , k , disease , ...
                         viral , risk , hpvTypes , hpvStates , periods , ...
-                        vaxAgeCU , vaxCoverCU , vaxGCU);
+                        vaxAgeCU , vaxCoverCU , vaxGCU , vaxDiseaseIndsCU);
                     pop(end , :) = pop(end , :) + dPop;
                     if any(pop(end , :) < 0)
                         disp('After hpvVaxCU')
