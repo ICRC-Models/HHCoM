@@ -53,7 +53,7 @@ if hivOn
 end
 
 % Directory to save results
-pathModifier = 'toNow_061319_WHOp2';
+pathModifier = 'toNow_061819_noBaseVax_baseScreen';
 
 % Time
 c = fix(clock);

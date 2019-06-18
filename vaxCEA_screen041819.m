@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_053119_noVax']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_061319_WHOp2']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -50,8 +50,8 @@ tVec = noV.tVec;
 tVecYr = tVec(1 : stepsPerYear : end);
 
 %% Run this section to plot percent reduction comparison to standard baseline
-resultFileNameBaseline = [pwd , '\HHCoM_Results\Vaccine' , '052919_WHO_baselineScreen', '\' , 'vaxSimResult'];
-for n = nSims
+resultFileNameBaseline = [pwd , '\HHCoM_Results\Vaccine' , '061319_WHOp2_baselineScreening', '\' , 'vaxSimResult'];
+for n = 2 %nSims
     % load results from vaccine run into cell array
     noV = load([resultFileNameBaseline , num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to current year to population
@@ -73,11 +73,14 @@ files = {'CC_General_Hpv_VaxCover' , ...
      'CC_ART_HPV_VaxCover' , 'CC_HivAll_HPV_VaxCover'};
 plotTits1 = {'General' , 'HIV-' , ...
     'HIV+ no ART' , 'HIV+ ART' , 'HIV all'};
-plotTits2 = {'General:    80% Vax Coverage' , '90% coverage'  , ...
-    'HIV-:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ no ART:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ ART:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ all:    80% Vax Coverage' , '90% coverage'};
+% plotTits2 = {'General:    80% Vax Coverage' , '90% coverage'  , ...
+%     'HIV-:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ no ART:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ ART:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ all:    80% Vax Coverage' , '90% coverage'};
+plotTits2 = {'2x screen' , '3x screen HIV-positive' , '3x screen HIV-positive, 50% catch-up vax 15-26' , ...
+    '3x screen HIV-positive, 80% catch-up vax 15-26' , '3x screen HIV-positive, 50% catch-up vax all' , ...
+    '3x screen HIV-positive, 80% catch-up vax all'};
 fac = 10 ^ 5;
 %plotTitsS = {'No Screening' , 'Screen- NH baseline' , 'Screen- WHO35' , 'Screen- WHO3545' , 'Screen- WHO45'};
 plotTitsS = {'Baseline Screening' , 'Increased Screening- Age 35' , 'Increased Screening- Ages 35,45'};
@@ -86,11 +89,12 @@ linStyle = {'-' , '--' , ':'};
 linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g' , 'c'};
 
 %figure();
-subplot(1,2,1);
 set(gca,'ColorOrderIndex',1)
 
 for i = 1 : length(inds) %-1
-     plotTits = {plotTits2{(i*2-1):(i*2)}}; % Turn on for percent reduction plots
+    subplot(3,2,i);
+%     plotTits = {plotTits2{(i*2-1):(i*2)}}; % Turn on for percent reduction plots
+    plotTits = {plotTits2{6}}; % Turn on for percent reduction plots
 % %     figure();
 % %     noV.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
 % %     for n = 1 : length(vaxResult)-1
@@ -178,7 +182,7 @@ for i = 1 : length(inds) %-1
         hold all
               
         % Save reduction results
-        fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'BaselineScreen' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+        fname = [pwd , '\HHCoM_Results\Vaccine' , '061319_WHOp2_baselineScreening', '\' , 'SCE5' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
         sname = [plotTits1{i} , '_IncRed']
         if exist(fname , 'file') == 2
@@ -192,9 +196,11 @@ for i = 1 : length(inds) %-1
     end
 %     title(' Cervical Cancer Incidence')
 %     xlabel('Year'); ylabel('Incidence per 100,000')
+%     xlim([2019 2099]);
+%     xticks([2019 : 10 : 2099]);
 %     hold all;
 
-    title('Figure 1: Percent reduction in cervical cancer cases, by HIV status')
+    title(plotTits1{i})
     xlabel('Year'); ylabel('Percent change')
 end        
 
@@ -205,21 +211,26 @@ files = {'CC_General_Hpv_VaxCover' , ...
      'CC_ART_HPV_VaxCover' , 'CC_HivAll_HPV_VaxCover'};
 plotTits1 = {'General' , 'HIV-' , ...
     'HIV+ no ART' , 'HIV+ ART' , 'HIV all'};
-plotTits2 = {'General:    80% Vax Coverage' , '90% coverage'  , ...
-    'HIV-:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ no ART:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ ART:    80% Vax Coverage' , '90% coverage' , ...
-    'HIV+ all:    80% Vax Coverage' , '90% coverage'};
+% plotTits2 = {'General:    80% Vax Coverage' , '90% coverage'  , ...
+%     'HIV-:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ no ART:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ ART:    80% Vax Coverage' , '90% coverage' , ...
+%     'HIV+ all:    80% Vax Coverage' , '90% coverage'};
+plotTits2 = {'2x screen' , '3x screen HIV-positive' , '3x screen HIV-positive, 50% catch-up vax 15-26' , ...
+    '3x screen HIV-positive, 80% catch-up vax 15-26' , '3x screen HIV-positive, 50% catch-up vax all' , ...
+    '3x screen HIV-positive, 80% catch-up vax all'};
 fac = 10 ^ 5;
 linStyle = {'-' , '--' , ':'};
 linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g' , 'c'};
 
 %figure();
-subplot(1,2,2);
+% subplot(2,1,2);
 set(gca,'ColorOrderIndex',1)
 
 for i = 1 : length(inds) %-1
-    plotTits = {plotTits2{(i*2-1):(i*2)}}; % Turn on for percent reduction plots
+    subplot(3,2,i);
+%     plotTits = {plotTits2{(i*2-1):(i*2)}}; % Turn on for percent reduction plots
+    plotTits = {plotTits2{6}}; % Turn on for percent reduction plots
 % %     figure();
 % %     noV.ccMortRef = zeros(length(tVec(length(curr.tVec) + 1 : stepsPerYear : end)),1)';
 % %     for n = 1 : length(vaxResult)-1
@@ -282,13 +293,13 @@ for i = 1 : length(inds) %-1
         
 % %     end
 % %     noV.ccMort = noV.ccMortRef ./ (annlz(sum(noV.popVec(length(curr.tVec) + 1 : end , allFAge) , 2) ./ stepsPerYear));
-      noV.ccMort = noV.ccMortRef;
+    noV.ccMort = noV.ccMortRef;
 %     plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , noV.ccMort ,'DisplayName' , ...
 %          [plotTits1{i} , ': Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
 %          'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%']);
 %     legend('-DynamicLegend');
 %     hold all;
-    for n = 2 : 2 %length(vaxResult)-1
+    for n = 1 : 1 %length(vaxResult)-1
 % %         vaxResult{n}.ccMort = vaxResult{n}.ccMortRef ./ (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end , allFAge) , 2) ./ stepsPerYear));
         vaxResult{n}.ccMort = vaxResult{n}.ccMortRef;
 %         plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , vaxResult{n}.ccMort , 'DisplayName' , ...
@@ -309,7 +320,7 @@ for i = 1 : length(inds) %-1
         hold all       
         
         % Save reduction results
-        fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'BaselineScreen' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+        fname = [pwd , '\HHCoM_Results\Vaccine' , '061319_WHOp2_baselineScreening', '\' , 'SCE5' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_Mort' , '.xlsx'];
         sname = [plotTits1{i} , '_MortRed'];
         if exist(fname , 'file') == 2
@@ -323,9 +334,11 @@ for i = 1 : length(inds) %-1
     end
 %     title('Cervical Cancer Mortality')
 %     xlabel('Year'); ylabel('Mortality per 100,000')
+%     xlim([2019 2099]);
+%     xticks([2019 : 10 : 2099]);
 %     hold all;
 
-    title('Figure 2: Percent reduction in cervical cancer mortality, by HIV status')
+    title(plotTits1{i})
     xlabel('Year'); ylabel('Percent change')
 end
 

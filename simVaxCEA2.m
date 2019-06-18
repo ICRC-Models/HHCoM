@@ -49,7 +49,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_061319_WHOp2']);
+popIn = load([pwd , '\HHCoM_Results\toNow_061819_noBaseVax_baseScreen']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -62,7 +62,7 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % Directory to save results
-pathModifier = '061319_WHOp2_SCE4';
+pathModifier = '061819_noBaseVax_baseScreen';
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -105,8 +105,8 @@ who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
 
-hivPosScreen = 1; 
-screenAlgorithm = 3;
+hivPosScreen = 0; 
+screenAlgorithm = 1;
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
@@ -213,15 +213,15 @@ vaxCover = [0.8]; % , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 1;    % turn catch-up vaccination on or off
+vaxCU = 0;    % turn catch-up vaccination on or off
 hivPosVaxCU = 1; 
 if hivPosVaxCU
     vaxDiseaseIndsCU = [2:6 , 10];
 else
     vaxDiseaseIndsCU = [1 : disease];
 end
-vaxAgeCU = [4 : age]; %[4 , 5 , 6];     % ages catch-up vaccinated
-vaxCoverCU = ones(1,length(vaxAgeCU)).*0.5; %[0.5 , 0.5 , 0.5*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated
+vaxAgeCU = [4 : age]; %[4 , 5 , 6];    % ages catch-up vaccinated
+vaxCoverCU = ones(1,length(vaxAgeCU)).*0.8; %[0.8 , 0.8 , 0.8*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
