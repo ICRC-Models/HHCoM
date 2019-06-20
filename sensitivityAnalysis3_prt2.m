@@ -1,4 +1,11 @@
 % Parameter estimation and sensitivity analysis
+
+% Calculates the negative log likelihood of a sample of potential parameter sets
+% Accepts:
+% 1) paramSetIdx (index in larger sample matrix to start selection of sub-set)
+% Saves:
+% 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
+
 function sensitivityAnalysis3_prt2(paramSetIdx)
 
 %delete(gcp('nocreate')); 

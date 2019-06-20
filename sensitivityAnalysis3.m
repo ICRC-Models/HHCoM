@@ -1,4 +1,12 @@
-% Parameter estimation and sensitivity analysis
+% Generates LHS sample of specified parameters for calibration
+% Accepts:
+% 1) nSets (number of potential parameter sets to sample)
+% Saves:
+% 1) File: pIdx_calib_[date].dat (indices for parameters included in
+% calibration)
+% 2) File: paramSets_calib_[date].dat (sample of parameter sets [number
+% parameters x number samples])
+
 function sensitivityAnalysis3(nSets)
 
 %delete(gcp('nocreate')); 
@@ -68,28 +76,6 @@ if (any(2 == pIdx) && ~prtnrActMults)
     sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
         (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
     sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
-end
-
-% riskDistM, riskDistF
-if any(3 == pIdx)
-    idx = find(3 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
-        ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
-    sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
-end
-if any(4 == pIdx)
-    idx = find(4 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
-        ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
-    sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
 end
 
 % maleActs, femaleActs (if calibrating actual values vs. multipliers)
@@ -195,6 +181,29 @@ csvwrite([paramDir, file] , sample)
 % % subplot(1,2,2);
 % % plot(ccIncSet);
 % % title('CC Incidence');
+
+%% Apply parameter constraints
+% % riskDistM, riskDistF
+% if any(3 == pIdx)
+%     idx = find(3 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
+%         ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
+%     sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
+% end
+% if any(4 == pIdx)
+%     idx = find(4 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (1.0 - sample(rl,:))./2.0 + sampleNorm(rm,:) .* ...
+%         ((1.0 - sample(rl,:)) - ((1.0 - sample(rl,:))./2.0));
+%     sample(rh,:) = 1.0 - sample(rl,:) - sample(rm,:);
+% end
 
 %%
 % file = 'negSumLogL_calib_25Feb19.dat';
