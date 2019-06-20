@@ -193,4 +193,4 @@ N =  [N ;  hivPrevM_obs(: , 3) ; hivPrevF_obs(: , 3)];
 %% Likelihood function
 pPos = pPos ./ 100; % scale percent probabilities to decimals
 logL = nPos .* log(pPos) + (N - nPos) .* log(1 - pPos); % log likelihoods for binomial events
-negSumLogL = - sum(logL); % negative logL to be minimized
+negSumLogL = sum(logL); % -sum(logL); % negative logL to be minimized --> CJB: positive logL
