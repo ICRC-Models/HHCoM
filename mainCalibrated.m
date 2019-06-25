@@ -18,8 +18,8 @@ perPartnerHpv = 0.0045;
 
 % To similate a lower HIV prevalence setting, approximating with decreased HIV transmission probability
 % % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.90;
-% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.90;
+% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.60;
+% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.60;
 % % transM = vagTransM .* (1 - analProp(: , 1));
 % % transF = vagTransF .* (1 - analProp(: , 2));
 % % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
@@ -67,9 +67,6 @@ if hivOn
     disp('HIV module activated')
 end
 
-% Directory to save results
-pathModifier = 'toNow_062519_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
-
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
@@ -91,6 +88,21 @@ maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
+
+%%  Variables/parameters to set based on your scenario
+
+% DIRECTORY TO SAVE RESULTS
+pathModifier = 'toNow_062519_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+
+% VACCINATION
+vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
+
+waning = 0;    % turn waning on or off
+
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
+vaxAge = 2;
+vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
@@ -177,18 +189,6 @@ for aS = 1 : length(screenAlgs{1}.screenAge)
 end
 
 %% Vaccination
-% actually bivalent vaccine, but to avoid adding additional compartments,
-% we use nonavalent vaccine and then reduce coverage
-vaxEff = 0.9;    
-
-%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAge = 2;
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
-vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
-
-% Parameters for waning
-waning = 0;    % turn waning on or off
-
 lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
 
 % No waning

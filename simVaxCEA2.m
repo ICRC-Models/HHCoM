@@ -33,12 +33,6 @@ load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
-% Load population
-popIn = load([pwd , '\HHCoM_Results\toNow_062519_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
-currPop = popIn.popLast;
-artDist = popIn.artDist;
-artDistList = popIn.artDistList;
-
 c = fix(clock);
 currYear = c(1); % get the current year
 stepsPerYear = 6;
@@ -46,14 +40,56 @@ timeStep = 1 / stepsPerYear;
 
 %%  Variables/parameters to set based on your scenario
 
-% Directory to save results
-pathModifier = '062519_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+% LOAD POPULATION
+popIn = load([pwd , '\HHCoM_Results\toNow_061319_WHOp2']); % ***SET ME***: name for historical run input file 
+currPop = popIn.popLast;
+artDist = popIn.artDist;
+artDistList = popIn.artDistList;
+
+% DIRECTORY TO SAVE RESULTS
+pathModifier = '062519_WHOp1_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
 
+% END YEAR & IMMMUNITY
 lastYear = 2100; %endYear;
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
+
+% SCREENING
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
+hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
+whoScreenAges = [8 , 10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
+
+% VACCINATION
+vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
+
+waning = 0;    % turn waning on or off
+
+% Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
+vaxAgeB = 2;
+vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
+vaxAge = 3;
+vaxCover = [0.8 , 0.9];
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+
+% Parameters for catch-up vaccination regimen
+vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+vaxAgeCU = [4 : age]; %[4 , 5 , 6];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = ones(1,length(vaxAgeCU)).*0.8; %[0.8 , 0.8 , 0.8*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
+
+% Parameters for vaccination during limited-vaccine years
+vaxLimit = 0;    % turn vaccine limit on or off
+vaxLimitYrs = 5;    % number years for which vaccines are limited
+vaxLimitPerYr = 20000;    % total vaccines available per year for all interventions
+vaxAgeL = 5;
+vaxCoverL = 0.5;
+vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
@@ -82,16 +118,13 @@ cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy
 cisnet.ccTreatRetain = 1.0;
 % WHO screening algorithm
 who.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
-who.screenAge = [6 , 8 , 10];
+who.screenAge = whoScreenAges;
 who.testSens = hpvSensWHO;
 who.colpoRetain = 1.0;
 who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
 who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
-
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
@@ -184,38 +217,12 @@ end
 
 %% Vaccination
 
-%vaxEff = [0.7 , 0.9];
-vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
-
-% Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = 2;
-vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
-vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
-
-%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
-vaxAge = 3;
-vaxCover = [0.8]; % , 0.9];
-vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
-
-% Parameters for catch-up vaccination regimen
-vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
-hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+% Set up differential HIV vaccination for catch-up vaccination regimen
 if hivPosVaxCU
     vaxDiseaseIndsCU = [2:6 , 10];
 else
     vaxDiseaseIndsCU = [1 : disease];
 end
-vaxAgeCU = [4 : age]; %[4 , 5 , 6];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = ones(1,length(vaxAgeCU)).*0.8; %[0.8 , 0.8 , 0.8*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
-vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
-
-% Parameters for vaccination during limited-vaccine years
-vaxLimit = 0;    % turn vaccine limit on or off
-vaxLimitYrs = 5;    % number years for which vaccines are limited
-vaxLimitPerYr = 20000;    % total vaccines available per year for all interventions
-vaxAgeL = 5;
-vaxCoverL = 0.5;
-vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
 % Set up testParams vector for multiple school-based vaccination regimens
 %   Example:
@@ -241,9 +248,6 @@ if vaxLimit
 else
     vaxCoverLmat = zeros(nTests,1);    % have to declare these even if vaxLimit=0 because parfor is dumb
 end
-
-% Parameters for waning
-waning = 0;    % turn waning on or off
 
 lambdaMultVaxMat = zeros(age , nTests); % nTests-1 % age-based vector for modifying lambda based on vaccination status
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff)); % nTests - 1
@@ -548,4 +552,4 @@ disp('Done')
 %profile viewer
 
 %%
-vaxCEA(pathModifier)
+% vaxCEA(pathModifier)

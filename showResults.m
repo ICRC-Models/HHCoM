@@ -184,6 +184,41 @@ for g = 1 : gender
     legend('Model' , 'Africa Center Data (Calibration)' , 'Africa Center Data (Validation)')
 end
 
+%% HIV prevalance
+figure()
+for g = 1 : 2
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , g , 1 : age , 1 : risk));
+    artPop = sum(popVec(: , artInds) , 2);
+    hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , g , 1 : age , 1 : risk));
+    allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , g , 1 : age , 1 : risk)); 
+    hivPop = sum(popVec(: , hivInds) , 2);
+    allPop = sum(popVec(: , allInds) , 2);
+    plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+    hold on
+end
+xlabel('Year')
+ylabel('Prevalence')
+title('HIV Prevalence')
+
+figure()
+artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
+artPop = sum(popVec(: , artInds) , 2);
+hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
+allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk)); 
+hivPop = sum(popVec(: , hivInds) , 2);
+allPop = sum(popVec(: , allInds) , 2);
+plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+
+xlabel('Year')
+ylabel('Prevalence')
+title('HIV Prevalence All')
+
 %% HIV mortality by age
 % figure()
 % bar(tVec , squeeze(hivDeaths(:,2,:)) , 'stacked')
