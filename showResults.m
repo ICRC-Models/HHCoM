@@ -179,7 +179,8 @@ for g = 1 : gender
         else
             plot(tVec , hivAgeRel);
         end
-        xlabel('Year'); ylabel('% HIV'); title([gen{g} , ' Age group ' , ageGroup{a} , ' HIV Prevalence'])
+        xlabel('Year'); ylabel('Prevalence (%)'); title([gen{g} , 's ages ' , ageGroup{a}]) % , ' HIV Prevalence'])
+        xlim([1980 2019])
     end
     legend('Model' , 'Africa Center Data (Calibration)' , 'Africa Center Data (Validation)')
 end

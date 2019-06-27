@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_061819_noBaseVax_baseScreen']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_062719_noBaseVax_baseScreen']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -694,6 +694,75 @@ plot(tVec , 100 * (hivPop + artPop) ./ allPop)
 xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence All')
+
+% Total HIV positive
+hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
+hivPop = sum(noV.popVec(: , hivInds) , 2);
+artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates, ...
+    1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
+art = sum(noV.popVec(: , artInds) , 2);
+% Compared to ANC data
+overallHivPrev_KZN_AC(1 , :) = 1990 : 2009;
+overallHivPrev_KZN_AC(2 , :) = [0.464072571
+    0.985438052
+    1.506803533
+    5.576509907
+    8.126044402
+    13.04177608
+    12.54905705
+    16.61876343
+    19.50632609
+    19.52064932
+    22.2391979
+    20.22439723
+    22.09787539
+    22.78825495
+    25.16877536
+    26.19622822
+    25.36548102
+    27.2380043
+    27.42134161
+    28.44974934];
+
+% Compared to Africa Center (validation years)
+prevValYrs = 2010 : 2016;
+prevVal = [0.290
+0.290
+0.293
+0.312
+0.338
+0.338
+0.344
+] .* 100;
+
+upper_prevVal = [0.30
+0.30
+0.31
+0.32
+0.35
+0.35
+0.36
+] .* 100;
+
+lower_prevVal = [0.27
+0.27
+0.27
+0.29
+0.32
+0.32
+0.33] .* 100;
+
+%figure()
+popTot = noV.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+    1 : 2 , 4 : 10, 1 : risk)));
+plot(tVec , (hivPop + art) ./ sum(popTot , 2) * 100 , overallHivPrev_KZN_AC(1 , :) , overallHivPrev_KZN_AC(2 , :) , '*')
+hold on 
+yPosError = abs(upper_prevVal - prevVal);
+yNegError = abs(lower_prevVal - prevVal);
+errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
+xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
+legend('Model' , 'National ANC Data' , 'Validation set: KZN Actual (Africa Center Data)' , 'Model Western Kenya' , 'Model Western Kenya' , 'Model Western Kenya')
 
 %% HPV prevalence by HIV group
 figure()

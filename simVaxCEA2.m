@@ -10,10 +10,29 @@ disp('Start up')
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+OMEGA = zeros(age , 1); % hysterectomy rate
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
-OMEGA = zeros(age , 1); % hysterectomy rate
+
+% To similate a lower HIV prevalence setting, approximating with decreased per-act HIV transmission probability (80% of initial values)
+% % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
+% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
+% % transM = vagTransM .* (1 - analProp(: , 1));
+% % transF = vagTransF .* (1 - analProp(: , 2));
+% % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
+% % betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transM);
+% % betaHIVF2M = zeros(age , risk , viral);
+% % betaHIVM2F = betaHIVF2M;
+% % for a = 1 : age % calculate per-partnership probability of HIV transmission
+% %     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+% %     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+% % end
+% % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+% % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+paramDir = [pwd , '\Params\'];
 % Load parameters
 load([paramDir,'general'])
 % Load indices
@@ -41,13 +60,13 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_061319_WHOp2']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '\HHCoM_Results\toNow_062719_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '062519_WHOp1_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '062719_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -552,4 +571,4 @@ disp('Done')
 %profile viewer
 
 %%
-% vaxCEA(pathModifier)
+vaxCEA(pathModifier)

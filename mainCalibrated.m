@@ -12,14 +12,15 @@ disp(' ');
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+OMEGA = zeros(age , 1); % hysterectomy rate
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
 
-% To similate a lower HIV prevalence setting, approximating with decreased HIV transmission probability
+% To similate a lower HIV prevalence setting, approximating with decreased per-act HIV transmission probability (80% of initial values)
 % % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.60;
-% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.60;
+% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
+% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
 % % transM = vagTransM .* (1 - analProp(: , 1));
 % % transF = vagTransF .* (1 - analProp(: , 2));
 % % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
@@ -33,7 +34,7 @@ perPartnerHpv = 0.0045;
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-OMEGA = zeros(age , 1); % hysterectomy rate
+paramDir = [pwd , '\Params\'];
 % Load parameters
 load([paramDir,'general'])
 % Load indices
@@ -92,7 +93,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_062519_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_062719_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
