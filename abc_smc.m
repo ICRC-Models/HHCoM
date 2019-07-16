@@ -1,7 +1,11 @@
 % ABC-SMC
 % Note: "particle" : a set of parameters 
 
-function [] = abc_smc(t , alpha , p_acc_min , date)
+function [] = abc_smc()  %(t , alpha , p_acc_min , date)
+t = 1;
+alpha = 0.6;
+p_acc_min = 0.05;
+date = '20June19';
 
 t_prev = t-1;
 t_curr = t;
@@ -10,7 +14,7 @@ t_next = t+1;
 %% Load all particles 
 paramDir = [pwd , '/Params/'];
 paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
-paramSetMatrix = paramSetMatrix(2:end,:);
+%paramSetMatrix = paramSetMatrix(2:end,:);
 pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
@@ -104,6 +108,8 @@ if t == 0
 elseif t > 0
     p_acc = sumall(vals(1:(numFltrdSets*alpha)) < eps) / (numFltrdSets*alpha);
 end
+filePacc = ['p_acc_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save p_acc 
+csvwrite([paramDir, filePacc] , p_acc);
 
 %% If the proportion of accepted particles is greater than the minimum acceptance criterion,
 % Increase value of t and select new batch of particles to simulate
