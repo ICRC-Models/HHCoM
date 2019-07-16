@@ -11,7 +11,7 @@
 % 2) artTreat, a matrix describing the distribution of individuals who went
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
-function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
+function[dPop , hivDeaths , artTreat] = hiv2a(pop , vlAdvancer , artDist , muHIV , ...
     kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
     viral , gender , age , risk , k , hivInds , ...
     stepsPerYear , year)
@@ -345,6 +345,6 @@ end
 
 dPop = dPop + vlAdvanced;
 
-extraOuts{1} = hivDeaths;
-extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
+% extraOuts{1} = hivDeaths;
+% extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
 dPop = sparse(dPop);

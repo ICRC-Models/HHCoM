@@ -16,7 +16,7 @@
 % derivatives that describes the change in the population's subgroups due
 % to aging.
 
-function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
+function [dPop , deathsOut] = bornAgeDieRisk(pop , year , ...
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
@@ -205,6 +205,7 @@ if (year >= hpvScreenStartYear)
     end
 end
 
-extraOut{1} = abs(deaths);
+%extraOut{1} = abs(deaths);
+deathsOut = abs(deaths);
 dPop = dPop + circBirths + births + hivBirths + deaths;
 dPop = sparse(dPop);
