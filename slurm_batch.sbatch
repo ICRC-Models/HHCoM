@@ -15,7 +15,7 @@
 
 pwd; hostname; date
 
-echo â€œRunning MATLAB script to estimate negSumLog for subset of parameter sets.â€?
+echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
 echo "${SETIDX}" 
 export SETIDX
 
