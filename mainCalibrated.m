@@ -72,11 +72,11 @@ end
 c = fix(clock);
 currYear = c(1); % get the current year
 startYear = 1910;
-endYear = currYear;
+endYear = 1915; %currYear;
 timeStep = 1 / stepsPerYear;
 
 % Intervention start years
-hivStartYear = 1980;
+hivStartYear = 1912; %1980;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
@@ -407,7 +407,7 @@ for i = 2 : length(s) - 1
             fertility , fertMat , fertMat2 , hivFertPosBirth , ...
             hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
             MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-            noVaxScreen , noVaxXscreen , vaxScreen , vaxXscreen , vaxG , vaxAge , vaxRate) , ...
+            noVaxScreen , noVaxXscreen , vaxScreen , vaxXscreen , vaxG , vaxAge , vaxRate , artDistList) , ...
             tspan , popIn);
     if any(pop(end , :) <  0)
         disp('After diffEqs')
