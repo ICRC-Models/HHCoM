@@ -88,7 +88,7 @@ save(fullfile(savdir , 'HIVParams')) % save HIV parameters to a workspace file
 %% save general parameters
 disease = 10;
 viral = 6;
-hpvTypes = 4;
+hpvTypes = 3;
 hpvStates = 10;
 periods = 6;
 gender = 2;

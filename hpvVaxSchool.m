@@ -20,6 +20,8 @@ for d = 1 : disease
                     g , vaxAge , r));
                 fromNonVImm = toInd(allcomb(d , v , 2 , 10 , 1 , ... 
                     g , vaxAge , r));
+                fromNonVImmNonV = toInd(allcomb(d , v , 3 , 10 , 1 , ... 
+                    g , vaxAge , r));
                 toV = toInd(allcomb(d , v , 1 , 9 , 1 , ...
                     g , vaxAge , r));
                 otherV = toInd(allcomb(d , v , 1 : hpvTypes , 1 : hpvStates , ...
@@ -33,10 +35,12 @@ for d = 1 : disease
                     vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
                     vaxdGroupSus = vaxCover .* pop(fromNonVSus);
                     vaxdGroupImm = vaxCover .* pop(fromNonVImm);
+                    vaxdGroupImmNonV = vaxCover .* pop(fromNonVImmNonV);
                     dPop(fromNonVSus) = dPop(fromNonVSus) - vaxdGroupSus;
                     dPop(fromNonVImm) = dPop(fromNonVImm) - vaxdGroupImm;
-                    dPop(toV) = dPop(toV) + vaxdGroupSus + vaxdGroupImm;
-                    hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
+                    dPop(fromNonVImmNonV) = dPop(fromNonVImmNonV) - vaxdGroupImmNonV;
+                    dPop(toV) = dPop(toV) + vaxdGroupSus + vaxdGroupImm + vaxdGroupImmNonV;
+                    hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm) + sumall(vaxdGroupImmNonV); % count number of people vaccinated at current time step
                 end
             end
         end

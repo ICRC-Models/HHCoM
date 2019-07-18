@@ -24,6 +24,10 @@ fromNonVSusL_scrn = toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , 6 , ...
 fromNonVImmL_noScrn = toInd(allcomb(1 : disease , 1 : viral , 2 , 10 , 1 , ...
     vaxGL , vaxAgeL , 1 : risk));
 fromNonVImmL_scrn = toInd(allcomb(1 : disease , 1 : viral , 2 , 10 , 6 , ...
+    vaxGL , vaxAgeL , 1 : risk));
+fromNonVImmLNonV_noScrn = toInd(allcomb(1 : disease , 1 : viral , 3 , 10 , 1 , ...
+    vaxGL , vaxAgeL , 1 : risk));
+fromNonVImmLNonV_scrn = toInd(allcomb(1 : disease , 1 : viral , 3 , 10 , 6 , ...
     vaxGL , vaxAgeL , 1 : risk));  
 toVL_noScrn = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
     vaxGL , vaxAgeL , 1 : risk));
@@ -40,7 +44,7 @@ if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target v
     vaxCover = max(0 , (vaxCoverL - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
     vaxdGroupSum = (sumall(pop(fromNonVSusL_noScrn)) + ...
         sumall(pop(fromNonVSusL_scrn)) + sumall(pop(fromNonVImmL_noScrn)) + ...
-        sumall(pop(fromNonVImmL_scrn)));
+        sumall(pop(fromNonVImmL_scrn)) + sumall(pop(fromNonVImmLNonV_noScrn)) + sumall(pop(fromNonVImmLNonV_scrn)));
     if vaxRemain >= 1    % when vaccines remain
         if (vaxRemain >= vaxdGroupSum)    % when remaining vaccines >= targeted coverage
             usedVax = vaxdGroupSum;
@@ -54,6 +58,10 @@ if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target v
                 .* (pop(fromNonVImmL_noScrn) > 0);
             vaxdGroupImm_scrn = (usedVax .* (pop(fromNonVImmL_scrn) ./ vaxdGroupSum))...
                 .* (pop(fromNonVImmL_scrn) > 0);
+            vaxdGroupImmNonV_noScrn = (usedVax .* (pop(fromNonVImmLNonV_noScrn) ./ vaxdGroupSum))...
+                .* (pop(fromNonVImmLNonV_noScrn) > 0);
+            vaxdGroupImmNonV_scrn = (usedVax .* (pop(fromNonVImmLNonV_scrn) ./ vaxdGroupSum))...
+                .* (pop(fromNonVImmLNonV_scrn) > 0);
         end
         vaxRemain = vaxRemain - usedVax;
     else 
@@ -61,16 +69,20 @@ if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target v
         vaxdGroupSus_scrn = pop(fromNonVSusL_scrn) .* 0;
         vaxdGroupImm_noScrn = pop(fromNonVImmL_noScrn) .* 0;
         vaxdGroupImm_scrn = pop(fromNonVImmL_scrn) .* 0;
+        vaxdGroupImmNonV_noScrn = pop(fromNonVImmLNonV_noScrn) .* 0;
+        vaxdGroupImmNonV_scrn = pop(fromNonVImmLNonV_scrn) .* 0;
     end
     dPop(fromNonVSusL_noScrn) = dPop(fromNonVSusL_noScrn) - vaxdGroupSus_noScrn;
     dPop(fromNonVSusL_scrn) = dPop(fromNonVSusL_scrn) - vaxdGroupSus_scrn;
     dPop(fromNonVImmL_noScrn) = dPop(fromNonVImmL_noScrn) - vaxdGroupImm_noScrn;
     dPop(fromNonVImmL_scrn) = dPop(fromNonVImmL_scrn) - vaxdGroupImm_scrn;
-    dPop(toVL_noScrn) = dPop(toVL_noScrn) + vaxdGroupSus_noScrn + vaxdGroupImm_noScrn;
-    dPop(toVL_scrn) = dPop(toVL_scrn) + vaxdGroupSus_scrn + vaxdGroupImm_scrn;
+    dPop(fromNonVImmLNonV_noScrn) = dPop(fromNonVImmLNonV_noScrn) - vaxdGroupImmNonV_noScrn;
+    dPop(fromNonVImmLNonV_scrn) = dPop(fromNonVImmLNonV_scrn) - vaxdGroupImmNonV_scrn;
+    dPop(toVL_noScrn) = dPop(toVL_noScrn) + vaxdGroupSus_noScrn + vaxdGroupImm_noScrn + vaxdGroupImmNonV_noScrn;
+    dPop(toVL_scrn) = dPop(toVL_scrn) + vaxdGroupSus_scrn + vaxdGroupImm_scrn + vaxdGroupImmNonV_scrn;
     hpvVaxd = hpvVaxd + sumall(vaxdGroupSus_noScrn) + ...
         sumall(vaxdGroupSus_scrn) + sumall(vaxdGroupImm_noScrn) + ...
-        sumall(vaxdGroupImm_scrn); % count number of people vaccinated at current time step
+        sumall(vaxdGroupImm_scrn) + sumall(vaxdGroupImmNonV_noScrn) + sumall(vaxdGroupImmNonV_scrn); % count number of people vaccinated at current time step
 end
                         
 dPop = sparse(dPop);

@@ -242,7 +242,7 @@ for g = 1 : gender
             % that is carrying HPV. Transmission probability throughout population
             % is dependent on the "concentration" of HPV carriers in the population.
             beta(g , a , r , 1) = -log(1 - beta_hrHPV(g , a , r)) .* p_hrHPV;
-            beta(g , a , r , 2) = -log(1 - beta_nonVHPV(g , a , r)) .* p_nonVHPV;
+            beta(g , a , r , 2) = -log(1 - beta_nonV_HPV(g , a , r)) .* p_nonVHPV;
         end
     end
 end
@@ -323,7 +323,7 @@ for d = 1 : disease
                         % vaccinated with non-vaccine-type infection history, screened
                         mSusVax2NonVScreen = hpvVaxd2NonVScreen(d , h , 1 , a , r , :); % non-naturally immune
                         fSusVax2NonVScreen = hpvVaxd2NonVScreen(d , h , 2 , a , r , :);
-                        fSusImmVax2NonV = hpvImmVaxd2NonVScreen(d , h , 2 , a , r , :); % naturally immune
+                        fSusImmVax2NonVScreen = hpvImmVaxd2NonVScreen(d , h , 2 , a , r , :); % naturally immune
                         mToVaxNonVScreen = hpvVaxd2NonVScreen(d , hTo , 1 , a , r , :);
                         fToVaxNonVScreen = hpvVaxd2NonVScreen(d , hTo , 2 , a , r , :);
                         
@@ -332,8 +332,8 @@ for d = 1 : disease
                         lambdaMultF = 1;
                         lambdaMultM = 1;
                         if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
-                            lambdaMultF = hpv_hivMult(d - 2 , hTo - 1);
-                            lambdaMultM = hpv_hivMult(d - 2 , hTo - 1);
+                            lambdaMultF = hpv_hivMult(d - 2 , 1); %hTo - 1);
+                            lambdaMultM = hpv_hivMult(d - 2 , 1); %hTo - 1);
                         elseif d == 10
                             lambdaMultF = artHpvMult; 
                             lambdaMultM = artHpvMult;
@@ -420,7 +420,7 @@ for d = 1 : disease
                             + sumall(mInfVax2NonV) + sumall(mInfVax2NonVScreen);
                         newVaxHpv(2 , d , a , r) = newVaxHpv(2 , d , a , r)...
                             + sumall(fInfVax) + sumall(fInfVaxScreen) + sumall(fInfVax2) + sumall(fInfVax2Screen) ...
-                            + sumall(fInfImmVax2) + sumall(fInfImmVax2Screen) + sumall(fInfVax2NonV) + sumall(fInfVax2NonoVScreen) ...
+                            + sumall(fInfImmVax2) + sumall(fInfImmVax2Screen) + sumall(fInfVax2NonV) + sumall(fInfVax2NonVScreen) ...
                             + sumall(fInfImmVax2NonV) + sumall(fInfImmVax2NonVScreen);
 
                         
