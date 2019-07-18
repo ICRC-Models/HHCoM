@@ -12,7 +12,16 @@ disp(' ');
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+perPartnerHpv_nonV = 0.5 * perPartnerHpv;
 OMEGA = zeros(age , 1); % hysterectomy rate
+kCC_Cin3 = [kCC_Cin3 , kCC_Cin3];
+kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2];
+kCin1_Inf = [kCin1_Inf , kCin1_Inf];
+kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1];
+kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3];
+kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2];
+kInf_Cin1 = [kInf_Cin1 , kInf_Cin1];
+rNormal_Inf = [rNormal_Inf , rNormal_Inf];
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
@@ -93,7 +102,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_062719_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_071719_baseVax_baseScreen_nonVhpv'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -102,7 +111,7 @@ waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
@@ -190,10 +199,10 @@ for aS = 1 : length(screenAlgs{1}.screenAge)
 end
 
 %% Vaccination
-lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
+lambdaMultVaxMat = zeros(age , 2);   % age-based vector for modifying lambda based on vaccination status
 
 % No waning
-lambdaMultVaxMat(3 : age) = vaxEff;
+lambdaMultVaxMat(3 : age , 1) = vaxEff;
 
 % Waning
 effPeriod = 20; % number of years that initial efficacy level is retained
@@ -291,7 +300,8 @@ if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 
     % Omni-HPV type (transition rates weighted by estimated prevalence in population)
-    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = infected; % moved to HPV+
+    initPop(1 , 1 , 2 , 1 , 1 , : , 4 : 9 , :) = 0.5 .* infected; % half moved to vaccine-type HPV+
+    initPop(1 , 1 , 3 , 1 , 1 , : , 4 : 9 , :) = 0.5 .* infected; % moved to non-vaccine-type HPV+
 end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
@@ -387,7 +397,7 @@ for i = 2 : length(s) - 1
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
-            disease , age , hpvTypes , ...
+            disease , age , hpvTypes , periods , ...
             rImmuneHiv , hyst , hystInds , hystSusInds , OMEGA) , tspan , popIn);
         popIn = pop(end , :); % for next module
         if any(pop(end , :) <  0)
