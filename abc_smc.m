@@ -70,6 +70,16 @@ end
 %% Keep the top alpha-proportion of particles 
 % Rho is the likelihood value of parameters given data. Want to maximize this value.
 % Order log likelihood values in descending order, and keep top alpha-proportion.
+
+%if t_curr == 0
+%    negSumLogLmatrix_prev = [];
+%elseif t_curr > 0
+%    negSumLogLmatrix_prev = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_prev) , '.dat']); % load previous log-likelihoods
+%    numSubsets_prev = size(negSumLogLmatrix_prev,1)/17;
+%    negS_format_prev = reshape(negSumLogLmatrix_prev , [17,numSubsets_prev]);
+%end
+%master_negS_format = [negS_format_prev , negS_format];
+
 [temp,firstRowOrder] = sort(negS_format(1,:)); % sort by paramSetIdx
 negS_ordered = negS_format(:,firstRowOrder);
 
@@ -81,6 +91,7 @@ elseif t_curr > 0
     negS_ordered_flatDat_prev = load([paramDir , 'masterLL_calib_' , date , '_' , num2str(t_prev) , '.dat']);
     negS_ordered_flatDat = [negS_ordered_flatDat_prev ; negS_ordered_flatDat];
 end
+numFltrdSets = length(negS_ordered_flatDat);
 
 [vals,inds] = sort(negS_ordered_flatDat,'descend'); % sort log-likelihoods in descending order
 
