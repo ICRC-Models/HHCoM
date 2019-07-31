@@ -35,7 +35,9 @@ perPartnerHpv = 0.0045;
 
 OMEGA = zeros(age , 1); % hysterectomy rate
 % Load parameters
+paramDir = [pwd , '\Params\'];
 load([paramDir,'general'])
+load([paramDir, 'popData'])
 % Load indices
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
