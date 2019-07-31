@@ -1,28 +1,29 @@
 % Load parameters and other input data. Accepts steps per year as an
 % argument
 function[] = loadUp(stepsPerYear)
-load('settings')
+load('Z:\SA_HPV-HIV_model_3\HHCoM\Params\settings')
+stepsPerYear = 6;
 
 %% import and save population parameters
-file = [pwd , '\Config\Population_data.xlsx'];
+file = [pwd , '\Config\Kenya_parameters.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
-popInit = xlsread(file , 'Demographics' , 'B6:C21'); % [age x gender]; initial population size
-riskDistM = xlsread(file , 'Demographics' , 'B54:D69'); % [age x risk]; male risk distribution
-riskDistF = xlsread(file , 'Demographics' , 'E54:G69'); % [age x risk]; female risk distribution
-mue = xlsread(file , 'Demographics' , 'B84:C99'); % [age x gender]; background mortality
-fertility = xlsread(file , 'Demographics' , 'B112:G127'); % [age x disease]; fertility rate per year before 1995
-fertility2 = xlsread(file , 'Demographics' , 'B133:G148'); % [age x disease]; fertility rate/2 for 2005 onwards
-partnersM = xlsread(file , 'Demographics' , 'B160:D175'); % [age x risk]; male partnerships per year
-partnersF = xlsread(file , 'Demographics' , 'E160:G175'); % [age x risk]; female partnerships per year
-actsPer = xlsread(file , 'Demographics' , 'B238:D239'); % [gender x risk]; acts per partnership (not currently used)
-epsA = xlsread(file , 'Demographics' , 'B185:B187'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
-epsR = xlsread(file , 'Demographics' , 'C185:C187'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
-yr = xlsread(file , 'Demographics' , 'A185:A187'); % years
+popInit = xlsread(file , 'Population' , 'H4:I19'); % [age x gender]; initial population size - 1979 census for Kenya 
+riskDistM = xlsread(file , 'Sexual behavior' , 'F54:H69'); % [age x risk]; male risk distribution - DHS 2014 for Nyanza 
+riskDistF = xlsread(file , 'Sexual behavior' , 'C54:E69'); % [age x risk]; female risk distribution - DHS 2014 for Nyanza
+mue = xlsread(file , 'Mortality' , 'C73:D288'); % [age x gender]; background mortality - DHS 2009 Nyanza
+fertility = xlsread(file , 'Fertility' , 'Q42:W57'); % [age x disease]; fertility rate per year before 1995 - 1993 Kenya census
+fertility2 = xlsread(file , 'Fertility' , 'Z42:AE57'); % [age x disease]; fertility rate/2 for 2005 onwards
+partnersM = xlsread(file , 'Sexual behavior' , 'O54:Q69'); % [age x risk]; male partnerships per year
+partnersF = xlsread(file , 'Sexual behavior' , 'L54:N69'); % [age x risk]; female partnerships per year
+%actsPer = xlsread(file , 'Demographics' , 'B238:D239'); % [gender x risk]; acts per partnership (not currently used)
+epsA = xlsread(file , 'Sexual behavior' , 'B157:B159'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
+epsR = xlsread(file , 'Sexual behavior' , 'C157:C159'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
+yr = xlsread(file , 'Sexual behavior' , 'A157:A159'); % years
 savdir = [pwd , '\Params']; 
 save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
-    'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
+    'partnersF' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
 
 %% import and save HIV parameters
 file = [pwd , '\Config\HIV_parameters.xlsx'];
@@ -35,7 +36,7 @@ circProtect = xlsread(file , 'Protection' , 'B18'); % Protection conferred by ci
 condProtect = xlsread(file , 'Protection' , 'B19'); % Protection conferred by condom use
 condUse = xlsread(file , 'Protection' , 'B25'); % Average proportion of population using condoms (not currently used, reset in mixInfect.m)
 % disease data
-MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8'); % <2004, 2005 , >2008; mother to child transmission rate
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8'); % <2004, 2005 , >2008; mother to child transmission rate - changed to Kenya rates 
 mtctVec = linspace(MTCTRate(1) , MTCTRate(end) , size(MTCTRate , 1) * 4);
 muHIV = xlsread(file , 'Disease Data' , 'B20 : G35'); %[age x cd4], [12 x 6]; HIV mortality
 kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'B44:E48'); % [gender x vl x cd4]; male cd4 progression by vl
@@ -113,7 +114,7 @@ save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates'
     'condUse' , 'kCD4' , 'kVl' , 'stepsPerYear'); % save general model parameters to a workspace file
 
 %% save parameters for mixInfect
-load('settings')
+load('Z:\SA_HPV-HIV_model_3\HHCoM\Params\settings')
 step = 1 / stepsPerYear;
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
