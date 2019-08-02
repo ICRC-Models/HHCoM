@@ -36,7 +36,9 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 
 paramDir = [pwd , '\Params\'];
 % Load parameters
+paramDir = [pwd , '\Params\'];
 load([paramDir,'general'])
+load([paramDir, 'popData'])
 % Load indices
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
