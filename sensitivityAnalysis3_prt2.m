@@ -14,10 +14,10 @@ function sensitivityAnalysis3_prt2(paramSetIdx)
 paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings']);
 load([paramDir,'general']);
-paramSetMatrix = load([paramDir,'paramSets_calib_20June19_1.dat']);
+paramSetMatrix = load([paramDir,'paramSets_calib_18July19_3.dat']);
 nPrlSets = 16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
-pIdx = load([paramDir,'pIdx_calib_20June19_0.dat']);
+pIdx = load([paramDir,'pIdx_calib_18July19_0.dat']);
 
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
@@ -43,6 +43,6 @@ parfor n = 1 : nPrlSets
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'negSumLogL_calib_20June19_1.dat';
+file = 'negSumLogL_calib_18July19_3.dat';
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , [paramSetIdx; negSumLogLSet] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')

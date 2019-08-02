@@ -101,11 +101,11 @@ if (any(9 == pIdx) && ~prtnrActMults)
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'pIdx_calib_20June19_0.dat';
+file = 'pIdx_calib_18July19_0.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , pIdx)
 
-file = 'paramSets_calib_20June19_0.dat';
+file = 'paramSets_calib_18July19_0.dat';
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 
