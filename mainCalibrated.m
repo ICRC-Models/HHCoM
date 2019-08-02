@@ -93,7 +93,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_062719_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_080119_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -305,12 +305,12 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize time vectors
 years = endYear - startYear;
-s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
+s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
 
 % Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
 % Initialize other vectors
-popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
+popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 newHiv = zeros(length(s) - 1 , gender , age , risk);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
@@ -331,7 +331,7 @@ hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec; 
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
 popVec(1 , :) = popIn;
-tVec = linspace(startYear , endYear , size(popVec , 1));
+tVec = linspace(startYear , endYear , length(s) - 1);
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 
@@ -493,7 +493,7 @@ for i = 2 : length(s) - 1
     runtimes(i) = toc;
     progressbar(i/(length(s) - 1))
 end
-popLast = popVec(end , :);
+popLast = popVec(end-1 , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
