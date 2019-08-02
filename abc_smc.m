@@ -1,11 +1,12 @@
 % ABC-SMC
-% Note: "particle" : a set of parameters 
+% Note: "particle" : a set of parameters
+% Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
 function [] = abc_smc()  %(t , alpha , p_acc_min , date)
-t = 1;
+t = 2;
 alpha = 0.6;
 p_acc_min = 0.05;
-date = '20June19';
+date = '18July19';
 
 t_prev = t-1;
 t_curr = t;
@@ -14,13 +15,17 @@ t_next = t+1;
 %% Load all particles 
 paramDir = [pwd , '/Params/'];
 paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
-%paramSetMatrix = paramSetMatrix(2:end,:);
 pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
 %% Filter out failed parameter sets (timed-out, etc.)
 numSubsets = size(negSumLogLmatrix,1)/17; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
 negS_format = reshape(negSumLogLmatrix , [17,numSubsets]); % first row is paramSetIdx, next 16 rows log-likelihoods for that sub-set
+
+[uniqueN uInds v] = unique(negS_format(1,:) , 'first'); % remove duplicate sub-set runs
+negS_format = negS_format(:,uInds);
+numSubsets = size(negS_format,2); % reset as number unique sub-sets
+
 maxV = max(negS_format(1,:)); % find maximum paramSetIdx
 setVec = [1:16:maxV];
 missingV = [];
@@ -32,23 +37,22 @@ for j = 1 : length(setVec) % identify failed parameter sets
          keepV = [keepV , [setVec(j) : setVec(j)+15]];
      end
 end
-paramSetMatrix = paramSetMatrix(:,keepV); % filter failed parameter sets from matrix
-numFltrdSets = length(keepV);
+paramSetMatrix = paramSetMatrix(:,keepV); % filter and save only successful parameter sets from matrix
+numFltrdSets = length(keepV); % number sets that successfully ran
 
-fileF = ['filteredSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+fileF = ['filteredSets_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of successfully run parameter sets
 csvwrite([paramDir, fileF] , paramSetMatrix);
 
 %% Calculate weights
-fileW = ['weights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of sorted log-likelihoods
 if t_curr == 0
     % Set w to 1 for all particles in iteration 0
-    weights = ones(numFltrdSets,1);
-    csvwrite([paramDir, fileW] , weights);
+    masterWeights = ones(numFltrdSets,1);
 elseif t_curr > 0
     % Load particles from iteration t-1
-     paramSetMatrix_prev = load([paramDir , 'alphaParamSets_calib_' , date , '_' , num2str(t_prev) , '.dat']); % load most recent parameter sample
-     weights_prev = load([paramDir , 'weights_calib_' , date , '_' , num2str(t_prev) , '.dat']);
-     [weights] = calcWeights(paramSetMatrix , paramSetMatrix_prev , weights_prev' , pIdx);
+     alphaSets_prev = load([paramDir , 'alphaParamSets_calib_' , date , '_' , num2str(t_prev) , '.dat']); % load most recent parameter sample
+     alphaWeights_prev = load([paramDir , 'alphaWeights_calib_' , date , '_' , num2str(t_prev) , '.dat']);
+     [weights] = calcWeights(paramSetMatrix , alphaSets_prev , alphaWeights_prev' , pIdx);
+     masterWeights = [alphaWeights_prev ; weights];
 end
 
 %% Specify iteration and concatenate particle matrices
@@ -63,23 +67,11 @@ elseif t_curr > 0
     masterSetMatrix = [alphaSets_prev , paramSetMatrix];
     fileM = ['masterSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
     csvwrite([paramDir, fileM] , masterSetMatrix);
-    
-    weights = [weights_prev ; weights];
 end
 
 %% Keep the top alpha-proportion of particles 
 % Rho is the likelihood value of parameters given data. Want to maximize this value.
 % Order log likelihood values in descending order, and keep top alpha-proportion.
-
-%if t_curr == 0
-%    negSumLogLmatrix_prev = [];
-%elseif t_curr > 0
-%    negSumLogLmatrix_prev = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_prev) , '.dat']); % load previous log-likelihoods
-%    numSubsets_prev = size(negSumLogLmatrix_prev,1)/17;
-%    negS_format_prev = reshape(negSumLogLmatrix_prev , [17,numSubsets_prev]);
-%end
-%master_negS_format = [negS_format_prev , negS_format];
-
 [temp,firstRowOrder] = sort(negS_format(1,:)); % sort by paramSetIdx
 negS_ordered = negS_format(:,firstRowOrder);
 
@@ -87,29 +79,37 @@ negS_ordered_flatDat = reshape(negS_ordered(2:end,:),[numFltrdSets,1]); % flatte
 if t_curr == 0
     fileMLL = ['masterLL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
     csvwrite([paramDir, fileMLL] , negS_ordered_flatDat);
+    master_negS_ordered_flatDat = negS_ordered_flatDat;
 elseif t_curr > 0
-    negS_ordered_flatDat_prev = load([paramDir , 'masterLL_calib_' , date , '_' , num2str(t_prev) , '.dat']);
-    negS_ordered_flatDat = [negS_ordered_flatDat_prev ; negS_ordered_flatDat];
+    negS_ordered_flatDat_prev = load([paramDir , 'alphaLL_calib_' , date , '_' , num2str(t_prev) , '.dat']);
+    master_negS_ordered_flatDat = [negS_ordered_flatDat_prev ; negS_ordered_flatDat];
 end
-numFltrdSets = length(negS_ordered_flatDat);
+masterNumFltrdSets = length(master_negS_ordered_flatDat);
 
-[vals,inds] = sort(negS_ordered_flatDat,'descend'); % sort log-likelihoods in descending order
+[vals,inds] = sort(master_negS_ordered_flatDat,'descend'); % sort log-likelihoods in descending order
 
 fileLL = ['orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of sorted log-likelihoods
 csvwrite([paramDir, fileLL] , [inds , vals]);
 
-%% Save accepted particles from iteration t
-alphaSets = masterSetMatrix(:,inds(1:(numFltrdSets*alpha)));
+%% Save accepted particles from iteration t and their associated data
+alphaSets = masterSetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
 fileAlpha = ['alphaParamSets_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of top alpha-proportion of particles
 csvwrite([paramDir, fileAlpha] , alphaSets);
 
+alphaWeights = masterWeights(inds(1:(masterNumFltrdSets*alpha)));
+fileW = ['alphaWeights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
+csvwrite([paramDir, fileW] , alphaWeights);
+
+alphaNegS_ordered = master_negS_ordered_flatDat(inds(1:(masterNumFltrdSets*alpha)));
+fileALL = ['alphaLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save sorted negLogLL for alpha accepted particles
+csvwrite([paramDir, fileALL] , alphaNegS_ordered);
+
 %% Normalize weights
-alphaWeights = weights(inds(1:(numFltrdSets*alpha)));
-normWeights = alphaWeights/sum(alphaWeights);
-csvwrite([paramDir, fileW] , normWeights);
+normWeights = alphaWeights./sum(alphaWeights);
 
 %% Calculate epsilon (distance criterion)
-eps = max(vals(1:(numFltrdSets*alpha)));
+eps = min(alphaNegS_ordered); % set epsilon as the largest distance/ lowest LL of the alpha-proportion of accelpted particles (which have
+                              % the smallest distances/ largest LL between simulated and observed data)
 fileEps = ['epsilon_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save epsilon
 csvwrite([paramDir, fileEps] , eps);
 
@@ -117,7 +117,8 @@ csvwrite([paramDir, fileEps] , eps);
 if t == 0
     p_acc = 1;
 elseif t > 0
-    p_acc = sumall(vals(1:(numFltrdSets*alpha)) < eps) / (numFltrdSets*alpha);
+    eps_prev = load([paramDir , 'epsilon_calib_' , date , '_' , num2str(t_prev) , '.dat']);
+    p_acc = sum(negS_ordered_flatDat > eps_prev) / (numFltrdSets);
 end
 filePacc = ['p_acc_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save p_acc 
 csvwrite([paramDir, filePacc] , p_acc);
@@ -126,10 +127,10 @@ csvwrite([paramDir, filePacc] , p_acc);
 % Increase value of t and select new batch of particles to simulate
 if p_acc > p_acc_min
     % Select particles for next iteration (t+1). Particles are sampled from iteration t with probability equal to their normalized weight.
-    n_new_particles = (numFltrdSets - numFltrdSets*alpha);
+    n_new_particles = (masterNumFltrdSets * (1 - alpha));
     select_particles = datasample(alphaSets, round(n_new_particles) , 2 , 'Weights' , normWeights'); % uniform sample taken at random, with replacement
     
-    % Perturn each of the selected particles.
+    % Perturb each of the selected particles.
     % Each particle is then moved with a Gaussian perturbation kernel with variance equal to twice the empirical weighted variance of the particles in the previous iteration
     new_particles = select_particles;
     new_particles = [zeros(1 , size(select_particles , 2)) ; select_particles]; % row of bools: all set to false

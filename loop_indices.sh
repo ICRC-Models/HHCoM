@@ -1,14 +1,21 @@
-NSETS=3968    # nSets
+NSETS=3110    # nSets
 echo "${NSETS}" 
 export NSETS
 
-#for SETIDX in $(seq 1 16 ${NSETS}); do 
-MISSING=(289 369 385 401 417 433 449 465 481 497 513 529 545 561 577 593 609 625 641 657 673 689 705 721 737 753 769 785 801 817 833 849 865 881 897 913 929 945 961 977 993 1009 1025 1041 1057 1073 1089 1105 1121 1137 1153 1169 1185 1201 1233 1249 1265 3697 3713 3729 3745 3761 3777 3793 3809 3825 3841 3857 3873 3889 3905 3921 3937 3953)
-for SETIDX in ${MISSING[@]}; do
+INT=0
+
+for SETIDX in $(seq 1 16 ${NSETS}); do 
+#MISSING=(2145 2289 2545 2689 3057 3105)
+#for SETIDX in ${MISSING[@]}; do
 export SETIDX
 
-sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs9
- 
-sleep 1 # pause to be kind to the scheduler 
+INT=$(($INT + 1))
+
+sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs11
+
+if [ $INT -ge 10 ]; then 
+sleep 6000 # pause to be kind to the scheduler
+INT=0
+fi 
 
 done

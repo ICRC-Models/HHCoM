@@ -1,8 +1,8 @@
-function [weights] = calcWeights(paramSetMatrix , paramSetMatrix_prev , weights_prev , pIdx)
+function [weights] = calcWeights(paramSetMatrix , alphaSets_prev , alphaWeights_prev , pIdx)
 
 %% Specify dimensions
-numParam = size(paramSetMatrix_prev , 1); % number parameters
-numPart_prev = size(paramSetMatrix_prev , 2); % number particles (t-1)
+numParam = size(alphaSets_prev , 1); % number parameters
+numPart_prev = size(alphaSets_prev , 2); % number particles (t-1)
 numPart = size(paramSetMatrix , 2); % number particles (t)
 
 %% Calculate numerator
@@ -29,9 +29,9 @@ for i = 1 : numPart
         kernel = 1;
         for p = 1 : numParam
             v = var(paramSetMatrix(p,:)); % variance of sample (normalized by numPart-1)
-            kernel = kernel * (const * (1 / sqrt(v)) * exp(-0.5 * ((1/v)*(paramSetMatrix(p,i) - paramSetMatrix_prev(p,j))) ^ 2));
+            kernel = kernel * (const * (1 / sqrt(v)) * exp(-0.5 * ((1/v)*(paramSetMatrix(p,i) - alphaSets_prev(p,j))) ^ 2));
         end
-        denominator(i) = denominator(i) + weights_prev(j) * kernel;
+        denominator(i) = denominator(i) + alphaWeights_prev(j) * kernel;
     end
 end
   
