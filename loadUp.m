@@ -12,7 +12,7 @@ disp('This may take a couple seconds...');
 popInit = xlsread(file , 'Population' , 'H4:I19'); % [age x gender]; initial population size - 1979 census for Kenya 
 riskDistM = xlsread(file , 'Sexual behavior' , 'F54:H69'); % [age x risk]; male risk distribution - DHS 2014 for Nyanza 
 riskDistF = xlsread(file , 'Sexual behavior' , 'C54:E69'); % [age x risk]; female risk distribution - DHS 2014 for Nyanza
-mue = xlsread(file , 'Mortality' , 'C73:D288'); % [age x gender]; background mortality - DHS 2009 Nyanza
+mue = xlsread(file , 'Mortality' , 'C73:D88'); % [age x gender]; background mortality - DHS 2009 Nyanza
 fertility = xlsread(file , 'Fertility' , 'Q42:W57'); % [age x disease]; fertility rate per year before 1995 - 1993 Kenya census
 fertility2 = xlsread(file , 'Fertility' , 'Z42:AE57'); % [age x disease]; fertility rate/2 for 2005 onwards
 partnersM = xlsread(file , 'Sexual behavior' , 'O54:Q69'); % [age x risk]; male partnerships per year

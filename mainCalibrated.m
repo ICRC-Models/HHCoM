@@ -220,7 +220,7 @@ mInit = popInit(: , 1); % initial male population size by age
 fInit = popInit(: , 2); % initial female population size by age
 
 % use male risk distribution for both genders
-riskDistF = riskDistM;
+%riskDistF = riskDistM;
 
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
