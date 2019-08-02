@@ -60,13 +60,13 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_062719_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '062719_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '080119_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -377,7 +377,7 @@ parfor n = 1 : nTests
         vaxCoverL = vaxCoverLmat(n);
     end
     % Initialize vectors
-    popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
+    popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
     newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
@@ -401,7 +401,7 @@ parfor n = 1 : nTests
     vaxdCU = vaxdLmtd;
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
     popVec(1 , :) = popIn;
-    tVec = linspace(currYear , lastYear , size(popVec , 1));
+    tVec = linspace(currYear , lastYear-timeStep , length(s)-1);
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
     %% Main body of simulation
