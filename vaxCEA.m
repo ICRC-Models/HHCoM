@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_062719_noBaseVax_baseScreen']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -550,7 +550,7 @@ for i = 1 : length(inds)-1
 
         ccMortRef = ...
             (annlz(sum(sum(sum(noV.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-            (annlz(sum(noV.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
+            (annlz(sum(noV.popVec(length(curr.tVec) : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
 % %             .* (annlz(sum(noV.popVec(length(curr.tVec) + 1 : end , genArray{1}) , 2) ./ stepsPerYear));
 % %         noV.ccMortRef = noV.ccMortRef + ccMortRef;
         noV.ccMortRef = ccMortRef;
@@ -558,7 +558,7 @@ for i = 1 : length(inds)-1
         for n = 1 : length(vaxResult)-1
             ccMortRef = ...
                 (annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-                (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+                (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
 % %                 .* (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) + 1 : end  , genArray{1}) , 2) ./ stepsPerYear));
 % %             vaxResult{n}.ccMortRef = vaxResult{n}.ccMortRef + ccMortRef;
             vaxResult{n}.ccMortRef = ccMortRef;
@@ -581,7 +581,7 @@ for i = 1 : length(inds)-1
         
         % Reduction
         vaxResult{n}.ccRed = (vaxResult{n}.ccMort - noV.ccMort) ./ noV.ccMort * 100;
-        plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , vaxResult{n}.ccRed , 'LineStyle' , linStyle{n} , 'Color' , linColor{i} , 'DisplayName' , plotTits{n}) 
+        plot(tVec(length(curr.tVec) : stepsPerYear : end) , vaxResult{n}.ccRed , 'LineStyle' , linStyle{n} , 'Color' , linColor{i} , 'DisplayName' , plotTits{n}) 
 %             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
 %             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
         grid on        
