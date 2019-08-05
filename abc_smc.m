@@ -3,7 +3,7 @@
 % Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
 function [] = abc_smc()  %(t , alpha , p_acc_min , date)
-t = 2;
+t = 3;
 alpha = 0.6;
 p_acc_min = 0.05;
 date = '18July19';
