@@ -7,7 +7,7 @@ hpvTypes = 4;
 hpvStates = 10;
 periods = 6;
 gender = 2;
-age = 16;
+age = 80;
 risk = 3;
 
 % index retrieval function
@@ -273,20 +273,19 @@ for d = 1 : disease
     end
 end
 
-screen35PlusInds = zeros(disease , hpvTypes , (age - 8 + 1) * risk * periods * viral);
-screen25_35Inds = zeros(disease , hpvTypes , 2 * risk , periods * viral);
-
-for d = 1 : disease
-    for h = 2 : hpvTypes
-        screen35PlusInds(d , h , :) = sort(toInd(allcomb(d , 1 : viral , h , 4 , 1 : periods , 2 , 8 : age , 1 : risk)));
-        screen25_35Inds(d , h , :) = sort(toInd(allcomb(d , 1 : viral , h , 4 , 1 : periods , 2 , 6 : 7 , 1 : risk)));
-    end
-end
+% % screen35PlusInds = zeros(disease , hpvTypes , (age - 8 + 1) * risk * periods * viral);
+% % screen25_35Inds = zeros(disease , hpvTypes , 2 * risk , periods * viral);
+% % 
+% % for d = 1 : disease
+% %     for h = 2 : hpvTypes
+% %         screen35PlusInds(d , h , :) = sort(toInd(allcomb(d , 1 : viral , h , 4 , 1 : periods , 2 , 8 : age , 1 : risk)));
+% %         screen25_35Inds(d , h , :) = sort(toInd(allcomb(d , 1 : viral , h , 4 , 1 : periods , 2 , 6 : 7 , 1 : risk)));
+% %     end
+% % end
 
 
 ccRInds = zeros(disease , hpvTypes , hpvStates , periods , age * risk * viral);
 cc2SusInds = zeros(disease , age * risk * viral);
-
 
 for d = 1 : disease
     for v = 1 : viral
