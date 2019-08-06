@@ -9,13 +9,13 @@ paramDir = [pwd ,'/Params/'];
 % load([paramDir,'vlBeta'])
 % load([paramDir,'hpvData'])
 % load([paramDir,'cost_weights'])
-% load([paramDir,'calibData'])
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
 OMEGA = zeros(age , 1); % hysterectomy rate
 paramDir = [pwd ,'/Params/'];
 % Load parameters
 load([paramDir,'general'])
+load([paramDir,'calibData'])
 % Load indices
 load([paramDir,'mixInfectIndices'])
 load([paramDir,'hivIndices'])
@@ -76,29 +76,29 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 %% Calibration parameters (FEED FROM LHS)
 if any(1 == pIdx)
     idx = find(1 == pIdx);
-    partnersMmult = paramSet(paramsSub{idx}.inds(:));
-    % rowL = paramsSub{idx}.length/3;
-    % rl = paramsSub{idx}.inds(1:rowL);
-    % rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    % rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    % partnersMmult = paramSet(paramsSub{idx}.inds(:));
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    % partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    % partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-    partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
-    partnersM(10:age , 3) = ones(7 , 1);
+    partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
+    partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
+    % partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
+    % partnersM(10:age , 3) = ones(7 , 1);
 end
 if any(2 == pIdx)
     idx = find(2 == pIdx);
-    partnersFmult = paramSet(paramsSub{idx}.inds(:));
-    % rowL = paramsSub{idx}.length/3;
-    % rl = paramsSub{idx}.inds(1:rowL);
-    % rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    % rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    % partnersFmult = paramSet(paramsSub{idx}.inds(:));
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    % partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    % partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-    partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-    partnersF(10:age , 3) = ones(7 , 1);
+    partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
+    partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
+    % partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
+    % partnersF(10:age , 3) = ones(7 , 1);
 end
 % partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
 % partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
@@ -123,25 +123,25 @@ end
 % epsR = paramSet(173:175);
 if any(8 == pIdx)
     idx = find(8 == pIdx);
-    maleActsmult = paramSet(paramsSub{idx}.inds(:));
-    % rowL = paramsSub{idx}.length/3;
-    % rl = paramsSub{idx}.inds(1:rowL);
-    % rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    % rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    % maleActsmult = paramSet(paramsSub{idx}.inds(:));
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     maleActs(1:2 , 1:risk) = zeros(2 , risk);
-    % maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm)];
-    maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+    maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
+    % maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 end
 if any(9 == pIdx)
     idx = find(9 == pIdx);
-    femaleActsmult = paramSet(paramsSub{idx}.inds(:));
-    % rowL = paramsSub{idx}.length/3;
-    % rl = paramsSub{idx}.inds(1:rowL);
-    % rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    % rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    % femaleActsmult = paramSet(paramsSub{idx}.inds(:));
+    rowL = paramsSub{idx}.length/3;
+    rl = paramsSub{idx}.inds(1:rowL);
+    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-    % femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm)];
-    femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+    femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
+    % femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 end
 % maleActs(1:2 , 1:risk) = zeros(2 , risk);
 % femaleActs(1:2 , 1:risk) = zeros(2 , risk);
@@ -623,8 +623,9 @@ if error
 else
     negSumLogL = likeFun(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,...
         hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
-        hivPrevM_obs , hivPrevF_obs , disease , viral , gender , age , risk , ...
-        hpvTypes , hpvStates , periods , startYear , stepsPerYear);
+        hivPrevM_obs , hivPrevF_obs , hpv_hivM2008_obs , hpv_hivMNeg2008_obs , ...
+        disease , viral , gender , age , risk , hpvTypes , hpvStates , ...
+        periods , startYear , stepsPerYear);
 
     %ccInc = annlz(sum(sum(sum(newCC(end , ':' , : , 4 : age),2),3),4)) ./ ...
     %    (annlz(sum(popVec(end , allF) , 2) ./ stepsPerYear))* (10 ^ 5);
