@@ -43,8 +43,10 @@ hivOn = 1;
 % pIdx = [1,2,5,6,7,8,9,10,19];
 % % paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
 % %    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
-% paramSet = [4.7022; 0.47332; 0.81494; 0.70898; 0.76744; 0.38557; 0.26816; ...
-% 0.75175; 0.37118; 8.7002; 13.258; 0.35454; 0.57692]; % 1.7591e+05; 857
+% % paramSet = [4.7022; 0.47332; 0.81494; 0.70898; 0.76744; 0.38557; 0.26816; ...
+% % 0.75175; 0.37118; 8.7002; 13.258; 0.35454; 0.57692]; % 1.7591e+05; 857
+% paramSet = [1.4894; 1.9707; 0.84234; 0.9383; 0.82112; 0.56634; 0.77342; ...
+%     0.53429; 0.25521; 3.4473; 6.7432; 0.7543; 0.67004];
 % [paramsAll] = genParamStruct();
 % paramsSub = cell(length(pIdx),1);
 % startIdx = 1;
@@ -317,7 +319,7 @@ vaxEff = 0.9;
 
 %Parameters for school-based vaccination regimen
 vaxAge = 2;
-vaxRate = 0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0.86*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for waning
@@ -629,7 +631,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_060619calib_857';
+% pathModifier = 'toNow_080519calib_18July_03_paramSet1';
 % savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...

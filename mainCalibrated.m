@@ -4,8 +4,6 @@
 close all; clear all; clc
 profile clear;
 
-% [~ , startYear , endYear , stepsPerYr , IntSteps] = Menu();
-% disp('Done with input')
 
 %%
 disp('Initializing. Standby...')
@@ -16,6 +14,7 @@ paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
 OMEGA = zeros(age , 1); % hysterectomy rate
+paramDir = [pwd , '\Params\'];
 % Load parameters
 load([paramDir,'general'])
 % Load indices
@@ -49,9 +48,6 @@ if hivOn
     disp('HIV module activated')
 end
 
-% Directory to save results
-pathModifier = 'toNow_052919';
-
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
@@ -67,12 +63,26 @@ vaxStartYear = 2014;
 % ART
 import java.util.LinkedList
 artDistList = LinkedList();
-maxRateM_vec = [0.40 , 0.40];% maxRateM_arr{sim}; % Maximum ART coverage
-maxRateF_vec = [0.55 , 0.55];% maxRateF_arr{sim};
+maxRateM_vec = [0.40 , 0.40]; % Maximum ART coverage
+maxRateF_vec = [0.55 , 0.55];
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
+
+%%  Variables/parameters to set based on your scenario
+
+% DIRECTORY TO SAVE RESULTS
+pathModifier = 'toNow_052919'; % ***SET ME***: name for historical run output file
+
+% VACCINATION
+vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
+
+waning = 0;    % turn waning on or off
+
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls+vaxAge = 2;
+vaxRate = 0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
@@ -286,12 +296,12 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % Initialize time vectors
 years = endYear - startYear;
-s = 1 : timeStep : years + 1; % stepSize and steps calculated in loadUp.m
+s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
 
 % Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
 % Initialize other vectors
-popVec = spalloc(years / timeStep , prod(dim) , 10 ^ 8);
+popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 newHiv = zeros(length(s) - 1 , gender , age , risk);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
@@ -312,7 +322,7 @@ hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec; 
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
 popVec(1 , :) = popIn;
-tVec = linspace(startYear , endYear , size(popVec , 1));
+tVec = linspace(startYear , endYear , length(s) - 1);
 k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 
@@ -457,7 +467,7 @@ for i = 2 : length(s) - 1
         break
     end 
     
-    if (year >= vaxStartYear)
+    if ((year >= vaxStartYear) && (vaxRate > 0))
         % HPV vaccination module- school-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , k , ...
             disease , viral , risk , hpvTypes , hpvStates , ...
@@ -474,7 +484,7 @@ for i = 2 : length(s) - 1
     runtimes(i) = toc;
     progressbar(i/(length(s) - 1))
 end
-popLast = popVec(end , :);
+popLast = popVec(end-1 , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
