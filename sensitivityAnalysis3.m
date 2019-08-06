@@ -7,10 +7,13 @@
 % 2) File: paramSets_calib_[date].dat (sample of parameter sets [number
 % parameters x number samples])
 
-function sensitivityAnalysis3(nSets)
+function sensitivityAnalysis3(nSets , tstep_abc , date_abc)
 
 %delete(gcp('nocreate')); 
 %loadUp(6);
+
+t_curr = tstep_abc;
+date = date_abc;
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
@@ -29,7 +32,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
-pIdx = [1,2,5,6,7,8,9,10,19];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10,15,16,17,19];    % indices in paramsAll cell array
 prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
@@ -101,11 +104,11 @@ if (any(9 == pIdx) && ~prtnrActMults)
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'pIdx_calib_18July19_0.dat';
+file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , pIdx)
 
-file = 'paramSets_calib_18July19_0.dat';
+file = ['paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 

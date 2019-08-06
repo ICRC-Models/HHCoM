@@ -19,6 +19,13 @@ NSETS=10000    # nSets
 echo "${NSETS}" 
 export NSETS
 
+TCURR=0    # t_curr
+echo "${TCURR}"
+export TCURR
+
+DATE="05Aug19"
+echo "${DATE}"
+export DATE
 
 pwd; hostname; date
 
@@ -27,7 +34,7 @@ echo "Running MATLAB script to get LHS parameter sets."
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "sensitivityAnalysis3(${NSETS})"
+matlab -nodisplay -nosplash -r "sensitivityAnalysis3(${NSETS} , ${TCURR} , ${DATE})"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID 
 

@@ -2,11 +2,11 @@
 % Note: "particle" : a set of parameters
 % Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
-function [] = abc_smc()  %(t , alpha , p_acc_min , date)
-t = 3;
+function [] = abc_smc(tstep_abc , date_abc)  %(alpha , p_acc_min)
+t = tstep_abc;
 alpha = 0.6;
 p_acc_min = 0.05;
-date = '18July19';
+date = date_abc;
 
 t_prev = t-1;
 t_curr = t;
