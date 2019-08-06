@@ -11,7 +11,7 @@
 #SBATCH --nodes=1   		 		     # Node resources
 #SBATCH --mem=58G   		                     # Memory per node
 #SBATCH --time=02:00:00 	                     # Wall clock time limit hrs:min:sec
-#SBATCH --qos=MaxJobs11
+#SBATCH --qos=MaxJobs10
 
 pwd; hostname; date
 
@@ -26,7 +26,7 @@ export DATE
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "sensitivityAnalysis3_prt2(${SETIDX} , ${TCURR} , ${DATE})"
+matlab -nodisplay -nosplash -r "sensitivityAnalysis3_prt2(${SETIDX} , ${TCURR} , '${DATE}')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 
