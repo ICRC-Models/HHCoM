@@ -46,6 +46,6 @@ parfor n = 1 : nPrlSets
 end
 
 %% Save parameter sets and negSumLogL values
-file = 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat';
+file = ['negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , [paramSetIdx; negSumLogLSet] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')

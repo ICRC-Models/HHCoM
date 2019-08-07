@@ -11,7 +11,6 @@ echo "Running MATLAB script to get matrix size."
 #sleep 670
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
-#NSETS=3088    # nSets
 echo "${NSETS}" 
 export NSETS
 
@@ -22,7 +21,7 @@ export SETIDX
 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs10
 INT=$(($INT + 1))
 if [ $INT -ge 10 ]; then 
-sleep 6000 # pause to be kind to the scheduler
+sleep 4800 # pause to be kind to the scheduler
 INT=0
 fi 
 done
@@ -43,7 +42,7 @@ export SETIDX
 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs10
 INT=$(($INT + 1))
 if [ $INT -ge 10 ]; then 
-sleep 6000 # pause to be kind to the scheduler
+sleep 4800 # pause to be kind to the scheduler
 INT=0
 fi 
 done

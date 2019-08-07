@@ -98,7 +98,7 @@ for aV = 1 : length(ageVec)
         1 : periods , 1 , a , 1 : risk));
     ageInds = toInd(allcomb([2:6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         1 , a , 1 : risk));
-    hpv_hivM2008(aV) = hpv_hivM2008(aV) + sum(popVec((2009 - startYear) * stepsPerYear , hpvInds))...
+    hpv_hivM2008(aV) = sum(popVec((2009 - startYear) * stepsPerYear , hpvInds))...
         ./ sum(popVec((2009 - startYear) * stepsPerYear , ageInds)) * 100;
 end
 
@@ -109,17 +109,14 @@ nPos = [nPos ; hpv_hivM2008_obs(: , 1)];
 %% HR HPV Prevalence in HIV- men
 hpv_hivMNeg2008 = zeros(4 , 1);
 ageVec = {[4:5],[6:7],[8:9],[10:13]};
-dVec = [1 , 7 : 9];
 for aV = 1 : length(ageVec)
     a = ageVec{aV};
-    for d = 1 : length(dVec)
-        hpvInds = toInd(allcomb(dVec(d) , 1 : viral , 2 : 4 , 1, ...
-            1 : periods , 1 , a , 1 : risk));
-        ageInds = toInd(allcomb(dVec(d) , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-            1 , a , 1 : risk));
-        hpv_hivMNeg2008(aV) = hpv_hivMNeg2008(aV) + sum(popVec((2009 - startYear) * stepsPerYear , hpvInds))...
-            ./ sum(popVec((2009 - startYear) * stepsPerYear , ageInds)) * 100;
-    end
+    hpvInds = toInd(allcomb([1,7:9] , 1 : viral , 2 : 4 , 1, ...
+        1 : periods , 1 , a , 1 : risk));
+    ageInds = toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        1 , a , 1 : risk));
+    hpv_hivMNeg2008(aV) = sum(popVec((2009 - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((2009 - startYear) * stepsPerYear , ageInds)) * 100;
 end
 
 pPos = [pPos ; hpv_hivMNeg2008];
