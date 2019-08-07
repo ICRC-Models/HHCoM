@@ -32,7 +32,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
-pIdx = [1,2,5,6,7,8,9,10,15,16,17,19];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10,15,16,17,19,22];    % indices in paramsAll cell array
 prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
