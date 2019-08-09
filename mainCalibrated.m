@@ -2,19 +2,20 @@
 % Runs simulation over the time period and time step specified by the
 % user.
 close all; clear all; clc
-profile clear;
+% profile clear;
 
 %% Load calibrated parameters and reset general parameters based on changes to model
 disp('Initializing. Standby...')
 disp(' ');
 
 % Use calibrated parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 % Load general parameters and reset changed parameters
 load([paramDir,'general'])
+muHIV(11 , 2) = 0.02;
 
 %% Convert 5-year age groups to 1-year age groups
 % Divide popInit age groups equally into five
@@ -132,7 +133,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_080719_noBaseVax_baseScreen_singleAgeGrps'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_080719_noBaseVax_baseScreen_singleAgeGrps_smaller'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -336,7 +337,7 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infe
 
 %% Simulation
 disp('Start up')
-profile on
+% profile on
 disp(' ')
 
 at = @(x , y) sort(prod(dim)*(y-1) + x);
@@ -381,14 +382,14 @@ disp(' ')
 disp('Simulation running...')
 disp(' ')
 
-progressbar('Simulation Progress')
+% progressbar('Simulation Progress')
 for i = 2 : length(s) - 1
     tic
     year = startYear + s(i) - 1;
 %     currStep = round(s(i) * stepsPerYear);
-    disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
-        num2str(length(s) - i) ' time steps remaining until year ' ...
-        num2str(endYear) ')'])
+%    disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
+%        num2str(length(s) - i) ' time steps remaining until year ' ...
+%        num2str(endYear) ')'])
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
     
@@ -536,37 +537,36 @@ popLast = popVec(end-1 , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
-if ~ exist([pwd , '\HHCoM_Results\'])
+if ~ exist([pwd , '/HHCoM_Results/'])
     mkdir HHCoM_Results
 end
 
-savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
+savdir = [pwd , '/HHCoM_Results/'];%'H:\HHCoM_Results';
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
-    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , ... %'hivDeaths' , 'deaths' , 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newCC' , 'artDist' , 'artDistList' , ... %artTreatTracker
     'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')
 
-profile viewer
+% profile viewer
 
-%% Runtimes
-figure()
-plot(1 : size(runtimes , 1) , runtimes)
-xlabel('Step'); ylabel('Time(s)')
-title('Runtimes')
-%%
-avgRuntime = mean(runtimes); % seconds
-stdRuntime = std(runtimes); % seconds
-disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
-disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
-disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
-figure()
-h = histogram(runtimes);
-title('Runtimes')
-ylabel('Frequency')
-xlabel('Times (s)')
+% %% Runtimes
+% figure()
+% plot(1 : size(runtimes , 1) , runtimes)
+% xlabel('Step'); ylabel('Time(s)')
+% title('Runtimes')
+% %%
+% avgRuntime = mean(runtimes); % seconds
+% stdRuntime = std(runtimes); % seconds
+% disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
+% disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
+% disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
+% figure()
+% h = histogram(runtimes);
+% title('Runtimes')
+% ylabel('Frequency')
+% xlabel('Times (s)')
 
-%% Show results
-showResults(pathModifier)
+% %% Show results
+% showResults(pathModifier)
