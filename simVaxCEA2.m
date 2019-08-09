@@ -250,7 +250,7 @@ end
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [vaxCoverB , vaxEff]]; % Append baseline vaccination scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test
-testParams2(1:(nTests-1),1) = {vaxAge};
+testParams2(1:(nTests-1),1) = {min(vaxAge)};
 testParams2(1:(nTests-1),2) = {vaxG};
 testParams2(nTests,1) = {vaxAgeB};
 testParams2(nTests,2) = {vaxGB};

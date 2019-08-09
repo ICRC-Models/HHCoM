@@ -63,7 +63,7 @@ for d = 1 : disease
     
     % Hysterectomy (age dependent rate)
     if hyst
-        for a = 3 : age % can adjust age group range
+        for a = 11 : age % can adjust age group range
             for s = [1:7 , 9:10]
                 hystSusPop = hystSusInds(d , s , a , :);
                 hystPop = hystInds(d , a , :);
