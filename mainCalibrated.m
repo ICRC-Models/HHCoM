@@ -1,6 +1,6 @@
 % Main
-% Runs simulation over the time period and time step specified by the
-% user.
+% Runs simulation over the time period and time step specified by the user.
+
 close all; clear all; clc
 % profile clear;
 
@@ -233,7 +233,7 @@ end
 lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
 
 % No waning
-lambdaMultVaxMat(11 : age) = vaxEff;
+lambdaMultVaxMat(min(vaxAge) : age) = vaxEff;
 
 % Waning
 effPeriod = 20; % number of years that initial efficacy level is retained
@@ -248,7 +248,7 @@ if waning
     vaxInit = vaxEff;
     lambdaMultVaxMat(round(effPeriod / 5) + min(vaxAge) - 1 : age) = ...
         max(0 , linspace(vaxInit , ...
-        vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + vaxAge)) ,...
+        vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(vaxAge))) ,...
         age - (round(wanePeriod / 5) + min(vaxAge)) + 2)'); % ensures vaccine efficacy is >= 0
 end
 lambdaMultVax = 1 - lambdaMultVaxMat;

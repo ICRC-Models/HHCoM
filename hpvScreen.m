@@ -29,7 +29,6 @@ for i = 1 : length(screenAlgs)
         lastInd = size(screenAlgs{i}.screenCover_vec , 1);
         screenRate = screenAlgs{i}.screenCover_vec{lastInd}(size(screenAlgs{i}.screenCover_vec{lastInd} , 2));
     end
-    screenRate = screenRate * 0.20; % find 1/5 of age group (represents 35 year olds, only)
 
     for aS = 1 : length(screenAlgs{i}.screenAge)
         for dS = 1 : length(screenAlgs{i}.diseaseInds)

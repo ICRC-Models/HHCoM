@@ -3,14 +3,49 @@
 close all;clear all;clc
 %profile clear;
 
-%%
+%% Load calibrated parameters and reset general parameters based on changes to model
 disp('Start up')
 
 % Use calibrated parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
+
+paramDir = [pwd , '\Params\'];
+% Load general parameters and reset changed parameters
+load([paramDir,'general'])
+muHIV(11 , 2) = 0.02;
+
+%% Convert 5-year age groups to 1-year age groups
+% Replicate rates across single age groups
+vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , ...
+             'partnersM' , 'partnersF' , 'muHIV' , 'maleActs' , 'femaleActs' , 'kCin1_Inf' , ...
+             'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , 'kInf_Cin1' , ...
+             'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , ...
+             partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
+             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
+             kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};
+for j = 1 : length(vars5To1_vals)
+    valsA1 = age5To1(vars5To1_vals{j});
+    assignin('base', vars5To1_nms{j} , valsA1);
+end
+
+riskDist = zeros(age , risk , 2);
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
+
+%% Reset additional changed parameters; load indices and matrices
 perPartnerHpv = 0.0045;
 OMEGA = zeros(age , 1); % hysterectomy rate
+
+betaHIVF2M = zeros(age , risk , viral);
+betaHIVM2F = betaHIVF2M;
+for a = 1 : age % calculate per-partnership probability of HIV transmission
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
@@ -32,9 +67,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-paramDir = [pwd , '\Params\'];
-% Load parameters
-load([paramDir,'general'])
+
 % Load indices
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
@@ -60,13 +93,13 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '\HHCoM_Results\toNow_080719_noBaseVax_baseScreen_singleAgeGrps']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '080119_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '080719_noBaseVax_baseScreen_singleAgeGrps'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -78,7 +111,7 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 % SCREENING
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
-whoScreenAges = [8 , 10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
+whoScreenAges = [36 , 46]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
@@ -86,12 +119,12 @@ vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = 2;
+vaxAgeB = [11 : 15];
 vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
-vaxAge = 3;
+vaxAge = [11 : 15];
 vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
@@ -250,7 +283,7 @@ end
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [vaxCoverB , vaxEff]]; % Append baseline vaccination scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test
-testParams2(1:(nTests-1),1) = {min(vaxAge)};
+testParams2(1:(nTests-1),1) = {vaxAge};
 testParams2(1:(nTests-1),2) = {vaxG};
 testParams2(nTests,1) = {vaxAgeB};
 testParams2(nTests,2) = {vaxGB};
@@ -272,7 +305,7 @@ lambdaMultVaxMat = zeros(age , nTests); % nTests-1 % age-based vector for modify
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff)); % nTests - 1
 for n = 1 : nTests %nTests - 1
     % No waning
-    lambdaMultVaxMat(testParams2{n , 1} : age , n) = vaxEff(vaxEffInd(n));
+    lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
@@ -285,10 +318,10 @@ for n = 1 : nTests %nTests - 1
         % waning is based on the least effective initial vaccine efficacy scenario.        
         kWane = min(vaxEff) / round(wanePeriod / 5);     
         vaxInit = vaxEff(vaxEffInd(n));
-        lambdaMultVaxMat(round(effPeriod / 5) + testParams2{n , 1} - 1 : age , n) = ...
+        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : age , n) = ...
             max(0 , linspace(vaxInit , ...
-            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + testParams2{n , 1})) ,...
-            age - (round(wanePeriod / 5) + testParams2{n , 1}) + 2)'); % ensures vaccine efficacy is >= 0
+            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
+            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); % ensures vaccine efficacy is >= 0
     end
 end
 %lambdaMultVaxMat = [lambdaMultVaxMat , zeros(age , 1)]; % append 0 vaccine protection for no vaccine scenario
@@ -562,13 +595,13 @@ parfor n = 1 : nTests
     end
     
     parsave(filename , tVec ,  popVec , newHiv ,...
-        newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
-        newCC , artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , newTreatImm , newTreatHpv , newTreatHyst , ...
-        ccTreated , currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
+        newImmHpv , newVaxHpv , newHpv , ... %deaths , hivDeaths , ccDeath , ...
+        newCC , ...%artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ccTreated , ...
+        currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier); %newTreatImm , newTreatHpv , newTreatHyst , ...
 end
 disp('Done')
 
 %profile viewer
 
 %%
-vaxCEA(pathModifier)
+%vaxCEA(pathModifier)
