@@ -283,10 +283,8 @@ end
 % %     end
 % % end
 
-
 ccRInds = zeros(disease , hpvTypes , hpvStates , periods , age * risk * viral);
 cc2SusInds = zeros(disease , age * risk * viral);
-
 for d = 1 : disease
     for v = 1 : viral
         cc2SusInds(d , :) = sort(toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 2 , 1 : age , 1 : risk)));
@@ -335,9 +333,9 @@ for a = 1 : age
     end
 end
 
-save([paramDir , 'hpvIndices'] , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , 'normalInds' , ...
-    'ccRInds' , 'screen35PlusInds' , 'screen25_35Inds' , 'ccInds' , 'ccRegInds' , ...
-    'ccDistInds' ,'immuneInds' , 'ccTreatedInds' , 'ccLocDetInds' , 'ccDistDetInds' , 'ccRegDetInds' , ...
+save([paramDir , 'hpvIndices'] , 'infInds' , 'cin1Inds' , 'cin2Inds' , 'cin3Inds' , ...
+    'normalInds' , 'ccRInds' , 'ccInds' , 'ccRegInds' , 'ccDistInds' ,'immuneInds' , ...
+    'ccTreatedInds' , 'ccLocDetInds' , 'ccDistDetInds' , 'ccRegDetInds' , ...
     'hystSusInds' , 'hystInds')
 disp('hpv indices loaded')
 
