@@ -39,7 +39,7 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 %% Plot results
 % gropInds();
-% load('groupedInds');u
+% load('groupedInds');
 % Total HIV positive
 hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
     1 : periods , 1 : 2 , 16 : 50 , 1 : risk));
