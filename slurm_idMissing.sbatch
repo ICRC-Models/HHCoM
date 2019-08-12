@@ -19,7 +19,7 @@ echo "${TCURR}"
 export TCURR
 echo "${DATE}"
 export DATE
-echo "{NSETS}"
+echo "${NSETS}"
 export NSETS
 
 export TZ="America/Los_Angeles"
