@@ -133,7 +133,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_080719_noBaseVax_baseScreen_singleAgeGrps_smaller'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_080719_noBaseVax_baseScreen_singleAgeGrps_delta'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage

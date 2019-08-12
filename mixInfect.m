@@ -46,8 +46,19 @@ epsR = 0.3;
 deltaR = eye(3 , 3);
 % if currStep <= (2005 - startYear) * int
 % original
-deltaAF = eye(80) .* 0.3 + diag(ones(79 , 1) .* 0.7 , 1);
-deltaAM = eye(80) .* 0.3 + diag(ones(79 , 1) .* 0.7 , -1);
+diagVec = [-2 , -1 , 1 , 2];
+deltaAF = eye(80) .* 0.3;
+deltaAM = eye(80) .* 0.3;
+for i = 1 : length(diagVec)
+    deltaAF = deltaAF + diag(ones(80-abs(diagVec(i)) , 1) .* 0.3 , diagVec(i));
+    deltaAM = deltaAM + diag(ones(80-abs(diagVec(i)) , 1) .* 0.3 , diagVec(i));
+end
+diagVecF = [3 : 1 : 7];
+diagVecM = [-3 : -1 : -7];
+for j = 1 : length(diagVecF)
+    deltaAF = deltaAF + diag(ones(80-abs(diagVecF(j)) , 1) .* 0.7 , diagVecF(j));
+    deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* 0.7 , diagVecM(j));
+end
 % after 2005
 % if currStep > (2000 - startYear) * stepsPerYear
 %     deltaAF = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , 1);

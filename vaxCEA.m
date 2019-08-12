@@ -5,13 +5,13 @@ waning = 0;    % turn waning on or off
 %% Load parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
-    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall')
 
 sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_080719_noBaseVax_baseScreen_singleAgeGrps']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
