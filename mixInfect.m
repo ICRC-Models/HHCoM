@@ -59,22 +59,22 @@ for j = 1 : length(diagVecF)
     deltaAF = deltaAF + diag(ones(80-abs(diagVecF(j)) , 1) .* 0.7 , diagVecF(j));
     deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* 0.7 , diagVecM(j));
 end
-% after 2005
-% if currStep > (2000 - startYear) * stepsPerYear
-%     deltaAF = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , 1);
-%     deltaAM = eye(16) .* 0.8 + diag(ones(15 , 1) .* 0.2 , -1);
-%     deltaR = eye(3);
-% %     deltaAM(5 , 4) = 0.6;
-% %     deltaAM(5 , 5) = 0.4;
-% end
-deltaAF(16:20 , 16:20) = 1;
-deltaAF(11:15 , 16:20) = 0;
-deltaAF(16:20 , 21:25) = 0;
-deltaAF(11:15 , 11:15) = 1;
-deltaAM(16:20 , 16:20) = 1;
-deltaAM(16:20 , 11:15) = 0;
-deltaAM(11:15 , 6:10) = 0;
-deltaAM(11:15 , 11:15) = 1;
+
+deltaAF(1:22,1:22) = eye(22);
+deltaAM(1:22,1:22) = eye(22);
+for i = 1 : length(diagVec)
+    deltaAF(1:22,1:22) = deltaAF(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 1.0 , diagVec(i));
+    deltaAM(1:22,1:22) = deltaAM(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 1.0 , diagVec(i));
+end
+deltaAF(23,21) = 1.0;
+deltaAF(23,22) = 1.0;
+deltaAF(24,22) = 1.0;
+deltaAM(23,22) = 1.0;
+deltaAM(24,22) = 1.0;
+deltaAM(25:29,22) = 0.0;
+deltaAM(23,21) = 1.0;
+deltaAM(24:28,21) = 0.0;
+deltaAM(23:27,16:20) = 0.0;
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk] (not currently used)
 
