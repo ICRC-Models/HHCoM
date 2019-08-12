@@ -7,10 +7,10 @@ close all;clear all;clc
 disp('Start up')
 
 % Use calibrated parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 % Load general parameters and reset changed parameters
 load([paramDir,'general'])
 muHIV(11 , 2) = 0.02;
@@ -93,15 +93,15 @@ timeStep = 1 / stepsPerYear;
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_080719_noBaseVax_baseScreen_singleAgeGrps']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_081219_noBaseVax_baseScreen_singleAgeGrps_delta']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '080719_noBaseVax_baseScreen_singleAgeGrps'; % ***SET ME***: name for simulation output file
-if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
-    mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
+pathModifier = '081219_noBaseVax_baseScreen_singleAgeGrps_delta'; % ***SET ME***: name for simulation output file
+if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % END YEAR & IMMMUNITY
