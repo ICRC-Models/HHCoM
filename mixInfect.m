@@ -35,8 +35,8 @@ elseif year >= dataYrLast % assortativity in last year and after
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
-epsA = 0.3;
-epsR = 0.3;
+% epsA = 0.3;
+% epsR = 0.3;
 % epsA = epsA_vec(1);
 % epsR = epsR_vec(1);
 
@@ -195,8 +195,8 @@ cAdj(isinf(cAdj)) = 0;
 peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
-%condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
+%condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year <= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
