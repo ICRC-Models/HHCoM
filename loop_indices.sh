@@ -41,7 +41,7 @@ for SETIDX in ${MISSING[@]}; do
 export SETIDX
 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs10
 INT=$(($INT + 1))
-if [ $INT -ge 10 ] || [${#MISSING[@]} -lt 10 ]; then 
+if [ $INT -ge 10 ] || [ ${#MISSING[@]} -lt 10 ]; then 
 sleep 4800 # pause to be kind to the scheduler
 INT=0
 fi 
@@ -55,6 +55,10 @@ RERUN=$(<$FILE)
 echo "$RERUN"
 done
 
-echo "Running MATLAB abc_smc script to get next set of particles."
-sbatch -p csde -A csde slurm_abc.sbatch
+#echo "Running MATLAB abc_smc script to get next set of particles."
+#sbatch -p csde -A csde slurm_abc.sbatch
+#sleep 7200
+ 
+#echo "Running MATLAB idParamRanges script to get ranges of parameters in best-fitting sets."
+#sbatch -p csde -A csde slurm_idParamRanges.sbatch
 

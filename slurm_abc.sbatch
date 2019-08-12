@@ -19,13 +19,11 @@ echo "${TCURR}"
 export TCURR
 echo "${DATE}"
 export DATE
-echo "${NSETS}"
-export NSETS
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "abc_smc(${TCURR} , '${DATE}' , ${NSETS})"
+matlab -nodisplay -nosplash -r "abc_smc(${TCURR} , '${DATE}')"
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 
 date

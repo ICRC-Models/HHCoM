@@ -37,6 +37,6 @@ end
 
 %% Print ranges
 fileRanges = ['rangesVSbounds_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save ranges compared to bounds
-csvwrite([paramDir, fileRanges , [minVals , maxVals , lbVals, ubVals]);
+csvwrite([paramDir, fileRanges] , [minVals , maxVals , lbVals, ubVals]);
 
 
