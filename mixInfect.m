@@ -47,32 +47,32 @@ deltaR = eye(3 , 3);
 % if currStep <= (2005 - startYear) * int
 % original
 diagVec = [-2 , -1 , 1 , 2];
-deltaAF = eye(80) .* 0.3;
-deltaAM = eye(80) .* 0.3;
+deltaAF = eye(80) .* (0.3*0.2);
+deltaAM = eye(80) .* (0.3*0.2);
 for i = 1 : length(diagVec)
-    deltaAF = deltaAF + diag(ones(80-abs(diagVec(i)) , 1) .* 0.3 , diagVec(i));
-    deltaAM = deltaAM + diag(ones(80-abs(diagVec(i)) , 1) .* 0.3 , diagVec(i));
+    deltaAF = deltaAF + diag(ones(80-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
+    deltaAM = deltaAM + diag(ones(80-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
 end
 diagVecF = [3 : 1 : 7];
 diagVecM = [-3 : -1 : -7];
 for j = 1 : length(diagVecF)
-    deltaAF = deltaAF + diag(ones(80-abs(diagVecF(j)) , 1) .* 0.7 , diagVecF(j));
-    deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* 0.7 , diagVecM(j));
+    deltaAF = deltaAF + diag(ones(80-abs(diagVecF(j)) , 1) .* (0.7*0.2) , diagVecF(j));
+    deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* (0.7*0.2) , diagVecM(j));
 end
 
-deltaAF(1:22,1:22) = eye(22);
-deltaAM(1:22,1:22) = eye(22);
+deltaAF(1:22,1:22) = eye(22) .* 0.2;
+deltaAM(1:22,1:22) = eye(22) .* 0.2;
 for i = 1 : length(diagVec)
-    deltaAF(1:22,1:22) = deltaAF(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 1.0 , diagVec(i));
-    deltaAM(1:22,1:22) = deltaAM(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 1.0 , diagVec(i));
+    deltaAF(1:22,1:22) = deltaAF(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+    deltaAM(1:22,1:22) = deltaAM(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
 end
-deltaAF(23,21) = 1.0;
-deltaAF(23,22) = 1.0;
-deltaAF(24,22) = 1.0;
-deltaAM(23,22) = 1.0;
-deltaAM(24,22) = 1.0;
+deltaAF(23,21) = 0.2;
+deltaAF(23,22) = 0.2;
+deltaAF(24,22) = 0.2;
+deltaAM(23,22) = 0.2;
+deltaAM(24,22) = 0.2;
 deltaAM(25:29,22) = 0.0;
-deltaAM(23,21) = 1.0;
+deltaAM(23,21) = 0.2;
 deltaAM(24:28,21) = 0.0;
 deltaAM(23:27,16:20) = 0.0;
 
@@ -577,3 +577,4 @@ end
 newInfs{4} = newHiv;
 % Convert to column vector for output to ODE solver
 dPop = sparse(dPop);
+
