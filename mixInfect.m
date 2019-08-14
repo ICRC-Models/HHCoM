@@ -60,21 +60,32 @@ for j = 1 : length(diagVecF)
     deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* (0.7*0.2) , diagVecM(j));
 end
 
-deltaAF(1:22,1:22) = eye(22) .* 0.2;
-deltaAM(1:22,1:22) = eye(22) .* 0.2;
+deltaAF(1:10,1:10) = eye(10) .* 0.2;
+deltaAM(1:10,1:10) = eye(10) .* 0.2;
 for i = 1 : length(diagVec)
-    deltaAF(1:22,1:22) = deltaAF(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
-    deltaAM(1:22,1:22) = deltaAM(1:22,1:22) + diag(ones(22-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+    deltaAF(1:10,1:10) = deltaAF(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+    deltaAM(1:10,1:10) = deltaAM(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
 end
-deltaAF(23,21) = 0.2;
-deltaAF(23,22) = 0.2;
-deltaAF(24,22) = 0.2;
-deltaAM(23,22) = 0.2;
-deltaAM(24,22) = 0.2;
-deltaAM(25:29,22) = 0.0;
-deltaAM(23,21) = 0.2;
-deltaAM(24:28,21) = 0.0;
-deltaAM(23:27,16:20) = 0.0;
+deltaAF(11,9) = 0.0;
+deltaAF(11:12,10) = 0.0;
+deltaAF(3:12,11:19) = [zeros(8,9); ...
+                       ones(1,8).*0.125 , 0.0; ...
+                       ones(1,9).*(1/9)];
+deltaAM(11,4) = 0.0;
+deltaAM(11:12,5) = 0.0;
+deltaAM(11:13,6) = 0.0;
+deltaAM(11:14,7) = 0.0;
+deltaAM(11:15,8) = 0.0;
+deltaAM(11:16,9) = 0.0;
+deltaAM(11:17,10) = 0.0;
+deltaAM(8:17,11:19) = [zeros(3,9); ...
+                       1/3 , 1/3 , 1/3 , zeros(1,6); ...
+                       0.25 , 0.25 , 0.25 , 0.25 , zeros(1,5); ...
+                       0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,4); ...
+                       0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,3); ...
+                       0.0 , 0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.0 , 0.0; ...
+                       ones(1,8).*(1/8) , 0.0; ...
+                       ones(1,9).*(1/9)];
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk] (not currently used)
 
