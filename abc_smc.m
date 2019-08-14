@@ -135,30 +135,41 @@ if p_acc > p_acc_min
     new_particles = select_particles;
     new_particles = [zeros(1 , size(select_particles , 2)) ; select_particles]; % row of bools: all set to false
       
-    while any(~new_particles(1,:))
-        not_in_prior = find(~new_particles(1,:));
-    
-        for iS = 1 : length(not_in_prior)
+    % Load bounds for comparison
+    [paramsAll] = genParamStruct();
+    paramsSub = cell(length(pIdx),1);
+    lb = [];
+    ub = [];
+    for s = 1 : pIdx_length
+        paramsSub{s} = paramsAll{pIdx(s)};
+        lb = [lb; paramsSub{s}.lb];
+        ub = [ub; paramsSub{s}.ub];
+    end
+ 
+    while any(~new_particles(1,:)) % while any particles have any parameter values outside bounds
+        not_in_prior = find(~new_particles(1,:)); % indices for particles not in prior
+        
+        pIdx_length = length(pIdx);
+        select_particles_length = size(select_particles , 1); % number parameters in particle
+        notInPrior = zeros((select_particles_length + 1) , length(not_in_prior)); % matrix to hold new particles
+   
+        parfor iS = 1 : length(not_in_prior)
             i = not_in_prior(iS);
             stddev = std(alphaSets,0,2); % standard deviation of sample by parameter (normalized by numPart-1)
-            new_particles(2:end,i) = normrnd(select_particles(:,i), stddev);
+            
+            new_particlesT = zeros(select_particles_length + 1 , 1);
+            new_particlesT(2:end) = normrnd(select_particles(:,i), stddev);
             
             % Ensure that all perturbations are within the specified priors to ensure weights of subsequent particles > 0.
-            [paramsAll] = genParamStruct();
-            paramsSub = cell(length(pIdx),1);
-            lb = [];
-            ub = [];
-            for s = 1 : length(pIdx)
-                paramsSub{s} = paramsAll{pIdx(s)};
-                lb = [lb; paramsSub{s}.lb];
-                ub = [ub; paramsSub{s}.ub];
-            end
             dBool = 1;
-            for s = 1 : size(select_particles,1)
-                dBool = dBool * unifpdf(new_particles(s+1,i) , lb(s) , ub(s));
+            for sP = 1 : select_particles_length
+                sPT = sP + 1;
+                dBool = dBool * unifpdf(new_particlesT(sPT) , lb(sP) , ub(sP));
             end
-            new_particles(1,i) = (dBool > 0.0);  
+            new_particlesT(1) = (dBool > 0.0);
+            notInPrior(:,iS) = new_particlesT;  
         end
+        new_particles(:,not_in_prior) = notInPrior;
     end
     fileD = ['paramSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
     csvwrite([paramDir, fileD] , new_particles(2:end,:));
