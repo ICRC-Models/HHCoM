@@ -136,6 +136,7 @@ if p_acc > p_acc_min
     new_particles = [zeros(1 , size(select_particles , 2)) ; select_particles]; % row of bools: all set to false
       
     % Load bounds for comparison
+    pIdx_length = length(pIdx);
     [paramsAll] = genParamStruct();
     paramsSub = cell(length(pIdx),1);
     lb = [];
@@ -149,7 +150,6 @@ if p_acc > p_acc_min
     while any(~new_particles(1,:)) % while any particles have any parameter values outside bounds
         not_in_prior = find(~new_particles(1,:)); % indices for particles not in prior
         
-        pIdx_length = length(pIdx);
         select_particles_length = size(select_particles , 1); % number parameters in particle
         notInPrior = zeros((select_particles_length + 1) , length(not_in_prior)); % matrix to hold new particles
    
@@ -158,15 +158,20 @@ if p_acc > p_acc_min
             stddev = std(alphaSets,0,2); % standard deviation of sample by parameter (normalized by numPart-1)
             
             new_particlesT = zeros(select_particles_length + 1 , 1);
-            new_particlesT(2:end) = normrnd(select_particles(:,i), stddev);
+            new_particlesT(2:end) = normrnd(select_particles(:,i) , stddev);
             
             % Ensure that all perturbations are within the specified priors to ensure weights of subsequent particles > 0.
-            dBool = 1;
+            dBoolTot = 1;
             for sP = 1 : select_particles_length
                 sPT = sP + 1;
-                dBool = dBool * unifpdf(new_particlesT(sPT) , lb(sP) , ub(sP));
+                dBool = unifpdf(new_particlesT(sPT) , lb(sP) , ub(sP));
+                while (dBool <= 0.0)
+                    new_particlesT(sPT) = normrnd(select_particles(sP,i) , stddev(sP)); 
+                    dBool = unifpdf(new_particlesT(sPT) , lb(sP) , ub(sP));
+                end
+                dBoolTot = dBoolTot * dBool;
             end
-            new_particlesT(1) = (dBool > 0.0);
+            new_particlesT(1) = (dBoolTot > 0.0);
             notInPrior(:,iS) = new_particlesT;  
         end
         new_particles(:,not_in_prior) = notInPrior;
