@@ -111,9 +111,9 @@ legend('Model' , 'National ANC Data' , 'Validation set: KZN Actual (Africa Cente
 
 %% HIV prevalence by age vs. AC data
 % hivAge = zeros(age , length(tVec));
-ageGroup = {'10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
+ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+    '60 - 64' , '65 - 69' , '70 - 74'};
 % figure()
 % for g = 1 : gender
 %     for a = 1 : age
@@ -978,7 +978,7 @@ legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
 % legend('HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
 
 %% Cervical cancer incidence by age
-ccIncYears = [2017 , 2003 , 1994];
+ccIncYears = [2017 , 2003 , 1994 , 2012];
 ccAgeRel = zeros(16 , length(ccIncYears));
 ccAgeNegRel = ccAgeRel;
 ccAgePosRel = zeros(16 , 4 , length(ccIncYears));
