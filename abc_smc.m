@@ -96,16 +96,15 @@ alphaSets = masterSetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
 fileAlpha = ['alphaParamSets_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of top alpha-proportion of particles
 csvwrite([paramDir, fileAlpha] , alphaSets);
 
-alphaWeights = masterWeights(inds(1:(masterNumFltrdSets*alpha)));
-fileW = ['alphaWeights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
-csvwrite([paramDir, fileW] , alphaWeights);
-
 alphaNegS_ordered = master_negS_ordered_flatDat(inds(1:(masterNumFltrdSets*alpha)));
 fileALL = ['alphaLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save sorted negLogLL for alpha accepted particles
 csvwrite([paramDir, fileALL] , alphaNegS_ordered);
 
+alphaWeights = masterWeights(inds(1:(masterNumFltrdSets*alpha)));
 %% Normalize weights
 normWeights = alphaWeights./sum(alphaWeights);
+fileW = ['alphaWeights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
+csvwrite([paramDir, fileW] , normWeights);
 
 %% Calculate epsilon (distance criterion)
 eps = min(alphaNegS_ordered); % set epsilon as the largest distance/ lowest LL of the alpha-proportion of accelpted particles (which have
