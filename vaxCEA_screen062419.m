@@ -5,7 +5,7 @@ waning = 0;    % turn waning on or off
 %% LOAD PARAMETERS
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
-    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall')
 
 % Helper functions
 sumall = @(x) sum(x(:));
@@ -52,9 +52,9 @@ for i = 1 : nResults
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
         % matrices for years past current year
-        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec];
-        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC];
-        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec];
+        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end , :)];
+        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : ,:)];
+        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
     end
     allResult{i} = vaxResult;
 end

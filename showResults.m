@@ -362,7 +362,7 @@ for g = 1 : gender
 end
 
 %% HPV Prevalence by age in 2002 vs. McDonald 2014 data
-ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
+ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 hpv2017 = zeros(13 , 1);
@@ -370,7 +370,7 @@ hpvHIV2017 = hpv2017;
 hpvNeg2017 = hpv2017;
 hpvImm2017 = hpv2017;
 
-aVec = {16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 % for aInd = 1 : 13
 %     a = aVec{aInd};
 %     hpvInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : 4, ...
@@ -534,20 +534,20 @@ title('Age Specific hrHPV Prevalence in 2002')
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data, bar graph
 yearPrev = 2008;
 hpvHivPosInd = [toInd(allcomb(2 : 6 , 1 : viral , 2 : hpvTypes , 1 : 4 , ...
-    1 : periods , 2 , 16 : 65 , 1 : risk)); toInd(allcomb(10, 6 ,...
-    2 : hpvTypes , 1 : 4 , 1 : periods , 2 , 16 : 65 , 1 : risk))];
+    1 : periods , 2 , 19 : 67 , 1 : risk)); toInd(allcomb(10, 6 ,...
+    2 : hpvTypes , 1 : 4 , 1 : periods , 2 , 19 : 67 , 1 : risk))];
 hpvHivNegInd = toInd(allcomb(1 , 1 , 2 : hpvTypes , 1 : 4 , 1 : periods , 2, ...
-    16 : 65 , 1 : risk));
+    19 : 67 , 1 : risk));
 genHpvInd = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 4 , ...
-    1 : periods , 2 , 16 : 65 , 1 : risk));
+    1 : periods , 2 , 19 : 67 , 1 : risk));
 
 popHivInd = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-    1 : periods , 2 , 16 : 65 , 1 : risk)); toInd(allcomb(10, 6 ,...
-    1 : hpvTypes , 1 : hpvStates , 1 : periods , 2 , 16 : 65 , 1 : risk))];
+    1 : periods , 2 , 19 : 67 , 1 : risk)); toInd(allcomb(10, 6 ,...
+    1 : hpvTypes , 1 : hpvStates , 1 : periods , 2 , 19 : 67 , 1 : risk))];
 popNegInd = toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
-    1 : periods , 2 , 16 : 65 , 1 : risk));
+    1 : periods , 2 , 19 : 67 , 1 : risk));
 popGenInd = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-    1 : periods , 2 , 16 : 65 , 1 : risk));
+    1 : periods , 2 , 19 : 67 , 1 : risk));
 
 popGen = sum(popVec((yearPrev - startYear) * stepsPerYear , popGenInd));
 popHiv = sum(popVec((yearPrev - startYear) * stepsPerYear , popHivInd));
@@ -605,10 +605,10 @@ legend('General Population' , 'HIV+' , 'HIV-' , 'Mbulawa (General)' , ...
 %% CIN2/3 prevalence by HIV status, HPV type, and age in 2002 vs. McDonald 2014 data and Firnhaber data
 cinPos2017 = zeros(hpvTypes - 1 , 13 , 1);
 cinNeg2017 = cinPos2017;
-ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
+ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-aVec = {16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 for aInd = 1 : 13
     a = aVec{aInd};
     for h = 2 : hpvTypes
@@ -765,10 +765,10 @@ title('CIN Prevalence in HIV Positive Women in 2017')
 %% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002 vs. McDonald 2014 data
 cinPos2017 = zeros(13 , 1);
 cinNeg2017 = cinPos2017;
-ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
+ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-aVec = {16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 for aInd = 1 : 13
     a = aVec{aInd};
     % HIV+
@@ -1814,10 +1814,15 @@ plot(tVec(1 : stepsPerYear : end-1) , ccInc)
 hold on;
 scatter(olorunfemi(:,1),olorunfemi(:,2))
 hold all;
-scatter(2012,ccIncGlobocan)
+scatter(2012,ccIncGlobocan , '*')
+hold all;
+scatter(2018, 61.9 , '*') % Globocan 2018 South Africa incidence rates were estimated from ...
+                    % national mortality estimates by modelling, using mortality-to-incidence ratios ...
+                    % derived from cancer registries in neighbouring countries: ASR = 61.9/100,000 for females 15-79
+xlim([1995 2020]);
 title('General Cervical Cancer Incidence')
 xlabel('Year'); ylabel('Incidence per 100,000')
-legend('Model' , 'Olorunfemi Validation' , 'Globocan Validation')
+legend('Model' , 'Olorunfemi Validation' , 'Globocan 2012 Validation' , 'Globocan 2018 Validation')
 
 %% New infections
 % figure()
