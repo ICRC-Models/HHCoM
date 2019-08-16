@@ -1,4 +1,4 @@
-function [negSumLogL] = calibratorAll3(paramSet)
+function [negSumLogL] = calibratorPtrnSrch(paramSet)
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
@@ -31,6 +31,17 @@ load([paramDir,'hivFertMats2'])
 load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
+
+% Load calibration parameter information
+pIdx = load([paramDir,'pIdx_patternSrch_' , '16Aug19' , '_0.dat']);
+[paramsAll] = genParamStruct();
+paramsSub = cell(length(pIdx),1);
+startIdx = 1;
+for s = 1 : length(pIdx)
+    paramsSub{s}.length = paramsAll{pIdx(s)}.length;
+    paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+    startIdx = startIdx + paramsSub{s}.length;
+end
 
 % Model specs
 hyst = 0;

@@ -4,7 +4,7 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function lhsPatternSrch_prt2(paramSetIdx , tstep , date)
+function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn)
 
 %delete(gcp('nocreate'));
 
@@ -14,8 +14,8 @@ t_curr = tstep;
 paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings']);
 load([paramDir,'general']);
-paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , date , '_' , num2str(t_curr) , '.dat']);
-pIdx = load([paramDir,'pIdx_patternSrch_' , date , '_0.dat']);
+paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat']);
+pIdx = load([paramDir,'pIdx_patternSrch_' , dateIn , '_0.dat']);
 
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
@@ -41,7 +41,7 @@ options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
-file = ['negSumLogL_patternSrch_' , date , '_' , num2str(t_curr) , '.dat'];
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag; output; optiParams] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
 
