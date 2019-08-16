@@ -62,13 +62,3 @@ file = ['paramSets_patternSrch_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 
-%% Obtain model output for each set of sampled parameters
-% negSumLogLSet = zeros(nSets,1);
-% parfor n = 1 : nSets
-%     paramSet = sample(:,n);
-%     %[negSumLogL , ccInc] = calibratorAll3(paramSet);
-%     [negSumLogL] = calibratorAll3(paramSet);
-%     negSumLogLSet(n,1) = negSumLogL;
-%     %ccIncSet(n,1) = ccInc;
-% end
-
