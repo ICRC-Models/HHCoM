@@ -154,7 +154,9 @@ if p_acc > p_acc_min
    
         parfor iS = 1 : length(not_in_prior)
             i = not_in_prior(iS);
-            stddev = std(alphaSets,0,2); % standard deviation of sample by parameter (normalized by numPart-1)
+            v = 2 .* var(alphaSets,0,2); % 2x variance of previous accepted particles (normalized by numPart-1)
+            stddev = v .^ (1/2);
+            %stddev = std(alphaSets,0,2); % standard deviation of sample by parameter (normalized by numPart-1)
             
             new_particlesT = zeros(select_particles_length + 1 , 1);
             new_particlesT(2:end) = normrnd(select_particles(:,i) , stddev);
