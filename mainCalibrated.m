@@ -4,7 +4,6 @@
 close all; clear all; clc
 profile clear;
 
-
 %%
 disp('Initializing. Standby...')
 disp(' ');
@@ -14,6 +13,27 @@ paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
 OMEGA = zeros(age , 1); % hysterectomy rate
+% % rNormal_Inf = ones(age,1); % for VCLIR analysis
+% % hpv_hivClear = ones(4,1);
+% % kCIN1_Inf = zeros(age,1);
+
+% To similate a lower HIV prevalence setting, approximating with decreased per-act HIV transmission probability (80% of initial values)
+% % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
+% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
+% % transM = vagTransM .* (1 - analProp(: , 1));
+% % transF = vagTransF .* (1 - analProp(: , 2));
+% % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
+% % betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transM);
+% % betaHIVF2M = zeros(age , risk , viral);
+% % betaHIVM2F = betaHIVF2M;
+% % for a = 1 : age % calculate per-partnership probability of HIV transmission
+% %     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+% %     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+% % end
+% % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+% % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
 paramDir = [pwd , '\Params\'];
 % Load parameters
 load([paramDir,'general'])
@@ -73,15 +93,16 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_052919'; % ***SET ME***: name for historical run output file
+pathModifier = 'toNow_080119_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 waning = 0;    % turn waning on or off
 
-%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls+vaxAge = 2;
-vaxRate = 0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
+vaxAge = 2;
+vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
@@ -169,18 +190,6 @@ for aS = 1 : length(screenAlgs{1}.screenAge)
 end
 
 %% Vaccination
-% actually bivalent vaccine, but to avoid adding additional compartments,
-% we use nonavalent vaccine and then reduce coverage
-vaxEff = 0.9;    
-
-%Parameters for school-based vaccination regimen
-vaxAge = 2;
-vaxRate = 0.86*0.20*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
-vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
-
-% Parameters for waning
-waning = 0;    % turn waning on or off
-
 lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
 
 % No waning

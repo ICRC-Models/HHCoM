@@ -24,10 +24,6 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 sumall = @(x)sum(x(:));
 
-% if any(pop<0)
-%     find(pop<0)
-% end
-
 %% births and deaths
 %fertility = zeros(age , 6);
 kHiv = MTCTRate(1); % year <= 2004
@@ -93,10 +89,6 @@ end
 % prospective population after accounting for births, circumcised births,
 % hiv births, and deaths
 prosPop = pop + circBirths + births + hivBirths + deaths;
-
-% if any(prosPop<0)
-%     find(prosPop<0)
-% end
 
 dPop = zeros(size(pop));
 for g = 1 : gender
@@ -191,27 +183,6 @@ for g = 1 : gender
         dPop(r1) = dPop(r1) - 1/5 .* pop(r1);
         dPop(r2) = dPop(r2) - 1/5 .* pop(r2);
         dPop(r3) = dPop(r3) - 1/5 .* pop(r3); 
-        
-        % For debugging
-        %if any(dPop(r1To)<0) || any(dPop(r2To)<0) || any(dPop(r3To)<0) || any(dPop(r1)<0) || any(dPop(r2)<0) || any(dPop(r3)<0)
-%         if any(pop<0)
-%             %if popR1Tot<0 || popR2Tot<0 || popR3Tot <0    
-%             any(pop(r1)<0)
-%             any(pop(r2)<0)
-%             any(pop(r3)<0)
-%             any(pop(r1To)<0)
-%             any(pop(r2To)<0)
-%             any(pop(r3To)<0)
-%             %dPop(find(pop(r1To)<0))
-%             %dPop(find(pop(r2To)<0))
-%             %dPop(find(pop(r3To)<0))
-%             %dPop(find(pop(r1)<0))
-%             %dPop(find(pop(r2)<0))
-%             %dPop(find(pop(r3)<0))
-%             %error = 1;
-%             %break
-%             %end
-%         end
 
     end
     % age last age group
@@ -234,10 +205,6 @@ if (year >= hpvScreenStartYear)
     end
 end
 
-%extraOut{1} = abs(deaths);
-extraOut{1} = deaths;
+extraOut{1} = abs(deaths);
 dPop = dPop + circBirths + births + hivBirths + deaths;
-% if any(dPop<0)
-%     find(dPop<0)
-% end
 dPop = sparse(dPop);
