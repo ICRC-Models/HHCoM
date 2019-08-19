@@ -1,8 +1,7 @@
-% Run a global sensitivity analysis
+% Parameter estimation and sensitivity analysis
 %function sensitivityAnalysis()
 
-%close all; 
-clear all; clc
+close all; clear all; clc
 profile clear
 profile on
 

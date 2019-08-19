@@ -32,7 +32,7 @@ hyst = 'off';
 hpvOn = 1;
 hivOn = 1;
 
-startYear = 1980;
+startYear = 1900; %1980;
 endYear = 2015; % run to 2015 for calibration
 years = endYear - startYear;
 timeStep = 1 / stepsPerYear;
@@ -49,9 +49,8 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
 
-
-riskDistM(3:end,:) = [paramSet(100:113) , paramSet(114:127) , paramSet(128:141)];
-riskDistF(3:end,:) = [paramSet(142:155) , paramSet(156:169) , paramSet(170:183)];
+%riskDistM(3:end,:) = [paramSet(100:113) , paramSet(114:127) , paramSet(128:141)];
+%riskDistF(3:end,:) = [paramSet(142:155) , paramSet(156:169) , paramSet(170:183)];
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
 
@@ -120,7 +119,7 @@ end
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.1 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) * (0.05 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) = ...
         initPop_0(1 , 1 , 1 , 1 , 1 , : , 4 : 9 , :) - infected; % moved from HPV
 

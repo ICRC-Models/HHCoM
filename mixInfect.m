@@ -19,27 +19,26 @@ sumall = @(x) sum(x(:));
 %% Process mixInfect constants
 
 % epsAge and epsRisk - extent of assortative mixing
-% % dataYr1 = yr(1);
-% % dataYrLast = yr(size(yr , 1));
-% % now = currStep / stepsPerYear + startYear;
-% % baseYrInd = max(find(now >= yr , 1, 'last') , 1); % get index of first year <= current year
-% % baseYr = yr(baseYrInd);
-% % if currStep < (dataYr1 - startYear) * stepsPerYear % assortativity in 1st year
-% %     epsA = epsA_vec{1}(1);
-% %     epsR = epsR_vec{1}(1);
-% % elseif currStep < (dataYrLast - startYear) * stepsPerYear % assortativity between 1st and last year
-% %     epsA = epsA_vec{baseYrInd}(currStep - (baseYr - startYear) * stepsPerYear + 1);
-% %     epsR = epsR_vec{baseYrInd}(currStep - (baseYr - startYear) * stepsPerYear + 1);
-% % else % assortativity in last year
-% %     lastIndA = size(epsA_vec , 1);
-% %     lastIndR = size(epsR_vec , 1);
-% %     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
-% %     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
-% % end
-% Note: if reimplementing this, need to fix logic around currStep, see
-% condom use or hpv screening vectors as an example
-epsA = 0.3;
-epsR = 0.3;
+dataYr1 = yr(1);
+dataYrLast = yr(size(yr , 1));
+baseYrInd = max(find(year >= yr , 1, 'last') , 1); % get index of first year <= current year
+baseYr = yr(baseYrInd);
+if year <= dataYr1 % assortativity in 1st year
+    epsA = epsA_vec{1}(1);
+    epsR = epsR_vec{1}(1);
+elseif (year < dataYrLast) && (year > dataYr1) % assortativity between 1st and last year
+    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+elseif year >= dataYrLast % assortativity in last year and after
+    lastIndA = size(epsA_vec , 1);
+    lastIndR = size(epsR_vec , 1);
+    epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
+    epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
+end
+% epsA = 0.3;
+% epsR = 0.3;
+% epsA = epsA_vec(1);
+% epsR = epsR_vec(1);
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times
@@ -196,8 +195,9 @@ cAdj(isinf(cAdj)) = 0;
 peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
-condUse = condUseVec(1); % year >= peakYear
+%condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
+condUse = condUseVec(1); % year <= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
     condUse = condUseVec(yrInd);
