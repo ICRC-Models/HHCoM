@@ -1,6 +1,5 @@
 % Main
-% Runs simulation over the time period and time step specified by the
-% user.
+% Runs simulation over the time period and time step specified by the user.
 close all; clear all; clc
 profile clear;
 
@@ -11,6 +10,26 @@ disp(' ');
 % Use calibrated parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
+
+% Load general parameters
+paramDir = [pwd , '\Params\'];
+load([paramDir,'general'])
+load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
+    'gender','age','risk','k','toInd','sumall')
+dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
+at = @(x , y) sort(prod(dim)*(y-1) + x);
+
+% Initialize time vectors
+c = fix(clock);
+currYear = c(1); % get the current year
+startYear = 1910;
+endYear = currYear;
+timeStep = 1 / stepsPerYear;
+years = endYear - startYear;
+s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
+
+
+% Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
@@ -46,16 +65,15 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-paramDir = [pwd , '\Params\'];
-% Load parameters
-load([paramDir,'general'])
 % Load indices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -80,13 +98,6 @@ if hivOn
     disp('HIV module activated')
 end
 
-% Time
-c = fix(clock);
-currYear = c(1); % get the current year
-startYear = 1910;
-endYear = currYear;
-timeStep = 1 / stepsPerYear;
-
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
@@ -105,11 +116,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_080119_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_082019_noBaseVax_baseScreen_test'; % ***SET ME***: name for historical run output file 
+
+% IMMUNITY
+fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
-
 waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -311,13 +324,6 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infe
 disp('Start up')
 profile on
 disp(' ')
-
-at = @(x , y) sort(prod(dim)*(y-1) + x);
-fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
-
-% Initialize time vectors
-years = endYear - startYear;
-s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
 
 % Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
@@ -530,7 +536,6 @@ figure()
 plot(1 : size(runtimes , 1) , runtimes)
 xlabel('Step'); ylabel('Time(s)')
 title('Runtimes')
-%%
 avgRuntime = mean(runtimes); % seconds
 stdRuntime = std(runtimes); % seconds
 disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);

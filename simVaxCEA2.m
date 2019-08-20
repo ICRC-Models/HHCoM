@@ -9,6 +9,23 @@ disp('Start up')
 % Use calibrated parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
+
+% Load general parameters
+paramDir = [pwd , '\Params\'];
+load([paramDir,'general'])
+load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
+    'gender','age','risk','k','toInd','sumall')
+dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
+
+% Initialize time vectors
+c = fix(clock);
+currYear = c(1); % get the current year
+stepsPerYear = 6;
+timeStep = 1 / stepsPerYear;
+years = lastYear - currYear;
+s = 1 : timeStep : years + 1;
+
+% Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
@@ -44,16 +61,15 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-paramDir = [pwd , '\Params\'];
-% Load parameters
-load([paramDir,'general'])
 % Load indices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -64,10 +80,24 @@ load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
-c = fix(clock);
-currYear = c(1); % get the current year
-stepsPerYear = 6;
-timeStep = 1 / stepsPerYear;
+% Model specs
+hyst = 0;
+hivOn = 1;
+hpvOn = 1;
+
+% Intervention start years
+circStartYear = 1990;
+vaxStartYear = 2014;
+
+% ART
+import java.util.LinkedList
+artDistList = popIn.artDistList;
+maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
 
 %%  Variables/parameters to set based on your scenario
 
@@ -83,8 +113,8 @@ if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
 
-% END YEAR & IMMMUNITY
-lastYear = 2100; %endYear;
+% LAST YEAR & IMMMUNITY
+lastYear = 2120; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -94,7 +124,6 @@ whoScreenAges = [8 , 10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, 
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
-
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -344,33 +373,6 @@ disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
 %     toVL = [];
 % end
 
-%% Initialize fixed parameters
-
-% Initialize time vectors
-years = lastYear - currYear;
-s = 1 : timeStep : years + 1;
-
-% Model specs
-hyst = 0;
-hivOn = 1;
-hpvOn = 1;
-
-dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
-
-% Intervention start years
-circStartYear = 1990;
-vaxStartYear = 2014;
-
-% ART
-import java.util.LinkedList
-artDistList = popIn.artDistList;
-maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
-
 %% Run simulation
 
 %profile on
@@ -416,6 +418,7 @@ parfor n = 1 : nTests
     tVec = linspace(currYear , lastYear-timeStep , length(s)-1);
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+    
     %% Main body of simulation
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;
