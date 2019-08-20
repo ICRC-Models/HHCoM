@@ -17,13 +17,12 @@ load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',..
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 
-% Initialize time vectors
+% Time
 c = fix(clock);
 currYear = c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 years = lastYear - currYear;
-s = 1 : timeStep : years + 1;
 
 % Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
@@ -391,6 +390,7 @@ parfor n = 1 : nTests
         vaxCoverL = vaxCoverLmat(n);
     end
     % Initialize vectors
+    s = 1 : timeStep : years + 1;
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);

@@ -14,20 +14,18 @@ load([paramDir , 'calibratedParams'])
 % Load general parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir,'general'])
-load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
+load([paramDir, 'general'],'stepsPerYear','disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 
-% Initialize time vectors
+% Time
 c = fix(clock);
 currYear = c(1); % get the current year
 startYear = 1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
-s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
-
 
 % Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
@@ -263,7 +261,6 @@ else
     end
 end
 
-dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 initPop = zeros(dim);
 initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, male
 initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
@@ -325,6 +322,8 @@ disp('Start up')
 profile on
 disp(' ')
 
+% Initialize time vector
+s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
 % Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
 % Initialize other vectors
