@@ -12,9 +12,8 @@ disp(' ');
 paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-<<<<<<< HEAD
 % Load general parameters and reset changed parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir, 'general'],'stepsPerYear','disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
@@ -59,7 +58,7 @@ years = endYear - startYear;
 
 % Reset additional changed parameters different than calibrated
 perPartnerHpv = 0.0045;
-condUse = 0.5 * 0.5;
+condUse = 0.20; %0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
@@ -103,14 +102,14 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
 % Load indices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 % load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -153,7 +152,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_081319_singleAgeGrps_deltaFxd_prob'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_082019_singleAge_baseScreen_noBaseVax'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -558,9 +557,9 @@ if ~ exist([pwd , '/HHCoM_Results/'])
     mkdir HHCoM_Results
 end
 
-savdir = [pwd , '/HHCoM_Results/'];%'H:\HHCoM_Results';
+savdir = [pwd , '/HHCoM_Results/'];
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , ... %'hivDeaths' , 'deaths' , 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' ,... % 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
     'newCC' , 'artDist' , 'artDistList' , ... %artTreatTracker
     'startYear' , 'endYear' , 'popLast');
 disp(' ')

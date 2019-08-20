@@ -10,9 +10,8 @@ disp('Start up')
 paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-<<<<<<< HEAD
 % Load general parameters and reset changed parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir,'general'])
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
@@ -44,11 +43,10 @@ c = fix(clock);
 currYear = c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-years = lastYear - currYear;
 
 % Reset  additional changed parameters different than calibrated; load indices and matrices
 perPartnerHpv = 0.0045;
-condUse = 0.5 * 0.5;
+condUse = 0.20; %0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
@@ -92,14 +90,14 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
 % Load indices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 %load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -121,7 +119,6 @@ vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
-artDistList = popIn.artDistList;
 maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
 maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
 maxRateM1 = maxRateM_vec(1);
@@ -421,6 +418,7 @@ parfor n = 1 : nTests
         vaxCoverL = vaxCoverLmat(n);
     end
     % Initialize vectors
+    years = lastYear - currYear;
     s = 1 : timeStep : years + 1;
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
@@ -608,7 +606,7 @@ parfor n = 1 : nTests
     end
     
     parsave(filename , tVec ,  popVec , newHiv ,...
-        newImmHpv , newVaxHpv , newHpv , ... %deaths , hivDeaths , ccDeath , ...
+        newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
         newCC , ...%artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ccTreated , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier); %newTreatImm , newTreatHpv , newTreatHyst , ...
 end
