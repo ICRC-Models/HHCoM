@@ -13,7 +13,6 @@ load([paramDir , 'calibratedParams'])
 
 % Load general parameters
 paramDir = [pwd , '\Params\'];
-load([paramDir,'general'])
 load([paramDir, 'general'],'stepsPerYear','disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];

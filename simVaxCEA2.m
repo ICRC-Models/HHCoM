@@ -12,7 +12,6 @@ load([paramDir , 'calibratedParams'])
 
 % Load general parameters
 paramDir = [pwd , '\Params\'];
-load([paramDir,'general'])
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
@@ -22,7 +21,6 @@ c = fix(clock);
 currYear = c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-years = lastYear - currYear;
 
 % Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
@@ -90,7 +88,6 @@ vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
-artDistList = popIn.artDistList;
 maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
 maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
 maxRateM1 = maxRateM_vec(1);
@@ -101,13 +98,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '\HHCoM_Results\toNow_082019_noBaseVax_baseScreen_test']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '080119_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '082019_noBaseVax_baseScreen_test'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
@@ -390,6 +387,7 @@ parfor n = 1 : nTests
         vaxCoverL = vaxCoverLmat(n);
     end
     % Initialize vectors
+    years = lastYear - currYear;
     s = 1 : timeStep : years + 1;
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
