@@ -437,7 +437,6 @@ parfor n = 1 : nTests
 %     newCin2 = newCC;
 %     newCin3 = newCC;
     ccDeath = newCC;
-    ccDeath = newCC;
     ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
     newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , risk , 2);
     newTreatImm = newScreen;
