@@ -41,7 +41,7 @@ riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
@@ -142,7 +142,7 @@ if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2120; % ***SET ME***: end year of simulation run
+lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING

@@ -50,7 +50,7 @@ riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 startYear = 1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
