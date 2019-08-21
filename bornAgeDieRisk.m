@@ -20,7 +20,7 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-        stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
+        stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 sumall = @(x)sum(x(:));
 
@@ -184,25 +184,26 @@ for g = 1 : gender
         dPop(r2) = dPop(r2) - pop(r2);
         dPop(r3) = dPop(r3) - pop(r3); 
 
+        % Remove screened status as people age out of screened age groups
+        if (year >= hpvScreenStartYear)
+            if any((a-1) == agesComb)
+                aOut = find((a-1) == agesComb);
+                noVaxScreend = dPop(noVaxScreen(:,aOut));
+                dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
+                dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
+
+                vaxScreend = dPop(vaxScreen(:,aOut));
+                dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
+                dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
+            end
+        end
+         
     end
     % age last age group
     dPop(r1To) = dPop(r1To) - pop(r1To);
     dPop(r2To) = dPop(r2To) - pop(r2To);
     dPop(r3To) = dPop(r3To) - pop(r3To);
     
-end
-
-%% Remove screened status as people age out of screened age groups
-if (year >= hpvScreenStartYear)
-    for aOut = 1 : length(screenAge)
-        noVaxScreend = dPop(noVaxScreen(:,aOut));
-        dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
-        dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
-
-        vaxScreend = dPop(vaxScreen(:,aOut));
-        dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
-        dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
-    end
 end
 
 extraOut{1} = abs(deaths);

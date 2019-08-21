@@ -194,6 +194,8 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values a
 end
 
 % Create screening indices
+numScreenAge = length(screenAlgs{1}.screenAge);
+agesComb = screenAlgs{1}.screenAge;
 screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAlgs{1}.screenAge) , risk);
 screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAlgs{1}.screenAge) , risk);
 noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAlgs{1}.screenAge) , risk);
@@ -524,7 +526,7 @@ for i = 2 : length(s) - 1
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-        stepsPerYear , currYear , screenAlgs{1}.screenAge , noVaxScreen , noVaxXscreen , ...
+        stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     popIn = pop(end , :);
     if any(pop(end , :) < 0)

@@ -16,7 +16,10 @@ ccTreatHyst = ccScreen;
 dPop = zeros(size(pop));
 
 for i = 1 : length(screenAlgs)
-
+    prevAL = 0;
+    if i == 2
+        prevAL = length(screenAlgs{1}.screenAge);
+    end
     % Screening level
     dataYr1 = screenYrs(1);
     dataYrLast = screenYrs(size(screenYrs , 1));
@@ -30,7 +33,7 @@ for i = 1 : length(screenAlgs)
         screenRate = screenAlgs{i}.screenCover_vec{lastInd}(size(screenAlgs{i}.screenCover_vec{lastInd} , 2));
     end
 
-    for aS = 1 : length(screenAlgs{i}.screenAge)
+    for aS = (prevAL + 1) : (prevAL + length(screenAlgs{i}.screenAge))
         for dS = 1 : length(screenAlgs{i}.diseaseInds)
             d = screenAlgs{i}.diseaseInds(dS);
             for v = 1 : viral
