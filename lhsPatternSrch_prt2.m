@@ -26,6 +26,8 @@ for s = 1 : length(pIdx)
     lb = [lb; paramsSub{s}.lb];
     ub = [ub; paramsSub{s}.ub];
 end
+lb(8) = lb(8).*10; % re-scale perPartnerHpv to be more similar in scale to other params
+ub(8) = lb(8).*10;
 
 initParams = paramSetMatrix(:,paramSetIdx);
 
@@ -37,11 +39,16 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %% Obtain model output for each set of sampled parameters
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ...
+    'MaxTime' , 86400 , 'MeshTolerance' , 0.001 , ...
     'Display','iter'); %,'PlotFcn',@psplotbestf);
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
 file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
-dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag; output; optiParams] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
+dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag; output] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
+
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , paramSetIdx , '.dat'];
+paramDir = [pwd , '/Params/'];
+dlmwrite([paramDir, file] , optiParams)
 
