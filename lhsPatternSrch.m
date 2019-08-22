@@ -46,7 +46,7 @@ for s = 1 : length(pIdx)
     ub = [ub; paramsSub{s}.ub];
 end
 lb(8) = lb(8).*10; % re-scale perPartnerHpv to be more similar in scale to other params
-ub(8) = lb(8).*10;
+ub(8) = ub(8).*10;
 
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 

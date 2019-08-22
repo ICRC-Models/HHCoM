@@ -166,7 +166,7 @@ end
 % femaleActs(3:age , 1:risk) = [paramSet(218:231) , paramSet(232:245) , paramSet(246:259)];
 if any(10 == pIdx)
     idx = find(10 == pIdx);
-    perPartnerHpv = paramSet(paramsSub{idx}.inds(:));
+    perPartnerHpv = paramSet(paramsSub{idx}.inds(:)).*0.1;
 end
 % perPartnerHpv = paramSet(260);
 % perPartnerHpv_lr = paramSet(261);
