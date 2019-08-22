@@ -41,7 +41,7 @@ riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = 2020; % c(1); % get the current year
+currYear = 2019; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
@@ -136,7 +136,7 @@ artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '082019_singleAge_WHOP2_SCE1'; % ***SET ME***: name for simulation output file
+pathModifier = '082019_singleAge_WHOP2_SCE1_2019testChanges'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
