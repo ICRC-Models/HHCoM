@@ -12,11 +12,14 @@ load([paramDir , 'calibratedParams'])
 
 % Load general parameters and reset changed parameters
 paramDir = [pwd , '/Params/'];
-load([paramDir,'general'])
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
-    'gender','age','risk','k','toInd','sumall')
+    'gender','age','risk','k')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 at = @(x , y) sort(prod(dim)*(y-1) + x);
+toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
+    + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
+    + (x(: , 2) - 1) * k(1) + x(: , 1);
+sumall = @(x) sum(x(:));
 
 muHIV(11 , 2) = 0.02;
 
