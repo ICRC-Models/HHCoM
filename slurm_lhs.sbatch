@@ -15,7 +15,7 @@
 #SBATCH –-output=./SlurmOut/%j.out      # Standard output
 #SBATCH –-error=./SlurmOut/%j.err       # Standard error
 
-NSETS=10000    # nSets
+NSETS=5000    # nSets
 echo "${NSETS}" 
 export NSETS
 
@@ -23,7 +23,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=05Aug19
+DATE=22Aug19
 echo "${DATE}"
 export DATE
 
