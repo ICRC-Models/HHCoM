@@ -5,7 +5,7 @@ waning = 0;    % turn waning on or off
 %% LOAD PARAMETERS
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
-    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall')
 
 % Helper functions
 sumall = @(x) sum(x(:));
