@@ -11,6 +11,9 @@ paramDir = [pwd ,'/Params/'];
 % load([paramDir,'cost_weights'])
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+condUse = 0.5 * 0.5;
+epsA = [0.3 ; 0.3 ; 0.3];
+epsR = [0.3 ; 0.3 ; 0.3];
 muHIV(11,2) = 0.02;
 OMEGA = zeros(age , 1); % hysterectomy rate
 paramDir = [pwd ,'/Params/'];
@@ -641,7 +644,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_081219calib_05Aug19_0_1424';
+% pathModifier = 'toNow_082219calib_22Aug19_0_baseline';
 % savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...

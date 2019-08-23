@@ -4,7 +4,10 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn)
+function lhsPatternSrch_prt2 %(paramSetIdx , tstep , dateIn)
+paramSetIdx = 1;
+tstep = 0;
+dateIn = '22Aug19';
 
 %delete(gcp('nocreate'));
 
@@ -32,15 +35,14 @@ ub(8) = ub(8).*10;
 initParams = paramSetMatrix(:,paramSetIdx);
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Obtain model output for each set of sampled parameters
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
-    'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ...
-    'MaxTime' , 86400 , 'MeshTolerance' , 0.001 , ...
-    'Display','iter'); %,'PlotFcn',@psplotbestf);
+    'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ... 
+    'Display','iter'); %,'PlotFcn',@psplotbestf); %'MeshTolerance' , 0.001 , 'MaxTime' , 86400 ,
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
