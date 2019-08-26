@@ -102,7 +102,7 @@ for j = 1 : nResults
 
         % Save incidence results
         for n = 1 : nSims
-            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , '_Screen_' , ...
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawInc' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
@@ -181,7 +181,7 @@ for j = 1 : nResults
         
         % Save incidence results
         for n = 1 : nSims
-            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , '_Screen_' , ...
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
@@ -239,7 +239,7 @@ for j = 1 : nResults
 
         % Save mortality results
         for n = 1 : nSims
-            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , '_Screen_' , ...
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawMort' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
@@ -318,7 +318,7 @@ for j = 1 : nResults
 
         % Save mortality results
         for n = 1 : nSims
-            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , '_Screen_' , ...
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandMort' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
