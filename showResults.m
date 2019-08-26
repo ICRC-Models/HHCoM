@@ -164,8 +164,8 @@ for g = 1 : gender
         hivPrevs2 = hivPrevF_val;
     end
     figure()
-    aVec = {16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75};
-    for aInd = 1 : 12
+    aVec = {16:20,21:25,26:30,31:35,36:40,41:45,46:50}; %,51:55,56:60,61:65,66:70,71:75};
+    for aInd = 1 : 7 %12
         a = aVec{aInd};
         hivAgeInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             g , a , 1 : risk)); toInd(allcomb(10, 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
@@ -174,9 +174,9 @@ for g = 1 : gender
             g , a , 1 : risk));
         hivAge(: , aInd) = sum(popVec(: , hivAgeInds) , 2);
         hivAgeRel = bsxfun(@rdivide , hivAge(: , aInd) , sum(popVec(: , ageInds) , 2)) * 100;
-        subplot(4 , 3 , aInd)
+        subplot(3 , 3 , aInd) %subplot(4 , 3 , aInd)
         if aInd <= 7
-            plot(tVec' , hivAgeRel , prevYears , hivPrevs((aInd) : 7 : end) ,'o' ); %, ...
+            plot(tVec' , hivAgeRel , prevYears , hivPrevs((aInd) : 7 : end) ,'o'); % , ...
                 %prevYears2 , hivPrevs2((aInd) : 7 : end) , 'bo');
         else
             plot(tVec' , hivAgeRel);

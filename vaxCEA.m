@@ -4,14 +4,13 @@ waning = 0;    % turn waning on or off
 
 %% Load parameters
 paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
+load([paramDir, 'general'],'stepsPerYear','disease','viral',...
     'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall')
-
 sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_080719_noBaseVax_baseScreen_singleAgeGrps']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_082119_singleAge_baseScreen_noBaseVax_2020']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -38,7 +37,7 @@ parfor n = 1 : nSims
     %vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)];
     vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : ,:)];
     vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , :) ; vaxResult{n}.newHiv(2 : end , : , : ,:)];
-    vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :) ; vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
+    %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :) ; vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
     vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
 %     vaxResult{n}.ccTreated = [curr.ccTreated(1 : end) , vaxResult{n}.ccTreated(2 : end)];
 end
@@ -613,34 +612,27 @@ end
 
 %% Population Size
 % HIV-positive women not on ART
-hivNoART = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 7 , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk)); ...
-    toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk))];
+hivNoART = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
 % All HIV-negative women
-hivNeg = [toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : 7 , 1 : periods , ...
-    1 : gender , 1 : age , 1 : risk)); ...
-    toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 9 : 10 , 1 : periods , ...
-    1 : gender , 1 : age , 1 : risk))];
+hivNeg = toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+    1 : gender , 1 : age , 1 : risk));
 % Women on ART
-art = [toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : 7 , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk)); ...
-    toInd(allcomb(10 , 6 , 1 : hpvTypes , 9 : 10 , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk))];
-genArray = {hivNoART , hivNeg , art};
+art = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+    1 : periods , 1 : gender , 1 : age , 1 : risk));
+genArray = {hivNeg , hivNoART , art};
 
 figure()
-subplot(1,2,1)
+plot(tVec , sum(noV.popVec(:,genArray{1}),2) + sum(noV.popVec(:,genArray{2}),2) + sum(noV.popVec(:,genArray{3}),2))
+hold all
 for i = 1 : length(genArray)
     plot(tVec , sum(noV.popVec(: , genArray{i}) , 2))
     hold all;
 end
-subplot(1,2,2)
-plot(tVec , sum(noV.popVec(: , genArray{1}) , 2)+sum(noV.popVec(: , genArray{2}) , 2)+sum(noV.popVec(: , genArray{3}) , 2))
 title('Population Size')
 xlabel('Year'); ylabel('Individuals')
-xlim([1910 2099]);
-legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
+xlim([1910 2120]);
+legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
 hold off
 
 %% Proportion HIV population on ART
@@ -697,10 +689,10 @@ title('HIV Prevalence All')
 
 % Total HIV positive
 hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-    1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
+    1 : periods , 1 : 2 , 16 : 50 , 1 : risk));
 hivPop = sum(noV.popVec(: , hivInds) , 2);
 artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates, ...
-    1 : periods , 1 : 2 , 4 : 10 , 1 : risk));
+    1 : periods , 1 : 2 , 16 : 50 , 1 : risk));
 art = sum(noV.popVec(: , artInds) , 2);
 % Compared to ANC data
 overallHivPrev_KZN_AC(1 , :) = 1990 : 2009;
@@ -755,7 +747,7 @@ lower_prevVal = [0.27
 
 %figure()
 popTot = noV.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-    1 : 2 , 4 : 10, 1 : risk)));
+    1 : 2 , 16 : 50, 1 : risk)));
 plot(tVec , (hivPop + art) ./ sum(popTot , 2) * 100 , overallHivPrev_KZN_AC(1 , :) , overallHivPrev_KZN_AC(2 , :) , '*')
 hold on 
 yPosError = abs(upper_prevVal - prevVal);
