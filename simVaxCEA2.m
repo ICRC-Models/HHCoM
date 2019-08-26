@@ -149,9 +149,11 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
-whoScreenAges = [36 , 46]; %[26 , 29 , 32 , 35 , 38 , 41 , 44 , 47 , 50]; % ***SET ME***: ages that get screened
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
+hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
+screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
+whoScreenAges = [36 , 46]; %[26 , 29 , 32 , 35 , 38 , 41 , 44 , 47 , 50]; % ***SET ME***: ages that get screened when using the WHOa algorithm
+cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
@@ -200,14 +202,14 @@ baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 % CISNET
 cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cisnet.screenAge = [36 , 46];
+cisnet.screenAge = cisnetScreenAges; %[36 , 46];
 cisnet.testSens = hpvSens;
 cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
 cisnet.cinTreatRetain = 1.0;
 cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy 
 cisnet.ccTreatRetain = 1.0;
-% WHO screening algorithm
+% WHO screening algorithm - version a
 who.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
 who.screenAge = whoScreenAges;
 who.testSens = hpvSensWHO;
@@ -216,20 +218,45 @@ who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
 who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
+% WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
+whob.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
+whob.screenAge = [36 , 46];
+whob.testSens = hpvSensWHO;
+whob.colpoRetain = 1.0;
+whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
+whob.cinTreatRetain = 0.90; % treatment compliance
+whob.cinTreatHpvPersist = 0.0; %100% treatment efficacy
+whob.ccTreatRetain = 0.90; % treatment compliance
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
     screenAlgs{1} = baseline;
 elseif (screenAlgorithm == 2)
-    % CISNET
+    % CISNET screening algorithm
     screenAlgs{1} = cisnet;
-elseif (screenAlgorithm ==3)
-    % WHO screening algorithm
+elseif (screenAlgorithm == 3)
+    % WHO screening algorithm - version a
     screenAlgs{1} = who;
+elseif (screenAlgorithm == 4)
+    % WHO screening algorithm - version b
+    screenAlgs{1} = whob;
 end
 
 if hivPosScreen
-    screenAlgs{2} = baseline;
+    if (screenAlgorithmNeg == 1)
+        % Baseline screening algorithm
+        screenAlgs{2} = baseline;
+    elseif (screenAlgorithmNeg == 2)
+        % CISNET screening algorithm
+        screenAlgs{2} = cisnet;
+    elseif (screenAlgorithmNeg == 3)
+        % WHO screening algorithm - version a
+        screenAlgs{2} = who;
+    elseif (screenAlgorithmNeg == 4)
+        % WHO screening algorithm - version b
+        screenAlgs{2} = whob;
+    end
+
     screenAlgs{2}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
     for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
         period = [screenYrs(i) , screenYrs(i + 1)];
