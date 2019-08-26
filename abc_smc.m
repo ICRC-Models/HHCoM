@@ -2,7 +2,7 @@
 % Note: "particle" : a set of parameters
 % Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
-function [] = abc_smc(tstep_abc , date_abc)  %(alpha , p_acc_min)
+function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
 t = tstep_abc;
 alpha = 0.6;
 p_acc_min = 0.05;
@@ -26,7 +26,7 @@ negS_format = reshape(negSumLogLmatrix , [17,numSubsets]); % first row is paramS
 negS_format = negS_format(:,uInds);
 numSubsets = size(negS_format,2); % reset as number unique sub-sets
 
-maxV = max(negS_format(1,:)); % find maximum paramSetIdx
+maxV = min(max(negS_format(1,:)) , nSets-15); % find maximum paramSetIdx
 setVec = [1:16:maxV];
 missingV = [];
 keepV = [];
@@ -74,6 +74,8 @@ end
 % Order log likelihood values in descending order, and keep top alpha-proportion.
 [temp,firstRowOrder] = sort(negS_format(1,:)); % sort by paramSetIdx
 negS_ordered = negS_format(:,firstRowOrder);
+
+negS_ordered = negS_ordered(:,(negS_ordered(1,:)<nSets)); % remove extra sets if more than nSets were run
 
 negS_ordered_flatDat = reshape(negS_ordered(2:end,:),[numFltrdSets,1]); % flatten into vector of log-likelihoods 
 if t_curr == 0
