@@ -42,16 +42,16 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %% Obtain model output for each set of sampled parameters
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ...
-    'TolMesh' , 0.001 , 'TimeLimit' , 259200 , ... 
+    'TolMesh' , 0.001 , 'MaxIter' , 10 , ... 
     'Display','iter'); %,'PlotFcn',@psplotbestf);
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
-file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat'];
-paramDir = [pwd , '/Params/'];
-dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag; output] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
-
-file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , paramSetIdx , '.dat'];
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , paramSetIdx , '_params.dat'];
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , optiParams)
+
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_info.dat'];
+paramDir = [pwd , '/Params/'];
+dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
 

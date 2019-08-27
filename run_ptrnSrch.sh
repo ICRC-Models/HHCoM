@@ -8,9 +8,9 @@ export DATE
 
 echo "Running simulations."
 INT=0
-for SETIDX in $(seq 1 1 2); do 
+for SETIDX in $(seq 1 1 4); do 
 export SETIDX
-sbatch -p csde -A csde slurm_ptrnSrch.sbatch --qos=MaxJobs2
+sbatch -p csde -A csde slurm_ptrnSrch.sbatch --qos=MaxJobs4
 #INT=$(($INT + 1))
 #if [ $INT -ge 5 ]; then 
 #sleep 4800 # pause to be kind to the scheduler

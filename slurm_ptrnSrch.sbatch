@@ -11,7 +11,7 @@
 #SBATCH --nodes=1   		 		     # Node resources
 #SBATCH --mem=58G   		                     # Memory per node
 #SBATCH --time=96:00:00 	                     # Wall clock time limit hrs:min:sec
-#SBATCH --qos=MaxJobs2
+#SBATCH --qos=MaxJobs4
 
 pwd; hostname; date
 
