@@ -42,9 +42,9 @@ hpvOn = 1;
 hivOn = 1;
 
 % Use newly calibrated parameters
-% masterSetMatrix = load([paramDir , 'masterSets_calib_05Aug19_0.dat']); % load most recent parameter sample
-% paramSet = masterSetMatrix(:,1424);
-% pIdx = [1,2,5,6,7,8,9,10,15,16,17,19,22];
+% masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_0.dat']); % load most recent parameter sample
+% paramSet = masterSetMatrix(:,2493);
+% pIdx = [1,2,5,6,7,8,9,10,19,22,25];
 % % paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
 % %    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
 % % paramSet = [4.7022; 0.47332; 0.81494; 0.70898; 0.76744; 0.38557; 0.26816; ...
@@ -644,7 +644,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_082219calib_22Aug19_0_baseline';
+% pathModifier = 'toNow_082219calib_22Aug19_0_2493';
 % savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
