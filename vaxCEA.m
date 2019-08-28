@@ -189,7 +189,7 @@ ccCost = [2617 , 8533 ,8570]; % local, regional, distant
 % artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
 %     1 : gender , 1 : age , 1 : risk));
 
-%% Vaccination
+%% Vaccination 
 discountRate = 0.03; % discount rate of 3% per annum
 cost2v = 27; % cost of 2 doses of bivalent vaccine
 import java.util.LinkedList
@@ -613,13 +613,13 @@ end
 %% Population Size
 % HIV-positive women not on ART
 hivNoART = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk));
+    1 : periods , 1 : gender , 10 : 75 , 1 : risk));
 % All HIV-negative women
 hivNeg = toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
-    1 : gender , 1 : age , 1 : risk));
+    1 : gender , 10 : 75 , 1 : risk));
 % Women on ART
 art = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-    1 : periods , 1 : gender , 1 : age , 1 : risk));
+    1 : periods , 1 : gender , 10 : 75 , 1 : risk));
 genArray = {hivNeg , hivNoART , art};
 
 figure()
@@ -639,10 +639,10 @@ hold off
 figure()
 for g = 1 : 2
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-        1 : periods , g , 3 : age , 1 : risk));
+        1 : periods , g , 10 : 75 , 1 : risk));
     artPop = sum(noV.popVec(: , artInds) , 2);
     hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-        1 : periods , g , 3 : age , 1 : risk));
+        1 : periods , g , 10 : 75 , 1 : risk));
     hivPop = sum(noV.popVec(: , hivInds) , 2);
     plot(tVec , 100 * artPop ./ (hivPop + artPop))
     hold on
@@ -651,7 +651,7 @@ xlabel('Year')
 ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
-% 
+
 %% HIV prevalance
 figure()
 for g = 1 : 2
@@ -756,6 +756,38 @@ errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
 legend('Model' , 'National ANC Data' , 'Validation set: KZN Actual (Africa Center Data)' , 'Model Western Kenya' , 'Model Western Kenya' , 'Model Western Kenya')
 
+%% HIV prevalence by gender vs. AC data
+prevYears = unique(hivPrevF_obs(: , 1));
+hivRaw(:,:,1) = hivPrevM_obs(: , 2:3);
+hivRaw(:,:,2) = hivPrevF_obs(: , 2:3);
+
+hivData(: , : , 1) = zeros(length(prevYears) , 1);
+hivData(: , : , 2) = zeros(length(prevYears) , 1);
+
+for i = 1 : length(prevYears)
+    for g = 1 : gender
+        hivData(i,1,g) = sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g)) .* 100;
+    end
+end
+
+gen = {'Male' , 'Female'};
+for g = 1 : gender
+    hivInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk)); toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk))];
+    totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk));
+    hivPop = sum(noV.popVec(: , hivInds) , 2);
+    hivPopPrev = bsxfun(@rdivide , hivPop , sum(noV.popVec(: , totInds) , 2)) * 100;
+    subplot(1,2,g)
+    plot(tVec' , hivPopPrev);
+    hold all;
+    plot(prevYears , hivData(:,:,g) , 'ro');
+    xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
+    xlim([1980 2120])
+    legend('Model' , 'Africa Center Data (Calibration)')
+end
+
 %% HPV prevalence by HIV group
 figure()
 linStyle = {'--' , '-' , ':'};
@@ -859,6 +891,22 @@ legend('HIV- lr' , 'HIV+ noART lr' , 'ART lr' , 'HIV- mr' , 'HIV+ noART mr' , 'A
 % %axis([tVec(1) tVec(end) 0 100])
 % xlabel('Year'); ylabel('Prevalence (%)'); title(' CC Prevalence')
 % legend('HIV-' , 'HIV+ noART' , 'ART')
+
+%% Vaccinated proportion
+% figure;
+
+vaxInds = [toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , [1,6] , 2 , 10 : 75 , 1 : risk)); ...
+    toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , [2,4] , 2 , 10 : 75 , 1 : risk))];
+vaxPop = sum(vaxResult{1}.popVec(: , vaxInds) , 2);
+popTot = vaxResult{1}.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+    2 , 10 : 75 , 1 : risk)));
+
+hold all;
+plot(tVec , 100 * vaxPop ./ sum(popTot , 2))
+
+axis([2020 2120 0 100])
+xlabel('Year'); ylabel('Coverage (%)');
+legend('Phase I, Scenario 1' , 'Phase 2, Scenario 5');
 
 %% Vaccinated proportion by HIV group
 figure();

@@ -187,6 +187,38 @@ for g = 1 : gender
     legend('Model' , 'Africa Center Data (Calibration)' , 'Africa Center Data (Validation)')
 end
 
+%% HIV prevalence by gender vs. AC data
+prevYears = unique(hivPrevF_obs(: , 1));
+hivRaw(:,:,1) = hivPrevM_obs(: , 2:3);
+hivRaw(:,:,2) = hivPrevF_obs(: , 2:3);
+
+hivData(: , : , 1) = zeros(length(prevYears) , 1);
+hivData(: , : , 2) = zeros(length(prevYears) , 1);
+
+for i = 1 : length(prevYears)
+    for g = 1 : gender
+        hivData(i,1,g) = sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g)) .* 100;
+    end
+end
+
+gen = {'Male' , 'Female'};
+for g = 1 : gender
+    hivInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk)); toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk))];
+    totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        g , 16 : 50 , 1 : risk));
+    hivPop = sum(popVec(: , hivInds) , 2);
+    hivPopPrev = bsxfun(@rdivide , hivPop , sum(popVec(: , totInds) , 2)) * 100;
+    subplot(1,2,g)
+    plot(tVec' , hivPopPrev);
+    hold all;
+    plot(prevYears , hivData(:,:,g) , 'ro');
+    xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
+    xlim([1980 2020])
+    legend('Model' , 'Africa Center Data (Calibration)')
+end
+
 %% HIV prevalance, all ages by gender
 figure()
 for g = 1 : 2
@@ -765,9 +797,9 @@ legend('General Population' , 'HIV+' , 'HIV-' , 'Mbulawa (General)' , ...
 %% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002 vs. McDonald 2014 data
 cinPos2017 = zeros(13 , 1);
 cinNeg2017 = cinPos2017;
-ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
-    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+ageGroup = {'17-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
 aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 for aInd = 1 : 13
     a = aVec{aInd};
@@ -986,9 +1018,9 @@ legend('Male' , 'Female')
 % ccNegPosArtTot = ccNegPosArt;
 % ccArtRel = ccAgeRel;
 % fScale = 10^5;
-% ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
-%     '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+%     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+%     '60-64' , '65-69' , '70-74' , '75-79'};
 % annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 % ccYrs = ((ccIncYears - startYear) * stepsPerYear :...
 %     (ccIncYears + 1 - startYear) * stepsPerYear);
