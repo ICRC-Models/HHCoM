@@ -73,20 +73,20 @@ end
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
-startYear = 1910;
+startYear = 1930;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
 
 % Intervention start years
 hivStartYear = 1980;
-circStartYear = 1990;
-vaxStartYear = 2014;
+circStartYear = 1990; % changed circumcision start year from 1990 to 1985
+vaxStartYear = 2019;
 
 % ART
 import java.util.LinkedList
 artDistList = LinkedList();
-maxRateM_vec = [0.40 , 0.40]; % Maximum ART coverage
-maxRateF_vec = [0.55 , 0.55];
+maxRateM_vec = [0.50 , 0.50]; % Maximum ART coverage - increase from .4 to .6 for M and from .55 to .7 for F
+maxRateF_vec = [0.60 , 0.60];
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -104,7 +104,7 @@ waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
@@ -113,7 +113,7 @@ hpvScreenStartYear = screenYrs(1);
 cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.164; 0.164; 0.164; 0.164; 0.164; 0.164];
 baseline.screenAge = 8;
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
@@ -532,4 +532,4 @@ ylabel('Frequency')
 xlabel('Times (s)')
 
 %% Show results
-showResults(pathModifier)
+showResults_Ken(pathModifier)
