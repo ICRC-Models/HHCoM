@@ -38,8 +38,24 @@ sumall = @(x) sum(x(:));
 % % end
 % Note: if reimplementing this, need to fix logic around currStep, see
 % condom use or hpv screening vectors as an example
+
 epsA = 0.3;
 epsR = 0.3;
+
+% if year < 1993
+% epsA = 0.3;
+% epsR = 0.3;
+% end
+% 
+% if (year >= 1993) && (year < 2006)
+%     epsA = 0.1;
+%     epsR = 0.1;
+% end
+% 
+% if year >= 2006
+%     epsA = 0.15;
+%     epsR = 0.15;
+% end
 
 % deltaR and deltaA - nature of assortative mixing (Kronecker delta)
 % for all times
@@ -66,6 +82,8 @@ deltaAM(3 , 2) = 0;
 deltaAM(3 , 3) = 1;
 
 acts = actsPer; % acts per partnership, from loaded workspace [gender x risk] (not currently used)
+% 
+
 
 % Rate of partner change (contact)
 % males
@@ -196,7 +214,7 @@ cAdj(isinf(cAdj)) = 0;
 peakYear = 2000;
 condStart = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
+condUseVec = linspace(0 , 0.8, (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year >= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
