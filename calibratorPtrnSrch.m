@@ -37,7 +37,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load calibration parameter information
-pIdx = load([paramDir,'pIdx_patternSrch_' , '22Aug19' , '_0.dat']);
+pIdx = load([paramDir,'pIdx_patternSrch_' , '29Aug19' , '_0.dat']);
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
 startIdx = 1;

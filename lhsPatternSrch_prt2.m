@@ -4,21 +4,24 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn)
-paramSetIdx = 1;
+function lhsPatternSrch_prt2 %(paramSetIdx , tstep , dateIn)
+
+dateIn = '29Aug19';
+
 tstep = 0;
-dateIn = '22Aug19';
-
-%delete(gcp('nocreate'));
-
 t_curr = tstep;
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 load([paramDir,'settings']);
 load([paramDir,'general']);
-paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat']);
-pIdx = load([paramDir,'pIdx_patternSrch_' , dateIn , '_0.dat']);
+%paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat']);
+
+pIdx = [1,2,5,6,7,8,9,10,19,22,25];    % indices in paramsAll cell array
+file = ['pIdx_patternSrch_' , date , '_' , num2str(t_curr) , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , pIdx)
+%pIdx = load([paramDir,'pIdx_patternSrch_' , dateIn , '_0.dat']);
 
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
@@ -35,19 +38,19 @@ ub(8) = ub(8).*10;
 initParams = paramSetMatrix(:,paramSetIdx);
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+%pc = parcluster('local');    % create a local cluster object
+%pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+%parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Obtain model output for each set of sampled parameters
 options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ...
     'TolMesh' , 0.001 , 'MaxIter' , 10 , ... 
-    'Display','iter'); %,'PlotFcn',@psplotbestf);
+    'Display','iter' , 'PlotFcn' , @psplotbestf);
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
-file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , paramSetIdx , '_params.dat'];
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_' , paramSetIdx , '_params.dat'];
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , optiParams)
 
