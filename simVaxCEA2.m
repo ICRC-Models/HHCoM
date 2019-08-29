@@ -468,7 +468,7 @@ parfor n = 1 : nTests
 %     newCin3 = newCC;
     ccDeath = newCC;
     ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , age , risk , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , numScreenAge , risk , 2);
     newTreatImm = newScreen;
     newTreatHpv = newScreen;
     newTreatHyst = newScreen;
@@ -521,7 +521,7 @@ parfor n = 1 : nTests
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                     noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                     vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                    screenAlgorithm);
+                    screenAlgorithm , numScreenAge);
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);  % for next module
                 if any(pop(end , :) <  0)
