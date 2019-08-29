@@ -10,13 +10,15 @@ disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 % demographic data
 popInit = xlsread(file , 'Population' , 'H4:I19'); % [age x gender]; initial population size - 1979 census for Kenya 
-riskDistM = xlsread(file , 'Sexual behavior' , 'F54:H69'); % [age x risk]; male risk distribution - DHS 2014 for Nyanza 
-riskDistF = xlsread(file , 'Sexual behavior' , 'C54:E69'); % [age x risk]; female risk distribution - DHS 2014 for Nyanza
-mue = xlsread(file , 'Mortality' , 'C73:D88'); % [age x gender]; background mortality - DHS 2009 Nyanza
-fertility = xlsread(file , 'Fertility' , 'Q42:W57'); % [age x disease]; fertility rate per year before 1995 - 1993 Kenya census
-fertility2 = xlsread(file , 'Fertility' , 'Z42:AE57'); % [age x disease]; fertility rate/2 for 2005 onwards
-partnersM = xlsread(file , 'Sexual behavior' , 'O54:Q69'); % [age x risk]; male partnerships per year
-partnersF = xlsread(file , 'Sexual behavior' , 'L54:N69'); % [age x risk]; female partnerships per year
+riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88'); % [age x risk]; male risk distribution - DHS 2014 for Nyanza 
+riskDistF = xlsread(file , 'Sexual behavior' , 'C73:E88'); % [age x risk]; female risk distribution - DHS 2014 for Nyanza
+partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88'); % [age x risk]; annual partners among men - DHS 2014 for Nyanza
+partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88'); % [age x risk]; annual partners among women - DHS 2014 for Nyanza
+
+mue = xlsread(file , 'Mortality' , 'C73:D88'); % [age x gender]; background mortality - Census 2009 Nyanza
+fertility = xlsread(file , 'Fertility' , 'D42:I57') .* 0.0005; % [age x disease]; fertility rate per year before 1995 - 1993 Kenya census
+fertility2 = (xlsread(file , 'Fertility' , 'Z42:AE57')) .* 0.0001 ; % [age x disease]; fertility rate/2 for 2005 onwards
+
 %actsPer = xlsread(file , 'Demographics' , 'B238:D239'); % [gender x risk]; acts per partnership (not currently used)
 epsA = xlsread(file , 'Sexual behavior' , 'B157:B159'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
 epsR = xlsread(file , 'Sexual behavior' , 'C157:C159'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
@@ -26,24 +28,24 @@ save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue
     'partnersF' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
 
 %% import and save HIV parameters
-file = [pwd , '\Config\HIV_parameters.xlsx'];
+file = [pwd , '\Config\HIV_parameters_Kenya.xlsx'];
 disp(['Loading data from ' , file , '...']);
 disp('This may take a couple seconds...');
 
 % protection data
 circ = xlsread(file , 'Protection' , 'B4 : C4'); % Circumcision rate [1 x year] <2009, 2012>
-circProtect = xlsread(file , 'Protection' , 'B18'); % Protection conferred by circumcision
+circProtect = 0.53 ;%xlsread(file , 'Protection' , 'B18'); % Protection conferred by circumcision - based on Bailey et al RCT in Kisumu
 condProtect = xlsread(file , 'Protection' , 'B19'); % Protection conferred by condom use
 condUse = xlsread(file , 'Protection' , 'B25'); % Average proportion of population using condoms (not currently used, reset in mixInfect.m)
 % disease data
 MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8'); % <2004, 2005 , >2008; mother to child transmission rate - changed to Kenya rates 
 mtctVec = linspace(MTCTRate(1) , MTCTRate(end) , size(MTCTRate , 1) * 4);
-muHIV = xlsread(file , 'Disease Data' , 'B20 : G35'); %[age x cd4], [12 x 6]; HIV mortality
-kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'B44:E48'); % [gender x vl x cd4]; male cd4 progression by vl
-kCD4(2 , : , :) = xlsread(file , 'Disease Data' , 'B52:E56'); % [gender x vl x cd4]; female cd4 progression by vl
+muHIV = xlsread(file , 'Disease Data' , 'B21 : G36'); %[age x cd4], [12 x 6]; HIV mortality
+kCD4(1 , : , :) = xlsread(file , 'Disease Data' , 'B45:E49'); % [gender x vl x cd4]; male cd4 progression by vl
+kCD4(2 , : , :) = xlsread(file , 'Disease Data' , 'B53:E57'); % [gender x vl x cd4]; female cd4 progression by vl
 % viral load progression by CD4 count
-kVl(1 , : , :) = xlsread(file , 'Disease Data' , 'B65 : E69'); % [gender x cd4 x vl]; male vl progression by cd4
-kVl(2 , : , :) = xlsread(file , 'Disease Data' , 'B73 : E77'); % [gender x cd4 x vl]; female vl progression by cd4
+kVl(1 , : , :) = xlsread(file , 'Disease Data' , 'B66 : E70'); % [gender x cd4 x vl]; male vl progression by cd4
+kVl(2 , : , :) = xlsread(file , 'Disease Data' , 'B74 : E78'); % [gender x cd4 x vl]; female vl progression by cd4
 
 %% Actual data
 % disp('Retrieving actual data')
@@ -147,9 +149,9 @@ betaHIV_M2F = bsxfun(@ times , [7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04;
     7 1 5.8 6.9 11.9 0.04] , transM);
 
-file = [pwd , '\Config\Population_data.xlsx'];
-maleActs = xlsread(file , 'Demographics' , 'D199 : F214'); % [age x risk]; male acts
-femaleActs = xlsread(file , 'Demographics' , 'D219 : F234'); % [age x risk]; female acts
+file = [pwd , '\Config\Kenya_parameters.xlsx'];
+maleActs = xlsread(file , 'Sexual behavior' , 'D168 : F183'); % [age x risk]; male acts
+femaleActs = xlsread(file , 'Sexual behavior' , 'D188 : F203'); % [age x risk]; female acts
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
