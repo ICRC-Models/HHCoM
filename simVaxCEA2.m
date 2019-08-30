@@ -9,7 +9,33 @@ disp('Start up')
 % Use calibrated parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
+
+% Load general parameters
+paramDir = [pwd , '\Params\'];
+load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
+    'gender','age','risk','k','toInd','sumall')
+dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
+
+% Time
+c = fix(clock);
+currYear = c(1); % get the current year
+stepsPerYear = 6;
+timeStep = 1 / stepsPerYear;
+
+% Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
+condUse = 0.5 * 0.5;
+epsA = [0.3 ; 0.3 ; 0.3];
+epsR = [0.3 ; 0.3 ; 0.3];
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+end
 OMEGA = zeros(age , 1); % hysterectomy rate
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
@@ -32,16 +58,15 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 % % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-paramDir = [pwd , '\Params\'];
-% Load parameters
-load([paramDir,'general'])
 % Load indices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
+paramDir = [pwd , '\Params\'];
 load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -52,27 +77,40 @@ load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
-c = fix(clock);
-currYear = c(1); % get the current year
-stepsPerYear = 6;
-timeStep = 1 / stepsPerYear;
+% Model specs
+hyst = 0;
+hivOn = 1;
+hpvOn = 1;
+
+% Intervention start years
+circStartYear = 1990;
+vaxStartYear = 2014;
+
+% ART
+import java.util.LinkedList
+maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_080119_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '\HHCoM_Results\toNow_082019_noBaseVax_baseScreen_test']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '080119_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '082019_noBaseVax_baseScreen_test'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
     mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
 end
 
-% END YEAR & IMMMUNITY
-lastYear = 2100; %endYear;
+% LAST YEAR & IMMMUNITY
+lastYear = 2120; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -82,7 +120,6 @@ whoScreenAges = [8 , 10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, 
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
-
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -332,33 +369,6 @@ disp(['Simulating period from ' num2str(currYear) ' to ' num2str(lastYear) ...
 %     toVL = [];
 % end
 
-%% Initialize fixed parameters
-
-% Initialize time vectors
-years = lastYear - currYear;
-s = 1 : timeStep : years + 1;
-
-% Model specs
-hyst = 0;
-hivOn = 1;
-hpvOn = 1;
-
-dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
-
-% Intervention start years
-circStartYear = 1990;
-vaxStartYear = 2014;
-
-% ART
-import java.util.LinkedList
-artDistList = popIn.artDistList;
-maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
-
 %% Run simulation
 
 %profile on
@@ -377,6 +387,8 @@ parfor n = 1 : nTests
         vaxCoverL = vaxCoverLmat(n);
     end
     % Initialize vectors
+    years = lastYear - currYear;
+    s = 1 : timeStep : years + 1;
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popIn = currPop; % initial population to "seed" model
     newHiv = zeros(length(s) - 1 , gender , age , risk);
@@ -404,6 +416,7 @@ parfor n = 1 : nTests
     tVec = linspace(currYear , lastYear-timeStep , length(s)-1);
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+    
     %% Main body of simulation
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;
