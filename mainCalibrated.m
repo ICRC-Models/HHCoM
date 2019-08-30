@@ -532,4 +532,4 @@ ylabel('Frequency')
 xlabel('Times (s)')
 
 %% Show results
-showResults_Ken(pathModifier)
+showResults_ken(pathModifier)
