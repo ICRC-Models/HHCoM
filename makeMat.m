@@ -411,10 +411,10 @@ for a = 1 : age
         1 : periods , 2 , a , 1 : risk));
     hivPosArt = toInd(allcomb(10 , 6 , 1 : hpvTypes , [1:7 , 9:10] ,...
         1 : periods , 2 , a , 1 : risk));
-    fertMat(at(negMaleBirth , hivUninf)) = 0.5 * fertility(a , 1);
-    fertMat(at(negFemaleBirth , hivUninf)) = 0.5 * fertility(a , 1);
-    fertMat(at(negMaleBirth , hivPosArt)) = 0.5 * fertility(a , 1);
-    fertMat(at(negFemaleBirth , hivPosArt)) = 0.5 * fertility(a , 1);
+    fertMat(at(negMaleBirth , hivUninf)) =  fertility(a , 1); % delete 0.5
+    fertMat(at(negFemaleBirth , hivUninf)) = fertility(a , 1);
+    fertMat(at(negMaleBirth , hivPosArt)) =  fertility(a , 1);
+    fertMat(at(negFemaleBirth , hivPosArt)) = fertility(a , 1);
 end
 
 % fertility matrix accounting for infected mothers
@@ -435,10 +435,10 @@ for d = 2 : 6 % hiv infected
         for a = 1 : age
 %             kHiv = MTCTRate(1);
             hivInfected = toInd(allcomb(d , v , 1 : hpvTypes , [1:7 , 9:10] , 1 : periods , 2 , a , 1 : risk));
-            hivFertPosBirth(at(posMaleBirth , hivInfected)) = 0.5 * fertility(a , d); % * kHiv; 
-            hivFertPosBirth(at(posFemaleBirth , hivInfected)) = 0.5 * fertility(a , d); % * kHiv;
-            hivFertNegBirth(at(negMaleBirth , hivInfected)) = 0.5 * fertility(a , d); % * (1 - kHiv);
-            hivFertNegBirth(at(negFemaleBirth , hivInfected)) = 0.5 * fertility(a , d);%  * (1 - kHiv);             
+            hivFertPosBirth(at(posMaleBirth , hivInfected)) = fertility(a , d); % * kHiv; 
+            hivFertPosBirth(at(posFemaleBirth , hivInfected)) = fertility(a , d); % * kHiv;
+            hivFertNegBirth(at(negMaleBirth , hivInfected)) = fertility(a , d); % * (1 - kHiv);
+            hivFertNegBirth(at(negFemaleBirth , hivInfected)) =  fertility(a , d);%  * (1 - kHiv);             
         end
     end
 end
@@ -460,10 +460,10 @@ for a = 1 : age
         1 : periods , 2 , a , 1 : risk));
     hivPosArt = toInd(allcomb(10 , 6 , 1 : hpvTypes , [1:7 , 9:10] ,...
         1 : periods , 2 , a , 1 : risk));
-    fertMat2(at(negMaleBirth , hivUninf)) = 0.5 * fertility2(a , 1);
-    fertMat2(at(negFemaleBirth , hivUninf)) = 0.5 * fertility2(a , 1);
-    fertMat2(at(negMaleBirth , hivPosArt)) = 0.5 * fertility2(a , 1);
-    fertMat2(at(negFemaleBirth , hivPosArt)) = 0.5 * fertility2(a , 1);
+    fertMat2(at(negMaleBirth , hivUninf)) =  fertility2(a , 1); % delete 0.5 * fertility 
+    fertMat2(at(negFemaleBirth , hivUninf)) =  fertility2(a , 1);
+    fertMat2(at(negMaleBirth , hivPosArt)) = fertility2(a , 1);
+    fertMat2(at(negFemaleBirth , hivPosArt)) = fertility2(a , 1);
 end
 
 % fertility matrix accounting for infected mothers
@@ -484,10 +484,10 @@ for d = 2 : 6 % hiv infected
         for a = 1 : age
 %             kHiv = MTCTRate(1);
             hivInfected = toInd(allcomb(d , v , 1 : hpvTypes , [1:7 , 9:10] , 1 : periods , 2 , a , 1 : risk));
-            hivFertPosBirth2(at(posMaleBirth , hivInfected)) = 0.5 * fertility2(a , d); % * kHiv; 
-            hivFertPosBirth2(at(posFemaleBirth , hivInfected)) = 0.5 * fertility2(a , d); % * kHiv;
-            hivFertNegBirth2(at(negMaleBirth , hivInfected)) = 0.5 * fertility2(a , d); % * (1 - kHiv);
-            hivFertNegBirth2(at(negFemaleBirth , hivInfected)) = 0.5 * fertility2(a , d);%  * (1 - kHiv);             
+            hivFertPosBirth2(at(posMaleBirth , hivInfected)) =  fertility2(a , d); % * kHiv; 
+            hivFertPosBirth2(at(posFemaleBirth , hivInfected)) =  fertility2(a , d); % * kHiv;
+            hivFertNegBirth2(at(negMaleBirth , hivInfected)) =  fertility2(a , d); % * (1 - kHiv);
+            hivFertNegBirth2(at(negFemaleBirth , hivInfected)) = fertility2(a , d);%  * (1 - kHiv);             
         end
     end
 end
