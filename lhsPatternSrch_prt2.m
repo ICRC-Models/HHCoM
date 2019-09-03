@@ -50,11 +50,11 @@ options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
 [optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
-file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_' , paramSetIdx , '_params.dat'];
+file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_params.dat']; %, '_' , paramSetIdx
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , optiParams)
 
 file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_info.dat'];
 paramDir = [pwd , '/Params/'];
-dlmwrite([paramDir, file] , [paramSetIdx; negSumLogL; exitFlag] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
+dlmwrite([paramDir, file] , [negSumLogL; exitFlag] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append') %paramSetIdx; 
 
