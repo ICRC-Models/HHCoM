@@ -339,7 +339,7 @@ for j = 1 : nResults
         end
             
     end
-    
+
     %% HPV PREVALENCE REDUCTION - age standardized
 %     inds = {':'}; % HIV state inds
 %     plotTits1 = {'General'};
@@ -368,7 +368,7 @@ for j = 1 : nResults
 %             1 : periods , 1 : gender , a , 1 : risk));
 % 
 %         % Calculate hpv prevalence
-%         for n = 1
+%         for n = 1 : nSims
 %             hpvPrevRef = ...
 %                 (annlz(sum(vaxResult{n}.popVec(: , hpv) , 2)) ./ ...
 %                 annlz(sum(vaxResult{n}.popVec(: , popTot) , 2))) ...
