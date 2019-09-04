@@ -10,15 +10,16 @@ paramDir = [pwd ,'/Params/'];
 % load([paramDir,'hpvData'])
 % load([paramDir,'cost_weights'])
 load([paramDir , 'calibratedParams'])
+paramDir = [pwd ,'/Params/'];
+% Load parameters
+load([paramDir,'general'])
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 muHIV(11,2) = 0.02;
 OMEGA = zeros(age , 1); % hysterectomy rate
-paramDir = [pwd ,'/Params/'];
-% Load parameters
-load([paramDir,'general'])
+
 load([paramDir,'calibData'])
 % Load indices
 load([paramDir,'mixInfectIndices'])
@@ -42,8 +43,8 @@ hpvOn = 1;
 hivOn = 1;
 
 % Use newly calibrated parameters
-% masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_0.dat']); % load most recent parameter sample
-% paramSet = masterSetMatrix(:,2493);
+% masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_6.dat']); % load most recent parameter sample
+% paramSet = masterSetMatrix(:,5);
 % pIdx = [1,2,5,6,7,8,9,10,19,22,25];
 % % paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
 % %    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
@@ -644,7 +645,7 @@ else
 end
 
 % negSumLogL
-% pathModifier = 'toNow_082219calib_22Aug19_0_2493';
+% pathModifier = 'toNow_090319calib_22Aug19_6_5';
 % savdir = [pwd , '\HHCoM_Results\'];
 % save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 %     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
