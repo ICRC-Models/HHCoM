@@ -1,11 +1,11 @@
 % Accepts population vector from calibrated natural history model as input
 
 % Use calibrated parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
 % Load general parameters
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
@@ -25,14 +25,14 @@ muHIV(11,2) = 0.02;
 OMEGA = zeros(age , 1); % hysterectomy rate
 
 % Load indices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir,'mixInfectIndices'])
 % load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
 load([paramDir,'hivIndices'])
 load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
@@ -219,15 +219,15 @@ end
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '\HHCoM_Results\toNow_090319calib_22Aug19_baseline']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_090319calib_22Aug19_baseline']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '090319calib_22Aug19_baseline'; % ***SET ME***: name for simulation output file
-if ~ exist([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\'])
-    mkdir ([pwd, '\HHCoM_Results\Vaccine' , pathModifier, '\'])
+if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
