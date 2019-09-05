@@ -622,35 +622,60 @@ art = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
     1 : periods , 1 : gender , 10 : 75 , 1 : risk));
 genArray = {hivNeg , hivNoART , art};
 
-figure()
+%figure()
+subplot(2,1,1);
 plot(tVec , sum(noV.popVec(:,genArray{1}),2) + sum(noV.popVec(:,genArray{2}),2) + sum(noV.popVec(:,genArray{3}),2))
-hold all
-for i = 1 : length(genArray)
-    plot(tVec , sum(noV.popVec(: , genArray{i}) , 2))
-    hold all;
-end
+% hold all
+% for i = 1 : length(genArray)
+%     plot(tVec , sum(noV.popVec(: , genArray{i}) , 2))
+%     hold all;
+% end
 title('Population Size')
 xlabel('Year'); ylabel('Individuals')
-xlim([1910 2120]);
+xlim([1950 2120]);
 legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
 hold off
 
+%figure;
+subplot(2,1,2);
+aVec = {10:15,16:25,26:35,36:50,51:75};
+popProp = zeros(length(tVec),length(aVec));
+for aInd = 1:length(aVec)
+    a = aVec{aInd};
+    popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 1 : gender , a , 1 : risk));
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 1 : gender , 10 : 75 , 1 : risk));
+    popProp(:,aInd) = sum(noV.popVec(:,popAge),2) ./ sum(noV.popVec(:,popTot),2);
+end
+plot(tVec , popProp);
+ylabel('Proportion'); xlabel('Year');
+xlim([1950 2120]);
+legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
+
 %% Proportion HIV population on ART
-figure()
-for g = 1 : 2
+gender = {'Females (ages 15-74)','Males (ages 15-74)'};
+gList = [2,1];
+
+for gInt = 1 : 2
+    g = gList(gInt);
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
-        1 : periods , g , 10 : 75 , 1 : risk));
+        1 : periods , g , 16 : 75 , 1 : risk));
     artPop = sum(noV.popVec(: , artInds) , 2);
     hivInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
-        1 : periods , g , 10 : 75 , 1 : risk));
+        1 : periods , g , 16 : 75 , 1 : risk));
     hivPop = sum(noV.popVec(: , hivInds) , 2);
+    subplot(2,1,gInt);
     plot(tVec , 100 * artPop ./ (hivPop + artPop))
     hold on
+    xlabel('Year')
+    %ylabel('Proportion of HIV Population')
+    ylabel('Coverage (%)');
+    title(gender{gInt});
+    %legend('Model (Male)' , 'Model (Female)')
+    axis([2000 2050 0 100])
+
 end
-xlabel('Year')
-ylabel('Proportion of HIV Population')
-title('Proportion on ART')
-legend('Model (Male)' , 'Model (Female)')
 
 %% HIV prevalance
 figure()
@@ -907,6 +932,24 @@ plot(tVec , 100 * vaxPop ./ sum(popTot , 2))
 axis([2020 2120 0 100])
 xlabel('Year'); ylabel('Coverage (%)');
 legend('Phase I, Scenario 1' , 'Phase 2, Scenario 5');
+
+figure;
+aVec = {10:15,16:25,26:35,36:50,51:75};
+for aInd = 1:length(aVec)
+    a = aVec{aInd};
+    vaxInds = [toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , [1,6] , 2 , a , 1 : risk)); ...
+    toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , [2,4] , 2 , a , 1 : risk))];
+    vaxPop = sum(vaxResult{1}.popVec(: , vaxInds) , 2);
+    popTot = vaxResult{1}.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        2 , a , 1 : risk)));
+
+    hold all;
+    plot(tVec , 100 * vaxPop ./ sum(popTot , 2))
+    axis([2010 2120 0 100])
+    xlabel('Year'); ylabel('Coverage (%)');
+    %legend('Phase I, Scenario 1' , 'Phase 2, Scenario 5');
+    legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
+end
 
 %% Vaccinated proportion by HIV group
 figure();
