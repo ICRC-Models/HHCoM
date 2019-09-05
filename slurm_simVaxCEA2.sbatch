@@ -14,7 +14,7 @@
 
 pwd; hostname; date
 
-echo "Running MATLAB script simVaxCEA2 for historical simulation."
+echo "Running MATLAB script simVaxCEA2 for simulation predictions."
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
