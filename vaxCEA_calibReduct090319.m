@@ -22,33 +22,47 @@ dirName_calibCurr2 = 'toNow_090319calib_22Aug19_6_7';
 dirName_calibCurr3 = 'toNow_090319calib_22Aug19_6_8';
 dirName_calibCurr4 = 'toNow_090319calib_22Aug19_6_9';
 dirName_calibCurr5 = 'toNow_090319calib_22Aug19_6_10';
-dirName_calibCurr6 = 'toNow_090319calib_22Aug19_6_1_CU50';
-dirName_calibCurr7 = 'toNow_090319calib_22Aug19_6_2_CU50';
-dirName_calibCurr8 = 'toNow_090319calib_22Aug19_6_3_CU50';
-dirName_calibCurr9 = 'toNow_090319calib_22Aug19_6_4_CU50';
-dirName_calibCurr10 = 'toNow_090319calib_22Aug19_6_5_CU50';
-dirName_calibCurr11 = 'toNow_090319calib_22Aug19_6_6_CU50';
-dirName_calibCurr12 = 'toNow_090319calib_22Aug19_6_7_CU50';
-dirName_calibCurr13 = 'toNow_090319calib_22Aug19_6_8_CU50';
-dirName_calibCurr14 = 'toNow_090319calib_22Aug19_6_9_CU50';
-dirName_calibCurr15 = 'toNow_090319calib_22Aug19_6_10_CU50';
-dirName_calibCurr16 = 'toNow_090319calib_22Aug19_6_1_CU80';
-dirName_calibCurr17 = 'toNow_090319calib_22Aug19_6_2_CU80';
-dirName_calibCurr18 = 'toNow_090319calib_22Aug19_6_3_CU80';
-dirName_calibCurr19 = 'toNow_090319calib_22Aug19_6_4_CU80';
-dirName_calibCurr20 = 'toNow_090319calib_22Aug19_6_5_CU80';
-dirName_calibCurr21 = 'toNow_090319calib_22Aug19_6_6_CU80';
-dirName_calibCurr22 = 'toNow_090319calib_22Aug19_6_7_CU80';
-dirName_calibCurr23 = 'toNow_090319calib_22Aug19_6_8_CU80';
-dirName_calibCurr24 = 'toNow_090319calib_22Aug19_6_9_CU80';
-dirName_calibCurr25 = 'toNow_090319calib_22Aug19_6_10_CU80';
-currVec = {dirName_calibCurr1 , dirName_calibCurr2 , dirName_calibCurr3 , ...
-    dirName_calibCurr4 , dirName_calibCurr5 , dirName_calibCurr6 , dirName_calibCurr7 , ...
-    dirName_calibCurr8 , dirName_calibCurr9 , dirName_calibCurr10 , ...
-    dirName_calibCurr11 , dirName_calibCurr12 , dirName_calibCurr13 , dirName_calibCurr14 , ...
-    dirName_calibCurr15 , dirName_calibCurr16 , dirName_calibCurr17 , dirName_calibCurr18 , ...
-    dirName_calibCurr19 , dirName_calibCurr20 , dirName_calibCurr21 , dirName_calibCurr22 , ...
-    dirName_calibCurr23 , dirName_calibCurr24 , dirName_calibCurr25};
+dirName_calibCurr6 = 'toNow_090319calib_22Aug19_6_1';
+dirName_calibCurr7 = 'toNow_090319calib_22Aug19_6_2';
+dirName_calibCurr8 = 'toNow_090319calib_22Aug19_6_3';
+dirName_calibCurr9 = 'toNow_090319calib_22Aug19_6_4';
+dirName_calibCurr10 = 'toNow_090319calib_22Aug19_6_5';
+dirName_calibCurr11 = 'toNow_090319calib_22Aug19_6_6';
+dirName_calibCurr12 = 'toNow_090319calib_22Aug19_6_7';
+dirName_calibCurr13 = 'toNow_090319calib_22Aug19_6_8';
+dirName_calibCurr14 = 'toNow_090319calib_22Aug19_6_9';
+dirName_calibCurr15 = 'toNow_090319calib_22Aug19_6_10';
+dirName_calibCurr16 = 'toNow_090319calib_22Aug19_6_1';
+dirName_calibCurr17 = 'toNow_090319calib_22Aug19_6_2';
+dirName_calibCurr18 = 'toNow_090319calib_22Aug19_6_3';
+dirName_calibCurr19 = 'toNow_090319calib_22Aug19_6_4';
+dirName_calibCurr20 = 'toNow_090319calib_22Aug19_6_5';
+dirName_calibCurr21 = 'toNow_090319calib_22Aug19_6_6';
+dirName_calibCurr22 = 'toNow_090319calib_22Aug19_6_7';
+dirName_calibCurr23 = 'toNow_090319calib_22Aug19_6_8';
+dirName_calibCurr24 = 'toNow_090319calib_22Aug19_6_9';
+dirName_calibCurr25 = 'toNow_090319calib_22Aug19_6_10';
+dirName_calibCurr26 = 'toNow_090319calib_22Aug19_baseline';
+dirName_calibCurr27 = 'toNow_090319calib_22Aug19_baseline';
+dirName_calibCurr28 = 'toNow_090319calib_22Aug19_baseline';
+dirName_calibCurr29 = 'toNow_090319calib_22Aug19_6_1';
+dirName_calibCurr30 = 'toNow_090319calib_22Aug19_6_2';
+dirName_calibCurr31 = 'toNow_090319calib_22Aug19_6_3';
+dirName_calibCurr32 = 'toNow_090319calib_22Aug19_6_4';
+dirName_calibCurr33 = 'toNow_090319calib_22Aug19_6_5';
+currVec = {dirName_calibCurr26 , dirName_calibCurr27 , dirName_calibCurr28 , ...
+    dirName_calibCurr29 , dirName_calibCurr30 , dirName_calibCurr31 , ...
+    dirName_calibCurr32 , dirName_calibCurr33}; 
+% dirName_calibCurr2 , ... % dirName_calibCurr1 , dirName_calibCurr3
+%     dirName_calibCurr6 , dirName_calibCurr7 , ... %dirName_calibCurr4 , dirName_calibCurr5 , 
+%     dirName_calibCurr8 , dirName_calibCurr9 , dirName_calibCurr10 , ...
+%     dirName_calibCurr11 , dirName_calibCurr12 , dirName_calibCurr13 ,  ... %dirName_calibCurr14 ,
+%     dirName_calibCurr15 , 
+% dirName_calibCurr16 , dirName_calibCurr17 , dirName_calibCurr18 , ...
+%     dirName_calibCurr19 , dirName_calibCurr20 , dirName_calibCurr21 ,  ... %dirName_calibCurr22 ,
+%     dirName_calibCurr23
+%dirName_calibCurr14 , dirName_calibCurr15 , dirName_calibCurr23 , dirName_calibCurr24 ,  dirName_calibCurr25
+%dirName_calibCurr24 ,  dirName_calibCurr25
 
 dirName_calibSim1 = '090319calib_22Aug19_6_6';
 dirName_calibSim2 = '090319calib_22Aug19_6_7';
@@ -75,13 +89,27 @@ dirName_calibSim22 = '090319calib_22Aug19_6_7_CU80';
 dirName_calibSim23 = '090319calib_22Aug19_6_8_CU80';
 dirName_calibSim24 = '090319calib_22Aug19_6_9_CU80';
 dirName_calibSim25 = '090319calib_22Aug19_6_10_CU80';
-simVec = {dirName_calibSim1 , dirName_calibSim2 , dirName_calibSim3 , ...
-    dirName_calibSim4 , dirName_calibSim5 , dirName_calibSim6 , dirName_calibSim7 , ...
-    dirName_calibSim8 , dirName_calibSim9 , dirName_calibSim10 , ...
-    dirName_calibSim11 , dirName_calibSim12 , dirName_calibSim13 , dirName_calibSim14 , ...
-    dirName_calibSim15 , dirName_calibSim16 , dirName_calibSim17 , dirName_calibSim18 , ...
-    dirName_calibSim19 , dirName_calibSim20 , dirName_calibSim21 , dirName_calibSim22 , ...
-    dirName_calibSim23 , dirName_calibSim24 , dirName_calibSim25};
+dirName_calibSim26 = '090319calib_22Aug19_baseline';
+dirName_calibSim27 = '090319calib_22Aug19_baseline_CU50';
+dirName_calibSim28 = '090319calib_22Aug19_baseline_CU80';
+dirName_calibSim29 = '090319calib_22Aug19_6_1';
+dirName_calibSim30 = '090319calib_22Aug19_6_2';
+dirName_calibSim31 = '090319calib_22Aug19_6_3';
+dirName_calibSim32 = '090319calib_22Aug19_6_4';
+dirName_calibSim33 = '090319calib_22Aug19_6_5';
+simVec = {dirName_calibSim26 , dirName_calibSim27 , dirName_calibSim28 , ...
+    dirName_calibSim29 , dirName_calibSim30 , dirName_calibSim31 , dirName_calibSim32 , ...
+    dirName_calibSim33}; 
+% dirName_calibSim2 , ... %dirName_calibSim1 ,  dirName_calibSim3 ,
+%     dirName_calibSim6 , dirName_calibSim7 , ... %dirName_calibSim4 , dirName_calibSim5 , 
+%     dirName_calibSim8 , dirName_calibSim9 , dirName_calibSim10 , ...
+%     dirName_calibSim11 , dirName_calibSim12 , dirName_calibSim13 ,  ... %dirName_calibSim14 ,
+%     dirName_calibSim15 , 
+% dirName_calibSim16 , dirName_calibSim17 , dirName_calibSim18 , ...
+%     dirName_calibSim19 , dirName_calibSim20 , dirName_calibSim21 , ... %dirName_calibSim22 , 
+%     dirName_calibSim23 
+%dirName_calibSim14 , dirName_calibSim15 , dirName_calibSim23 ,
+%dirName_calibSim24 , dirName_calibSim25 %, dirName_calibSim24 , dirName_calibSim25
 
 r80inc = [];
 r90inc = [];
@@ -109,7 +137,7 @@ for j = 1 : length(simVec)
         % matrices for years past current year
         vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end-5 , :)];
         vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end-5 , : , : , :)];
-        vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end-5 , : , : , :)];
+        vaxResult{n}.ccDeath = [vaxResult{n}.ccDeath(2 : end-5 , : , : , :)];
         vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end-5)];
     end
 
@@ -136,7 +164,7 @@ for j = 1 : length(simVec)
     linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g' , 'c'};
     set(gca,'ColorOrderIndex',1)
 
-    for i = 1 : length(inds)
+    for i = 1 : 1 %length(inds)
         % General
         allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
             1 : periods , 2 , 3 : age , 1 : risk)); ...
@@ -199,7 +227,7 @@ for j = 1 : length(simVec)
             end
     
             % Save reduction results
-            fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , dirName_calibSim , '_' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+            fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
             sname = [plotTits1{i} , '_IncRed'];
             if exist(fname , 'file') == 2
@@ -231,7 +259,7 @@ for j = 1 : length(simVec)
     linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g' , 'c'};
     set(gca,'ColorOrderIndex',1)
 
-    for i = 1 : length(inds)
+    for i = 1 : 1 %length(inds)
         % General
         allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
             1 : periods , 2 , 3 : age , 1 : risk)); ...
@@ -263,13 +291,13 @@ for j = 1 : length(simVec)
         % Baseline
         ccMortRef = ...
             (annlz(sum(sum(sum(vaxResult{noVaxInd}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-            (annlz(sum(vaxResult{noVaxInd}.popVec(length(curr.tVec) : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
+            (annlz(sum(vaxResult{noVaxInd}.popVec(length(curr.tVec) +1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
         vaxResult{noVaxInd}.ccMort = ccMortRef;
         % Increased vaccination scenarios
         for n = 1 : length(vaxResult)-1
             ccMortRef = ...
                 (annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-                (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+                (annlz(sum(vaxResult{n}.popVec(length(curr.tVec) +1 : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
             vaxResult{n}.ccMort = ccMortRef;
         end
 
@@ -295,7 +323,7 @@ for j = 1 : length(simVec)
             end
     
             % Save reduction results
-                fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , dirName_calibSim , '_' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+                fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
                     'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_Mort' , '.xlsx'];
                 sname = [plotTits1{i} , '_MortRed'];
                 if exist(fname , 'file') == 2
@@ -311,6 +339,11 @@ for j = 1 : length(simVec)
     % %title('Percent Reduction in Mortality')
     % xlabel('Year'); ylabel('Percent change')
     % set(gca,'FontSize',18)
+    
+    r80inc
+    r90inc
+    r80mort
+    r90mort
 end
 
 r80inc
