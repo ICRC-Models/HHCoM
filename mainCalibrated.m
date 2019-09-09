@@ -41,6 +41,7 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
         yr(i) : timeStep : yr(i + 1));
 end
 OMEGA = zeros(age , 1); % hysterectomy rate
+muHIV(11,2) = 0.02;
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
@@ -113,7 +114,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_090319_noBaseVax_baseScreen_mainCalCompare'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_090919_noBaseVax_baseScreen_GuiAbstract'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
