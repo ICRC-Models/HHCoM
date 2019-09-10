@@ -50,9 +50,13 @@ dirName_calibCurr30 = 'toNow_090319calib_22Aug19_6_2';
 dirName_calibCurr31 = 'toNow_090319calib_22Aug19_6_3';
 dirName_calibCurr32 = 'toNow_090319calib_22Aug19_6_4';
 dirName_calibCurr33 = 'toNow_090319calib_22Aug19_6_5';
-currVec = {dirName_calibCurr26 , dirName_calibCurr27 , dirName_calibCurr28 , ...
-    dirName_calibCurr29 , dirName_calibCurr30 , dirName_calibCurr31 , ...
-    dirName_calibCurr32 , dirName_calibCurr33}; 
+dirName_calibCurr34 = 'toNow_090919calib_22Aug19_10_3607'; 
+dirName_calibCurr35 = 'toNow_090919calib_22Aug19_11_4628';
+dirName_calibCurr36 = 'toNow_090919_noBaseVax_baseScreen_GuiAbstract';
+currVec = {dirName_calibCurr36 , dirName_calibCurr36 , dirName_calibCurr36};
+% {dirName_calibCurr26 , dirName_calibCurr27 , dirName_calibCurr28 , ...
+%     dirName_calibCurr29 , dirName_calibCurr30 , dirName_calibCurr31 , ...
+%     dirName_calibCurr32 , dirName_calibCurr33}; 
 % dirName_calibCurr2 , ... % dirName_calibCurr1 , dirName_calibCurr3
 %     dirName_calibCurr6 , dirName_calibCurr7 , ... %dirName_calibCurr4 , dirName_calibCurr5 , 
 %     dirName_calibCurr8 , dirName_calibCurr9 , dirName_calibCurr10 , ...
@@ -97,9 +101,19 @@ dirName_calibSim30 = '090319calib_22Aug19_6_2';
 dirName_calibSim31 = '090319calib_22Aug19_6_3';
 dirName_calibSim32 = '090319calib_22Aug19_6_4';
 dirName_calibSim33 = '090319calib_22Aug19_6_5';
-simVec = {dirName_calibSim26 , dirName_calibSim27 , dirName_calibSim28 , ...
-    dirName_calibSim29 , dirName_calibSim30 , dirName_calibSim31 , dirName_calibSim32 , ...
-    dirName_calibSim33}; 
+dirName_calibSim34 = '090919calib_22Aug19_10_3607';
+dirName_calibSim35 = '090919calib_22Aug19_10_3607_CU50'; 
+dirName_calibSim36 = '090919calib_22Aug19_10_3607_CU80'; 
+dirName_calibSim37 = '090919calib_22Aug19_11_4628';
+dirName_calibSim38 = '090919calib_22Aug19_11_4628_CU50';
+dirName_calibSim39 = '090919calib_22Aug19_11_4628_CU80';
+dirName_calibSim40 = '090919_noBaseVax_baseScreen_GuiAbstract';
+dirName_calibSim41 = '090919_noBaseVax_baseScreen_GuiAbstract_CU50';
+dirName_calibSim42 = '090919_noBaseVax_baseScreen_GuiAbstract_CU80';
+simVec = {dirName_calibSim40 , dirName_calibSim41 , dirName_calibSim42};
+% {dirName_calibSim26 , dirName_calibSim27 , dirName_calibSim28 , ...
+%     dirName_calibSim29 , dirName_calibSim30 , dirName_calibSim31 , dirName_calibSim32 , ...
+%     dirName_calibSim33}; 
 % dirName_calibSim2 , ... %dirName_calibSim1 ,  dirName_calibSim3 ,
 %     dirName_calibSim6 , dirName_calibSim7 , ... %dirName_calibSim4 , dirName_calibSim5 , 
 %     dirName_calibSim8 , dirName_calibSim9 , dirName_calibSim10 , ...
@@ -135,12 +149,12 @@ for j = 1 : length(simVec)
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
         % matrices for years past current year
-        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end-5 , :)];
-        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end-5 , : , : , :)];
-        vaxResult{n}.ccDeath = [vaxResult{n}.ccDeath(2 : end-5 , : , : , :)];
-        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end-5)];
+        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end , :)];
+        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : , :)];
+        vaxResult{n}.ccDeath = [vaxResult{n}.ccDeath(2 : end , : , : , :)];
+        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
     end
-
+    
     noVaxInd = nSims;
     tVec = vaxResult{noVaxInd}.tVec;
     tVecYr = tVec(1 : stepsPerYear : end);
@@ -148,7 +162,6 @@ for j = 1 : length(simVec)
     % Plot settings
     reset(0)
     set(0 , 'defaultlinelinewidth' , 2)
-
 
     %% CC INCIDENCE REDUCTION- WITH VACCINATION
     inds = {':' , [1,7:9] , [2 : 6] , 10 , [2:6,10]}; % HIV state inds
@@ -340,13 +353,13 @@ for j = 1 : length(simVec)
     % xlabel('Year'); ylabel('Percent change')
     % set(gca,'FontSize',18)
     
-    r80inc
-    r90inc
-    r80mort
-    r90mort
+%     r80inc
+%     r90inc
+%     r80mort
+%     r90mort
 end
 
-r80inc
-r90inc
-r80mort
-r90mort
+% r80inc
+% r90inc
+% r80mort
+% r90mort
