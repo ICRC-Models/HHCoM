@@ -133,13 +133,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_082119_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_090519_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '082119_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
+pathModifier = '090519_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
@@ -210,7 +210,7 @@ cisnet.cinTreatRetain = 1.0;
 cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy 
 cisnet.ccTreatRetain = 1.0;
 % WHO screening algorithm - version a
-who.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
+who.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
 who.screenAge = whoScreenAges;
 who.testSens = hpvSensWHO;
 who.colpoRetain = 1.0;
@@ -219,7 +219,7 @@ who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
 % WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
-whob.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
+whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
 whob.screenAge = [36 , 46];
 whob.testSens = hpvSensWHO;
 whob.colpoRetain = 1.0;
