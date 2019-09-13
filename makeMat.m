@@ -1,67 +1,98 @@
 function makeMat
 close all; clear all; clc
 % loadUp(6);
-%% Initialize pop vector
+%% Load variables and initialize pop vector
 disp('Building matrices')
 paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
-load([paramDir , 'popData'])
 savedir = [pwd , '\Params']; 
+
+% % load([paramDir, 'general'])
+% % load([paramDir , 'popData'])
+% % load([paramDir , 'HIVParams'])
+load([paramDir , 'calibratedParams'])
+perPartnerHpv = 0.0045;
+load([paramDir,'general'])
+
 pop = spalloc(prod(dim) , 1 , prod(dim));
-at = @(x , y) sort(prod(dim)*(y-1) + x); 
+at = @(x , y) sort(prod(dim)*(y-1) + x);
+
+%% Convert 5-year age groups to 1-year age groups
+
+% Divide popInit age groups equally into five
+popInit_orig = popInit;
+[ageDim, valDim] = size(popInit_orig);
+popInit = zeros(ageDim*5 , valDim);
+for i = 1 : ageDim
+    popInit(((i-1)*5+1) : i*5 , :) = ones(5 , valDim) .* (popInit_orig(i , :)./5);
+end
+
+% Replicate rates across single age groups for other variables
+vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , ...
+             'partnersM' , 'partnersF' , 'muHIV' , 'maleActs' , 'femaleActs' , 'kCin1_Inf' , ...
+             'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , 'kInf_Cin1' , ...
+             'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , ...
+             partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
+             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
+             kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};
+for j = 1 : length(vars5To1_vals)
+    valsA1 = age5To1(vars5To1_vals{j});
+    assignin('base', vars5To1_nms{j} , valsA1);
+end
+
 %% aging and risk assortment
-disp('Building aging matrix')
-% aging matrix
-ageIn = spalloc(numel(pop) , numel(pop) , numel(pop));
-for g = 1 : gender
-    for a = 1 : age - 1
-        for r = 1 : risk
-            fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
-                1 : hpvStates , 1 : periods , g , a, r));
-            toAge = toInd (allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
-                1 : hpvStates , 1 : periods , g , a + 1 , r));
-            ageIn(at(toAge , fromAge)) = 1/5;
-        end
-    end
-end
-
-% risk sorting matrix
-disp('Building risk sorting matrix')
-riskSorter = speye(numel(pop) , numel(pop));
-riskDist(1 , : , :) = riskDistM;
-riskDist(2 , : , :) = riskDistF;
-for g = 1 : gender
-    for a = 1 : age
-        for r = 1 : risk
-            for rr = 1 : risk
-                fromRisk = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
-                    1 : hpvStates , 1 : periods , g , a , r));
-                toRisk = toInd (allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
-                    1 : hpvStates , 1 : periods , g , a , rr));
-                riskSorter(at(toRisk , fromRisk)) = riskDist(g , a , rr);
-            end
-        end
-    end
-end
-save(fullfile(savedir , 'riskSorter') , 'riskSorter');
-
-disp('Combining age and risk sorting matrices')
-ageRiskSorter = riskSorter * ageIn;
-save(fullfile(savedir , 'ageRiskSorter') , 'ageRiskSorter')
-ageOut = spalloc(numel(pop) , numel(pop) , numel(pop));
-for g = 1 : gender
-    for a = 1 : age
-        for r = 1 : risk
-            fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
-                1 : hpvStates , 1 : periods , g , a, r));
-            ageOut(at(fromAge , fromAge)) = - 1/5;
-        end
-    end
-end
-save(fullfile(savedir ,'ageOut') , 'ageOut')
-ager = riskSorter * ageIn + ageOut;
-save(fullfile(savedir ,'ager') , 'ager')
-disp('Finished building age and risk matrices')
+% disp('Building aging matrix')
+% % aging matrix
+% ageIn = spalloc(numel(pop) , numel(pop) , numel(pop));
+% for g = 1 : gender
+%     for a = 1 : age - 1
+%         for r = 1 : risk
+%             fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+%                 1 : hpvStates , 1 : periods , g , a, r));
+%             toAge = toInd (allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+%                 1 : hpvStates , 1 : periods , g , a + 1 , r));
+%             ageIn(at(toAge , fromAge)) = 1.0;
+%         end
+%     end
+% end
+% 
+% % risk sorting matrix
+% disp('Building risk sorting matrix')
+% riskSorter = speye(numel(pop) , numel(pop));
+% riskDist(1 , : , :) = riskDistM;
+% riskDist(2 , : , :) = riskDistF;
+% for g = 1 : gender
+%     for a = 1 : age
+%         for r = 1 : risk
+%             for rr = 1 : risk
+%                 fromRisk = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+%                     1 : hpvStates , 1 : periods , g , a , r));
+%                 toRisk = toInd (allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+%                     1 : hpvStates , 1 : periods , g , a , rr));
+%                 riskSorter(at(toRisk , fromRisk)) = riskDist(g , a , rr);
+%             end
+%         end
+%     end
+% end
+% save(fullfile(savedir , 'riskSorter') , 'riskSorter');
+% 
+% disp('Combining age and risk sorting matrices')
+% ageRiskSorter = riskSorter * ageIn;
+% save(fullfile(savedir , 'ageRiskSorter') , 'ageRiskSorter')
+% ageOut = spalloc(numel(pop) , numel(pop) , numel(pop));
+% for g = 1 : gender
+%     for a = 1 : age
+%         for r = 1 : risk
+%             fromAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , ...
+%                 1 : hpvStates , 1 : periods , g , a, r));
+%             ageOut(at(fromAge , fromAge)) = - 1.0;
+%         end
+%     end
+% end
+% save(fullfile(savedir ,'ageOut') , 'ageOut')
+% ager = riskSorter * ageIn + ageOut;
+% save(fullfile(savedir ,'ager') , 'ager')
+% disp('Finished building age and risk matrices')
 %% hiv
 % produces hivTrans, hivDeathMat, artMat, and prepMat
 
@@ -170,7 +201,7 @@ disp('Finished building age and risk matrices')
 % disp('Finished building HIV matrices.')
 %% Viral load progression (by CD4 count)
 disp('Building viral load progression matrix')
-load([paramDir , 'HIVParams'])
+
 vlAdvancer = spalloc(numel(pop) , numel(pop) , numel(pop));
 
 for g = 1 : gender
@@ -398,8 +429,6 @@ disp('Finished building viral load progression matrix')
 % disp('Finished building HPV screening and treatment matrix')
 %% bornDie
 %% Fertility prior to 1995
-load([paramDir ,'HIVParams'])
-load([paramDir ,'popData'])
 fertMat = spalloc(numel(pop) , numel(pop) , numel(pop));
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
@@ -447,8 +476,6 @@ end
 save(fullfile(savedir ,'fertMat') , 'fertMat')
 save(fullfile(savedir ,'hivFertMats') , 'hivFertPosBirth' , 'hivFertNegBirth')
 %% Fertility from 2005 onwards
-load([paramDir ,'HIVParams'])
-load([paramDir ,'popData'])
 fertMat2 = spalloc(numel(pop) , numel(pop) , numel(pop));
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));

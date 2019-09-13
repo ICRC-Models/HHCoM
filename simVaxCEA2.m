@@ -3,28 +3,54 @@
 close all;clear all;clc
 %profile clear;
 
-%%
+%% Load calibrated parameters and reset general parameters based on changes to model
 disp('Start up')
 
 % Use calibrated parameters
 paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-% Load general parameters
+% Load general parameters and reset changed parameters
 paramDir = [pwd , '/Params/'];
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
-    'gender','age','risk','k','toInd','sumall')
+    'gender','age','risk','k')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
+at = @(x , y) sort(prod(dim)*(y-1) + x);
+toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
+    + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
+    + (x(: , 2) - 1) * k(1) + x(: , 1);
+sumall = @(x) sum(x(:));
+
+muHIV(11 , 2) = 0.02;
+
+%% Convert 5-year age groups to 1-year age groups
+% Replicate rates across single age groups
+vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , ...
+             'partnersM' , 'partnersF' , 'muHIV' , 'maleActs' , 'femaleActs' , 'kCin1_Inf' , ...
+             'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , 'kInf_Cin1' , ...
+             'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , ...
+             partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
+             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
+             kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};
+for j = 1 : length(vars5To1_vals)
+    valsA1 = age5To1(vars5To1_vals{j});
+    assignin('base', vars5To1_nms{j} , valsA1);
+end
+
+riskDist = zeros(age , risk , 2);
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
-% Adjust parameters different than calibrated
+% Reset  additional changed parameters different than calibrated; load indices and matrices
 perPartnerHpv = 0.0045;
-condUse = 0.5 * 0.5;
+condUse = 0.20; %0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
@@ -37,7 +63,14 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
         yr(i) : timeStep : yr(i + 1));
 end
 OMEGA = zeros(age , 1); % hysterectomy rate
-muHIV(11,2) = 0.02;
+betaHIVF2M = zeros(age , risk , viral);
+betaHIVM2F = betaHIVF2M;
+for a = 1 : age % calculate per-partnership probability of HIV transmission
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % % rNormal_Inf = ones(age,1); % for VCLIR analysis
 % % hpv_hivClear = ones(4,1);
 % % kCIN1_Inf = zeros(age,1);
@@ -68,7 +101,7 @@ load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
 paramDir = [pwd , '/Params/'];
-load([paramDir,'ager'])
+%load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
@@ -99,45 +132,47 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_091319_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_091319_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '091319_noBaseVax_baseScreen'; % ***SET ME***: name for simulation output file
+pathModifier = '091319_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2100; % ***SET ME***: end year of simulation run
+lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
-whoScreenAges = [8 , 10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
+hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
+screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
+whoScreenAges = [36 , 46]; %[26 , 29 , 32 , 35 , 38 , 41 , 44 , 47 , 50]; % ***SET ME***: ages that get screened when using the WHOa algorithm
+cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = 2;
-vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxAgeB = [10];
+vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
-%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
-vaxAge = 3;
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
+vaxAge = [10 : 15];
 vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
-hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 , 5 , 6];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [0.8 , 0.8 , 0.8];    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+vaxAgeCU = [16 : 46]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = ones(1,length(vaxAgeCU)).*0.80; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -157,7 +192,7 @@ hpvSensWHO = [0.0 , 0.0 , 0.90 , 0.94 , 0.94 , 0.94 , 0.94 , 0.0 , 0.0 , 0.0]; %
 
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
-baseline.screenAge = 8;
+baseline.screenAge = 36;
 baseline.testSens = cytoSens;
 baseline.colpoRetain = 0.72;
 baseline.cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
@@ -166,15 +201,15 @@ baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 % CISNET
 cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cisnet.screenAge = [8 , 10];
+cisnet.screenAge = cisnetScreenAges; %[36 , 46];
 cisnet.testSens = hpvSens;
 cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
 cisnet.cinTreatRetain = 1.0;
 cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy 
 cisnet.ccTreatRetain = 1.0;
-% WHO screening algorithm
-who.screenCover = [0.0; 0.18; 0.48; 0.48*0.90; 0.48*0.90; 0.70*0.90; 0.90*0.90]; %90% screening compliance beginning in current year
+% WHO screening algorithm - version a
+who.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
 who.screenAge = whoScreenAges;
 who.testSens = hpvSensWHO;
 who.colpoRetain = 1.0;
@@ -182,20 +217,45 @@ who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
 who.cinTreatRetain = 0.90; % treatment compliance
 who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
 who.ccTreatRetain = 0.90; % treatment compliance
+% WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
+whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
+whob.screenAge = [36 , 46];
+whob.testSens = hpvSensWHO;
+whob.colpoRetain = 1.0;
+whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
+whob.cinTreatRetain = 0.90; % treatment compliance
+whob.cinTreatHpvPersist = 0.0; %100% treatment efficacy
+whob.ccTreatRetain = 0.90; % treatment compliance
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
     screenAlgs{1} = baseline;
 elseif (screenAlgorithm == 2)
-    % CISNET
+    % CISNET screening algorithm
     screenAlgs{1} = cisnet;
-elseif (screenAlgorithm ==3)
-    % WHO screening algorithm
+elseif (screenAlgorithm == 3)
+    % WHO screening algorithm - version a
     screenAlgs{1} = who;
+elseif (screenAlgorithm == 4)
+    % WHO screening algorithm - version b
+    screenAlgs{1} = whob;
 end
 
 if hivPosScreen
-    screenAlgs{2} = baseline;
+    if (screenAlgorithmNeg == 1)
+        % Baseline screening algorithm
+        screenAlgs{2} = baseline;
+    elseif (screenAlgorithmNeg == 2)
+        % CISNET screening algorithm
+        screenAlgs{2} = cisnet;
+    elseif (screenAlgorithmNeg == 3)
+        % WHO screening algorithm - version a
+        screenAlgs{2} = who;
+    elseif (screenAlgorithmNeg == 4)
+        % WHO screening algorithm - version b
+        screenAlgs{2} = whob;
+    end
+
     screenAlgs{2}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
     for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
         period = [screenYrs(i) , screenYrs(i + 1)];
@@ -216,25 +276,30 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values a
 end
 
 % Create screening indices
-screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAlgs{1}.screenAge) , risk);
-screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAlgs{1}.screenAge) , risk);
-noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAlgs{1}.screenAge) , risk);
+numScreenAge = length(screenAlgs{1}.screenAge);
+agesComb = screenAlgs{1}.screenAge;
+if hivPosScreen
+    numScreenAge = numScreenAge + length(screenAlgs{2}.screenAge);
+    agesComb = [agesComb , screenAlgs{2}.screenAge];
+end
+screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , numScreenAge , risk);
+screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , numScreenAge , risk);
+noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
 vaxToScreen = noVaxNoScreen;
-noVaxToScreenTreatImm = zeros(disease , viral , length(screenAlgs{1}.screenAge) , risk);
+noVaxToScreenTreatImm = zeros(disease , viral , numScreenAge , risk);
 vaxToScreenTreatImm = noVaxToScreenTreatImm;
 noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
-noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , length(screenAlgs{1}.screenAge));
+noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , numScreenAge);
 noVaxXscreen = noVaxScreen;
 vaxScreen = noVaxScreen;
 vaxXscreen = noVaxScreen;
-for aS = 1 : length(screenAlgs{1}.screenAge)
-    a = screenAlgs{1}.screenAge(aS);
-    
+for aS = 1 : numScreenAge
+    a = agesComb(aS);
     for d = 1 : disease
         for v = 1 : viral
             for h = 1 : hpvTypes
@@ -310,7 +375,7 @@ lambdaMultVaxMat = zeros(age , nTests); % nTests-1 % age-based vector for modify
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff)); % nTests - 1
 for n = 1 : nTests %nTests - 1
     % No waning
-    lambdaMultVaxMat(testParams2{n , 1} : age , n) = vaxEff(vaxEffInd(n));
+    lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
@@ -323,10 +388,10 @@ for n = 1 : nTests %nTests - 1
         % waning is based on the least effective initial vaccine efficacy scenario.        
         kWane = min(vaxEff) / round(wanePeriod / 5);     
         vaxInit = vaxEff(vaxEffInd(n));
-        lambdaMultVaxMat(round(effPeriod / 5) + testParams2{n , 1} - 1 : age , n) = ...
+        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : age , n) = ...
             max(0 , linspace(vaxInit , ...
-            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + testParams2{n , 1})) ,...
-            age - (round(wanePeriod / 5) + testParams2{n , 1}) + 2)'); % ensures vaccine efficacy is >= 0
+            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
+            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); % ensures vaccine efficacy is >= 0
     end
 end
 %lambdaMultVaxMat = [lambdaMultVaxMat , zeros(age , 1)]; % append 0 vaccine protection for no vaccine scenario
@@ -401,9 +466,8 @@ parfor n = 1 : nTests
 %     newCin2 = newCC;
 %     newCin3 = newCC;
     ccDeath = newCC;
-    ccDeath = newCC;
     ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , risk , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , numScreenAge , risk , 2);
     newTreatImm = newScreen;
     newTreatHpv = newScreen;
     newTreatHyst = newScreen;
@@ -447,16 +511,16 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , : , :) , ...
+                    newTreatImm(i , : , : , : , : , : , : , :) , ...
+                    newTreatHpv(i , : , : , : , : , : , : , :) , ...
+                    newTreatHyst(i , : , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                     noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                     vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                    screenAlgorithm);
+                    screenAlgorithm , numScreenAge);
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);  % for next module
                 if any(pop(end , :) <  0)
@@ -515,7 +579,7 @@ parfor n = 1 : nTests
             hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , ...
             hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
             MTCTRate , circStartYear , ageInd , riskInd , riskDist ,...
-            stepsPerYear , currYear , screenAlgs{1}.screenAge , noVaxScreen , noVaxXscreen , ...
+            stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
             vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
         popIn = pop(end , :);
         if any(pop(end , :) < 0)
@@ -577,8 +641,8 @@ parfor n = 1 : nTests
     
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
-        newCC , artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , newTreatImm , newTreatHpv , newTreatHyst , ...
-        ccTreated , currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
+        newCC , ...%artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ccTreated , ...
+        currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier); %newTreatImm , newTreatHpv , newTreatHyst , ...
 end
 disp('Done')
 

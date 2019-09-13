@@ -92,7 +92,7 @@ hpvTypes = 4;
 hpvStates = 10;
 periods = 6;
 gender = 2;
-age = 16;
+age = 80;
 risk = 3;
 
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
@@ -105,11 +105,10 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 
 sumall = @(x) sum(x(:));
-modelYr1 = 1980;
-modelYrLast = endYear;
+
+savdir = [pwd , '\Params'];
 save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates' , 'periods' ,...
-    'gender' , 'age' , 'risk' , 'modelYr1' , ...
-    'dim' , 'k' , 'sumall' , 'toInd' , 'circ' , ...
+    'gender' , 'age' , 'risk' , 'dim' , 'k' , 'sumall' , 'toInd' , 'circ' , ...
     'condUse' , 'kCD4' , 'kVl' , 'stepsPerYear'); % save general model parameters to a workspace file
 
 %% save parameters for mixInfect

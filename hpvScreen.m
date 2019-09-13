@@ -4,11 +4,11 @@ function[dPop , ccScreen , ccTreatImm , ccTreatHpv , ccTreatHyst] = hpvScreen(po
     year , stepsPerYear , screenAgeAll , screenAgeS , noVaxNoScreen , ...
     noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
     vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
-    noVaxToScreenHyst , vaxToScreenHyst , screenAlgorithm)
+    noVaxToScreenHyst , vaxToScreenHyst , screenAlgorithm , numScreenAge)
 
 %% Set constants and initialize vectors
 sumall = @(x) sum(x(:));
-ccScreen = zeros(disease , viral , hpvTypes , hpvStates , risk , 2);
+ccScreen = zeros(disease , viral , hpvTypes , hpvStates , numScreenAge , risk , 2);
 ccTreatImm = ccScreen;
 ccTreatHpv = ccScreen;
 ccTreatHyst = ccScreen;
@@ -16,7 +16,10 @@ ccTreatHyst = ccScreen;
 dPop = zeros(size(pop));
 
 for i = 1 : length(screenAlgs)
-
+    prevAL = 0;
+    if i == 2
+        prevAL = length(screenAlgs{1}.screenAge);
+    end
     % Screening level
     dataYr1 = screenYrs(1);
     dataYrLast = screenYrs(size(screenYrs , 1));
@@ -29,9 +32,8 @@ for i = 1 : length(screenAlgs)
         lastInd = size(screenAlgs{i}.screenCover_vec , 1);
         screenRate = screenAlgs{i}.screenCover_vec{lastInd}(size(screenAlgs{i}.screenCover_vec{lastInd} , 2));
     end
-    screenRate = screenRate * 0.20; % find 1/5 of age group (represents 35 year olds, only)
 
-    for aS = 1 : length(screenAlgs{i}.screenAge)
+    for aS = (prevAL + 1) : (prevAL + length(screenAlgs{i}.screenAge))
         for dS = 1 : length(screenAlgs{i}.diseaseInds)
             d = screenAlgs{i}.diseaseInds(dS);
             for v = 1 : viral
@@ -42,29 +44,27 @@ for i = 1 : length(screenAlgs)
                             if screenRate - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
                                 screenCover = max(0 , (screenRate - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
 
-                                if (screenAlgorithm == 1) || (screenAlgorithm == 2) || (screenAlgorithm == 3)
-                                    % Baseline screening or CISNET or WHO screening algorithm
-                                    if any(s == [1 : 2 , 8 : 10])
-                                        toScreenMult = 1.0;
-                                        toScreenTreatImmMult = 0.0;
-                                        toScreenTreatHpvMult = 0.0;
-                                        toScreenTreatHystMult = 0.0;
-                                    elseif any(s == [3 : 4]) 
-                                        toScreenMult = ((1-screenAlgs{i}.testSens(s)) + (screenAlgs{i}.testSens(s) * (1 - screenAlgs{i}.colpoRetain)) + ...
-                                            (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * (1 - screenAlgs{i}.cinTreatRetain)) + ...
-                                            (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * (1-screenAlgs{i}.cinTreatEff(d))));
-                                        toScreenTreatImmMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
-                                            (1.0-((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d)));
-                                        toScreenTreatHpvMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
-                                            ((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d));
-                                        toScreenTreatHystMult = 0.0;
-                                    elseif any(s == [5 : 7]) 
-                                        toScreenMult = ((1-screenAlgs{i}.testSens(s)) + (screenAlgs{i}.testSens(s) * (1 - screenAlgs{i}.colpoRetain)) + ...
-                                            (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * (1 - screenAlgs{i}.ccTreatRetain)));
-                                        toScreenTreatImmMult = 0.0;
-                                        toScreenTreatHpvMult = 0.0;
-                                        toScreenTreatHystMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.ccTreatRetain;
-                                    end
+                                % Baseline screening or CISNET or WHO screening algorithm
+                                if any(s == [1 : 2 , 8 : 10])
+                                    toScreenMult = 1.0;
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = 0.0;
+                                elseif any(s == [3 : 4]) 
+                                    toScreenMult = ((1-screenAlgs{i}.testSens(s)) + (screenAlgs{i}.testSens(s) * (1 - screenAlgs{i}.colpoRetain)) + ...
+                                        (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * (1 - screenAlgs{i}.cinTreatRetain)) + ...
+                                        (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * (1-screenAlgs{i}.cinTreatEff(d))));
+                                    toScreenTreatImmMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
+                                        (1.0-((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d)));
+                                    toScreenTreatHpvMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
+                                        ((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d));
+                                    toScreenTreatHystMult = 0.0;
+                                elseif any(s == [5 : 7]) 
+                                    toScreenMult = ((1-screenAlgs{i}.testSens(s)) + (screenAlgs{i}.testSens(s) * (1 - screenAlgs{i}.colpoRetain)) + ...
+                                        (screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * (1 - screenAlgs{i}.ccTreatRetain)));
+                                    toScreenTreatImmMult = 0.0;
+                                    toScreenTreatHpvMult = 0.0;
+                                    toScreenTreatHystMult = screenAlgs{i}.testSens(s) * screenAlgs{i}.colpoRetain * screenAlgs{i}.ccTreatRetain;
                                 end
 
                                 noVaxScreend = screenCover .* pop(noVaxNoScreen(d,v,h,s,aS,r));
@@ -73,10 +73,10 @@ for i = 1 : length(screenAlgs)
                                 dPop(noVaxToScreenTreatImm(d,v,aS,r)) = dPop(noVaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* noVaxScreend;
                                 dPop(noVaxToScreenTreatHpv(d,v,aS,r)) = dPop(noVaxToScreenTreatHpv(d,v,aS,r)) + toScreenTreatHpvMult .* noVaxScreend;
                                 dPop(noVaxToScreenHyst(d,v,aS,r)) = dPop(noVaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* noVaxScreend;
-                                ccScreen(d , v , h , s , r , 1) = sumall(noVaxScreend);
-                                ccTreatImm(d , v , h , s , r , 1) = sumall(toScreenTreatImmMult .* noVaxScreend);
-                                ccTreatHpv(d , v , h , s , r , 1) = sumall(toScreenTreatHpvMult .* noVaxScreend);
-                                ccTreatHyst(d , v , h , s , r , 1) = sumall(toScreenTreatHystMult .* noVaxScreend);
+                                ccScreen(d , v , h , s , aS , r , 1) = sumall(noVaxScreend);
+                                ccTreatImm(d , v , h , s , aS , r , 1) = sumall(toScreenTreatImmMult .* noVaxScreend);
+                                ccTreatHpv(d , v , h , s , aS , r , 1) = sumall(toScreenTreatHpvMult .* noVaxScreend);
+                                ccTreatHyst(d , v , h , s , aS , r , 1) = sumall(toScreenTreatHystMult .* noVaxScreend);
 
                                 vaxScreend = screenCover .* pop(vaxNoScreen(d,v,h,s,aS,r));
                                 dPop(vaxNoScreen(d,v,h,s,aS,r)) = dPop(vaxNoScreen(d,v,h,s,aS,r)) - vaxScreend;
@@ -84,10 +84,10 @@ for i = 1 : length(screenAlgs)
                                 dPop(vaxToScreenTreatImm(d,v,aS,r)) = dPop(vaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* vaxScreend;
                                 dPop(vaxToScreenTreatHpv(d,v,aS,r)) = dPop(vaxToScreenTreatHpv(d,v,aS,r)) + toScreenTreatHpvMult .* vaxScreend;
                                 dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
-                                ccScreen(d , v , h , s , r , 2) = sumall(vaxScreend);
-                                ccTreatImm(d , v , h , s , r , 1) = sumall(toScreenTreatImmMult .* noVaxScreend);
-                                ccTreatHpv(d , v , h , s , r , 1) = sumall(toScreenTreatHpvMult .* noVaxScreend);
-                                ccTreatHyst(d , v , h , s , r , 1) = sumall(toScreenTreatHystMult .* noVaxScreend);
+                                ccScreen(d , v , h , s , aS , r , 2) = sumall(vaxScreend);
+                                ccTreatImm(d , v , h , s , aS , r , 2) = sumall(toScreenTreatImmMult .* vaxScreend);
+                                ccTreatHpv(d , v , h , s , aS , r , 2) = sumall(toScreenTreatHpvMult .* vaxScreend);
+                                ccTreatHyst(d , v , h , s , aS , r , 2) = sumall(toScreenTreatHystMult .* vaxScreend);
                             end
                         end
                     end

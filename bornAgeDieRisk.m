@@ -20,7 +20,7 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-        stepsPerYear , currYear , screenAge , noVaxScreen , noVaxXscreen , ...
+        stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 sumall = @(x)sum(x(:));
 
@@ -109,11 +109,11 @@ for g = 1 : gender
         
         % get prospective risk distribution if staying in same risk group when
         % aging
-        agedOut = 1/5 .* sumall(prosPop(aPrev)); % age 1/5th of previous age group
-        agedProsp = agedOut + 4/5 .* sumall(prosPop(aCurr)); % age 1/5th of previous age group into current age group
+        agedOut = sumall(prosPop(aPrev)); % age 1/5th of previous age group
+        agedProsp = agedOut; % age 1/5th of previous age group into current age group
         riskTarget = agedProsp .* riskDist(a , : , g);
-        riskNeed = riskTarget - 4/5 .* [sumall(prosPop(r1To)) , sumall(prosPop(r2To)) , sumall(prosPop(r3To))]; % numbers needed to fill risk groups
-        riskAvail = 1/5 .* [popR1Tot , popR2Tot , popR3Tot];
+        riskNeed = riskTarget; % numbers needed to fill risk groups
+        riskAvail = [popR1Tot , popR2Tot , popR3Tot];
         riskDiff = riskNeed - riskAvail; % difference between numbers needed and available for each risk group
         riskFrac1 = 0;
         riskFrac2 = 0;
@@ -176,33 +176,34 @@ for g = 1 : gender
             riskAvail(3) = riskAvail(3) - sum(pop(r3) .* riskFrac3);
         end
         
-        dPop(r1To) = dPop(r1To) + 1/5 .* pop(r1);
-        dPop(r2To) = dPop(r2To) + 1/5 .* pop(r2);
-        dPop(r3To) = dPop(r3To) + 1/5 .* pop(r3); 
+        dPop(r1To) = dPop(r1To) + pop(r1);
+        dPop(r2To) = dPop(r2To) + pop(r2);
+        dPop(r3To) = dPop(r3To) + pop(r3); 
         
-        dPop(r1) = dPop(r1) - 1/5 .* pop(r1);
-        dPop(r2) = dPop(r2) - 1/5 .* pop(r2);
-        dPop(r3) = dPop(r3) - 1/5 .* pop(r3); 
+        dPop(r1) = dPop(r1) - pop(r1);
+        dPop(r2) = dPop(r2) - pop(r2);
+        dPop(r3) = dPop(r3) - pop(r3); 
 
+        % Remove screened status as people age out of screened age groups
+        if (year >= hpvScreenStartYear)
+            if any((a-1) == agesComb)
+                aOut = find((a-1) == agesComb);
+                noVaxScreend = dPop(noVaxScreen(:,aOut));
+                dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
+                dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
+
+                vaxScreend = dPop(vaxScreen(:,aOut));
+                dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
+                dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
+            end
+        end
+         
     end
     % age last age group
-    dPop(r1To) = dPop(r1To) - 1/5 .* pop(r1To);
-    dPop(r2To) = dPop(r2To) - 1/5 .* pop(r2To);
-    dPop(r3To) = dPop(r3To) - 1/5 .* pop(r3To);
+    dPop(r1To) = dPop(r1To) - pop(r1To);
+    dPop(r2To) = dPop(r2To) - pop(r2To);
+    dPop(r3To) = dPop(r3To) - pop(r3To);
     
-end
-
-%% Remove screened status as people age out of screened age groups
-if (year >= hpvScreenStartYear)
-    for aOut = 1 : length(screenAge)
-        noVaxScreend = dPop(noVaxScreen(:,aOut));
-        dPop(noVaxScreen(:,aOut)) = dPop(noVaxScreen(:,aOut)) - noVaxScreend;
-        dPop(noVaxXscreen(:,aOut)) = dPop(noVaxXscreen(:,aOut)) + noVaxScreend;
-
-        vaxScreend = dPop(vaxScreen(:,aOut));
-        dPop(vaxScreen(:,aOut)) = dPop(vaxScreen(:,aOut)) - vaxScreend;
-        dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
-    end
 end
 
 extraOut{1} = abs(deaths);
