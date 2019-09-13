@@ -5,7 +5,7 @@ waning = 0;    % turn waning on or off
 %% LOAD PARAMETERS
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','circ','condUse','disease','viral',...
-    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall','modelYr1')
+    'hpvTypes','hpvStates','periods','gender','age','risk','dim','k','toInd','sumall')
 
 % Helper functions
 sumall = @(x) sum(x(:));
@@ -52,9 +52,9 @@ for i = 1 : nResults
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
         % matrices for years past current year
-        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec];
-        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC];
-        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec];
+        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end , :)];
+        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : , :)];
+        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
     end
     allResult{i} = vaxResult;
 end
@@ -180,19 +180,19 @@ for i = 1 : length(inds)-1
     % Baseline
     ccMortRef = ...
         (annlz(sum(sum(sum(allResult{1,1}{noVaxInd}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-        (annlz(sum(allResult{1,1}{noVaxInd}.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
+        (annlz(sum(allResult{1,1}{noVaxInd}.popVec(length(curr.tVec) : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
     allResult{1,1}{noVaxInd}.ccMort = ccMortRef;
     % Increased vaccination scenarios
     for n = 1 : nSims-1
         ccMortRef = ...
             (annlz(sum(sum(sum(allResult{1,1}{n}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-            (annlz(sum(allResult{1,1}{n}.popVec(length(curr.tVec) + 1 : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+            (annlz(sum(allResult{1,1}{n}.popVec(length(curr.tVec) : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
         allResult{1,1}{n}.ccMort = ccMortRef;
     end
         
     % Plot mortality
     % Baseline
-    plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , allResult{1,1}{noVaxInd}.ccMort ,'DisplayName' , ...
+    plot(tVec(length(curr.tVec) : stepsPerYear : end) , allResult{1,1}{noVaxInd}.ccMort ,'DisplayName' , ...
          [plotTits1{i}]); % , ': Efficacy: ' , num2str(round(allResult{1,1}{n}.vaxEff * 100)) '% ,', ...
          %'Coverage: ' , num2str(round(allResult{1,1}{n}.vaxRate * 100)) , '%']);
     legend('-DynamicLegend');
@@ -457,13 +457,13 @@ for j = 1 : 1
         % Baseline
         ccMortRef = ...
             (annlz(sum(sum(sum(allResult{nResults,1}{noVaxInd}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-            (annlz(sum(allResult{nResults,1}{noVaxInd}.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
+            (annlz(sum(allResult{nResults,1}{noVaxInd}.popVec(length(curr.tVec) : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
         allResult{nResults,1}{noVaxInd}.ccMort = ccMortRef;
         % Increased vaccination scenarios
         for n = 1 : length(vaxResult)-1
             ccMortRef = ...
                 (annlz(sum(sum(sum(allResult{j,1}{n}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-                (annlz(sum(allResult{j,1}{n}.popVec(length(curr.tVec) + 1 : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+                (annlz(sum(allResult{j,1}{n}.popVec(length(curr.tVec) : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
             allResult{j,1}{n}.ccMort = ccMortRef;
         end
 
@@ -471,7 +471,7 @@ for j = 1 : 1
         for n = 1 : nSims-1       
             % Calculate reduction
             allResult{j,1}{n}.ccRed = (allResult{j,1}{n}.ccMort - allResult{nResults,1}{noVaxInd}.ccMort) ./ allResult{nResults,1}{noVaxInd}.ccMort * 100;
-            plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , allResult{j,1}{n}.ccRed , ...
+            plot(tVec(length(curr.tVec) : stepsPerYear : end) , allResult{j,1}{n}.ccRed , ...
                 'LineStyle' , linStyle{n} , 'DisplayName' , plotTits2{(i*2-1)+(n-1)} , 'Color' , linColor{i})
     %             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
     %             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
@@ -564,13 +564,13 @@ for j = 1 : nResults-1
         % Baseline
         ccMortRef = ...
             (annlz(sum(sum(sum(allResult{nResults,1}{noVaxInd}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-            (annlz(sum(allResult{nResults,1}{noVaxInd}.popVec(length(curr.tVec) + 1 : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
+            (annlz(sum(allResult{nResults,1}{noVaxInd}.popVec(length(curr.tVec) : end , genArray{i}) , 2) ./ stepsPerYear))* fac);
         allResult{nResults,1}{noVaxInd}.ccMort = ccMortRef;
         % Increased vaccination scenarios
         for n = 1 : nSims-1
             ccMortRef = ...
                 (annlz(sum(sum(sum(allResult{j,1}{n}.ccDeath(: , inds{i} , : , :),2),3),4)) ./ ...
-                (annlz(sum(allResult{j,1}{n}.popVec(length(curr.tVec) + 1 : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+                (annlz(sum(allResult{j,1}{n}.popVec(length(curr.tVec) : end  , genArray{i}) , 2) ./ stepsPerYear)) * fac);
             allResult{j,1}{n}.ccMort = ccMortRef;
         end
 
@@ -579,7 +579,7 @@ for j = 1 : nResults-1
         %for n = 2 : nSims-1 % For 90% vaccination 
             % Calculate reduction
             allResult{j,1}{n}.ccRed = (allResult{j,1}{n}.ccMort - allResult{nResults,1}{noVaxInd}.ccMort) ./ allResult{nResults,1}{noVaxInd}.ccMort * 100;
-            plot(tVec(length(curr.tVec) + 1 : stepsPerYear : end) , allResult{j,1}{n}.ccRed , ...
+            plot(tVec(length(curr.tVec) : stepsPerYear : end) , allResult{j,1}{n}.ccRed , ...
                 'LineStyle' , linStyle{j} , 'DisplayName' , plotTits2{(i-1)+(j*5-4)} , 'Color' , linColor{i})
     %             ': Efficacy ' , num2str(round(allResult{j,1}{n}.vaxEff * 100)) '% ,', ...
     %             'Coverage ' , num2str(round(allResult{j,1}{n}.vaxRate * 100)) , '%'])
