@@ -17,23 +17,21 @@ c = fix(clock); % get time
 currYear = 2020; %c(1); % get the current year from time
 
 %% LOAD SAVED RESULTS
-curr = load([pwd , '\HHCoM_Results\toNow_082119_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run file
+curr = load([pwd , '\HHCoM_Results\toNow_090519_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run file
 % ***SET ME***: save names of potential scenarios to analyze as variables
-dirName_reductBaseline = '082119_WHOP1_SCE1';
-dirName_P1_SCE3 = '082119_WHOP1_SCE3';
-dirName_P1_SCE5 = '082119_WHOP1_SCE5';
-dirName_P2_SCE1 = '082119_WHOP2_SCE1';
-dirName_P2_SCE2 = '082119_WHOP2_SCE2';
-dirName_P2_SCE3 = '082119_WHOP2_SCE3';
-dirName_P2_SCE4 = '082119_WHOP2_SCE4';
-dirName_P2_SCE5 = '082119_WHOP2_SCE5';
-dirName_P2_SCE1_2xHIVneg = '082119_WHOP2_SCE1_2xHIVneg';
-dirName_P2_SCE2_2xHIVneg = '082119_WHOP2_SCE2_2xHIVneg';
+dirName_reductBaseline = '090519_WHOP1_SCES12';
+dirName_P1_SCE3 = '090519_WHOP1_SCES34';
+dirName_P1_SCE5 = '090519_WHOP1_SCES56';
+dirName_P2_SCE1 = '090519_WHOP2_SCE1';
+dirName_P2_SCE2 = '090519_WHOP2_SCE2';
+dirName_P2_SCE3 = '090519_WHOP2_SCE3';
+dirName_P2_SCE4 = '090519_WHOP2_SCE4';
+dirName_P2_SCE5 = '090519_WHOP2_SCE5';
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5}; %{dirName_P2_SCE1_2xHIVneg , dirName_P2_SCE2_2xHIVneg};
+simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'P1_SCE1' , 'P1_SCE3' , 'P1_SCE5' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'}; %{'P2_SCE1x2neg' , 'P2_SCE2x2neg'};
+fileTits = {'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
 
 nResults = length(simVec);
 
@@ -118,8 +116,14 @@ for j = 1 : nResults
             else
                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
             end
-
         end
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc')
+%         hold all;
+%         axis([1980 2120 0 275])
+%         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+        
     end     
     
     %% CC INCIDENCE - age standardized
@@ -199,6 +203,12 @@ for j = 1 : nResults
                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
             end
         end
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '--')
+%         hold all;
+%         axis([1980 2120 0 150])
+%         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
         
     end  
 
