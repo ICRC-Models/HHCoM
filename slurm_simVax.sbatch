@@ -10,7 +10,7 @@
 #SBATCH --partition=csde
 #SBATCH --nodes=1                                   # Node resources
 #SBATCH --mem=58G                                  # Memory per node
-#SBATCH --time=06:00:00                             # Wall clock time limit hrs:min:sec
+#SBATCH --time=04:00:00                             # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
 
@@ -19,7 +19,7 @@ echo "Running MATLAB script simVaxCEA2 for scenario simulation."
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "calibratorSimVax"
+matlab -nodisplay -nosplash -r "simVaxCEA2"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 

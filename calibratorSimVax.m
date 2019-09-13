@@ -53,8 +53,9 @@ circStartYear = 1990;
 vaxStartYear = 2014;
 
 % Use newly calibrated parameters
-masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_6.dat']); % load most recent parameter sample
-paramSet = masterSetMatrix(:,1);
+
+masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_11.dat']); % load most recent parameter sample
+paramSet = masterSetMatrix(:,4628);
 pIdx = [1,2,5,6,7,8,9,10,19,22,25];
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
@@ -219,13 +220,13 @@ end
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_090319calib_22Aug19_6_1']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_090919calib_22Aug19_11_4628']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '090319calib_22Aug19_6_1'; % ***SET ME***: name for simulation output file
+pathModifier = '090919calib_22Aug19_11_4628'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
@@ -256,8 +257,8 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 : age]; %[4 , 5 , 6];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = ones(1,length(vaxAgeCU)).*0.8; %[0.8 , 0.8 , 0.8*0.40];    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxAgeCU = [4 , 5 , 6]; %[4:age];   % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [0.5 , 0.5 , 0.5*0.40]; %ones(1,length(vaxAgeCU)).*0.8;    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

@@ -1,4 +1,4 @@
-TCURR=3    # t_curr
+TCURR=12    # t_curr
 echo "${TCURR}"
 export TCURR
 
