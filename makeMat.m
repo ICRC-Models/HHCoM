@@ -11,6 +11,7 @@ savedir = [pwd , '\Params'];
 % % load([paramDir , 'HIVParams'])
 load([paramDir , 'calibratedParams'])
 perPartnerHpv = 0.0045;
+muHIV(11 , 2) = 0.02;
 load([paramDir,'general'])
 
 pop = spalloc(prod(dim) , 1 , prod(dim));
@@ -199,6 +200,7 @@ end
 % save(fullfile(savedir , 'artMat') , 'artMat')
 % save(fullfile(savedir , 'prepMat') , 'prepMat')
 % disp('Finished building HIV matrices.')
+
 %% Viral load progression (by CD4 count)
 disp('Building viral load progression matrix')
 
