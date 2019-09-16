@@ -17,113 +17,62 @@ c = fix(clock); % get time
 currYear = c(1); % get the current year from time
 
 %% LOAD SAVED RESULTS
-dirName_calibCurr1 = 'toNow_090319calib_22Aug19_6_6';
-dirName_calibCurr2 = 'toNow_090319calib_22Aug19_6_7';
-dirName_calibCurr3 = 'toNow_090319calib_22Aug19_6_8';
-dirName_calibCurr4 = 'toNow_090319calib_22Aug19_6_9';
-dirName_calibCurr5 = 'toNow_090319calib_22Aug19_6_10';
-dirName_calibCurr6 = 'toNow_090319calib_22Aug19_6_1';
-dirName_calibCurr7 = 'toNow_090319calib_22Aug19_6_2';
-dirName_calibCurr8 = 'toNow_090319calib_22Aug19_6_3';
-dirName_calibCurr9 = 'toNow_090319calib_22Aug19_6_4';
-dirName_calibCurr10 = 'toNow_090319calib_22Aug19_6_5';
-dirName_calibCurr11 = 'toNow_090319calib_22Aug19_6_6';
-dirName_calibCurr12 = 'toNow_090319calib_22Aug19_6_7';
-dirName_calibCurr13 = 'toNow_090319calib_22Aug19_6_8';
-dirName_calibCurr14 = 'toNow_090319calib_22Aug19_6_9';
-dirName_calibCurr15 = 'toNow_090319calib_22Aug19_6_10';
-dirName_calibCurr16 = 'toNow_090319calib_22Aug19_6_1';
-dirName_calibCurr17 = 'toNow_090319calib_22Aug19_6_2';
-dirName_calibCurr18 = 'toNow_090319calib_22Aug19_6_3';
-dirName_calibCurr19 = 'toNow_090319calib_22Aug19_6_4';
-dirName_calibCurr20 = 'toNow_090319calib_22Aug19_6_5';
-dirName_calibCurr21 = 'toNow_090319calib_22Aug19_6_6';
-dirName_calibCurr22 = 'toNow_090319calib_22Aug19_6_7';
-dirName_calibCurr23 = 'toNow_090319calib_22Aug19_6_8';
-dirName_calibCurr24 = 'toNow_090319calib_22Aug19_6_9';
-dirName_calibCurr25 = 'toNow_090319calib_22Aug19_6_10';
-dirName_calibCurr26 = 'toNow_090319calib_22Aug19_baseline';
-dirName_calibCurr27 = 'toNow_090319calib_22Aug19_baseline';
-dirName_calibCurr28 = 'toNow_090319calib_22Aug19_baseline';
-dirName_calibCurr29 = 'toNow_090319calib_22Aug19_6_1';
-dirName_calibCurr30 = 'toNow_090319calib_22Aug19_6_2';
-dirName_calibCurr31 = 'toNow_090319calib_22Aug19_6_3';
-dirName_calibCurr32 = 'toNow_090319calib_22Aug19_6_4';
-dirName_calibCurr33 = 'toNow_090319calib_22Aug19_6_5';
-dirName_calibCurr34 = 'toNow_090919calib_22Aug19_10_3607'; 
-dirName_calibCurr35 = 'toNow_090919calib_22Aug19_11_4628';
-dirName_calibCurr36 = 'toNow_090919_noBaseVax_baseScreen_GuiAbstract';
-currVec = {dirName_calibCurr36 , dirName_calibCurr36 , dirName_calibCurr36};
-% {dirName_calibCurr26 , dirName_calibCurr27 , dirName_calibCurr28 , ...
-%     dirName_calibCurr29 , dirName_calibCurr30 , dirName_calibCurr31 , ...
-%     dirName_calibCurr32 , dirName_calibCurr33}; 
-% dirName_calibCurr2 , ... % dirName_calibCurr1 , dirName_calibCurr3
-%     dirName_calibCurr6 , dirName_calibCurr7 , ... %dirName_calibCurr4 , dirName_calibCurr5 , 
-%     dirName_calibCurr8 , dirName_calibCurr9 , dirName_calibCurr10 , ...
-%     dirName_calibCurr11 , dirName_calibCurr12 , dirName_calibCurr13 ,  ... %dirName_calibCurr14 ,
-%     dirName_calibCurr15 , 
-% dirName_calibCurr16 , dirName_calibCurr17 , dirName_calibCurr18 , ...
-%     dirName_calibCurr19 , dirName_calibCurr20 , dirName_calibCurr21 ,  ... %dirName_calibCurr22 ,
-%     dirName_calibCurr23
-%dirName_calibCurr14 , dirName_calibCurr15 , dirName_calibCurr23 , dirName_calibCurr24 ,  dirName_calibCurr25
-%dirName_calibCurr24 ,  dirName_calibCurr25
+dirName_calibCurr1 = 'toNow_090319calib_22Aug19_baseline';
+dirName_calibCurr2 = 'toNow_090319calib_22Aug19_6_1';
+dirName_calibCurr3 = 'toNow_090319calib_22Aug19_6_2';
+dirName_calibCurr4 = 'toNow_090319calib_22Aug19_6_3';
+dirName_calibCurr5 = 'toNow_090319calib_22Aug19_6_4';
+dirName_calibCurr6 = 'toNow_090319calib_22Aug19_6_5';
+dirName_calibCurr7 = 'toNow_090319calib_22Aug19_6_6';
+dirName_calibCurr8 = 'toNow_090319calib_22Aug19_6_7';
+dirName_calibCurr9 = 'toNow_090319calib_22Aug19_6_8';
+dirName_calibCurr10 = 'toNow_090919calib_22Aug19_10_3607'; 
+dirName_calibCurr11 = 'toNow_090919calib_22Aug19_11_4628';
+ 
+currVec = {dirName_calibCurr1 , dirName_calibCurr2 , dirName_calibCurr3 , ...
+    dirName_calibCurr4 , dirName_calibCurr5 , dirName_calibCurr6 , dirName_calibCurr7, ...
+    dirName_calibCurr8, dirName_calibCurr9 , dirName_calibCurr10, dirName_calibCurr11};
+ 
+dirName_calibSim1 = '090319calib_22Aug19_baseline';
+dirName_calibSim2 = '090319calib_22Aug19_6_1';
+dirName_calibSim3 = '090319calib_22Aug19_6_2';
+dirName_calibSim4 = '090319calib_22Aug19_6_3';
+dirName_calibSim5 = '090319calib_22Aug19_6_4';
+dirName_calibSim6 = '090319calib_22Aug19_6_5';
+dirName_calibSim7 = '090319calib_22Aug19_6_6';
+dirName_calibSim8 = '090319calib_22Aug19_6_7';
+dirName_calibSim9 = '090319calib_22Aug19_6_8';
+dirName_calibSim10 = '090919calib_22Aug19_10_3607';
+dirName_calibSim11 = '090919calib_22Aug19_11_4628';
+ 
+dirName_calibSim12 = '090319calib_22Aug19_baseline_CU50';
+dirName_calibSim13 = '090319calib_22Aug19_6_1_CU50';
+dirName_calibSim14 = '090319calib_22Aug19_6_2_CU50';
+dirName_calibSim15 = '090319calib_22Aug19_6_3_CU50';
+dirName_calibSim16 = '090319calib_22Aug19_6_4_CU50';
+dirName_calibSim17 = '090319calib_22Aug19_6_5_CU50';
+dirName_calibSim18 = '090319calib_22Aug19_6_6_CU50';
+dirName_calibSim19 = '090319calib_22Aug19_6_7_CU50';
+dirName_calibSim20 = '090319calib_22Aug19_6_8_CU50';
+dirName_calibSim21 = '090919calib_22Aug19_10_3607_CU50'; 
+dirName_calibSim22 = '090919calib_22Aug19_11_4628_CU50';
+ 
+dirName_calibSim23 = '090319calib_22Aug19_baseline_CU80';
+dirName_calibSim24 = '090319calib_22Aug19_6_1_CU80';
+dirName_calibSim25 = '090319calib_22Aug19_6_2_CU80';
+dirName_calibSim26 = '090319calib_22Aug19_6_3_CU80';
+dirName_calibSim27 = '090319calib_22Aug19_6_4_CU80';
+dirName_calibSim28 = '090319calib_22Aug19_6_5_CU80';
+dirName_calibSim29 = '090319calib_22Aug19_6_6_CU80';
+dirName_calibSim30 = '090319calib_22Aug19_6_7_CU80';
+dirName_calibSim31 = '090319calib_22Aug19_6_8_CU80';
+dirName_calibSim32 = '090919calib_22Aug19_10_3607_CU80'; 
+dirName_calibSim33 = '090919calib_22Aug19_11_4628_CU80';
+ 
+simVec = {dirName_calibSim23, dirName_calibSim24, dirName_calibSim25 , dirName_calibSim26 , ...
+    dirName_calibSim27 , dirName_calibSim28, dirName_calibSim29 , dirName_calibSim30 , ...
+    dirName_calibSim31, dirName_calibSim32, dirName_calibSim33};
 
-dirName_calibSim1 = '090319calib_22Aug19_6_6';
-dirName_calibSim2 = '090319calib_22Aug19_6_7';
-dirName_calibSim3 = '090319calib_22Aug19_6_8';
-dirName_calibSim4 = '090319calib_22Aug19_6_9';
-dirName_calibSim5 = '090319calib_22Aug19_6_10';
-dirName_calibSim6 = '090319calib_22Aug19_6_1_CU50';
-dirName_calibSim7 = '090319calib_22Aug19_6_2_CU50';
-dirName_calibSim8 = '090319calib_22Aug19_6_3_CU50';
-dirName_calibSim9 = '090319calib_22Aug19_6_4_CU50';
-dirName_calibSim10 = '090319calib_22Aug19_6_5_CU50';
-dirName_calibSim11 = '090319calib_22Aug19_6_6_CU50';
-dirName_calibSim12 = '090319calib_22Aug19_6_7_CU50';
-dirName_calibSim13 = '090319calib_22Aug19_6_8_CU50';
-dirName_calibSim14 = '090319calib_22Aug19_6_9_CU50';
-dirName_calibSim15 = '090319calib_22Aug19_6_10_CU50';
-dirName_calibSim16 = '090319calib_22Aug19_6_1_CU80';
-dirName_calibSim17 = '090319calib_22Aug19_6_2_CU80';
-dirName_calibSim18 = '090319calib_22Aug19_6_3_CU80';
-dirName_calibSim19 = '090319calib_22Aug19_6_4_CU80';
-dirName_calibSim20 = '090319calib_22Aug19_6_5_CU80';
-dirName_calibSim21 = '090319calib_22Aug19_6_6_CU80';
-dirName_calibSim22 = '090319calib_22Aug19_6_7_CU80';
-dirName_calibSim23 = '090319calib_22Aug19_6_8_CU80';
-dirName_calibSim24 = '090319calib_22Aug19_6_9_CU80';
-dirName_calibSim25 = '090319calib_22Aug19_6_10_CU80';
-dirName_calibSim26 = '090319calib_22Aug19_baseline';
-dirName_calibSim27 = '090319calib_22Aug19_baseline_CU50';
-dirName_calibSim28 = '090319calib_22Aug19_baseline_CU80';
-dirName_calibSim29 = '090319calib_22Aug19_6_1';
-dirName_calibSim30 = '090319calib_22Aug19_6_2';
-dirName_calibSim31 = '090319calib_22Aug19_6_3';
-dirName_calibSim32 = '090319calib_22Aug19_6_4';
-dirName_calibSim33 = '090319calib_22Aug19_6_5';
-dirName_calibSim34 = '090919calib_22Aug19_10_3607';
-dirName_calibSim35 = '090919calib_22Aug19_10_3607_CU50'; 
-dirName_calibSim36 = '090919calib_22Aug19_10_3607_CU80'; 
-dirName_calibSim37 = '090919calib_22Aug19_11_4628';
-dirName_calibSim38 = '090919calib_22Aug19_11_4628_CU50';
-dirName_calibSim39 = '090919calib_22Aug19_11_4628_CU80';
-dirName_calibSim40 = '090919_noBaseVax_baseScreen_GuiAbstract';
-dirName_calibSim41 = '090919_noBaseVax_baseScreen_GuiAbstract_CU50';
-dirName_calibSim42 = '090919_noBaseVax_baseScreen_GuiAbstract_CU80';
-simVec = {dirName_calibSim40 , dirName_calibSim41 , dirName_calibSim42};
-% {dirName_calibSim26 , dirName_calibSim27 , dirName_calibSim28 , ...
-%     dirName_calibSim29 , dirName_calibSim30 , dirName_calibSim31 , dirName_calibSim32 , ...
-%     dirName_calibSim33}; 
-% dirName_calibSim2 , ... %dirName_calibSim1 ,  dirName_calibSim3 ,
-%     dirName_calibSim6 , dirName_calibSim7 , ... %dirName_calibSim4 , dirName_calibSim5 , 
-%     dirName_calibSim8 , dirName_calibSim9 , dirName_calibSim10 , ...
-%     dirName_calibSim11 , dirName_calibSim12 , dirName_calibSim13 ,  ... %dirName_calibSim14 ,
-%     dirName_calibSim15 , 
-% dirName_calibSim16 , dirName_calibSim17 , dirName_calibSim18 , ...
-%     dirName_calibSim19 , dirName_calibSim20 , dirName_calibSim21 , ... %dirName_calibSim22 , 
-%     dirName_calibSim23 
-%dirName_calibSim14 , dirName_calibSim15 , dirName_calibSim23 ,
-%dirName_calibSim24 , dirName_calibSim25 %, dirName_calibSim24 , dirName_calibSim25
 
 r80inc = [];
 r90inc = [];
@@ -149,10 +98,10 @@ for j = 1 : length(simVec)
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
         % matrices for years past current year
-        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end , :)];
-        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : , :)];
-        vaxResult{n}.ccDeath = [vaxResult{n}.ccDeath(2 : end , : , : , :)];
-        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
+        vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(1 : end , :)];
+        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(1 : end , : , : , :)];
+        vaxResult{n}.ccDeath = [vaxResult{n}.ccDeath(1 : end , : , : , :)];
+        vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(1 : end)];
     end
     
     noVaxInd = nSims;
@@ -174,7 +123,9 @@ for j = 1 : length(simVec)
     fileTits = {'baselineScreen' , '35Screen' , '3545Screen'};
     fac = 10 ^ 5;
     linStyle = {'-' , '--' , ':'};
-    linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g' , 'c'};
+    linColor = {'k' , '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , ...
+        '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , ...
+        '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]' , '[0.5, 0.5, 0.5]'};
     set(gca,'ColorOrderIndex',1)
 
     for i = 1 : 1 %length(inds)
@@ -232,7 +183,7 @@ for j = 1 : length(simVec)
     %             ylim([-100 0]);
     %             xticks([2019 : 10 : 2099]);
     %             hold all
-
+        
             if n == 1
                 r80inc = [r80inc , vaxResult{n}.ccRed(end)];
             elseif n == 2
@@ -250,7 +201,12 @@ for j = 1 : length(simVec)
             else
                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , vaxResult{n}.ccInc' , vaxResult{n}.ccRed'] , sname)
             end
-
+%             subplot(1,2,n)
+%             hold all;
+%             plot(tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccRed' , 'Color' , linColor{j});
+%             xlabel('Year');
+%             ylabel('Cervical Cancer Incidence Reduction (%)');
+%             hold all;
         end
     end     
     %     %title('Percent Reduction in Incidence')
