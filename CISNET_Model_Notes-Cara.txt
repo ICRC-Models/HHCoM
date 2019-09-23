@@ -12,10 +12,6 @@ g - Gender
 a - Age
 r - Risk
 
-States
-h - HPV type(s)
-s - HPV progression status
-
 For d:
 1 - HIV negative
 2 - Acute infection
