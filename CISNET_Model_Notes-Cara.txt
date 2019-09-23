@@ -2,14 +2,15 @@
 LEGEND:
 _________________________________________________________________________
 pop(d , v , h , s , p , g , a , r)
-d - disease
-v - viral load
-h - HPV types
-s - HPV/Cervical cancer status
-p - period of infection or cervical cancer status / vaccination history
-g - gender
-a - age
-r - risk
+d - Disease
+v - Viral load
+h - Vaccine-type HPV precancer state
+s - Non-vaccine-type HPV precancer state
+x - Cervical cancer or hysterectomy status
+p - Vaccination and screening history
+g - Gender
+a - Age
+r - Risk
 
 States
 h - HPV type(s)
@@ -17,7 +18,7 @@ s - HPV progression status
 
 For d:
 1 - HIV negative
-2 - acute infection
+2 - Acute infection
 3 - CD4 > 500 cells/uL
 4 - CD4 500-350 cells/uL
 5 - CD4 350-200 cells/uL
@@ -28,37 +29,42 @@ For d:
 10 - HIV-positive on ART
 
 For v:
-1 - acute infection
-2 - VL < 1000 copies/mL (if d > 1) , 0 (if d = 1)
+1 - Acute infection (if d > 1) , 0 (if d = 1)
+2 - VL < 1000 copies/mL
 3 - VL 1000-10,000 copies/mL
 4 - VL 10,000-50,000 copies/mL
 5 - VL > 50,000 copies/mL
 6 - HIV-positive on ART
 
 For h:
-1 - HPV Susceptible
-2 - Infected with vaccine type hrHPV (16/18 & other 9v types) (currently includes all hrHPV types)
-3 - Infected with non-vaccine type hrHPV (other high risk)
+1 - Susceptible to vaccine type hrHPV 
+2 - Infected with vaccine type hrHPV (16/18 & other 9v types)
+3 - CIN1 (vaccine type)
+4 - CIN2 (vaccine type)
+5 - CIN3 (vaccine type)
+6 - Cervical Cancer or hysterectomy
+7 - Immune (vaccine type)
 
 For s:
-1 - No precancer(h = 1) , infected (h >= 2)
-2 - CIN1 (if h > 1)
-3 - CIN2
-4 - CIN3
-5 - Cervical Cancer (Local)
-6 - Cervical Cancer (Regional)
-7 - Cervical Cancer (Distant)
-8 - Hysterectomy
-9 - Vaccinated
-10 - Immune
+1 - Susceptible to non-vaccine type hrHPV
+2 - Infected with non-vaccine type hrHPV (other high risk)
+3 - CIN1 (non-vaccine type)
+4 - CIN2 (non-vaccine type)
+5 - CIN3 (non-vaccine type)
+6 - Cervical Cancer or hysterectomy
+7 - Immune (non-vaccine type)
+
+For x:
+1 - Cervical Cancer (Local) (if h or s = 6)
+2 - Cervical Cancer (Regional)
+3 - Cervical Cancer (Distant)
+4 - Hysterectomy
 
 For p:
-1 - non-vaccinated (s = 1-8,10) , vaccinated and uninfected (s = 9)
-2 - vaccinated, with subsequent vaccine type infection
-3 - vaccinated, with subsequent non-vaccine type infection
-4 - vaccinated, with vaccine type infection, and screened
-5 - vaccinated, with non-vaccine type infection, and screened
-6 - non-vaccinated or vaccinated and uninfected, and screened
+1 - non-vaccinated, non-screened
+2 - vaccinated
+3 - screened
+4 - vaccinated, screened
 
 For g:
 1 - Male
