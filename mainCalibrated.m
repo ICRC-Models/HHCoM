@@ -25,7 +25,8 @@ load([paramDir, 'hpvParams'], 'perPartnerHpv' , 'perPartnerHpv_nonV' , 'fImm' , 
     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm');
 load([paramDir, 'intervenParams'], 'circ' , 'condUse' , ...
     'maxRateM1' , 'maxRateM2' , 'maxRateF1' , 'maxRateF2' , ...
-    'hivStartYear' , 'circStartYear' , 'vaxStartYear');
+    'hivStartYear' , 'circStartYear' , 'vaxStartYear' , ...
+    'baseline');
 load([paramDir , 'calibData'], 'cinPos2014_obs' , 'cinNeg2014_obs' , ...
     'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
     'hivPrevM_obs' , 'hivPrevF_obs');
@@ -52,13 +53,6 @@ load([paramDir,'deathMat'], 'deathMat')
 load([paramDir,'circMat'], 'circMat')
 load([paramDir,'circMat2'] , 'circMat2')
 
-%% Time
-startYear = 1910;
-c = fix(clock);
-currYear = 2020; % c(1); % get the current year
-endYear = currYear;
-years = endYear - startYear;
-
 %% Model specs
 % choose whether to model hysterectomy
 hyst = 0;
@@ -73,9 +67,12 @@ if hivOn
     disp('HIV module activated')
 end
 
-% ART
-import java.util.LinkedList
-artDistList = LinkedList();
+%% Time
+startYear = 1910;
+c = fix(clock);
+currYear = 2020; % c(1); % get the current year
+endYear = currYear;
+years = endYear - startYear;
 
 %%  Variables/parameters to set based on your scenario
 
@@ -94,18 +91,6 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
-cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
-
-% Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
-baseline.screenAge = 36;
-baseline.testSens = cytoSens;
-% cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.72;
-baseline.cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
-baseline.cinTreatRetain = 0.51;
-baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
-baseline.ccTreatRetain = 0.40;
 
 screenAlgorithm = 1;
 screenAlgs{1} = baseline;
@@ -121,9 +106,9 @@ end
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
 agesComb = screenAlgs{1}.screenAge;
-screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAlgs{1}.screenAge) , risk);
-screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAlgs{1}.screenAge) , risk);
-noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAlgs{1}.screenAge) , risk);
+screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , length(screenAlgs{1}.screenAge) , risk);
+screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , length(screenAlgs{1}.screenAge) , risk);
+noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , length(screenAlgs{1}.screenAge) , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
 vaxToScreen = noVaxNoScreen;
@@ -133,33 +118,44 @@ noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
-noVaxScreen = zeros(disease*viral*hpvTypes*hpvStates*risk , length(screenAlgs{1}.screenAge));
+noVaxToScreenTreatVaxHpv = zeros(disease , viral , hpvNonVaxStates , length(screenAlgs{1}.screenAge) , risk);
+vaxToScreenTreatVaxHpv = noVaxToScreenTreatVaxHpv;
+noVaxToScreenTreatNonVaxHpv = zeros(disease , viral , hpvVaxStates , length(screenAlgs{1}.screenAge) , risk);
+vaxToScreenTreatNonVaxHpv = noVaxToScreenTreatNonVaxHpv;
+noVaxScreen = zeros(disease*viral*hpvVaxStates*hpvNonVaxStates*endpoints*risk , length(screenAlgs{1}.screenAge));
 noVaxXscreen = noVaxScreen;
 vaxScreen = noVaxScreen;
 vaxXscreen = noVaxScreen;
+
 for aS = 1 : length(screenAlgs{1}.screenAge)
     a = screenAlgs{1}.screenAge(aS);
     
     for d = 1 : disease
         for v = 1 : viral
-            for h = 1 : hpvTypes
-                for s = 1 : hpvStates
-                    for r = 1 : risk
-                        screenAgeAll(d,v,h,s,:,aS,r) = toInd(allcomb(d , v , h , s , 1 : periods , 2 , a , r)); 
-                        screenAgeS(d,v,h,s,:,aS,r) = toInd(allcomb(d , v , h , s , [4,6] , 2 , a , r));
+            for h = 1 : hpvVaxStates
+                for s = 1 : hpvNonVaxStates
+                    for x = 1 : endpoints
+                        for r = 1 : risk
+                            screenAgeAll(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 1 : intervens , 2 , a , r)); 
+                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 3 : intervens , 2 , a , r));
 
-                        noVaxNoScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 1 , 2 , a , r)));
-                        noVaxToScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 6 , 2 , a , r)));
-                        vaxNoScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 2 , 2 , a , r)));
-                        vaxToScreen(d,v,h,s,aS,r) = sort(toInd(allcomb(d , v , h , s , 4 , 2 , a , r)));
+                            noVaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 1 , 2 , a , r)));
+                            noVaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
+                            vaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 2 , 2 , a , r)));
+                            vaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 4 , 2 , a , r)));
 
-                        noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 1 , 10 , 6 , 2 , a , r));
-                        vaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 1 , 10 , 4 , 2 , a , r));
-                        noVaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 1 , 6 , 2 , a , r));
-                        vaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 1 , 4 , 2 , a , r));
-                        noVaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 1 , 8 , 6 , 2 , a , r));
-                        vaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 1 , 8 , 4 , 2 , a , r));
-                    end
+                            noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 2 , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 2 , 1 , 4 , 2 , a , r));
+                            noVaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 6 , 6 , 4 , 3 , 2 , a , r));
+                            vaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 6 , 6 , 4 , 4 , 2 , a , r));
+                        end
+                    end    
                 end
             end
         end
@@ -167,13 +163,13 @@ for aS = 1 : length(screenAlgs{1}.screenAge)
     end
 
     % Create indices for removing screening status as people age out of screened age groups
-    noVaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 6 , ... 
+    noVaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 3 , ... 
         2 , a+1 , 1 : risk));
-    noVaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 , ... 
+    noVaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 , ... 
         2 , a+1 , 1 : risk));
-    vaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 4 , ... 
+    vaxScreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 4 , ... 
         2 , a+1 , 1 : risk));
-    vaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 2 , ... 
+    vaxXscreen(:,aS) = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 2 , ... 
         2 , a+1 , 1 : risk));
 end
 
@@ -286,30 +282,31 @@ disp(' ')
 s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
 % Initialize performance tracking vector
 runtimes = zeros(size(s , 2) - 2 , 1);
+tVec = linspace(startYear , endYear , length(s) - 1);
 % Initialize other vectors
 popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
+popVec(1 , :) = popIn;
 newHiv = zeros(length(s) - 1 , gender , age , risk);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
-newCC = zeros(length(s) - 1 , disease , hpvTypes , age);
+newCC = zeros(length(s) - 1 , disease , hpvVaxStates , age);
 newCin1 = newCC;
 newCin2 = newCC;
 newCin3 = newCC;
 ccDeath = newCC;
-ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , numScreenAge , risk , 2);
+ccTreated = zeros(length(s) - 1 , disease , hpvVaxStates , age , 3); % 3 cancer stages: local, regional, distant
+newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , numScreenAge , risk , 2);
 newTreatImm = newScreen;
 newTreatHpv = newScreen;
 newTreatHyst = newScreen;
 vaxdSchool = zeros(length(s) - 1 , 1);
 hivDeaths = zeros(length(s) - 1 , gender , age);
 deaths = popVec; 
+import java.util.LinkedList
+artDistList = LinkedList();
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
-popVec(1 , :) = popIn;
-tVec = linspace(startYear , endYear , length(s) - 1);
-k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
 artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
 
 %% Main body of simulation
@@ -338,8 +335,8 @@ for i = 2 : length(s) - 1
         % Create indices
         fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk))); 
         toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk)));
-        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvStates , 1 , 1:gender , 16 : 30 , 1:risk))); 
-        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvStates , 1 , 1:gender , 16 : 30 , 1:risk)));
+        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvNonVaxStates , 1 , 1:gender , 16 : 30 , 1:risk))); 
+        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvNonVaxStates , 1 , 1:gender , 16 : 30 , 1:risk)));
 
         % Distribute HIV infections (HPV-)        
         popIn(fromNonHivNonHpv) = (1 - 0.002) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
@@ -364,7 +361,7 @@ for i = 2 : length(s) - 1
             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf  ,...
             rNormal_Inf , hpv_hivClear , c3c2Mults , ...
             c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
-            disease , age , hpvTypes , periods , ...
+            disease , age , hpvVaxStates , intervens , ...
             rImmuneHiv , hyst , hystInds , hystSusInds , OMEGA) , tspan , popIn);
         popIn = pop(end , :); % for next module
         if any(pop(end , :) <  0)
@@ -377,12 +374,12 @@ for i = 2 : length(s) - 1
                 newTreatImm(i , : , : , : , : , : , : , :) , ...
                 newTreatHpv(i , : , : , : , : , : , : , :) , ...
                 newTreatHyst(i , : , : , : , : , : , : , :)] ...
-                = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates ,  risk , ...
-                screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
-                noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
-                noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
-                vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                screenAlgorithm , numScreenAge);
+                = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
+                    screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
+                    noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
+                    vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
+                    noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
+                    vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
@@ -390,8 +387,8 @@ for i = 2 : length(s) - 1
                 break
             end
         end
-        %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvTypes , age , ...
-        %                     periods , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
+        %                 [~ , pop] = ode4x(@(t , pop) hpvTreat(t , pop , disease , viral , hpvVaxStates , age , ...
+        %                     intervens , detCC , hivCC , muCC , ccRInds , ccSusInds , ...
         %                     hystPopInds , screenFreq , screenCover , hpvSens , ccTreat , ...
         %                     cytoSens , cin1Inds , cin2Inds , cin3Inds ,  normalInds , getHystPopInds ,...
         %                     OMEGA , leep , hystOption , year) , tspan , pop(end , :));
@@ -409,8 +406,8 @@ for i = 2 : length(s) - 1
         hpvVaxdScreen , hpvVaxd2 , hpvVaxd2Screen , hpvImmVaxd2 , hpvImmVaxd2Screen , ...
         hpvVaxd2NonV , hpvVaxd2NonVScreen , hpvImmVaxd2NonV , hpvImmVaxd2NonVScreen, ...
         hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , betaHIVF2M , ...
-        betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-        hrInds , nonVInds , periods , startYear , stepsPerYear , year) , tspan , popIn);
+        betaHIVM2F , disease , viral , gender , age , risk , hpvNonVaxStates , hpvVaxStates , ...
+        hrInds , nonVInds , intervens , startYear , stepsPerYear , year) , tspan , popIn);
     popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
         disp('After mixInfect')
@@ -456,8 +453,8 @@ for i = 2 : length(s) - 1
     if ((year >= vaxStartYear) && (vaxRate > 0))
         % HPV vaccination module- school-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , k , ...
-            disease , viral , risk , hpvTypes , hpvStates , ...
-            periods , vaxG , vaxAge , vaxRate);
+            disease , viral , risk , hpvVaxStates , hpvNonVaxStates , ...
+            intervens , vaxG , vaxAge , vaxRate);
         pop(end , :) = pop(end , :) + dPop;
         if any(pop(end , :) < 0)
             disp('After hpvVaxSchool')

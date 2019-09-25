@@ -186,9 +186,22 @@ hivStartYear = 1980;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
+cytoSens = [0.0 , 0.57 , 0.57];
+% Baseline screening algorithm
+baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenAge = 36;
+baseline.testSens = cytoSens;
+% cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
+baseline.colpoRetain = 0.72;
+baseline.cinTreatEff = [0.905 , 0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
+baseline.cinTreatRetain = 0.51;
+baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
+baseline.ccTreatRetain = 0.40;
+
 save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
     'maxRateM1' , 'maxRateM2' , 'maxRateF1' , 'maxRateF2' , ...
-    'hivStartYear' , 'circStartYear' , 'vaxStartYear');
+    'hivStartYear' , 'circStartYear' , 'vaxStartYear' , ...
+    'baseline');
 
 %% Import and save calibration data
 file = [pwd , '\Config\Calibration_targets.xlsx'];
@@ -345,7 +358,7 @@ disp('hiv2a indices loaded')
 %% hpvCCdet.m indices
 disp('Preparing indices for HPV modules...')
 
-ccLocInds = zeros(disease , age , intervens , viral * hpvNonVaxStates * risk + viral * hpvVaxStates * risk);
+ccLocInds = zeros(disease , age , intervens , viral * risk);
 ccRegInds = ccLocInds;
 ccDistInds = ccLocInds;
 cin1hpvVaxInds = zeros(disease , age , intervens , viral * hpvNonVaxStates * risk);
@@ -357,12 +370,9 @@ cin3hpvNonVaxInds = cin1hpvNonVaxInds;
 for d = 1 : disease
     for a = 1 : age
         for p = 1 : intervens
-            ccLocInds(d , a , p , :) = sort([toInd(allcomb(d , 1 : viral , 6 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk));
-                toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 6 , 1 , p , 2 , a , 1 : risk))]);
-            ccRegInds(d , a , p , :) = sort([toInd(allcomb(d , 1 : viral , 6 , 1 : hpvNonVaxStates , 2 , p , 2 , a , 1 : risk));
-                toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 6 , 2 , p , 2 , a , 1 : risk))]);
-            ccDistInds(d , a , p , :) = sort([toInd(allcomb(d , 1 : viral , 6 , 1 : hpvNonVaxStates , 3 , p , 2 , a , 1 : risk));
-                toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 6 , 3 , p , 2 , a , 1 : risk))]);
+            ccLocInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 1 , p , 2 , a , 1 : risk)));
+            ccRegInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 2 , p , 2 , a , 1 : risk)));
+            ccDistInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 3 , p , 2 , a , 1 : risk)));
 
             cin1hpvVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 3 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk)));
             cin2hpvVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 4 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk)));
