@@ -4,185 +4,60 @@
 close all; clear all; clc
 % profile clear;
 
-%% Load calibrated parameters and reset general parameters based on changes to model
+%% Save pre-loaded parameters and pre-calculated indices and matrices
+%loadUp2;
+
+%% Load saved parameters
 disp('Initializing. Standby...')
-disp(' ');
 
-% Use calibrated parameters
 paramDir = [pwd , '/Params/'];
-load([paramDir , 'calibratedParams'])
 
-% Load general parameters and reset changed parameters
-paramDir = [pwd , '/Params/'];
-load([paramDir, 'general'],'stepsPerYear','disease','viral','hpvTypes','hpvStates','periods',...
-    'gender','age','risk','k','toInd','sumall')
-dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
-at = @(x , y) sort(prod(dim)*(y-1) + x);
+% Load saved parameters
+load([paramDir, 'generalParams'], 'stepsPerYear' , 'timeStep' , ...
+    'disease' , 'viral' , 'hpvVaxStates' , 'hpvNonVaxStates' , 'endpoints' , ...
+    'intervens' , 'gender' , 'age' , 'risk' , 'dim' , 'k' , 'toInd' , ...
+    'sumall');
+load([paramDir, 'demoBehavParams'], 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
+    'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'mue');
+load([paramDir, 'hivParams'], 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl');
+load([paramDir, 'hpvParams'], 'perPartnerHpv' , 'perPartnerHpv_nonV' , 'fImm' , ...
+    'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
+    'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm');
+load([paramDir, 'intervenParams'], 'circ' , 'condUse' , ...
+    'maxRateM1' , 'maxRateM2' , 'maxRateF1' , 'maxRateF2' , ...
+    'hivStartYear' , 'circStartYear' , 'vaxStartYear');
+load([paramDir , 'calibData'], 'cinPos2014_obs' , 'cinNeg2014_obs' , ...
+    'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
+    'hivPrevM_obs' , 'hivPrevF_obs');
 
-muHIV(11 , 2) = 0.02;
+%% Load saved indices
+load([paramDir,'mixInfectIndices'], 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , ...
+    'gar' , 'hivSus' , 'hpvVaxSus' , 'hpvVaxImm' , 'hpvVaxSusVaxd' , 'hpvVaxImmVaxd' , ...
+    'hpvNonVaxSus' , 'hpvNonVaxImm' , 'hpvNonVaxSusVaxd' , 'hpvNonVaxImmVaxd' , ...
+    'toHiv' , 'hpvVaxInfs' , 'hpvNonVaxInfs')
+load([paramDir,'hivIndices'], 'hivInds')
+load([paramDir,'hpvIndices'], 'ccLocInds' , 'ccRegInds' , 'ccDistInds' , ...
+    'cin1hpvVaxInds' , 'cin2hpvVaxInds' , 'cin3hpvVaxInds' , 'cin1hpvNonVaxInds' , ...
+    'cin2hpvNonVaxInds' , 'cin3hpvNonVaxInds' , 'normalhpvVaxInds' , 'immunehpvVaxInds' , ...
+    'infhpvVaxInds' , 'normalhpvNonVaxInds' , 'immunehpvNonVaxInds' , 'infhpvNonVaxInds'))
+load([paramDir,'ageRiskInds'], 'ageInd' , 'riskInd')
 
-% CIN transition data
-kCin1_Inf = zeros(age,2);
-kCin2_Cin1 = zeros(age,2);
-kCin3_Cin2 = zeros(age,2);
-kCC_Cin3 = zeros(age,2);
-rNormal_Inf = zeros(age,2);
-kInf_Cin1 = zeros(age,2);
-kCin1_Cin2 = zeros(age,2);
-kCin2_Cin3 = zeros(age,2);
-file = [pwd , '\Config\HPV_parameters.xlsx'];
-% HPV 16/18
-kCin1_Inf_orig(: , 1) = xlsread(file , 'CIN Transition' , 'B5 : B20'); % HPV to CIN1
-kCin2_Cin1_orig(: , 1) = xlsread(file , 'CIN Transition' , 'C5 : C20'); % CIN1 to CIN2
-kCin3_Cin2_orig(: , 1) = xlsread(file , 'CIN Transition', 'D5 : D20'); %CIN2 to CIN3
-kCC_Cin3_orig(: , 1) = xlsread(file , 'CIN Transition', 'E5 : E20'); % CIN3 to unlocalized
-rNormal_Inf_orig(: , 1) = xlsread(file , 'CIN Transition' , 'F5 : F20'); % HPV to Well (natural immunity)
-kInf_Cin1_orig(: , 1) = xlsread(file , 'CIN Transition' , 'G5 : G20'); % CIN1 to HPV
-kCin1_Cin2_orig(: , 1) = xlsread(file , 'CIN Transition', 'H5 : H20'); % CIN2 to CIN1
-kCin2_Cin3_orig(: , 1) = xlsread(file , 'CIN Transition', 'I5 : I20'); % CIN3 to CIN2
-% 9v type ohr
-kCin1_Inf_orig(: , 2) = xlsread(file , 'CIN Transition' , 'B25 : B40');
-kCin2_Cin1_orig(: , 2) = xlsread(file , 'CIN Transition' , 'C25 : C40');
-kCin3_Cin2_orig(: , 2) = xlsread(file , 'CIN Transition' , 'D25 : D40');
-kCC_Cin3_orig(: , 2) = xlsread(file , 'CIN Transition' , 'E25 : E40');
-rNormal_Inf_orig(: , 2) = xlsread(file , 'CIN Transition' , 'F25 : F40');
-kInf_Cin1_orig(: , 2) = xlsread(file , 'CIN Transition' , 'G25 : G40');
-kCin1_Cin2_orig(: , 2) = xlsread(file , 'CIN Transition', 'H25 : H40');
-kCin2_Cin3_orig(: , 2) = xlsread(file , 'CIN Transition', 'I25 : I40');
-% Non-vaccine type ohr
-kCin1_Inf_orig(: , 3) = xlsread(file , 'CIN Transition' , 'B45 : B60');
-kCin2_Cin1_orig(: , 3) = xlsread(file , 'CIN Transition' , 'C45 : C60');
-kCin3_Cin2_orig(: , 3) = xlsread(file , 'CIN Transition', 'D45 : D60');
-kCC_Cin3_orig(: , 3) = xlsread(file , 'CIN Transition', 'E45 : E60');
-rNormal_Inf_orig(: , 3) = xlsread(file , 'CIN Transition' , 'F45 : F60');
-kInf_Cin1_orig(: , 3) = xlsread(file , 'CIN Transition' , 'G45 : G60');
-kCin1_Cin2_orig(: , 3) = xlsread(file , 'CIN Transition', 'H45 : H60');
-kCin2_Cin3_orig(: , 3) = xlsread(file , 'CIN Transition', 'I45 : I60');
-% Weight HPV transitions and HPV incidence multiplier according to type distribution
-distWeight = [0.7/(0.7+0.2) , 0.2/(0.7+0.2)];
-kCin1_Inf(:,1) = sum(bsxfun(@times , kCin1_Inf_orig(:,1:2) , distWeight) , 2);
-kCin2_Cin1(:,1) = sum(bsxfun(@times , kCin2_Cin1_orig(:,1:2) , distWeight) , 2);
-kCin3_Cin2(:,1) = sum(bsxfun(@times , kCin3_Cin2_orig(:,1:2) , distWeight) , 2);
-kCC_Cin3(:,1) = sum(bsxfun(@times , kCC_Cin3_orig(:,1:2) , distWeight) , 2);
-rNormal_Inf(:,1) = sum(bsxfun(@times , rNormal_Inf_orig(:,1:2) , distWeight) , 2);
-kInf_Cin1(:,1) = sum(bsxfun(@times , kInf_Cin1_orig(:,1:2) , distWeight) , 2);
-kCin1_Cin2(:,1) = sum(bsxfun(@times , kCin1_Cin2_orig(:,1:2) , distWeight) , 2);
-kCin2_Cin3(:,1) = sum(bsxfun(@times , kCin2_Cin3_orig(:,1:2) , distWeight) , 2);
-kCin1_Inf(:,2) = kCin1_Inf_orig(:,3);
-kCin2_Cin1(:,2) = kCin2_Cin1_orig(:,3);
-kCin3_Cin2(:,2) = kCin3_Cin2_orig(:,3);
-kCC_Cin3(:,2) = kCC_Cin3_orig(:,3);
-rNormal_Inf(:,2) = rNormal_Inf_orig(:,3);
-kInf_Cin1(:,2) = kInf_Cin1_orig(:,3);
-kCin1_Cin2(:,2) = kCin1_Cin2_orig(:,3);
-kCin2_Cin3(:,2) = kCin2_Cin3_orig(:,3);
-% % % kCC_Cin3 = [kCC_Cin3 , kCC_Cin3];
-% % % kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2];
-% % % kCin1_Inf = [kCin1_Inf , kCin1_Inf];
-% % % kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1];
-% % % kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3];
-% % % kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2];
-% % % kInf_Cin1 = [kInf_Cin1 , kInf_Cin1];
-% rNormal_Inf = [rNormal_Inf , rNormal_Inf];
+%% Load saved matrices
+load([paramDir,'vlAdvancer'], 'vlAdvancer')
+load([paramDir,'fertMat'], 'fertMat')
+load([paramDir,'hivFertMats'], 'hivFertPosBirth' , 'hivFertNegBirth')
+load([paramDir,'fertMat2'], 'fertMat2')
+load([paramDir,'hivFertMats2'], 'hivFertPosBirth2' , 'hivFertNegBirth2')
+load([paramDir,'deathMat'], 'deathMat')
+load([paramDir,'circMat'], 'circMat')
+load([paramDir,'circMat2'] , 'circMat2')
 
-%% Convert 5-year age groups to 1-year age groups
-% Divide popInit age groups equally into five
-popInit_orig = popInit;
-[ageDim, valDim] = size(popInit_orig);
-popInit = zeros(ageDim*5 , valDim);
-for i = 1 : ageDim
-    popInit(((i-1)*5+1) : i*5 , :) = ones(5 , valDim) .* (popInit_orig(i , :)./5);
-end
-
-% Replicate rates across single age groups for other variables
-vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , ...
-             'partnersM' , 'partnersF' , 'muHIV' , 'maleActs' , 'femaleActs' , 'kCin1_Inf' , ...
-             'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , 'kInf_Cin1' , ...
-             'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
-vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , ...
-             partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
-             kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
-             kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};
-for j = 1 : length(vars5To1_vals)
-    valsA1 = age5To1(vars5To1_vals{j});
-    assignin('base', vars5To1_nms{j} , valsA1);
-end
-
-riskDist = zeros(age , risk , 2);
-riskDist(: , : , 1) = riskDistM;
-riskDist(: , : , 2) = riskDistF;
-
-% Time
+%% Time
+startYear = 1910;
 c = fix(clock);
 currYear = 2020; % c(1); % get the current year
-startYear = 1910;
 endYear = currYear;
-timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
-
-% Reset additional changed parameters different than calibrated
-perPartnerHpv = 0.0045;
-perPartnerHpv_nonV = 0.5 * perPartnerHpv;
-condUse = 0.20; %0.5 * 0.5;
-epsA = [0.3 ; 0.3 ; 0.3];
-epsR = [0.3 ; 0.3 ; 0.3];
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
-for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-    period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-end
-OMEGA = zeros(age , 1); % hysterectomy rate
-betaHIVF2M = zeros(age , risk , viral);
-betaHIVM2F = betaHIVF2M;
-for a = 1 : age % calculate per-partnership probability of HIV transmission
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-end
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
-% % rNormal_Inf = ones(age,1); % for VCLIR analysis
-% % hpv_hivClear = ones(4,1);
-% % kCIN1_Inf = zeros(age,1);
-
-% To similate a lower HIV prevalence setting, approximating with decreased per-act HIV transmission probability (80% of initial values)
-% % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
-% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
-% % transM = vagTransM .* (1 - analProp(: , 1));
-% % transF = vagTransF .* (1 - analProp(: , 2));
-% % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
-% % betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transM);
-% % betaHIVF2M = zeros(age , risk , viral);
-% % betaHIVM2F = betaHIVF2M;
-% % for a = 1 : age % calculate per-partnership probability of HIV transmission
-% %     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-% %     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-% % end
-% % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-% % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
-
-% Load indices
-paramDir = [pwd , '/Params/'];
-load([paramDir,'mixInfectIndices'])
-% load([paramDir ,'mixInfectIndices2']) % to load hpvImmVaxd2
-load([paramDir,'hivIndices'])
-load([paramDir,'hpvIndices'])
-load([paramDir,'ageRiskInds'])
-% Load matrices
-paramDir = [pwd , '/Params/'];
-% load([paramDir,'ager'])
-load([paramDir,'vlAdvancer'])
-load([paramDir,'fertMat'])
-load([paramDir,'hivFertMats'])
-load([paramDir,'fertMat2'])
-load([paramDir,'hivFertMats2'])
-load([paramDir,'deathMat'])
-load([paramDir,'circMat'])
-load([paramDir,'circMat2'])
 
 %% Model specs
 % choose whether to model hysterectomy
@@ -198,28 +73,14 @@ if hivOn
     disp('HIV module activated')
 end
 
-% Intervention start years
-hivStartYear = 1980;
-circStartYear = 1990;
-vaxStartYear = 2014;
-
 % ART
 import java.util.LinkedList
 artDistList = LinkedList();
-maxRateM_vec = [0.40 , 0.40]; % Maximum ART coverage
-maxRateF_vec = [0.55 , 0.55];
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = 'toNow_091319_singleAge_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
-
-% IMMUNITY
-fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -341,12 +202,6 @@ end
 lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Initial Population 
-mInit = popInit(: , 1); % initial male population size by age
-fInit = popInit(: , 2); % initial female population size by age
-
-% use male risk distribution for both genders
-riskDistF = riskDistM;
-
 MpopStruc = riskDistM;
 FpopStruc = riskDistF;
 
