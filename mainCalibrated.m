@@ -221,47 +221,6 @@ initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susc
 initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
 initPop_0 = initPop;
 
-if (hivOn && (hivStartYear == startYear))
-    initPop(3 , 2 , 1 , 1 , 1 , 1 , 16 : 30 , 2 : 3) = 0.005 / 2 .* ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 16 : 30 , 2 : 3); % initial HIV infected male (age groups 4-6, med-high risk) (% prevalence)
-    initPop(1 , 1 , 1 , 1 , 1 , 1 , 16 : 30 , 2 : 3) = ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 16 : 30 , 2 : 3) .* (1 - 0.005 / 2); % moved to HIV infected
-    initPop(3 , 2 , 1 , 1 , 1 , 2 , 16 : 30 , 2 : 3) = 0.005 / 2 .*...
-        initPop_0(1 , 1 , 1 , 1 , 1 , 2 , 16 : 30 , 2 : 3); % initial HIV infected female (% prevalence)
-    initPop(1 , 1 , 1 , 1 , 1 , 2 , 16 : 30 , 2 : 3) = ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , 2 , 16 : 30 , 2 : 3) .* (1 - 0.005 / 2); % moved to HIV infected
-
-    if hpvOn
-        initPopHiv_0 = initPop;
-        % HIV+ not infected by HPV
-        % females
-        initPop(3 , 2 , 1 , 1 , 1 , 2 , 16 : 30 , 1 : 3) = 0.3 .* ...
-            initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 16 : 30 , 1 : 3);
-        % males
-        initPop(3 , 2 , 1 , 1 , 1 , 1 , 16 : 30 , 1 : 3) = 0.3 .* ...
-            initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 16 : 30 , 1 : 3);
-
-        % HIV+ infected by HPV
-        % females
-        initPop(3 , 2 , 2 , 1 , 1 , 2 , 16 : 30 , 1 : 3) = 0.7 .* ...
-            initPopHiv_0(3 , 2 , 1 , 1 , 1 , 2 , 16 : 30 , 1 : 3);
-        % males
-        initPop(3 , 2 , 2 , 1 , 1 , 1 , 16 : 30 , 1 : 3) = 0.7 .* ...
-            initPopHiv_0(3 , 2 , 1 , 1 , 1 , 1 , 16 : 30 , 1 : 3);
-    end
-end
-assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HIV infections.')
-
-if (hpvOn && hivOn && (hivStartYear == startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) * 0.20; % 20% initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
-    initPop(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) = ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) - infected; % moved from HPV-
-
-    % Omni-HPV type (transition rates weighted by estimated prevalence in population)
-    initPop(1 , 1 , 2 , 1 , 1 , : , 16 : 45 , :) = infected; % moved to HPV+
-end
-assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
-
 if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
     infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
     initPop(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) = ...
