@@ -203,32 +203,23 @@ FpopStruc = riskDistF;
 
 mPop = zeros(age , risk); % distribute initial population size by gender, age risk
 fPop = mPop;
-
-if startYear >= 1980;
-    for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ 1.25;
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ 1.25;
-    end
-else
-    for i = 1 : age
-        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12);
-        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
-    end
+for i = 1 : age
+    mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12); % scale population size back to an approximated level at the start year
+    fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
 end
-
 initPop = zeros(dim);
-initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, male
-initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
+initPop(1 , 1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, HPV Susceptible, no precancer, male
+initPop(1 , 1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, HPV Susceptible, no precancer, female
 initPop_0 = initPop;
 
-% Assumes HPV starts before HIV
-infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
-initPop(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) = ...
-    initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) - infected; % moved from HPV
-
-% Omni-HPV type (transition rates weighted by estimated prevalence in population)
-initPop(1 , 1 , 2 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % half moved to vaccine-type HPV+
-initPop(1 , 1 , 3 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % moved to non-vaccine-type HPV+
+% Assumes HPV starts before HIV in ages 15-44
+infected = initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 1 : gender , 16 : 45 , :) * (0.2 * 0.9975); % initial HPV prevalence among ages 15-44 (sexually active) (HIV-)
+initPop(1 , 1 , 1 , 1 , 1 , 1 , 1 : gender , 16 : 45 , :) = ...
+    initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 1 : gender , 16 : 45 , :) - infected; % moved from HPV susceptible
+initPop(1 , 1 , 2 , 1 , 1 , 1 , 1 : gender , 16 : 45 , :) = infected;
+%initPop(1 , 1 , 2 , 1 , 1 , 1 , : , 16 : 45 , :) = 0.50 .* infected; % half moved to vaccine-type HPV+
+%initPop(1 , 1 , 1 , 2 , 1 , 1 , : , 16 : 45 , :) = 0.45 .* infected; % moved to non-vaccine-type HPV+
+%initPop(1 , 1 , 2 , 2 , 1 , 1 , : , 16 : 45 , :) = 0.05 .* infected; % moved to vaccine-type and non-vaccine-type HPV+
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 %% Simulation
@@ -245,23 +236,22 @@ tVec = linspace(startYear , endYear , length(s) - 1);
 popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
 popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
 popVec(1 , :) = popIn;
+deaths = popVec; 
 newHiv = zeros(length(s) - 1 , gender , age , risk);
+hivDeaths = zeros(length(s) - 1 , gender , age);
 newHpv = zeros(length(s) - 1 , gender , disease , age , risk);
 newImmHpv = newHpv;
 newVaxHpv = newHpv;
-newCC = zeros(length(s) - 1 , disease , hpvVaxStates , age);
+newCC = zeros(length(s) - 1 , disease , 2 , age); % track by HPV type causal to CC
 newCin1 = newCC;
 newCin2 = newCC;
 newCin3 = newCC;
 ccDeath = newCC;
-ccTreated = zeros(length(s) - 1 , disease , hpvVaxStates , age , 3); % 3 cancer stages: local, regional, distant
-newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , numScreenAge , risk , 2);
+newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
 newTreatImm = newScreen;
 newTreatHpv = newScreen;
 newTreatHyst = newScreen;
 vaxdSchool = zeros(length(s) - 1 , 1);
-hivDeaths = zeros(length(s) - 1 , gender , age);
-deaths = popVec; 
 import java.util.LinkedList
 artDistList = LinkedList();
 artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
@@ -285,17 +275,17 @@ for i = 2 : length(s) - 1
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
     
-    % Add HIV index cases at hivStartYear if not present in initial population
+    % Add HIV index cases at hivStartYear
     if (hivOn && (year == hivStartYear))
-        % Initialize hiv cases in population
+        % Initialize HIV cases in population ages 15-29
         popIn_init = popIn;
         
         % Create indices
-        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk))); 
-        toHivNonHpv = sort(toInd(allcomb(3 , 2 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk)));
-        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2:4 , 1:hpvNonVaxStates , 1 , 1:gender , 16 : 30 , 1:risk))); 
-        toHivHpv = sort(toInd(allcomb(3 , 2 , 2:4 , 1:hpvNonVaxStates , 1 , 1:gender , 16 : 30 , 1:risk)));
-
+        fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk))); 
+        toHivNonHpv = sort(toInd(allcomb(4 , 2 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk)));
+        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : endpoints , 1 , 1:gender , 16 : 30 , 1:risk))); 
+        toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : endpoints , 1 , 1:gender , 16 : 30 , 1:risk)));
+        
         % Distribute HIV infections (HPV-)        
         popIn(fromNonHivNonHpv) = (1 - 0.002) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
         popIn(toHivNonHpv) = (0.002) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6, med-high risk) (% prevalence)
