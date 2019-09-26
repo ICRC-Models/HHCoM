@@ -221,15 +221,14 @@ initPop(1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, acute infection, HPV Susc
 initPop(1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, acute infection, HPV Susceptible, no precancer, __, female
 initPop_0 = initPop;
 
-if (hpvOn && ~hivOn) || (hpvOn && hivOn && (hivStartYear > startYear))
-    infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
-    initPop(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) = ...
-        initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) - infected; % moved from HPV
+% Assumes HPV starts before HIV
+infected = initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) * (0.2 * 0.9975); % initial HPV prevalence among age groups 4 - 9 (sexually active) (HIV-)
+initPop(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) = ...
+    initPop_0(1 , 1 , 1 , 1 , 1 , : , 16 : 45 , :) - infected; % moved from HPV
 
-    % Omni-HPV type (transition rates weighted by estimated prevalence in population)
-    initPop(1 , 1 , 2 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % half moved to vaccine-type HPV+
-    initPop(1 , 1 , 3 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % moved to non-vaccine-type HPV+
-end
+% Omni-HPV type (transition rates weighted by estimated prevalence in population)
+initPop(1 , 1 , 2 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % half moved to vaccine-type HPV+
+initPop(1 , 1 , 3 , 1 , 1 , : , 16 : 45 , :) = 0.5 .* infected; % moved to non-vaccine-type HPV+
 assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
 
 %% Simulation
@@ -287,7 +286,7 @@ for i = 2 : length(s) - 1
     popIn = popVec(i - 1 , :);
     
     % Add HIV index cases at hivStartYear if not present in initial population
-    if (hivOn && (hivStartYear > startYear) && (year == hivStartYear))
+    if (hivOn && (year == hivStartYear))
         % Initialize hiv cases in population
         popIn_init = popIn;
         
