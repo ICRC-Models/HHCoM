@@ -150,8 +150,12 @@ save(fullfile(paramDir ,'demoBehavParams'), 'mInit' , 'fInit' , 'partnersM' , 'p
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+    % force of infection: females to infect HIV-negative males, 
+    % affected by betaHIV_F2M (probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
+    % force of infection: males to infect HIV-negative females,
+    % affected by betaHIV_M2F (probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
 end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
@@ -159,13 +163,13 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 save(fullfile(paramDir ,'hivParams'), 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl');
 
 %% Save HPV natural history parameters
-perPartnerHpv = 0.0045;
-perPartnerHpv_nonV = 0.5 * perPartnerHpv;
+perPartnerHpv_vax = 0.0045;
+perPartnerHpv_nonV = 0.5 * perPartnerHpv_vax;
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
-save(fullfile(paramDir ,'hpvParams'), 'perPartnerHpv' , 'perPartnerHpv_nonV' , 'fImm' , ...
+save(fullfile(paramDir ,'hpvParams'), 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , 'fImm' , ...
     'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm');
 
@@ -230,6 +234,79 @@ disp('Preparing indices...')
 disp('This may take a while...')
 
 %% mixInfect.m indices
+gar = zeros(gender , age , risk , disease * viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
+for g = 1 : gender
+    for a = 1 : age
+        for r = 1 : risk
+            gar(g , a , r , :) = sort(toInd(allcomb(1 : disease , 1 : viral ,...
+                1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , r)));
+        end
+    end
+end
+
+vaxInds = zeros(gender , age , risk , disease * viral * 5 * hpvNonVaxStates * 3 * intervens);
+nonVInds = zeros(gender , age , risk , disease * viral * hpvVaxStates * 5 * 3 * intervens);
+vaxNonVInds = zeros(gender , age , risk , disease * viral * 5 * 5 * 3 * intervens);
+for g = 1 : gender
+    for a = 1 : age
+        for r = 1 : risk
+            vaxInds(g , a , r , :) = ...
+                sort(toInd(allcomb(1 : disease , 1 : viral , 2 : 6 , ...
+                1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , g , a , r)));
+            nonVInds(g , a , r , :) = ...
+                sort(toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , ...
+                2 : 6 , 1 : 3 , 1 : intervens , g , a , r)));
+            vaxNonVInds(g , a , r , :) = ...
+                sort(toInd(allcomb(1 : disease , 1 : viral , 2 : 6 , ...
+                2 : 6 , 1 : 3 , 1 : intervens , g , a , r)));
+        end
+    end
+end
+
+hpvVaxSus = zeros(disease, gender , age , risk , viral*hpvNonVaxStates*intervens);
+hpvVaxImm = hpvVaxSus;
+hpvVaxInf = hpvVaxSus;
+hpvNonVaxSus = zeros(disease , gender , age , risk , viral*hpvVaxStates*intervens);
+hpvNonVaxImm = hpvNonVaxSus;
+hpvNonVaxInf = hpvNonVaxSus;
+hpvVaxNonVaxSusSus = zeros(disease , gender , age , risk , viral*intervens);
+hpvVaxNonVaxSusImm = hpvVaxNonVaxSusSus;
+hpvVaxNonVaxImmSus = hpvVaxNonVaxSusSus;
+hpvVaxNonVaxImmImm = hpvVaxNonVaxSusSus;
+hpvVaxNonVaxInf = hpvVaxNonVaxSusSus;
+for d = 1 : disease
+    for g = 1 : gender
+        for a = 1 : age
+            for r = 1 : risk
+                hpvVaxSus(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 , 1 : intervens , g , a , r)));
+                hpvVaxImm(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 , 1 : intervens , g , a , r)));
+                hpvVaxInf(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 2 , 1 : hpvNonVaxStates , 1 , 1 : intervens , g , a , r)));
+                
+                hpvNonVaxSus(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 , 1 : intervens , g , a , r)));
+                hpvNonVaxImm(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvNonVaxStates , 7 , 1 , 1 : intervens , g , a , r)));
+                hpvNonVaxInf(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 , 1 : intervens , g , a , r)));
+                
+                hpvVaxNonVaxSusSus(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 , 1 , 1 : intervens , g , a , r)));
+                hpvVaxNonVaxSusImm(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 , 7 , 1 , 1 : intervens , g , a , r)));
+                hpvVaxNonVaxImmSus(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 , 1 , 1 : intervens , g , a , r)));
+                hpvVaxNonVaxImmImm(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 7 , 7 , 1 , 1 : intervens , g , a , r)));
+                hpvVaxNonVaxInf(d , g , a , r , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 2 , 2 , 1 , 1 : intervens , g , a , r)));
+            end
+        end
+    end
+end
+
 mCurr = zeros(age , risk , viral , 5 * hpvVaxStates * hpvNonVaxStates * endpoints * intervens); % 5 HIV+ disease states
 fCurr = zeros(age , risk , viral , 5 * hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
 mCurrArt = zeros(age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens); % 1 HIV+ ART disease state
@@ -249,16 +326,6 @@ for a = 1 : age
     end
 end
 
-gar = zeros(gender , age , risk , disease * viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
-for g = 1 : gender
-    for a = 1 : age
-        for r = 1 : risk
-            gar(g , a , r , :) = sort(toInd(allcomb(1 : disease , 1 : viral ,...
-                1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , r)));
-        end
-    end
-end
-
 hivSus = zeros(2 , gender , age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
 for d = 1 : 2
     for g = 1 : gender
@@ -266,40 +333,6 @@ for d = 1 : 2
             for r = 1 : risk
                 hivSus(d , g , a , r , :) =...
                     sort(toInd(allcomb(d , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , r)));
-            end
-        end
-    end
-end
-
-hpvVaxSus = zeros(disease, gender , age , risk , viral*hpvNonVaxStates*2);
-hpvVaxImm = hpvVaxSus;
-hpvVaxSusVaxd = hpvVaxSus;
-hpvVaxImmVaxd = hpvVaxSus;
-hpvNonVaxSus = zeros(disease , gender , age , risk , viral*hpvVaxStates*2);
-hpvNonVaxImm = hpvNonVaxSus;
-hpvNonVaxSusVaxd = hpvNonVaxSus;
-hpvNonVaxImmVaxd = hpvNonVaxSus;
-for d = 1 : disease
-    for g = 1 : gender
-        for a = 1 : age
-            for r = 1 : risk
-                hpvVaxSus(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 , [1,3] , g , a , r)));
-                hpvVaxImm(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 , [1,3] , g , a , r)));
-                hpvNonVaxSus(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 , [1,3] , g , a , r)));
-                hpvNonVaxImm(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvNonVaxStates , 7 , 1 , [1,3] , g , a , r)));
-
-                hpvVaxSusVaxd(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 , [2,4] , g , a , r)));
-                hpvVaxImmVaxd(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 , [2,4] , g , a , r)));
-                hpvNonVaxSusVaxd(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 , [2,4] , g , a , r)));
-                hpvNonVaxImmVaxd(d , g , a , r , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 7 , 1 , [2,4] , g , a , r)));
             end
         end
     end
@@ -315,25 +348,12 @@ for g = 1 : gender
     end
 end
 
-hpvVaxInfs = zeros(gender , age , risk , disease * viral * 5 * hpvNonVaxStates * endpoints * intervens);
-hpvNonVaxInfs = zeros(gender , age , risk , disease , viral * hpvVaxStates * 5 * endpoints * intervens);
-for g = 1 : gender
-    for a = 1 : age
-        for r = 1 : risk
-            hpvVaxInfs(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 2 : 6 , ...
-                1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , r)));
-            hpvNonVaxInfs(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , ...
-                2 : 6 , 1 : endpoints , 1 : intervens , g , a , r)));
-        end
-    end
-end
-
 save([paramDir , 'mixInfectIndices'] , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , ...
     'gar' , 'hivSus' , 'hpvVaxSus' , 'hpvVaxImm' , 'hpvVaxSusVaxd' , 'hpvVaxImmVaxd' , ...
     'hpvNonVaxSus' , 'hpvNonVaxImm' , 'hpvNonVaxSusVaxd' , 'hpvNonVaxImmVaxd' , ...
-    'toHiv' , 'hpvVaxInfs' , 'hpvNonVaxInfs')
+    'toHiv' , 'vaxInds' , 'nonVInds' , 'vaxNonVInds' , 'hpvVaxInf' , 'hpvNonVaxInf' , ...
+    'hpvVaxNonVaxSusSus' , 'hpvVaxNonVaxSusImm' , 'hpvVaxNonVaxImmSus' , ...
+    'hpvVaxNonVaxImmImm' , 'hpvVaxNonVaxInf');
 disp('mixInfect indices loaded')
 
 %% hiv2a.m indices

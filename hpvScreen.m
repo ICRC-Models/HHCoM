@@ -84,6 +84,7 @@ for i = 1 : length(screenAlgs)
                                     dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
                                             
                                     % if you have CIN2+ of either HPV type and are susceptible or immune to the other HPV type
+                                    % Note: don't want to move individuals susceptible/immune to the other HPV type falsely into an HPV infected compartment
                                     if ( (((h==4) || (h==5)) && (((s==1) || (s==7)))) || ((((h==1) || (h==7))) && ((s==4) || (s==5))) ) && (x==1)
                                         if ((h==4) || (h==5))
                                             dPop(noVaxToScreenTreatVaxHpv(d,v,s,aS,r)) = dPop(noVaxToScreenTreatVaxHpv(d,v,s,aS,r)) + toScreenTreatHpvMult .* noVaxScreend;

@@ -5,20 +5,26 @@
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , ...
-        gar , perPartnerHpv , perPartnerHpv_nonV , maleActs , ...
+        gar , perPartnerHpv_vax , perPartnerHpv_nonV , maleActs , ...
         femaleActs , lambdaMultImm , lambdaMultVax , artHpvMult , epsA_vec , ...
-        epsR_vec , yr , circProtect , condProtect , condUse , actsPer , ...
+        epsR_vec , yr , circProtect , condProtect , condUse , ...
         partnersM , partnersF , hpv_hivMult , hpvSus , hpvImm , hpvVaxd , ...
         hpvVaxdScreen , hpvVaxd2 , hpvVaxd2Screen , hpvImmVaxd2 , hpvImmVaxd2Screen , ...
         hpvVaxd2NonV , hpvVaxd2NonVScreen , hpvImmVaxd2NonV , hpvImmVaxd2NonVScreen , ...
         hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , betaHIVF2M , ...
-        betaHIVM2F , disease , viral , gender , age , risk , hpvStates , hpvTypes , ...
-        hrInds , nonVInds , periods , startYear , stepsPerYear , year)
-    
-sumall = @(x) sum(x(:));
-%% Process mixInfect constants
+        betaHIVM2F , disease , viral , gender , age , risk , hpvVaxStates , hpvNonVaxStates , ...
+        vaxInds , nonVInds , vaxNonVInds , endpoints , intervens , startYear , stepsPerYear , year)
 
-% epsAge and epsRisk - extent of assortative mixing
+%% Initialize dPop and output vectors
+dPop = zeros(size(pop));
+newHpv = zeros(gender , disease , age , risk);
+newImmHpv = newHpv;
+newVaxHpv = newHpv;
+newHiv = zeros(gender , age , risk);
+    
+%% Find epsAge and epsRisk according to the present year (extent of assortative mixing) 
+% Random mixing (epsilon = 1), mixing proportional to relative sizes of all compartments
+% Assortative mixing (epsilon = 0), mixing among groups similar by age/risk
 dataYr1 = yr(1);
 dataYrLast = yr(size(yr , 1));
 baseYrInd = max(find(year >= yr , 1, 'last') , 1); % get index of first year <= current year
@@ -35,16 +41,9 @@ elseif year >= dataYrLast % assortativity in last year and after
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
-% epsA = 0.3;
-% epsR = 0.3;
-% epsA = epsA_vec(1);
-% epsR = epsR_vec(1);
 
-% deltaR and deltaA - nature of assortative mixing (Kronecker delta)
-% for all times
+%% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
 deltaR = eye(3 , 3);
-% if currStep <= (2005 - startYear) * int
-% original
 diagVec = [-2 , -1 , 1 , 2];
 deltaAF = eye(80) .* (0.3*0.2);
 deltaAM = eye(80) .* (0.3*0.2);
@@ -86,24 +85,14 @@ deltaAM(8:17,11:19) = [zeros(3,9); ...
                        ones(1,8).*(1/8) , 0.0; ...
                        ones(1,9).*(1/9)];
 
-acts = actsPer; % acts per partnership, from loaded workspace [gender x risk] (not currently used)
-
-% Rate of partner change (contact)
+%% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
+% partnership/ contact matrices
 % males
 c(1 , : , :) = partnersM;
 % females
 c(2 , : , :) = partnersF;
 
-% Protection from circumcision
-%circProtect
-%condProtect
-prepProtect = 0.75; % Ying et al. HIV Home HTC supplementary appendix
-artProtect = 0.96; % Ying et al. HIV Home HTC supplementary appendix. change to 0.93?
-
-%% MixInfect
-% Mixing matrix
 popSum = zeros(gender , age , risk);
-
 for g = 1 : gender
     for a = 1 : age
         for r = 1 : risk
@@ -111,7 +100,6 @@ for g = 1 : gender
         end
     end
 end
-
 ageNum = sum(c .* popSum , 3); % numerator for age portion, sum by r -> dim [g x a]
 den = sum(ageNum , 2); % sum across a -> dim [g x 1]
 
@@ -148,7 +136,7 @@ for i = 11 : age
         + (1 - epsR) .* deltaR; % [a(i) x r x r] + [r x r] -> [a x r x r]
 end
 
-% Intialize rho matrices for males and females
+% intialize rho matrices for males and females
 rhoM = zeros(age, age, risk, risk);
 rhoF = rhoM;
 for i = 11 : age
@@ -164,7 +152,8 @@ end
 rho(1 , : , : , : , :) = rhoM;
 rho(2 , : , : , : , :) = rhoF;
 
-% calculate discrepancy between male and female reported contacts
+%% Adjust for discrepancies in contact reporting between male and female contacts
+% calculate the discrepancy between the two populations
 mfRatio = zeros(age , age , risk , risk);
 for aa = 11 : age
     for rr = 1 : risk
@@ -191,8 +180,9 @@ for i = 11 : age
 end
 B(isnan(B)) = 0; % 0/0 , 1/0 -> 0
 B(isinf(B)) = 0;
+
 % adjust c to account for discrepancy in reporting
-theta = 0.5; 
+theta = 0.5; % contact rate equally driven by contact rates reported by males and females
 cAdjMale = zeros(age , age , risk , risk);
 cAdjFemale = cAdjMale;
 for i = 11 : age
@@ -213,28 +203,8 @@ cAdj(2 , : , : , : , :) = cAdjFemale;
 cAdj(isnan(cAdj)) = 0;
 cAdj(isinf(cAdj)) = 0;
 
-% Protection due to condom usage and circumcision
-peakYear = 2000;
-condStart = 1995;
-yrVec = condStart : 1 / stepsPerYear : peakYear;
-%condUseVec = linspace(0 , 0.5 * 0.5 , (peakYear - condStart) * stepsPerYear);
-condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
-condUse = condUseVec(1); % year <= peakYear
-if year < peakYear && year > condStart
-    yrInd = year == yrVec;
-    condUse = condUseVec(yrInd);
-elseif year >= peakYear
-    condUse = condUseVec(end);
-end
-cond = 1-(condProtect * condUse); % condom usage and condom protection rates
-psi = ones(disease) .* cond;  % vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
-psi(7) = (1 - circProtect) .* cond;
-psi(8) = (1 - circProtect) * (1 - prepProtect) .* cond; % no one on PrEP for now
-dPop = zeros(size(pop));
-newHiv = zeros(gender , age , risk); % incidence tally by gender
-
 %% HPV Infection
-% HPV parameters
+% calculate per-partnership probability of HPV transmission
 sexPop = zeros(2 , 1);
 sexPop(1) = sumall(popSum(1 , 11 : age , :)); % total sexually active males in population
 sexPop(2) = sumall(popSum(2 , 11 : age , :)); % total sexually active females in population
@@ -242,36 +212,36 @@ beta = zeros(gender , age , risk , 3);
 for g = 1 : gender
     for a = 11 : age
         for r = 1 : risk
-            beta_hrHPV_F2M = 1 - (1 - perPartnerHpv) ^ maleActs(a , r); % per year per partner probability
-            beta_hrHPV_M2F = 1 - (1 - perPartnerHpv) ^ femaleActs(a , r);
-            beta_nonV_HPV_F2M = 1 - (1 - perPartnerHpv_nonV) ^ maleActs(a , r);
-            beta_nonV_HPV_M2F = 1 - (1 - perPartnerHpv_nonV) ^ femaleActs(a , r);
+            beta_hpvVax_M2F = 1 - (1 - perPartnerHpv_vax) ^ femaleActs(a , r); % per year per partner probability of HPV transmission
+            beta_hpvVax_F2M = 1 - (1 - perPartnerHpv_vax) ^ maleActs(a , r);
+            beta_hpvNonVax_M2F = 1 - (1 - perPartnerHpv_nonV) ^ femaleActs(a , r);
+            beta_hpvNonVax_F2M = 1 - (1 - perPartnerHpv_nonV) ^ maleActs(a , r);
             % Per partnership beta
-            beta_hrHPV(2 , a , r) = beta_hrHPV_F2M;  % HPV(-) males [g x r]
-            beta_hrHPV(1 , a , r) = beta_hrHPV_M2F; % HPV(-) females [g x r]
-            beta_nonV_HPV(2 , a , r) = beta_nonV_HPV_F2M; % HPV(-) males [g x r]
-            beta_nonV_HPV(1 , a , r) = beta_nonV_HPV_M2F; % HPV(-) females [g x r]
+            beta_hpvVax(1 , a , r) = beta_hpvVax_M2F; % males to infect HPV-negative females [g x r]
+            beta_hpvVax(2 , a , r) = beta_hpvVax_F2M;  % females to infect HPV-negative males [g x r]
+            beta_hpvNonVax(1 , a , r) = beta_hpvNonVax_M2F; % males to infect HPV-negative females [g x r]
+            beta_hpvNonVax(2 , a , r) = beta_hpvNonVax_F2M; % females to infect HPV-negative males [g x r]
             
-            hrSum = 0;
-            nonVSum = 0;
-            hr = hrInds(g , a , r , :);
+            vax = vaxInds(g , a , r , :);
             nonV = nonVInds(g , a , r , :);
-            hrSum = hrSum + sumall(pop(hr));
-            nonVSum = nonVSum + sumall(pop(nonV));
-            p_hrHPV = max(hrSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type HPV. Max handles divide by 0 error.
-            p_nonVHPV = max(nonVSum / popSum(g , a , r) , 0); % proportion of sexually active with non-vax type HPV
-            % adjust betas for HPV transmission to account for proportion of population
-            % that is carrying HPV. Transmission probability throughout population
-            % is dependent on the "concentration" of HPV carriers in the population.
-            beta(g , a , r , 1) = -log(1 - beta_hrHPV(g , a , r)) .* p_hrHPV;
-            beta(g , a , r , 2) = -log(1 - beta_nonV_HPV(g , a , r)) .* p_nonVHPV;
+            vaxNonV = vaxNonVInds(g , a , r , :);
+            vaxSum = sumall(pop(vax));
+            nonVSum = sumall(pop(nonV));
+            vaxNonVSum = sumall(pop(vaxNonV);
+            p_vaxHPV = max(vaxSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type HPV. Max handles divide by 0 error.
+            p_nonVHPV = max(nonVSum / popSum(g , a , r) , 0); % proportion of sexually active with non-vax-type HPV
+            p_vaxNonVHPV = max(vaxNonVSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type and non-vax-type HPV
+            % adjust betas for HPV transmission to account for proportion of population that is carrying HPV. 
+            % Transmission probability throughout population is dependent on the "concentration" of HPV carriers in the population.
+            beta(g , a , r , 1) = -log(1 - beta_hpvVax(g , a , r)) .* p_vaxHPV;
+            beta(g , a , r , 2) = -log(1 - beta_hpvNonVax(g , a , r)) .* p_nonVHPV;
+            beta(g , a , r , 3) = -log(1 - beta_hpvVax(g , a , r)*beta_hpvNonVax(g , a , r)) .* p_vaxNonVHPV;
         end
     end
 end
 
-states = 3; % (3 HPV infection states)
-% lambda
-lambda = zeros(gender, age , risk , states);
+% calculate lambda (HPV force of infection)
+lambda = zeros(gender, age , risk , 3);
 for g = 1 : gender
     gg = 2; % partner's gender
     if g == 2
@@ -281,224 +251,202 @@ for g = 1 : gender
         for j = 1 : risk
             for ii = 11 : age
                 for jj = 1 : risk
-                    for s = 1 : states
-                        lambda(g , i , j , s) = ...
-                            lambda(g , i , j , s)...
+                    for z = 1 : 3
+                        lambda(g , i , j , z) = ...
+                            lambda(g , i , j , z)...
                             + cAdj(g , i , ii , j , jj)...
-                            * beta(gg , ii , jj , s); % [3 x 1]
+                            * beta(gg , ii , jj , z); % [3 x 1]
                     end
                 end
             end
         end
     end
 end
-newHpv = zeros(gender , disease , age , risk);
-newImmHpv = newHpv;
-newVaxHpv = newHpv;
+
+% calculate new HPV infections
 for d = 1 : disease
-    for h = 1 % infected compartments cannot acquire more infections
-        for toState = 1 : 2 % 2 HPV types
-            hTo = toState + 1; 
-            for a = 11 : age
-                for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
-                    if lambda(1 , a , r , toState) > 10 ^ -6 || lambda(2 , a , r , toState) > 10 ^ -6 ... % only evaluate if lambda is non-zero
-                            && hTo ~= h % and if not acquiring pre-existing infection
-                        
-                        % Prepare indices
-                        % non-vaccinated, screened or non-screened
-                        mSus = hpvSus(d , h , 1 , a , r , :); % non-naturally immune
-                        fSus = hpvSus(d , h , 2 , a , r , :);
-                        %mSusImm = hpvImm(d , hTo , 1 , a , r , :); % only females have natural immunity
-                        fSusImm = hpvImm(d , h , 2 , a , r , :); % naturally immune
-                        mTo = hpvSus(d , hTo , 1 , a , r , :); % update HPV state to infected if just acquiring HPV
-                        fTo = hpvSus(d , hTo , 2 , a , r , :);
-                        %mToImm = toHpv_Imm(d , hTo , 1 , a , r , :);
-                        fToImm = hpvSus(d , hTo , 2 , a , r , :); % update HPV state to infected if just acquiring HPV
+    for a = 11 : age
+        for r = 1 : risk % move age and risk iterators below fromState and toState to reduce unneccessary iterations
+            if any(lambda(1 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) || any(lambda(2 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) ... % only evaluate if lambda is non-zero
+                
+                % Prepare indices
+                % susceptible to vaccine-type HPV --> infected with vaccine-type HPV
+                mhpvVaxSus = hpvVaxSus(d , 1 , a , r , :); % non-naturally immune
+                fhpvVaxSus = hpvVaxSus(d , 2 , a , r , :);
+                fhpvVaxImm = hpvVaxImm(d , 2 , a , r , :); % naturally immune, only females have natural immunity
+                % vaccine-type HPV infection
+                mhpvVaxInf = hpvVaxInf(d , 1 , a , r , :); % update to infected
+                fhpvVaxInf = hpvVaxInf(d , 2 , a , r , :);
+                
+                % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV
+                mhpvNonVaxSus = hpvNonVaxSus(d , 1 , a , r , :); % non-naturally immune
+                fhpvNonVaxSus = hpvNonVaxSus(d , 2 , a , r , :);
+                fhpvNonVaxImm = hpvNonVaxImm(d , 2 , a , r , :); % naturally immune, only females have natural immunity
+                % non-vaccine-type HPV infection
+                mhpvNonVaxInf = hpvNonVaxInf(d , 1 , a , r , :); % update to infected
+                fhpvNonVaxInf = hpvNonVaxInf(d , 2 , a , r , :);
+                
+                % susceptible to vaccine-type and non-vaccine-type HPV --> infected with both HPV types
+                mhpvVaxNonVaxSusSus = hpvVaxNonVaxSusSus(d , 1 , a , r , :);
+                fhpvVaxNonVaxSusSus = hpvVaxNonVaxSusSus(d , 1 , a , r , :);
+                mhpvVaxNonVaxSusImm = hpvVaxNonVaxSusImm(d , 1 , a , r , :);
+                fhpvVaxNonVaxSusImm = hpvVaxNonVaxSusImm(d , 1 , a , r , :);
+                mhpvVaxNonVaxImmSus = hpvVaxNonVaxImmSus(d , 1 , a , r , :);
+                fhpvVaxNonVaxImmSus = hpvVaxNonVaxImmSus(d , 1 , a , r , :);
+                mhpvVaxNonVaxImmImm = hpvVaxNonVaxImmImm(d , 1 , a , r , :);
+                fhpvVaxNonVaxImmImm = hpvVaxNonVaxImmImm(d , 1 , a , r , :);
+                % vaccine-type and non-vaccine type HPV infection
+                mhpvVaxNonVaxInf = hpvVaxNonVaxInf(d , 1 , a , r , :);
+                fhpvVaxNonVaxInf = hpvVaxNonVaxInf(d , 1 , a , r , :);
+                
+                
+                % Set lambda multipliers based on CD4 count
+                lambdaMultF = 1;
+                lambdaMultM = 1;
+                if (d > 3) && (d < 8) % CD4 > 500 -> CD4 < 200
+                    lambdaMultF = hpv_hivMult(d - 3 , 1); %hTo - 1);
+                    lambdaMultM = hpv_hivMult(d - 3 , 1); %hTo - 1);
+                elseif d == 8
+                    lambdaMultF = artHpvMult; 
+                    lambdaMultM = artHpvMult;
+                end
 
-                        % vaccinated with no infection history, non-naturally immune
-                        mSusVax = hpvVaxd(d , h , 1 , a , r , :); % screened
-                        fSusVax = hpvVaxd(d , h , 2 , a , r , :);
-                        mSusVaxScreen = hpvVaxdScreen(d , h , 1 , a , r , :); % non-screened
-                        fSusVaxScreen = hpvVaxdScreen(d , h , 2 , a , r , :);
-                        
-                        % vaccine-type infections:
-                        % vaccinated with vaccine-type infection history, non-screened
-                        mSusVax2 = hpvVaxd2(d , h , 1 , a , r , :); % non-naturally immune
-                        fSusVax2 = hpvVaxd2(d , h , 2 , a , r , :);
-                        fSusImmVax2 = hpvImmVaxd2(d , h , 2 , a , r , :); % naturally immune
-                        mToVax = hpvVaxd2(d , hTo , 1 , a , r , :); % getting infected with a vaccine-type infection
-                        fToVax = hpvVaxd2(d , hTo , 2 , a , r , :);
-                        % vaccinated with vaccine-type infection history, screened
-                        mSusVax2Screen = hpvVaxd2Screen(d , h , 1 , a , r , :); % non-naturally immune
-                        fSusVax2Screen = hpvVaxd2Screen(d , h , 2 , a , r , :);
-                        fSusImmVax2Screen = hpvImmVaxd2Screen(d , h , 2 , a , r , :); % naturally immune
-                        mToVaxScreen = hpvVaxd2Screen(d , hTo , 1 , a , r , :); % getting infected with a vaccine-type infection
-                        fToVaxScreen = hpvVaxd2Screen(d , hTo , 2 , a , r , :);
-                        
-                        % non-vaccine-type infections: 
-                        % vaccinated with non-vaccine-type infection history, non-screened
-                        mSusVax2NonV = hpvVaxd2NonV(d , h , 1 , a , r , :); % non-naturally immune
-                        fSusVax2NonV = hpvVaxd2NonV(d , h , 2 , a , r , :);
-                        fSusImmVax2NonV = hpvImmVaxd2NonV(d , h , 2 , a , r , :); % naturally immune
-                        mToVaxNonV = hpvVaxd2NonV(d , hTo , 1 , a , r , :); % getting infected with a non-vaccine-type infection
-                        fToVaxNonV = hpvVaxd2NonV(d , hTo , 2 , a , r , :);
-                        % vaccinated with non-vaccine-type infection history, screened
-                        mSusVax2NonVScreen = hpvVaxd2NonVScreen(d , h , 1 , a , r , :); % non-naturally immune
-                        fSusVax2NonVScreen = hpvVaxd2NonVScreen(d , h , 2 , a , r , :);
-                        fSusImmVax2NonVScreen = hpvImmVaxd2NonVScreen(d , h , 2 , a , r , :); % naturally immune
-                        mToVaxNonVScreen = hpvVaxd2NonVScreen(d , hTo , 1 , a , r , :);
-                        fToVaxNonVScreen = hpvVaxd2NonVScreen(d , hTo , 2 , a , r , :);
-                        
-                        
-                        % Set lambda multipliers based on CD4 count
-                        lambdaMultF = 1;
-                        lambdaMultM = 1;
-                        if d > 2 && d < 7% && toState < 3 % CD4 > 500 -> CD4 < 200
-                            lambdaMultF = hpv_hivMult(d - 2 , 1); %hTo - 1);
-                            lambdaMultM = hpv_hivMult(d - 2 , 1); %hTo - 1);
-                        elseif d == 10
-                            lambdaMultF = artHpvMult; 
-                            lambdaMultM = artHpvMult;
-                        end
- 
-                        
-                        % Calculate infections
-                        % non-vaccinated susceptibles (screened or non-screened) (infection rate capped at 0.99) 
-                        % non-naturally immune
-                        mInfected = min(lambdaMultM * lambda(1 , a , r , toState)...
-                            , 0.999) .* pop(mSus); % infected males
-                        fInfected = min(lambdaMultF * lambda(2 , a , r , toState)...
-                            , 0.999) .* pop(fSus); % infected females
-                        % naturally immune
-                        %mInfImm = min(lambdaMultM * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
-                        %    , 0.999) .* pop(mSusImm);
-                        fInfImm = min(lambdaMultF * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
-                            , 0.999) .* pop(fSusImm);
-                        
-                        % vaccinated susceptibles
-                        hVax = 1;
-                        if hTo == 3
-                            hVax = 2;
-                        end
-                        vaxProtect = max(lambdaMultVax(a , hVax) , 0.0); % oHR has no vaccine protection
-                        
-                        % vaccinated with no infection history, non-naturally immune
-                        % non-screened
-                        mInfVax = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVax);
-                        fInfVax = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVax);
-                        % screened
-                        mInfVaxScreen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVaxScreen);
-                        fInfVaxScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVaxScreen);
-                        
-                        % vaccinated with vaccine-type infection history
-                        % non-screened
-                        mInfVax2 = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVax2); % non-naturally immune
-                        fInfVax2 = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVax2);
-                        fInfImmVax2 = min(lambdaMultF * vaxProtect * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusImmVax2); % naturally immune
-                        % screened
-                        mInfVax2Screen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVax2Screen); % non-naturally immune
-                        fInfVax2Screen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVax2Screen);
-                        fInfImmVax2Screen = min(lambdaMultF * vaxProtect * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusImmVax2Screen); % naturally immune
-                        
-                        % vaccinated with non-vaccine-type infection history
-                        % non-screened
-                        mInfVax2NonV = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVax2NonV);
-                        fInfVax2NonV = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVax2NonV);
-                        fInfImmVax2NonV = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusImmVax2NonV);
-                        % screened
-                        mInfVax2NonVScreen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(mSusVax2NonVScreen);
-                        fInfVax2NonVScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusVax2NonVScreen);
-                        fInfImmVax2NonVScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
-                            , 0.999 * vaxProtect) .* pop(fSusImmVax2NonVScreen);
-                        
-                        
-                        % Incidence tracker
-                        % non-vaccinated new infections (screened or non-screened)
-                        % non-naturally immune
-                        newHpv(1 , d , a , r) = newHpv(1 , d , a , r) + sumall(mInfected);
-                        newHpv(2 , d , a , r) = newHpv(2 , d , a , r) + sumall(fInfected);
-                        % naturally immune
-                        %newImmHpv(1 , d , a , r) = newImmHpv(1 , d , a , r) + sumall(mInfImm);
-                        newImmHpv(2 , d , a , r) = newImmHpv(2 , d , a , r) + sumall(fInfImm);
+                %****************STOPPED EDITING HERE********************
+                % Calculate infections
+                % non-vaccinated susceptibles (screened or non-screened) (infection rate capped at 0.99) 
+                % non-naturally immune
+                mInfected = min(lambdaMultM * lambda(1 , a , r , toState)...
+                    , 0.999) .* pop(mSus); % infected males
+                fInfected = min(lambdaMultF * lambda(2 , a , r , toState)...
+                    , 0.999) .* pop(fSus); % infected females
+                % naturally immune
+                %mInfImm = min(lambdaMultM * lambdaMultImm(a) * lambda(1 , a , r , toState) ...
+                %    , 0.999) .* pop(mSusImm);
+                fInfImm = min(lambdaMultF * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
+                    , 0.999) .* pop(fSusImm);
 
-                        % vaccinated new infections
-                        newVaxHpv(1 , d , a , r) = newVaxHpv(1 , d , a , r) ...
-                            + sumall(mInfVax) + sumall(mInfVaxScreen) + sumall(mInfVax2) + sumall(mInfVax2Screen) ...
-                            + sumall(mInfVax2NonV) + sumall(mInfVax2NonVScreen);
-                        newVaxHpv(2 , d , a , r) = newVaxHpv(2 , d , a , r)...
-                            + sumall(fInfVax) + sumall(fInfVaxScreen) + sumall(fInfVax2) + sumall(fInfVax2Screen) ...
-                            + sumall(fInfImmVax2) + sumall(fInfImmVax2Screen) + sumall(fInfVax2NonV) + sumall(fInfVax2NonVScreen) ...
-                            + sumall(fInfImmVax2NonV) + sumall(fInfImmVax2NonVScreen);
+                % vaccinated susceptibles
+                hVax = 1;
+                if hTo == 3
+                    hVax = 2;
+                end
+                vaxProtect = max(lambdaMultVax(a , hVax) , 0.0); % oHR has no vaccine protection
 
-                        
-                        % Adjust compartments
-                        % non-vaccinated (screened or non-screened)
-                        % non-naturally immune
-                        dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
-                        dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
-                        dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
-                        dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
-                        % naturally immune
-                        %dPop(mSusImm) = dPop(mSusImm) - mInfImm;
-                        dPop(fSusImm) = dPop(fSusImm) - fInfImm;
-                        %dPop(mToImm) = dPop(mToImm) + mInfImm;
-                        dPop(fToImm) = dPop(fToImm) + fInfImm;
+                % vaccinated with no infection history, non-naturally immune
+                % non-screened
+                mInfVax = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVax);
+                fInfVax = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVax);
+                % screened
+                mInfVaxScreen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVaxScreen);
+                fInfVaxScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVaxScreen);
 
-                        %vaccinated  
-                        dPop(mSusVax) = dPop(mSusVax) - mInfVax; % vaccinated w/ no infection history, non-naturally immune , non-screened
-                        dPop(fSusVax) = dPop(fSusVax) - fInfVax;
+                % vaccinated with vaccine-type infection history
+                % non-screened
+                mInfVax2 = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVax2); % non-naturally immune
+                fInfVax2 = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVax2);
+                fInfImmVax2 = min(lambdaMultF * vaxProtect * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusImmVax2); % naturally immune
+                % screened
+                mInfVax2Screen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVax2Screen); % non-naturally immune
+                fInfVax2Screen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVax2Screen);
+                fInfImmVax2Screen = min(lambdaMultF * vaxProtect * lambdaMultImm(a) * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusImmVax2Screen); % naturally immune
 
-                        dPop(mSusVaxScreen) = dPop(mSusVaxScreen) - mInfVaxScreen; % vaccinated w/ no infection history, non-naturally immune , screened
-                        dPop(fSusVaxScreen) = dPop(fSusVaxScreen) - fInfVaxScreen;
-                   
-                        dPop(mSusVax2) = dPop(mSusVax2) - mInfVax2; % vaccinated w/ vaccine-type infection history, non-naturally immune, non-screened
-                        dPop(fSusVax2) = dPop(fSusVax2) - fInfVax2;
-                        dPop(fSusImmVax2) = dPop(fSusImmVax2) - fInfImmVax2; % vaccinated w/ vaccine-type infection history, naturally immune, non-screened
-                        
-                        dPop(mSusVax2Screen) = dPop(mSusVax2Screen) - mInfVax2Screen; % vaccinated w/ vaccine-type infection history, non-naturally immune, screened
-                        dPop(fSusVax2Screen) = dPop(fSusVax2Screen) - fInfVax2Screen;
-                        dPop(fSusImmVax2Screen) = dPop(fSusImmVax2Screen) - fInfImmVax2Screen; % vaccinated w/ vaccine-type infection history, naturally immune, screened
-                        
-                        dPop(mSusVax2NonV) = dPop(mSusVax2NonV) - mInfVax2NonV; % vaccinated w/ non-vaccine-type infection history, non-naturally immune, non-screened
-                        dPop(fSusVax2NonV) = dPop(fSusVax2NonV) - fInfVax2NonV;
-                        dPop(fSusImmVax2NonV) = dPop(fSusImmVax2NonV) - fInfImmVax2NonV; % vaccinated w/ non-vaccine-type infection history, naturally immune, non-screened
-                        
-                        dPop(mSusVax2NonVScreen) = dPop(mSusVax2NonVScreen) - mInfVax2NonVScreen; % vaccinated w/ non-vaccine-type infection history, non-naturally immune, screened
-                        dPop(fSusVax2NonVScreen) = dPop(fSusVax2NonVScreen) - fInfVax2NonVScreen;
-                        dPop(fSusImmVax2NonVScreen) = dPop(fSusImmVax2NonVScreen) - fInfImmVax2NonVScreen; % vaccinated w/ non-vaccine-type infection history, naturally immune, screened
-                        
-                        if hTo == 2 % vaccinated and acquiring vaccine type infection
-                            dPop(mToVax) = dPop(mToVax) + mInfVax + mInfVax2 + mInfVax2NonV;
-                            dPop(fToVax) = dPop(fToVax) + fInfVax + fInfVax2 + fInfImmVax2 + fInfVax2NonV + fInfImmVax2NonV;
-                            
-                            dPop(mToVaxScreen) = dPop(mToVaxScreen) + mInfVaxScreen + mInfVax2Screen + mInfVax2NonVScreen;
-                            dPop(fToVaxScreen) = dPop(fToVaxScreen) + fInfVaxScreen + fInfVax2Screen + fInfImmVax2Screen + ...
-                                fInfVax2NonVScreen + fInfImmVax2NonVScreen;
-                            
-                        elseif hTo == 3 % vaccinated and acquiring non-vaccine type infection
-                            dPop(mToVaxNonV) = dPop(mToVaxNonV) + mInfVax + mInfVax2 + mInfVax2NonV;
-                            dPop(fToVaxNonV) = dPop(fToVaxNonV) + fInfVax + fInfVax2 + fInfImmVax2 + fInfVax2NonV + fInfImmVax2NonV;
-                            
-                            dPop(mToVaxNonVScreen) = dPop(mToVaxNonVScreen) + mInfVaxScreen + mInfVax2Screen + mInfVax2NonVScreen;
-                            dPop(fToVaxNonVScreen) = dPop(fToVaxNonVScreen) + fInfVaxScreen + fInfVax2Screen + fInfImmVax2Screen + ...
-                                fInfVax2NonVScreen + fInfImmVax2NonVScreen;
-                        end
-                    end
+                % vaccinated with non-vaccine-type infection history
+                % non-screened
+                mInfVax2NonV = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVax2NonV);
+                fInfVax2NonV = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVax2NonV);
+                fInfImmVax2NonV = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusImmVax2NonV);
+                % screened
+                mInfVax2NonVScreen = min(lambdaMultM * vaxProtect * lambda(1 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(mSusVax2NonVScreen);
+                fInfVax2NonVScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusVax2NonVScreen);
+                fInfImmVax2NonVScreen = min(lambdaMultF * vaxProtect * lambda(2 , a , r , toState) ...
+                    , 0.999 * vaxProtect) .* pop(fSusImmVax2NonVScreen);
+
+
+                % Incidence tracker
+                % non-vaccinated new infections (screened or non-screened)
+                % non-naturally immune
+                newHpv(1 , d , a , r) = newHpv(1 , d , a , r) + sumall(mInfected);
+                newHpv(2 , d , a , r) = newHpv(2 , d , a , r) + sumall(fInfected);
+                % naturally immune
+                %newImmHpv(1 , d , a , r) = newImmHpv(1 , d , a , r) + sumall(mInfImm);
+                newImmHpv(2 , d , a , r) = newImmHpv(2 , d , a , r) + sumall(fInfImm);
+
+                % vaccinated new infections
+                newVaxHpv(1 , d , a , r) = newVaxHpv(1 , d , a , r) ...
+                    + sumall(mInfVax) + sumall(mInfVaxScreen) + sumall(mInfVax2) + sumall(mInfVax2Screen) ...
+                    + sumall(mInfVax2NonV) + sumall(mInfVax2NonVScreen);
+                newVaxHpv(2 , d , a , r) = newVaxHpv(2 , d , a , r)...
+                    + sumall(fInfVax) + sumall(fInfVaxScreen) + sumall(fInfVax2) + sumall(fInfVax2Screen) ...
+                    + sumall(fInfImmVax2) + sumall(fInfImmVax2Screen) + sumall(fInfVax2NonV) + sumall(fInfVax2NonVScreen) ...
+                    + sumall(fInfImmVax2NonV) + sumall(fInfImmVax2NonVScreen);
+
+
+                % Adjust compartments
+                % non-vaccinated (screened or non-screened)
+                % non-naturally immune
+                dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
+                dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
+                dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
+                dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
+                % naturally immune
+                %dPop(mSusImm) = dPop(mSusImm) - mInfImm;
+                dPop(fSusImm) = dPop(fSusImm) - fInfImm;
+                %dPop(mToImm) = dPop(mToImm) + mInfImm;
+                dPop(fToImm) = dPop(fToImm) + fInfImm;
+
+                %vaccinated  
+                dPop(mSusVax) = dPop(mSusVax) - mInfVax; % vaccinated w/ no infection history, non-naturally immune , non-screened
+                dPop(fSusVax) = dPop(fSusVax) - fInfVax;
+
+                dPop(mSusVaxScreen) = dPop(mSusVaxScreen) - mInfVaxScreen; % vaccinated w/ no infection history, non-naturally immune , screened
+                dPop(fSusVaxScreen) = dPop(fSusVaxScreen) - fInfVaxScreen;
+
+                dPop(mSusVax2) = dPop(mSusVax2) - mInfVax2; % vaccinated w/ vaccine-type infection history, non-naturally immune, non-screened
+                dPop(fSusVax2) = dPop(fSusVax2) - fInfVax2;
+                dPop(fSusImmVax2) = dPop(fSusImmVax2) - fInfImmVax2; % vaccinated w/ vaccine-type infection history, naturally immune, non-screened
+
+                dPop(mSusVax2Screen) = dPop(mSusVax2Screen) - mInfVax2Screen; % vaccinated w/ vaccine-type infection history, non-naturally immune, screened
+                dPop(fSusVax2Screen) = dPop(fSusVax2Screen) - fInfVax2Screen;
+                dPop(fSusImmVax2Screen) = dPop(fSusImmVax2Screen) - fInfImmVax2Screen; % vaccinated w/ vaccine-type infection history, naturally immune, screened
+
+                dPop(mSusVax2NonV) = dPop(mSusVax2NonV) - mInfVax2NonV; % vaccinated w/ non-vaccine-type infection history, non-naturally immune, non-screened
+                dPop(fSusVax2NonV) = dPop(fSusVax2NonV) - fInfVax2NonV;
+                dPop(fSusImmVax2NonV) = dPop(fSusImmVax2NonV) - fInfImmVax2NonV; % vaccinated w/ non-vaccine-type infection history, naturally immune, non-screened
+
+                dPop(mSusVax2NonVScreen) = dPop(mSusVax2NonVScreen) - mInfVax2NonVScreen; % vaccinated w/ non-vaccine-type infection history, non-naturally immune, screened
+                dPop(fSusVax2NonVScreen) = dPop(fSusVax2NonVScreen) - fInfVax2NonVScreen;
+                dPop(fSusImmVax2NonVScreen) = dPop(fSusImmVax2NonVScreen) - fInfImmVax2NonVScreen; % vaccinated w/ non-vaccine-type infection history, naturally immune, screened
+
+                if hTo == 2 % vaccinated and acquiring vaccine type infection
+                    dPop(mToVax) = dPop(mToVax) + mInfVax + mInfVax2 + mInfVax2NonV;
+                    dPop(fToVax) = dPop(fToVax) + fInfVax + fInfVax2 + fInfImmVax2 + fInfVax2NonV + fInfImmVax2NonV;
+
+                    dPop(mToVaxScreen) = dPop(mToVaxScreen) + mInfVaxScreen + mInfVax2Screen + mInfVax2NonVScreen;
+                    dPop(fToVaxScreen) = dPop(fToVaxScreen) + fInfVaxScreen + fInfVax2Screen + fInfImmVax2Screen + ...
+                        fInfVax2NonVScreen + fInfImmVax2NonVScreen;
+
+                elseif hTo == 3 % vaccinated and acquiring non-vaccine type infection
+                    dPop(mToVaxNonV) = dPop(mToVaxNonV) + mInfVax + mInfVax2 + mInfVax2NonV;
+                    dPop(fToVaxNonV) = dPop(fToVaxNonV) + fInfVax + fInfVax2 + fInfImmVax2 + fInfVax2NonV + fInfImmVax2NonV;
+
+                    dPop(mToVaxNonVScreen) = dPop(mToVaxNonVScreen) + mInfVaxScreen + mInfVax2Screen + mInfVax2NonVScreen;
+                    dPop(fToVaxNonVScreen) = dPop(fToVaxNonVScreen) + fInfVaxScreen + fInfVax2Screen + fInfImmVax2Screen + ...
+                        fInfVax2NonVScreen + fInfImmVax2NonVScreen;
                 end
             end
         end
@@ -509,6 +457,25 @@ newInfs{1} = newHpv;
 newInfs{2} = newImmHpv;
 newInfs{3} = newVaxHpv;
 
+%% Protection against HIV due to condom usage and circumcision
+% find condom use according to the present year
+condStart = 1995;
+peakYear = 2000;
+yrVec = condStart : 1 / stepsPerYear : peakYear;
+condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
+condUse = condUseVec(1); % year <= peakYear
+if year < peakYear && year > condStart
+    yrInd = year == yrVec;
+    condUse = condUseVec(yrInd);
+elseif year >= peakYear
+    condUse = condUseVec(end);
+end
+cond = 1-(condProtect * condUse); % condom usage and condom protection rates
+
+% calculate psi vector for protective factors. Scaled to reflect protection by contraception. Currently parameterized for HIV only.
+psi = ones(disease) .* cond; % condom use only for all disease states
+psi(2) = (1 - circProtect) .* cond; % condom use + circumcision protection for d=2
+
 %% HIV Infection
 % HIV average betas
 beta = zeros(risk , age , gender , age , risk);
@@ -518,6 +485,7 @@ for a = 1 : age
 %     for aa = 1 : age
         for r = 1 : risk
 %             for rr = 1 : risk
+                % force of infection: males to infect HIV-negative females 
                 if popSum(1 , a , r) ~= 0
                     for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
                         beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , v)) ...
@@ -526,6 +494,7 @@ for a = 1 : age
                     beta(: , : , 1 , a , r) = beta(: , : , 1 , a , r) - log(1 - betaHIVM2F(: , : , 6)) ...
                         * sumall(pop(mCurrArt(a , r , 1 , :)))  ./ popSum(1 , a , r);
                 end
+                % force of infection: females to infect HIV-negative males 
                 if popSum(2 , a , r) ~= 0
                     for v = 1 : 5 % viral load (up to vl = 6). Note: last index is (viral - 1) + 1. Done to align pop index with betaHIV index.
                         beta(: , : , 2 , a , r) = beta(: , : , 2 , a , r) - log(1 - betaHIVF2M(: , : , v))...
