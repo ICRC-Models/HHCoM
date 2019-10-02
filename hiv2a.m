@@ -11,10 +11,10 @@
 % 2) artTreat, a matrix describing the distribution of individuals who went
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
-function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
+function[dPop , hivDeaths , artTreat] = hiv2a(pop , vlAdvancer , artDist , muHIV , ...
     kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
     viral , gender , age , risk , k , hivInds , ...
-    stepsPerYear , year)
+    stepsPerYear , year , dPopCum , timeStep)
 
 %% Load constants and parameters
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
@@ -262,6 +262,9 @@ for g = 1 : gender
                 % CD4 500-350 cells/uL (d = 4)
                 % CD4 350-200 cells/uL (d = 5)
                 % CD4 <200 cells/uL (d = 6)
+                if any((pop + (dPopCum+dPop).*timeStep) < 0.0)
+                    error(['Breaking out of hiv2a after acute infection:' year , ',' , g , ',' , a , ',' , 'r' , ',' , v]);
+                end
                 
                 for d = 3 : 6
                     % get indices
@@ -292,6 +295,9 @@ for g = 1 : gender
                         dPop(hivPositiveArt)...
                         + treat(d , v , g , a , r)... % rate of going on ART
                         .* pop(cd4Curr); % going on ART
+                    if any((pop + (dPopCum+dPop).*timeStep) < 0.0)
+                        error(['Breaking out of hiv2a after lower CD4 infection:' , year , ',' , g , ',' , a , ',' , 'r' , ',' , v , ',' , d]);
+                    end
                 end
             end
             
@@ -329,6 +335,9 @@ for g = 1 : gender
             dPop(hivPositiveArt) = ...
                 dPop(hivPositiveArt)...
                 - artOut .* pop(hivPositiveArt); % artOut to d = 2:6 as determined by distribution matrix
+            if any((pop + (dPopCum+dPop).*timeStep) < 0.0)
+                error(['Breaking out of hiv2a after uninfecteds:' , year , ',' , g , ',' , a , ',' , 'r']);
+            end
         end
     end
 end
@@ -344,7 +353,10 @@ if size(vlAdvanced , 1) ~= size(dPop , 1)
 end
 
 dPop = dPop + vlAdvanced;
+if any((pop + (dPopCum+dPop).*timeStep) < 0.0)
+    error('Breaking out of hiv2a after viral load:' , year);
+end
 
-extraOuts{1} = hivDeaths;
-extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
+% extraOuts{1} = hivDeaths;
+% extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
 dPop = sparse(dPop);

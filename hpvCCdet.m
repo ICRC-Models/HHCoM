@@ -3,7 +3,7 @@
 % Accepts a population matrix as input and returns dPop, a vector of
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.
-function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds , ...
+function[dPop , ccInc , ccDeath , ccTreated] = hpvCCdet(pop , immuneInds , infInds , cin1Inds , ...
     cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
     ccTreatedInds , ccLocDetInds , ccRegDetInds , ccDistDetInds , ...
     kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
@@ -196,6 +196,6 @@ for d = 1 : disease
     end   
 end
 
-extraOut{1} = ccInc;
-extraOut{2} = ccDeath;
-extraOut{3} = ccTreated;
+% extraOut{1} = ccInc;
+% extraOut{2} = ccDeath;
+% extraOut{3} = ccTreated;
