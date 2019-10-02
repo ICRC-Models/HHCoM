@@ -10,7 +10,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_091319_singleAge_baseScreen_noBaseVax_2020']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_090519_singleAge_baseScreen_noBaseVax_2020']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -820,32 +820,32 @@ linStyle = {'--' , '-' , ':'};
 %for a = 1 : age
 %    for r = 1 : risk
         % HIV+
-        hpvHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 2:4 , 5:7, ...
+        hpvHivInds = toInd(allcomb(2 : 6 , 1 : 5 , 2:4 , 4 , ...
              1 : periods , 2 : gender , 10:75 , 1:risk));
         hpvHivPop = sum(vaxResult{3}.popVec(: , hpvHivInds) , 2);
         popHivTot = vaxResult{3}.popVec(: , toInd(allcomb(2 : 6 , 1 : 5 , 1 : hpvTypes , 1 : hpvStates ,  1 : periods , ...
             2 : gender , 10:75 , 1:risk)));
         %ART
-        hpvArtInds = toInd(allcomb(10 , 6 , 2:4 , 5:7, ...
+        hpvArtInds = toInd(allcomb(10 , 6 , 2:4 , 4 , ...
              1 : periods , 2 : gender , 10:75 , 1:risk));
         hpvArtPop = sum(vaxResult{3}.popVec(: , hpvArtInds) , 2);
         popArtTot = vaxResult{3}.popVec(: , toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             2 : gender , 10:75 , 1:risk)));
         %HIV ALL
-        hpvAllInds = toInd(allcomb([2:6,10] , 1 : viral , 2:4 , 5:7, ...
+        hpvAllInds = toInd(allcomb([2:6,10] , 1 : viral , 2:4 , 4 , ...
              1 : periods , 2 : gender , 10:75 , 1:risk));
         hpvAllPop = sum(vaxResult{3}.popVec(: , hpvAllInds) , 2);
         popAllTot = vaxResult{3}.popVec(: , toInd(allcomb([2:6,10] , 1:viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             2 : gender , 10:75 , 1:risk)));
         %HIV-
-        hpvHivNegInds = toInd(allcomb([1,7:9] , 1 , 2:4 , 5:7 , ...
+        hpvHivNegInds = toInd(allcomb([1,7:9] , 1 , 2:4 , 4 , ...
              1 : periods , 2 : gender , 10:75 , 1:risk));
         hpvHivNegPop = sum(vaxResult{3}.popVec(: , hpvHivNegInds) , 2);
         popHivNegTot = vaxResult{3}.popVec(: , toInd(allcomb([1,7:9] , 1 , 1 : hpvTypes , 1 : hpvStates ,  1 : periods , ...
             2 : gender , 10:75 , 1:risk)));
         
         %General
-        genInds = toInd(allcomb(1 : disease , 1 : viral , 2:4 , 5:7 , ...
+        genInds = toInd(allcomb(1 : disease , 1 : viral , 2:4 , 4 , ...
              1 : periods , 2 : gender , 10:75 , 1:risk));
         genPop = sum(vaxResult{3}.popVec(: , genInds) , 2);
         genTot = vaxResult{3}.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates ,  1 : periods , ...
@@ -853,19 +853,19 @@ linStyle = {'--' , '-' , ':'};
 
         %subplot(4,4,a)
         hold all;
-        plot(tVec , 100 * genPop ./ sum(genTot , 2) , '--')
+        plot(tVec , 100 * genPop ./ sum(genTot , 2) , '-')
         hold all;
-        plot(tVec , 100 * hpvHivNegPop ./ sum(popHivNegTot , 2) , '--')
+        plot(tVec , 100 * hpvHivNegPop ./ sum(popHivNegTot , 2) , '-')
         hold all;
-        plot(tVec , 100 * hpvHivPop ./ sum(popHivTot , 2) , '--')
+        plot(tVec , 100 * hpvHivPop ./ sum(popHivTot , 2) , '-')
         hold all;
-        plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2) , '--')
+        plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2) , '-')
         hold all;
-        plot(tVec , 100 * hpvAllPop ./ sum(popAllTot , 2) , '--')
+        plot(tVec , 100 * hpvAllPop ./ sum(popAllTot , 2) , '-')
         %axis([tVec(1) tVec(end) 0 100])
         xlim([1950 2120])
-        ylim([0 100])
-        xlabel('Year'); ylabel('Prevalence (%)'); title(' CC Prevalence, ages 9-74')
+        ylim([0 20])
+        xlabel('Year'); ylabel('Prevalence (%)'); title(' CIN3 Prevalence, ages 9-74')
         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
 %    end
 %end
@@ -958,6 +958,7 @@ legend('Phase I, Scenario 1' , 'Phase 2, Scenario 5');
 % By age
 figure;
 aVec = {10:15,16:25,26:35,36:50,51:75};
+saveResults = [];
 for aInd = 1:length(aVec)
     a = aVec{aInd};
     vaxInds = [toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , [1,6] , 2 , a , 1 : risk)); ...
@@ -965,7 +966,9 @@ for aInd = 1:length(aVec)
     vaxPop = sum(vaxResult{1}.popVec(: , vaxInds) , 2);
     popTot = vaxResult{1}.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk)));
-
+    
+    covAge = 100 * vaxPop ./ sum(popTot , 2);
+    saveResults = [saveResults , covAge(1 : stepsPerYear : end)];
     hold all;
     plot(tVec , 100 * vaxPop ./ sum(popTot , 2))
     axis([2010 2120 0 100])
@@ -973,6 +976,9 @@ for aInd = 1:length(aVec)
     %legend('Phase I, Scenario 1' , 'Phase 2, Scenario 5');
     legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
 end
+saveResults = [tVec(1 : stepsPerYear : end)' , saveResults];
+fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
+xlswrite(fname , saveResults)
 
 % Age-standardized
 figure;
