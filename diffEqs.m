@@ -66,7 +66,7 @@ if hpvOn
     extraOut{2} = ccDeath;
     extraOut{3} = ccTreated;
     if any((pop + dPopCum.*timeStep) < 0.0)
-        error('Breaking out of function after hpvCCdet');
+        error(['Breaking out of function after hpvCCdet:' , num2str(year)]);
     end
 
     if (year >= hpvScreenStartYear)
@@ -84,7 +84,7 @@ if hpvOn
         extraOut{6} = newTreatHpv;
         extraOut{7} = newTreatHyst;
         if any((pop + dPopCum) < 0.0)
-            error('Breaking out of function after hpvScreen');
+            error(['Breaking out of function after hpvScreen:' , num2str(year)]);
         end
     end
 end
@@ -107,7 +107,7 @@ extraOut{9} = newImmHpv;
 extraOut{10} = newVaxHpv;
 extraOut{11} = newHiv;
 if any((pop + dPopCum.*timeStep) < 0.0)
-    error('Breaking out of function after mixInfect');
+    error(['Breaking out of function after mixInfect:' , num2str(year)]);
 end
 
 % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
@@ -122,7 +122,7 @@ if (hivOn && (year >= hivStartYear))
 %     extraOut{13} = artTreatTracker;
     extraOut{14} = artTreat;
     if any((pop + dPopCum.*timeStep) < 0.0)
-        error('Breaking out of function after hiv2a');
+        error(['Breaking out of function after hiv2a' , num2str(year)]);
     end
 end
 
@@ -139,7 +139,7 @@ end
 dPopCum = dPopCum + dPop;
 extraOut{15} = deaths;
 if any((pop + dPopCum.*timeStep) < 0.0)
-    error('Breaking out of function after bornAgeDieRisk');
+    error(['Breaking out of function after bornAgeDieRisk' , num2str(year)]);
 end
 
 if ((year >= vaxStartYear) && (vaxRate > 0))
@@ -150,6 +150,7 @@ if ((year >= vaxStartYear) && (vaxRate > 0))
     dPopCum = dPopCum + dPop;
     extraOut{16} = vaxdSchool;
     if any((pop + dPopCum.*timeStep) < 0.0)
-        error('Breaking out of function after hpvVaxSchool');
+        error(['Breaking out of function after hpvVaxSchool' , num2str(year)]);
     end
 end
+

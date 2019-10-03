@@ -20,6 +20,7 @@ dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 at = @(x , y) sort(prod(dim)*(y-1) + x);
 
 muHIV(11 , 2) = 0.02;
+stepsPerYear = 10;
 
 %% Convert 5-year age groups to 1-year age groups
 % Divide popInit age groups equally into five
@@ -51,7 +52,7 @@ riskDist(: , : , 2) = riskDistF;
 % Time
 c = fix(clock);
 currYear = 2020; % c(1); % get the current year
-startYear = 1910;
+startYear = 1978; %1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
@@ -134,7 +135,7 @@ if hivOn
 end
 
 % Intervention start years
-hivStartYear = 1912; %1980;
+hivStartYear = 1980;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
@@ -151,7 +152,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_100219_singleAge_baseScreen_noBaseVax_2020_allfuncs1timestep'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_100319_singleAge_baseScreen_noBaseVax_2020_allfuncs1timestep_10stepsPerYear'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
