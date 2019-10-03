@@ -223,18 +223,14 @@ for g = 1 : gender
             
             vax = vaxInds(g , a , r , :);
             nonV = nonVInds(g , a , r , :);
-            %%%vaxNonV = vaxNonVInds(g , a , r , :); % CJB: I think I should take this out; one transition per time step; memoryless process
             vaxSum = sumall(pop(vax));
             nonVSum = sumall(pop(nonV));
-            %%%vaxNonVSum = sumall(pop(vaxNonV);
             p_vaxHPV = max(vaxSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type HPV. Max handles divide by 0 error.
             p_nonVHPV = max(nonVSum / popSum(g , a , r) , 0); % proportion of sexually active with non-vax-type HPV
-            %%%p_vaxNonVHPV = max(vaxNonVSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type and non-vax-type HPV
             % adjust betas for HPV transmission to account for proportion of population that is carrying HPV. 
             % Transmission probability throughout population is dependent on the "concentration" of HPV carriers in the population.
             beta(g , a , r , 1) = -log(1 - beta_hpvVax(g , a , r)) .* p_vaxHPV;
             beta(g , a , r , 2) = -log(1 - beta_hpvNonVax(g , a , r)) .* p_nonVHPV;
-            %%%beta(g , a , r , 3) = -log(1 - beta_hpvVax(g , a , r)*beta_hpvNonVax(g , a , r)) .* p_vaxNonVHPV;
         end
     end
 end
@@ -284,19 +280,6 @@ for a = 11 : age
                     % non-vaccine-type HPV infection
                     mhpvNonVaxInf = hpvNonVaxInf(d , 1 , a , r , p , :); % update to infected
                     fhpvNonVaxInf = hpvNonVaxInf(d , 2 , a , r , p , :);
-
-                    % susceptible to vaccine-type and non-vaccine-type HPV --> infected with both HPV types
-                    %%%mhpvVaxNonVaxSusSus = hpvVaxNonVaxSusSus(d , 1 , a , r , p , :);
-                    %%%fhpvVaxNonVaxSusSus = hpvVaxNonVaxSusSus(d , 1 , a , r , p , :);
-                    %%%mhpvVaxNonVaxSusImm = hpvVaxNonVaxSusImm(d , 1 , a , r , p , :);
-                    %%%fhpvVaxNonVaxSusImm = hpvVaxNonVaxSusImm(d , 1 , a , r , p , :);
-                    %%%mhpvVaxNonVaxImmSus = hpvVaxNonVaxImmSus(d , 1 , a , r , p , :);
-                    %%%fhpvVaxNonVaxImmSus = hpvVaxNonVaxImmSus(d , 1 , a , r , p , :);
-                    %%%mhpvVaxNonVaxImmImm = hpvVaxNonVaxImmImm(d , 1 , a , r , p , :);
-                    %%%fhpvVaxNonVaxImmImm = hpvVaxNonVaxImmImm(d , 1 , a , r , p , :);
-                    % vaccine-type and non-vaccine type HPV infection
-                    %%%mhpvVaxNonVaxInf = hpvVaxNonVaxInf(d , 1 , a , r , p , :);
-                    %%%fhpvVaxNonVaxInf = hpvVaxNonVaxInf(d , 1 , a , r , p , :);
 
 
                     % Set lambda multipliers based on CD4 count
