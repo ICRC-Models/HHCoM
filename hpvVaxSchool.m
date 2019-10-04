@@ -1,6 +1,7 @@
 % HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
-function[dPop , hpvVaxd] = hpvVaxSchool(pop , k , disease , viral , risk , ...
-    hpvTypes , hpvStates , periods , vaxG , vaxAge , vaxRate)
+function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
+    hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
+    vaxRate)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -13,31 +14,30 @@ for d = 1 : disease
             for r = 1 : risk
                 for aV = 1 : length(vaxAge)
                     a = vaxAge(aV);
-                    fromNonVSus(:,aV) = toInd(allcomb(d , v , 1 , 1 , 1 , ... 
+                    fromNonVSus = toInd(allcomb(d , v , 1 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ... 
                         g , a , r));
-                    fromNonVImm(:,aV) = toInd(allcomb(d , v , 2 , 10 , 1 , ... 
+                    fromNonVImm = toInd(allcomb(d , v , 7 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ... 
                         g , a , r));
-                    fromNonVImmNonV(:,aV) = toInd(allcomb(d , v , 3 , 10 , 1 , ... 
+                    toVSus = toInd(allcomb(d , v , 1 , 1 : hpvNonVaxStates , 1 : 3 , 2 , ...
                         g , a , r));
-                    toV(:,aV) = toInd(allcomb(d , v , 1 , 9 , 1 , ...
+                    toVImm = toInd(allcomb(d , v , 7 , 1 : hpvNonVaxStates , 1 : 3 , 2 , ...
                         g , a , r));
-                    otherV(:,aV) = toInd(allcomb(d , v , 1 : hpvTypes , 1 : hpvStates , ...
-                        2 , g , a , r));
-                    allVNonV(:,aV) = toInd(allcomb(d , v , 1 : hpvTypes , 1 :hpvStates , ...
-                        1 : periods , g , a , r)); 
+                    otherV = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                        1 : endpoints , 2 , g , a , r));
+                    allVNonV = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                        1 : endpoints , 1 : intervens , g , a , r)); 
                     
-                    fracVaxd = (sumall(pop(toV(:,aV))) + sumall(pop(otherV(:,aV)))) / ... % find proportion of population that is currently vaccinated
-                        (sumall(pop(allVNonV(:,aV))));
+                    fracVaxd = sumall(pop(otherV)) / ... % find proportion of population that is currently vaccinated
+                        sumall(pop(allVNonV));
                     if vaxRate - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target vaccination level
                         vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
-                        vaxdGroupSus = vaxCover .* pop(fromNonVSus(:,aV));
-                        vaxdGroupImm = vaxCover .* pop(fromNonVImm(:,aV));
-                        vaxdGroupImmNonV = vaxCover .* pop(fromNonVImmNonV(:,aV));
-                        dPop(fromNonVSus(:,aV)) = dPop(fromNonVSus(:,aV)) - vaxdGroupSus;
-                        dPop(fromNonVImm(:,aV)) = dPop(fromNonVImm(:,aV)) - vaxdGroupImm;
-                        dPop(fromNonVImmNonV(:,aV)) = dPop(fromNonVImmNonV(:,aV)) - vaxdGroupImmNonV;
-                        dPop(toV(:,aV)) = dPop(toV(:,aV)) + vaxdGroupSus + vaxdGroupImm + vaxdGroupImmNonV;
-                        hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm) + sumall(vaxdGroupImmNonV); % count number of people vaccinated at current time step
+                        vaxdGroupSus = vaxCover .* pop(fromNonVSus);
+                        vaxdGroupImm = vaxCover .* pop(fromNonVImm);
+                        dPop(fromNonVSus) = dPop(fromNonVSus) - vaxdGroupSus;
+                        dPop(fromNonVImm) = dPop(fromNonVImm) - vaxdGroupImm;
+                        dPop(toVSus) = dPop(toVSus) + vaxdGroupSus;
+                        dPop(toVImm) = dPop(toVImm) + vaxdGroupImm;
+                        hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
                     end
                 end
             end
