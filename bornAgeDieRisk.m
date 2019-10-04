@@ -22,9 +22,11 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
-sumall = @(x)sum(x(:));
 
-%% births and deaths
+%% Initialize dPop and output vectors
+dPop = zeros(size(pop));
+
+%% Births and deaths
 %fertility = zeros(age , 6);
 kHiv = MTCTRate(1); % year <= 2004
 % linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant
@@ -90,7 +92,6 @@ end
 % hiv births, and deaths
 prosPop = pop + circBirths + births + hivBirths + deaths;
 
-dPop = zeros(size(pop));
 for g = 1 : gender
     for a = 2 : age
         aPrev = ageInd(g , a - 1 , :);
@@ -206,6 +207,9 @@ for g = 1 : gender
     
 end
 
-extraOut{1} = abs(deaths);
 dPop = dPop + circBirths + births + hivBirths + deaths;
+
+%% Save outputs and convert dPop to a column vector for output to ODE solver
+extraOut{1} = abs(deaths);
+
 dPop = sparse(dPop);

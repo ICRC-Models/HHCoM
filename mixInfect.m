@@ -1,7 +1,7 @@
 % Population Mixing and Infection Module
 % Simulates mixing and HPV/HIV coinfection in a population.
 % Models heterosexual interactions and corresponding transmissions.
-% Accepts contact matrix [agecohort x sact x gender] and a population matrix
+% Accepts contact parameters and a population matrix
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , ...
@@ -458,7 +458,7 @@ for a = 11 : age
     end
 end
 
+%% Save outputs and convert dPop to a column vector for output to ODE solver
 newInfs{5} = newHiv;
 
-% Convert to column vector for output to ODE solver
 dPop = sparse(dPop);

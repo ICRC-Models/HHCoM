@@ -2,14 +2,9 @@
 function[dPop , hpvVaxd] = hpvVaxCU(pop , k , disease , viral , risk , ...
     hpvTypes , hpvStates , periods , vaxAgeCU , vaxCoverCU , vaxGCU , vaxDiseaseIndsCU)
 
-%% Set constants and initialize vectors
-toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
-    + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
-    + (x(: , 2) - 1) * k(1) + x(: , 1);
-sumall = @(x) sum(x(:));
-hpvVaxd = 0;
-
+%% Initialize dPop and output vectors
 dPop = zeros(size(pop));
+hpvVaxd = 0;
 
 % Apply catch-up vaccination regimen
 for dS = 1 : length(vaxDiseaseIndsCU)
@@ -69,4 +64,5 @@ for dS = 1 : length(vaxDiseaseIndsCU)
     end
 end
 
+%% Convert dPop to a column vector for output to ODE solver
 dPop = sparse(dPop);

@@ -3,16 +3,11 @@ function[dPop , hpvVaxd , vaxRemain] = hpvVaxLmtd(pop , k , year , vaxLimitPerYr
     disease , viral , risk , hpvTypes , hpvStates , periods , vaxCoverL , ...
     vaxRemain , vaxGL)
 
-%% Set constants and initialize vectors
-toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
-    + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
-    + (x(: , 2) - 1) * k(1) + x(: , 1);
-sumall = @(x) sum(x(:));
+%% Initialize dPop and output vectors
+dPop = zeros(size(pop));
 hpvVaxd = 0;
 
-dPop = zeros(size(pop));
-
-% If within first vaxLimitYrs-many vaccine-limited years
+%% If within first vaxLimitYrs-many vaccine-limited years
 if rem(year,1) == 0.0    % reset vaxRemain at start of each new year to the number of available vaccines per year
     vaxRemain = vaxLimitPerYr;
 end
@@ -84,5 +79,6 @@ if vaxCoverL - fracVaxd > 10 ^ -6 % when proportion vaccinated is below target v
         sumall(vaxdGroupSus_scrn) + sumall(vaxdGroupImm_noScrn) + ...
         sumall(vaxdGroupImm_scrn) + sumall(vaxdGroupImmNonV_noScrn) + sumall(vaxdGroupImmNonV_scrn); % count number of people vaccinated at current time step
 end
-                        
+
+%% Convert dPop to a column vector for output to ODE solver
 dPop = sparse(dPop);

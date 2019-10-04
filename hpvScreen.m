@@ -7,14 +7,14 @@ function[dPop , ccScreen , ccTreatImm , ccTreatHpv , ccTreatHyst] = hpvScreen(po
     noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
     vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge)
 
-%% Set constants and initialize vectors
+%% Initialize dPop and output vectors
+dPop = zeros(size(pop));
 ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
 ccTreatImm = ccScreen;
 ccTreatHpv = ccScreen;
 ccTreatHyst = ccScreen;
 
-dPop = zeros(size(pop));
-
+%% Run screening algorithm
 for i = 1 : length(screenAlgs)
     prevAL = 0;
     if i == 2
@@ -117,4 +117,6 @@ for i = 1 : length(screenAlgs)
         end
     end
 end
+
+%% Convert dPop to a column vector for output to ODE solver
 dPop = sparse(dPop);
