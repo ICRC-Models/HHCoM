@@ -22,37 +22,24 @@ artTreat = zeros(disease , viral , gender , age , risk);
 hivDeaths = zeros(gender , age , 1);
 
 %% Calculate ART treatment coverage
-artOut = 0; %0.0619; %0.03; % dropout rate
+artOut = 0; %0.0619; %0.03; % ART dropout rate
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
-% pie [d x v x g x a x r]
-
 treat = zeros(disease , viral , gender , age ,risk);
-% treat(3 : 7 , : , : , 4 : end , :) = 0; % ART coverage
-kOn = ones(6 , 1);
-kOn(6) = 0;
 
 %CD4 > 200, from 2006 to 2013
 if year >= 2006 && year < 2013
     yrs = 2006 : 1/ stepsPerYear : 2013;
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-%         for a = 11 : age
         maxRateM = maxRateM1;
         maxRateF = maxRateF1;
-%         if a > 12
-%             maxRateF = maxRateF2;
-%             maxRateM = maxRateM2;
-%         end
         maxCover = {linspace(0 , maxRateM , length(yrs)) , ...
             linspace(0 , maxRateF , length(yrs))};
-%         for r = 1 : risk
-%         hivPositiveArt = hivInds(8 , 6 , g , a , r , :);
         hivPositiveArt = hivInds(8 , 6 , g , 11 : age , : , :);
         onArt = sumall(pop(hivPositiveArt));
         totHivPos = 0;
         for d = 3 : 6
             for v = 1 : 5
-%                 hivPositive = hivInds(d , v , g , a , r , :);
                 hivPositive = hivInds(d , v , g , 11 : age , : , :);
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
@@ -60,15 +47,11 @@ if year >= 2006 && year < 2013
         fracART = onArt / (onArt + totHivPos); %* (1 - artOut)
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-            %treat(3 : 6 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(3 : 6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         elseif year >= 2013 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-            %treat(3 : 6 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(3 : 6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         end
-%         end
-%         end
     end
 end
 
@@ -77,36 +60,24 @@ if year >= 2004 && year < 2013
     yrs = 2004 : 1 / stepsPerYear : 2006;
     ind = (round(yrs , 4) == round(year , 4));
     for g = 1 : gender
-%         for a = 11 : age
         maxRateM = maxRateM1;
         maxRateF = maxRateF1;
-%         if a > 12
-%             maxRateM = maxRateM2;
-%             maxRateF = maxRateF2;
-%         end
         maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
             linspace(0 , maxRateF , length(yrs))};
-%         for r = 1 : risk
-%         onArt = sum(pop(hivInds(8 , 6 , g , a , r , :)));
         onArt = sumall(pop(hivInds(8 , 6 , g , 11 : age , : , :)));
         totBelow200 = 0;
         for v = 1 : 5
-%             below200 = sum(pop(hivInds(7 , v , g , a , r , :)));
             below200 = sumall(pop(hivInds(7 , v , g , 11 : age , : , :)));
             totBelow200 = totBelow200 + below200;
         end
         fracART = onArt / (onArt + totBelow200); %* (1 - artOut) 
         if year < 2006 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-%             treat(7 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         elseif year >= 2006 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-%             treat(7 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         end
-%         end
-%         end
     end
 end
 
@@ -140,23 +111,15 @@ if year >= 2015
     ind = round(yrs , 4) == round(year , 4);
     
     for g = 1 : gender
-%         for a = 11 : age
         maxRateM = maxRateM1;
         maxRateF = maxRateF1;
-%         if a > 12
-%             maxRateM = maxRateM2;
-%             maxRateF = maxRateF2;
-%         end
         maxCover = {linspace(maxRateM , 0.70 , length(yrs)) ,...
            linspace(maxRateF , 0.70 , length(yrs))};
-%         for r = 1 : risk
-%         hivPositiveArt = hivInds(8 , 6 , g , a , r , :);
         hivPositiveArt = hivInds(8 , 6 , g , 11 : age , : , :);
         onArt = sumall(pop(hivPositiveArt));
         totHivPos = 0;
         for d = 3 : 7
             for v = 1 : 5
-%                 hivPositive = hivInds(d , v , g , a , r , :);
                 hivPositive = hivInds(d , v , g , 11 : age , : , :);
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
@@ -164,15 +127,11 @@ if year >= 2015
         fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
         if year < 2030 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-%             treat(3 : 7 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(3 : 7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         elseif year >= 2030 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
-%             treat(3 : 7 , 1 : 5 , g , a , r) = max(cover , 0);
             treat(3 : 7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
         end
-%         end
-%         end
     end
 end
 
@@ -183,63 +142,52 @@ for g = 1 : gender
             
             hivPositiveArt = hivInds(8 , 6 , g , a , r , :);
             
+            % CD4 progression for HIV-positives with acute infection
             for v = 1 : 5
                 acuteInf = hivInds(3 , v , g , a , r , :);
-                
                 dPop(acuteInf) = dPop(acuteInf) ...
-                    - (muHIV(a , 2) + kCD4(g , v , 1) + treat(2 , v , g , a , r)) ... % out: disease related mortality, ART coverage, CD4 progression. removed pie(2 , v , g , a , r)
+                    - (muHIV(a , 2) + kCD4(g , v , 1) + treat(2 , v , g , a , r)) ... % out: disease related mortality, CD4 progression, ART coverage.
                     .* pop(acuteInf) + artOut * artDist(2 , v , g , a , r) ... % Distributed dropouts from ART
                     .* pop(hivPositiveArt);
-                hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
                 
-                artTreat(3 , v , g , a , r) = treat(2 , v , g , a , r) ... % keep track of distribution of people going on ART
-                        .* sumall(pop(acuteInf)); % going on ART
-                    
-                % HIV-positive going on ART (d = 10)
-                dPop(hivPositiveArt) = ...
-                    dPop(hivPositiveArt)...
+                % HIV-positive going on ART (d = 8)
+                dPop(hivPositiveArt) = dPop(hivPositiveArt)...
                     + treat(2 , v , g , a , r)... % rate of going on ART
-                    .* pop(acuteInf); % going on ART    
+                    .* pop(acuteInf); % going on ART   
                 
-                %                 artTreat(2 , v , g , a , r) = pie(2 , v , g , a , r) ... % keep track of distribution of people going on ART
-                %                         .* sumall(pop(acuteInf)); % going on ART
+                hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
+                artTreat(3 , v , g , a , r) = treat(2 , v , g , a , r) .* sumall(pop(acuteInf)); % keep track of distribution of people going on ART
                 
+                % CD4 progression for HIV-positives advanced to decreased CD4 count
                 for d = 4 : 7
-                    % get indices
                     cd4Curr = hivInds(d , v , g , a , r , :);
-                    
                     cd4Prev = hivInds(d - 1 , v , g , a , r , :);
                     kCD4_next = 0;
                     if d ~= 7
-                        kCD4_next = kCD4(g , v , d - 1); %  progression to next disease state (when d = 7 , kOn = 0 , else kOn = 1)
+                        kCD4_next = kCD4(g , v , d - 1); %  progression to next disease state
                     end
-                    % calculate CD4 changes
                     dPop(cd4Curr) = ...
                         kCD4(g , v , d - 2) * pop(cd4Prev) ... % CD4 progression from previous disease state
                         + artOut * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
-                        - (kCD4_next ... % progression to next disease state (when d = 7 , kOn = 0 , else kOn = 1)
+                        - (kCD4_next ... % progression to next disease state
                         + muHIV(a , d) ... % disease-related mortality
                         + treat(d , v , g , a , r))... % going on ART
                         .* pop(cd4Curr);
                     
-                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d) .* pop(cd4Curr));
-                    
-                    artTreat(d , v , g , a , r) = treat(d , v , g , a , r) ... % keep track of distribution of people going on ART
-                        .* sumall(pop(cd4Curr)); % going on ART
-                    
-                    % HIV-positive going on ART (d = 10)
-                    dPop(hivPositiveArt) = ...
-                        dPop(hivPositiveArt)...
+                    % HIV-positive going on ART (d = 8)
+                    dPop(hivPositiveArt) = dPop(hivPositiveArt)...
                         + treat(d , v , g , a , r)... % rate of going on ART
                         .* pop(cd4Curr); % going on ART
+                    
+                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d) .* pop(cd4Curr));
+                    artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART                    
                 end
             end
             
             % ART dropout weighted by proportion of individuals with CD4 above/below 200 receiving ART
-            % Dropout from ART (d = 10)
-            dPop(hivPositiveArt) = ...
-                dPop(hivPositiveArt)...
+            % Dropout from ART (d = 8)
+            dPop(hivPositiveArt) = dPop(hivPositiveArt)...
                 - artOut .* pop(hivPositiveArt); % artOut to d = 3:7 as determined by distribution matrix
         end
     end
