@@ -180,12 +180,8 @@ condUse = 0.20; %0.5 * 0.5;
 OMEGA = zeros(age , 1); % hysterectomy rate
 
 % Maximum ART coverage
-maxRateM_vec = [0.40 , 0.40]; 
-maxRateF_vec = [0.55 , 0.55];
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
+maxRateM1 = 0.40;
+maxRateF1 = 0.55;
 
 % Intervention start years
 hivStartYear = 1980;
@@ -205,9 +201,8 @@ baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 
 save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
-    'maxRateM1' , 'maxRateM2' , 'maxRateF1' , 'maxRateF2' , ...
-    'hivStartYear' , 'circStartYear' , 'vaxStartYear' , ...
-    'baseline');
+    'maxRateM1' , 'maxRateF1' , 'hivStartYear' , 'circStartYear' , ...
+    'vaxStartYear' , 'baseline');
 
 %% Import and save calibration data
 file = [pwd , '\Config\Calibration_targets.xlsx'];
