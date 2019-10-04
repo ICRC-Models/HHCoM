@@ -1,14 +1,12 @@
 % Births and deaths module
 % Simulates births and non-disease related deaths in a
 % population.
-% More comments about births here....
 % Accepts a population matrix as input and returns dPop, a matrix of
 % derivatives that describes the change in the population's subgroups due
 % to births and deaths.
 
 % Aging module
 % Ages population.
-% 1/5th of the previous age group progresses into the next age group each year.
 % Aged cohort is redistributed into new risk groups upon entry into new age
 % group. Risk group status in previous age group does not affect risk group
 % status in new age group. Risk redistribution is solely age dependent.
@@ -26,11 +24,9 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 
-%% Births and deaths
-%fertility = zeros(age , 6);
+%% Calculate MTCT rate
 kHiv = MTCTRate(1); % year <= 2004
-% linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant
-% after 2008
+% linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant after 2008
 if year > 2008
     kHiv = MTCTRate(3);
 elseif year > 2005
@@ -45,6 +41,7 @@ elseif year > 2004
     kHiv = mtctVec(ind);
 end
 
+%% Calculate births: HIV-negative and HIV-positive births
 if year > 1990 && year <= 2015
     dt = (year - 1990) * stepsPerYear;
     dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
@@ -71,8 +68,11 @@ end
 
 births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
+
+%% Calculate deaths
 deaths = deathMat * pop;
 
+%% Calculate males receiving neonatal circumcision
 circBirths = births * 0;
 if (year > circStartYear) && (year <= currYear)
     circBirths = circMat * births;
@@ -88,8 +88,7 @@ end
 
 %% Aging and risk proportion redistribution
 
-% prospective population after accounting for births, circumcised births,
-% hiv births, and deaths
+% prospective population after accounting for births, deaths, and circumcision
 prosPop = pop + circBirths + births + hivBirths + deaths;
 
 for g = 1 : gender
@@ -108,8 +107,7 @@ for g = 1 : gender
         popR2Tot = sumall(pop(r2));
         popR3Tot = sumall(pop(r3));
         
-        % get prospective risk distribution if staying in same risk group when
-        % aging
+        % get prospective risk distribution if staying in same risk group when aging
         agedOut = sumall(prosPop(aPrev)); % age 1/5th of previous age group
         agedProsp = agedOut; % age 1/5th of previous age group into current age group
         riskTarget = agedProsp .* riskDist(a , : , g);
@@ -120,8 +118,7 @@ for g = 1 : gender
         riskFrac2 = 0;
         riskFrac3 = 0;
         
-        % find fraction of every compartment that must be moved to maintain
-        % risk group distribution
+        % find fraction of every compartment that must be moved to maintain risk group distribution
         if riskDiff(3) > 0 % if risk 3 deficient
             % start with moving from risk 2 to risk 3
             if riskAvail(2) > 0
@@ -207,6 +204,7 @@ for g = 1 : gender
     
 end
 
+% Account for births, deaths, circumcision, and aging
 dPop = dPop + circBirths + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
