@@ -5,6 +5,7 @@ paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 load([paramDir,'calibData'])
 load([paramDir,'general'])
+stepsPerYear = 12;
 resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
