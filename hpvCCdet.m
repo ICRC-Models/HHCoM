@@ -3,194 +3,237 @@
 % Accepts a population matrix as input and returns dPop, a vector of
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.
-function[dPop , extraOut] = hpvCCdet(t , pop , immuneInds , infInds , cin1Inds , ...
-    cin2Inds , cin3Inds , normalInds , ccInds , ccRegInds , ccDistInds , ...
-    ccTreatedInds , ccLocDetInds , ccRegDetInds , ccDistDetInds , ...
-    kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
-    kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , ...
-    rNormal_Inf , hpv_hivClear , c3c2Mults , ...
-    c2c1Mults , fImm , kRL , kDR , muCC , muCC_det , kCCDet , ...
-    disease , age , hpvTypes , periods , ...
-    rImmuneHiv , hyst , hystInds, hystSusInds, OMEGA)
+function[dPop , extraOut] = hpvCCdet(t , pop , ...
+    hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
+    normalhpvVaxInds , immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , ...
+    immunehpvNonVaxInds , infhpvNonVaxInds , cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ...
+    ccLochpvVaxIndsFrom , ccReghpvVaxInds , ccDisthpvVaxInds , ...
+    cin3hpvNonVaxIndsFrom , ccLochpvNonVaxIndsTo , ccLochpvNonVaxIndsFrom , ...
+    ccReghpvNonVaxInds , ccDisthpvNonVaxInds , cin1hpvVaxInds , ...
+    cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
+    cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+    kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
+    rImmune , fImm , kRL , kDR , disease , age , hpvTypeGroups)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
-ccInc = zeros(disease , hpvTypes , age);
+ccInc = zeros(disease , age , hpvTypeGroups);
 % cin1Inc = ccInc;
 % cin2Inc = ccInc;
 % cin3Inc = ccInc;
 ccDeath = ccInc;
 
-%% Set constants
-
-% leep (effective treatment rate by leep)
-rImmune = 0.024; % for HPV16, Johnson (2012)
-
-%%
-
+%% Progress HPV disease states
+% Set transition multipliers based on HIV disease state
 for d = 1 : disease
-    c3c2Mult = c3c2Mults(1); % multiplier used for CIN2 -> CIN3 in HIV infecteds
-    c2c1Mult = c2c1Mults(1); % multiplier used for CIN1 -> CIN2 in HIV infecteds
-    c1c2Mult = 1; % CIN2 -> CIN1 regression multiplier
-    c2c3Mult = 1; % CIN3 -> CIN2 regression multiplier
-    rHivHpvMult = 1; % for HIV negative
-    deathCC = muCC(6 , :); % HIV negative undetected CC mortality
-    deathCC_det = muCC_det(6 , :); % HIV negative detected CC mortality
-    rHiv = 1; % Multiplier for immunity clearance for HIV+
+    % No multipliers for HIV-negative; set CC-associated mortality
     rHivHpv_Clear = 1;
-    if d > 2 && d < 7 % CD4 > 500 -> CD4 < 200
-        c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 multiplier
-        c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 multiplier
-        c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
-        c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
-        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
+    rHiv = 1;
+    c3c2Mult = c3c2Mults(1); % =1
+    c2c1Mult = c2c1Mults(1); % =1
+    c1c2Mult = 1;
+    rHivHpvMult = 1;
+    c2c3Mult = 1;
+    deathCC = muCC(6 , :); % HIV-negative CC-associated mortality
+    % Multipliers for HIV-positives with CD4>500 --> CD4<200; set increased CC-associated mortality
+    if d > 2 && d < 7
         rHivHpv_Clear = hpv_hivClear(d - 2); % Infection clearance multiplier
-        deathCC = muCC(d - 2 , :); % HIV+ CC death rate
-        deathCC_det = muCC_det(d - 2 , :);
         rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
-    elseif d == 10 % CD4 > 500 multipliers for HIV+ on ART
-        c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 multiplier
-        c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 multiplier
-        c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier, (same as high CD4)
-        c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier, (same as high CD4)
-        rHivHpvMult = hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier, (same as high CD4), compounds c1c2Mult
-        rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier, (same as high CD4)
-        deathCC_det = muCC_det(5 , :);
-        deathCC = muCC(5 , :); % HIV+ CC death rate, (same as high CD4)
+        c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 progression multiplier
+        c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 progression multiplier
+        c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
+        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
+        c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
+        deathCC = muCC(d - 2 , :); % HIV-positive CC-associated mortality     
+    % Multipliers for HIV-positives on ART equivalent to those for CD4>500; ...
+    % set CC-associated mortality equivalent to CD4>500
+    elseif d == 10
+        rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
+        c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 progression multiplier
+        c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 progression multiplier
+        c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
+        rHivHpvMult = hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier, compounds c1c2Mult
+        c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
+        deathCC = muCC(5 , :); % HIV-positive on ART CC-associated mortality
     end
     
-    % Hysterectomy (age dependent rate)
-    if hyst
-        for a = 11 : age % can adjust age group range
-            for s = [1:7 , 9:10]
-                hystSusPop = hystSusInds(d , s , a , :);
-                hystPop = hystInds(d , a , :);
-                toHyst = pop(hystSusPop) .* OMEGA(a);        
-                dPop(hystSusPop) = dPop(hystSusPop) - toHyst;
-                dPop(hystPop) = dPop(hystPop) + toHyst;
+    % Background hysterectomy (age dependent rate) % NOT UPDATED!!!!!!!!!!!!!!!!!
+    %if hyst
+    %    for a = 11 : age % can adjust age group range
+    %        for s = [1:7 , 9:10]
+    %            hystSusPop = hystSusInds(d , s , a , :);
+    %            hystPop = hystInds(d , a , :);
+    %            toHyst = pop(hystSusPop) .* OMEGA(a);        
+    %            dPop(hystSusPop) = dPop(hystSusPop) - toHyst;
+    %            dPop(hystPop) = dPop(hystPop) + toHyst;
+    %        end
+    %    end
+    %end
+    
+    % HPV state transitions
+    for a = 1 : age
+        % prepare indices
+        normalMVax = normalhpvVaxInds(d , 1 , a , :);
+        normalFVax = normalhpvVaxInds(d , 2 , a , :);
+        normalMNonVax = normalhpvNonVaxInds(d , 1 , a , :);
+        normalFNonVax = normalhpvNonVaxInds(d , 2 , a , :);
+        
+        immuneFVax = immunehpvVaxInds(d , 2 , a , :);
+        immuneFNonVax = immunehpvNonVaxInds(d , 2 , a , :);
+        
+        infMVax = infhpvVaxInds(d , 1 , a , :);
+        infFVax = infhpvVaxInds(d , 2 , a , :);
+        infMNonVax = infhpvNonVaxInds(d , 1 , a , :);
+        infFNonVax = infhpvNonVaxInds(d , 2 , a , :);
+        
+        cin1Vax = cin1hpvVaxInds(d , a , :);
+        cin2Vax = cin2hpvVaxInds(d , a , :);
+        cin3Vax = cin3hpvVaxInds(d , a , :);
+        cin1NonVax = cin1hpvNonVaxInds(d , a , :);
+        cin2NonVax = cin2hpvNonVaxInds(d , a , :);
+        cin3NonVax = cin3hpvNonVaxInds(d , a , :);
+        
+        % Adjust compartments
+        % normal, immune, and infected transitions
+        dPop(normalFVax) = dPop(normalFVax) + fImm(a) * rImmune * rHiv * pop(immuneFVax)... % if fImm(a)=1, immuneF -> normalF 
+            + (1 - fImm(a)) * rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infFVax); % if fImm(a)=0, infF -> normalF
+        dPop(normalMVax) = dPop(normalMVax) + rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infMVax);  % infM -> normalM
+        
+        dPop(normalFNonVax) = dPop(normalFNonVax) + fImm(a) * rImmune * rHiv * pop(immuneFNonVax)... % if fImm(a)=1, immuneF -> normalF 
+            + (1 - fImm(a)) * rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infFNonVax); % if fImm(a)=0, infF -> normalF
+        dPop(normalMNonVax) = dPop(normalMNonVax) + rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infMNonVax);  % infM -> normalM
+            
+
+        dPop(immuneFVax) = dPop(immuneFVax)...
+            + fImm(a) * rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infFVax)... % if fImm(a)=1, infF -> immuneF
+            - fImm(a) * rImmune * rHiv * pop(immuneFVax); % if fImm(a)=1, immuneF -> normalF
+        
+        dPop(immuneFNonVax) = dPop(immuneFNonVax)...
+            + fImm(a) * rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infFNonVax)... % if fImm(a)=1, infF -> immuneF
+            - fImm(a) * rImmune * rHiv * pop(immuneFNonVax); % if fImm(a)=1, immuneF -> normalF
+        
+        
+        % infected -> CIN1
+        dPop(infFVax) = dPop(infFVax) ...
+            + kInf_Cin1(a , 1) * pop(cin1Vax)... % CIN1 -> infF
+            - (kCin1_Inf(a , 1) + ... % infF -> CIN1
+            rNormal_Inf(a , 1) * rHivHpv_Clear) .* pop(infFVax); % infF -> immuneF or normalF
+        dPop(infMVax) = dPop(infMVax) - rNormal_Inf(a , 1) * rHivHpv_Clear * pop(infMVax); % regression to normal from infected males
+        
+        dPop(infFNonVax) = dPop(infFNonVax) ...
+            + kInf_Cin1(a , 2) * pop(cin1NonVax)... % CIN1 -> infF
+            - (kCin1_Inf(a , 2) + ... % infF -> CIN1
+            rNormal_Inf(a , 2) * rHivHpv_Clear) .* pop(infFNonVax); % infF -> immuneF or normalF
+        dPop(infMNonVax) = dPop(infMNonVax) - rNormal_Inf(a , 2) * rHivHpv_Clear * pop(infMNonVax); % regression to normal from infected males
+        
+
+        % Infection and CIN progression in females only
+        % CIN1 group
+        dPop(cin1Vax) = dPop(cin1Vax) + kCin1_Inf(a , 1) .* pop(infFVax)... % progression to CIN1 from infected females
+            + rHivHpvMult * kCin1_Cin2(a , 1) * c1c2Mult .* pop(cin2Vax)... % CIN2 -> CIN1
+            - (kCin2_Cin1(a , 1) * c2c1Mult ... % CIN1 -> CIN2
+            + kInf_Cin1(a , 1)) .* pop(cin1Vax); % CIN1 -> Infected
+        
+        dPop(cin1NonVax) = dPop(cin1NonVax) + kCin1_Inf(a , 2) .* pop(infFNonVax)... % progression to CIN1 from infected females
+            + rHivHpvMult * kCin1_Cin2(a , 2) * c1c2Mult .* pop(cin2NonVax)... % CIN2 -> CIN1
+            - (kCin2_Cin1(a , 2) * c2c1Mult ... % CIN1 -> CIN2
+            + kInf_Cin1(a , 2)) .* pop(cin1NonVax); % CIN1 -> Infected
+        
+
+        % CIN2 group
+        dPop(cin2Vax) = dPop(cin2Vax) ...
+            + kCin2_Cin1(a , 1) * c2c1Mult * pop(cin1Vax) ... % CIN1 -> CIN2
+            + kCin2_Cin3(a , 1) * c2c3Mult * pop(cin3Vax) ... % CIN3 -> CIN2
+            - (kCin3_Cin2(a , 1) * c3c2Mult... % CIN2 -> CIN3
+            + kCin1_Cin2(a , 1) * rHivHpvMult * c1c2Mult) .* pop(cin2Vax) ; % CIN2 -> CIN1
+        
+        dPop(cin2Vax) = dPop(cin2Vax) ...
+            + kCin2_Cin1(a , 2) * c2c1Mult * pop(cin1Vax) ... % CIN1 -> CIN2
+            + kCin2_Cin3(a , 2) * c2c3Mult * pop(cin3Vax) ... % CIN3 -> CIN2
+            - (kCin3_Cin2(a , 2) * c3c2Mult... % CIN2 -> CIN3
+            + kCin1_Cin2(a , 2) * rHivHpvMult * c1c2Mult) .* pop(cin2Vax) ; % CIN2 -> CIN1
+
+        
+        % CIN3 group
+        dPop(cin3Vax) = dPop(cin3Vax) + kCin3_Cin2(a , 1) * c3c2Mult .* pop(cin2Vax)... %CIN2 -> CIN3
+            - (kCC_Cin3(a , 1)... % CIN3 -> CC
+            + kCin2_Cin3(a , 1) * c2c3Mult)... % CIN3 -> CIN2
+            .* pop(cin3Vax);
+        
+        dPop(cin3NonVax) = dPop(cin3NonVax) + kCin3_Cin2(a , 2) * c3c2Mult .* pop(cin2NonVax)... %CIN2 -> CIN3
+            - (kCC_Cin3(a , 2)... % CIN3 -> CC
+            + kCin2_Cin3(a , 2) * c2c3Mult)... % CIN3 -> CIN2
+            .* pop(cin3NonVax);
+
+        
+        % Cervical cancer        
+        for s = 1 : hpvNonVaxStates
+            % prepare indices
+            cin3VaxFrom = cin3hpvVaxIndsFrom(d , s , a , :);
+            ccLocVaxTo = ccLochpvVaxIndsTo(d , s , a , :);
+            ccLocVaxFrom = ccLochpvVaxIndsFrom(d , s , a , :);
+            ccRegVax = ccReghpvVaxInds(d , s , a , :);
+            ccDistVax = ccDisthpvVaxInds(d , s , a , :);
+            
+            cin3NonVaxFrom = cin3hpvNonVaxIndsFrom(d , h , a , :);
+            ccLocNonVaxTo = ccLochpvNonVaxIndsTo(d , h , a , :);
+            ccLocNonVaxFrom = ccLochpvNonVaxIndsFrom(d , h , a , :);
+            ccRegNonVax = ccReghpvNonVaxInds(d , h , a , :);
+            ccDistNonVax = ccDisthpvNonVaxInds(d , h , a , :);
+
+            % local
+            dPop(ccLocVaxTo) = dPop(ccLocVaxTo) + kCC_Cin3(a , 1) .* pop(cin3VaxFrom); % CIN3 -> CC
+            if (s ~= 6) % track CC incidence; do not double count if person already has cancer from a different HPV type
+                ccInc(d , a , 1) = ccInc(d , a , 1) + sum(kCC_Cin3(a , 1) .* pop(cin3VaxFrom));
+                %cin1Inc(d , a , 1) = cin1Inc(d , a , 1) + sum(kCin1_Inf(a , 1) .* pop(infF)); % !!!!!!infF indices out-dated
+                %cin2Inc(d , a , 1) = cin2Inc(d , a , 1) + sum(kCin2_Cin1(a , 1) * c2c1Mult * pop(cin1)); % !!!!!!cin1 indices out-dated
+                %cin3Inc(d , a , 1) = cin3Inc(d , a , 1) + sum(kCin3_Cin2(a , 1) * c3c2Mult .* pop(cin2)); % !!!!!!cin2 indices out-dated
             end
+            dPop(ccLocVaxFrom) = dPop(ccLocVaxFrom) - kRL * pop(ccLocVaxFrom)... % local -> regional
+                - deathCC(1) * pop(ccLocVaxFrom); % local CC mortality
+                    
+            % regional
+            dPop(ccRegVax) = dPop(ccRegVax) + kRL * pop(ccLocVaxFrom)...  % local -> regional
+                - kDR * pop(ccRegVax)... % regional -> distant
+                - deathCC(2) * pop(ccRegVax); % regional CC mortality
+        
+            % distant
+            dPop(ccDistVax) = dPop(ccDistVax) + kDR * pop(ccRegVax) ... % regional -> distant
+                - deathCC(3) * pop(ccDistVax); % distant CC mortality
+            
+            % CC death tracker
+            ccDeath(d , a , 1) = ccDeath(d , a , 1) + ...
+                sum(deathCC(1) * pop(ccLocVaxFrom) ...
+                + deathCC(2) * pop(ccRegVax) + deathCC(3) * pop(ccDistVax));
         end
-    end
-    
-    for h = 2 : hpvTypes % infected onwards
-        for a = 1 : age
-            for p = 1 : periods
-                % Infected group
-                immuneM = immuneInds(d , h , 1 , a , p , :);
-                immuneF = immuneInds(d , h , 2 , a , p , :);
-                infM = infInds(d , h , 1 , a , p , :);
-                infF = infInds(d , h , 2 , a , p , :);
-                cin1 = cin1Inds(d , h , a , p , :);
-                cin2 = cin2Inds(d , h , a , p , :);
-                cin3 = cin3Inds(d , h , a , p , :);
-                normalM = normalInds(d , 1 , a , p , :);
-                normalF = normalInds(d , 2 , a , p , :);
-                % to immune from HPV infected, CIN1, CIN2, CIN3 (remove immunity for now)
-                
-                dPop(normalF) = dPop(normalF) + fImm(a) * rImmune * rHiv * pop(immuneF)... % if fImm(a)=1, immuneF -> normalF 
-                    + (1 - fImm(a)) * rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF); % if fImm(a)=0, infF -> normalF
-                
-                dPop(normalM) = dPop(normalM) + rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infM);  % infM -> normalM
-                
-                dPop(immuneF) = dPop(immuneF)...
-                    + fImm(a) * rNormal_Inf(a , h - 1) * rHivHpv_Clear .* pop(infF)... % if fImm(a)=1, infF -> immuneF
-                    - fImm(a) * rImmune * rHiv * pop(immuneF); % if fImm(a)=1, immuneF -> normalF
-                                
-                %                 dPop(immuneM) = dPop(immuneM) + rNormal_Inf(a) ...
-                %                     * fImm(a) * rHivHpvMult * pop(infM)...; % infected -> immune
-                %                     - rImmune * pop(immuneM); % immune -> normal
-                
-                % infected -> CIN1
-                dPop(infF) = dPop(infF) ...
-                    + kInf_Cin1(a , h - 1) * pop(cin1)... % CIN1 -> infF
-                    - (kCin1_Inf(a , h - 1) + ... % infF -> CIN1
-                    rNormal_Inf(a , h - 1) * rHivHpv_Clear) .* pop(infF); % infF -> immuneF or normalF
-                
-                dPop(infM) = dPop(infM) - rNormal_Inf(a , h - 1) * rHivHpv_Clear * pop(infM); % regression to normal from infected males
-                
-                % Infection and CIN progression in females only
-                % kCin_Inf(stage , hpvType , age group)
-                % CIN1 group
-                dPop(cin1) = dPop(cin1) + kCin1_Inf(a , h - 1) .* pop(infF)... % progression to CIN1 from infected females
-                    + rHivHpvMult * kCin1_Cin2(a , h - 1) * c1c2Mult .* pop(cin2)... % CIN2 -> CIN1
-                    - (kCin2_Cin1(a , h - 1) * c2c1Mult ... % CIN1 -> CIN2
-                    + kInf_Cin1(a , h - 1)) .* pop(cin1); % CIN1 -> Infected
-                
-                % CIN2 group
-                dPop(cin2) = dPop(cin2) ...
-                    + kCin2_Cin1(a , h - 1) * c2c1Mult * pop(cin1) ... % CIN1 -> CIN2
-                    + kCin2_Cin3(a , h - 1) * c2c3Mult * pop(cin3) ... % CIN3 -> CIN2
-                    - (kCin3_Cin2(a , h - 1) * c3c2Mult... % CIN2 -> CIN3
-                    + kCin1_Cin2(a , h - 1) * rHivHpvMult * c1c2Mult) .* pop(cin2) ; % CIN2 -> CIN1
-                
-                % CIN3 group
-                dPop(cin3) = dPop(cin3) + kCin3_Cin2(a , h - 1) * c3c2Mult .* pop(cin2)... %CIN2 -> CIN3
-                    - (kCC_Cin3(a , h - 1)... % CIN3 -> CC
-                    + kCin2_Cin3(a , h - 1) * c2c3Mult)... % CIN3 -> CIN2
-                    .* pop(cin3);
-                
-                % CC group
-%                 kCCDet = kCCDet .* 0; % TESTING!!!
-%                 deathCC = deathCC .* 0; % TESTING!!!
-                
-                ccLoc = ccInds(d , h , a , p , :);
-                %locDet = kCCDet(1) * pop(ccLoc);
-                dPop(ccLoc) = dPop(ccLoc) + kCC_Cin3(a , h - 1) .* pop(cin3)... % CIN3 -> CC
-                    - kRL * pop(ccLoc)... % local -> regional
-                    - deathCC(1) * pop(ccLoc);%... % local CC mortality
-                    %- locDet; % detect local CC -> treat
-                
-                ccReg = ccRegInds(d , h , a , p , :);
-                %regDet = kCCDet(2) * pop(ccReg);
-                dPop(ccReg) = dPop(ccReg) + kRL * pop(ccLoc)...  % local -> regional
-                    - kDR * pop(ccReg)... % regional -> distant
-                    - deathCC(2) * pop(ccReg);%... % regional CC mortality
-                    %- regDet; % detect regional CC -> treat
-                
-                ccDist = ccDistInds(d , h , a , p , :);
-                %distDet = kCCDet(3) * pop(ccDist);
-                dPop(ccDist) = dPop(ccDist) + kDR * pop(ccReg) ... % regional -> distant
-                    - deathCC(3) * pop(ccDist);... % distant CC mortality
-                    %- distDet; % detect distant CC -> treat
-                
-                % CC treated tracker
-%                 ccTreated(d , h , a , 1) = sum(locDet);
-%                 ccTreated(d , h , a , 2) = sum(regDet);
-%                 ccTreated(d , h , a , 3) = sum(distDet);
-                
-%                 ccLocDet = ccLocDetInds(d , h , a , :);
-%                 ccRegDet = ccRegDetInds(d , h , a , :);
-%                 ccDistDet = ccDistDetInds(d , h , a , :);
-%                 dPop(ccLocDet) = dPop(ccLocDet) + locDet;
-%                 dPop(ccRegDet) = dPop(ccRegDet) + regDet;
-%                 dPop(ccDistDet) = dPop(ccDistDet) + distDet;
-                
-                % CC incidence tracker
-                ccInc(d , h , a) = ccInc(d , h , a) + sum(kCC_Cin3(a , h - 1) .* pop(cin3));
-%                 cin1Inc(d , h , a) = cin1Inc(d , h , a) + sum(kCin1_Inf(a , h - 1) .* pop(infF));
-%                 cin2Inc(d , h , a) = cin2Inc(d , h , a) + sum(kCin2_Cin1(a , h - 1) * c2c1Mult * pop(cin1));
-%                 cin3Inc(d , h , a) = cin3Inc(d , h , a) + sum(kCin3_Cin2(a , h - 1) * c3c2Mult .* pop(cin2));
+       
+        for h = 1 : hpvVaxStates
+            % local
+            dPop(ccLocNonVaxTo) = dPop(ccLocNonVaxTo) + kCC_Cin3(a , 2) .* pop(cin3NonVaxFrom); % CIN3 -> CC
+            if (h ~= 6) % track CC incidence; do not double count if person already has cancer from a different HPV type
+                ccInc(d , a , 2) = ccInc(d , a , 2) + sum(kCC_Cin3(a , 2) .* pop(cin3NonVaxFrom));
+                %cin1Inc(d , a , 2) = cin1Inc(d , a , 2) + sum(kCin1_Inf(a , 2) .* pop(infF)); % !!!!!!infF indices out-dated
+                %cin2Inc(d , a , 2) = cin2Inc(d , a , 2) + sum(kCin2_Cin1(a , 2) * c2c1Mult * pop(cin1)); % !!!!!!cin1 indices out-dated
+                %cin3Inc(d , a , 2) = cin3Inc(d , a , 2) + sum(kCin3_Cin2(a , 2) * c3c2Mult .* pop(cin2)); % !!!!!!cin2 indices out-dated
+            
+                dPop(ccLocNonVaxFrom) = dPop(ccLocNonVaxFrom) - kRL * pop(ccLocNonVaxFrom)... % local -> regional
+                    - deathCC(1) * pop(ccLocNonVaxFrom); % local CC mortality
+
+                % regional
+                dPop(ccRegNonVax) = dPop(ccRegNonVax) + kRL * pop(ccLocNonVaxFrom)...  % local -> regional
+                    - kDR * pop(ccRegNonVax)... % regional -> distant
+                    - deathCC(2) * pop(ccRegNonVax); % regional CC mortality
+
+                % distant
+                dPop(ccDistNonVax) = dPop(ccDistNonVax) + kDR * pop(ccRegNonVax) ... % regional -> distant
+                    - deathCC(3) * pop(ccDistNonVax); % distant CC mortality
                 
                 % CC death tracker
-                ccDeath(d , h , a) = ccDeath(d , h , a) + ...
-                    sum(deathCC(1) * pop(ccLoc) ...
-                    + deathCC(2) * pop(ccReg) + deathCC(3) * pop(ccDist));
-            end
-            
-            % Detected CC deaths and transitions
-%             dPop(ccLocDet) = dPop(ccLocDet) - kRL * pop(ccLocDet) ...
-%                 - deathCC_det(1) * pop(ccLocDet);
-%             dPop(ccRegDet) = dPop(ccRegDet) + kRL * pop(ccLocDet) ...
-%                 - kDR * pop(ccRegDet) - deathCC_det(2) * pop(ccRegDet);
-%             dPop(ccDistDet) = dPop(ccDistDet) + kDR * pop(ccRegDet) ...
-%                 - deathCC_det(3) * pop(ccDistDet);
-            
-            % Add detected CC deaths to CC death tracker
-%             ccDeath(d , h , a) = ccDeath(d , h , a) + ...
-%                 sum(deathCC_det(1) * pop(ccLocDet) ...
-%                 + deathCC_det(2) * pop(ccRegDet)...
-%                 + deathCC_det(3) * pop(ccDistDet));
+                ccDeath(d , a , 2) = ccDeath(d , a , 2) + ...
+                    sum(deathCC(2) * pop(ccLocNonVaxFrom) ...
+                    + deathCC(2) * pop(ccRegNonVax) + deathCC(3) * pop(ccDistNonVax));
+            end 
         end
     end   
 end
@@ -198,6 +241,5 @@ end
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = ccInc;
 extraOut{2} = ccDeath;
-extraOut{3} = ccTreated;
 
 dPop = sparse(dPop);

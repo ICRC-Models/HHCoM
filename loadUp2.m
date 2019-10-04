@@ -169,10 +169,11 @@ perPartnerHpv_vax = 0.0045;
 perPartnerHpv_nonV = 0.5 * perPartnerHpv_vax;
 
 % IMMUNITY
+rImmune = 0.024; % for HPV16, Johnson (2012)
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
-save(fullfile(paramDir ,'hpvParams'), 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , 'fImm' , ...
-    'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
+save(fullfile(paramDir ,'hpvParams'), 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
+    'fImm' , 'rImmune' , 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm');
 
 %% Save intervention parameters
@@ -256,10 +257,10 @@ for g = 1 : gender
     end
 end
 
-hpvVaxSus = zeros(disease, gender , age , risk , intervens , viral*hpvNonVaxStates);
+hpvVaxSus = zeros(disease, gender , age , risk , intervens , viral*hpvNonVaxStates*3);
 hpvVaxImm = hpvVaxSus;
 hpvVaxInf = hpvVaxSus;
-hpvNonVaxSus = zeros(disease , gender , age , risk , intervens , viral*hpvVaxStates);
+hpvNonVaxSus = zeros(disease , gender , age , risk , intervens , viral*hpvVaxStates*3);
 hpvNonVaxImm = hpvNonVaxSus;
 hpvNonVaxInf = hpvNonVaxSus;
 for d = 1 : disease
@@ -268,18 +269,18 @@ for d = 1 : disease
             for r = 1 : risk
                 for p = 1 : intervens
                     hpvVaxSus(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 : 3 , p , g , a , r)));
                     hpvVaxImm(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 : 3 , p , g , a , r)));
                     hpvVaxInf(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 2 , 1 : hpvNonVaxStates , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 2 , 1 : hpvNonVaxStates , 1 : 3 , p , g , a , r)));
 
                     hpvNonVaxSus(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 : 3 , p , g , a , r)));
                     hpvNonVaxImm(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvNonVaxStates , 7 , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvNonVaxStates , 7 , 1 : 3 , p , g , a , r)));
                     hpvNonVaxInf(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 : 3 , p , g , a , r)));
                 end
             end
         end
@@ -355,62 +356,75 @@ disp('hiv2a indices loaded')
 %% hpvCCdet.m indices
 disp('Preparing indices for HPV modules...')
 
-ccLocInds = zeros(disease , age , intervens , viral * risk);
-ccRegInds = ccLocInds;
-ccDistInds = ccLocInds;
-cin1hpvVaxInds = zeros(disease , age , intervens , viral * hpvNonVaxStates * risk);
+cin3hpvVaxIndsFrom = zeros(disease , hpvNonVaxStates , age , viral * intervens * risk * 3);
+ccLochpvVaxIndsTo = cin3hpvVaxIndsFrom;
+ccLochpvVaxIndsFrom = zeros(disease , hpvNonVaxStates , age , viral * intervens * risk);
+ccReghpvVaxInds = ccLochpvVaxIndsFrom;
+ccDisthpvVaxInds = ccLochpvVaxIndsFrom;
+cin3hpvNonVaxIndsFrom = zeros(disease , hpvVaxStates , age , viral * intervens * risk * 3);
+ccLochpvNonVaxIndsTo = cin3hpvNonVaxIndsFrom;
+ccLochpvNonVaxIndsFrom = zeros(disease , hpvVaxStates , age , viral * intervens * risk);
+ccReghpvNonVaxInds = ccLochpvNonVaxIndsFrom;
+ccDisthpvNonVaxInds = ccLochpvNonVaxIndsFrom;
+cin1hpvVaxInds = zeros(disease , age , viral * hpvNonVaxStates * intervens * risk * 3);
 cin2hpvVaxInds = cin1hpvVaxInds;
 cin3hpvVaxInds = cin1hpvVaxInds;
-cin1hpvNonVaxInds = zeros(disease , age , intervens , viral * hpvVaxStates * risk);
+cin1hpvNonVaxInds = zeros(disease , age , viral * hpvVaxStates * intervens * risk * 3);
 cin2hpvNonVaxInds = cin1hpvNonVaxInds;
 cin3hpvNonVaxInds = cin1hpvNonVaxInds;
 for d = 1 : disease
     for a = 1 : age
-        for p = 1 : intervens
-            ccLocInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 1 , p , 2 , a , 1 : risk)));
-            ccRegInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 2 , p , 2 , a , 1 : risk)));
-            ccDistInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 6 , 6 , 3 , p , 2 , a , 1 : risk)));
-
-            cin1hpvVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 3 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk)));
-            cin2hpvVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 4 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk)));
-            cin3hpvVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 5 , 1 : hpvNonVaxStates , 1 , p , 2 , a , 1 : risk)));
-            cin1hpvNonVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 3 , 1 , p , 2 , a , 1 : risk)));
-            cin2hpvNonVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 4 , 1 , p , 2 , a , 1 : risk)));
-            cin3hpvNonVaxInds(d , a , p , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 5 , 1 , p , 2 , a , 1 : risk)));
+        for s = 1 : hpvNonVaxStates
+            cin3hpvVaxIndsFrom(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , 5 , s , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+            ccLochpvVaxIndsTo(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , 6 , s , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+            ccLochpvVaxIndsFrom(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , 6 , s , 1 , 1 : intervens , 2 , a , 1 : risk)));
+            ccReghpvVaxInds(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , 6 , s , 2 , 1 : intervens , 2 , a , 1 : risk)));
+            ccDisthpvVaxInds(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , 6 , s , 3 , 1 : intervens , 2 , a , 1 : risk)));
         end
+        for h = 1 : hpvVaxStates
+            cin3hpvNonVaxIndsFrom(d , s , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 5 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+            ccLochpvNonVaxIndsTo(d , h , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 6 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+            ccLochpvNonVaxIndsFrom(d , h , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 6 , 1 , 1 : intervens , 2 , a , 1 : risk)));
+            ccReghpvNonVaxInds(d , h , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 6 , 2 , 1 : intervens , 2 , a , 1 : risk)));
+            ccDisthpvNonVaxInds(d , h , a , :) = sort(toInd(allcomb(d , 1 : viral , h , 6 , 3 , 1 : intervens , 2 , a , 1 : risk)));
+        end
+        cin1hpvVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 3 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+        cin2hpvVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 4 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+        cin3hpvVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 5 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+        cin1hpvNonVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 3 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+        cin2hpvNonVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 4 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
+        cin3hpvNonVaxInds(d , a , :) = sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 5 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk)));
     end
 end
 
-normalhpvVaxInds = zeros(disease , gender , age , intervens ,  viral * hpvNonVaxStates * risk);
+normalhpvVaxInds = zeros(disease , gender , age , viral * hpvNonVaxStates * intervens * risk * 3);
 immunehpvVaxInds = normalhpvVaxInds;
 infhpvVaxInds = normalhpvVaxInds;
-normalhpvNonVaxInds = zeros(disease , gender , age , intervens ,  viral * hpvVaxStates * risk);
+normalhpvNonVaxInds = zeros(disease , gender , age , viral * hpvVaxStates * intervens * risk * 3);
 immunehpvNonVaxInds = normalhpvNonVaxInds;
 infhpvNonVaxInds = normalhpvNonVaxInds;
 for g = 1 : gender
     for d = 1 : disease
         for a = 1 : age
-            for p = 1 : intervens
-                normalhpvVaxInds(d , g , a , p , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 , p , g , a , 1 : risk)));
-                normalhpvNonVaxInds(d , g , a , p , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 , p , g , a , 1 : risk)));
+                normalhpvVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
+                normalhpvNonVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
                 
-                immunehpvVaxInds(d , g , a , p , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 , p , g , a , 1 : risk)));
-                immunehpvNonVaxInds(d , g , a , p , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 7 , 1 , p , g , a , 1 : risk)));
+                immunehpvVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 7 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
+                immunehpvNonVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 7 , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
                 
-                infhpvVaxInds(d , g , a , p  , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 2 , 1 : hpvNonVaxStates , 1 , p , g , a , 1 : risk)));
-                infhpvNonVaxInds(d , g , a , p  , :) = ...
-                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 , p , g , a , 1 : risk)));
-            end
+                infhpvVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 2 , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
+                infhpvNonVaxInds(d , g , a , :) = ...
+                    sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 : 3 , 1 : intervens , g , a , 1 : risk)));
         end
     end      
 end
 
-% NOT UPDATED!!!!!!!!!!!!!!!!!
+% BACKGROUND HYSTERECTOMY NOT UPDATED!!!!!!!!!!!!!!!!!
 % hystSusInds = zeros(disease , 9 , age , viral * hpvVaxStates * intervens * risk);
 % hystInds = zeros(disease , age , viral * hpvVaxStates * intervens * risk);
 % for a = 1 : age
@@ -430,8 +444,11 @@ end
 %     end
 % end
 
-save([paramDir , 'hpvIndices'] , 'ccLocInds' , 'ccRegInds' , 'ccDistInds' , ...
-    'cin1hpvVaxInds' , 'cin2hpvVaxInds' , 'cin3hpvVaxInds' , 'cin1hpvNonVaxInds' , ...
+save([paramDir , 'hpvIndices'] , 'cin3hpvVaxIndsFrom' , 'ccLochpvVaxIndsTo' , ...
+    'ccLochpvVaxIndsFrom' , 'ccReghpvVaxInds' , 'ccDisthpvVaxInds' , ...
+    'cin3hpvNonVaxIndsFrom' , 'ccLochpvNonVaxIndsTo' , 'ccLochpvNonVaxIndsFrom' , ...
+    'ccReghpvNonVaxInds' , 'ccDisthpvNonVaxInds' , 'cin1hpvVaxInds' , ...
+    'cin2hpvVaxInds' , 'cin3hpvVaxInds' , 'cin1hpvNonVaxInds' , ...
     'cin2hpvNonVaxInds' , 'cin3hpvNonVaxInds' , 'normalhpvVaxInds' , 'immunehpvVaxInds' , ...
     'infhpvVaxInds' , 'normalhpvNonVaxInds' , 'immunehpvNonVaxInds' , 'infhpvNonVaxInds')
 disp('hpvCCdet indices loaded')
