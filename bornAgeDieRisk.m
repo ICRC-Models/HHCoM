@@ -19,10 +19,7 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
-        vaxScreen , vaxXscreen , hpvScreenStartYear)
-
-%% Initialize dPop and output vectors
-dPop = zeros(size(pop));
+        vaxScreen , vaxXscreen , hpvScreenStartYear , sumall)
 
 %% Calculate MTCT rate
 kHiv = MTCTRate(1); % year <= 2004
@@ -87,6 +84,8 @@ elseif year > 2030
 end
 
 %% Aging and risk proportion redistribution
+% Initialize dPop
+dPop = zeros(size(pop));
 
 % prospective population after accounting for births, deaths, and circumcision
 prosPop = pop + circBirths + births + hivBirths + deaths;
@@ -201,7 +200,6 @@ for g = 1 : gender
     dPop(r1To) = dPop(r1To) - pop(r1To);
     dPop(r2To) = dPop(r2To) - pop(r2To);
     dPop(r3To) = dPop(r3To) - pop(r3To);
-    
 end
 
 % Account for births, deaths, circumcision, and aging

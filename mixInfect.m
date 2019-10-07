@@ -12,7 +12,7 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIVF2M , betaHIVM2F , ...
-    hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt)
+    hivSus , toHiv , mCurr , fCurr , mCurrArt , fCurrArt , sumall)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -261,7 +261,7 @@ end
 % calculate new HPV infections
 for a = 11 : age
     for r = 1 : risk
-        if any(lambda(1 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) || any(lambda(2 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) ... % only evaluate if lambda is non-zero
+        if any(lambda(1 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) || any(lambda(2 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) % only evaluate if lambda is non-zero
             for d = 1 : disease
                 for p = 1 : intervens
                     % Prepare indices

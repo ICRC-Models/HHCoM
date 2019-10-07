@@ -13,7 +13,8 @@ function[dPop , extraOut] = hpvCCdet(t , pop , ...
     cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
     cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
-    rImmune , fImm , kRL , kDR , disease , age , hpvTypeGroups)
+    rImmune , fImm , kRL , kDR , disease , age , hpvVaxStates , ...
+    hpvNonVaxStates , hpvTypeGroups)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -175,12 +176,6 @@ for d = 1 : disease
             ccLocVaxFrom = ccLochpvVaxIndsFrom(d , s , a , :);
             ccRegVax = ccReghpvVaxInds(d , s , a , :);
             ccDistVax = ccDisthpvVaxInds(d , s , a , :);
-            
-            cin3NonVaxFrom = cin3hpvNonVaxIndsFrom(d , h , a , :);
-            ccLocNonVaxTo = ccLochpvNonVaxIndsTo(d , h , a , :);
-            ccLocNonVaxFrom = ccLochpvNonVaxIndsFrom(d , h , a , :);
-            ccRegNonVax = ccReghpvNonVaxInds(d , h , a , :);
-            ccDistNonVax = ccDisthpvNonVaxInds(d , h , a , :);
 
             % local
             dPop(ccLocVaxTo) = dPop(ccLocVaxTo) + kCC_Cin3(a , 1) .* pop(cin3VaxFrom); % CIN3 -> CC
@@ -209,6 +204,12 @@ for d = 1 : disease
         end
        
         for h = 1 : hpvVaxStates
+            cin3NonVaxFrom = cin3hpvNonVaxIndsFrom(d , h , a , :);
+            ccLocNonVaxTo = ccLochpvNonVaxIndsTo(d , h , a , :);
+            ccLocNonVaxFrom = ccLochpvNonVaxIndsFrom(d , h , a , :);
+            ccRegNonVax = ccReghpvNonVaxInds(d , h , a , :);
+            ccDistNonVax = ccDisthpvNonVaxInds(d , h , a , :);
+            
             % local
             dPop(ccLocNonVaxTo) = dPop(ccLocNonVaxTo) + kCC_Cin3(a , 2) .* pop(cin3NonVaxFrom); % CIN3 -> CC
             if (h ~= 6) % track CC incidence; do not double count if person already has cancer from a different HPV type
