@@ -13,7 +13,7 @@
 % went on treatment.
 function[dPop , extraOuts] = hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
     kCD4 ,  maxRateM1 , maxRateF1 , disease , viral , gender , age , risk , ...
-    hivInds , stepsPerYear , year)
+    hivInds , stepsPerYear , year , sumall)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));

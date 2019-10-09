@@ -1,6 +1,9 @@
 % Main
 % Runs simulation over the time period and time step specified by the user.
 
+% Save parameters, indices, and matrices
+loadUp2
+
 close all; clear all; clc
 % profile clear;
 
@@ -19,7 +22,7 @@ load([paramDir, 'generalParams'], 'stepsPerYear' , 'timeStep' , ...
     'sumall');
 load([paramDir, 'demoBehavParams'], 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
     'maleActs' , 'femaleActs' , 'riskDist' , 'mue' , 'epsA_vec' , 'epsR_vec' , 'yr');
-load([paramDir, 'hivParams'], 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl');
+load([paramDir, 'hivParams'], 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
 load([paramDir, 'hpvParams'], 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
     'fImm' , 'rImmune' , 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm' , ...
@@ -81,7 +84,7 @@ years = endYear - startYear;
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_100719_singleAge_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_100819_singleAge_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -368,7 +371,7 @@ for i = 2 : length(s) - 1
         [~ , pop , hivDeaths(i , : , :) , artTreat] =...
             ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
             kCD4 ,  maxRateM1 , maxRateF1 , disease , viral , gender , age , risk , ...
-            hivInds , stepsPerYear , year) , tspan , popIn);
+            hivInds , stepsPerYear , year , sumall) , tspan , popIn);
         popIn = pop(end , :);
         artTreatTracker(i , : , : , : , :  ,:) = artTreat;
         artDistList.add(artTreat);
