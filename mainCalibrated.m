@@ -1,14 +1,11 @@
 % Main
 % Runs simulation over the time period and time step specified by the user.
 
-% Save parameters, indices, and matrices
+% Save pre-loaded parameters and pre-calculated indices and matrices
 loadUp2
 
 close all; clear all; clc
 % profile clear;
-
-%% Save pre-loaded parameters and pre-calculated indices and matrices
-%loadUp2;
 
 %% Load saved parameters
 disp('Initializing. Standby...')
