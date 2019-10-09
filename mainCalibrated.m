@@ -151,7 +151,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_091319_singleAge_baseScreen_noBaseVax_2020'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_100819_singleAge_baseScreen_noBaseVax_2020_artOut'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -512,7 +512,7 @@ for i = 2 : length(s) - 1
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk);
+            risk , sumall);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
