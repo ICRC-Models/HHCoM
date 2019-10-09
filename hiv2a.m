@@ -163,14 +163,14 @@ for g = 1 : gender
                     cd4Prev = hivInds(d - 1 , v , g , a , r , :);
                     kCD4_next = 0;
                     if d ~= 7
-                        kCD4_next = kCD4(g , v , d - 1); %  progression to next disease state
+                        kCD4_next = kCD4(g , v , d - 2); %  progression to next disease state
                     end
                     dPop(cd4Curr) = ...
-                        kCD4(g , v , d - 2) * pop(cd4Prev) ... % CD4 progression from previous disease state
+                        kCD4(g , v , d - 3) * pop(cd4Prev) ... % CD4 progression from previous disease state
                         + artOut * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state
-                        + muHIV(a , d) ... % disease-related mortality
+                        + muHIV(a , d - 1) ... % disease-related mortality
                         + treat(d , v , g , a , r))... % going on ART
                         .* pop(cd4Curr);
                     
@@ -179,7 +179,7 @@ for g = 1 : gender
                         + treat(d , v , g , a , r)... % rate of going on ART
                         .* pop(cd4Curr); % going on ART
                     
-                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d) .* pop(cd4Curr));
+                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
                     artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART                    
                 end
             end
