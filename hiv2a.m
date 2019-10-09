@@ -66,7 +66,7 @@ if year >= 2006 && year < 2013
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut)
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
@@ -104,7 +104,7 @@ if year >= 2004 && year < 2013
             below200 = sumall(pop(hivInds(6 , v , g , 11 : age , : , :)));
             totBelow200 = totBelow200 + below200;
         end
-        fracART = onArt / (onArt + totBelow200); %* (1 - artOut) 
+        fracART = onArt / (onArt + totBelow200) * (1 - artOut); 
         if year < 2006 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
 %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
@@ -135,7 +135,7 @@ if year >= 2013 && year < 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if fracART < maxCover{g}
             cover = (maxCover{g} - fracART) ./ (1 - fracART);
             treat(2 : 6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
@@ -170,7 +170,7 @@ if year >= 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if year < 2030 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
 %             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
