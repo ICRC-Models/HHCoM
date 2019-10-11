@@ -1,9 +1,9 @@
 % Main
 % Runs simulation over the time period and time step specified by the user.
 close all; clear all; clc
-profile clear;
+% profile clear;
 
-%%
+%% Load calibrated parameters and reset general parameters based on changes to model
 disp('Initializing. Standby...')
 disp(' ');
 
@@ -11,7 +11,7 @@ disp(' ');
 paramDir = [pwd , '\Params\'];
 load([paramDir , 'calibratedParams'])
 
-% Load general parameters
+% Load general parameters and reset changed parameters
 paramDir = [pwd , '\Params\'];
 load([paramDir, 'general'],'stepsPerYear','disease','viral','hpvTypes','hpvStates','periods',...
     'gender','age','risk','k','toInd','sumall')
@@ -20,13 +20,13 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 
 % Time
 c = fix(clock);
-currYear = 2020; %c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 startYear = 1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
 years = endYear - startYear;
 
-% Adjust parameters different than calibrated
+% Reset additional changed parameters different than calibrated
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
@@ -72,7 +72,7 @@ load([paramDir,'hpvIndices'])
 load([paramDir,'ageRiskInds'])
 % Load matrices
 paramDir = [pwd , '\Params\'];
-load([paramDir,'ager'])
+% load([paramDir,'ager'])
 load([paramDir,'vlAdvancer'])
 load([paramDir,'fertMat'])
 load([paramDir,'hivFertMats'])
@@ -82,7 +82,7 @@ load([paramDir,'deathMat'])
 load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
-% Model specs
+%% Model specs
 % choose whether to model hysterectomy
 hyst = 0;
 % choose whether to model HIV
@@ -125,7 +125,7 @@ waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
@@ -150,7 +150,7 @@ screenAlgs{1} = baseline;
 screenAlgs{1}.diseaseInds = [1 : disease];
 
 screenAlgs{1}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
     screenAlgs{1}.screenCover_vec{i} = interp1(period , screenAlgs{1}.screenCover(i : i + 1 , 1) , ...
         screenYrs(i) : timeStep : screenYrs(i + 1));
@@ -220,7 +220,7 @@ end
 lambdaMultVaxMat = zeros(age , 1);   % age-based vector for modifying lambda based on vaccination status
 
 % No waning
-lambdaMultVaxMat(3 : age) = vaxEff;
+lambdaMultVaxMat(min(vaxAge) : age) = vaxEff;
 
 % Waning
 effPeriod = 20; % number of years that initial efficacy level is retained
@@ -233,10 +233,10 @@ if waning
     % waning is based on the least effective initial vaccine efficacy scenario.        
     kWane = vaxEff / round(wanePeriod / 5);     
     vaxInit = vaxEff;
-    lambdaMultVaxMat(round(effPeriod / 5) + vaxAge - 1 : age) = ...
+    lambdaMultVaxMat(round(effPeriod / 5) + min(vaxAge) - 1 : age) = ...
         max(0 , linspace(vaxInit , ...
-        vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + vaxAge)) ,...
-        age - (round(wanePeriod / 5) + vaxAge) + 2)'); % ensures vaccine efficacy is >= 0
+        vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(vaxAge))) ,...
+        age - (round(wanePeriod / 5) + min(vaxAge)) + 2)'); % ensures vaccine efficacy is >= 0
 end
 lambdaMultVax = 1 - lambdaMultVaxMat;
 
@@ -323,7 +323,7 @@ assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infe
 
 %% Simulation
 disp('Start up')
-profile on
+% profile on
 disp(' ')
 
 % Initialize time vector
@@ -532,23 +532,23 @@ save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
 disp(' ')
 disp('Simulation complete.')
 
-profile viewer
+% profile viewer
 
 %% Runtimes
-figure()
-plot(1 : size(runtimes , 1) , runtimes)
-xlabel('Step'); ylabel('Time(s)')
-title('Runtimes')
-avgRuntime = mean(runtimes); % seconds
-stdRuntime = std(runtimes); % seconds
-disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
-disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
-disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
-figure()
-h = histogram(runtimes);
-title('Runtimes')
-ylabel('Frequency')
-xlabel('Times (s)')
+% figure()
+% plot(1 : size(runtimes , 1) , runtimes)
+% xlabel('Step'); ylabel('Time(s)')
+% title('Runtimes')
+% avgRuntime = mean(runtimes); % seconds
+% stdRuntime = std(runtimes); % seconds
+% disp(['Total runtime: ' , num2str(sum(runtimes) / 3600) , ' hrs' , ' (' , num2str(sum(runtimes) / 60) , ' mins)']);
+% disp(['Average runtime per step: ' , num2str(avgRuntime / 60) , ' mins (' , num2str(avgRuntime) , ' secs)']);
+% disp(['Standard deviation: ' , num2str(stdRuntime / 60) , ' mins (' , num2str(stdRuntime) , ' secs)']);
+% figure()
+% h = histogram(runtimes);
+% title('Runtimes')
+% ylabel('Frequency')
+% xlabel('Times (s)')
 
 %% Show results
-showResults(pathModifier)
+% showResults(pathModifier)
