@@ -20,7 +20,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 
 % Time
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2020; %c(1); % get the current year
 startYear = 1910;
 endYear = currYear;
 timeStep = 1 / stepsPerYear;
@@ -114,7 +114,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_090919_noBaseVax_baseScreen_GuiAbstract'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101019_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -136,6 +136,7 @@ cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
 baseline.screenAge = 8;
+baseline.screenAgeMults = [0.20];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72;
@@ -156,6 +157,9 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values a
 end
 
 % Create screening indices
+numScreenAge = length(screenAlgs{1}.screenAge);
+agesComb = screenAlgs{1}.screenAge;
+ageMultsComb = screenAlgs{1}.screenAgeMults;
 screenAgeAll = zeros(disease , viral , hpvTypes , hpvStates , periods , length(screenAlgs{1}.screenAge) , risk);
 screenAgeS = zeros(disease , viral , hpvTypes , hpvStates , 2 , length(screenAlgs{1}.screenAge) , risk);
 noVaxNoScreen = zeros(disease , viral , hpvTypes , hpvStates , length(screenAlgs{1}.screenAge) , risk);
@@ -339,7 +343,7 @@ newCin2 = newCC;
 newCin3 = newCC;
 ccDeath = newCC;
 ccTreated = zeros(length(s) - 1 , disease , hpvTypes , age , 3); % 3 cancer stages: local, regional, distant
-newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , risk , 2);
+newScreen = zeros(length(s) - 1 , disease , viral , hpvTypes , hpvStates , numScreenAge , risk , 2);
 newTreatImm = newScreen;
 newTreatHpv = newScreen;
 newTreatHyst = newScreen;
@@ -413,16 +417,16 @@ for i = 2 : length(s) - 1
         end
         
         if (year >= hpvScreenStartYear)
-            [dPop , newScreen(i , : , : , : , : , : , :) , ...
-                newTreatImm(i , : , : , : , : , : , :) , ...
-                newTreatHpv(i , : , : , : , : , : , :) , ...
-                newTreatHyst(i , : , : , : , : , : , :)] ...
+            [dPop , newScreen(i , : , : , : , : , : , : , :) , ...
+                newTreatImm(i , : , : , : , : , : , : , :) , ...
+                newTreatHpv(i , : , : , : , : , : , : , :) , ...
+                newTreatHyst(i , : , : , : , : , : , : , :)] ...
                 = hpvScreen(popIn , disease , viral , hpvTypes , hpvStates , risk , ...
                 screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                 noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                 vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                screenAlgorithm);
+                screenAlgorithm , numScreenAge);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
@@ -473,7 +477,7 @@ for i = 2 : length(s) - 1
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk);
+            risk , sumall);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
@@ -486,7 +490,7 @@ for i = 2 : length(s) - 1
         gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
-        stepsPerYear , currYear , screenAlgs{1}.screenAge , noVaxScreen , noVaxXscreen , ...
+        stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     popIn = pop(end , :);
     if any(pop(end , :) < 0)

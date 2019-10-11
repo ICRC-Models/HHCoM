@@ -4,9 +4,12 @@ close all; clear all; clc
 %% Initialize pop vector
 disp('Building matrices')
 paramDir = [pwd , '\Params\'];
-load([paramDir, 'general'])
-load([paramDir , 'popData'])
-savedir = [pwd , '\Params']; 
+% load([paramDir, 'general'])
+% load([paramDir , 'popData'])
+load([paramDir , 'calibratedParams']);
+perPartnerHpv = 0.0045;
+load([paramDir , 'general']);
+savedir = [pwd , '\Params\']; 
 pop = spalloc(prod(dim) , 1 , prod(dim));
 at = @(x , y) sort(prod(dim)*(y-1) + x); 
 %% aging and risk assortment
@@ -398,8 +401,8 @@ disp('Finished building viral load progression matrix')
 % disp('Finished building HPV screening and treatment matrix')
 %% bornDie
 %% Fertility prior to 1995
-load([paramDir ,'HIVParams'])
-load([paramDir ,'popData'])
+% load([paramDir ,'HIVParams'])
+% load([paramDir ,'popData'])
 fertMat = spalloc(numel(pop) , numel(pop) , numel(pop));
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
@@ -447,8 +450,8 @@ end
 save(fullfile(savedir ,'fertMat') , 'fertMat')
 save(fullfile(savedir ,'hivFertMats') , 'hivFertPosBirth' , 'hivFertNegBirth')
 %% Fertility from 2005 onwards
-load([paramDir ,'HIVParams'])
-load([paramDir ,'popData'])
+% load([paramDir ,'HIVParams'])
+% load([paramDir ,'popData'])
 fertMat2 = spalloc(numel(pop) , numel(pop) , numel(pop));
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));

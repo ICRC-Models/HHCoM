@@ -1,7 +1,7 @@
 % Load parameters and other input data. Accepts steps per year as an
 % argument
 function[] = loadUp(stepsPerYear)
-load('settings')
+load([pwd , '\Params\' , 'settings'])
 
 %% import and save population parameters
 file = [pwd , '\Config\Population_data.xlsx'];
@@ -20,7 +20,7 @@ actsPer = xlsread(file , 'Demographics' , 'B238:D239'); % [gender x risk]; acts 
 epsA = xlsread(file , 'Demographics' , 'B185:B187'); % [year] <1985 , 1990 , >2000; force of infection mixing by age
 epsR = xlsread(file , 'Demographics' , 'C185:C187'); % [year] <1985 , 1990 , >2000; force of infection mixing by sexual risk
 yr = xlsread(file , 'Demographics' , 'A185:A187'); % years
-savdir = [pwd , '\Params']; 
+savdir = [pwd , '\Params\']; 
 save(fullfile(savdir , 'popData') , 'popInit' , 'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'partnersM' , ...
     'partnersF' , 'actsPer' , 'epsA' , 'epsR' , 'fertility2' , 'yr');
 

@@ -18,7 +18,7 @@ for d = 1 : disease
             for r = 1 : risk
                 for aV = 1 : length(vaxAge)
                     a = vaxAge(aV);
-	            fromNonVSus(:,aV) = toInd(allcomb(d , v , 1 , 1 , 1 , ... 
+                    fromNonVSus(:,aV) = toInd(allcomb(d , v , 1 , 1 , 1 , ... 
                         g , a , r));
                     fromNonVImm(:,aV) = toInd(allcomb(d , v , 2 , 10 , 1 , ... 
                         g , a , r));
@@ -40,7 +40,7 @@ for d = 1 : disease
                         dPop(toV(:,aV)) = dPop(toV(:,aV)) + vaxdGroupSus + vaxdGroupImm;
                         hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
                     end
-		end
+                end
             end
         end
     end
