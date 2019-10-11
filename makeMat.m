@@ -71,6 +71,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 %% hiv
 % produces hivTrans, hivDeathMat, artMat, and prepMat
 
+% load([paramDir , 'HIVParams'])
 % disp('Building HIV CD4 progression matrix')
 % % cd4 progression
 % % Time dependent components: ART uptake/dropout (artIn, artOut) , PrEP
@@ -175,7 +176,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 % disp('Finished building HIV matrices.')
 %% Viral load progression (by CD4 count)
 disp('Building viral load progression matrix')
-load([paramDir , 'HIVParams'])
+
 vlAdvancer = spalloc(numel(pop) , numel(pop) , numel(pop));
 
 for g = 1 : gender
