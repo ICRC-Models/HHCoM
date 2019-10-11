@@ -19,7 +19,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
     + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
     + (x(: , 2) - 1) * k(1) + x(: , 1);
-sumall = @(x , y) sort(prod(dim)*(y-1) + x);
+sumall = @(x) sum(x(:));
 
 % Time
 c = fix(clock);
@@ -123,7 +123,7 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV- 
 screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
-whoScreenAges = [6,7,8,9,10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
+whoScreenAges = [6,7,8,9,10]; % , 6]; % ***SET ME***: ages that get screened when using the WHOa algorithm, [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
 whoScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
@@ -144,8 +144,8 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 , 5 , 6];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [0.8 , 0.8 , 0.8];    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxAgeCU = [4 , 5 , 6];    % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [0.8 , 0.8 , 0.8];    % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -232,6 +232,7 @@ if hivPosScreen
         % WHO screening algorithm - version b
         screenAlgs{2} = whob;
     end
+    
     screenAlgs{2}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
     for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
         period = [screenYrs(i) , screenYrs(i + 1)];
