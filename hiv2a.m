@@ -66,7 +66,7 @@ if year >= 2006 && year < 2013
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos) * (1 - artOut)
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
