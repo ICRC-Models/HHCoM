@@ -1,5 +1,6 @@
 % Main
 % Runs simulation over the time period and time step specified by the user.
+
 close all; clear all; clc
 % profile clear;
 
@@ -125,7 +126,7 @@ waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * (bivalent vaccine efficacy adjustment)
+vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
@@ -523,7 +524,7 @@ if ~ exist([pwd , '\HHCoM_Results\'])
     mkdir HHCoM_Results
 end
 
-savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
+savdir = [pwd , '\HHCoM_Results\'];
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
     'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
