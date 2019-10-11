@@ -3,26 +3,31 @@
 close all;clear all;clc
 %profile clear;
 
-%%
+%% Load calibrated parameters and reset general parameters based on changes to model
 disp('Start up')
 
 % Use calibrated parameters
 paramDir = [pwd , '/Params/'];
 load([paramDir , 'calibratedParams'])
 
-% Load general parameters
+% Load general parameters and reset changed parameters
 paramDir = [pwd , '/Params/'];
 load([paramDir, 'general'],'disease','viral','hpvTypes','hpvStates','periods',...
-    'gender','age','risk','k','toInd','sumall')
+    'gender','age','risk','k')
 dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
+at = @(x , y) sort(prod(dim)*(y-1) + x);
+toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(5) ...
+    + (x(: , 5) - 1) * k(4) + (x(: , 4) - 1) * k(3) + (x(: , 3) - 1) * k(2) ...
+    + (x(: , 2) - 1) * k(1) + x(: , 1);
+sumall = @(x , y) sort(prod(dim)*(y-1) + x);
 
 % Time
 c = fix(clock);
-currYear = 2020; %c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
-% Adjust parameters different than calibrated
+% Reset additional changed parameters different than calibrated; load indices and matrices
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
@@ -115,8 +120,8 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHO)
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm for all HIV states; 1 applies baseline screening to HIV- and selected algorithm for HIV+ 
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
+hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV- 
 screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
 whoScreenAges = [6,7,8,9,10]; % , 6]; % ***SET ME***: [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
 whoScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40];
@@ -128,10 +133,10 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = 2;
-vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
-%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
+%Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];
 vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
@@ -537,7 +542,7 @@ parfor n = 1 : nTests
                 artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
             end
             artDist = calcDist(artDistList , disease , viral , gender , age , ...
-                risk , sumall); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
+                risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
             popIn = pop(end , :);
             if any(pop(end , :) < 0)
                 disp('After hiv')
