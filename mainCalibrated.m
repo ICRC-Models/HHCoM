@@ -478,7 +478,7 @@ for i = 2 : length(s) - 1
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk , sumall);
+            risk);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
