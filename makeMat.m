@@ -174,6 +174,7 @@ at = @(x , y) sort(prod(dim)*(y-1) + x);
 % save(fullfile(savedir , 'artMat') , 'artMat')
 % save(fullfile(savedir , 'prepMat') , 'prepMat')
 % disp('Finished building HIV matrices.')
+
 %% Viral load progression (by CD4 count)
 disp('Building viral load progression matrix')
 

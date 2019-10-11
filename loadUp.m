@@ -111,7 +111,6 @@ save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates'
     'condUse' , 'kCD4' , 'kVl' , 'stepsPerYear'); % save general model parameters to a workspace file
 
 %% save parameters for mixInfect
-load('settings')
 step = 1 / stepsPerYear;
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
@@ -125,7 +124,7 @@ end
 modelYrLast = endYear;
 
 save(fullfile(savdir , 'mixInfectParams')  , 'epsA_vec' , ...
-    'epsR_vec' , 'yr' , 'modelYr1' , 'modelYrLast' , ...
+    'epsR_vec' , 'yr' , 'modelYrLast' , ...
     'circProtect' , 'condProtect')
 
 analProp = [0 , 0;
