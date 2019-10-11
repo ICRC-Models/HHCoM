@@ -10,7 +10,7 @@
 #SBATCH --partition=csde
 #SBATCH --nodes=1   		 		    # Node resources
 #SBATCH --mem=120G   		 		    # Memory per node
-#SBATCH --time=06:00:00 	 		    # Wall clock time limit hrs:min:sec
+#SBATCH --time=08:00:00 	 		    # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
 
