@@ -22,7 +22,7 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
 
-artOut = 0.0; %0.0619; %0.03; % 3% dropout
+artOut = 0.0619; %0.03; % 3% dropout
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 
 % pie [d x v x g x a x r]

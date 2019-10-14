@@ -115,7 +115,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_101019_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101119_noBaseVax_baseScreen_5yrArtOut'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -427,7 +427,7 @@ for i = 2 : length(s) - 1
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , ...
                 noVaxToScreenTreatImm , vaxToScreenTreatImm , noVaxToScreenTreatHpv , ...
                 vaxToScreenTreatHpv , noVaxToScreenHyst , vaxToScreenHyst , ...
-                screenAlgorithm , numScreenAge);
+                screenAlgorithm , numScreenAge , ageMultsComb);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
