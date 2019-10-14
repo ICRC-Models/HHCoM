@@ -427,7 +427,7 @@ for g = 1 : gender
     end
 end
 
-% calculate new HPV infections
+% calculate new HIV infections
 for a = 11 : age
     for r = 1 : risk
         if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero

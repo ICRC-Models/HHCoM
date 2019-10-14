@@ -288,8 +288,8 @@ for i = 2 : length(s) - 1
         % Create indices
         fromNonHivNonHpv = sort(toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk))); 
         toHivNonHpv = sort(toInd(allcomb(4 , 2 , 1 , 1 , 1 , 1 , 1:gender , 16 : 30 , 1:risk)));
-        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : endpoints , 1 , 1:gender , 16 : 30 , 1:risk))); 
-        toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : endpoints , 1 , 1:gender , 16 : 30 , 1:risk)));
+        fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 1 , 1 : 3 , 1 , 1:gender , 16 : 30 , 1:risk))); 
+        toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 1 , 1 : 3 , 1 , 1:gender , 16 : 30 , 1:risk)));
         
         % Distribute HIV infections (HPV-)        
         popIn(fromNonHivNonHpv) = (1 - 0.002) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
