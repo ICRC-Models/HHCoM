@@ -115,7 +115,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_101119_noBaseVax_baseScreen_5yrArtOut'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101419_noBaseVax_baseScreen_5yrArtOut-11_8'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity

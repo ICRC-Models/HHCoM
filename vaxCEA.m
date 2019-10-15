@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_101119_noBaseVax_baseScreen_5yrArtOut']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_101419_noBaseVax_baseScreen_5yrArtOut-11_8']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -671,17 +671,17 @@ title('Proportion on ART')
 legend('Model (Male)' , 'Model (Female)')
 
 %% On ART by age
-ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
+ageGroup = {'0-4' , '5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
      '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
      '60-64' , '65-69' , '70-74' , '75-79'};
 aMatrix = zeros(1 , age);
 for a = 1 : age
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
         1 : periods , 2 , a , 1 : risk));
-    artPop = sum(noV.popVec(end-605 , artInds) , 2);
+    artPop = sum(noV.popVec(end , artInds) , 2); %end-605
     hivInds = toInd(allcomb([2 : 6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
         1 : periods , 2 , a , 1 : risk));
-    hivPop = sum(noV.popVec(end-605 , hivInds) , 2);
+    hivPop = sum(noV.popVec(end , hivInds) , 2);
     hiv_art = [100 * artPop ./ hivPop];
 
     aMatrix(a) = hiv_art;
@@ -689,12 +689,12 @@ end
 
 %figure;
 hold all;
-plot([1:age] , aMatrix(1,:) , '--')
+plot([1:age] , aMatrix(1,:) , ':')
 hold all;
-ylabel('Percent females on ART in 2020 by age');
+ylabel('Percent females on ART in 2120 by age');
 ylim([0 110])
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-legend('Without ART dropout' , 'With ART dropout');
+legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');
 
 %% HIV prevalance
 figure()
@@ -814,16 +814,16 @@ for g = 1 : gender
             1 : periods , g , a , 1 : risk));
         hivInds = toInd(allcomb([2:6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
             1 : periods , g , a , 1 : risk));
-        hivAge(a , g) = (sum(noV.popVec(end-605,hivInds),2)/sum(noV.popVec(end-605,ageInds),2))*100;
+        hivAge(a , g) = (sum(noV.popVec(end-605,hivInds),2)/sum(noV.popVec(end-605,ageInds),2))*100; %end-605
     end
     hold all;
     subplot(2,2,g+2);
-    plot(1 : size(hivAge , 1) , hivAge(: , g) , '-');
+    plot(1 : size(hivAge , 1) , hivAge(: , g) , ':');
     hold all;
     xlabel('Age Group'); ylabel('HIV Prevalence')
     set(gca , 'xtick' , 1 : length(hivAge) , 'xtickLabel' , ageGroup);
     title(genderVec{g})
-    legend('Without ART dropout' , 'With ART dropout');
+    legend('With ART dropout: 6.19%' , 'Without ART dropout' , 'With ART dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');
 end
 
 %% CD4 count and VL proportions over time
