@@ -70,6 +70,13 @@ end
 if hivOn
     disp('HIV module activated')
 end
+% choose whether to use 5-year or 1-year age groups
+5yrAgeGrpsOn = 1;
+if 5yrAgeGrpsOn
+    ageSexDebut = 3;
+else
+    ageSexDebut = 11;
+end
 
 %% Time
 startYear = 1910;
@@ -81,7 +88,7 @@ years = endYear - startYear;
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_100919_singleAge_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101719_5yr_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
