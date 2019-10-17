@@ -123,6 +123,25 @@ for j = 1 : nResults
 %         axis([1980 2120 0 275])
 %         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
 %         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+
+%         for n = 1 : 2
+%             if (n == 1)
+%                 s = 2;
+%             end
+%             if (n == 2)
+%                 s = 1;
+%             end
+%             if ((j == 1) && (i == 1)) || ((i == 1) && (s == 1))
+%                 hold all;
+%                 plot(tVec(1 : stepsPerYear : end)' , vaxResult{s}.ccInc')
+%                
+%                 hold all;
+%                 axis([2020 2120 0 70])
+%                 xlabel('Year'); ylabel('Cervical cancer incidence rate (per 100K)'); 
+%                 legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5');
+%                 %legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+%             end
+%         end
         
     end     
     
@@ -407,3 +426,6 @@ for j = 1 : nResults
     clear vaxResult; 
 end
 
+% hold all;
+% elim = ones(length(tVec(1 : stepsPerYear : end)),1).*4.0;
+% plot(tVec(1 : stepsPerYear : end)' , elim);

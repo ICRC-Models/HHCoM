@@ -3,6 +3,11 @@
 close all;clear all;clc
 %profile clear;
 
+%% Cluster information
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+
 %% Load calibrated parameters and reset general parameters based on changes to model
 disp('Start up')
 
@@ -132,13 +137,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_091319_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_101719_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '091319_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
+pathModifier = '101719_baseScreen_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
@@ -564,7 +569,7 @@ parfor n = 1 : nTests
                 artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
             end
             artDist = calcDist(artDistList , disease , viral , gender , age , ...
-                risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
+                risk , sumall); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
             popIn = pop(end , :);
             if any(pop(end , :) < 0)
                 disp('After hiv')
@@ -641,7 +646,7 @@ parfor n = 1 : nTests
     
     parsave(filename , tVec ,  popVec , newHiv ,...
         newImmHpv , newVaxHpv , newHpv , deaths , hivDeaths , ccDeath , ...
-        newCC , ...%artTreatTracker , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ccTreated , ...
+        newCC , artDistList , artTreatTracker , ... % vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ccTreated , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier); %newTreatImm , newTreatHpv , newTreatHyst , ...
 end
 disp('Done')
@@ -650,3 +655,6 @@ disp('Done')
 
 %%
 %vaxCEA(pathModifier)
+
+exit(0)
+

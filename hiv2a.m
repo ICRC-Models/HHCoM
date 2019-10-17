@@ -21,7 +21,7 @@ artTreat = zeros(disease , viral , gender , age , risk);
 hivDeaths = zeros(gender , age , 1);
 
 %% Calculate ART treatment coverage
-artOut = 0; %0.0619; %0.03; % ART dropout rate
+artOut = 0.0; %0.0619; %0.03; % ART dropout rate
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 treat = zeros(disease , viral , gender , age ,risk);
 
@@ -43,7 +43,7 @@ if year >= 2006 && year < 2013
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut)
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             treat(3 : 6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
@@ -69,7 +69,7 @@ if year >= 2004 && year < 2013
             below200 = sumall(pop(hivInds(7 , v , g , 11 : age , : , :)));
             totBelow200 = totBelow200 + below200;
         end
-        fracART = onArt / (onArt + totBelow200); %* (1 - artOut) 
+        fracART = onArt / (onArt + totBelow200) * (1 - artOut); 
         if year < 2006 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             treat(7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
@@ -96,7 +96,7 @@ if year >= 2013 && year < 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if fracART < maxCover{g}
             cover = (maxCover{g} - fracART) ./ (1 - fracART);
             treat(3 : 7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
@@ -123,7 +123,7 @@ if year >= 2015
                 totHivPos = totHivPos + sumall(pop(hivPositive));
             end
         end
-        fracART = onArt / (onArt + totHivPos); %* (1 - artOut) 
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
         if year < 2030 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
             treat(3 : 7 , 1 : 5 , g , 11 : age , :) = max(cover , 0);

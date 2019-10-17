@@ -376,7 +376,7 @@ for i = 2 : length(s) - 1
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
         artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk);
+            risk , sumall);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
@@ -426,7 +426,7 @@ savdir = [pwd , '/HHCoM_Results/'];
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' ,... % 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artDist' , 'artDistList' , ... %artTreatTracker
+    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
     'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')

@@ -272,6 +272,34 @@ xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence All')
 
+%% HIV prevalence by age on x-axis
+genderVec = {'Males (on and off ART)' , 'Females (on and off ART)'};
+hivAge = zeros(16 , 2);
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
+
+%figure;
+for g = 1 : gender
+    aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+    for aInd = 1 : 16
+        a = aVec{aInd};
+        ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , g , a , 1 : risk));
+        hivInds = toInd(allcomb([2:6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , g , a , 1 : risk));
+        hivAge(aInd , g) = (sum(popVec(end,hivInds),2)/sum(popVec(end,ageInds),2))*100;
+    end
+    hold all;
+    subplot(1,2,g);
+    plot(1 : size(hivAge , 1) , hivAge(: , g) , '--');
+    hold all;
+    xlabel('Age Group'); ylabel('HIV Prevalence')
+    set(gca , 'xtick' , 1 : length(hivAge) , 'xtickLabel' , ageGroup);
+    title(genderVec{g})
+    legend('Without ART dropout' , 'With ART dropout');
+end
+
 %% HIV mortality by age
 % figure()
 % bar(tVec , squeeze(hivDeaths(:,2,:)) , 'stacked')
@@ -309,9 +337,10 @@ hivPop = sum(popVec(: , hivInds) , 2);
 hiv_art = [100 * hivPop ./ sum(popTot , 2), 100 * artPop ./ sum(popTot , 2)];
 area(tVec , hiv_art); %art ./ sum(popVec , 2) , tVec , hiv ./ sum(popVec , 2))
 xlabel('Year')
-ylabel('Proportion of Population (%)')
+ylabel('Proportion of Population ages 15-49 (%)')
 title('Relative HIV Prevalence')
 legend('Untreated', 'On ART' , 'Location' , 'NorthWest')
+xlim([1980 2020]);
 
 %% Proportion of HIV+ population on ART
 figure()
@@ -369,6 +398,35 @@ xlabel('Year')
 ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model (Male)' , 'Observed(Male)' , 'Model (Female)' , 'Observed (Female)')
+
+%% On ART by age
+aVec = {1:5,6:1011:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80}; %{10:15,16:25,26:35,36:50,51:75};
+ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
+     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+     '60-64' , '65-69' , '70-74' , '75-79'};
+aMatrix = zeros(1 , length(aVec));
+for aInd = 1 : length(aVec)
+    a = aVec{aInd};
+
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , a , 1 : risk));
+    artPop = sum(popVec(end , artInds) , 2);
+    hivInds = toInd(allcomb([2 : 6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , 2 , a , 1 : risk));
+    hivPop = sum(popVec(end , hivInds) , 2);
+    hiv_art = [100 * artPop ./ hivPop];
+
+    aMatrix(aInd) = hiv_art;
+end
+
+%figure;
+hold all;
+plot([1:length(aVec)] , aMatrix(1,:) , '--')
+hold all;
+ylabel('Percent females on ART in 2020 by age');
+ylim([0 110])
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+legend('Without ART dropout' , 'With ART dropout');
 
 %% HPV prevalence over time by HIV status and gender
 genders = {'Male' , 'Female'};
@@ -1511,6 +1569,37 @@ legend('Male' , 'Female')
 % legend('Male' , 'Female')
 % xlabel('Year'); ylabel('Rate Per 100'); title('HPV Incidence')
 
+%% HIV incidence by age
+genderVec = {'Males' , 'Females'};
+hivAge = zeros(16 , 2);
+fScale = 100;
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
+annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+
+%figure;
+for g = 1 : gender
+    aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+    for aInd = 1 : 16
+        a = aVec{aInd};
+        hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , g , a , 1 : risk)); ...
+            toInd(allcomb(7 : 9 , 1 , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , g , a , 1 : risk))];
+        hivAge(aInd , g) = annlz(sum(sum(newHiv(end-6:end-1 , g , a , 1 : risk) , 3) , 4)) ...
+            ./ (annlz(sum(popVec(end-6:end-1 , hivSusInds) , 2)) ./ stepsPerYear) * fScale;
+    end
+    hold all;
+    subplot(1,2,g);
+    plot(1 : size(hivAge , 1) , hivAge(: , g) , '--');
+    hold all;
+    xlabel('Age Group'); ylabel('HIV incidence per 100')
+    set(gca , 'xtick' , 1 : length(hivAge) , 'xtickLabel' , ageGroup);
+    title(genderVec{g})
+    legend('Without ART dropout' , 'With ART dropout');
+end
+
 %% HPV incidence from immune only by gender
 % figure()
 % for g = 1 : 2
@@ -1989,60 +2078,57 @@ legend('Male' , 'Female')
 % % legend('Male' , 'Female')
 
 %% VL breakdown
-% hivInf = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%     1 : endpoints , 1 : gender , 1 : age , 1 : risk));
-% totalHiv = sum(popVec(: , hivInf) , 2);
-% viralPop = zeros(length(tVec) , 6);
-% for v = 1 : viral
-%     viralGroup = toInd(allcomb(2 : 6 , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : gender , 1 : age , 1 : risk));
-%     viralPop(: , v) = sum(popVec(: , viralGroup) , 2);
-% end
-% figure()
-% area(tVec , bsxfun(@rdivide , viralPop , totalHiv));
-% legend('Acute Infection' , 'VL < 1000' , 'VL 1,000 - 10,000' , 'VL 10,000 - 50,000' ,...
-%     'VL > 50,000' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('Proportion of HIV infected')
-% figure()
-% bar(tVec , bsxfun(@rdivide , viralPop , totalHiv) , 'stacked')
-% legend('Acute Infection' , 'VL < 1000' , 'VL 1,000 - 10,000' , 'VL 10,000 - 50,000' ,...
-%     'VL > 50,000' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('Proportion of HIV infected')
-% 
-% bar(tVec , viralPop , 'stacked')
-% legend('Acute Infection' , 'VL < 1000' , 'VL 1,000 - 10,000' , 'VL 10,000 - 50,000' ,...
-%     'VL > 50,000' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('HIV Infected')
+hivInf = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+totalHiv = sum(popVec(: , hivInf) , 2);
+viralPop = zeros(length(tVec) , 6);
+for v = 1 : viral
+    viralGroup = toInd(allcomb(2 : 6 , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+    viralPop(: , v) = sum(popVec(: , viralGroup) , 2);
+end
+figure()
+subplot(1,2,1);
+area(tVec , bsxfun(@rdivide , viralPop , totalHiv));
+legend('Acute Infection' , 'VL < 1000' , 'VL 1,000 - 10,000' , 'VL 10,000 - 50,000' ,...
+    'VL > 50,000')
+xlabel('Year')
+ylabel('Proportion of HIV infected')
+xlim([1980 2020]);
+ylim([0 1]);
+
+subplot(1,2,2);
+bar(tVec , viralPop , 'stacked')
+legend('Acute Infection' , 'VL < 1000' , 'VL 1,000 - 10,000' , 'VL 10,000 - 50,000' ,...
+    'VL > 50,000')
+xlabel('Year')
+ylabel('HIV Infected')
+xlim([1980 2020]);
 
 %% CD4 breakdown
-% cd4Pop = zeros(length(tVec) , 5);
-% for d = 2 : 6
-%     cd4Group = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : gender , 1 : age , 1 : risk));
-%     cd4Pop(: , d - 1) = sum(popVec(: , cd4Group) , 2);
-% end
-% figure()
-% area(tVec , bsxfun(@rdivide , cd4Pop , totalHiv));
-% legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
-%     'CD4 <= 200 cells/uL' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('Proportion of HIV infected')
-% figure()
-% bar(tVec , bsxfun(@rdivide , cd4Pop , totalHiv) , 'stacked')
-% legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
-%     'CD4 <= 200 cells/uL' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('Proportion of HIV infected')
-% 
-% figure()
-% bar(tVec , cd4Pop , 'stacked')
-% legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
-%     'CD4 <= 200 cells/uL' , 'Location' , 'NorthEastOutside')
-% xlabel('Year')
-% ylabel('HIV Infected')
+cd4Pop = zeros(length(tVec) , 5);
+for d = 2 : 6
+    cd4Group = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+    cd4Pop(: , d - 1) = sum(popVec(: , cd4Group) , 2);
+end
+figure()
+subplot(1,2,1);
+area(tVec , bsxfun(@rdivide , cd4Pop , totalHiv));
+legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
+    'CD4 <= 200 cells/uL')
+xlabel('Year');
+ylabel('Proportion of HIV infected');
+xlim([1980 2020]);
+ylim([0 1]);
+
+subplot(1,2,2);
+bar(tVec , cd4Pop , 'stacked')
+legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
+    'CD4 <= 200 cells/uL')
+xlabel('Year');
+ylabel('HIV Infected');
+xlim([1980 2020]);
 
 %% HIV by age group
 % hivAge = zeros(length(tVec) , 12);
@@ -2210,23 +2296,23 @@ legend('Male' , 'Female')
 % end
 
 %% ART treatment tracker- cd4
-% figure()
-% cd4ARTFrac = zeros(length(tVec) , 5);
-% for a = 1 : age
-%     for i = 1 : length(tVec)
-%     currTot = sumall(artTreatTracker(i , 2 : 6 , 1 : 5 , 1 : gender , a , 1 :risk));
-%         for d = 2 : 6
-%             curr = sumall(artTreatTracker(i , d , 1 : 5 , 1 : gender , a , 1 : risk));
-%             cd4ARTFrac(i , d - 1) = curr / currTot;
-%         end
-%     end
-%     subplot(4,4,a)
-%     area(tVec , cd4ARTFrac)
-%     xlabel('Year')
-%     ylabel('Initiated ART')
-% end
-% legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
-%         'CD4 <= 200 cells/uL' , 'Location' , 'NorthEastOutside')
+figure()
+cd4ARTFrac = zeros(length(tVec) , 5);
+for a = 1 : 5 : age
+    for i = 1 : length(tVec)
+    currTot = sumall(artTreatTracker(i , 2 : 6 , 1 : 5 , 1 : gender , a , 1 :risk));
+        for d = 2 : 6
+            curr = sumall(artTreatTracker(i , d , 1 : 5 , 1 : gender , a , 1 : risk));
+            cd4ARTFrac(i , d - 1) = curr / currTot;
+        end
+    end
+    subplot(4,4,a)
+    area(tVec , cd4ARTFrac)
+    xlabel('Year')
+    ylabel('Initiated ART')
+end
+legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
+        'CD4 <= 200 cells/uL' , 'Location' , 'NorthEastOutside')
 
 %% ART treatment tracker- risk/age
 % aARTFrac = zeros(length(tVec) , 5);
