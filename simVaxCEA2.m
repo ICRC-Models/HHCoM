@@ -94,8 +94,10 @@ vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
-maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+artOutMult = 0.95;
+maxRateM_vec = [0.40*artOutMult , 0.70*artOutMult]; % Maximum ART coverage
+maxRateF_vec = [0.55*artOutMult , 0.70*artOutMult];
+
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -104,13 +106,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_101419_noBaseVax_baseScreen_5yrArtOut-11_8']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_101619_noBaseVax_baseScreen_5yr_artOutAdjCov095_090cap']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '101419_noBaseVax_baseScreen_5yrArtOut-11_8'; % ***SET ME***: name for simulation output file
+pathModifier = '101619_noBaseVax_baseScreen_5yr_artOutAdjCov095_090cap'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end

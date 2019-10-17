@@ -318,6 +318,32 @@ ylabel('Proportion of HIV Population')
 title('Proportion on ART')
 legend('Model (Male)' , 'Observed(Male)' , 'Model (Female)' , 'Observed (Female)')
 
+%% On ART by age
+ageGroup = {'0-4' , '5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
+     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+     '60-64' , '65-69' , '70-74' , '75-79'};
+aMatrix = zeros(1 , age);
+for a = 1 : age
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , a , 1 : risk));
+    artPop = sum(popVec(end , artInds) , 2); %end-605
+    hivInds = toInd(allcomb([2 : 6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
+        1 : periods , 2 , a , 1 : risk));
+    hivPop = sum(popVec(end , hivInds) , 2);
+    hiv_art = [100 * artPop ./ hivPop];
+
+    aMatrix(a) = hiv_art;
+end
+
+figure;
+hold all;
+plot([1:age] , aMatrix(1,:) , '-')
+hold all;
+ylabel('Percent females on ART in 2020 by age');
+ylim([0 110])
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');
+
 %% Overall HPV
 genders = {'Male' , 'Female'};
 figure()

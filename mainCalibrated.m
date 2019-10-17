@@ -48,21 +48,21 @@ muHIV(11,2) = 0.02;
 % % kCIN1_Inf = zeros(age,1);
 
 % To similate a lower HIV prevalence setting, approximating with decreased per-act HIV transmission probability (80% of initial values)
-% % analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-% % vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
-% % vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1) .* 0.80;
-% % transM = vagTransM .* (1 - analProp(: , 1));
-% % transF = vagTransF .* (1 - analProp(: , 2));
-% % betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
-% % betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transM);
-% % betaHIVF2M = zeros(age , risk , viral);
-% % betaHIVM2F = betaHIVF2M;
-% % for a = 1 : age % calculate per-partnership probability of HIV transmission
-% %     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
-% %     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
-% % end
-% % betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-% % betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+% analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+% vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1); % .* 0.80;
+% vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1); % .* 0.80;
+% transM = vagTransM .* (1 - analProp(: , 1));
+% transF = vagTransF .* (1 - analProp(: , 2));
+% betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.1; 7 1 5.8 6.9 11.9 0.1; 7 1 5.8 6.9 11.9 0.1] , transF);
+% betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.1; 7 1 5.8 6.9 11.9 0.1; 7 1 5.8 6.9 11.9 0.1] , transM);
+% betaHIVF2M = zeros(age , risk , viral);
+% betaHIVM2F = betaHIVF2M;
+% for a = 1 : age % calculate per-partnership probability of HIV transmission
+%     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)')); % HIV(-) males
+%     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); % HIV(-) females
+% end
+% betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+% betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
 % Load indices
 paramDir = [pwd , '\Params\'];
@@ -105,8 +105,10 @@ vaxStartYear = 2014;
 % ART
 import java.util.LinkedList
 artDistList = LinkedList();
-maxRateM_vec = [0.40 , 0.40]; % Maximum ART coverage
-maxRateF_vec = [0.55 , 0.55];
+artOutMult = 1.0; %0.95;
+maxRateM_vec = [0.40*artOutMult , 0.70*artOutMult]; % Maximum ART coverage
+maxRateF_vec = [0.55*artOutMult , 0.70*artOutMult];
+
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -115,7 +117,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_101419_noBaseVax_baseScreen_5yrArtOut-11_8'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101719_noBaseVax_baseScreen_5yr_070cap'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity

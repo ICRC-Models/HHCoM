@@ -22,62 +22,67 @@ toInd = @(x) (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(6) + (x(: , 6) - 1) * k(
     + (x(: , 2) - 1) * k(1) + x(: , 1);
 sumall = @(x) sum(x(:));
 
-artOut = 0.118; %0.0619; %0.03; % 3% dropout
+artOut = 0.0; %0.118; %0.0619; %0.03; % 3% dropout
 artDist = reshape(artDist, [disease , viral , gender , age , risk]);
 
 % pie [d x v x g x a x r]
 
-treat = zeros(disease , viral , gender , age ,risk);
+treat = zeros(disease , viral , gender , age , risk);
 % treat(1 , : , : , 4 : end , :) = 0; % rate of going on PrEP
 % treat(2 : 6 , : , : , 4 : end , :) = 0; % ART coverage
 kOn = ones(6 , 1);
 kOn(6) = 0;
-
-% if year < 2018
-% maxRateM1 = 0.42;%1 - exp(-0.25);
-% maxRateM2 = 0.42;%1 - exp(-0.35);
-% maxRateF1 = 0.42;%1 - exp(-0.35);
-% maxRateF2 = 0.42;%1 - exp(-0.5);
-% end
 
 %CD4 > 200, from 2006 to 2013
 if year >= 2006 && year < 2013
     yrs = 2006 : 1/ stepsPerYear : 2013;
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-%         for a = 3 : age
-        maxRateM = maxRateM1;
-        maxRateF = maxRateF1;
-%         if a > 6
-%             maxRateF = maxRateF2;
-%             maxRateM = maxRateM2;
-%         end
-        maxCover = {linspace(0 , maxRateM , length(yrs)) , ...
-            linspace(0 , maxRateF , length(yrs))};
-%         for r = 1 : risk
-%         hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
-        onArt = sumall(pop(hivPositiveArt));
-        totHivPos = 0;
-        for d = 2 : 5
-            for v = 1 : 5
-%                 hivPositive = hivInds(d , v , g , a , r , :);
-                hivPositive = hivInds(d , v , g , 3 : age , : , :);
-                totHivPos = totHivPos + sumall(pop(hivPositive));
+        maxCover = {linspace(0 , maxRateM1 , length(yrs)) , ...
+            linspace(0 , maxRateF1 , length(yrs))};
+        onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
+        aList = [];
+        ageSubTots = [];
+        totHivPosQualAges = 0; 
+        toRedisAge = [];
+        for a = 3 : age 
+            onArtAge = sumall(pop(hivInds(10 , 6 , g , a , : , :)));
+            totHivPosAge = 0;
+            totHivPos = 0;
+            for d = 2 : 5
+                for v = 1 : 5
+                    totHivPosAge = totHivPosAge + sumall(pop(hivInds(d , v , g , a , : , :)));
+                    totHivPos = totHivPos + sumall(pop(hivInds(d , v , g , 3 : age , : , :)));
+                end
             end
-        end
+            fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
+            if fracARTAge >= 0.70
+                toRedisAge = [toRedisAge totHivPosAge];
+            elseif fracARTAge < 0.70
+                aList = [aList a];
+                ageSubTots = [ageSubTots totHivPosAge];
+                totHivPosQualAges = totHivPosQualAges + totHivPosAge;
+            end
+        end 
         fracART = onArt / (onArt + totHivPos) * (1 - artOut);
+        fracQualAges = ageSubTots ./ totHivPosQualAges;
         if year < 2013 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-            %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(2 : 5 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis');
+            treat(2 : 5 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(4 , 5 , 1 , length(aList) , risk) , formatToRedis);
         elseif year >= 2013 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-            %treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(2 : 5 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis);
+            treat(2 : 5 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(4 , 5 , 1 , length(aList) , risk) , formatToRedis);
         end
-%         end
-%         end
     end
 end
 
@@ -86,59 +91,90 @@ if year >= 2004 && year < 2013
     yrs = 2004 : 1 / stepsPerYear : 2006;
     ind = (round(yrs , 4) == round(year , 4));
     for g = 1 : gender
-%         for a = 3 : age
-        maxRateM = maxRateM1;
-        maxRateF = maxRateF1;
-%         if a > 6
-%             maxRateM = maxRateM2;
-%             maxRateF = maxRateF2;
-%         end
-        maxCover = {linspace(0 , maxRateM , length(yrs)) ,...
-            linspace(0 , maxRateF , length(yrs))};
-%         for r = 1 : risk
-%         onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
+        maxCover = {linspace(0 , maxRateM1 , length(yrs)) ,...
+            linspace(0 , maxRateF1 , length(yrs))};
         onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
-        totBelow200 = 0;
-        for v = 1 : 5
-%             below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
-            below200 = sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
-            totBelow200 = totBelow200 + below200;
+        aList = [];
+        ageSubTots = [];
+        totBelow200QualAges = 0;
+        toRedisAge = [];
+        for a = 3 : age
+            onArtAge = sumall(pop(hivInds(10 , 6 , g , a , : , :)));
+            totBelow200Age = 0;
+            totBelow200 = 0;
+            for v = 1 : 5
+                totBelow200Age = totBelow200Age + sumall(pop(hivInds(6 , v , g , a , : , :)));
+                totBelow200 = totBelow200 + sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
+            end
+            fracARTAge = onArtAge / (onArtAge + totBelow200Age) * (1 - artOut);
+            if fracARTAge >= 0.70
+                toRedisAge = [toRedisAge totBelow200Age];
+            elseif fracARTAge < 0.70
+                aList = [aList a];
+                ageSubTots = [ageSubTots totBelow200Age];
+                totBelow200QualAges = totBelow200QualAges + totBelow200Age;
+            end
         end
         fracART = onArt / (onArt + totBelow200) * (1 - artOut); 
+        fracQualAges = ageSubTots ./ totBelow200QualAges;
         if year < 2006 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-%             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis');
+            treat(6 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(1 , 5 , 1 , length(aList) , risk) , formatToRedis);
         elseif year >= 2006 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-%             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis');
+            treat(6 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(1 , 5 , 1 , length(aList) , risk) , formatToRedis);
         end
-%         end
-%         end
     end
 end
 
 % CD4 >= 200, from 2013 to 2015
 if year >= 2013 && year < 2015
     for g = 1 : gender  
-        maxRateM = maxRateM1;
-        maxRateF = maxRateF1;
-        maxCover = {maxRateM , maxRateF};
-
-        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
-        onArt = sumall(pop(hivPositiveArt));
-        totHivPos = 0;
-        for d = 2 : 6
-            for v = 1 : 5
-                hivPositive = hivInds(d , v , g , 3 : age , : , :);
-                totHivPos = totHivPos + sumall(pop(hivPositive));
+        maxCover = {maxRateM1 , maxRateF1};
+        onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
+        aList = [];
+        ageSubTots = [];
+        totHivPosQualAges = 0;
+        toRedisAge = [];
+        for a = 3 : age
+            onArtAge = sumall(pop(hivInds(10 , 6 , g , a , : , :)));
+            totHivPosAge = 0;
+            totHivPos = 0;
+            for d = 2 : 6
+                for v = 1 : 5
+                    totHivPosAge = totHivPosAge + sumall(pop(hivInds(d , v , g , a , : , :)));
+                    totHivPos = totHivPos + sumall(pop(hivInds(d , v , g , 3 : age , : , :)));
+                end
+            end
+            fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
+            if fracARTAge >= 0.70
+                toRedisAge = [toRedisAge totHivPosAge];
+            elseif fracARTAge < 0.70
+                aList = [aList a];
+                ageSubTots = [ageSubTots totHivPosAge];
+                totHivPosQualAges = totHivPosQualAges + totHivPosAge;
             end
         end
         fracART = onArt / (onArt + totHivPos) * (1 - artOut);
+        fracQualAges = ageSubTots ./ totHivPosQualAges;
         if fracART < maxCover{g}
             cover = (maxCover{g} - fracART) ./ (1 - fracART);
-            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis');
+            treat(2 : 6 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(5 , 5 , 1 , length(aList) , risk) , formatToRedis);
         end
     end
 end
@@ -147,81 +183,54 @@ end
 if year >= 2015
     yrs = 2015 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
     ind = round(yrs , 4) == round(year , 4);
-    
     for g = 1 : gender
-%         for a = 3 : age
-        maxRateM = maxRateM1;
-        maxRateF = maxRateF1;
-%         if a > 6
-%             maxRateM = maxRateM2;
-%             maxRateF = maxRateF2;
-%         end
-        maxCover = {linspace(maxRateM , 0.70 , length(yrs)) ,...
-           linspace(maxRateF , 0.70 , length(yrs))};
-%         for r = 1 : risk
-%         hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
-        hivPositiveArt = hivInds(10 , 6 , g , 3 : age , : , :);
-        onArt = sumall(pop(hivPositiveArt));
-        totHivPos = 0;
-        for d = 2 : 6
-            for v = 1 : 5
-%                 hivPositive = hivInds(d , v , g , a , r , :);
-                hivPositive = hivInds(d , v , g , 3 : age , : , :);
-                totHivPos = totHivPos + sumall(pop(hivPositive));
+        maxCover = {linspace(maxRateM1 , maxRateM2 , length(yrs)) ,...
+           linspace(maxRateF1 , maxRateF2 , length(yrs))};
+        onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
+        aList = [];
+        ageSubTots = [];
+        totHivPosQualAges = 0;
+        toRedisAge = [];
+        for a = 3 : age
+            onArtAge = sumall(pop(hivInds(10 , 6 , g , a , : , :)));
+            totHivPosAge = 0;
+            totHivPos = 0;
+            for d = 2 : 6
+                for v = 1 : 5
+                    totHivPosAge = totHivPosAge + sumall(pop(hivInds(d , v , g , a , : , :)));
+                    totHivPos = totHivPos + sumall(pop(hivInds(d , v , g , 3 : age , : , :)));
+                end
+            end
+            fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
+            if fracARTAge >= 0.70
+                toRedisAge = [toRedisAge totHivPosAge];
+            elseif fracARTAge < 0.70
+                aList = [aList a];
+                ageSubTots = [ageSubTots totHivPosAge];
+                totHivPosQualAges = totHivPosQualAges + totHivPosAge;
             end
         end
-        fracART = onArt / (onArt + totHivPos) * (1 - artOut); 
+        fracART = onArt / (onArt + totHivPos) * (1 - artOut);
+        fracQualAges = ageSubTots ./ totHivPosQualAges;
         if year < 2030 && fracART < maxCover{g}(ind)
             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-%             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis');
+            treat(2 : 6 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(5 , 5 , 1 , length(aList) , risk) , formatToRedis);
         elseif year >= 2030 && fracART < maxCover{g}(end)
             cover = (maxCover{g}(end)- fracART) ./ (1 - fracART);
-%             treat(2 : 5 , 1 : 5 , g , a , r) = max(cover , 0);
-            treat(2 : 6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
+            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
+            fracToRedis = totToRedis ./ ageSubTots;
+            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
+            formatToRedis(:) = (max(cover , 0) + fracToRedis);
+            treat(2 : 6 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
+                ones(5 , 5 , 1 , length(aList) , risk) , formatToRedis);
         end
-%         end
-%         end
     end
 end
-
-% % CD4 <= 200, from 2017 to 2030
-% if year >= 2017
-%     yrs = 2017 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
-%     ind = round(yrs , 4) == round(year , 4);
-%     for g = 1 : gender
-% %         for a = 3 : age
-%         maxRateM = maxRateM1;
-%         maxRateF = maxRateF1;
-% %             if a > 6
-% %                 maxRateM = maxRateM2;
-% %                 maxRateF = maxRateF2;
-% %             end
-%         maxCover = {linspace(maxRateM , 0.70 , length(yrs)) , ...
-%            linspace(maxRateF , 0.70 , length(yrs))};
-% %         for r = 1 : risk
-% %         onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
-%         onArt = sumall(pop(hivInds(10 , 6 , g , 3 : age , : , :)));
-%         totBelow200 = 0;
-%         for v = 1 : 5
-% %             below200 = sum(pop(hivInds(6 , v , g , a , r , :)));
-%                 below200 = sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
-%             totBelow200 = totBelow200 + below200;
-%         end
-%         fracART = onArt * (1 - artOut) / (onArt + totBelow200);
-%         if year < 2030 && fracART < maxCover{g}(ind)
-%             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
-% %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-%             treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
-%         elseif year >= 2030 && fracART < 0.70
-%             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
-% %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
-%             treat(6 , 1 : 5 , g , 3 : age , :) = max(cover , 0);
-%         end
-% %         end
-% %         end
-%     end
-% end
 
 %%
 dPop = zeros(size(pop));
