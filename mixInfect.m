@@ -6,7 +6,7 @@
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , ...
     stepsPerYear , year , disease , intervens , gender , ...
-    age , risk , hpvTypeGroups , gar , epsA_vec , epsR_vec , yr , ...
+    age , risk , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , maleActs , femaleActs , ...
     perPartnerHpv_vax , perPartnerHpv_nonV , vaxInds , nonVInds , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
@@ -42,48 +42,52 @@ elseif year >= dataYrLast % assortativity in last year and after
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
 
-%% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
-deltaR = eye(3 , 3);
-diagVec = [-2 , -1 , 1 , 2];
-deltaAF = eye(80) .* (0.3*0.2);
-deltaAM = eye(80) .* (0.3*0.2);
-for i = 1 : length(diagVec)
-    deltaAF = deltaAF + diag(ones(80-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
-    deltaAM = deltaAM + diag(ones(80-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
-end
-diagVecF = [3 : 1 : 7];
-diagVecM = [-3 : -1 : -7];
-for j = 1 : length(diagVecF)
-    deltaAF = deltaAF + diag(ones(80-abs(diagVecF(j)) , 1) .* (0.7*0.2) , diagVecF(j));
-    deltaAM = deltaAM + diag(ones(80-abs(diagVecM(j)) , 1) .* (0.7*0.2) , diagVecM(j));
-end
+if 5yrAgeGrpsOn
+    %*********INSERT CODE HERE********************
+else
+    %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
+    deltaR = eye(3 , 3);
+    diagVec = [-2 , -1 , 1 , 2];
+    deltaAF = eye(age) .* (0.3*0.2);
+    deltaAM = eye(age) .* (0.3*0.2);
+    for i = 1 : length(diagVec)
+        deltaAF = deltaAF + diag(ones(age-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
+        deltaAM = deltaAM + diag(ones(age-abs(diagVec(i)) , 1) .* (0.3*0.2) , diagVec(i));
+    end
+    diagVecF = [3 : 1 : 7];
+    diagVecM = [-3 : -1 : -7];
+    for j = 1 : length(diagVecF)
+        deltaAF = deltaAF + diag(ones(age-abs(diagVecF(j)) , 1) .* (0.7*0.2) , diagVecF(j));
+        deltaAM = deltaAM + diag(ones(age-abs(diagVecM(j)) , 1) .* (0.7*0.2) , diagVecM(j));
+    end
 
-deltaAF(1:10,1:10) = eye(10) .* 0.2;
-deltaAM(1:10,1:10) = eye(10) .* 0.2;
-for i = 1 : length(diagVec)
-    deltaAF(1:10,1:10) = deltaAF(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
-    deltaAM(1:10,1:10) = deltaAM(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+    deltaAF(1:10,1:10) = eye(10) .* 0.2;
+    deltaAM(1:10,1:10) = eye(10) .* 0.2;
+    for i = 1 : length(diagVec)
+        deltaAF(1:10,1:10) = deltaAF(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+        deltaAM(1:10,1:10) = deltaAM(1:10,1:10) + diag(ones(10-abs(diagVec(i)) , 1) .* 0.2 , diagVec(i));
+    end
+    deltaAF(11,9) = 0.0;
+    deltaAF(11:12,10) = 0.0;
+    deltaAF(3:12,11:19) = [zeros(8,9); ...
+                           ones(1,8).*0.125 , 0.0; ...
+                           ones(1,9).*(1/9)];
+    deltaAM(11,4) = 0.0;
+    deltaAM(11:12,5) = 0.0;
+    deltaAM(11:13,6) = 0.0;
+    deltaAM(11:14,7) = 0.0;
+    deltaAM(11:15,8) = 0.0;
+    deltaAM(11:16,9) = 0.0;
+    deltaAM(11:17,10) = 0.0;
+    deltaAM(8:17,11:19) = [zeros(3,9); ...
+                           1/3 , 1/3 , 1/3 , zeros(1,6); ...
+                           0.25 , 0.25 , 0.25 , 0.25 , zeros(1,5); ...
+                           0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,4); ...
+                           0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,3); ...
+                           0.0 , 0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.0 , 0.0; ...
+                           ones(1,8).*(1/8) , 0.0; ...
+                           ones(1,9).*(1/9)];
 end
-deltaAF(11,9) = 0.0;
-deltaAF(11:12,10) = 0.0;
-deltaAF(3:12,11:19) = [zeros(8,9); ...
-                       ones(1,8).*0.125 , 0.0; ...
-                       ones(1,9).*(1/9)];
-deltaAM(11,4) = 0.0;
-deltaAM(11:12,5) = 0.0;
-deltaAM(11:13,6) = 0.0;
-deltaAM(11:14,7) = 0.0;
-deltaAM(11:15,8) = 0.0;
-deltaAM(11:16,9) = 0.0;
-deltaAM(11:17,10) = 0.0;
-deltaAM(8:17,11:19) = [zeros(3,9); ...
-                       1/3 , 1/3 , 1/3 , zeros(1,6); ...
-                       0.25 , 0.25 , 0.25 , 0.25 , zeros(1,5); ...
-                       0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,4); ...
-                       0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , zeros(1,3); ...
-                       0.0 , 0.0 , 0.2 , 0.2 , 0.2 , 0.2 , 0.2 , 0.0 , 0.0; ...
-                       ones(1,8).*(1/8) , 0.0; ...
-                       ones(1,9).*(1/9)];
 
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
@@ -118,7 +122,7 @@ ageFraction_F = bsxfun(@times , ageFraction(2 , : , :) , ones(age , age));
 riskFraction_M = zeros(age, risk, risk); % [a x r x r]
 riskFraction_F = riskFraction_M;
 % prepare matrices containing risk info associated with age
-for i = 11 : age % create square risk fraction x risk fraction matrices for each age group
+for i = ageSexDebut : age % create square risk fraction x risk fraction matrices for each age group
     riskFraction_M(i , : , :) = bsxfun(@times , squeeze(riskFraction(1 , i , :)) , ones(risk , risk))'; % [r x r](age)
     riskFraction_F(i , : , :) = bsxfun(@times , squeeze(riskFraction(2 , i , :)) , ones(risk , risk))'; % [r x r](age)
 end
@@ -129,7 +133,7 @@ rhoAgeM = epsA .* ageFraction_F + (1 - epsA) .* deltaAM; % [a x a]
 rhoRiskM = zeros(age , risk , risk);
 rhoRiskF = rhoRiskM;
 
-for i = 11 : age
+for i = ageSexDebut : age
     rhoRiskF(i , : , :) = squeeze(epsR .* riskFraction_M(i , : , :))...
         + (1 - epsR) .* deltaR; % [a(i) x r x r] + [r x r] -> [a x r x r]
     rhoRiskM(i , : , :) = squeeze(epsR .* riskFraction_F(i , : , :))...
@@ -139,8 +143,8 @@ end
 % intialize rho matrices for males and females
 rhoM = zeros(age, age, risk, risk);
 rhoF = rhoM;
-for i = 11 : age
-    for ii = 11 : age
+for i = ageSexDebut : age
+    for ii = ageSexDebut : age
         for j = 1 : risk
             for jj = 1 : risk
                 rhoM(i , ii , j , jj) = rhoAgeM(i , ii) * rhoRiskM(ii , j , jj);
@@ -155,11 +159,11 @@ rho(2 , : , : , : , :) = rhoF;
 %% Adjust for discrepancies in contact reporting between male and female contacts
 % calculate the discrepancy between the two populations
 mfRatio = zeros(age , age , risk , risk);
-for aa = 11 : age
+for aa = ageSexDebut : age
     for rr = 1 : risk
         if popSum(2 , aa , rr) ~= 0
-            mfRatio(11 : age , aa , : , rr) = ...
-                max(popSum(1 , 11 : age , :) ./ popSum(2 , aa ,rr) , 0);
+            mfRatio(ageSexDebut : age , aa , : , rr) = ...
+                max(popSum(1 , ageSexDebut : age , :) ./ popSum(2 , aa ,rr) , 0);
         end
     end
 end
@@ -167,8 +171,8 @@ end
 B = zeros(age , age , risk , risk);
 cMale = partnersM; % [age x risk]
 cFemale = partnersF; % [age x risk]
-for i = 11 : age
-    for ii = 11: age
+for i = ageSexDebut : age
+    for ii = ageSexDebut : age
         for j = 1 : risk
             for jj = 1: risk
                 B(i, ii , j , jj) = cMale(i , j) * rhoM(i , ii , j , jj) ...
@@ -185,17 +189,17 @@ B(isinf(B)) = 0;
 theta = 0.5; % contact rate equally driven by contact rates reported by males and females
 cAdjMale = zeros(age , age , risk , risk);
 cAdjFemale = cAdjMale;
-for i = 11 : age
+for i = ageSexDebut : age
     for j = 1 : risk
-        cAdjMale(i , 11 : age , j , :) = cMale(i , j) ...
-            .* rhoM(i , 11 : age , j , :)...
-            .* B(i , 11 : age , j , :) .^ -(1 - theta) ...
-            .* mfRatio(i , 11 : age , j , 1 : risk) .^ theta;
+        cAdjMale(i , ageSexDebut : age , j , :) = cMale(i , j) ...
+            .* rhoM(i , ageSexDebut : age , j , :)...
+            .* B(i , ageSexDebut : age , j , :) .^ -(1 - theta) ...
+            .* mfRatio(i , ageSexDebut : age , j , 1 : risk) .^ theta;
         
-        cAdjFemale(11 : age , i , : , j) = cFemale(11 : age , :) ...
-            .* squeeze(rhoF(11 : age , i , : , j)) ...
-            .* squeeze(B(i , 11 : age , j , :)) .^ theta ...
-            .* squeeze(mfRatio(i , 11 : age , j , 1 : risk)) .^ -(1 - theta);
+        cAdjFemale(ageSexDebut : age , i , : , j) = cFemale(ageSexDebut : age , :) ...
+            .* squeeze(rhoF(ageSexDebut : age , i , : , j)) ...
+            .* squeeze(B(i , ageSexDebut : age , j , :)) .^ theta ...
+            .* squeeze(mfRatio(i , ageSexDebut : age , j , 1 : risk)) .^ -(1 - theta);
     end
 end
 cAdj(1 , : , : , : , :) = cAdjMale;
@@ -209,7 +213,7 @@ beta = zeros(gender , age , risk , 3);
 beta_hpvVax = zeros(gender , age , risk);
 beta_hpvNonVax = zeros(gender , age , risk);
 for g = 1 : gender
-    for a = 11 : age
+    for a = ageSexDebut : age
         for r = 1 : risk
             beta_hpvVax_M2F = 1 - (1 - perPartnerHpv_vax) ^ femaleActs(a , r); % per year per partner probability of HPV transmission
             beta_hpvVax_F2M = 1 - (1 - perPartnerHpv_vax) ^ maleActs(a , r);
@@ -242,9 +246,9 @@ for g = 1 : gender
     if g == 2
         gg = 1;
     end
-    for i = 11 : age
+    for i = ageSexDebut : age
         for j = 1 : risk
-            for ii = 11 : age
+            for ii = ageSexDebut : age
                 for jj = 1 : risk
                     for z = 1 : hpvTypeGroups % 2 hpvTypeGroups: vaccine-type and non-vaccine-type
                         lambda(g , i , j , z) = ...
@@ -259,7 +263,7 @@ for g = 1 : gender
 end
 
 % calculate new HPV infections
-for a = 11 : age
+for a = ageSexDebut : age
     for r = 1 : risk
         if any(lambda(1 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) || any(lambda(2 , a , r , 1 : hpvTypeGroups) > 10 ^ -6) % only evaluate if lambda is non-zero
             for d = 1 : disease
@@ -413,9 +417,9 @@ for g = 1 : gender
     if g == 2
         gg = 1;
     end
-    for i = 11 : age
+    for i = ageSexDebut : age
         for j = 1 : risk
-            for ii = 11 : age
+            for ii = ageSexDebut : age
                 for jj = 1 : risk
                     lambda(g , i , j) = ...
                         lambda(g , i , j)...
@@ -428,7 +432,7 @@ for g = 1 : gender
 end
 
 % calculate new HIV infections
-for a = 11 : age
+for a = ageSexDebut : age
     for r = 1 : risk
         if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero
             for d = 1 : 2
@@ -462,3 +466,4 @@ end
 newInfs{5} = newHiv;
 
 dPop = sparse(dPop);
+
