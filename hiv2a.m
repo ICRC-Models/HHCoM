@@ -56,9 +56,9 @@ if year >= 2006 && year < 2013
                 end
             end
             fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
-            if fracARTAge >= 0.70
+            if fracARTAge >= 1.0
                 toRedisAge = [toRedisAge totHivPosAge];
-            elseif fracARTAge < 0.70
+            elseif fracARTAge < 1.0
                 aList = [aList a];
                 ageSubTots = [ageSubTots totHivPosAge];
                 totHivPosQualAges = totHivPosQualAges + totHivPosAge;
@@ -107,9 +107,9 @@ if year >= 2004 && year < 2013
                 totBelow200 = totBelow200 + sumall(pop(hivInds(6 , v , g , 3 : age , : , :)));
             end
             fracARTAge = onArtAge / (onArtAge + totBelow200Age) * (1 - artOut);
-            if fracARTAge >= 0.70
+            if fracARTAge >= 1.0
                 toRedisAge = [toRedisAge totBelow200Age];
-            elseif fracARTAge < 0.70
+            elseif fracARTAge < 1.0
                 aList = [aList a];
                 ageSubTots = [ageSubTots totBelow200Age];
                 totBelow200QualAges = totBelow200QualAges + totBelow200Age;
@@ -157,9 +157,9 @@ if year >= 2013 && year < 2015
                 end
             end
             fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
-            if fracARTAge >= 0.70
+            if fracARTAge >= 1.0
                 toRedisAge = [toRedisAge totHivPosAge];
-            elseif fracARTAge < 0.70
+            elseif fracARTAge < 1.0
                 aList = [aList a];
                 ageSubTots = [ageSubTots totHivPosAge];
                 totHivPosQualAges = totHivPosQualAges + totHivPosAge;
@@ -202,9 +202,9 @@ if year >= 2015
                 end
             end
             fracARTAge = onArtAge / (onArtAge + totHivPosAge) * (1 - artOut);
-            if fracARTAge >= 0.70
+            if fracARTAge >= 1.0
                 toRedisAge = [toRedisAge totHivPosAge];
-            elseif fracARTAge < 0.70
+            elseif fracARTAge < 1.0
                 aList = [aList a];
                 ageSubTots = [ageSubTots totHivPosAge];
                 totHivPosQualAges = totHivPosQualAges + totHivPosAge;
