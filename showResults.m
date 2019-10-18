@@ -400,6 +400,7 @@ title('Proportion on ART')
 legend('Model (Male)' , 'Observed(Male)' , 'Model (Female)' , 'Observed (Female)')
 
 %% On ART by age
+<<<<<<< HEAD
 aVec = {1:5,6:1011:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80}; %{10:15,16:25,26:35,36:50,51:75};
 ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
      '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
@@ -411,24 +412,49 @@ for aInd = 1 : length(aVec)
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
         1 : periods , 2 , a , 1 : risk));
     artPop = sum(popVec(end , artInds) , 2);
+=======
+ageGroup = {'0-4' , '5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
+     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+     '60-64' , '65-69' , '70-74' , '75-79'};
+aMatrix = zeros(1 , age);
+for a = 1 : age
+    artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 2 , a , 1 : risk));
+    artPop = sum(popVec(end , artInds) , 2); %end-605
+>>>>>>> origin/5yearAgeGroups_091319
     hivInds = toInd(allcomb([2 : 6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
         1 : periods , 2 , a , 1 : risk));
     hivPop = sum(popVec(end , hivInds) , 2);
     hiv_art = [100 * artPop ./ hivPop];
 
+<<<<<<< HEAD
     aMatrix(aInd) = hiv_art;
 end
 
 %figure;
 hold all;
 plot([1:length(aVec)] , aMatrix(1,:) , '--')
+=======
+    aMatrix(a) = hiv_art;
+end
+
+figure;
+hold all;
+plot([1:age] , aMatrix(1,:) , '-')
+>>>>>>> origin/5yearAgeGroups_091319
 hold all;
 ylabel('Percent females on ART in 2020 by age');
 ylim([0 110])
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+<<<<<<< HEAD
 legend('Without ART dropout' , 'With ART dropout');
 
 %% HPV prevalence over time by HIV status and gender
+=======
+legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');
+
+%% Overall HPV
+>>>>>>> origin/5yearAgeGroups_091319
 genders = {'Male' , 'Female'};
 figure()
 for g = 1 : gender

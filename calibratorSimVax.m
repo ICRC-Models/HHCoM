@@ -12,7 +12,7 @@ dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age , risk];
 
 % Time
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2020; %c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
@@ -53,7 +53,6 @@ circStartYear = 1990;
 vaxStartYear = 2014;
 
 % Use newly calibrated parameters
-
 masterSetMatrix = load([paramDir , 'masterSets_calib_22Aug19_11.dat']); % load most recent parameter sample
 paramSet = masterSetMatrix(:,4628);
 pIdx = [1,2,5,6,7,8,9,10,19,22,25];
@@ -220,19 +219,19 @@ end
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_090919calib_22Aug19_11_4628']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_090319calib_22Aug19_11_4628_2020']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '090919calib_22Aug19_11_4628'; % ***SET ME***: name for simulation output file
+pathModifier = '090919calib_22Aug19_11_4628_2020_SCE5'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2100; % ***SET ME***: end year of simulation run
+lastYear = 2101; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -246,19 +245,19 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = 2;
-vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
+vaxCoverB = 0.86; %0.86*(0.7/0.9);    % (9 year-olds: vax whole age group vs. 1/5th (*0.20) to get correct coverage at transition to 10-14 age group) * (bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 10-14 year-old girls
-vaxAge = 3;
-vaxCover = [0.8 , 0.9];
+vaxAge = [2 , 3];
+vaxCover = [0.86]; %[0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
-hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
 vaxAgeCU = [4 , 5 , 6]; %[4:age];   % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [0.5 , 0.5 , 0.5*0.40]; %ones(1,length(vaxAgeCU)).*0.8;    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxCoverCU = [0.8 , 0.8 , 0.8*0.40]; %ones(1,length(vaxAgeCU)).*0.8;    % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

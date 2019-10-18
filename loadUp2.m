@@ -30,7 +30,7 @@ load([paramDir , 'calibData'], 'cinPos2014_obs' , 'cinNeg2014_obs' , ...
 load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
     'mue' , 'partnersM' , 'partnersF' , 'muHIV' , ...
     'maleActs' , 'femaleActs' , 'lambdaMultImm' , 'kVl' , 'kCD4' , 'circ' , 'yr' , ...
-    'betaHIV_F2M' , 'betaHIV_M2F' , 'fertility' , 'fertility2' , ...
+    'fertility' , 'fertility2' , ...
     'hpv_hivClear' , 'rImmuneHiv' , 'c3c2Mults' , 'c2c1Mults' , 'muCC' , ...
     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult' , 'circProtect' , ...
     'condProtect' , 'MTCTRate');
@@ -183,6 +183,13 @@ save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 
 
 
 %% Save HIV natural history parameters
+analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+transM = vagTransM .* (1 - analProp(: , 1));
+transF = vagTransF .* (1 - analProp(: , 2));
+betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);
+betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transM);
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -213,12 +220,19 @@ save(fullfile(paramDir ,'hpvParams'), 'perPartnerHpv_vax' , 'perPartnerHpv_nonV'
     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult');
 
 %% Save intervention parameters
-condUse = 0.20; %0.5 * 0.5;
+if 5yrAgeGrpsOn
+    condUse = 0.5 * 0.5;
+else
+    condUse = 0.20;
+end
 OMEGA = zeros(age , 1); % hysterectomy rate
 
 % Maximum ART coverage
-maxRateM1 = 0.40;
-maxRateF1 = 0.55;
+artOutMult = 1.0; %0.95;
+maxRateM1 = 0.40*artOutMult;
+maxRateM2 = 0.729*artOutMult; 
+maxRateF1 = 0.55*artOutMult;
+maxRateF2 = 0.729*artOutMult;
 
 % Intervention start years
 hivStartYear = 1980;
@@ -228,7 +242,8 @@ vaxStartYear = 2014;
 cytoSens = [0.0 , 0.57 , 0.57];
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
-baseline.screenAge = 7*max(1 , 5yrAgeGrpsOn*5)+1;
+baseline.screenAge = [7*max(1 , 5yrAgeGrpsOn*5)+1];
+baseline.screenAgeMults = [1.0 / max(1 , 5yrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72;

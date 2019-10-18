@@ -83,7 +83,7 @@ years = endYear - startYear;
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_101719_5yr_baseScreen_noBaseVax_nonVhpv'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101819_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv'; % ***SET ME***: name for historical run output file 
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -112,6 +112,7 @@ end
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
 agesComb = screenAlgs{1}.screenAge;
+ageMultsComb = screenAlgs{1}.screenAgeMults;
 screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , length(screenAlgs{1}.screenAge) , risk);
 screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , length(screenAlgs{1}.screenAge) , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , length(screenAlgs{1}.screenAge) , risk);
@@ -336,7 +337,7 @@ for i = 2 : length(s) - 1
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
                 vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
                 noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
-                vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , sumall);
+                vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , ageMultsComb , sumall);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)

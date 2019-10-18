@@ -179,7 +179,7 @@ for g = 1 : gender
         
         dPop(r1) = dPop(r1) - (1.0/max(1 , (5*5yrAgeGrpsOn))) .* pop(r1);
         dPop(r2) = dPop(r2) - (1.0/max(1 , (5*5yrAgeGrpsOn))) .* pop(r2);
-        dPop(r3) = dPop(r3) - (1.0/max(1 , (5*5yrAgeGrpsOn))) .* pop(r3); 
+        dPop(r3) = dPop(r3) - (1.0/max(1 , (5*5yrAgeGrpsOn))) .* pop(r3);
 
         % Remove screened status as people age out of screened age groups
         if (year >= hpvScreenStartYear)
@@ -194,7 +194,6 @@ for g = 1 : gender
                 dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
             end
         end
-         
     end
     % age last age group
     dPop(r1To) = dPop(r1To) - (1.0/max(1 , (5*5yrAgeGrpsOn))) .* pop(r1To);

@@ -4,7 +4,7 @@
 % have elapsed, the distribution is obtained by averaging over all the 
 % elapsed time steps.
 % Accepts artDistList, a linked list of matrices describing the distributon of individuals who
-% go on ART in the past stepsPerYear*2 time steps.
+% have gone on ART in the past stepsPerYear*2 time steps.
 % Returns artDist, a matrix describing the distribution of individuals who
 % went on ART averaged over the past stepsPerYear*2 time steps.
 function[artDist] = calcDist(artDistList , disease , viral , gender , age , ...

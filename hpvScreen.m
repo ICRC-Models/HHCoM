@@ -5,7 +5,7 @@ function[dPop , ccScreen , ccTreatImm , ccTreatHpv , ccTreatHyst] = hpvScreen(po
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
     vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
     noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
-    vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , sumall)
+    vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , ageMultsComb , sumall)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -20,6 +20,7 @@ for i = 1 : length(screenAlgs)
     if i == 2
         prevAL = length(screenAlgs{1}.screenAge);
     end
+
     % Screening level
     dataYr1 = screenYrs(1);
     dataYrLast = screenYrs(size(screenYrs , 1));
@@ -34,6 +35,7 @@ for i = 1 : length(screenAlgs)
     end
 
     for aS = (prevAL + 1) : (prevAL + length(screenAlgs{i}.screenAge))
+        screenRateAge = screenRate * ageMultsComb(aS); % apply screening to fraction of age group (1/5 represents 35 year olds only with 5-year age groups)
         for dS = 1 : length(screenAlgs{i}.diseaseInds)
             d = screenAlgs{i}.diseaseInds(dS);
             for v = 1 : viral
@@ -42,8 +44,8 @@ for i = 1 : length(screenAlgs)
                         for x = 1 : endpoints
                             for r = 1 : risk
                                 fracScreend = (sumall(pop(screenAgeS(d,v,h,s,x,:,aS,r))) / sumall(pop(screenAgeAll(d,v,h,s,x,:,aS,r)))); % find proportion of population that is currently screened
-                                if screenRate - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
-                                    screenCover = max(0 , (screenRate - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
+                                if screenRateAge - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
+                                    screenCover = max(0 , (screenRateAge - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
 
                                     % Apply selected screening algorithm(s)
                                     % if you're susceptible/infected/CIN1/immune to both HPV types or have had a hysterectomy
