@@ -112,7 +112,7 @@ artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '101819_5yrAgeGrps_noBaseVax_baseScreen_WHOP1_SCES34'; % ***SET ME***: name for simulation output file
+pathModifier = '101819_5yrAgeGrps_noBaseVax_baseScreen_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
@@ -122,12 +122,12 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
-screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV- 
 screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
-whoScreenAges = [8]; % , 6,7,8,9,10]; % ***SET ME***: ages that get screened when using the WHOa algorithm, [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
-whoScreenAgeMults = [0.20]; %0.40 , 0.40 , 0.20 , 0.40 , 0.40];
-cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
+whoScreenAges = [6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm, [8] for 35, [8,10] for 35&45, [6,8,10] for 25&35&45
+whoScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40];
+cisnetScreenAges = [8,10]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
 % VACCINATION
 vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
@@ -145,9 +145,9 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
-hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 , 5 , 6];    % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [0.8 , 0.8 , 0.8];    % ***SET ME***: coverage for catch-up vaccination by age
+hivPosVaxCU = 1; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+vaxAgeCU = [4 , 5 , 6 , 7 , 8 , 9 , 10];    % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [0.8 , 0.8 , 0.8 , 0.8 , 0.8 , 0.8 , 0.8*0.2];    % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

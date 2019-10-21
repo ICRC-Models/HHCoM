@@ -117,7 +117,7 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_101819_5yrAgeGrps_noBaseVax_baseScreen'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_101819_5yrAgeGrps_noBaseVax_baseScreen_save-ccDeath'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -530,7 +530,7 @@ savdir = [pwd , '\HHCoM_Results\'];
 save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
     'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'newCC' , 'ccDeath' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
     'startYear' , 'endYear' , 'popLast');
 disp(' ')
 disp('Simulation complete.')
