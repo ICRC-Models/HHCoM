@@ -6,7 +6,7 @@
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , ...
     stepsPerYear , year , disease , intervens , gender , ...
-    age , risk , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
+    age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , maleActs , femaleActs , ...
     perPartnerHpv_vax , perPartnerHpv_nonV , vaxInds , nonVInds , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
@@ -42,8 +42,19 @@ elseif year >= dataYrLast % assortativity in last year and after
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
 
-if 5yrAgeGrpsOn
-    %*********INSERT CODE HERE********************
+if fivYrAgeGrpsOn
+    %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
+    deltaR = eye(3 , 3);
+    deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
+    deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
+    deltaAF(4 , 4) = 1;
+    deltaAF(3 , 4) = 0;
+    deltaAF(4 , 5) = 0;
+    deltaAF(3 , 3) = 1;
+    deltaAM(4 , 4) = 1;
+    deltaAM(4 , 3) = 0;
+    deltaAM(3 , 2) = 0;
+    deltaAM(3 , 3) = 1;
 else
     %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
     deltaR = eye(3 , 3);
