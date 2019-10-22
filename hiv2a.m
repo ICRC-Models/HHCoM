@@ -28,7 +28,7 @@ treat = zeros(disease , viral , gender , age ,risk);
 
 %CD4 > 200, from 2006 to 2013
 if year >= 2006 && year < 2013
-    yrs = 2006 : 1/ stepsPerYear : 2013;
+    yrs = 2006 : 1/stepsPerYear : 2013;
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
         maxCover = {linspace(0 , maxRateM1 , length(yrs)) , ...

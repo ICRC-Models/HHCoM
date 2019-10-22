@@ -198,8 +198,8 @@ vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 transM = vagTransM .* (1 - analProp(: , 1));
 transF = vagTransF .* (1 - analProp(: , 2));
-betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);
-betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transM);
+betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transF);
+betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04; 7 1 5.8 6.9 11.9 0.04] , transM);
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -263,7 +263,7 @@ baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 
 save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
-    'maxRateM1' , 'maxRateF1' , 'hivStartYear' , 'circStartYear' , ...
+    'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , 'circStartYear' , ...
     'vaxStartYear' , 'baseline' , 'circProtect' , 'condProtect' , 'MTCTRate');
 
 %% Import and save calibration data
