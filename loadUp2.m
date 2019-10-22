@@ -607,12 +607,12 @@ for d = 3 : 7 % hiv infected
     for v = 1 : viral % hiv infected
         for a = 1 : age
             hivInfected = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk));
-            xIndsPos = [xInds; ones(length(hivInfected),1).*posMaleBirth; ones(length(hivInfected),1).*posFemaleBirth];
-            yIndsPos = [yInds; hivInfected; hivInfected];
-            valsPos = [vals; ones((length(hivInfected)*2),1) .* ( 0.5*fertility(a,d-1) )];   
-            xIndsNeg = [xInds; ones(length(hivInfected),1).*negMaleBirth; ones(length(hivInfected),1).*negFemaleBirth];
-            yIndsNeg = [yInds; hivInfected; hivInfected];
-            valsNeg = [vals; ones((length(hivInfected)*2),1) .* ( 0.5*fertility(a,d-1) )];   
+            xIndsPos = [xIndsPos; ones(length(hivInfected),1).*posMaleBirth; ones(length(hivInfected),1).*posFemaleBirth];
+            yIndsPos = [yIndsPos; hivInfected; hivInfected];
+            valsPos = [valsPos; ones((length(hivInfected)*2),1) .* ( 0.5*fertility(a,d-1) )];   
+            xIndsNeg = [xIndsNeg; ones(length(hivInfected),1).*negMaleBirth; ones(length(hivInfected),1).*negFemaleBirth];
+            yIndsNeg = [yIndsNeg; hivInfected; hivInfected];
+            valsNeg = [valsNeg; ones((length(hivInfected)*2),1) .* ( 0.5*fertility(a,d-1) )];   
         end
     end
 end
