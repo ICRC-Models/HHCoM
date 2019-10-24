@@ -240,7 +240,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % Maximum ART coverage
 artOutMult = 1.0; %0.95;
 maxRateM1 = 0.40*artOutMult;
-maxRateM2 = 0.729*artOutMult; 
+maxRateM2 = 0.729*artOutMult;
 maxRateF1 = 0.55*artOutMult;
 maxRateF2 = 0.729*artOutMult;
 
@@ -270,8 +270,8 @@ save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
 %{
 file = [pwd , '/Config/Calibration_targets.xlsx'];
 
-cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2014, by age
-cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2014, by age
+cinPos2002_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2002, by age
+cinNeg2002_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2002, by age
 
 hpv_hiv_obs = xlsread(file , 'Calibration' , 'D144 : F152'); % HPV Prevalence in HIV+ Women (All) 2014, by age
 hpv_hivNeg_obs = xlsread(file , 'Calibration' , 'D153 : F161'); % HPV Prevalence in HIV- Women (All) 2014, by age
