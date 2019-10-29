@@ -1,16 +1,21 @@
-% Main
+% Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-%function [negSumLogL] = mainCalibrated(pIdx , paramsSub , paramSet)
+%function [negSumLogL] = mainCalibrated(pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date_abc)
 
 %%
 close all; clear all; clc;
+tic
 % profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_102019_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_102919_5yrAgeGrps_noBaseVax_baseScreen_nonVhpvOn_wChckPnt'; % ***SET ME***: name for historical run output file 
+%pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
+
+% AGE GROUPS
+fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -34,8 +39,6 @@ end
 if hivOn
     disp('HIV module activated')
 end
-% choose whether to use 5-year or 1-year age groups
-fivYrAgeGrpsOn = 1;
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 loadUp2(fivYrAgeGrpsOn)
@@ -59,8 +62,9 @@ load([paramDir, 'hpvParams'], 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
     'hpv_hivClear' , 'rImmuneHiv' , 'c3c2Mults' , 'c2c1Mults' , 'muCC' , ...
     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult');
 load([paramDir, 'intervenParams'], 'circ' , 'condUse' , ...
-    'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , 'circStartYear' , ...
-    'vaxStartYear' , 'baseline' , 'circProtect' , 'condProtect' , 'MTCTRate');
+    'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , ...
+    'circStartYear' , 'vaxStartYear' , 'baseline' , 'cisnet' , 'who' , 'whob' , ...
+    'circProtect' , 'condProtect' , 'MTCTRate');
 load([paramDir , 'calibData'], 'cinPos2002_obs' , 'cinNeg2002_obs' , ...
     'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
     'hivPrevM_obs' , 'hivPrevF_obs');
@@ -236,29 +240,29 @@ end
 numScreenAge = length(screenAlgs{1}.screenAge);
 agesComb = screenAlgs{1}.screenAge;
 ageMultsComb = screenAlgs{1}.screenAgeMults;
-screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , length(screenAlgs{1}.screenAge) , risk);
-screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , length(screenAlgs{1}.screenAge) , risk);
-noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , length(screenAlgs{1}.screenAge) , risk);
+screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
+screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
+noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
 vaxToScreen = noVaxNoScreen;
-noVaxToScreenTreatImm = zeros(disease , viral , length(screenAlgs{1}.screenAge) , risk);
+noVaxToScreenTreatImm = zeros(disease , viral , numScreenAge , risk);
 vaxToScreenTreatImm = noVaxToScreenTreatImm;
 noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
-noVaxToScreenTreatVaxHpv = zeros(disease , viral , hpvNonVaxStates , length(screenAlgs{1}.screenAge) , risk);
+noVaxToScreenTreatVaxHpv = zeros(disease , viral , hpvNonVaxStates , numScreenAge , risk);
 vaxToScreenTreatVaxHpv = noVaxToScreenTreatVaxHpv;
-noVaxToScreenTreatNonVaxHpv = zeros(disease , viral , hpvVaxStates , length(screenAlgs{1}.screenAge) , risk);
+noVaxToScreenTreatNonVaxHpv = zeros(disease , viral , hpvVaxStates , numScreenAge , risk);
 vaxToScreenTreatNonVaxHpv = noVaxToScreenTreatNonVaxHpv;
-noVaxScreen = zeros(disease*viral*hpvVaxStates*hpvNonVaxStates*endpoints*risk , length(screenAlgs{1}.screenAge));
+noVaxScreen = zeros(disease*viral*hpvVaxStates*hpvNonVaxStates*endpoints*risk , numScreenAge);
 noVaxXscreen = noVaxScreen;
 vaxScreen = noVaxScreen;
 vaxXscreen = noVaxScreen;
 
-for aS = 1 : length(screenAlgs{1}.screenAge)
-    a = screenAlgs{1}.screenAge(aS);
+for aS = 1 : numScreenAge
+    a = agesComb(aS);
     
     for d = 1 : disease
         for v = 1 : viral
@@ -327,67 +331,117 @@ if waning
 end
 lambdaMultVax = 1 - lambdaMultVaxMat;
 
-%% Initial Population 
-MpopStruc = riskDist(: , : , 1);
-FpopStruc = riskDist(: , : , 2);
-
-mPop = zeros(age , risk); % distribute initial population size by gender, age risk
-fPop = mPop;
-for i = 1 : age
-    mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12); % scale population size back to an approximated level at the start year
-    fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
-end
-initPop = zeros(dim);
-initPop(1 , 1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, HPV Susceptible, no precancer, male
-initPop(1 , 1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, HPV Susceptible, no precancer, female
-initPop_0 = initPop;
-
-% Assumes HPV starts before HIV in ages 15-44
-infected = initPop_0(1 , 1 , 1 , 1 , 1 , 1 , : , ...
-    (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) .* (0.2 * 0.9975); % initial HPV prevalence among ages 15-44 (sexually active) (HIV-)
-initPop(1 , 1 , 1 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = ...
-    initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 1 : gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) - infected; % moved from HPV susceptible
-initPop(1 , 1 , 2 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = infected;
-%initPop(1 , 1 , 2 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.50 .* infected; % half moved to vaccine-type HPV+
-%initPop(1 , 1 , 1 , 2 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.45 .* infected; % moved to non-vaccine-type HPV+
-%initPop(1 , 1 , 2 , 2 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.05 .* infected; % moved to vaccine-type and non-vaccine-type HPV+
-assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
-
 %% Simulation
 disp('Start up')
 % profile on
 disp(' ')
 
-% Initialize time vector
-s = 1 : timeStep : years + 1 + timeStep; % stepSize and steps calculated in loadUp.m
-% Initialize performance tracking vector
-% runtimes = zeros(size(s , 2) - 2 , 1);
-tVec = linspace(startYear , endYear , length(s) - 1);
-% Initialize other vectors
-popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
-popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
-popVec(1 , :) = popIn;
-deaths = popVec; 
-newHiv = zeros(length(s) - 1 , gender , age , risk);
-hivDeaths = zeros(length(s) - 1 , gender , age);
-newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
-newImmHpvVax = newHpvVax;
-newHpvNonVax = newHpvVax;
-newImmHpvNonVax = newHpvVax;
-newCC = zeros(length(s) - 1 , disease , age , hpvTypeGroups); % track by HPV type causal to CC
-newCin1 = newCC;
-newCin2 = newCC;
-newCin3 = newCC;
-ccDeath = newCC;
-newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-newTreatImm = newScreen;
-newTreatHpv = newScreen;
-newTreatHyst = newScreen;
-vaxdSchool = zeros(length(s) - 1 , 1);
-import java.util.LinkedList
-artDistList = LinkedList();
-artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
-artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+% If starting from beginning
+if ~ exist([pwd , '/HHCoM_Results/' , pathModifier])
+    
+    % Initial Population 
+    MpopStruc = riskDist(: , : , 1);
+    FpopStruc = riskDist(: , : , 2);
+    mPop = zeros(age , risk); % distribute initial population size by gender, age risk
+    fPop = mPop;
+    for i = 1 : age
+        mPop(i , :) = MpopStruc(i, :).* mInit(i) ./ (12*1.12); % scale population size back to an approximated level at the start year
+        fPop(i , :) = FpopStruc(i, :).* fInit(i) ./ (12*1.12);
+    end
+    initPop = zeros(dim);
+    initPop(1 , 1 , 1 , 1 , 1 , 1 , 1 , : , :) = mPop; % HIV-, HPV Susceptible, no precancer, male
+    initPop(1 , 1 , 1 , 1 , 1 , 1 , 2 , : , :) = fPop; % HIV-, HPV Susceptible, no precancer, female
+    initPop_0 = initPop;
+    % Assumes HPV starts before HIV in ages 15-44
+    infected = initPop_0(1 , 1 , 1 , 1 , 1 , 1 , : , ...
+        (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) .* (0.2 * 0.9975); % initial HPV prevalence among ages 15-44 (sexually active) (HIV-)
+    initPop(1 , 1 , 1 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = ...
+        initPop_0(1 , 1 , 1 , 1 , 1 , 1 , 1 : gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) - infected; % moved from HPV susceptible
+    %initPop(1 , 1 , 2 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = infected;
+    initPop(1 , 1 , 2 , 1 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.50 .* infected; % half moved to vaccine-type HPV+
+    initPop(1 , 1 , 1 , 2 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.45 .* infected; % moved to non-vaccine-type HPV+
+    initPop(1 , 1 , 2 , 2 , 1 , 1 , : , (15/max(1,fivYrAgeGrpsOn*5)+1) : (45/max(1,fivYrAgeGrpsOn*5)) , :) = 0.05 .* infected; % moved to vaccine-type and non-vaccine-type HPV+  
+    assert(~any(initPop(:) < 0) , 'Some compartments negative after seeding HPV infections.')
+    popIn = reshape(initPop , prod(dim) , 1); % initial population to "seed" model
+    
+    % Directory to save results
+    if ~ exist([pwd , '/HHCoM_Results/'])
+        mkdir HHCoM_Results
+    end
+    
+    % Initialize performance tracking vector
+    % runtimes = zeros(size(s , 2) - 2 , 1);
+    
+    % Initialize time vector
+    s = 1 : timeStep : years + 1 + timeStep;
+    tVec = linspace(startYear , endYear , length(s) - 1);
+    iStart = 2;
+    
+    % Initialize result vectors
+    popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
+    popVec(1 , :) = popIn;
+    deaths = popVec; 
+    newHiv = zeros(length(s) - 1 , gender , age , risk);
+    hivDeaths = zeros(length(s) - 1 , gender , age);
+    newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
+    newImmHpvVax = newHpvVax;
+    newHpvNonVax = newHpvVax;
+    newImmHpvNonVax = newHpvVax;
+    newCC = zeros(length(s) - 1 , disease , age , hpvTypeGroups); % track by HPV type causal to CC
+    % newCin1 = newCC;
+    % newCin2 = newCC;
+    % newCin3 = newCC;
+    ccDeath = newCC;
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
+    newTreatImm = newScreen;
+    newTreatHpv = newScreen;
+    newTreatHyst = newScreen;
+    vaxdSchool = zeros(length(s) - 1 , 1);
+    
+    % ART
+    import java.util.LinkedList
+    artDistList = LinkedList();
+    artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+
+% If continuing from checkpoint
+elseif exist([pwd , '/HHCoM_Results/' , pathModifier])
+    % Initial Population 
+    chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % ***SET ME***: name for historical run input file 
+    currPop = chckPntIn.popLast;
+    popIn = currPop; % initial population to "seed" model
+    
+    % Initialize time vector
+    s = 1 : timeStep : years + 1 + timeStep;
+    tVec = linspace(startYear , endYear , length(s) - 1);
+    iStart = i;
+    
+    % Initialize result vectors
+    popVec = chckPntIn.popVec;
+    deaths = chckPntIn.deaths; 
+    newHiv = chckPntIn.newHiv;
+    hivDeaths = chckPntIn.hivDeaths;
+    newHpvVax = chckPntIn.newHpvVax;
+    newImmHpvVax = chckPntIn.newImmHpvVax;
+    newHpvNonVax = chckPntIn.newHpvNonVax;
+    newImmHpvNonVax = chckPntIn.newImmHpvNonVax;
+    newCC = chckPntIn.newCC; % track by HPV type causal to CC
+    % newCin1 = chckPntIn.newCin1;
+    % newCin2 = chckPntIn.newCin2;
+    % newCin3 = chckPntIn.newCin3;
+    ccDeath = chckPntIn.ccDeath;
+    newScreen = chckPntIn.newScreen;
+    newTreatImm = chckPntIn.newTreatImm;
+    newTreatHpv = chckPntIn.newTreatHpv;
+    newTreatHyst = chckPntIn.newTreatHyst;
+    vaxdSchool = chckPntIn.vaxdSchool;
+    
+    % ART
+    import java.util.LinkedList
+    artDistList = popIn.artDistList;
+    artDist = popIn.artDist;
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+end
 
 %% Main body of simulation
 disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
@@ -395,17 +449,16 @@ disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
 disp(' ')
 disp('Simulation running...')
 disp(' ')
-
 % progressbar('Simulation Progress')
-for i = 2 : length(s) - 1
-    tic
+
+for i = iStart : length(s) - 1
     year = startYear + s(i) - 1;
-%     currStep = round(s(i) * stepsPerYear);
-%    disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
-%        num2str(length(s) - i) ' time steps remaining until year ' ...
-%        num2str(endYear) ')'])
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
+%   currStep = round(s(i) * stepsPerYear);
+%   disp(['current step = ' num2str(startYear + s(i) - 1) ' ('...
+%       num2str(length(s) - i) ' time steps remaining until year ' ...
+%       num2str(endYear) ')'])
     
     % Add HIV index cases at hivStartYear
     if (hivOn && (year == hivStartYear))
@@ -540,14 +593,33 @@ for i = 2 : length(s) - 1
     popVec(i , :) = pop(end , :)';
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
+    
+    if rem(year , 10) == 0.0
+        year
+        savdir = [pwd , '/HHCoM_Results/'];
+        save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+            'hivDeaths' , 'deaths' , 'ccDeath' ,... % 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+            'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
+            'startYear' , 'endYear' , 'i');
+    end
 end
 popLast = popVec(end-1 , :);
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
+%% Save results
+savdir = [pwd , '/HHCoM_Results/'];
+save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+    'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+    'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
+    'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
+    'startYear' , 'endYear' , 'popLast');
+
 disp(' ')
 disp('Simulation complete.')
-
+toc
 % profile viewer
 
 %% Calculate summed log-likelihood
@@ -559,19 +631,9 @@ disp('Simulation complete.')
 %     hivPrevM_obs , hivPrevF_obs , hpv_hivM2008_obs , hpv_hivMNeg2008_obs , toInd , ...
 %     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
 %     gender , age , risk , startYear , stepsPerYear);
+% 
+%     delete([savdir , pathModifier]);
 % end
-
-%% Save results
-if ~ exist([pwd , '/HHCoM_Results/'])
-    mkdir HHCoM_Results
-end
-
-savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-    'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-    'hivDeaths' , 'deaths' , 'ccDeath' ,... % 'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
-    'startYear' , 'endYear' , 'popLast');
 
 %% Runtimes
 % figure()
