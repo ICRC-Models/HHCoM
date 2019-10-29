@@ -4,27 +4,6 @@ function [] = loadUp2(fivYrAgeGrpsOn)
 tic
 
 paramDir = [pwd , '/Params/'];
-%{
-%% Load saved parameters on Hyak
-load([paramDir, 'generalParams'], 'stepsPerYear' , 'timeStep' , ...
-    'disease' , 'viral' , 'hpvVaxStates' , 'hpvNonVaxStates' , 'endpoints' , ...
-    'intervens' , 'gender' , 'age' , 'risk' , 'hpvTypeGroups' , 'dim' , 'k' , 'toInd' , ...
-    'sumall');
-load([paramDir, 'demoBehavParams'], 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
-    'maleActs' , 'femaleActs' , 'riskDist' , 'mue' , 'epsA_vec' , 'epsR_vec' , 'yr');
-load([paramDir, 'hivParams'], 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl');
-load([paramDir, 'hpvParams'], 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
-    'fImm' , 'rImmune' , 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
-    'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm' , ...
-    'hpv_hivClear' , 'rImmuneHiv' , 'c3c2Mults' , 'c2c1Mults' , 'muCC' , ...
-    'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult');
-load([paramDir, 'intervenParams'], 'circ' , 'condUse' , ...
-    'maxRateM1' , 'maxRateF1' , 'hivStartYear' , 'circStartYear' , ...
-    'vaxStartYear' , 'baseline' , 'circProtect' , 'condProtect' , 'MTCTRate');
-load([paramDir , 'calibData'], 'cinPos2014_obs' , 'cinNeg2014_obs' , ...
-    'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
-    'hivPrevM_obs' , 'hivPrevF_obs');
-%}
 
 %% Load parameters previously saved in "calibratedParams" file
 load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
@@ -37,7 +16,6 @@ load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , .
     'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , ...
     'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3');
 muHIV(11 , 2) = 0.02; % fix typo
-%load([paramDir , 'calibratedParams'] , 'fertility' , 'fertility2' , 'kCD4');
 
 %% Set and save general parameters
 stepsPerYear = 6;
@@ -72,14 +50,14 @@ save(fullfile(paramDir ,'generalParams'), 'stepsPerYear' , 'timeStep' , ...
     'sumall');
 
 %% Import CIN transition data from Excel
-kCin1_Inf = [kCin1_Inf , kCin1_Inf];
-kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1];
-kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2];
-kCC_Cin3 = [kCC_Cin3 , kCC_Cin3];
-rNormal_Inf = [rNormal_Inf , rNormal_Inf];
-kInf_Cin1 = [kInf_Cin1 , kInf_Cin1];
-kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2];
-kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3];
+kCin1_Inf = [kCin1_Inf , kCin1_Inf .* 0.5];
+kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* 0.5];
+kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* 0.5];
+kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* 0.5];
+rNormal_Inf = [rNormal_Inf , rNormal_Inf .* 0.5];
+kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* 0.5];
+kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* 0.5];
+kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* 0.5];
 %{
 kCin1_Inf = zeros(16,2);
 kCin2_Cin1 = zeros(16,2);
@@ -157,8 +135,6 @@ if ~fivYrAgeGrpsOn
                  partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
                  kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
                  kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};    
-    %vars5To1_nms = {'fertility' , 'fertility2'};
-    %vars5To1_vals = {fertility , fertility2};
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
         assignin('base', vars5To1_nms{j} , valsA1);
@@ -190,7 +166,6 @@ end
 save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'mue' , ...
     'epsA_vec' , 'epsR_vec' , 'yr');
-
 
 %% Save HIV natural history parameters
 analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
@@ -249,7 +224,11 @@ hivStartYear = 1980;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
-cytoSens = [0.0 , 0.57 , 0.57];
+% Test sensitivities
+cytoSens = [0.0 , 0.57 , 0.57]; % pap smear
+hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
+hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
+
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
@@ -262,9 +241,41 @@ baseline.cinTreatRetain = 0.51;
 baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP
 baseline.ccTreatRetain = 0.40;
 
+% CISNET screening algorithm
+cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
+cisnet.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
+cisnet.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
+cisnet.testSens = hpvSens;
+cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
+cisnet.cinTreatEff = baseline.cinTreatEff;
+cisnet.cinTreatRetain = 1.0;
+cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy 
+cisnet.ccTreatRetain = 1.0;
+
+% WHO screening algorithm - version a
+who.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
+who.testSens = hpvSensWHO;
+who.colpoRetain = 1.0;
+who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
+who.cinTreatRetain = 0.90; % treatment compliance
+who.cinTreatHpvPersist = 0.0; %100% treatment efficacy 
+who.ccTreatRetain = 0.90; % treatment compliance
+
+% WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
+whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
+whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
+whob.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
+whob.testSens = hpvSensWHO;
+whob.colpoRetain = 1.0;
+whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
+whob.cinTreatRetain = 0.90; % treatment compliance
+whob.cinTreatHpvPersist = 0.0; %100% treatment efficacy
+whob.ccTreatRetain = 0.90; % treatment compliance
+
 save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
-    'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , 'circStartYear' , ...
-    'vaxStartYear' , 'baseline' , 'circProtect' , 'condProtect' , 'MTCTRate');
+    'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , ...
+    'circStartYear' , 'vaxStartYear' , 'baseline' , 'cisnet' , 'who' , 'whob' , ...
+    'circProtect' , 'condProtect' , 'MTCTRate');
 
 %% Import and save calibration data
 %{
@@ -282,10 +293,12 @@ hpv_hivMNeg2008_obs = xlsread(file , 'Calibration' , 'E56 : F59'); % HPV Prevale
 hivPrevM_obs = xlsread(file , 'Calibration' , 'D60 : F101'); % HIV Prevalence in Men 2003,2005,2006,2007,2008,2009, by age
 hivPrevF_obs = xlsread(file , 'Calibration' , 'D102 : F143'); % HIV Prevalence in Women 2003,2005,2006,2007,2008,2009, by age
  
-save(fullfile(paramDir , 'calibData'), 'cinPos2014_obs' , 'cinNeg2014_obs' , ...
+save(fullfile(paramDir , 'calibData'), 'cinPos2002_obs' , 'cinNeg2002_obs' , ...
     'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
     'hivPrevM_obs' , 'hivPrevF_obs')
 %}
+
+
 %% Load indices
 disp('Preparing indices...')
 disp('This may take a while...')
