@@ -41,7 +41,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    [negSumLogL] = mainCalibrated(pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date_abc);
+    [negSumLogL] = historicalSim(pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date_abc , 1);
     negSumLogLSet(n,1) = negSumLogL;
 end
 
