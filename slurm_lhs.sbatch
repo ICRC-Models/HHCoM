@@ -1,21 +1,21 @@
 #!/bin/bash
 
-#SBATCH --job-name=lhs_test   			    # Job name
-#SBATCH --workdir=/gscratch/csde/carajb/HHCoM       # Working directory
+#SBATCH --job-name=lhs   			    # Job name
+#SBATCH --chdir=/gscratch/csde/carajb/HHCoM       # Working directory
 #SBATCH --mail-type=FAIL           		    # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                                # Export environment variables to the batch job session
 
-#SBATCH --account=csde      	 		    # Allocation Definition
-#SBATCH --partition=csde
+#SBATCH --account=csde-ckpt    	 		    # Allocation Definition
+#SBATCH --partition=ckpt
 #SBATCH --nodes=1   		 		    # Node resources
-#SBATCH --mem=58G   		 		    # Memory per node
+#SBATCH --mem=120G   		 		    # Memory per node
 #SBATCH --time=00:30:00 	 		    # Wall clock time limit hrs:min:sec
 
 #SBATCH –-output=./SlurmOut/%j.out      # Standard output
 #SBATCH –-error=./SlurmOut/%j.err       # Standard error
 
-NSETS=5000    # nSets
+NSETS=100    # nSets
 echo "${NSETS}" 
 export NSETS
 
@@ -23,7 +23,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=22Aug19
+DATE=31Oct19
 echo "${DATE}"
 export DATE
 
