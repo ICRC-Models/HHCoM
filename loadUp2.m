@@ -50,14 +50,14 @@ save(fullfile(paramDir ,'generalParams'), 'stepsPerYear' , 'timeStep' , ...
     'sumall');
 
 %% Import CIN transition data from Excel
-kCin1_Inf = [kCin1_Inf , kCin1_Inf .* 0.5];
-kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* 0.5];
-kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* 0.5];
-kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* 0.5];
-rNormal_Inf = [rNormal_Inf , rNormal_Inf .* 0.5];
-kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* 0.5];
-kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* 0.5];
-kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* 0.5];
+kCin1_Inf = [kCin1_Inf , kCin1_Inf]; % .* 0.5];
+kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1]; % .* 0.5];
+kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2]; % .* 0.5];
+kCC_Cin3 = [kCC_Cin3 , kCC_Cin3]; % .* 0.5];
+rNormal_Inf = [rNormal_Inf , rNormal_Inf]; % .* 2.0];
+kInf_Cin1 = [kInf_Cin1 , kInf_Cin1]; % .* 2.0];
+kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2]; % .* 2.0];
+kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3]; % .* 2.0];
 %{
 kCin1_Inf = zeros(16,2);
 kCin2_Cin1 = zeros(16,2);
@@ -192,7 +192,7 @@ save(fullfile(paramDir ,'hivParams'), 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'k
 
 %% Save HPV natural history parameters
 perPartnerHpv_vax = 0.0045;
-perPartnerHpv_nonV = 0.5 * perPartnerHpv_vax;
+perPartnerHpv_nonV = perPartnerHpv_vax;
 
 % IMMUNITY
 rImmune = 0.024; % for HPV16, Johnson (2012)
@@ -299,7 +299,7 @@ save(fullfile(paramDir , 'calibData'), 'cinPos2002_obs' , 'cinNeg2002_obs' , ...
 %}
 
 
-%% Load indices
+%% Load indices *****************************************************************************************************************************************************************************
 disp('Preparing indices...')
 disp('This may take a while...')
 
@@ -544,7 +544,7 @@ save([paramDir , 'ageRiskInds'] , 'ageInd' , 'riskInd')
 
 
 
-%% Make matrices
+%% Make matrices ******************************************************************************************************************************************************************************
 pop = spalloc(prod(dim) , 1 , prod(dim));
 
 %% Viral load progression (by CD4 count)
