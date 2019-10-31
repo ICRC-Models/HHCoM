@@ -26,7 +26,7 @@ export DATE
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "sensitivityAnalysis3_prt2(${SETIDX} , ${TCURR} , '${DATE}')"
+matlab -nodisplay -nosplash -r "calib2_sumll4sets(${SETIDX} , ${TCURR} , '${DATE}')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 
