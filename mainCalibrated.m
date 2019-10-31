@@ -1,17 +1,18 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-%function [negSumLogL] = mainCalibrated(pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date_abc)
+function [negSumLogL] = mainCalibrated(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
+%Run from the Command Window: mainCalibrated(0 , [] , [] , [] , [] , 0 , '103119')
 
 %%
-close all; clear all; clc;
+%close all; clear all; clc;
 tic
 % profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_103119_5yrAgeGrps_noBaseVax_baseScreen_nonVhpvOn_wChckPnt_incNonVaxTrans2_incRates2'; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpvOn_wChckPnt_incNonVaxTrans2_incRates2_' , tstep_abc]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
 
 % AGE GROUPS
@@ -19,29 +20,14 @@ fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % VACCINATION
 vaxEff = 0.9; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
-waning = 0;    % turn waning on or off
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
 vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
-%% Model specs
-% choose whether to model background hysterectomy
-hyst = 0; % NOT UPDATED!!!!!!!!!!!!!!!!!
-% choose whether to model HIV
-hivOn = 1;
-% choose whether to model HPV
-hpvOn = 1;
-if hpvOn
-    disp('HPV module activated')
-end
-if hivOn
-    disp('HIV module activated')
-end
-
 %% Save pre-loaded parameters and pre-calculated indices and matrices
-loadUp2(fivYrAgeGrpsOn)
+loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 %% Load saved parameters
 disp('Initializing. Standby...')
@@ -50,21 +36,24 @@ paramDir = [pwd , '/Params/'];
 
 % Load saved parameters
 load([paramDir, 'generalParams'], 'stepsPerYear' , 'timeStep' , ...
+    'startYear' , 'currYear' , 'endYear' , 'years' , ...
     'disease' , 'viral' , 'hpvVaxStates' , 'hpvNonVaxStates' , 'endpoints' , ...
     'intervens' , 'gender' , 'age' , 'risk' , 'hpvTypeGroups' , 'dim' , 'k' , 'toInd' , ...
     'sumall');
 load([paramDir, 'demoBehavParams'], 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
-    'maleActs' , 'femaleActs' , 'riskDist' , 'mue' , 'epsA_vec' , 'epsR_vec' , 'yr');
-load([paramDir, 'hivParams'], 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
-load([paramDir, 'hpvParams'], 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
+    'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'mue' , ...
+    'epsA_vec' , 'epsR_vec' , 'yr');
+load([paramDir, 'hivParams'], 'hivOn' , 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
+load([paramDir, 'hpvParams'], 'hpvOn' , 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
     'fImm' , 'rImmune' , 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm' , ...
     'hpv_hivClear' , 'rImmuneHiv' , 'c3c2Mults' , 'c2c1Mults' , 'muCC' , ...
     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult');
 load([paramDir, 'intervenParams'], 'circ' , 'condUse' , ...
+    'screenYrs' , 'hpvScreenStartYear' , 'waning' , ...
     'maxRateM1' , 'maxRateF1' , 'maxRateM2' , 'maxRateF2' , 'hivStartYear' , ...
     'circStartYear' , 'vaxStartYear' , 'baseline' , 'cisnet' , 'who' , 'whob' , ...
-    'circProtect' , 'condProtect' , 'MTCTRate');
+    'circProtect' , 'condProtect' , 'MTCTRate' , 'hyst' , 'OMEGA');
 load([paramDir , 'calibData'], 'cinPos2002_obs' , 'cinNeg2002_obs' , ...
     'hpv_hiv_obs' , 'hpv_hivNeg_obs' , 'hpv_hivM2008_obs' , 'hpv_hivMNeg2008_obs' , ...
     'hivPrevM_obs' , 'hivPrevF_obs');
@@ -94,147 +83,9 @@ load([paramDir,'deathMat'], 'deathMat')
 load([paramDir,'circMat'], 'circMat')
 load([paramDir,'circMat2'] , 'circMat2')
 
-%% Time
-startYear = 1910;
-c = fix(clock);
-currYear = 2020; % c(1); % get the current year
-endYear = currYear;
-years = endYear - startYear;
-
-%% Reset calibrated parameters (FEED FROM LHS)
-% if any(1 == pIdx)
-%     idx = find(1 == pIdx);
-%     partnersMmult = paramSet(paramsSub{idx}.inds(:));
-%     %rowL = paramsSub{idx}.length/3;
-%     %rl = paramsSub{idx}.inds(1:rowL);
-%     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-%     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-%     partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-%     %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-%     %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-%     partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
-%     % partnersM(10:age , 3) = ones(7 , 1);
-% end
-% if any(2 == pIdx)
-%     idx = find(2 == pIdx);
-%     partnersFmult = paramSet(paramsSub{idx}.inds(:));
-%     %rowL = paramsSub{idx}.length/3;
-%     %rl = paramsSub{idx}.inds(1:rowL);
-%     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-%     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-%     partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-%     %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-%     %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-%     partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-%     % partnersF(10:age , 3) = ones(7 , 1);
-% end
-% 
-% if any(5 == pIdx);
-%     idx = find(5 == pIdx);
-%     condUse = paramSet(paramsSub{idx}.inds(:));
-% end
-% 
-% if any(6 == pIdx);
-%     idx = find(6 == pIdx);
-%     %epsA = paramSet(paramsSub{idx}.inds(:));
-%     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-% end
-% if any(7 == pIdx);
-%     idx = find(7 == pIdx);
-%     %epsR = paramSet(paramsSub{idx}.inds(:));
-%     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-%     epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-%     epsR_vec = cell(size(yr , 1) - 1, 1);
-%     for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-%         period = [yr(i) , yr(i + 1)];
-%         epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-%             yr(i) : timeStep : yr(i + 1));
-%         epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-%             yr(i) : timeStep : yr(i + 1));
-%     end
-% end
-% 
-% if any(8 == pIdx)
-%     idx = find(8 == pIdx);
-%     maleActsmult = paramSet(paramsSub{idx}.inds(:));
-%     %rowL = paramsSub{idx}.length/3;
-%     %rl = paramsSub{idx}.inds(1:rowL);
-%     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-%     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-%     maleActs(1:2 , 1:risk) = zeros(2 , risk);
-%     %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-%     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
-% end
-% if any(9 == pIdx)
-%     idx = find(9 == pIdx);
-%     femaleActsmult = paramSet(paramsSub{idx}.inds(:));
-%     %rowL = paramsSub{idx}.length/3;
-%     %rl = paramsSub{idx}.inds(1:rowL);
-%     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-%     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-%     femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-%     %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-%     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
-% end
-% 
-% if any(10 == pIdx)
-%     idx = find(10 == pIdx);
-%     perPartnerHpv = paramSet(paramsSub{idx}.inds(:));
-% end
-% 
-% if any(15 == pIdx)
-%     idx = find(15 == pIdx);
-%     hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
-%     hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
-%     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
-%     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
-% end
-% 
-% if any(16 == pIdx)
-%     idx = find(16 == pIdx);
-%     c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-%     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-%     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-% end
-% 
-% if any(17 == pIdx)
-%     idx = find(17 == pIdx);
-%     c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-%     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-%     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-% end
-% 
-% if any(19 == pIdx)
-%     idx = find(19 == pIdx);
-%     lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
-%     lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
-% end
-% 
-% if any(22 == pIdx)
-%     idx = find(22 == pIdx);
-%     artHpvMult = paramSet(paramsSub{idx}.inds(:));
-% end
-% 
-% if any(25 == pIdx)
-%     idx = find(25 == pIdx);
-%     kCCcin3mult = paramSet(paramsSub{idx}.inds(:));
-%     kCC_Cin3 = kCC_Cin3 .* kCCcin3mult;
-% end
-
 %% Screening
-screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
-hpvScreenStartYear = screenYrs(1);
-
 screenAlgorithm = 1;
 screenAlgs{1} = baseline;
-screenAlgs{1}.diseaseInds = [1 : disease];
-
-screenAlgs{1}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    screenAlgs{1}.screenCover_vec{i} = interp1(period , screenAlgs{1}.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
@@ -623,17 +474,21 @@ toc
 % profile viewer
 
 %% Calculate summed log-likelihood
-% if error
-%     negSumLogL = -1;
-% else
-%     negSumLogL = likeFun(popVec , newCC , cinPos2002_obs , cinNeg2002_obs ,...
-%     hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
-%     hivPrevM_obs , hivPrevF_obs , hpv_hivM2008_obs , hpv_hivMNeg2008_obs , toInd , ...
-%     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-%     gender , age , risk , startYear , stepsPerYear);
-% 
-%     delete([savdir , pathModifier]);
-% end
+if calibBool    
+    if error
+        negSumLogL = -1;
+    else
+        negSumLogL = likeFun(popVec , newCC , cinPos2002_obs , cinNeg2002_obs ,...
+        hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
+        hivPrevM_obs , hivPrevF_obs , hpv_hivM2008_obs , hpv_hivMNeg2008_obs , toInd , ...
+        disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
+        gender , age , risk , startYear , stepsPerYear);
+
+        delete([savdir , pathModifier]);
+    end
+else
+    negSumLogL = nan;
+end
 
 %% Runtimes
 % figure()
