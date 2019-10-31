@@ -66,32 +66,32 @@ if calibBool
         %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
         femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
     end
-    if any(15 == pIdx)
-        idx = find(15 == pIdx);
+    if any(14 == pIdx)
+        idx = find(14 == pIdx);
         hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
         hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
         hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
         hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
     end
-    if any(16 == pIdx)
-        idx = find(16 == pIdx);
+    if any(15 == pIdx)
+        idx = find(15 == pIdx);
         c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
         c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
         c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
     end
-    if any(17 == pIdx)
-        idx = find(17 == pIdx);
+    if any(16 == pIdx)
+        idx = find(16 == pIdx);
         c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
         c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
         c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
     end
-    if any(19 == pIdx)
-        idx = find(19 == pIdx);
+    if any(18 == pIdx)
+        idx = find(18 == pIdx);
         lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
         lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
     end
-    if any(25 == pIdx)
-        idx = find(25 == pIdx);
+    if any(24 == pIdx)
+        idx = find(24 == pIdx);
         kCCcin3mult = paramSet(paramsSub{idx}.inds(:));
         kCC_Cin3 = kCC_Cin3 .* kCCcin3mult;
     end
@@ -108,7 +108,7 @@ stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1910;
 currYear = 2020;
-endYear = currYear;
+endYear = 2010; %currYear;
 years = endYear - startYear;
 
 % Compartments
@@ -305,10 +305,14 @@ if calibBool
         idx = find(10 == pIdx);
         perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
     end
+    if any(11 == pIdx)
+        idx = find(11 == pIdx);
+        perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
+    end
 else
     perPartnerHpv_vax = 0.0045;
+    perPartnerHpv_nonV = perPartnerHpv_vax;
 end
-perPartnerHpv_nonV = perPartnerHpv_vax;
 
 % IMMUNITY
 rImmune = 0.024; % for HPV16, Johnson (2012)
@@ -316,8 +320,8 @@ fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % HIV and ART multipliers
 if calibBool
-    if any(22 == pIdx)
-        idx = find(22 == pIdx);
+    if any(21 == pIdx)
+        idx = find(21 == pIdx);
         artHpvMult = paramSet(paramsSub{idx}.inds(:));
     end
 else
