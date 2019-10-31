@@ -140,16 +140,15 @@ pPos = [pPos ; hpv_hiv];
 N = [N ; hpv_hiv_obs(: , 3)];
 nPos = [nPos ; hpv_hiv_obs(: , 2)];
 
-%% Cervical cancer incidence type distribution    ****CJB note: not updated
-% % newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
-% % newCCType = zeros(size(newCC , 1) , 3);
-% % for h = 2 : hpvVaxStates
-% %     newCCType(: , h - 1) = sum(sum(newCC(: , : , h  , :) , 2) , 4) ...
-% %         ./ newCCTotal;
-% % end
-% % pPos = [pPos; mean(newCCType(: , 1)); mean(newCCType(: , 2));  mean(newCCType(: , 3))];
-% % nPos = [nPos ; 70 ; 20 ; 10];
-% % N =  [N ; 100 ; 100 ; 100];
+%% Cervical cancer incidence type distribution
+newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
+newCCType = zeros(size(newCC , 1) , 2);
+for z = 1 : hpvTypeGroups
+    newCCType(: , z) = sum(sum(newCC(: , : , :  , z) , 2) , 3) ./ newCCTotal;
+end
+pPos = [pPos; mean(newCCType(: , 1)); mean(newCCType(: , 2))];
+nPos = [nPos ; 90 ; 10];
+N =  [N ; 100 ; 100];
 
 %% HIV
 hivYearVec = unique(hivPrevM_obs(: ,1));
