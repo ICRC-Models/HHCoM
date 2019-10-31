@@ -147,13 +147,13 @@ for d = 1 : disease
             + kCin2_Cin1(a , 1) * c2c1Mult * pop(cin1Vax) ... % CIN1 -> CIN2
             + kCin2_Cin3(a , 1) * c2c3Mult * pop(cin3Vax) ... % CIN3 -> CIN2
             - (kCin3_Cin2(a , 1) * c3c2Mult... % CIN2 -> CIN3
-            + kCin1_Cin2(a , 1) * rHivHpvMult * c1c2Mult) .* pop(cin2Vax) ; % CIN2 -> CIN1
+            + kCin1_Cin2(a , 1) * rHivHpvMult * c1c2Mult) .* pop(cin2Vax); % CIN2 -> CIN1
         
-        dPop(cin2Vax) = dPop(cin2Vax) ...
-            + kCin2_Cin1(a , 2) * c2c1Mult * pop(cin1Vax) ... % CIN1 -> CIN2
-            + kCin2_Cin3(a , 2) * c2c3Mult * pop(cin3Vax) ... % CIN3 -> CIN2
+        dPop(cin2NonVax) = dPop(cin2NonVax) ...
+            + kCin2_Cin1(a , 2) * c2c1Mult * pop(cin1NonVax) ... % CIN1 -> CIN2
+            + kCin2_Cin3(a , 2) * c2c3Mult * pop(cin3NonVax) ... % CIN3 -> CIN2
             - (kCin3_Cin2(a , 2) * c3c2Mult... % CIN2 -> CIN3
-            + kCin1_Cin2(a , 2) * rHivHpvMult * c1c2Mult) .* pop(cin2Vax) ; % CIN2 -> CIN1
+            + kCin1_Cin2(a , 2) * rHivHpvMult * c1c2Mult) .* pop(cin2NonVax) ; % CIN2 -> CIN1
 
         
         % CIN3 group
