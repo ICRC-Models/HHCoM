@@ -5,102 +5,6 @@ tic
 
 paramDir = [pwd , '/Params/'];
 
-%% Load parameters previously saved in "calibratedParams" file
-load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
-    'mue' , 'muHIV' , ...
-    'kVl' , 'kCD4' , 'circ' , 'yr' , ...
-    'fertility' , 'fertility2' , ...
-    'rImmuneHiv' , 'muCC' , ...
-    'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , ...
-    'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'rNormal_Inf' , ...
-    'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3');
-muHIV(11 , 2) = 0.02; % fix typo
-
-if calibBool
-    if any(1 == pIdx)
-        idx = find(1 == pIdx);
-        partnersMmult = paramSet(paramsSub{idx}.inds(:));
-        %rowL = paramsSub{idx}.length/3;
-        %rl = paramsSub{idx}.inds(1:rowL);
-        %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-        %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-        partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-        %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-        %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-        partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
-        % partnersM(10:age , 3) = ones(7 , 1);
-    end
-    if any(2 == pIdx)
-        idx = find(2 == pIdx);
-        partnersFmult = paramSet(paramsSub{idx}.inds(:));
-        %rowL = paramsSub{idx}.length/3;
-        %rl = paramsSub{idx}.inds(1:rowL);
-        %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-        %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-        partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-        %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-        %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-        partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-        % partnersF(10:age , 3) = ones(7 , 1);
-    end
-    if any(8 == pIdx)
-        idx = find(8 == pIdx);
-        maleActsmult = paramSet(paramsSub{idx}.inds(:));
-        %rowL = paramsSub{idx}.length/3;
-        %rl = paramsSub{idx}.inds(1:rowL);
-        %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-        %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-        maleActs(1:2 , 1:risk) = zeros(2 , risk);
-        %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-        maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
-    end
-    if any(9 == pIdx)
-        idx = find(9 == pIdx);
-        femaleActsmult = paramSet(paramsSub{idx}.inds(:));
-        %rowL = paramsSub{idx}.length/3;
-        %rl = paramsSub{idx}.inds(1:rowL);
-        %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-        %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-        femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-        %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-        femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
-    end
-    if any(14 == pIdx)
-        idx = find(14 == pIdx);
-        hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
-        hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
-        hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
-        hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
-    end
-    if any(15 == pIdx)
-        idx = find(15 == pIdx);
-        c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-        c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-        c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-    end
-    if any(16 == pIdx)
-        idx = find(16 == pIdx);
-        c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-        c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-        c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-    end
-    if any(18 == pIdx)
-        idx = find(18 == pIdx);
-        lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
-        lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
-    end
-    if any(24 == pIdx)
-        idx = find(24 == pIdx);
-        kCCcin3mult = paramSet(paramsSub{idx}.inds(:));
-        kCC_Cin3 = kCC_Cin3 .* kCCcin3mult;
-    end
-else
-    load([paramDir , 'calibratedParams'] , 'partnersM' , 'partnersF' , ...
-        'maleActs' , 'femaleActs' , 'hpv_hivClear' , 'c3c2Mults' , 'c2c1Mults' , ...
-        'lambdaMultImm' , 'kCC_Cin3');
-end
-
 %% Set and save general parameters
 
 % Time
@@ -140,6 +44,128 @@ save(fullfile(paramDir ,'generalParams'), 'stepsPerYear' , 'timeStep' , ...
     'disease' , 'viral' , 'hpvVaxStates' , 'hpvNonVaxStates' , 'endpoints' , ...
     'intervens' , 'gender' , 'age' , 'risk' , 'hpvTypeGroups' , 'dim' , 'k' , 'toInd' , ...
     'sumall');
+
+%% Load parameters previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
+    'mue' , 'muHIV' , 'kVl' , 'kCD4' , 'circ' , 'yr' , ...
+    'fertility' , 'fertility2' , 'rImmuneHiv' , 'muCC' , ...
+    'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate' , ...
+    'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'rNormal_Inf' , ...
+    'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3');
+muHIV(11 , 2) = 0.02; % fix typo
+
+if calibBool && any(1 == pIdx)
+    idx = find(1 == pIdx);
+    partnersM = zeros(age , risk);
+    partnersMmult = paramSet(paramsSub{idx}.inds(:));
+    %rowL = paramsSub{idx}.length/3;
+    %rl = paramsSub{idx}.inds(1:rowL);
+    %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+    %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
+    %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
+    partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
+    % partnersM(10:age , 3) = ones(7 , 1);
+else 
+    load([paramDir , 'calibratedParams'] , 'partnersM');
+end
+
+if calibBool && any(2 == pIdx)
+    idx = find(2 == pIdx);
+    partnersF = zeros(age , risk);
+    partnersFmult = paramSet(paramsSub{idx}.inds(:));
+    %rowL = paramsSub{idx}.length/3;
+    %rl = paramsSub{idx}.inds(1:rowL);
+    %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
+    %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
+    %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
+    partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
+    % partnersF(10:age , 3) = ones(7 , 1);
+else
+    load([paramDir , 'calibratedParams'] , 'partnersF');
+end    
+    
+if calibBool && any(8 == pIdx)
+    idx = find(8 == pIdx);
+    maleActs = zeros(age , risk);
+    maleActsmult = paramSet(paramsSub{idx}.inds(:));
+    %rowL = paramsSub{idx}.length/3;
+    %rl = paramsSub{idx}.inds(1:rowL);
+    %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    maleActs(1:2 , 1:risk) = zeros(2 , risk);
+    %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
+    maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+else
+    load([paramDir , 'calibratedParams'] , 'maleActs');
+end
+
+if calibBool && any(9 == pIdx)
+    idx = find(9 == pIdx);
+    femaleActs = zeros(age , risk);
+    femaleActsmult = paramSet(paramsSub{idx}.inds(:));
+    %rowL = paramsSub{idx}.length/3;
+    %rl = paramsSub{idx}.inds(1:rowL);
+    %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+    %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+    femaleActs(1:2 , 1:risk) = zeros(2 , risk);
+    %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
+    femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+else
+    load([paramDir , 'calibratedParams'] , 'femaleActs');
+end
+
+if calibBool && any(14 == pIdx)
+    idx = find(14 == pIdx);
+    hpv_hivClear = zeros(4 , 1);
+    hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
+    hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
+    hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
+    hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
+else
+    load([paramDir , 'calibratedParams'] , 'hpv_hivClear');
+end
+
+if calibBool && any(15 == pIdx)
+    idx = find(15 == pIdx);
+    c3c2Mults = zeros(4 , 1);
+    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+else
+    load([paramDir , 'calibratedParams'] , 'c3c2Mults');
+end
+
+if calibBool && any(16 == pIdx)
+    idx = find(16 == pIdx);
+    c2c1Mults = zeros(4 , 1);
+    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+else
+    load([paramDir , 'calibratedParams'] , 'c2c1Mults');
+end
+
+if calibBool && any(18 == pIdx)
+    idx = find(18 == pIdx);
+    lambdaMultImm = zeros(age , 1);
+    lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
+    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+else
+    load([paramDir , 'calibratedParams'] , 'lambdaMultImm');
+end
+
+if calibBool && any(24 == pIdx)
+    idx = find(24 == pIdx);
+    kCC_Cin3 = zeros(age , hpvTypeGroups);
+    kCCcin3mult = paramSet(paramsSub{idx}.inds(:));
+    kCC_Cin3 = kCC_Cin3 .* kCCcin3mult;
+else
+    load([paramDir , 'calibratedParams'] , 'kCC_Cin3');
+end
 
 %% Import CIN transition data from Excel
 kCin1_Inf = [kCin1_Inf , kCin1_Inf]; % .* 0.5];
@@ -243,21 +269,24 @@ riskDist = zeros(age , risk , 2);
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
 
-if calibBool
-    if any(6 == pIdx);
-        idx = find(6 == pIdx);
-        %epsA = paramSet(paramsSub{idx}.inds(:));
-        epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-    end
-    if any(7 == pIdx);
-        idx = find(7 == pIdx);
-        %epsR = paramSet(paramsSub{idx}.inds(:));
-        epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-    end
+if calibBool && any(6 == pIdx);
+    idx = find(6 == pIdx);
+    epsA = zeros(3 , 1);
+    %epsA = paramSet(paramsSub{idx}.inds(:));
+    epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
     epsA = [0.3 ; 0.3 ; 0.3];
+end
+   
+if calibBool && any(7 == pIdx);
+    idx = find(7 == pIdx);
+    epsR = zeros(3 , 1);
+    %epsR = paramSet(paramsSub{idx}.inds(:));
+    epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
+else
     epsR = [0.3 ; 0.3 ; 0.3];
 end
+
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
@@ -300,17 +329,17 @@ save(fullfile(paramDir ,'hivParams'), 'hivOn' , 'betaHIVM2F' , 'betaHIVF2M' , 'm
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
 
-if calibBool
-    if any(10 == pIdx)
-        idx = find(10 == pIdx);
-        perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
-    end
-    if any(11 == pIdx)
-        idx = find(11 == pIdx);
-        perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
-    end
+if calibBool && any(10 == pIdx)
+    idx = find(10 == pIdx);
+    perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
     perPartnerHpv_vax = 0.0045;
+end
+
+if calibBool && any(11 == pIdx)
+    idx = find(11 == pIdx);
+    perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
+else
     perPartnerHpv_nonV = perPartnerHpv_vax;
 end
 
@@ -319,11 +348,9 @@ rImmune = 0.024; % for HPV16, Johnson (2012)
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % HIV and ART multipliers
-if calibBool
-    if any(21 == pIdx)
-        idx = find(21 == pIdx);
-        artHpvMult = paramSet(paramsSub{idx}.inds(:));
-    end
+if calibBool && any(21 == pIdx)
+    idx = find(21 == pIdx);
+    artHpvMult = paramSet(paramsSub{idx}.inds(:));
 else
     artHpvMult = 1.0;
 end
@@ -336,11 +363,9 @@ save(fullfile(paramDir ,'hpvParams'), 'hpvOn' , 'perPartnerHpv_vax' , 'perPartne
 
 %% Save intervention parameters
 % Condom use
-if calibBool
-    if any(5 == pIdx);
-        idx = find(5 == pIdx);
-        condUse = paramSet(paramsSub{idx}.inds(:));
-    end
+if calibBool && any(5 == pIdx);
+    idx = find(5 == pIdx);
+    condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
