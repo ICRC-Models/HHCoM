@@ -12,7 +12,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpvOn_wChckPnt_incNonVaxTrans2_incRates2_' , tstep_abc]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_' , tstep_abc , '_' , paramSetIdx]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
 
 % AGE GROUPS
