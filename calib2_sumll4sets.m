@@ -15,8 +15,6 @@ date = date_abc;
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
-load([paramDir,'settings']);
-load([paramDir,'general']);
 paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
 nPrlSets = 16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];

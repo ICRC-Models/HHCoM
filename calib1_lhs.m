@@ -10,15 +10,9 @@
 function calib1_lhs(nSets , tstep_abc , date_abc)
 
 %delete(gcp('nocreate')); 
-%loadUp(6);
 
 t_curr = tstep_abc;
 date = date_abc;
-
-%% Load parameters
-paramDir = [pwd ,'/Params/'];
-load([paramDir,'settings'])
-load([paramDir,'general'])
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
