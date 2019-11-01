@@ -12,9 +12,6 @@
 #SBATCH --mem=120G   		 		    # Memory per node
 #SBATCH --time=00:30:00 	 		    # Wall clock time limit hrs:min:sec
 
-#SBATCH –-output=./SlurmOut/%j.out      # Standard output
-#SBATCH –-error=./SlurmOut/%j.err       # Standard error
-
 NSETS=100    # nSets
 echo "${NSETS}" 
 export NSETS
