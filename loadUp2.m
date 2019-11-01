@@ -168,14 +168,28 @@ else
 end
 
 %% Import CIN transition data from Excel
-kCin1_Inf = [kCin1_Inf , kCin1_Inf]; % .* 0.5];
-kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1]; % .* 0.5];
-kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2]; % .* 0.5];
-kCC_Cin3 = [kCC_Cin3 , kCC_Cin3]; % .* 0.5];
-rNormal_Inf = [rNormal_Inf , rNormal_Inf]; % .* 2.0];
-kInf_Cin1 = [kInf_Cin1 , kInf_Cin1]; % .* 2.0];
-kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2]; % .* 2.0];
-kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3]; % .* 2.0];
+if calibBool && any(25 == pIdx)
+    idx = find(25 == pIdx);
+    kProgrsMult = paramSet(paramsSub{idx}.inds(:));
+else
+    kProgrsMult = 1.0;
+end
+
+if calibBool && any(26 == pIdx)
+    idx = find(26 == pIdx);
+    kRegrsMult = paramSet(paramsSub{idx}.inds(:));
+else
+    kRegrsMult = 1.0;
+end
+
+kCin1_Inf = [kCin1_Inf , kCin1_Inf .* kProgrsMult];
+kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* kProgrsMult];
+kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* kProgrsMult];
+kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* kProgrsMult];
+rNormal_Inf = [rNormal_Inf , rNormal_Inf .* kRegrsMult];
+kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* kRegrsMult];
+kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
+kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
 %{
 kCin1_Inf = zeros(16,2);
 kCin2_Cin1 = zeros(16,2);
