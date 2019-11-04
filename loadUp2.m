@@ -1,5 +1,5 @@
 % Load and save parameters, calibration data, indices, and matrices
-function [stepsPerYear , timeStep , startYear , currYear , endYear , ...
+function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     sumall , ...
@@ -31,8 +31,7 @@ function [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     ageInd , riskInd , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
-    hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2] ...
-    = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -650,7 +649,7 @@ end
 %     'gar' , 'hivSus' , 'hpvVaxSus' , 'hpvVaxImm' , ...
 %     'hpvNonVaxSus' , 'hpvNonVaxImm' , ...
 %     'toHiv' , 'vaxInds' , 'nonVInds' , 'hpvVaxInf' , 'hpvNonVaxInf');
-disp('mixInfect indices loaded')
+% disp('mixInfect indices loaded')
 
 %% hiv2a.m indices
 hivInds = zeros(disease , viral , gender , age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
@@ -669,10 +668,10 @@ for d = 1 : disease
 end
 
 % save([paramDir , 'hivIndices'] , 'hivInds')
-disp('hiv2a indices loaded')
+% disp('hiv2a indices loaded')
 
 %% hpvCCdet.m indices
-disp('Preparing indices for HPV modules...')
+% disp('Preparing indices for HPV modules...')
 
 cin3hpvVaxIndsFrom = zeros(disease , hpvNonVaxStates , age , viral * intervens * risk * 3);
 ccLochpvVaxIndsTo = cin3hpvVaxIndsFrom;
@@ -769,7 +768,7 @@ end
 %     'cin2hpvVaxInds' , 'cin3hpvVaxInds' , 'cin1hpvNonVaxInds' , ...
 %     'cin2hpvNonVaxInds' , 'cin3hpvNonVaxInds' , 'normalhpvVaxInds' , 'immunehpvVaxInds' , ...
 %     'infhpvVaxInds' , 'normalhpvNonVaxInds' , 'immunehpvNonVaxInds' , 'infhpvNonVaxInds')
-disp('hpvCCdet indices loaded')
+% disp('hpvCCdet indices loaded')
 
 %% ageRisk.m indices
 ageInd = zeros(gender , age , disease * viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens * risk);
@@ -794,7 +793,7 @@ end
 pop = spalloc(prod(dim) , 1 , prod(dim));
 
 %% Viral load progression (by CD4 count)
-disp('Building viral load progression matrix')
+% disp('Building viral load progression matrix')
 
 xInds = [];
 yInds = [];
@@ -827,7 +826,7 @@ end
 vlAdvancer = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % save(fullfile(paramDir ,'vlAdvancer') , 'vlAdvancer' , '-v7.3')
-disp('Finished building viral load progression matrix')
+% disp('Finished building viral load progression matrix')
 
 %% Fertility prior to 1990
 
@@ -838,7 +837,7 @@ posMaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 posFemaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
 
 % fertility matrix for uninfected mothers
-disp('Building fertility matrix for uninfected mothers')
+% disp('Building fertility matrix for uninfected mothers')
 xInds = [];
 yInds = [];
 vals = [];
@@ -855,7 +854,7 @@ end
 fertMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % fertility matrix for infected mothers
-disp('Building fertility matrix for HIV-infected mothers')
+% disp('Building fertility matrix for HIV-infected mothers')
 xIndsPos = [];
 yIndsPos = [];
 valsPos = [];
@@ -890,7 +889,7 @@ posMaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 posFemaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
 
 % fertility matrix for uninfected mothers
-disp('Building fertility2 matrix for uninfected mothers')
+% disp('Building fertility2 matrix for uninfected mothers')
 xInds = [];
 yInds = [];
 vals = [];
@@ -907,7 +906,7 @@ end
 fertMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % fertility matrix for infected mothers
-disp('Building fertility2 matrix for HIV-infected mothers')
+% disp('Building fertility2 matrix for HIV-infected mothers')
 xIndsPos = [];
 yIndsPos = [];
 valsPos = [];
@@ -934,7 +933,7 @@ hivFertNegBirth2 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop
 % save(fullfile(paramDir ,'hivFertMats2') , 'hivFertPosBirth2' , 'hivFertNegBirth2')
 
 %% Background deaths
-disp('Building death matrix')
+% disp('Building death matrix')
 
 xInds = [];
 yInds = [];
@@ -950,10 +949,10 @@ end
 deathMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % save(fullfile(paramDir ,'deathMat') , 'deathMat')
-disp('Death matrix complete')
+% disp('Death matrix complete')
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
-disp('Building circumcision matrix')
+% disp('Building circumcision matrix')
 
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
@@ -963,10 +962,10 @@ vals = [ones(length(negCircMaleBirth),1) .* ( circ(1) ); ones(length(negMaleBirt
 circMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % save(fullfile(paramDir ,'circMat') , 'circMat')
-disp('Circumcision matrix complete')
+% disp('Circumcision matrix complete')
 
 %% Make circumcision matrix after 2030
-disp('Building circumcision matrix after 2030')
+% disp('Building circumcision matrix after 2030')
 
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
@@ -976,6 +975,6 @@ vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),
 circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % save(fullfile(paramDir ,'circMat2') , 'circMat2')
-disp('Circumcision matrix after 2030 complete')
+% disp('Circumcision matrix after 2030 complete')
 
 toc
