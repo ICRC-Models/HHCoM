@@ -12,7 +12,7 @@
 #SBATCH --mem=120G   		 		    # Memory per node
 #SBATCH --time=00:30:00 	 		    # Wall clock time limit hrs:min:sec
 
-NSETS=100    # nSets
+NSETS=112    # nSets
 echo "${NSETS}" 
 export NSETS
 
