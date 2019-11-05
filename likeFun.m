@@ -190,6 +190,30 @@ pPos = [pPos; ccInc];
 nPos = [nPos ; 43.0];
 N =  [N ; fac];
 
+%% Cervical cancer incidence in 2012 by age
+incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
+fac = 10 ^ 5;
+
+ccInc = zeros(14 , 1)';
+for a = 3 : age
+    allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+        1 : periods , 2 , a , 1 : risk)); ...
+        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+        1 : periods , 2 , a , 1 : risk))];
+    % Calculate incidence
+  
+    ccInc(a - 2 , 1) = ...
+        (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
+        (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
+    if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4))) == 0.0)
+        ccInc(a - 2 , 1) = zeros(length(tVec(incTimeSpan)),1)';
+    end
+end
+
+pPos = [pPos; ccInc];
+nPos = [nPos ; 43.0];
+N =  [N ; fac];
+
 %% HIV
 hivYearVec = unique(hivPrevM_obs(: ,1));
 hivAgeM = zeros(7 , length(hivYearVec));
