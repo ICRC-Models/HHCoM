@@ -156,8 +156,8 @@ fac = 10 ^ 5;
 worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
     247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
     23477 9261 2155];
-    
-ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
+
+ccIncRef = 0.0;
 for aInd = 1:age+4
     if aInd >= age
         a = age;
@@ -169,16 +169,16 @@ for aInd = 1:age+4
     % Calculate incidence
     if aInd <= age    
         ccIncRefA = ...
-            (annlz(sum(sum(sum(newCC(: , : , : , a),2),3),4)) ./ ...
-            (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear)) * fac) ...
+            (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac) ...
             .* (worldStandard_WP2015(aInd));
-        if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(: , : , : , a),2),3),4))) == 0.0)
-            ccIncRefA = zeros(length(tVec(1 : stepsPerYear : end)),1)';
+        if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4))) == 0.0)
+            ccIncRefA = 0.0;
         end
     elseif aInd > age
         ccIncRefA = ...
-            (annlz(sum(sum(sum(newCC(: , : , : , a),2),3),4)) ./ ...
-            (annlz(sum(popVec(: , allF) , 2) ./ stepsPerYear)) * fac);
+            (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
         ccIncRefA = [(ones(1,aInd-a).*ccIncRefA(1,1)) , ccIncRefA(1,1:end-(aInd-a))];
         ccIncRefA = ccIncRefA .* worldStandard_WP2015(aInd);
     end
