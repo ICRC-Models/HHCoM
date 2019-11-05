@@ -151,44 +151,44 @@ nPos = [nPos ; 90 ; 10];
 N =  [N ; 100 ; 100];
 
 %% Cervical cancer incidence in 2011 applied to 2009 --> CJB note: need to change year and add more years to this
-incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +6)];
-fac = 10 ^ 5;
-worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
-    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
-    23477 9261 2155];
-
-ccIncRef = 0.0;
-for aInd = 1:age+4
-    if aInd >= age
-        a = age;
-    end
-    allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
-        1 : periods , 2 , a , 1 : risk)); ...
-        toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
-        1 : periods , 2 , a , 1 : risk))];
-    % Calculate incidence
-    if aInd <= age    
-        ccIncRefA = ...
-            (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
-            (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac) ...
-            .* (worldStandard_WP2015(aInd));
-        if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4))) == 0.0)
-            ccIncRefA = 0.0;
-        end
-    elseif aInd > age
-        ccIncRefA = ...
-            (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
-            (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
-        ccIncRefA = [(ones(1,aInd-a).*ccIncRefA(1,1)) , ccIncRefA(1,1:end-(aInd-a))];
-        ccIncRefA = ccIncRefA .* worldStandard_WP2015(aInd);
-    end
-    ccIncRef = ccIncRef + ccIncRefA;
-end
-ccInc = ccIncRef ./ (sum(worldStandard_WP2015(1:age+4)));
-
-pPos = [pPos; ccInc];
-nPos = [nPos ; 43.0];
-N =  [N ; fac];
+% incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +6)];
+% fac = 10 ^ 5;
+% worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+%     247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+%     23477 9261 2155];
+% 
+% ccIncRef = 0.0;
+% for aInd = 1:age+4
+%     if aInd >= age
+%         a = age;
+%     end
+%     allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+%         1 : periods , 2 , a , 1 : risk)); ...
+%         toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+%         1 : periods , 2 , a , 1 : risk))];
+%     % Calculate incidence
+%     if aInd <= age    
+%         ccIncRefA = ...
+%             (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
+%             (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac) ...
+%             .* (worldStandard_WP2015(aInd));
+%         if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4))) == 0.0)
+%             ccIncRefA = 0.0;
+%         end
+%     elseif aInd > age
+%         ccIncRefA = ...
+%             (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
+%             (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
+%         ccIncRefA = [(ones(1,aInd-a).*ccIncRefA(1,1)) , ccIncRefA(1,1:end-(aInd-a))];
+%         ccIncRefA = ccIncRefA .* worldStandard_WP2015(aInd);
+%     end
+%     ccIncRef = ccIncRef + ccIncRefA;
+% end
+% ccInc = ccIncRef ./ (sum(worldStandard_WP2015(1:age+4)));
+% 
+% pPos = [pPos; ccInc];
+% nPos = [nPos ; 43.0];
+% N =  [N ; fac];
 
 %% Cervical cancer incidence in 2012 by age
 incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
@@ -206,7 +206,7 @@ for a = 3 : age
         (annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4)) ./ ...
         (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
     if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(newCC(incTimeSpan , : , : , a),2),3),4))) == 0.0)
-        ccInc(a - 2 , 1) = zeros(length(tVec(incTimeSpan)),1)';
+        ccInc(a - 2 , 1) = 0.0;
     end
 end
 
