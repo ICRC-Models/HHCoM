@@ -246,8 +246,8 @@ kCin2_Cin3 = zeros(16,2);
 if calibBool && any(27 == pIdx)
     idx = find(27 == pIdx);
     kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult;
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult;
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2);
@@ -256,8 +256,8 @@ end
 if calibBool && any(28 == pIdx)
     idx = find(28 == pIdx);
     kCin2_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult;
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult;
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2);
@@ -266,8 +266,8 @@ end
 if calibBool && any(29 == pIdx)
     idx = find(29 == pIdx);
     kCin3_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult;
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2);
@@ -276,8 +276,8 @@ end
 if calibBool && any(30 == pIdx)
     idx = find(30 == pIdx);
     kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2);
@@ -286,8 +286,8 @@ end
 if calibBool && any(31 == pIdx)
     idx = find(31 == pIdx);
     rNormal_InfMult = paramSet(paramsSub{idx}.inds(:));
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult;
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult;
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2);
@@ -296,8 +296,8 @@ end
 if calibBool && any(32 == pIdx)
     idx = find(32 == pIdx);
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult;
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult;
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2);
@@ -306,8 +306,8 @@ end
 if calibBool && any(33 == pIdx)
     idx = find(33 == pIdx);
     kCin1_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult;
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult;
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2);
@@ -316,8 +316,8 @@ end
 if calibBool && any(34 == pIdx)
     idx = find(34 == pIdx);
     kCin2_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult;
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult;
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2);
