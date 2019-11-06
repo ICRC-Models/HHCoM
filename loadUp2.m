@@ -47,7 +47,7 @@ stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1910;
 currYear = 2020;
-endYear = 2010; %currYear;
+endYear = 2015; %currYear;
 years = endYear - startYear;
 
 % Compartments
@@ -84,9 +84,7 @@ sumall = @(x) sum(x(:));
 load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
     'mue' , 'muHIV' , 'kVl' , 'kCD4' , 'circ' , 'yr' , ...
     'fertility' , 'fertility2' , 'rImmuneHiv' , 'muCC' , ...
-    'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate' , ...
-    'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'rNormal_Inf' , ...
-    'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3');
+    'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
 muHIV(11 , 2) = 0.02; % fix typo
 
 if calibBool && any(1 == pIdx)
@@ -193,39 +191,49 @@ else
     load([paramDir , 'calibratedParams'] , 'lambdaMultImm');
 end
 
-if calibBool && any(24 == pIdx)
-    idx = find(24 == pIdx);
-    kCC_Cin3 = zeros(age , hpvTypeGroups);
-    kCCcin3mult = paramSet(paramsSub{idx}.inds(:));
-    kCC_Cin3 = kCC_Cin3 .* kCCcin3mult;
-else
-    load([paramDir , 'calibratedParams'] , 'kCC_Cin3');
-end
+%% Import HPV/CIN/CC transition data from Excel
+% file = [pwd , '/Config/HPV_parameters.xlsx'];
+% 
+% ageTrends = xlsread(file , 'CIN transitions by type' , 'C38 : J40');
+% 
+% kCin1_Inf_orig = zeros(1,2);
+% kCin2_Cin1_orig = zeros(1,2);
+% kCin3_Cin2_orig = zeros(1,2);
+% kCC_Cin3_orig = zeros(1,2);
+% rNormal_Inf_orig = zeros(1,2);
+% kInf_Cin1_orig = zeros(1,2);
+% kCin1_Cin2_orig = zeros(1,2);
+% kCin2_Cin3_orig = zeros(1,2);
+% % 9v HPV types
+% kCin1_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'C25'); % HPV to CIN1, ages 10-24
+% kCin2_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'D25'); % CIN1 to CIN2
+% kCin3_Cin2_orig(1, 1) = xlsread(file , 'CIN transitions by type', 'E25'); %CIN2 to CIN3
+% kCC_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'F25'); % CIN3 to unlocalized
+% rNormal_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'G25'); % HPV to Well (natural immunity)
+% kInf_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'H25'); % CIN1 to HPV
+% kCin1_Cin2_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'I25'); % CIN2 to CIN1
+% kCin2_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'J25'); % CIN3 to CIN2
+% % Non-9v HPV types
+% kCin1_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'M25');  % HPV to CIN1, ages 10-24
+% kCin2_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'N25'); % CIN1 to CIN2
+% kCin3_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'O25'); %CIN2 to CIN3
+% kCC_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'P25'); % CIN3 to unlocalized
+% rNormal_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'Q25'); % HPV to Well (natural immunity)
+% kInf_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'R25'); % CIN1 to HPV
+% kCin1_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'S25'); % CIN2 to CIN1
+% kCin2_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'T25'); % CIN3 to CIN2
+% 
+% save(fullfile(paramDir ,'hpvCinCCTrans'), 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
+%     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
+%     'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
 
-%% Import CIN transition data from Excel
-if calibBool && any(25 == pIdx)
-    idx = find(25 == pIdx);
-    kProgrsMult = paramSet(paramsSub{idx}.inds(:));
-else
-    kProgrsMult = 1.0;
-end
+%% Set transitions by age group based on pre-saved or calibrated values
 
-if calibBool && any(26 == pIdx)
-    idx = find(26 == pIdx);
-    kRegrsMult = paramSet(paramsSub{idx}.inds(:));
-else
-    kRegrsMult = 1.0;
-end
+% Set transitions in first age group from pre-saved or calibrated values
+load([paramDir , 'hpvCinCCTrans'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
+    'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
+    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
 
-kCin1_Inf = [kCin1_Inf , kCin1_Inf .* kProgrsMult];
-kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* kProgrsMult];
-kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* kProgrsMult];
-kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* kProgrsMult];
-rNormal_Inf = [rNormal_Inf , rNormal_Inf .* kRegrsMult];
-kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* kRegrsMult];
-kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
-kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
-%{
 kCin1_Inf = zeros(16,2);
 kCin2_Cin1 = zeros(16,2);
 kCin3_Cin2 = zeros(16,2);
@@ -234,54 +242,162 @@ rNormal_Inf = zeros(16,2);
 kInf_Cin1 = zeros(16,2);
 kCin1_Cin2 = zeros(16,2);
 kCin2_Cin3 = zeros(16,2);
-file = [pwd , '/Config/HPV_parameters.xlsx'];
-% HPV 16/18
-kCin1_Inf_orig(: , 1) = xlsread(file , 'CIN Transition' , 'B5 : B20'); % HPV to CIN1
-kCin2_Cin1_orig(: , 1) = xlsread(file , 'CIN Transition' , 'C5 : C20'); % CIN1 to CIN2
-kCin3_Cin2_orig(: , 1) = xlsread(file , 'CIN Transition', 'D5 : D20'); %CIN2 to CIN3
-kCC_Cin3_orig(: , 1) = xlsread(file , 'CIN Transition' , 'E5 : E20'); % CIN3 to unlocalized
-rNormal_Inf_orig(: , 1) = xlsread(file , 'CIN Transition' , 'F5 : F20'); % HPV to Well (natural immunity)
-kInf_Cin1_orig(: , 1) = xlsread(file , 'CIN Transition' , 'G5 : G20'); % CIN1 to HPV
-kCin1_Cin2_orig(: , 1) = xlsread(file , 'CIN Transition' , 'H5 : H20'); % CIN2 to CIN1
-kCin2_Cin3_orig(: , 1) = xlsread(file , 'CIN Transition' , 'I5 : I20'); % CIN3 to CIN2
-% 9v type ohr
-kCin1_Inf_orig(: , 2) = xlsread(file , 'CIN Transition' , 'B25 : B40');
-kCin2_Cin1_orig(: , 2) = xlsread(file , 'CIN Transition' , 'C25 : C40');
-kCin3_Cin2_orig(: , 2) = xlsread(file , 'CIN Transition' , 'D25 : D40');
-kCC_Cin3_orig(: , 2) = xlsread(file , 'CIN Transition' , 'E25 : E40');
-rNormal_Inf_orig(: , 2) = xlsread(file , 'CIN Transition' , 'F25 : F40');
-kInf_Cin1_orig(: , 2) = xlsread(file , 'CIN Transition' , 'G25 : G40');
-kCin1_Cin2_orig(: , 2) = xlsread(file , 'CIN Transition' , 'H25 : H40');
-kCin2_Cin3_orig(: , 2) = xlsread(file , 'CIN Transition' , 'I25 : I40');
-% Non-vaccine type ohr
-kCin1_Inf_orig(: , 3) = xlsread(file , 'CIN Transition' , 'B45 : B60');
-kCin2_Cin1_orig(: , 3) = xlsread(file , 'CIN Transition' , 'C45 : C60');
-kCin3_Cin2_orig(: , 3) = xlsread(file , 'CIN Transition' , 'D45 : D60');
-kCC_Cin3_orig(: , 3) = xlsread(file , 'CIN Transition' , 'E45 : E60');
-rNormal_Inf_orig(: , 3) = xlsread(file , 'CIN Transition' , 'F45 : F60');
-kInf_Cin1_orig(: , 3) = xlsread(file , 'CIN Transition' , 'G45 : G60');
-kCin1_Cin2_orig(: , 3) = xlsread(file , 'CIN Transition' , 'H45 : H60');
-kCin2_Cin3_orig(: , 3) = xlsread(file , 'CIN Transition' , 'I45 : I60');
-% Weight HPV transitions and HPV incidence multiplier according to type distribution
-distWeight = [0.7/(0.7+0.2) , 0.2/(0.7+0.2)];
-kCin1_Inf(:,1) = sum(bsxfun(@times , kCin1_Inf_Orig(:,1:2) , distWeight) , 2);
-kCin2_Cin1(:,1) = sum(bsxfun(@times , kCin2_Cin1_Orig(:,1:2) , distWeight) , 2);
-kCin3_Cin2(:,1) = sum(bsxfun(@times , kCin3_Cin2_Orig(:,1:2) , distWeight) , 2);
-kCC_Cin3(:,1) = sum(bsxfun(@times , kCC_Cin3_Orig(:,1:2) , distWeight) , 2);
-rNormal_Inf(:,1) = sum(bsxfun(@times , rNormal_Inf_Orig(:,1:2) , distWeight) , 2);
-kInf_Cin1(:,1) = sum(bsxfun(@times , kInf_Cin1_Orig(:,1:2) , distWeight) , 2);
-kCin1_Cin2(:,1) = sum(bsxfun(@times , kCin1_Cin2_Orig(:,1:2) , distWeight) , 2);
-kCin2_Cin3(:,1) = sum(bsxfun(@times , kCin2_Cin3_Orig(:,1:2) , distWeight) , 2);
-kCin1_Inf(:,2) = kCin1_Inf_Orig(:,3);
-kCin2_Cin1(:,2) = kCin2_Cin1_Orig(:,3);
-kCin3_Cin2(:,2) = kCin3_Cin2_Orig(:,3);
-kCC_Cin3(:,2) = kCC_Cin3_Orig(:,3);
-rNormal_Inf(:,2) = rNormal_Inf_Orig(:,3);
-kInf_Cin1(:,2) = kInf_Cin1_Orig(:,3);
-kCin1_Cin2(:,2) = kCin1_Cin2_Orig(:,3);
-kCin2_Cin3(:,2) = kCin2_Cin3_Orig(:,3);
-%}
 
+if calibBool && any(27 == pIdx)
+    idx = find(27 == pIdx);
+    kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult;
+else
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2);
+end
+
+if calibBool && any(28 == pIdx)
+    idx = find(28 == pIdx);
+    kCin2_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult;
+else
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2);
+end
+
+if calibBool && any(29 == pIdx)
+    idx = find(29 == pIdx);
+    kCin3_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult;
+else
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2);
+end
+
+if calibBool && any(30 == pIdx)
+    idx = find(30 == pIdx);
+    kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult;
+else
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2);
+end
+
+if calibBool && any(31 == pIdx)
+    idx = find(31 == pIdx);
+    rNormal_InfMult = paramSet(paramsSub{idx}.inds(:));
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult;
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult;
+else
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1);
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2);
+end
+
+if calibBool && any(32 == pIdx)
+    idx = find(32 == pIdx);
+    kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult;
+else
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2);
+end
+
+if calibBool && any(33 == pIdx)
+    idx = find(33 == pIdx);
+    kCin1_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult;
+else
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2);
+end
+
+if calibBool && any(34 == pIdx)
+    idx = find(34 == pIdx);
+    kCin2_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult;
+else
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2);
+end
+
+% Apply age trends to 9v HPV transitions
+kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
+kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
+kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
+kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
+rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5);
+kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
+kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
+kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
+kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
+kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
+kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
+kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4);
+rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5);
+kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
+kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
+kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
+kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
+kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
+kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
+kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4);
+rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5);
+kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
+kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
+kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
+
+% Apply age trends to non-9v HPV transitions
+kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
+kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
+kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
+kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
+rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5);
+kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
+kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
+kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
+kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
+kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
+kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
+kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4);
+rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
+kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
+kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
+kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
+kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
+kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
+kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
+kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4);
+rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5);
+kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
+kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
+kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
+
+% % if calibBool && any(25 == pIdx) % CJB note: old code
+% %     idx = find(25 == pIdx);
+% %     kProgrsMult = paramSet(paramsSub{idx}.inds(:));
+% % else
+% %     kProgrsMult = 1.0;
+% % end
+% % 
+% % if calibBool && any(26 == pIdx)
+% %     idx = find(26 == pIdx);
+% %     kRegrsMult = paramSet(paramsSub{idx}.inds(:));
+% % else
+% %     kRegrsMult = 1.0;
+% % end
+% % kCin1_Inf = [kCin1_Inf , kCin1_Inf .* kProgrsMult];
+% % kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* kProgrsMult];
+% % kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* kProgrsMult];
+% % kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* kProgrsMult];
+% % rNormal_Inf = [rNormal_Inf , rNormal_Inf .* kRegrsMult];
+% % kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* kRegrsMult];
+% % kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
+% % kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
+
+%%
 if ~fivYrAgeGrpsOn
     %% Convert 5-year age groups to 1-year age groups
 
