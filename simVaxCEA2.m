@@ -49,7 +49,7 @@ riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = 2020; % c(1); % get the current year
+currYear = 2018; %2020; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
@@ -68,6 +68,13 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
         yr(i) : timeStep : yr(i + 1));
 end
 OMEGA = zeros(age , 1); % hysterectomy rate
+analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+transM = vagTransM .* (1 - analProp(: , 1));
+transF = vagTransF .* (1 - analProp(: , 2));
+betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);
+betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transM);
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
