@@ -156,8 +156,8 @@ if year >= 2015
 %             maxRateM = maxRateM2;
 %             maxRateF = maxRateF2;
 %         end
-        maxCover = {linspace(maxRateM , 0.70 , length(yrs)) ,...
-           linspace(maxRateF , 0.70 , length(yrs))};
+        maxCover = {linspace(maxRateM , 0.729 , length(yrs)) ,...
+           linspace(maxRateF , 0.729 , length(yrs))};
 %         for r = 1 : risk
 %         hivPositiveArt = hivInds(10 , 6 , g , a , r , :);
         hivPositiveArt = hivInds(10 , 6 , g , 11 : age , : , :);
@@ -197,8 +197,8 @@ end
 % %                 maxRateM = maxRateM2;
 % %                 maxRateF = maxRateF2;
 % %             end
-%         maxCover = {linspace(maxRateM , 0.70 , length(yrs)) , ...
-%            linspace(maxRateF , 0.70 , length(yrs))};
+%         maxCover = {linspace(maxRateM , 0.729 , length(yrs)) , ...
+%            linspace(maxRateF , 0.729 , length(yrs))};
 % %         for r = 1 : risk
 % %         onArt = sum(pop(hivInds(10 , 6 , g , a , r , :)));
 %         onArt = sumall(pop(hivInds(10 , 6 , g , 11 : age , : , :)));
@@ -213,7 +213,7 @@ end
 %             cover = (maxCover{g}(ind) - fracART) ./ (1 - fracART);
 % %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
 %             treat(6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
-%         elseif year >= 2030 && fracART < 0.70
+%         elseif year >= 2030 && fracART < 0.729
 %             cover = (maxCover{g}(end) - fracART) ./ (1 - fracART);
 % %             treat(6 , 1 : 5 , g , a , r) = max(cover , 0);
 %             treat(6 , 1 : 5 , g , 11 : age , :) = max(cover , 0);
