@@ -218,9 +218,9 @@ end
 lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
-disp('Start up')
+% disp('Start up')
 % profile on
-disp(' ')
+% disp(' ')
 
 % If starting from beginning
 if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
@@ -262,7 +262,8 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     s = 1 : timeStep : years + 1 + timeStep;
     tVec = linspace(startYear , endYear , length(s) - 1);
     iStart = 2;
-    disp(['Starting from beginning, year: ' , num2str(startYear + s(iStart) - 1)])
+    disp(['Starting from beginning, year: ' , num2str(startYear + s(iStart) - 1) , ...
+        ' and simulating to ' , num2str(endYear) , ' with ' , num2str(stepsPerYear) , ' steps per year.'])
     
     % Initialize result vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
@@ -300,7 +301,8 @@ elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     s = 1 : timeStep : years + 1 + timeStep;
     tVec = linspace(startYear , endYear , length(s) - 1);
     iStart = chckPntIn.i+1;
-    disp(['Continuing from checkpoint, year: ' , num2str(startYear + s(iStart) - 1)])
+    disp(['Continuing from checkpoint, year: ' , num2str(startYear + s(iStart) - 1) , ...
+        ' and simulating to ' , num2str(endYear) , ' with ' , num2str(stepsPerYear) , ' steps per year.'])
     
     % Initialize result vectors
     popVec = chckPntIn.popVec;
@@ -330,8 +332,8 @@ elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
 end
 
 %% Main body of simulation
-disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
-    ' with ' num2str(stepsPerYear), ' steps per year.'])
+% disp(['Simulating period from ' num2str(startYear) ' to ' num2str(endYear) ...
+%     ' with ' num2str(stepsPerYear), ' steps per year.'])
 disp(' ')
 disp('Simulation running...')
 disp(' ')

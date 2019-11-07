@@ -36,7 +36,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
-tic
+% tic
 
 paramDir = [pwd , '/Params/'];
 
@@ -681,8 +681,8 @@ load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cinPos2002_dObs' , 'cinNeg200
 
 
 %% Load indices *****************************************************************************************************************************************************************************
-disp('Preparing indices...')
-disp('This may take a while...')
+% disp('Preparing indices...')
+% disp('This may take a while...')
 
 %% mixInfect.m indices
 gar = zeros(gender , age , risk , disease * viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
@@ -1113,4 +1113,4 @@ circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % save(fullfile(paramDir ,'circMat2') , 'circMat2')
 % disp('Circumcision matrix after 2030 complete')
 
-toc
+% toc
