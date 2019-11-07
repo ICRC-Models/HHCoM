@@ -4,7 +4,7 @@ function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-    age , risk , startYear , stepsPerYear)
+    age , risk , startYear , stepsPerYear , annlz)
 
 %% CIN2/3 prevalence by HIV status
 cinPos2002 = zeros(10 , 1);
@@ -194,8 +194,8 @@ dVar = [dVar ; hpv_hiv_dObs(: , 3)];
 incTimeSpan = [((2011 - startYear) * stepsPerYear +1) : ((2011 - startYear) * stepsPerYear +6)];
 fac = 10 ^ 5;
 
-ccInc2011 = zeros(14 , 1)';
-for a = 3 : age
+ccInc2011 = zeros(13 , 1);
+for a = 4 : age
     allF = toInd(allcomb(1 : disease , 1 : viral , [1:5,7] , [1:5,7] , ...
         1 , 1 : intervens , 2 , a , 1 : risk));
     % Calculate incidence
@@ -209,7 +209,7 @@ dMean = [dMean ; ccInc2011_dObs(: , 2)];
 dVar =  [dVar ; ccInc2011_dObs(: , 3)];
 
 %% HIV
-hivYearVec = unique(hivPrevM_obs(: ,1));
+hivYearVec = unique(hivPrevM_dObs(: ,1));
 hivAgeM = zeros(7 , length(hivYearVec));
 hivAgeF = hivAgeM;
 for t = 1 : length(hivYearVec)
