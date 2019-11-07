@@ -228,15 +228,15 @@ end
 %% HIV prevalence by gender vs. AC data
 figure;
 prevYears = unique(hivPrevF_dObs(: , 1));
-hivRaw(:,1) = hivPrevM_dObs(: , 2);
-hivRaw(:,2) = hivPrevF_dObs(: , 2);
+hivRaw(:,:,1) = hivPrevM_dObs(: , 4:5);
+hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
 
-hivData(: , 1) = zeros(length(prevYears) , 1);
-hivData(: , 2) = zeros(length(prevYears) , 1);
+hivData(: , : , 1) = zeros(length(prevYears) , 1);
+hivData(: , : , 2) = zeros(length(prevYears) , 1);
 
 for i = 1 : length(prevYears)
     for g = 1 : gender
-        hivData(i,g) = (sumall(hivRaw(((i-1)*7+1):(i*7) , g)) ./ 7) .* 100;
+        hivData(i,1,g) = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g))) .* 100;
     end
 end
 
@@ -252,7 +252,7 @@ for g = 1 : gender
     subplot(1,2,g)
     plot(tVec' , hivPopPrev);
     hold all;
-    plot(prevYears , hivData(:,g) , 'ro');
+    plot(prevYears , hivData(:,:,g) , 'ro');
     xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
     xlim([1980 2020])
     legend('Model' , 'Africa Center Data (Calibration)')
@@ -1143,6 +1143,7 @@ hpv_vax = sum(popVec(: , hpvInds_vax) , 2)...
 hpv_nonVax = sum(popVec(: , hpvInds_nonVax) , 2)...
     ./ sum(popVec(: , hpvInds_tot) , 2) * 100;
 
+figure;
 subplot(2,2,1)
 plot(tVec , hpv_vax)
 hold all;
