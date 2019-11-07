@@ -2,7 +2,7 @@
 
 function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
-    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , toInd , ...
+    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
     age , risk , startYear , stepsPerYear , annlz)
 
@@ -140,15 +140,22 @@ mObs = [mObs ; hpv_hiv];
 dMean = [dMean ; hpv_hiv_dObs(: , 2)];
 dVar = [dVar ; hpv_hiv_dObs(: , 3)];
 
-%% Cervical cancer incidence type distribution --> CJB note: don't use, need to figure out how to represent this as a normal distribution
-% newCCTotal = sum(sum(sum(newCC(: , : , : , :) , 2) , 3) , 4);
-% newCCType = zeros(size(newCC , 1) , 2);
-% for z = 1 : hpvTypeGroups
-%     newCCType(: , z) = sum(sum(newCC(: , : , :  , z) , 2) , 3) ./ newCCTotal;
-% end
-% mObs = [mObs; mean(newCCType(: , 1)); mean(newCCType(: , 2))];
-% nPos = [nPos ; 90 ; 10];
-% N =  [N ; 100 ; 100];
+%% Cervical cancer incidence type distribution
+ccInds_vax = toInd(allcomb(1 : disease , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
+    1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
+ccInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , 6 , ...
+    1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
+ccInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
+        1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 5 , 7] , 6 , 1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+cc_vax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , ccInds_vax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , ccInds_tot) , 2);
+cc_nonVax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , ccInds_nonVax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , ccInds_tot) , 2);
+
+mObs = [mObs; cc_vax; cc_nonVax];
+dMean = [dMean ; cc_dist_dObs(: , 2)];
+dVar =  [dVar ; cc_dist_dObs(: , 3)];
 
 %% Cervical cancer incidence in 2011 applied to 2009 --> CJB note: need to change year and add more years to this, not functional
 % incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +6)];
@@ -239,5 +246,5 @@ dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
 dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
 %% Likelihood function
-logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar))*(mObs-dMean).^2);
+logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar)).*(mObs-dMean).^2);
 negSumLogL = sum(logL); % CJB note: despite name, positive summed logL, used to be -sum(logL), the negative logL to be minimized
