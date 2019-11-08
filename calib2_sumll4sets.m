@@ -35,7 +35,6 @@ pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB
 parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Obtain model output for each set of sampled parameters
-%ccIncSet = zeros(nSets,1);
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
     paramSet = paramSetMatrix(:,subMatrixInds(n));
@@ -46,4 +45,4 @@ end
 %% Save parameter sets and negSumLogL values
 file = ['negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
-dlmwrite([paramDir, file] , [paramSetIdx; negSumLogLSet] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append')
+dlmwrite([paramDir, file] , [paramSetIdx; negSumLogLSet] , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append' , 'precision' , 9)
