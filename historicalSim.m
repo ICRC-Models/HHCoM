@@ -3,7 +3,7 @@
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
 %Run from the Command Window: mainCalibrated(0 , [] , [] , [] , [] , 0 , '103119')
-paramSet
+
 %%
 %close all; clear all; clc;
 tic
@@ -63,8 +63,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
-condUse
-kCin1_Inf
+
 %% Load saved parameters
 % disp('Initializing. Standby...')
 
