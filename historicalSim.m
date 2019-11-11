@@ -12,7 +12,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr085nvClr_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
 
 % AGE GROUPS
@@ -295,7 +295,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
 % If continuing from checkpoint
 elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
-    chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % ***SET ME***: name for historical run input file 
+    chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
     
     % Initialize time vector
     s = 1 : timeStep : years + 1 + timeStep;
