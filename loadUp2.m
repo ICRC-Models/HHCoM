@@ -252,7 +252,7 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2);
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.5;
 end
 
 if calibBool && any(28 == pIdx)
@@ -262,7 +262,7 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2);
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.5;
 end
 
 if calibBool && any(29 == pIdx)
@@ -272,7 +272,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2);
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.5;
 end
 
 if calibBool && any(30 == pIdx)
@@ -282,7 +282,7 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2);
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.5;
 end
 
 if calibBool && any(31 == pIdx)
@@ -291,8 +291,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1);
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2);
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1)*1.25;
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2)*0.85;
 end
 
 if calibBool && any(32 == pIdx)
@@ -302,7 +302,7 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2);
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2)*0.5;
 end
 
 if calibBool && any(33 == pIdx)
@@ -312,7 +312,7 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2);
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2)*0.5;
 end
 
 if calibBool && any(34 == pIdx)
@@ -322,7 +322,7 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2);
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.5;
 end
 
 % Apply age trends to 9v HPV transitions
