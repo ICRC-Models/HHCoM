@@ -144,19 +144,19 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_101719_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_110719_singleAge_noBaseScreen_noBaseVax_2018']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '101719_baseScreen_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
+pathModifier = '110719_noBaseScreen_noBaseVax_2018_Erasmus'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2121; % ***SET ME***: end year of simulation run
+lastYear = 2080; %2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -167,7 +167,7 @@ whoScreenAges = [36 , 46]; %[26 , 29 , 32 , 35 , 38 , 41 , 44 , 47 , 50]; % ***S
 cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
 % VACCINATION
-vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
+vaxEff = [0.7];    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -176,8 +176,8 @@ vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine e
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
-vaxAge = [10 : 15];
-vaxCover = [0.8 , 0.9];
+vaxAge = [10];
+vaxCover = [0.3 , 0.6 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
@@ -203,7 +203,7 @@ hpvSens = [0.0 , 0.0 , 0.881 , 0.881 , 0.881 , 0.881 , 0.881 , 0.0 , 0.0 , 0.0];
 hpvSensWHO = [0.0 , 0.0 , 0.90 , 0.94 , 0.94 , 0.94 , 0.94 , 0.0 , 0.0 , 0.0]; % HPV test sensitivity by HPV state
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0]; %[0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
 baseline.screenAge = 36;
 baseline.testSens = cytoSens;
 baseline.colpoRetain = 0.72;
