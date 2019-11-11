@@ -6,12 +6,12 @@
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                    	     # Export environment variables to the batch job session
 
-#SBATCH --account=csde-ckpt     	             # Allocation Definition
-#SBATCH --partition=ckpt
+#SBATCH --account=csde    	             # Allocation Definition
+#SBATCH --partition=csde
 #SBATCH --nodes=1   		 		     # Node resources
+#SBATCH --ntasks-per-node=28                         # Cores per node
 #SBATCH --mem=120G   		                     # Memory per node
 #SBATCH --time=06:00:00 	                     # Wall clock time limit hrs:min:sec
-#SBATCH --qos=MaxJobs10
 
 pwd; hostname; date
 
