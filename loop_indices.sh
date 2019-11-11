@@ -2,12 +2,12 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=31Oct19
+DATE=9Nov19
 echo "${DATE}"
 export DATE
 
 #echo "Running MATLAB script to get matrix size."
-#sbatch -p ckpt -A csde-ckpt slurm_sizeMatrix.sbatch
+#sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 #sleep 300
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
@@ -16,12 +16,12 @@ export NSETS
 
 echo "Running simulations, first try."
 INT=0
-for SETIDX in $(seq 1 16 ${NSETS}); do 
+for SETIDX in $(seq 1 28 ${NSETS}); do 
 export SETIDX
-sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch --qos=MaxJobs10
+sbatch -p csde -A csde slurm_batch.sbatch
 INT=$(($INT + 1))
-if [ $INT -ge 10 ]; then 
-sleep 60 #4800 # pause to be kind to the scheduler
+if [ $INT -ge 100 ]; then 
+sleep 5 #4800 # pause to be kind to the scheduler
 INT=0
 fi 
 done
