@@ -2,7 +2,7 @@
 % Runs simulation over the time period and time step specified by the user.
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: mainCalibrated(0 , [] , [] , [] , [] , 0 , '103119')
+%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '103119')
 
 %%
 %close all; clear all; clc;
