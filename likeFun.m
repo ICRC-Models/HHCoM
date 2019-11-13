@@ -2,7 +2,8 @@
 
 function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
-    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , toInd , ...
+    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
+    cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
     age , risk , startYear , stepsPerYear , annlz)
 
@@ -140,7 +141,7 @@ mObs = [mObs ; hpv_hiv];
 dMean = [dMean ; hpv_hiv_dObs(: , 2)];
 dVar = [dVar ; hpv_hiv_dObs(: , 3)];
 
-%% Cervical cancer incidence type distribution
+%% Cervical cancer type distribution
 ccInds_vax = toInd(allcomb(1 : disease , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
     1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
 ccInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , 6 , ...
@@ -156,6 +157,57 @@ cc_nonVax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , ccInds_nonVax) ,
 mObs = [mObs; cc_vax; cc_nonVax];
 dMean = [dMean ; cc_dist_dObs(: , 2)];
 dVar =  [dVar ; cc_dist_dObs(: , 3)];
+
+%% CIN3 type distribution
+cin3Inds_vax = toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+cin3Inds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 4 , 7] , 5 , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+cin3Inds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+cin3_vax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin3Inds_vax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin3Inds_tot) , 2);
+cin3_nonVax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin3Inds_nonVax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin3Inds_tot) , 2);
+
+mObs = [mObs; cin3_vax; cin3_nonVax];
+dMean = [dMean ; cin3_dist_dObs(: , 2)];
+dVar =  [dVar ; cin3_dist_dObs(: , 3)];
+
+%% CIN1 type distribution
+cin1Inds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+cin1Inds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 2 , 7] , 3 , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+cin1Inds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 2 , 7] , 3 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+cin1_vax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin1Inds_vax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin1Inds_tot) , 2);
+cin1_nonVax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin1Inds_nonVax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , cin1Inds_tot) , 2);
+
+mObs = [mObs; cin1_vax; cin1_nonVax];
+dMean = [dMean ; cin1_dist_dObs(: , 2)];
+dVar =  [dVar ; cin1_dist_dObs(: , 3)];
+
+%% HPV type distribution
+hpvInds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+hpvInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 2 , 7] , 3 , ...
+    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+hpvInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 2 , 7] , 3 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+hpv_vax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , hpvInds_vax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
+hpv_nonVax = sum(popVec(((2011 - startYear) * stepsPerYear +1) , hpvInds_nonVax) , 2)...
+    ./ sum(popVec(((2011 - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
+
+mObs = [mObs; hpv_vax; hpv_nonVax];
+dMean = [dMean ; hpv_dist_dObs(: , 2)];
+dVar =  [dVar ; hpv_dist_dObs(: , 3)];
 
 %% Cervical cancer incidence in 2011 applied to 2009 --> CJB note: need to change year and add more years to this, not functional
 % incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +6)];
@@ -241,9 +293,9 @@ for t = 1 : length(hivYearVec)
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totFInds));
     end
 end
-mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
-dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
-dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
+% mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
+% dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
+% dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
 %% Likelihood function
 logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar)).*(mObs-dMean).^2);

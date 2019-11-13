@@ -17,7 +17,8 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     circStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
     circProtect , condProtect , MTCTRate , hyst , ...
     OMEGA , ...
-    ccInc2011_dObs , cc_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
+    ccInc2011_dObs , cc_dist_dObs , cin3_dist_dObs , ...
+    cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
     hivPrevM_dObs , hivPrevF_dObs , ...
     mCurr , fCurr , mCurrArt , fCurrArt , ...
@@ -252,7 +253,7 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.5;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.6;
 end
 
 if calibBool && any(28 == pIdx)
@@ -262,7 +263,7 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.5;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.7;
 end
 
 if calibBool && any(29 == pIdx)
@@ -272,7 +273,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.5;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.7;
 end
 
 if calibBool && any(30 == pIdx)
@@ -282,7 +283,7 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.5;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.8;
 end
 
 if calibBool && any(31 == pIdx)
@@ -292,7 +293,7 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1)*1.25;
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2)*0.85;
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2)*0.75;
 end
 
 if calibBool && any(32 == pIdx)
@@ -302,7 +303,7 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2)*0.5;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2)*0.4;
 end
 
 if calibBool && any(33 == pIdx)
@@ -312,7 +313,7 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2)*0.5;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2)*0.3;
 end
 
 if calibBool && any(34 == pIdx)
@@ -322,7 +323,7 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.5;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.3;
 end
 
 % Apply age trends to 9v HPV transitions
@@ -652,6 +653,15 @@ end
 % cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D175 : D176'); % CC type distribution for 9v and non-9v HPV types
 % cc_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H175 : I176');
 % 
+% cin3_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D181 : D182'); % CIN3 type distribution for 9v and non-9v HPV types
+% cin3_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H181 : I182');
+% 
+% cin1_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D179 : D180'); % CIN1 type distribution for 9v and non-9v HPV types
+% cin1_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H179 : I180');
+% 
+% hpv_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D177 : D178'); % HPV type distribution for 9v and non-9v HPV types
+% hpv_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H177 : I178');
+% 
 % cinPos2002_dObs(: , 1) = xlsread(file , 'Calibration' , 'D2 : D11'); % CIN2/CIN3 Prevalence (HIV+) 2002, by age
 % cinPos2002_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H2 : I11');
 % cinNeg2002_dObs(: , 1) = xlsread(file , 'Calibration' , 'D12 : D21'); % CIN2/CIN3 Prevalence (HIV-) 2002, by age
@@ -674,11 +684,13 @@ end
 % hivPrevF_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H102 : I143');
 % hivPrevF_dObs(: , 4 : 5) = xlsread(file , 'Calibration' , 'E102 : F143'); % raw data
 %  
-% save(fullfile(paramDir , 'calibData'), 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
+% save(fullfile(paramDir , 'calibData'), 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+%     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
 %     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
 %     'hivPrevM_dObs' , 'hivPrevF_dObs')
 
-load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
+load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+    'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
     'hivPrevM_dObs' , 'hivPrevF_dObs');
 
