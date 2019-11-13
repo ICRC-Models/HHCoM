@@ -19,22 +19,22 @@ pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
 %% Filter out failed parameter sets (timed-out, etc.)
-numSubsets = size(negSumLogLmatrix,1)/17; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
-negS_format = reshape(negSumLogLmatrix , [17,numSubsets]); % first row is paramSetIdx, next 16 rows log-likelihoods for that sub-set
+numSubsets = size(negSumLogLmatrix,1)/29; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
+negS_format = reshape(negSumLogLmatrix , [29,numSubsets]); % first row is paramSetIdx, next 16 rows log-likelihoods for that sub-set
 
 [uniqueN uInds v] = unique(negS_format(1,:) , 'first'); % remove duplicate sub-set runs
 negS_format = negS_format(:,uInds);
 numSubsets = size(negS_format,2); % reset as number unique sub-sets
 
-maxV = min(max(negS_format(1,:)) , nSets-15); % find maximum paramSetIdx
-setVec = [1:16:maxV];
+maxV = min(max(negS_format(1,:)) , nSets-27); % find maximum paramSetIdx
+setVec = [1:28:maxV];
 missingV = [];
 keepV = [];
 for j = 1 : length(setVec) % identify failed parameter sets
      if ~any(setVec(j) == negS_format(1,:)) 
-         missingV = [missingV , [setVec(j) : setVec(j)+15]];
+         missingV = [missingV , [setVec(j) : setVec(j)+27]];
      else
-         keepV = [keepV , [setVec(j) : setVec(j)+15]];
+         keepV = [keepV , [setVec(j) : setVec(j)+27]];
      end
 end
 paramSetMatrix = paramSetMatrix(:,keepV); % filter and save only successful parameter sets from matrix
