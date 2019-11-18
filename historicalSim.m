@@ -3,6 +3,8 @@
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '103119')
+paramSetIdx
+paramSet
 
 %%
 %close all; clear all; clc;
@@ -12,7 +14,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
 
 % AGE GROUPS
@@ -525,7 +527,7 @@ if calibBool
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , risk , startYear , stepsPerYear , annlz)
 
-    delete([savdir , pathModifier , '.mat']);
+    %delete([savdir , pathModifier , '.mat']);
 else
     negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
         hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
