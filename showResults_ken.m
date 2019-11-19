@@ -375,43 +375,43 @@ for g = 1 : gender
     plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2))
     %axis([tVec(1) tVec(end) 0 100])
     % axis([-inf inf 0 min(max(hpvPop./sum(popTot , 2) * 100) + 10 , 100)])
-    xlabel('Year'); ylabel('Prevalence (%)'); title([genders{g} , ' HPV Prevalence (10-14)'])
+    xlabel('Year'); ylabel('Prevalence (%)'); title([genders{g} , ' HPV Prevalence (Aged 10+)'])
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthEastOutside')
 end
 
-%% General HPV Prevalence by Age in 2017
+%% HPV Prevalence in women by age in 2017
 ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-hpv2017 = zeros(age - 4 + 1 , 1);
-hpvHIV2017 = hpv2017;
-hpvNeg2017 = hpv2017;
-hpvImm2017 = hpv2017;
+hpv2015 = zeros(age - 4 + 1 , 1);
+hpvHIV2015 = hpv2015;
+hpvNeg2015 = hpv2015;
+hpvImm2015 = hpv2015;
 
 for a = 4 : age
     hpvInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 1 : 4, ...
         1 : periods , 2 , a , 1 : risk));
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    hpv2017(a - 3) = sum(popVec((2017 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpv2015(a - 3) = sum(popVec((2015 - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
 
     % immune
     hpvImmInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 10, ...
         1 : periods , 2 , a , 1 : risk));
-    hpvImm2017(a - 3) = sum(popVec((2017 - startYear) * stepsPerYear , hpvImmInds))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpvImm2015(a - 3) = sum(popVec((2015 - startYear) * stepsPerYear , hpvImmInds))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
 end
 figure()
-plot(1 : length(hpv2017) , hpv2017 , 'o-')
-set(gca , 'xtick' , 1 : length(hpv2017) , 'xtickLabel' , ageGroup);
+plot(1 : length(hpv2015) , hpv2015 , 'o-')
+set(gca , 'xtick' , 1 : length(hpv2015) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
-title('Age Specific hrHPV Prevalence in 2017')
+title('Age Specific hrHPV Prevalence in 2015')
 figure()
-plot(1 : length(hpvImm2017) , hpvImm2017 , 'o-')
-set(gca , 'xtick' , 1 : length(hpvImm2017) , 'xtickLabel' , ageGroup);
+plot(1 : length(hpvImm2015) , hpvImm2015 , 'o-')
+set(gca , 'xtick' , 1 : length(hpvImm2015) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
-title('hrHPV Immunity Prevalence in 2017')
+title('hrHPV Immunity Prevalence in 2015')
 
 %% 
 for a = 4 : age
@@ -421,8 +421,8 @@ for a = 4 : age
 
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    hpv2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , hrInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpv2015(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , hrInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
     
     % HIV+
     hrHIVInds = [toInd(allcomb(2 : 6 , 1 : viral , 2 : 4 , 1 : 4, ...
@@ -432,8 +432,8 @@ for a = 4 : age
     ageHIVInds = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk)); toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates, ...
         1 : periods , 2 , a , 1 : risk))];
-    hpvHIV2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , hrHIVInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageHIVInds)) * 100;
+    hpvHIV2015(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , hrHIVInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageHIVInds)) * 100;
     
     % HIV-
     hrNegInds = toInd(allcomb(1 , 1 , 2 : 4 , 1 : 4, ...
@@ -441,15 +441,15 @@ for a = 4 : age
 
     ageNegInds = toInd(allcomb(1 , 1 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    hpvNeg2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , hrNegInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds)) * 100;
+    hpvNeg2015(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , hrNegInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageNegInds)) * 100;
 
     % immune
     hrImmInds = toInd(allcomb(1 : disease , 1 : viral , 2 : 4 , 10 , ...
         1 : periods , 2 , a , 1 : risk));
 
-    hpvImm2017(a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , hrImmInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpvImm2015(a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , hrImmInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
 end
 
 % Ogembo, 2015 - Africa, not Kenya-specific 
@@ -513,11 +513,11 @@ hpvHivNrb(: , 3) = [44 25 12 15 10 10]; %HIV negative
 
 
 figure()
-plot(1 : length(hpv2017) , hpv2017 , 'co-')
+plot(1 : length(hpv2015) , hpv2015 , 'co-')
 hold on
-plot(1 : length(hpvHIV2017) , hpvHIV2017 , 'bo-');
+plot(1 : length(hpvHIV2015) , hpvHIV2015 , 'bo-');
 hold on
-plot(1 : length(hpvNeg2017) , hpvNeg2017 , 'o-')
+plot(1 : length(hpvNeg2015) , hpvNeg2015 , 'o-')
 hold on
 plot(hpvGenNrb(:, 1) , hpvGenNrb(:, 2) , 'p')
 hold on
@@ -539,11 +539,11 @@ errorbar(1 : length(hpvGenAfr) , hpvGenAfr(: , 1) , yNegError , yPosError , 'bs'
 % yNegError = abs(hpvNegObs(: , 2) - hpvNegObs(: , 1));
 % errorbar(1 : length(hpvNegObs) , hpvNegObs(: , 1) , yNegError , yPosError , 'rs')
 
-set(gca , 'xtick' , 1 : length(hpvNeg2017) , 'xtickLabel' , ageGroup);
+set(gca , 'xtick' , 1 : length(hpvNeg2015) , 'xtickLabel' , ageGroup);
 legend('General' , 'HIV+' , 'HIV-' , 'DeVuyst, 2003 (HR HPV), Gen',  'DeVuyst, 2012 (HR HPV), HIV+',...
     'Yamada, 2008 (Any HPV), HIV+', 'Yamada, 2008 (Any HPV), HIV-', 'Ogembo 2015 (any HPV), Gen')
 xlabel('Age Group'); ylabel('Prevalence (%)')
-title('Age Specific hrHPV Prevalence in 2017')
+title('Age Specific hrHPV Prevalence in 2015')
 
 % 
 % figure()
@@ -622,8 +622,8 @@ legend('General Population' , 'HIV+' , 'HIV-' , 'De Vuyst (General)' , ...
     'De Vuyst (HIV+)' , 'De Vuyst (HIV-)' , 'location' , 'NorthEastOutside')
 
 %% CIN2/3 prevalence by HIV status
-cinPos2017 = zeros(hpvTypes - 1 , age - 4 + 1 , 1);
-cinNeg2017 = cinPos2017;
+cinPos2015 = zeros(hpvTypes - 1 , age - 4 + 1 , 1);
+cinNeg2015 = cinPos2015;
 ageGroup = {'15 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
@@ -638,8 +638,8 @@ for a = 4 : age
         2 , a , 1 : risk));...
         toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk))];
-    cinPos2017(h - 1 , a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , cinInds)))...
-        ./ sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) * 100;
+    cinPos2015(h - 1 , a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , cinInds)))...
+        ./ sum(popVec((2015 - startYear) * stepsPerYear , ageInds)) * 100;
 
     cinNegInds = [toInd(allcomb(1, 1 : viral , h , 3 : 4, ...
         1 : periods , 2 , a , 1 : risk)); ...
@@ -649,8 +649,8 @@ for a = 4 : age
         2 , a , 1 : risk)); ...
         toInd(allcomb(7 : disease , 1 : 5 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk))];
-    cinNeg2017(h - 1 , a - 3) = (sum(popVec((2017 - startYear) * stepsPerYear , cinNegInds)))...
-        ./ (sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds))) * 100;
+    cinNeg2015(h - 1 , a - 3) = (sum(popVec((2015 - startYear) * stepsPerYear , cinNegInds)))...
+        ./ (sum(popVec((2015 - startYear) * stepsPerYear , ageNegInds))) * 100;
     end
 end
 
@@ -943,43 +943,43 @@ for a = 3 : age
         2 , a  , 1 : risk));
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             2 , a , 1 : risk));
-    ccAgeRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccInds) , 2) ...
-        / sum(popVec((2017 - startYear) * stepsPerYear , ageInds) , 2) * 100;
+    ccAgeRel(a) = sum(popVec((2015 - startYear) * stepsPerYear , ccInds) , 2) ...
+        / sum(popVec((2015 - startYear) * stepsPerYear , ageInds) , 2) * 100;
 
     % HIV Negative
     ccHivNegInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
     ageNegInds = toInd(allcomb(1 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
             2 , a , 1 : risk));
-    ccAgeNegRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivNegInds) , 2) ...
-        / (sum(popVec((2017 - startYear) * stepsPerYear , ageNegInds) , 2)) * 100;
+    ccAgeNegRel(a) = sum(popVec((2015 - startYear) * stepsPerYear , ccHivNegInds) , 2) ...
+        / (sum(popVec((2015 - startYear) * stepsPerYear , ageNegInds) , 2)) * 100;
 
     % HIV Positive
     ccHivPosInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
     agePosInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    ccAgePosRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivPosInds) , 2) ...
-        / (sum(popVec((2017 - startYear) * stepsPerYear , agePosInds) , 2)) * 100;
+    ccAgePosRel(a) = sum(popVec((2015 - startYear) * stepsPerYear , ccHivPosInds) , 2) ...
+        / (sum(popVec((2015 - startYear) * stepsPerYear , agePosInds) , 2)) * 100;
 
     % On ART
     ccArtInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 5 : 7 , 1 : periods , ...
         2 , a  , 1 : risk));
     ageArtInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
         2 , a , 1 : risk));
-    ccArtRel(a) = sum(popVec((2017 - startYear) * stepsPerYear , ccArtInds) , 2) ...
-        / (sum(popVec((2017 - startYear) * stepsPerYear , ageArtInds) , 2)) * 100;
+    ccArtRel(a) = sum(popVec((2015 - startYear) * stepsPerYear , ccArtInds) , 2) ...
+        / (sum(popVec((2015 - startYear) * stepsPerYear , ageArtInds) , 2)) * 100;
 
     % Each group relative to total female population
     % HIV-
-    ccNegPosArt(a , 1) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivNegInds) , 2) ...
-        / sum(popVec((2017 - startYear) * stepsPerYear , ageInds) , 2) * 100;
+    ccNegPosArt(a , 1) = sum(popVec((2015 - startYear) * stepsPerYear , ccHivNegInds) , 2) ...
+        / sum(popVec((2015 - startYear) * stepsPerYear , ageInds) , 2) * 100;
     % HIV+
-    ccNegPosArt(a , 2) = sum(popVec((2017 - startYear) * stepsPerYear , ccHivPosInds) , 2) ...
-        / sum(popVec((2017 - startYear) * stepsPerYear , ageInds) , 2) * 100;
+    ccNegPosArt(a , 2) = sum(popVec((2015 - startYear) * stepsPerYear , ccHivPosInds) , 2) ...
+        / sum(popVec((2015 - startYear) * stepsPerYear , ageInds) , 2) * 100;
     % ART
-    ccNegPosArt(a , 3) = sum(popVec((2017 - startYear) * stepsPerYear , ccArtInds) , 2) ...
-        / sum(popVec((2017 - startYear) * stepsPerYear , ageInds) , 2) * 100;
+    ccNegPosArt(a , 3) = sum(popVec((2015 - startYear) * stepsPerYear , ccArtInds) , 2) ...
+        / sum(popVec((2015 - startYear) * stepsPerYear , ageInds) , 2) * 100;
 
 end
 % 
@@ -998,7 +998,7 @@ hold on
 plot(1 : length(ccAgeRel) , ccAgeRel , '-o')
 xlabel('Age Group'); ylabel('Prevalence (%)')
 set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
-title('Cervical Cancer Prevalence in 2017')
+title('Cervical Cancer Prevalence in 2015')
 legend('HIV-' , 'HIV+' , 'ART' , 'General', 'Location' , 'NorthWest')
 
 %% Incidence
@@ -2112,6 +2112,47 @@ legend('Low' , 'Medium' , 'High' , 'Location' , 'NorthEastOutside')
 % xlim([1980 2019])
 % ylabel('Proportion of HIV Positive')
 % legend('Low' , 'Medium' , 'High' , 'Location' , 'NorthEastOutside')
+
+%% HIV prevalence within risk groups
+hivRisk = zeros(length(tVec) , risk);
+
+for r = 1 : risk
+    hivPos = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 1 : gender , 1 : age , r));
+    hivArt = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+        1 : periods , 1 : gender , 1 : age , r));
+    hivRisk(: , r) = sum(popVec(: , hivPos) , 2) + sum(popVec(: , hivArt) , 2);
+    riskPop = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+    1 : gender , 1 : age , r));
+    riskInd(:, r) = sum(popVec(: , riskPop), 2);
+end
+popTotAll = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , 1 : periods , ...
+        1: gender , 1 : age , 1 : risk)));
+
+figure()
+subplot(3,1,1)
+plot(tVec , bsxfun(@rdivide , hivRisk , riskInd)*100);
+title('HIV prevalence within risk group, aged 10+')
+xlim([1980 2015])
+xlabel('Year')
+ylabel('Proportion of HIV Positive')
+legend('Low' , 'Medium' , 'High' , 'Location' , 'NorthWest')
+
+subplot(3 , 1 , 2)
+plot(tVec , riskInd);
+title('Risk group population size, aged 10+')
+xlim([1980 2015])
+xlabel('Year')
+ylabel('Number of people')
+legend('Low' , 'Medium' , 'High' , 'Location' , 'NorthWest')
+
+subplot(3 , 1 , 3)
+plot(tVec ,  bsxfun(@rdivide ,riskInd, sum(popTotAll, 2))*100);
+title('Risk group prevalence in population, aged 10+')
+xlim([1980 2015])
+xlabel('Year')
+ylabel('% of people')
+legend('Low' , 'Medium' , 'High' , 'Location' , 'NorthWest')
 
 %% Population Size
 % % HIV-positive women not on ART
