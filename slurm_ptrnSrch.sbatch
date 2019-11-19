@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=ptrnSrch_${SETIDX}              # Job name
-#SBATCH --workdir=/gscratch/csde/carajb/HHCoM        # Working directory
+#SBATCH --chdir=/gscratch/csde/carajb/HHCoM        # Working directory
 #SBATCH --mail-type=FAIL           		     # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                    	     # Export environment variables to the batch job session
@@ -9,17 +9,21 @@
 #SBATCH --account=csde      	                     # Allocation Definition
 #SBATCH --partition=csde
 #SBATCH --nodes=1   		 		     # Node resources
-#SBATCH --mem=58G   		                     # Memory per node
+#SBATCH --mem=120G   		                     # Memory per node
 #SBATCH --time=96:00:00 	                     # Wall clock time limit hrs:min:sec
 #SBATCH --qos=MaxJobs4
 
 pwd; hostname; date
 
 echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
+
+SETIDX=1
 echo "${SETIDX}" 
 export SETIDX
+TCURR=0
 echo "${TCURR}"
 export TCURR
+DATE=19Nov19
 echo "${DATE}"
 export DATE
 

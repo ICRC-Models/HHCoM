@@ -4,6 +4,25 @@
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '103119')
 
+%% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
+% Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
+% Note: If you include incidence calibration data, need to change
+% likelihood function and calibration data Excel document as modeled in likeFun.
+%
+% calibBool = 1;
+% paramSetIdx = 1;
+% tstep_abc = 0;
+% date = '19Nov19';
+% pIdx = load([paramDir , 'pIdx_patternSrch_' , date , '_0.dat']);
+% [paramsAll] = genParamStruct();
+% paramsSub = cell(length(pIdx),1);
+% startIdx = 1;
+% for s = 1 : length(pIdx)
+%     paramsSub{s}.length = paramsAll{pIdx(s)}.length;
+%     paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+%     startIdx = startIdx + paramsSub{s}.length;
+% end
+
 %%
 %close all; clear all; clc;
 tic
