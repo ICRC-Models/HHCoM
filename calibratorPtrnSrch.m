@@ -1,22 +1,24 @@
-function [negSumLogL] = calibratorPtrnSrch(paramSet)
+function [negSumLogL] = calibratorPtrnSrch %(paramSet)
 
 %% Load parameters
-paramDir = [pwd ,'/Params/'];
+paramDir = [pwd ,'\Params\'];
 % load([paramDir,'settings'])
-% load([paramDir,'popData'])
+load([paramDir,'popData'])
 % load([paramDir,'HIVParams'])
 % load([paramDir,'mixInfectParams'])
 % load([paramDir,'vlBeta'])
 % load([paramDir,'hpvData'])
 % load([paramDir,'cost_weights'])
-load([paramDir , 'calibratedParams'])
+load([paramDir, 'calibratedParams'])
+% paramDir = [pwd ,'\Params\'];
+% load([paramDir , 'negSumLogL_patternSrch_29Aug19_0_params.dat'])
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 muHIV(11,2) = 0.02;
 OMEGA = zeros(age , 1); % hysterectomy rate
-paramDir = [pwd ,'/Params/'];
+paramDir = [pwd ,'\Params\'];
 % Load parameters
 load([paramDir,'general'])
 load([paramDir,'calibData'])
@@ -37,7 +39,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load calibration parameter information
-pIdx = load([paramDir,'pIdx_patternSrch_' , '29Aug19' , '_0.dat']);
+pIdx = load([paramDir,'pIdx_patternSrch_29Aug19_0.dat']);
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
 startIdx = 1;
@@ -52,29 +54,23 @@ hyst = 0;
 hpvOn = 1;
 hivOn = 1;
 
-% Use newly calibrated parameters
-% masterSetMatrix = load([paramDir , 'masterSets_calib_05Aug19_0.dat']); % load most recent parameter sample
-% paramSet = masterSetMatrix(:,1424);
-% pIdx = [1,2,5,6,7,8,9,10,15,16,17,19,22];
-% % paramSet = [1.1884; 3.5575; 0.28806; 0.24017; 0.53502; 0.10428; ...
-% %    0.21381; 0.43467; 12.663; 1.3583; 0.48721];    % 2179
-% % paramSet = [4.7022; 0.47332; 0.81494; 0.70898; 0.76744; 0.38557; 0.26816; ...
-% % 0.75175; 0.37118; 8.7002; 13.258; 0.35454; 0.57692]; % 1.7591e+05; 857
-% % paramSet = [1.4894; 1.9707; 0.84234; 0.9383; 0.82112; 0.56634; 0.77342; ...
-% %     0.53429; 0.25521; 3.4473; 6.7432; 0.7543; 0.67004];
-% [paramsAll] = genParamStruct();
-% paramsSub = cell(length(pIdx),1);
-% startIdx = 1;
-% for s = 1 : length(pIdx)
-%     paramsSub{s}.length = paramsAll{pIdx(s)}.length;
-%     paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
-%     startIdx = startIdx + paramsSub{s}.length;
-% end
+% % Use newly calibrated parameters
+paramSet = load([paramDir , 'negSumLogL_patternSrch_' , dateIn, '_0_params.dat']); % load most recent parameter sample
+pIdx = [1,2,3,4,5,6,7,8,9,10];
+% 
+[paramsAll] = genParamStruct();
+paramsSub = cell(length(pIdx),1);
+startIdx = 1;
+for s = 1 : length(pIdx)
+    paramsSub{s}.length = paramsAll{pIdx(s)}.length;
+    paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+    startIdx = startIdx + paramsSub{s}.length;
+end
 
 % Time
 c = fix(clock);
 currYear = c(1); % get the current year
-startYear = 1910; %1980;
+startYear = 1930; %1980;
 endYear = 2015; % run to 2015 for calibration
 years = endYear - startYear;
 timeStep = 1 / stepsPerYear;
@@ -82,7 +78,7 @@ timeStep = 1 / stepsPerYear;
 % Intervention start years
 hivStartYear = 1980;
 circStartYear = 1990;
-vaxStartYear = 2014;
+vaxStartYear = 2019;
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -174,27 +170,27 @@ end
 % hpv_hivMult = paramSet(263:266) .* 2.0;
 % rNormal_Inf_orig = rNormal_Inf;
 % rNormal_Inf = paramSet(267) .* rNormal_Inf_orig;
-if any(15 == pIdx)
-    idx = find(15 == pIdx);
-    hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
-    hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
-    hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
-    hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
-end
-% hpv_hivClear = paramSet(283:286) .* 0.5;
-if any(16 == pIdx)
-    idx = find(16 == pIdx);
-    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-end
-% c3c2Mults = paramSet(287:290) .* 2.0;
-if any(17 == pIdx)
-    idx = find(17 == pIdx);
-    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-end
+% if any(15 == pIdx)
+%     idx = find(15 == pIdx);
+%     hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
+%     hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
+%     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
+%     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
+% end
+% % hpv_hivClear = paramSet(283:286) .* 0.5;
+% if any(16 == pIdx)
+%     idx = find(16 == pIdx);
+%     c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+%     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+%     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+% end
+% % c3c2Mults = paramSet(287:290) .* 2.0;
+% if any(17 == pIdx)
+%     idx = find(17 == pIdx);
+%     c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+%     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+%     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+% end
 % c2c1Mults = paramSet(291:294) .* 2.0;
 % kCCDet = paramSet(295:297);
 if any(19 == pIdx)
@@ -205,10 +201,10 @@ end
 % lambdaMultImm = paramSet(298:313);
 % maxRateM_vec = paramSet(314:315);
 % maxRateF_vec = paramSet(316:317);
-if any(22 == pIdx)
-    idx = find(22 == pIdx);
-    artHpvMult = paramSet(paramsSub{idx}.inds(:));
-end
+% if any(22 == pIdx)
+%     idx = find(22 == pIdx);
+%     artHpvMult = paramSet(paramsSub{idx}.inds(:));
+% end
 % artHpvMult = paramSet(318) .* 2.0;
 if any(25 == pIdx)
     idx = find(25 == pIdx);
@@ -221,8 +217,8 @@ end
 % kVl(1,:,:) = [paramSet(359:363) , paramSet(364:368) , paramSet(369:373) , paramSet(374:378)];
 % kVl(2,:,:) = [paramSet(379:383) , paramSet(384:388) , paramSet(389:393) , paramSet(394:398)];
 
-maxRateM_vec = [0.4 , 0.4];
-maxRateF_vec = [0.55 , 0.55];
+maxRateM_vec = [0.5 , 0.5];
+maxRateF_vec = [0.6 , 0.6];
 maxRateM1 = maxRateM_vec(1);
 maxRateM2 = maxRateM_vec(2);
 maxRateF1 = maxRateF_vec(1);
@@ -254,12 +250,12 @@ end
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
-cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
+viaSens = [0.0 , 0.0 , 0.78 , 0.78 , 0.78 , 0.78 , 0.78 , 0.0 , 0.0 , 0.0];
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.164; 0.164; 0.164; 0.164; 0.164; 0.164];
 baseline.screenAge = 8;
-baseline.testSens = cytoSens;
+baseline.testSens = viaSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72;
 baseline.cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
@@ -342,7 +338,7 @@ vaxEff = 0.9;
 
 %Parameters for school-based vaccination regimen
 vaxAge = 2;
-vaxRate = 0.86*(0.7/0.9);    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
+vaxRate = 0;    % (9 year-olds = 1/5th of age group) * (bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for waning
@@ -374,6 +370,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 %% Initial population
 mInit = popInit(: , 1);
 fInit = popInit(: , 2);
+
 
 % riskDistM(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
 % riskDistF(1:2 , 1:risk) = [1 , 0 , 0; 1 , 0 , 0];
@@ -644,23 +641,24 @@ if error
     negSumLogL = -1;
     %ccInc = -1;
 else
-    negSumLogL = likeFunPtrnSrch(popVec , newCC , cinPos2014_obs , cinNeg2014_obs ,...
-        hpv_hiv_2008_obs , hpv_hivNeg_2008_obs , hpv_hiv_obs , hpv_hivNeg_obs , ...
-        hivPrevM_obs , hivPrevF_obs , hpv_hivM2008_obs , hpv_hivMNeg2008_obs , ...
-        disease , viral , gender , age , risk , hpvTypes , hpvStates , ...
-        periods , startYear , stepsPerYear);
+    negSumLogL = likeFunPtrnSrch(popVec ,  cinPos2007_obs , ...
+    hpv_2000_obs , hpv_hiv_obs , hivPrevM_obs , hivPrevF_obs ,...
+    disease , viral , gender , age , risk , ...
+    hpvTypes , hpvStates , periods , startYear , stepsPerYear);
 
     %ccInc = annlz(sum(sum(sum(newCC(end , ':' , : , 4 : age),2),3),4)) ./ ...
     %    (annlz(sum(popVec(end , allF) , 2) ./ stepsPerYear))* (10 ^ 5);
 end
 
-% negSumLogL
-% pathModifier = 'toNow_081219calib_05Aug19_0_1424';
-% savdir = [pwd , '\HHCoM_Results\'];
-% save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-%     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
-%     'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-%     'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
-%     'startYear' , 'endYear' , 'popLast');
-% showResults(pathModifier)
+negSumLogL
+pathModifier = 'toNow_calibrated_7Oct19'; %file for saving natural history runs with calibrated params
+savdir = [pwd , '\HHCoM_Results\'];
+save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
+    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'startYear' , 'endYear' , 'popLast');
+%
+pathModifier = 'toNow_calibrated_7Oct19';
+showResults_ken(pathModifier)
 
