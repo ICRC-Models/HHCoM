@@ -22,7 +22,6 @@ paramDir = [pwd , '\Params\'];
 % load([paramDir , 'calibData'], 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
 %     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
 %     'hivPrevM_dObs' , 'hivPrevF_dObs');
-
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
@@ -65,31 +64,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
-%% Plot Settings
-% colors = [241, 90, 90;
-%           240, 196, 25;
-%           78, 186, 111;
-%           45, 149, 191;
-%           149, 91, 165]/255;
-% 
-% set(groot, 'DefaultAxesColor', [10, 10, 10]/255);
-% set(groot, 'DefaultFigureColor', [10, 10, 10]/255);
-% set(groot, 'DefaultFigureInvertHardcopy', 'off');
-% set(0,'DefaultAxesXGrid','on','DefaultAxesYGrid','on')
-% set(groot, 'DefaultAxesColorOrder', colors);
-% set(groot, 'DefaultLineLineWidth', 3);
-% set(groot, 'DefaultTextColor', [1, 1, 1]);
-% set(groot, 'DefaultAxesXColor', [1, 1, 1]);
-% set(groot, 'DefaultAxesYColor', [1, 1, 1]);
-% set(groot , 'DefaultAxesZColor' , [1 , 1 ,1]);
-% set(0,'defaultAxesFontSize',14)
-% ax = gca;
-% ax.XGrid = 'on';
-% ax.XMinorGrid = 'on';
-% ax.YGrid = 'on';
-% ax.YMinorGrid = 'on';
-% ax.GridColor = [1, 1, 1];
-% ax.GridAlpha = 0.4;
+% Plot Settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 
