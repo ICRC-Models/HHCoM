@@ -1,7 +1,7 @@
 % Load parameters and other input data. Accepts steps per year as an
 % argument
 function[] = loadUp(stepsPerYear)
-load('Z:\SA_HPV-HIV_model_3\HHCoM\Params\settings')
+load('Z:\Kenya_model_optim_calib\HHCoM\Params\settings')
 stepsPerYear = 6;
 
 %% import and save population parameters
@@ -116,7 +116,7 @@ save(fullfile(savdir ,'general'), 'disease' , 'viral' , 'hpvTypes' , 'hpvStates'
     'condUse' , 'kCD4' , 'kVl' , 'stepsPerYear'); % save general model parameters to a workspace file
 
 %% save parameters for mixInfect
-load('Z:\SA_HPV-HIV_model_3\HHCoM\Params\settings')
+load('Z:\Kenya_model_optim_calib\HHCoM\Params\settings')
 step = 1 / stepsPerYear;
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
@@ -289,20 +289,13 @@ disp('Done')
 clear
 file = [pwd , '\Config\Calibration_targets.xlsx'];
 savdir = [pwd , '\Params']; 
-cinPos2014_obs = xlsread(file , 'Calibration' , 'D2 : F11'); %CIN2/CIN3 Prevalence (HIV+) 2014, by age
-cinNeg2014_obs = xlsread(file , 'Calibration' , 'D12 : F21'); %CIN2/CIN3 Prevalence (HIV-) 2014, by age
+cinPos2007_obs = xlsread(file , 'Calibration' , 'D2 : F4'); %CIN2/CIN3 Prevalence (HIV+) 2007, by age
 
-% hpv_hiv_2008_obs = xlsread(file , 'Calibration' , 'D42 : F51'); % HPV Prevalence in HIV+ Women (no CIN2/3) 2008, by age
-% hpv_hivNeg_2008_obs = xlsread(file , 'Calibration' , 'D32 : F41'); % HPV Prevalence in HIV- Women (no CIN2/3) 2008, by age
+hpv_2000_obs = xlsread(file , 'Calibration' , 'D5 : F10'); % HPV Prevalence in HIV+ Women (no CIN2/3) 2000, by age
 
-hpv_hiv_obs = xlsread(file , 'Calibration' , 'D144 : F152'); % HPV Prevalence in HIV+ Women (All) 2014, by age
-hpv_hivNeg_obs = xlsread(file , 'Calibration' , 'D153 : F161'); % HPV Prevalence in HIV- Women (All) 2014, by age
-
-hpv_hivM2008_obs = xlsread(file , 'Calibration' , 'E52 : F55'); % HPV Prevalence in HIV+ Men, by age
-hpv_hivMNeg2008_obs = xlsread(file , 'Calibration' , 'E56 : F59'); % HPV Prevalence in HIV- Men, by age
-
-hivPrevM_obs = xlsread(file , 'Calibration' , 'D60 : F101'); % HIV Prevalence in Men 2003,2005,2006,2007,2008,2009, by age
-hivPrevF_obs = xlsread(file , 'Calibration' , 'D102 : F143'); % HIV Prevalence in Women 2003,2005,2006,2007,2008,2009, by age
+hpv_hiv_obs = xlsread(file , 'Calibration' , 'D11 : F15'); % HPV Prevalence in HIV+ Women (All) 2014, by age
+hivPrevM_obs = xlsread(file , 'Calibration' , 'D16 : F29'); % HIV Prevalence in Men 2003,2005,2006,2007,2008,2009, by age
+hivPrevF_obs = xlsread(file , 'Calibration' , 'D30 : F43'); % HIV Prevalence in Women 2003,2005,2006,2007,2008,2009, by age
 save(fullfile(savdir , 'calibData'))
 clear
 
