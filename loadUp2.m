@@ -48,7 +48,7 @@ stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1910;
 currYear = 2020;
-endYear = 2015; %currYear;
+endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
 % Compartments
@@ -90,6 +90,7 @@ load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , .
     'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
 muHIV(11 , 2) = 0.02; % fix typo
 
+% Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
     partnersM = zeros(age , risk);
@@ -107,6 +108,7 @@ else
     load([paramDir , 'calibratedParams'] , 'partnersM');
 end
 
+% Female partners per year by age and risk group
 if calibBool && any(2 == pIdx)
     idx = find(2 == pIdx);
     partnersF = zeros(age , risk);
@@ -123,7 +125,8 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'calibratedParams'] , 'partnersF');
 end    
-    
+
+% Male acts per partnership per year by age and risk group
 if calibBool && any(8 == pIdx)
     idx = find(8 == pIdx);
     maleActs = zeros(age , risk);
@@ -139,6 +142,7 @@ else
     load([paramDir , 'calibratedParams'] , 'maleActs');
 end
 
+% Female acts per partnership per year by age and risk group
 if calibBool && any(9 == pIdx)
     idx = find(9 == pIdx);
     femaleActs = zeros(age , risk);
@@ -154,6 +158,7 @@ else
     load([paramDir , 'calibratedParams'] , 'femaleActs');
 end
 
+% HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
     idx = find(14 == pIdx);
     hpv_hivClear = zeros(4 , 1);
@@ -165,6 +170,7 @@ else
     load([paramDir , 'calibratedParams'] , 'hpv_hivClear');
 end
 
+% CIN2 to CIN3 progression multiplier for HIV-positive women
 if calibBool && any(15 == pIdx)
     idx = find(15 == pIdx);
     c3c2Mults = zeros(4 , 1);
@@ -175,6 +181,7 @@ else
     load([paramDir , 'calibratedParams'] , 'c3c2Mults');
 end
 
+% CIN1 to CIN2 progression multiplier for HIV-positive women
 if calibBool && any(16 == pIdx)
     idx = find(16 == pIdx);
     c2c1Mults = zeros(4 , 1);
@@ -185,6 +192,7 @@ else
     load([paramDir , 'calibratedParams'] , 'c2c1Mults');
 end
 
+% Natural immunity multiplier
 if calibBool && any(18 == pIdx)
     idx = find(18 == pIdx);
     lambdaMultImm = zeros(age , 1);
@@ -210,7 +218,7 @@ end
 % % 9v HPV types
 % kCin1_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'C25'); % HPV to CIN1, ages 10-24
 % kCin2_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'D25'); % CIN1 to CIN2
-% kCin3_Cin2_orig(1, 1) = xlsread(file , 'CIN transitions by type', 'E25'); %CIN2 to CIN3
+% kCin3_Cin2_orig(1, 1) = xlsread(file , 'CIN transitions by type', 'E25'); % CIN2 to CIN3
 % kCC_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'F25'); % CIN3 to unlocalized
 % rNormal_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'G25'); % HPV to Well (natural immunity)
 % kInf_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'H25'); % CIN1 to HPV
@@ -230,7 +238,7 @@ end
 %     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
 %     'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
 
-%% Set transitions by age group based on pre-saved or calibrated values
+%% Set HPV/CIN/CC transitions by age group based on pre-saved or calibrated values
 
 % Set transitions in first age group from pre-saved or calibrated values
 load([paramDir , 'hpvCinCCTrans'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
@@ -246,6 +254,7 @@ kInf_Cin1 = zeros(16,2);
 kCin1_Cin2 = zeros(16,2);
 kCin2_Cin3 = zeros(16,2);
 
+% HPV to CIN1, ages 10-24
 if calibBool && any(27 == pIdx)
     idx = find(27 == pIdx);
     kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
@@ -256,6 +265,7 @@ else
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.6;
 end
 
+% CIN1 to CIN2, ages 10-24
 if calibBool && any(28 == pIdx)
     idx = find(28 == pIdx);
     kCin2_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
@@ -266,6 +276,7 @@ else
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.7;
 end
 
+% CIN2 to CIN3, ages 10-24
 if calibBool && any(29 == pIdx)
     idx = find(29 == pIdx);
     kCin3_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
@@ -276,6 +287,7 @@ else
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.7;
 end
 
+% CIN3 to unlocalized cancer, ages 10-24
 if calibBool && any(30 == pIdx)
     idx = find(30 == pIdx);
     kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
@@ -286,6 +298,7 @@ else
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.8;
 end
 
+% HPV to Well (or natural immunity), ages 10-24
 if calibBool && any(31 == pIdx)
     idx = find(31 == pIdx);
     rNormal_InfMult = paramSet(paramsSub{idx}.inds(:));
@@ -296,6 +309,7 @@ else
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2)*0.75;
 end
 
+% CIN1 to HPV, ages 10-24
 if calibBool && any(32 == pIdx)
     idx = find(32 == pIdx);
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
@@ -306,6 +320,7 @@ else
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2)*0.4;
 end
 
+% CIN2 to CIN1, ages 10-24
 if calibBool && any(33 == pIdx)
     idx = find(33 == pIdx);
     kCin1_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
@@ -316,6 +331,7 @@ else
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2)*0.3;
 end
 
+% CIN3 to CIN2, ages 10-24
 if calibBool && any(34 == pIdx)
     idx = find(34 == pIdx);
     kCin2_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
@@ -430,13 +446,16 @@ end
 %% Save demographic and behavioral parameters
 ageSexDebut = (10/max(1 , fivYrAgeGrpsOn*5)+1);
 
+% Initial population size
 mInit = popInit(: , 1); % initial male population size by age
 fInit = popInit(: , 2); % initial female population size by age
 
+% Risk distribution
 riskDist = zeros(age , risk , 2);
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
 
+% Mixing by age group
 if calibBool && any(6 == pIdx);
     idx = find(6 == pIdx);
     epsA = zeros(3 , 1);
@@ -445,7 +464,7 @@ if calibBool && any(6 == pIdx);
 else
     epsA = [0.3 ; 0.3 ; 0.3];
 end
-   
+% Mixing by risk group
 if calibBool && any(7 == pIdx);
     idx = find(7 == pIdx);
     epsR = zeros(3 , 1);
@@ -454,7 +473,6 @@ if calibBool && any(7 == pIdx);
 else
     epsR = [0.3 ; 0.3 ; 0.3];
 end
-
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
@@ -472,6 +490,7 @@ end
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
+% HIV tranmission rate
 analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
 vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
 vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
@@ -497,6 +516,7 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
 
+% HPV tranmission rates
 if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
@@ -511,7 +531,7 @@ else
     perPartnerHpv_nonV = perPartnerHpv_vax;
 end
 
-% IMMUNITY
+% Immunity
 rImmune = 0.024; % for HPV16, Johnson (2012)
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
