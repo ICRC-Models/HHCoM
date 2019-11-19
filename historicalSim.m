@@ -3,8 +3,6 @@
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '103119')
-paramSetIdx
-paramSet
 
 %%
 %close all; clear all; clc;
@@ -14,8 +12,8 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = ['toNow_' , date_abc , tstep_abc , paramSetIdx , '_nonVhpv'];
+%pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_8Nov19_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -69,9 +67,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Load saved parameters
 % disp('Initializing. Standby...')
-
 paramDir = [pwd , '/Params/'];
-
 % Load saved parameters
 % load([paramDir, 'generalParams'], 'stepsPerYear' , 'timeStep' , ...
 %     'startYear' , 'currYear' , 'endYear' , 'years' , ...
@@ -364,11 +360,11 @@ for i = iStart : length(s) - 1
         fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk))); 
         toHivAll = sort(toInd(allcomb(4 , 2 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
         
-        % Distribute HIV infections (HPV-)        
+        % Distribute HIV infections 
+        % % (HPV-)        
         % % popIn(fromNonHivNonHpv) = (1 - 0.002) .* popIn_init(fromNonHivNonHpv);    % reduce non-HIV infected
         % % popIn(toHivNonHpv) = (0.002) .* popIn_init(fromNonHivNonHpv);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
-
-        % Distribute HIV infections (HPV+)
+        % % (HPV+)
         % % popIn(fromNonHivHpv) = (1 - 0.001) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
         % % popIn(toHivHpv) = (0.001) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
         popIn(fromNonHivAll) = (1 - 0.001) .* popIn_init(fromNonHivAll);    % reduce non-HIV infected
@@ -477,7 +473,7 @@ for i = iStart : length(s) - 1
         % HPV vaccination module- school-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-            vaxRate);
+            vaxRate , toInd , sumall);
         pop(end , :) = pop(end , :) + dPop;
         if any(pop(end , :) < 0)
             disp('After hpvVaxSchool')
