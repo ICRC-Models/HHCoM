@@ -1,7 +1,7 @@
 % HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
 function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-    vaxRate)
+    vaxRate , toInd , sumall)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));

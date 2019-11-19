@@ -1,7 +1,7 @@
 % HPV vaccination in a limited vaccine scenario
 function[dPop , hpvVaxd , vaxRemain] = hpvVaxLmtd(pop , year , vaxLimitPerYr , ...
     disease , viral , risk , hpvVaxStates , hpvNonVaxStates , endpoints , ...
-    intervens , vaxCoverL , vaxRemain , vaxGL)
+    intervens , vaxCoverL , vaxRemain , vaxGL , toInd , sumall)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
