@@ -28,7 +28,7 @@ years = endYear - startYear;
 
 % Adjust parameters different than calibrated
 perPartnerHpv = 0.0045;
-condUse = 0.5 * 0.5;
+condUse = 0.75;
 epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
@@ -131,12 +131,12 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 %% Screening
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
-cytoSens = [0.0 , 0.0 , 0.57 , 0.57 , 0.57 , 0.57 , 0.57 , 0.0 , 0.0 , 0.0];
+viaSens = [0.0 , 0.0 , 0.78 , 0.78 , 0.78 , 0.78 , 0.78 , 0.0 , 0.0 , 0.0];
 
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.164; 0.164; 0.164; 0.164; 0.164; 0.164];
 baseline.screenAge = 8;
-baseline.testSens = cytoSens;
+baseline.testSens = viaSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72;
 baseline.cinTreatEff = [0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.905 , 0.905 , 0.905 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
