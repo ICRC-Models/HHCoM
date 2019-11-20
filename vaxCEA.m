@@ -105,8 +105,7 @@ figure();
 for i = 1 : length(inds)
     % % plotTits = {plotTits2{(i*2-1):(i*2)}};
     
-    noV.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
-    for n = 1 : nSims-2
+    for n = 1 : nSims
         vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
     end
      
@@ -123,6 +122,8 @@ for i = 1 : length(inds)
     for aInd = 1 : age + 4
         if aInd >= age
             a = age;
+        else
+            a = aInd;
         end
         
         % General
@@ -146,11 +147,11 @@ for i = 1 : length(inds)
         for n = 1 : nSims
             if aInd <= age
                 ccIncRef = ...
-                    (annlz(sum(sum(sum(noV.newCC(: , inds{i} , a , :),2),3),4)) ./ ...
-                    (annlz(sum(noV.popVec(: , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
+                    (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4)) ./ ...
+                    (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
                     .* (worldStandard_WP2015(a));
                     %.* (annlz(sum(noV.popVec(: , genArray{3}) , 2) ./ stepsPerYear));
-                if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(noV.newCC(: , inds{i} , : , a),2),3),4))) == 0.0)
+                if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4))) == 0.0)
                     ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
                 end
             elseif aInd > age
@@ -172,6 +173,10 @@ for i = 1 : length(inds)
          [plotTits1{i} , ': Efficacy: ' , num2str(round(noV.vaxEff * 100)) '% ,', ...
          'Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
     legend('-DynamicLegend');
+    grid on;
+    xlim([1980 2120]);
+    ylim([0 150]);
+    xticks([1980 : 20 : 2120]);
     hold all;
 
 %     for n = 1 : length(vaxResult)-2
@@ -490,7 +495,7 @@ plot(tVec , sum(noV.popVec(:,genArray{1}),2) + sum(noV.popVec(:,genArray{2}),2) 
 % end
 title('Population Size')
 xlabel('Year'); ylabel('Individuals')
-xlim([1950 2120]);
+%xlim([1950 2120]);
 legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
 hold off
 
@@ -508,7 +513,7 @@ for aInd = 1:length(aVec)
 end
 plot(tVec , popProp);
 ylabel('Proportion'); xlabel('Year');
-xlim([1950 2120]);
+%xlim([1950 2120]);
 legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
 
 %% Proportion HIV population on ART
@@ -697,7 +702,7 @@ for g = 1 : gender
     hold all;
     plot(prevYears , hivData(:,:,g) , 'ro');
     xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
-    xlim([1980 2120])
+    %xlim([1980 2120])
     legend('Model' , 'Africa Center Data (Calibration)')
 end
 
@@ -875,7 +880,7 @@ for a = 1 : age
     plot(tVec(1 : stepsPerYear : end) , noV.hivInc);
     title(' HIV Incidence')
     xlabel('Year'); ylabel('Incidence per 100,000')
-    xlim([2018 2050])
+    %xlim([2018 2050])
     hold all;
 end
 
@@ -930,7 +935,7 @@ for a = 1 : age
     plot(tVec(1 : stepsPerYear : end) , noV.artInc , '-');
     title(['Ages: ' , ageGroup{a}])
     xlabel('Year'); ylabel('New females on ART')
-    xlim([2000 2120])
+    %xlim([2000 2120])
     hold all;
 end
 
