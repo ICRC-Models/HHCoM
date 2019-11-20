@@ -60,11 +60,12 @@ paramDir = [pwd , '\Params\'];
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2] = loadUp2(1 , 0 , [] , [] , []);
 
+% Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
-% Plot Settings
+% Plot settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 
