@@ -2,7 +2,7 @@
 function [paramsAll] = genParamStruct()
 
 numParams = 25;
-paramsAll = cellnum(numParams,1);
+paramsAll = cell(numParams,1);
 % partnersM, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 1; ... %24;
     paramsAll{1}.lb = ones(paramsAll{1}.length,1).*0.2; %[ones(paramsAll{1}.length*(1/3),1).*0.01; ones(paramsAll{1}.length*(1/3),1).*0.01; ...
