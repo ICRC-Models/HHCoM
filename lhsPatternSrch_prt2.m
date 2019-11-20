@@ -11,11 +11,10 @@ function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn)
 t_curr = tstep;
 
 %% Load parameters
-%paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat']);
-
+paramDir = [pwd , '/Params/'];
+paramSetMatrix = load([paramDir,'paramSets_patternSrch_' , dateIn , '_' , num2str(t_curr) , '.dat']);
 % pIdx = [1,2,5,6,7,8,9,10,19,22,25];    % indices in paramsAll cell array
 % file = ['pIdx_patternSrch_' , date , '_' , num2str(t_curr) , '.dat'];
-% paramDir = [pwd , '/Params/'];
 % csvwrite([paramDir, file] , pIdx)
 pIdx = load([paramDir,'pIdx_patternSrch_' , dateIn , '_0.dat']);
 
@@ -43,7 +42,7 @@ options = psoptimset('UseParallel' , true , 'Cache' , 'on' ,...
     'CacheTol' , 0.000000001 , 'CompletePoll' , 'on' , ...
     'TolMesh' , 0.001 , 'MaxIter' , 10 , ... 
     'Display','iter' , 'PlotFcn' , @psplotbestf);
-[optiParams , negSumLogL , exitFlag , output] = patternsearch(@calibratorPtrnSrch, initParams , [] , [] , [] , [] , lb , ub , [] , options);
+[optiParams , negSumLogL , exitFlag , output] = patternsearch(@historicalSim, initParams , [] , [] , [] , [] , lb , ub , [] , options);
 
 %% Save parameter sets and negSumLogL values
 file = ['negSumLogL_patternSrch_' , dateIn , '_' , num2str(t_curr) , '_params.dat']; %, '_' , paramSetIdx
