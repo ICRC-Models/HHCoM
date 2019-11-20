@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --job-name=ptrnSrch_${SETIDX}              # Job name
-#SBATCH --chdir=/gscratch/csde/carajb/HHCoM        # Working directory
-#SBATCH --mail-type=FAIL           		     # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
-#SBATCH --mail-user=carajb@uw.edu
+#SBATCH --chdir=/gscratch/csde/guiliu/HHCoM        # Working directory
+#SBATCH --mail-type=ALL           		     # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
+#SBATCH --mail-user=guiliu@uw.edu
 #SBATCH --export=all                    	     # Export environment variables to the batch job session
 
 #SBATCH --account=csde      	                     # Allocation Definition
@@ -28,9 +28,9 @@ export DATE
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
-mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
+mkdir -p /gscratch/csde/guiliu/$SLURM_JOB_ID
 matlab -nodisplay -nosplash -r "lhsPatternSrch_prt2(${SETIDX} , ${TCURR} , '${DATE}')"
 
-rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
+rm -r /gscratch/csde/guiliu/$SLURM_JOB_ID
 
 date
