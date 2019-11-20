@@ -32,7 +32,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_8Nov19_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0';
+pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0_fixAcutART-incInitHIV';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -386,8 +386,8 @@ for i = iStart : length(s) - 1
         % % (HPV+)
         % % popIn(fromNonHivHpv) = (1 - 0.001) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
         % % popIn(toHivHpv) = (0.001) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
-        popIn(fromNonHivAll) = (1 - 0.001) .* popIn_init(fromNonHivAll);    % reduce non-HIV infected
-        popIn(toHivAll) = (0.001) .* popIn_init(fromNonHivAll);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
+        popIn(fromNonHivAll) = (1 - 0.002) .* popIn_init(fromNonHivAll);    % reduce non-HIV infected
+        popIn(toHivAll) = (0.002) .* popIn_init(fromNonHivAll);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
         
     end
 
