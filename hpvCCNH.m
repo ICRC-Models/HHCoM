@@ -37,18 +37,18 @@ for d = 1 : disease
     c2c3Mult = 1;
     deathCC = muCC(6 , :); % HIV-negative CC-associated mortality
     % Multipliers for HIV-positives with CD4>500 --> CD4<200; set increased CC-associated mortality
-    if d > 2 && d < 7
-        rHivHpv_Clear = hpv_hivClear(d - 2); % Infection clearance multiplier
-        rHiv = rImmuneHiv(d - 2); % Multiplier for immunity clearance for HIV+
-        c3c2Mult = c3c2Mults(d - 2); % CIN2 -> CIN3 progression multiplier
-        c2c1Mult = c2c1Mults(d - 2); % CIN1 -> CIN2 progression multiplier
-        c1c2Mult = hpv_hivClear(d - 2); % CIN2 -> CIN1 regression multiplier
-        rHivHpvMult = hpv_hivClear(d - 2);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
-        c2c3Mult = hpv_hivClear(d - 2); % CIN3 -> CIN2 regression multiplier
-        deathCC = muCC(d - 2 , :); % HIV-positive CC-associated mortality     
+    if d > 3 && d < 8
+        rHivHpv_Clear = hpv_hivClear(d - 3); % Infection clearance multiplier
+        rHiv = rImmuneHiv(d - 3); % Multiplier for immunity clearance for HIV+
+        c3c2Mult = c3c2Mults(d - 3); % CIN2 -> CIN3 progression multiplier
+        c2c1Mult = c2c1Mults(d - 3); % CIN1 -> CIN2 progression multiplier
+        c1c2Mult = hpv_hivClear(d - 3); % CIN2 -> CIN1 regression multiplier
+        rHivHpvMult = hpv_hivClear(d - 3);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
+        c2c3Mult = hpv_hivClear(d - 3); % CIN3 -> CIN2 regression multiplier
+        deathCC = muCC(d - 3 , :); % HIV-positive CC-associated mortality     
     % Multipliers for HIV-positives on ART equivalent to those for CD4>500; ...
     % set CC-associated mortality equivalent to CD4>500
-    elseif d == 10
+    elseif d == 8
         rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
         c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 progression multiplier
