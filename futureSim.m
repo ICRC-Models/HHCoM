@@ -13,10 +13,10 @@
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_8Nov19_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0_fixAcutART-incInitHIV_savIncHivArtChar_fixHIVMult']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '8Nov19_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0_fixAcutART-incInitHIV_savIncHivArtChar_fixHIVMult_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -371,7 +371,7 @@ parfor n = 1 : nTests
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
     deaths = zeros(size(popVec));
-    newHiv = zeros(length(s) - 1 , gender , age , risk);
+    newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
@@ -394,7 +394,7 @@ parfor n = 1 : nTests
     import java.util.LinkedList
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
-    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
@@ -448,9 +448,9 @@ parfor n = 1 : nTests
         % HIV and HPV mixing and infection module. Protective effects of condom
         % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
         [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
-            newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , :)] = ...
+            newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , : , : , : , :)] = ...
             ode4xtra(@(t , pop) mixInfect(t , pop , ...
-            stepsPerYear , year , disease , intervens , gender , ...
+            stepsPerYear , year , disease , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
             age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
             partnersM , partnersF , maleActs , femaleActs , ...
             perPartnerHpv_vax , perPartnerHpv_nonV , vaxInds , nonVInds , ...
@@ -469,11 +469,12 @@ parfor n = 1 : nTests
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , artDist , muHIV , ...
-                kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , gender , age , risk , ...
+                kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , ...
+                hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year , sumall) , tspan , popIn);
                 popIn = pop(end , :);    
-            artTreatTracker(i , : , : , : , :  ,:) = artTreat;
-            artDistList.add(artTreat);
+            artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
+            artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
             if artDistList.size() >= stepsPerYear * 2
                 artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
             end
