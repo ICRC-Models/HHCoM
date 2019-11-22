@@ -5,7 +5,7 @@
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
 function [dPop , newInfs] = mixInfect(t , pop , ...
-    stepsPerYear , year , disease , intervens , gender , ...
+    stepsPerYear , year , disease , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
     age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , maleActs , femaleActs , ...
     perPartnerHpv_vax , perPartnerHpv_nonV , vaxInds , nonVInds , ...
@@ -20,7 +20,7 @@ newHpvVax = zeros(gender , disease , age , risk , intervens);
 newImmHpvVax = newHpvVax;
 newHpvNonVax = newHpvVax;
 newImmHpvNonVax = newHpvVax;
-newHiv = zeros(gender , age , risk);
+newHiv = zeros(hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 %% Find epsAge and epsRisk according to the present year (extent of assortative mixing) 
 % Random mixing (epsilon = 1), mixing proportional to relative sizes of all compartments
@@ -443,31 +443,37 @@ for g = 1 : gender
 end
 
 % calculate new HIV infections
-for a = ageSexDebut : age
-    for r = 1 : risk
-        if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero
-            for d = 1 : 2
-                % Prepare indices
-                mSus = hivSus(d , 1 , a , r , :);
-                fSus = hivSus(d , 2 , a , r , :);
-                mTo = toHiv(1 , a , r , :); % set disease state = 3 (acute infection)
-                fTo = toHiv(2 , a , r , :);
-                
-                % Calculate infections
-                mInfected = min(lambda(1 , a , r)...
-                    .* psi(d) , 0.999) .* pop(mSus); % infected males
-                fInfected = min(lambda(2 , a , r)...
-                    .* psi(d) , 0.999) .* pop(fSus); % infected females
+for h = 1 : hpvVaxStates
+    for s = 1 : hpvNonVaxStates
+        for x = 1 : endpoints
+            for a = ageSexDebut : age
+                for r = 1 : risk
+                    if lambda(1 , a , r) > 10 ^ - 6 || lambda(2 , a , r) > 10 ^ -6 % only evaluate if lambda is non-zero
+                        for d = 1 : 2
+                            % Prepare indices
+                            mSus = hivSus(d , h , s , x , 1 , a , r , :);
+                            fSus = hivSus(d , h , s , x , 2 , a , r , :);
+                            mTo = toHiv(h , s , x , 1 , a , r , :); % set disease state = 3 (acute infection)
+                            fTo = toHiv(h , s , x , 2 , a , r , :);
 
-                % HIV incidence tracker
-                newHiv(1 , a , r) = newHiv(1 , a , r) + sumall(mInfected);
-                newHiv(2 , a , r) = newHiv(2 , a , r) + sumall(fInfected);
-                
-                % Adjust compartments
-                dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
-                dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
-                dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
-                dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
+                            % Calculate infections
+                            mInfected = min(lambda(1 , a , r)...
+                                .* psi(d) , 0.999) .* pop(mSus); % infected males
+                            fInfected = min(lambda(2 , a , r)...
+                                .* psi(d) , 0.999) .* pop(fSus); % infected females
+
+                            % HIV incidence tracker
+                            newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);
+                            newHiv(h , s , x , 2 , a , r) = newHiv(h , s , x , 2 , a , r) + sumall(fInfected);
+
+                            % Adjust compartments
+                            dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
+                            dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
+                            dPop(mTo) = dPop(mTo) + mInfected; % influx of infected males
+                            dPop(fTo) = dPop(fTo) + fInfected; % influx of infected females
+                        end
+                    end
+                end
             end
         end
     end
