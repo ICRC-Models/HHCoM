@@ -766,7 +766,7 @@ for d = 1 : disease
                     hpvNonVaxSus(d , g , a , r , p , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 , 1 : 3 , p , g , a , r)));
                     hpvNonVaxImm(d , g , a , r , p , :) = ...
-                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvNonVaxStates , 7 , 1 : 3 , p , g , a , r)));
+                        sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 7 , 1 : 3 , p , g , a , r)));
                     hpvNonVaxInf(d , g , a , r , p , :) = ...
                         sort(toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 2 , 1 : 3 , p , g , a , r)));
                 end
@@ -833,7 +833,7 @@ end
 %     'toHiv' , 'vaxInds' , 'nonVInds' , 'hpvVaxInf' , 'hpvNonVaxInf');
 % disp('mixInfect indices loaded')
 
-%% hiv2a.m indices
+%% hivNH.m indices
 hivInds = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , intervens);
 for d = 1 : disease
     for v = 1 : viral
@@ -858,7 +858,7 @@ end
 % save([paramDir , 'hivIndices'] , 'hivInds')
 % disp('hiv2a indices loaded')
 
-%% hpvCCdet.m indices
+%% hpvCCNH.m indices
 % disp('Preparing indices for HPV modules...')
 
 cin3hpvVaxIndsFrom = zeros(disease , hpvNonVaxStates , age , viral * intervens * risk * 3);
