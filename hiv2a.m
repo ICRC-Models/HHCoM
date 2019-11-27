@@ -337,7 +337,10 @@ for g = 1 : gender
             % Dropout from ART (d = 10)
             dPop(hivPositiveArt) = ...
                 dPop(hivPositiveArt)...
-                - artOut .* pop(hivPositiveArt); % artOut to d = 2:6 as determined by distribution matrix
+                - artOut .* pop(hivPositiveArt) ...
+                - muHIV(a , 6) .* pop(hivPositiveArt); % artOut to d = 2:6 as determined by distribution matrix
+            
+            hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 6) .* pop(hivPositiveArt));
         end
     end
 end
