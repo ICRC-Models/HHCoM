@@ -1328,7 +1328,7 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
     '60-64' , '65-69' , '70-74' , '75-79'};
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
-ccYrs = ((ccIncYears - startYear) * stepsPerYear :...
+ccYrs = ((ccIncYears - startYear) * stepsPerYear : ...
     (ccIncYears + 1 - startYear) * stepsPerYear);
 
 %aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
@@ -1498,7 +1498,7 @@ for y = 1 : length(ccIncYears)
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 1 , y) , '-kp' , 1 : size(ccNegPosArtTot, 1) , ...
         ccNegPosArtTot(: , 2 , y) , '-k+' , 1 : size(ccNegPosArtTot, 1) , ccNegPosArtTot(: , 3 , y) , '-k^');
     hold on
-    plot(4 : age , globocan_ub , 'r--' , 4 : age , globocan_lb , 'r--') % 4 : 16 , globocan , 'r-' , 
+    plot(4 : age , globocan_ub , 'r--' , 4 : age , globocan_lb , 'r--' , 4 : age , ccInc2011_dObs(: , 2) , 'r-') 
     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Globocan SA' , 'Upper Bound' , 'Lower Bound')
     xlabel('Age Group'); ylabel('Incidence per 100,000')
