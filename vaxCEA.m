@@ -11,7 +11,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_101619_noBaseVax_baseScreen_5yr_artOutAdjCov095_090cap']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_112619_5yrAgeGrps_noBaseVax_baseScreen_artHivDeathCD4200']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -35,7 +35,7 @@ parfor n = 1 : nSims
     vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :); vaxResult{n}.newHpv(2 : end , : , : , : , :)];
     vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :); vaxResult{n}.newImmHpv(2 : end , : , : , : , :)];
     vaxResult{n}.newVaxHpv= [curr.newVaxHpv(1 : end , : , : , : , :); vaxResult{n}.newVaxHpv(2 : end , : , : , : , :)];
-    %vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)];
+    vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)];
     vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : ,:)];
     vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , :); vaxResult{n}.newHiv(2 : end , : , : ,:)];
     vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
