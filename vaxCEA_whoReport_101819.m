@@ -74,7 +74,7 @@ for j = 1 : nResults
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
         23477 9261 2155];
     
-    for i = 1 : length(inds)
+    for i = 1 : length(inds)-1
         for n = 1 : nSims
             vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
         end
@@ -136,25 +136,96 @@ for j = 1 : nResults
         end
         
         % Save incidence results
-        for n = 1 : nSims
-            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
-            sname = plotTits1{i};
-            if exist(fname , 'file') == 2
-                M = xlsread(fname);
-                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-                xlswrite(fname , M , sname)
-            else
-                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
-            end
-        end
-%         hold all;
-%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '--')
-%         hold all;
-%         axis([1980 2120 0 150])
-%         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
-%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
+%         for n = 1 : nSims
+%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+%                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
+%             sname = plotTits1{i};
+%             if exist(fname , 'file') == 2
+%                 M = xlsread(fname);
+%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+%                 xlswrite(fname , M , sname)
+%             else
+%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+%             end
+%         end
+        hold all;
+        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '-')
+        hold all;
+        axis([2020 2120 0 150])
+        xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
+        legend('General- no HPV mults on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
+            'General- no increased CC death on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
+            'General- baseline' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
 
+    end  
+    
+    %% CC INCIDENCE - not age standardized
+    inds = {':' , [1,7:9] , [2 : 6] , 10 , [2:6,10]}; % HIV state inds
+    plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+    fac = 10 ^ 5;
+    
+    for i = 1 : length(inds)-1
+        for n = 1 : nSims
+            vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
+        end
+        
+        % General
+        allF = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 1 : age , 1 : risk)); ...
+            toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 1 : age , 1 : risk))];
+        % All HIV-negative women
+        hivNeg = [toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvTypes , 1 : 4 , 1 : periods , ...
+            2 , 1 : age , 1 : risk)); ...
+            toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvTypes , 9 : 10 , 1 : periods , ...
+            2 , 1 : age , 1 : risk))];
+        % HIV-positive women not on ART
+        hivNoARTF = [toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 1 : age , 1 : risk)); ...
+            toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 1 : age , 1 : risk))];
+        % Women on ART
+        artF = [toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 1 : age , 1 : risk)); ...
+            toInd(allcomb(10 , 6 , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 1 : age , 1 : risk))];
+        % All HIV-positive women
+        hivAllF = [toInd(allcomb([2:6,10] , 1 : viral , 1 : hpvTypes , 1 : 4 , ...
+            1 : periods , 2 , 1 : age , 1 : risk)); ...
+            toInd(allcomb([2:6,10] , 1 : viral , 1 : hpvTypes , 9 : 10 , ...
+            1 : periods , 2 , 1 : age , 1 : risk))];
+        genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
+
+        % Calculate incidence
+        for n = 1 : nSims
+            ccIncRef = ...
+                (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , : , 1 : age),2),3),4)) ./ ...
+                (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+            vaxResult{n}.ccIncRef = ccIncRef;
+            vaxResult{n}.ccInc = vaxResult{n}.ccIncRef;
+        end
+
+        % Save incidence results
+    %         for n = 1 : nSims
+    %             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+    %                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
+    %             sname = plotTits1{i};
+    %             if exist(fname , 'file') == 2
+    %                 M = xlsread(fname);
+    %                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+    %                 xlswrite(fname , M , sname)
+    %             else
+    %                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+    %             end
+    %         end
+        hold all;
+        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , ':')
+        hold all;
+        axis([2020 2120 0 300])
+        xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
+        legend('General- baseline' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART', ...
+            'General- no HPV mults on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
+            'General- no increased CC death on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
     end  
 
 %% CC MORTALITY - age standardized
