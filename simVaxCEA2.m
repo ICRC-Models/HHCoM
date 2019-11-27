@@ -106,13 +106,13 @@ maxRateF2 = maxRateF_vec(2);
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_101819_5yrAgeGrps_noBaseVax_baseScreen']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_112619_5yrAgeGrps_noBaseVax_baseScreen_artHivDeathCD4200']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '101819_5yrAgeGrps_noBaseVax_baseScreen_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '112619_5yrAgeGrps_noBaseVax_baseScreen_artHivDeathCD4200_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
