@@ -149,13 +149,14 @@ for j = 1 : nResults
 %             end
 %         end
         hold all;
-        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '-')
+        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , ':')
         hold all;
         axis([2020 2120 0 150])
         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
         legend('General- no HPV mults on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
             'General- no increased CC death on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
-            'General- baseline' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
+            'General- baseline' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
+            'General- ART HIV death CD4<200' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
 
     end  
     
@@ -225,7 +226,8 @@ for j = 1 : nResults
         xlabel('Year'); ylabel('Incidence rates (per 100K)'); 
         legend('General- baseline' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART', ...
             'General- no HPV mults on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
-            'General- no increased CC death on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
+            'General- no increased CC death on ART' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , ...
+            'General- ART HIV death CD4<200' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART');
     end  
 
 %% CC MORTALITY - age standardized
