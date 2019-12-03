@@ -94,7 +94,7 @@ muHIV(11 , 2) = 0.02; % fix typo
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
     partnersM = zeros(age , risk);
-    partnersMmult = paramSet(paramsSub{idx}.inds(:));
+    %partnersMmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
@@ -102,8 +102,16 @@ if calibBool && any(1 == pIdx)
     partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
     %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
     %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-    partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
-    % partnersM(10:age , 3) = ones(7 , 1);
+    %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
+    %partnersM(10:age , 3) = ones(7 , 1);
+    partnersM(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
+    partnersM(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
+    partnersM(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
+    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7));
+    partnersM(3 , 3) = paramSet(paramsSub{idx}.inds(8));
+    for a = 4 : age
+        partnersM(a , 2:3) = (partnersM(a , 1)/partnersM(a-1 , 1)) .* partnersM(a-1 , 2:3);
+    end
 else 
     load([paramDir , 'calibratedParams'] , 'partnersM');
 end
@@ -112,7 +120,7 @@ end
 if calibBool && any(2 == pIdx)
     idx = find(2 == pIdx);
     partnersF = zeros(age , risk);
-    partnersFmult = paramSet(paramsSub{idx}.inds(:));
+    %partnersFmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
@@ -120,8 +128,16 @@ if calibBool && any(2 == pIdx)
     partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
     %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
     %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-    partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-    % partnersF(10:age , 3) = ones(7 , 1);
+    %partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
+    %partnersF(10:age , 3) = ones(7 , 1);
+    partnersF(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
+    partnersF(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
+    partnersF(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
+    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7));
+    partnersF(3 , 3) = paramSet(paramsSub{idx}.inds(8));
+    for a = 4 : age
+        partnersF(a , 2:3) = (partnersF(a , 1)/partnersF(a-1 , 1)) .* partnersF(a-1 , 2:3);
+    end
 else
     load([paramDir , 'calibratedParams'] , 'partnersF');
 end    
