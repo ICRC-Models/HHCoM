@@ -1,7 +1,7 @@
 
 LEGEND:
 _________________________________________________________________________
-pop(d , v , h , s , p , g , a , r)
+pop(d , v , h , s , x , p , g , a , r)
 d - (disease) Disease
 v - (viral) Viral load
 h - (hpvVaxStates) Vaccine-type HPV precancer state
