@@ -26,7 +26,7 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %%
 %close all; clear all; clc;
 tic
-% profile clear;
+%profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
@@ -238,7 +238,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
 % disp('Start up')
-% profile on
+%profile on
 % disp(' ')
 
 % If starting from beginning
@@ -479,8 +479,9 @@ for i = iStart : length(s) - 1
     % Birth, aging, risk redistribution module
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , ...
-        gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , hivFertPosBirth ,...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
+        gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
+        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
+        hivFertNegBirth3 , deathMat , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear , sumall) , tspan , popIn);
@@ -533,7 +534,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
 disp(' ')
 disp('Simulation complete.')
 toc
-% profile viewer
+%profile viewer
 
 %% Calculate summed log-likelihood
 if calibBool    
