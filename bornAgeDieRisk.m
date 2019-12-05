@@ -50,10 +50,21 @@ if year > 1990 && year <= 2010
     dFertMat = (fertMat2 - fertMat) ...
         ./ ((2010 - 1990) * stepsPerYear);
     fertMat = fertMat + dFertMat .* dt;
-elseif year >= 2010
-    fertMat = fertMat2;
-    hivFertPosBirth = hivFertPosBirth2;
-    hivFertNegBirth = hivFertNegBirth2;
+elseif year > 2010 && year <=2020
+    dt = (year - 2010) * stepsPerYear;
+    dFertPos = (hivFertPosBirth3 - hivFertPosBirth2) ...
+        ./ ((2020 - 2010) * stepsPerYear);
+    hivFertPosBirth = hivFertPosBirth2 + dFertPos .* dt;
+    dFertNeg = (hivFertNegBirth3 - hivFertNegBirth2) ...
+        ./ ((2020 - 2010) * stepsPerYear);
+    hivFertNegBirth = hivFertNegBirth2 + dFertNeg .* dt;
+    dFertMat = (fertMat3 - fertMat2) ...
+        ./ ((2020 - 2010) * stepsPerYear);
+    fertMat = fertMat2 + dFertMat .* dt;
+elseif year > 2020
+    hivFertPosBirth = hivFertPosBirth3;
+    hivFertNegBirth = hivFertNegBirth3;
+    fertMat = fertMat3;
 end
 
 hivFertPosBirth = hivFertPosBirth .* kHiv;
