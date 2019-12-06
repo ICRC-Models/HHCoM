@@ -26,13 +26,13 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %%
 %close all; clear all; clc;
 tic
-%profile clear;
+profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020';
+pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -238,7 +238,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
 % disp('Start up')
-%profile on
+profile on
 % disp(' ')
 
 % If starting from beginning
@@ -306,10 +306,10 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = zeros(length(s) - 1 , 1);
     
     % ART
-    import java.util.LinkedList
-    artDistList = LinkedList();
-    artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-    artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %import java.util.LinkedList
+    %artDistList = LinkedList();
+    %artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
 elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
@@ -344,10 +344,10 @@ elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = chckPntIn.vaxdSchool;
     
     % ART
-    import java.util.LinkedList
-    artDistList = chckPntIn.artDistList;
-    artDist = chckPntIn.artDist;
-    artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %import java.util.LinkedList
+    %artDistList = chckPntIn.artDistList;
+    %artDist = chckPntIn.artDist;
+    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 end
 
 %% Main body of simulation
@@ -458,18 +458,18 @@ for i = iStart : length(s) - 1
     % excess HIV mortality
     if (hivOn && (year >= hivStartYear))
         [~ , pop , hivDeaths(i , : , :) , artTreat] =...
-            ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , artDist , muHIV , ...
+            ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , ... %artDist , 
             kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
             ageSexDebut , hivInds , stepsPerYear , year , sumall) , tspan , popIn);
         popIn = pop(end , :);
-        artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
-        artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
-        if artDistList.size() >= stepsPerYear * 2
-            artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
-        end
-        artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk , sumall);
+        %artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
+        %artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
+        %if artDistList.size() >= stepsPerYear * 2
+        %    artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
+        %end
+        %artDist = calcDist(artDistList , disease , viral , gender , age , ...
+        %    risk , sumall);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
@@ -514,7 +514,7 @@ for i = iStart : length(s) - 1
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
             'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
             'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-            'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
+            'newCC' , ... %'artDist' , 'artDistList' , 'artTreatTracker' , ...
             'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 end
@@ -528,13 +528,13 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
+    'newCC' , ... %'artDist' , 'artDistList' , 'artTreatTracker' , ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')
 disp('Simulation complete.')
 toc
-%profile viewer
+profile viewer
 
 %% Calculate summed log-likelihood
 if calibBool    

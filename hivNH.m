@@ -12,7 +12,7 @@
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
 
-function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , artDist , muHIV , ...
+function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , ... %artDist ,
     kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year , sumall)
@@ -24,7 +24,7 @@ hivDeaths = zeros(gender , age , 1);
 
 %% Calculate ART treatment coverage
 artOut = 0.0; %0.118; %0.0619; %0.03; % ART dropout rate
-artDist = reshape(artDist, [disease , viral , gender , age , risk]);
+artDist = zeros(disease , viral , gender , age , risk); %reshape(artDist, [disease , viral , gender , age , risk]);
 treat = zeros(disease , viral , gender , age ,risk);
 
 %CD4 > 200, from 2006 to 2013
