@@ -859,24 +859,23 @@ end
 % disp('mixInfect indices loaded')
 
 %% hivNH.m indices
-hivInds = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , intervens);
+hivInds = zeros(disease , viral , gender , age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
 for d = 1 : disease
     for v = 1 : viral
-        for h = 1 : hpvVaxStates
-            for s = 1 : hpvNonVaxStates
-                for x = 1 : endpoints
+%         for h = 1 : hpvVaxStates
+%             for s = 1 : hpvNonVaxStates
+%                 for x = 1 : endpoints
                     for g = 1 : gender
                         for a = 1 : age
                             for r = 1 :risk
-                                hivInds(d , v , h , s , x , g , a , r , :) = ...
-                                    sort(toInd(allcomb(d , v , h , s , ...
-                                    x , 1 : intervens , g , a , r)));
+                                hivInds(d , v , g , a , r , :) = ...
+                                    sort(toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , r)));
                             end
                         end
                     end
-                end
-            end
-        end
+%                 end
+%             end
+%         end
     end
 end
 
