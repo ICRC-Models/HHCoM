@@ -9,9 +9,9 @@ paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_cu
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
 %% Filter out failed parameter sets (timed-out, etc.)
-numSubsets = size(negSumLogLmatrix,1)/29; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
-negS_format = reshape(negSumLogLmatrix , [29,numSubsets]); % first row is paramSetIdx, next 16 rows log-likelihoods for that sub-set
-setVec = [1:28:nSets];
+numSubsets = size(negSumLogLmatrix,1)/5; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
+negS_format = reshape(negSumLogLmatrix , [5,numSubsets]); % first row is paramSetIdx, next 4 rows log-likelihoods for that sub-set
+setVec = [1:4:nSets];
 missingV = [];
 for j = 1 : length(setVec) % identify failed parameter sets
      if ~any(setVec(j) == negS_format(1,:))

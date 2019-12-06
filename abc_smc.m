@@ -4,7 +4,7 @@
 
 function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
 t = tstep_abc;
-alpha = (5998/9996);
+alpha = 0.6; %(5998/9996);
 p_acc_min = 0.05;
 date = date_abc;
 
@@ -19,25 +19,25 @@ pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
 %% Filter out failed parameter sets (timed-out, etc.)
-numSubsets = size(negSumLogLmatrix,1)/29; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
-negS_format = reshape(negSumLogLmatrix , [29,numSubsets]); % first row is paramSetIdx, next 28 rows log-likelihoods for that sub-set
+numSubsets = size(negSumLogLmatrix,1)/5; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
+negS_format = reshape(negSumLogLmatrix , [5,numSubsets]); % first row is paramSetIdx, next 4 rows log-likelihoods for that sub-set
 
 [uniqueN uInds v] = unique(negS_format(1,:) , 'first'); % remove duplicate sub-set runs
 negS_format = negS_format(:,uInds);
 numSubsets = size(negS_format,2); % reset as number unique sub-sets
 
-maxV = min(max(negS_format(1,:)) , nSets-27); % find maximum paramSetIdx
-setVec = [1:28:maxV];
+maxV = min(max(negS_format(1,:)) , nSets-3); % find maximum paramSetIdx
+setVec = [1:4:maxV];
 missingV = [];
 extraVll = [];
 keepV = [];
 keepVll = [];
 for j = 1 : length(setVec) % identify failed or extra parameter sets
      if ~any(setVec(j) == negS_format(1,:)) 
-         missingV = [missingV , [setVec(j) : setVec(j)+27]];
+         missingV = [missingV , [setVec(j) : setVec(j)+3]];
          extraVll = [extraVll , setVec(j)];
      else
-         keepV = [keepV , [setVec(j) : setVec(j)+27]];
+         keepV = [keepV , [setVec(j) : setVec(j)+3]];
          keepVll = [keepVll , find(setVec(j) == negS_format(1,:))];
      end
 end
