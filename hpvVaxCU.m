@@ -1,7 +1,7 @@
 % HPV catch-up vaccination
 function[dPop , hpvVaxd] = hpvVaxCU(pop , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxAgeCU , ...
-    vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd , sumall)
+    vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));

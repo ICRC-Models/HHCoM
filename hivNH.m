@@ -15,7 +15,7 @@
 function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , ... %artDist ,
     kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
-    ageSexDebut , hivInds , stepsPerYear , year , sumall)
+    ageSexDebut , hivInds , stepsPerYear , year)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
