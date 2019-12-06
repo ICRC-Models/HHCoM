@@ -96,6 +96,9 @@ muHIV(11 , 2) = 0.02; % fix typo
 % save(fullfile(paramDir ,'fertilityBy2020'), 'fertility3');
 load([paramDir , 'fertilityBy2020'] , 'fertility3');
 
+file = [pwd , '/Config/Population_data.xlsx'];
+mue = xlsread(file , 'Demographics' , 'K85:L100');
+
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
