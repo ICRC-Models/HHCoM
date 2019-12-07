@@ -2,7 +2,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=9Nov19
+DATE=5Dec19
 echo "${DATE}"
 export DATE
 
@@ -16,11 +16,13 @@ export NSETS
 
 echo "Running simulations, first try."
 INT=0
-for SETIDX in $(seq 1 28 ${NSETS}); do 
+for SETIDX in $(seq 1 40 3200); do
+#for SETIDX in $(seq 3201 32 5760); do
+#for SETIDX in $(seq 5761 28 ${NSETS}); do
 export SETIDX
-sbatch -p csde -A csde slurm_batch.sbatch
+sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
 INT=$(($INT + 1))
-if [ $INT -ge 100 ]; then 
+if [ $INT -ge 50 ]; then 
 sleep 5 #4800 # pause to be kind to the scheduler
 INT=0
 fi 
@@ -39,7 +41,7 @@ done
 #INT=0
 #for SETIDX in ${MISSING[@]}; do
 #export SETIDX
-#sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch --qos=MaxJobs10
+#sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch --qos=MaxJobs4
 #INT=$(($INT + 1))
 #if [ $INT -ge 10 ] || [ $INT -eq ${#MISSING[@]} ]; then 
 #sleep 4800 # pause to be kind to the scheduler
