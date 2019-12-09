@@ -2,7 +2,7 @@
 % Runs simulation over the time period and time step specified by the user.
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '103119')
+%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '120619')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
 % Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
@@ -32,7 +32,7 @@ profile clear;
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort';
+pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -51,7 +51,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , mue , epsA_vec , epsR_vec , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , epsA_vec , epsR_vec , ...
     yr , ...
     hivOn , betaHIVM2F , betaHIVF2M , muHIV , kVl , kCD4 , ...
     hpvOn , perPartnerHpv_vax , perPartnerHpv_nonV , fImm , rImmune , ...
