@@ -26,7 +26,7 @@ paramDir = [pwd , '\Params\'];
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , mue , epsA_vec , epsR_vec , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , epsA_vec , epsR_vec , ...
     yr , ...
     hivOn , betaHIVM2F , betaHIVF2M , muHIV , kVl , kCD4 , ...
     hpvOn , perPartnerHpv_vax , perPartnerHpv_nonV , fImm , rImmune , ...
@@ -322,6 +322,99 @@ hold on
 plot(tVec , sum(popVec(: , fInds) , 2))
 legend('Males' , 'Females')
 xlabel('Year'); ylabel('Population')
+
+%% Population Size
+% All HIV-negative women
+hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
+% HIV-positive women not on ART
+hivNoART = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
+% Women on ART
+art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
+
+genArray = {hivNeg , hivNoART , art};
+
+totalPop0_69 = sum(popVec(:,genArray{1}),2) + sum(popVec(:,genArray{2}),2) + sum(popVec(:,genArray{3}),2);
+
+% Load validation data from Excel (years, values)
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+historicalPop0_69 = zeros(5,2);
+futurePop0_69 = zeros(16,2);
+historicalPop0_69(:,1) = xlsread(file , 'Demographics' , 'B91:F91'); % years
+historicalPop0_69(:,2) = xlsread(file , 'Demographics' , 'B130:F130') .* 1000; % estimates
+futurePop0_69(:,1) = xlsread(file , 'Demographics' , 'B144:Q144'); % years
+futurePop0_69(:,2) = xlsread(file , 'Demographics' , 'B145:Q145') .* 1000; % projections
+
+figure()
+plot(tVec , totalPop0_69 , '-');
+hold all;
+plot(historicalPop0_69(:,1) , historicalPop0_69(:,2) , 'o');
+hold all;
+plot(futurePop0_69(:,1) , futurePop0_69(:,2) , 'o');
+title('KZN Population Size Ages 0-69')
+xlabel('Year'); ylabel('Individuals')
+xlim([1950 2120]);
+legend('Model prediction' , 'KZN historical estimates (SSA)' , 'KZN future projections (UN & SSA)')
+hold off
+
+%% Fertility
+% Load validation data from Excel (years, values)
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
+
+fertilityVec = [];
+for y = 1 : stepsPerYear : length(tVec)
+    year = tVec(y);
+    fertilityAnl = fertility;
+    if year > 1990 && year <= 2010
+        dt = (year - 1990) * stepsPerYear;
+        dFert = (fertility2 - fertility) ...
+            ./ ((2010 - 1990) * stepsPerYear);
+        fertilityAnl = fertility + dFert .* dt;
+    elseif year > 2010 && year <=2020
+        dt = (year - 2010) * stepsPerYear;
+        dFert = (fertility3 - fertility2) ...
+            ./ ((2020 - 2010) * stepsPerYear);
+        fertilityAnl = fertility2 + dFert .* dt;
+    elseif year > 2020
+        fertilityAnl = fertility3;
+    end
+    
+    diseaseVec = {[1:2,8] , 3 , 4 , 5 , 6 , 7};
+    aSum = 0;        
+    for a = 4 : 10
+        allDinds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+        allTot = sumall(popVec(y,allDinds));
+        for d = 1 : length(diseaseVec)
+            subDinds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+            dProp = sumall(popVec(y,subDinds)) / allTot;
+            aSum = aSum + fertilityAnl(a,d)*dProp*5;
+        end
+    end
+    
+    fertilityVec = [fertilityVec; [year aSum]];
+end
+
+figure;
+plot(fertilityVec(:,1) , fertilityVec(:,2) , '-');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,2) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,3) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,4) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,5) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,6) , 'o');
+title('Total fertility rate');
+legend('Model prediction' , 'SA estimates & projections (UN)' , 'Lower 95' , ...
+    'Lower 80' , 'Upper 80' , 'Upper 95');
+ylim([0 8]);
 
 %% Relative HIV prevalence for untreated and on ART
 figure()
