@@ -43,8 +43,8 @@ done
 #export SETIDX
 #sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch --qos=MaxJobs4
 #INT=$(($INT + 1))
-#if [ $INT -ge 10 ] || [ $INT -eq ${#MISSING[@]} ]; then 
-#sleep 4800 # pause to be kind to the scheduler
+#if [ $INT -ge 50 ] || [ $INT -eq ${#MISSING[@]} ]; then 
+#sleep 5 #4800 # pause to be kind to the scheduler
 #INT=0
 #fi 
 #done
