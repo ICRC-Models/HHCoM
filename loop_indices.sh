@@ -7,8 +7,8 @@ echo "${DATE}"
 export DATE
 
 echo "Running MATLAB script to get matrix size."
-sbatch -p csde -A csde slurm_sizeMatrix.sbatch
-sleep 300
+#sbatch -p csde -A csde slurm_sizeMatrix.sbatch
+#sleep 300
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
 echo "${NSETS}" 
@@ -30,13 +30,13 @@ for i in $(seq 1 4 ${LENGTH40}); do
         SETIDX=${SEQ40[$j]}
 		export SETIDX
 		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40
-        SETIDX32=${SEQ32[$j]}
+        SETIDX=${SEQ32[$j]}
 		export SETIDX
 		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32
-        SETIDX28p=${SEQ28p[$j]}
+        SETIDX=${SEQ28p[$j]}
 		export SETIDX
 		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
-        SETIDX28s=${SEQ28s[$j]}
+        SETIDX=${SEQ28s[$j]}
 		export SETIDX
 		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
     done
