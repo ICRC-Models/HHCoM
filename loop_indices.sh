@@ -7,7 +7,7 @@ echo "${DATE}"
 export DATE
 
 echo "Running MATLAB script to get matrix size."
-batch -p csde -A csde slurm_sizeMatrix.sbatch
+sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 sleep 300
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
