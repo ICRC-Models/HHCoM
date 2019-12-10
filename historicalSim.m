@@ -32,7 +32,7 @@ profile clear;
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv';
+pathModifier = 'toNow_8Nov19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_fert2-065';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups

@@ -85,11 +85,14 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 %% Load parameters previously saved in "calibratedParams" file
 load([paramDir , 'calibratedParams'] , 'popInit' , 'riskDistM' , 'riskDistF' , ...
     'mue' , 'muHIV' , 'kVl' , 'kCD4' , 'circ' , 'yr' , ...
-    'fertility' , 'fertility2' , 'rImmuneHiv' , 'muCC' , ...
+    'fertility' , 'rImmuneHiv' , 'muCC' , ...
     'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
 muHIV(11 , 2) = 0.02; % fix typo
 
 % file = [pwd , '/Config/Population_data.xlsx'];
+% fertility2 = xlsread(file , 'Demographics' , 'B133:G148');
+% save(fullfile(paramDir ,'fertilityBy2010'), 'fertility2');
+load([paramDir , 'fertilityBy2010'] , 'fertility2');
 % fertility3 = xlsread(file , 'Demographics' , 'J133:O148');
 % save(fullfile(paramDir ,'fertilityBy2020'), 'fertility3');
 load([paramDir , 'fertilityBy2020'] , 'fertility3');
