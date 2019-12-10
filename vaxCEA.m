@@ -610,9 +610,9 @@ figure()
 % subplot(2,1,1);
 plot(tVec , totalPop0_69 , '-');
 hold all;
-plot(historicalPop0_69 , 'o');
+plot(historicalPop0_69(:,1) , historicalPop0_69(:,2) , 'o');
 hold all;
-plot(futurePop0_69 , 'o');
+plot(futurePop0_69(:,1) , futurePop0_69(:,2) , 'o');
 % for i = 1 : length(genArray)
 %     plot(tVec , sum(noV.popVec(: , genArray{i}) , 2))
 %     hold all;
@@ -855,9 +855,9 @@ title('HIV Prevalence All')
 % legend('Model' , 'National ANC Data' , 'Validation set: KZN Actual (Africa Center Data)' , 'Model Western Kenya' , 'Model Western Kenya' , 'Model Western Kenya')
 
 %% HIV prevalence by gender vs. AC data
-prevYears = unique(hivPrevF_obs(: , 1));
-hivRaw(:,:,1) = hivPrevM_obs(: , 2:3);
-hivRaw(:,:,2) = hivPrevF_obs(: , 2:3);
+prevYears = unique(hivPrevF_dObs(: , 1));
+hivRaw(:,:,1) = hivPrevM_dObs(: , 4:5);
+hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
 
 hivData(: , : , 1) = zeros(length(prevYears) , 1);
 hivData(: , : , 2) = zeros(length(prevYears) , 1);
@@ -874,18 +874,24 @@ for g = 1 : gender
     hivInds = [toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , ...
         g , 4 : 10 , 1 : risk)); toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , ...
         g , 4 : 10 , 1 : risk))];
+    artInds = [toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , ...
+        g , 4 : 10 , 1 : risk))];
     totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , ...
         g , 4 : 10 , 1 : risk));
     hivPop = sum(noV.popVec(: , hivInds) , 2);
     hivPopPrev = bsxfun(@rdivide , hivPop , sum(noV.popVec(: , totInds) , 2)) * 100;
+    artPop = sum(noV.popVec(: , artInds) , 2);
+    artProp = bsxfun(@rdivide , artPop , sum(noV.popVec(: , hivInds) , 2)) * 100;
     subplot(1,2,g)
     plot(tVec' , hivPopPrev);
     hold all;
     plot(prevYears , hivData(:,:,g) , 'ro');
+    hold all;
+    plot(tVec' , artProp);
     xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
     xlim([1980 2120])
-    ylim([0 50])
-    legend('Model' , 'Africa Center Data (Calibration)')
+    ylim([0 70])
+    legend('Model' , 'Africa Center Data (Calibration)' , 'Proportion on ART')
 end
 
 %% HIV prevalence by age on x-axis
