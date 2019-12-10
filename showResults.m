@@ -344,8 +344,8 @@ historicalPop0_69 = zeros(5,2);
 futurePop0_69 = zeros(16,2);
 historicalPop0_69(:,1) = xlsread(file , 'Demographics' , 'B91:F91'); % years
 historicalPop0_69(:,2) = xlsread(file , 'Demographics' , 'B130:F130') .* 1000; % estimates
-futurePop0_69(:,1) = xlsread(file , 'Demographics' , 'B144:Q144'); % years
-futurePop0_69(:,2) = xlsread(file , 'Demographics' , 'B145:Q145') .* 1000; % projections
+futurePop0_69(:,1) = xlsread(file , 'Demographics' , 'C144:R144'); % years
+futurePop0_69(:,2) = xlsread(file , 'Demographics' , 'C146:R146') .* 1000; % projections
 
 figure()
 plot(tVec , totalPop0_69 , '-');
