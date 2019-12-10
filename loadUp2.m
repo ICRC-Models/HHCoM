@@ -513,10 +513,18 @@ end
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
+% Baseline HIV vaginal transmission rate
+if calibBool && any(35 == pIdx);
+    idx = find(35 == pIdx);
+    baseVagTrans = paramSet(paramsSub{idx}.inds(:));
+else
+    baseVagTrans = [(4 / 10 ^ 4) ; (8 / 10 ^ 4)];
+end
+
 % HIV tranmission rate
 analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
-vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
+vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
 transM = vagTransM .* (1 - analProp(: , 1));
 transF = vagTransF .* (1 - analProp(: , 2));
 betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);

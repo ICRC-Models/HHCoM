@@ -1,7 +1,7 @@
 % Save all potentially calibrated parameters into structure
 function [paramsAll] = genParamStruct()
 
-numParams = 34;
+numParams = 35;
 paramsAll = cell(numParams,1);
 % partnersM, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 8; ... %1 %24;
@@ -169,3 +169,8 @@ paramsAll{33}.name = 'kCin1_Cin2Mult'; paramsAll{33}.length = 2; ...
 paramsAll{34}.name = 'kCin2_Cin3Mult'; paramsAll{34}.length = 2; ...
     paramsAll{34}.lb = [0.2 ; 0.2]; ...
     paramsAll{34}.ub = [1.8 ; 1.8];
+
+% baseVagTrans , [1 , 2]
+paramsAll{35}.name = 'baseVagTrans'; paramsAll{35}.length = 2; ...
+    paramsAll{35}.lb = [0.0001 ; 0.0006]; ...
+    paramsAll{35}.ub = [0.0110 ; 0.0063];
