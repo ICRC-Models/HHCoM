@@ -47,7 +47,7 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_evenHIVInit_0_0_fixAcutART-incInitHIV_savIncHivArtChar_fixHIVMult']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -68,7 +68,7 @@ parfor n = 1 : nSims
     vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : ,:)];
     vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
     vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , :); vaxResult{n}.hivDeaths(2 : end , : , :)];
-    vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , : , : , : , :)];
+    %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , : , : , : , :)];
     vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
     %vaxResult{n}.ccTreated = [curr.ccTreated(1 : end) , vaxResult{n}.ccTreated(2 : end)];
 end
