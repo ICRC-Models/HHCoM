@@ -6,7 +6,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , epsA_vec , epsR_vec , ...
     yr , ...
-    hivOn , betaHIVM2F , betaHIVF2M , muHIV , kVl , kCD4 , ...
+    hivOn , betaHIVM2F , betaHIVF2M , muHIV , kCD4 , ...
     hpvOn , perPartnerHpv_vax , perPartnerHpv_nonV , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
@@ -84,7 +84,7 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 
 %% Load parameters previously saved in "calibratedParams" file
 load([paramDir , 'calibratedParams'] , 'riskDistM' , 'riskDistF' , ...
-    'mue' , 'muHIV' , 'kVl' , 'kCD4' , 'circ' , 'yr' , ...
+    'muHIV' , 'circ' , 'yr' , ...
     'fertility' , 'rImmuneHiv' , 'muCC' , ...
     'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
 muHIV(11 , 2) = 0.02; % fix typo
@@ -102,6 +102,12 @@ load([paramDir , 'fertilityBy2020'] , 'fertility3');
 
 file = [pwd , '/Config/Population_data.xlsx'];
 mue = xlsread(file , 'Demographics' , 'K85:L100');
+
+file = [pwd , '/Config/HIV_parameters.xlsx'];
+kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
+kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
+kVlmale = xlsread(file , 'Disease Data' , 'C84:F99');
+kVlfemale = xlsread(file , 'Disease Data' , 'C101:F116');
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -459,13 +465,15 @@ if ~fivYrAgeGrpsOn
 
     % Replicate rates across single age groups for other variables
     vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , 'fertility3' , ...
-                 'partnersM' , 'partnersF' , 'muHIV' , 'maleActs' , 'femaleActs' , 'kCin1_Inf' , ...
-                 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , 'rNormal_Inf' , 'kInf_Cin1' , ...
-                 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs' , ...
+                 'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female' , ...
+                 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
+                 'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
     vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , fertility3 , ...
-                 partnersM , partnersF , muHIV , maleActs , femaleActs , kCin1_Inf , ...
-                 kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
-                 kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};    
+                 partnersM , partnersF , maleActs , femaleActs , ...
+                 muHIV , kVlmale , kVlfemale , kCD4male , kCD4female , ...
+                 kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , ...
+                 rNormal_Inf , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
         assignin('base', vars5To1_nms{j} , valsA1);
@@ -519,12 +527,22 @@ end
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
+% HIV Vl state transition matrices
+kVl = zeros(age , 4 , gender);
+kVl(: , : , 1) = kVlmale;
+kVl(: , : , 2) = kVlfemale;
+
+% HIV CD4 state transition matrices
+kCD4 = zeros(age , 4 , gender);
+kCD4(: , : , 1) = kCD4male;
+kCD4(: , : , 2) = kCD4female;
+
 % Baseline HIV vaginal transmission rate
 if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [(4 / 10 ^ 4) ; (8 / 10 ^ 4)];
+    baseVagTrans = [0.00097 ; 0.00097];
 end
 
 % HIV tranmission rate
@@ -533,8 +551,8 @@ vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of t
 vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
 transM = vagTransM .* (1 - analProp(: , 1));
 transF = vagTransF .* (1 - analProp(: , 2));
-betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);
-betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transM);
+betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
+betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transM);
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -1023,28 +1041,30 @@ xInds = [];
 yInds = [];
 vals = [];
 for g = 1 : gender
-    for d = 3 : 7
-        % for v = 1; vlAcute
-        vlAcute = toInd(allcomb(d , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , 1 : age , 1 : risk));
-        xInds = [xInds; vlAcute];
-        yInds = [yInds; vlAcute];
-        vals = [vals; ones(length(vlAcute),1) .* ( -kVl(g , d-2 , 1) )];
+    for a = 1 : age
+        for d = 3 : 7
+            % for v = 1; vlAcute
+            vlAcute = toInd(allcomb(d , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+            xInds = [xInds; vlAcute];
+            yInds = [yInds; vlAcute];
+            vals = [vals; ones(length(vlAcute),1) .* ( -kVl(a , 1 , g) )];
 
-        % for v = 2 : 4; VL < 1,000 ->  1,000 - 10,000 -> 10,000 - 50,000
-        for v = 2 : 4
-            vlCurr = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , 1 : age , 1 : risk));
-            vlPrev = toInd(allcomb(d , (v - 1) , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , 1 : age , 1 : risk));
-            xInds = [xInds; vlCurr; vlCurr]; % prev -> curr
-            yInds = [yInds; vlPrev; vlCurr]; % curr -> (next)
-            vals = [vals; ones(length(vlCurr),1) .* ( kVl(g , d-2 , v-1) ); ones(length(vlPrev),1) .* ( -kVl(g , d-2 , v) )];
+            % for v = 2 : 4; Asymptomatic -> Pre-AIDS -> AIDS
+            for v = 2 : 4
+                vlCurr = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+                vlPrev = toInd(allcomb(d , (v - 1) , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+                xInds = [xInds; vlCurr; vlCurr]; % prev -> curr
+                yInds = [yInds; vlPrev; vlCurr]; % curr -> (next)
+                vals = [vals; ones(length(vlCurr),1) .* ( kVl(a , v-1 , g) ); ones(length(vlPrev),1) .* ( -kVl(a , v , g) )];
+            end
+
+            % for v = 5; Late-stage
+            vl_50k = toInd(allcomb(d , 5 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+            vl_10kto50k = toInd(allcomb(d , 4 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+            xInds = [xInds; vl_50k];
+            yInds = [yInds; vl_10kto50k];
+            vals = [vals; ones(length(vl_50k),1) .* ( kVl(a , 4 , g) )];
         end
-        
-        % for v = 5; VL > 50,000
-        vl_50k = toInd(allcomb(d , 5 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , 1 : age , 1 : risk));
-        vl_10kto50k = toInd(allcomb(d , 4 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , 1 : age , 1 : risk));
-        xInds = [xInds; vl_50k];
-        yInds = [yInds; vl_10kto50k];
-        vals = [vals; ones(length(vl_50k),1) .* ( kVl(g , d-2 , 4) )];
     end
 end
 vlAdvancer = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
