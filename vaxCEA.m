@@ -47,7 +47,7 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_8Nov19_sameAssum_adjNonVtrans050_125vClr075nvClr_10-20-20-30_40-30-30_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
