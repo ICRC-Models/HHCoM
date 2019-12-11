@@ -240,7 +240,7 @@ for g = 1 : gender
             for v = 1 : 5
                 acuteInf = hivInds(3 , v , g , a , r , :);
                 dPop(acuteInf) = dPop(acuteInf) ...
-                    - (muHIV(a , 2) + kCD4(a , v , g) + treat(3 , v , g , a , r)) ... % out: disease related mortality, CD4 progression, ART coverage.
+                    - (muHIV(a , 2) + kCD4(a , 1 , g) + treat(3 , v , g , a , r)) ... % out: disease related mortality, CD4 progression, ART coverage.
                     .* pop(acuteInf) + artOut * artDist(3 , v , g , a , r) ... % Distributed dropouts from ART
                     .* pop(hivPositiveArt);
 
@@ -258,10 +258,10 @@ for g = 1 : gender
                     cd4Prev = hivInds(d - 1 , v , g , a , r , :);
                     kCD4_next = 0;
                     if d ~= 7
-                        kCD4_next = kCD4(a , v , g); %  progression to next disease state
+                        kCD4_next = kCD4(a , d - 2 , g); %  progression to next disease state
                     end
                     dPop(cd4Curr) = ...
-                        kCD4(a , v , g) * pop(cd4Prev) ... % CD4 progression from previous disease state
+                        kCD4(a , d - 3 , g) * pop(cd4Prev) ... % CD4 progression from previous disease state
                         + artOut * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state
