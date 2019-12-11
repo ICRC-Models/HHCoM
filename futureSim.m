@@ -6,17 +6,17 @@
 % profile clear;
 
 %% Cluster information
-% pc = parcluster('local');    % create a local cluster object
-% pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_8Nov19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_fert2-065']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '8Nov19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_fert2-065_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
