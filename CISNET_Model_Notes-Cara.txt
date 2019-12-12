@@ -24,10 +24,10 @@ For d:
 
 For v:
 1 - Acute infection (if 2<d<8) , 0 (if d = 1/2)
-2 - VL < 1000 copies/mL
-3 - VL 1000-10,000 copies/mL
-4 - VL 10,000-50,000 copies/mL
-5 - VL > 50,000 copies/mL
+2 - Asympotomatic (3-4.5 log10 VL)
+3 - Pre-AIDS symptomatic (4-5.5 log10 VL)
+4 - AIDS (5.5-7 log10 VL)
+5 - Late-stage 
 6 - On ART, virally suppressed
 
 For h:

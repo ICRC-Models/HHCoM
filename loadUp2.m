@@ -1034,7 +1034,7 @@ end
 %% Make matrices ******************************************************************************************************************************************************************************
 pop = spalloc(prod(dim) , 1 , prod(dim));
 
-%% Viral load progression (by CD4 count)
+%% Viral load progression
 % disp('Building viral load progression matrix')
 
 xInds = [];
