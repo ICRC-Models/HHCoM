@@ -47,7 +47,7 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop_saveCorrectFert']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -648,10 +648,10 @@ fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
     year = tVec(y);
     fertilityAnl = fertility;
-    if year > 1990 && year <= 2010
-        dt = (year - 1990) * stepsPerYear;
+    if year > 1960 && year <= 2000
+        dt = (year - 1960) * stepsPerYear;
         dFert = (fertility2 - fertility) ...
-            ./ ((2010 - 1990) * stepsPerYear);
+            ./ ((2000 - 1960) * stepsPerYear);
         fertilityAnl = fertility + dFert .* dt;
     elseif year > 2010 && year <=2020
         dt = (year - 2010) * stepsPerYear;

@@ -89,16 +89,16 @@ load([paramDir , 'calibratedParams'] , 'riskDistM' , 'riskDistF' , ...
     'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
 muHIV(11 , 2) = 0.02; % fix typo
 
-% file = [pwd , '/Config/Population_data.xlsx'];
-% popInit = xlsread(file , 'Demographics' , 'H6:I21');
+file = [pwd , '/Config/Population_data.xlsx'];
+popInit = xlsread(file , 'Demographics' , 'H6:I21');
 % save(fullfile(paramDir ,'popInitProjExp'), 'popInit');
-load([paramDir , 'popInitProjExp'] , 'popInit');
-% fertility2 = xlsread(file , 'Demographics' , 'B133:G148');
+% load([paramDir , 'popInitProjExp'] , 'popInit');
+fertility2 = xlsread(file , 'Demographics' , 'B133:G148');
 % save(fullfile(paramDir ,'fertilityBy2010'), 'fertility2');
-load([paramDir , 'fertilityBy2010'] , 'fertility2');
-% fertility3 = xlsread(file , 'Demographics' , 'J133:O148');
+% load([paramDir , 'fertilityBy2010'] , 'fertility2');
+fertility3 = xlsread(file , 'Demographics' , 'J133:O148');
 % save(fullfile(paramDir ,'fertilityBy2020'), 'fertility3');
-load([paramDir , 'fertilityBy2020'] , 'fertility3');
+% load([paramDir , 'fertilityBy2020'] , 'fertility3');
 
 file = [pwd , '/Config/Population_data.xlsx'];
 mue = xlsread(file , 'Demographics' , 'K85:L100');
