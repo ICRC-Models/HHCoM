@@ -43,36 +43,62 @@ for i in $(seq 1 4 ${LENGTH40}); do
 	sleep 19200    # give submitted simulations time to finish 
 done
 
-#echo "Running MATLAB script to identify failed simulations."
-#sbatch -p csde -A csde slurm_idMissing.sbatch
-#sleep 300
-#FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
-#RERUN=$(<$FILE)
-#echo "$RERUN"
+: <<'END'
+echo "Running MATLAB script to identify failed simulations."
+sbatch -p csde -A csde slurm_idMissing.sbatch
+sleep 300
+FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
+RERUN=$(<$FILE)
+echo "$RERUN"
 
-#echo "Re-running failed simulations."
-#while [ ! -z "$RERUN" ]; do
-    #MISSING=($RERUN)
-    ********
-	#INT=0
-    #for SETIDX in ${MISSING[@]}; do
-        #export SETIDX
-        #sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch --qos=MaxJobs4
-        #INT=$(($INT + 1))
-        #if [ $INT -ge 50 ] || [ $INT -eq ${#MISSING[@]} ]; then 
-            #sleep 5 #4800 # pause to be kind to the scheduler
-            #INT=0
-        #fi 
-    #done
-    *********
+echo "Re-running failed simulations."
+while [ ! -z "$RERUN" ]; do
+    MISSING=($RERUN)
+	INT=0
+	for i in $(seq 1 4 ${LENGTH40}); do
+		for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once
+            SETIDX=${SEQ40[$j]}
+		    if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
+				export SETIDX
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40
+				INT=$(($INT + 1))
+	        fi
+            SETIDX=${SEQ32[$j]}
+			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
+		        export SETIDX
+	    	    sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32
+				INT=$(($INT + 1))
+		    fi
+            SETIDX=${SEQ28p[$j]}
+			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
+	    	    export SETIDX
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+				INT=$(($INT + 1))
+			fi
+            SETIDX=${SEQ28s[$j]}
+			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
+	    	    export SETIDX
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+				INT=$(($INT + 1))
+			fi
+        done
+	    if [ $INT -ge 16 ]; then 
+		    sleep 19200    # give submitted simulations time to finish 
+			INT=0
+	    fi
+    done
+	if [ $INT -gt 0 ] && [ $INT lt 16 ]; then
+	    sleep 19200    # give submitted simulations time to finish 
+    fi
 
-    #echo "Running MATLAB script to identify failed simulations, again."
-    #sbatch -p csde -A csde slurm_idMissing.sbatch
-    #sleep 300
-    #FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
-    #RERUN=$(<$FILE)
-    #echo "$RERUN"
-#done
+    echo "Running MATLAB script to identify failed simulations, again."
+    sbatch -p csde -A csde slurm_idMissing.sbatch
+    sleep 300
+    FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
+    RERUN=$(<$FILE)
+    echo "$RERUN"
+done
+END
 
 #echo "Running MATLAB abc_smc script to get next set of particles."
 #sbatch -p csde -A csde slurm_abc.sbatch
@@ -80,4 +106,3 @@ done
  
 #echo "Running MATLAB idParamRanges script to get ranges of parameters in best-fitting sets."
 #sbatch -p ckpt -A ckpt-csde slurm_idParamRanges.sbatch
-
