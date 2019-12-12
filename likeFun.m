@@ -309,9 +309,9 @@ for t = 1 : length(hivYearVec)
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totFInds));
     end
 end
-% mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
-% dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
-% dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
+mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
+dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
+dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
 %% Likelihood function
 logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar)).*(mObs-dMean).^2);
