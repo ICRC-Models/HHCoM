@@ -84,9 +84,8 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 
 %% Save demographic and behavioral parameters
 
-% Load parameters previously saved in "calibratedParams" file
-load([paramDir , 'calibratedParams'] , 'riskDistM' , 'riskDistF' , ...
-    'fertility');
+% Load matrices by age and gender previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'riskDistM' , 'riskDistF' , 'fertility');
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -213,19 +212,21 @@ end
 
 ageSexDebut = (10/max(1 , fivYrAgeGrpsOn*5)+1);
 
-% Initial population size
+% Rename initial population size variables
 mInit = popInit(: , 1); % initial male population size by age
 fInit = popInit(: , 2); % initial female population size by age
 
-% Risk distribution
+% Rename risk distribution variable
 riskDist = zeros(age , risk , 2);
 riskDist(: , : , 1) = riskDistM;
 riskDist(: , : , 2) = riskDistF;
 
+% Load parameters previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'yr');
+
 % Mixing by age group
 if calibBool && any(6 == pIdx);
     idx = find(6 == pIdx);
-    epsA = zeros(3 , 1);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
@@ -234,7 +235,6 @@ end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
     idx = find(7 == pIdx);
-    epsR = zeros(3 , 1);
     %epsR = paramSet(paramsSub{idx}.inds(:));
     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
@@ -257,10 +257,11 @@ end
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
-load([paramDir , 'calibratedParams'] , 'muHIV' , 'circ' , 'yr' , ...
-     'circProtect' , 'condProtect' , 'MTCTRate');
+% Load matrix by age and gender previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'muHIV');
 muHIV(11 , 2) = 0.02; % fix typo
 
+% Load kCD4 and kVl transition matrices by age and gender from Excel
 file = [pwd , '/Config/HIV_parameters.xlsx'];
 kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
 kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
@@ -631,6 +632,11 @@ end
 %     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult');
 
 %% Save intervention parameters
+
+% Load parameters previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'circ' , ...
+     'circProtect' , 'condProtect' , 'MTCTRate');
+
 % Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
