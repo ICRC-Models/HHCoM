@@ -323,7 +323,7 @@ plot(tVec , sum(popVec(: , fInds) , 2))
 legend('Males' , 'Females')
 xlabel('Year'); ylabel('Population')
 
-%% Population Size
+%% Population size over time vs. validation data
 % All HIV-negative women
 hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
@@ -358,6 +358,37 @@ xlabel('Year'); ylabel('Individuals')
 xlim([1950 2120]);
 legend('Model prediction' , 'KZN historical estimates (SSA)' , 'KZN future projections (UN & SSA)')
 hold off
+
+%% Population size by age vs. validation data
+
+% Load validation data from Excel
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+kzn_popByage_2019 = zeros(2 , age);
+kzn_popByage_2019(1 , :) = xlsread(file , 'Demographics' , 'F92:F107').*1000;    % males by age in 2019
+kzn_popByage_2019(2 , :) = xlsread(file , 'Demographics' , 'F112:F127').*1000;    % females by age in 2019
+
+ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
+popProp2019 = zeros(1,5);
+popProp2019_obs = zeros(1,5);
+ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
+for aInd = 1 : length(ageVec)
+    a = ageVec{aInd};
+    popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
+    popProp2019(1,aInd) = sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popAge),2) ./ sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popTot),2);
+    
+    popProp2019_obs(1,aInd) = (sum(kzn_popByage_2019(1 , a)) + sum(kzn_popByage_2019(2 , a))) / sumall(kzn_popByage_2019(: , 3:15));  
+end
+
+figure;
+plot(popProp2019);
+hold all;
+plot(popProp2019_obs);
+ylabel('Population proportion'); xlabel('Age Group');
+set(gca , 'xtick' , 1 : 5 , 'xtickLabel' , ageGroup);
+legend('Model 2019' , 'SSA KZN observed data 2019');
 
 %% Fertility
 % Load validation data from Excel (years, values)
