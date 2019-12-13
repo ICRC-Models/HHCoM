@@ -377,7 +377,7 @@ for aInd = 1 : length(ageVec)
         1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
     popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
-    popProp2019(1,aInd) = sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popAge),2) ./ sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popTot),2);
+    popProp2019(1,aInd) = sum(popVec(((2019 - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((2019 - startYear) * stepsPerYear +1) , popTot),2);
     
     popProp2019_obs(1,aInd) = (sum(kzn_popByage_2019(1 , a)) + sum(kzn_popByage_2019(2 , a))) / sumall(kzn_popByage_2019(: , 3:15));  
 end
