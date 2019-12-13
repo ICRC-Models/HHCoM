@@ -82,32 +82,11 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 %     'intervens' , 'gender' , 'age' , 'risk' , 'hpvTypeGroups' , 'dim' , 'k' , 'toInd' , ...
 %     'annlz');
 
-%% Load parameters previously saved in "calibratedParams" file
+%% Save demographic and behavioral parameters
+
+% Load parameters previously saved in "calibratedParams" file
 load([paramDir , 'calibratedParams'] , 'riskDistM' , 'riskDistF' , ...
-    'muHIV' , 'circ' , 'yr' , ...
-    'fertility' , 'rImmuneHiv' , 'muCC' , ...
-    'kRL' , 'kDR' , 'hpv_hivMult' , 'circProtect' , 'condProtect' , 'MTCTRate');
-muHIV(11 , 2) = 0.02; % fix typo
-
-file = [pwd , '/Config/Population_data.xlsx'];
-popInit = xlsread(file , 'Demographics' , 'H6:I21');
-% save(fullfile(paramDir ,'popInitProjExp'), 'popInit');
-% load([paramDir , 'popInitProjExp'] , 'popInit');
-fertility2 = xlsread(file , 'Demographics' , 'B133:G148');
-% save(fullfile(paramDir ,'fertilityBy2010'), 'fertility2');
-% load([paramDir , 'fertilityBy2010'] , 'fertility2');
-fertility3 = xlsread(file , 'Demographics' , 'J133:O148');
-% save(fullfile(paramDir ,'fertilityBy2020'), 'fertility3');
-% load([paramDir , 'fertilityBy2020'] , 'fertility3');
-
-file = [pwd , '/Config/Population_data.xlsx'];
-mue = xlsread(file , 'Demographics' , 'K85:L100');
-
-file = [pwd , '/Config/HIV_parameters.xlsx'];
-kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
-kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
-kVlmale = xlsread(file , 'Disease Data' , 'C84:F99');
-kVlfemale = xlsread(file , 'Disease Data' , 'C101:F116');
+    'fertility');
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -193,49 +172,152 @@ else
     load([paramDir , 'calibratedParams'] , 'femaleActs');
 end
 
-% HPV clearance multiplier for HIV-positive persons
-if calibBool && any(14 == pIdx)
-    idx = find(14 == pIdx);
-    hpv_hivClear = zeros(4 , 1);
-    hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
-    hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
-    hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
-    hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
-else
-    load([paramDir , 'calibratedParams'] , 'hpv_hivClear');
+% Load initial population size by age and gender from Excel
+file = [pwd , '/Config/Population_data.xlsx'];
+popInit = xlsread(file , 'Demographics' , 'H6:I21');
+% save(fullfile(paramDir ,'popInitProjExp'), 'popInit');
+% load([paramDir , 'popInitProjExp'] , 'popInit');
+
+% Load fertility matrices by age and gender from Excel
+fertility2 = xlsread(file , 'Demographics' , 'B133:G148');
+% save(fullfile(paramDir ,'fertilityBy2010'), 'fertility2');
+% load([paramDir , 'fertilityBy2010'] , 'fertility2');
+fertility3 = xlsread(file , 'Demographics' , 'J133:O148');
+% save(fullfile(paramDir ,'fertilityBy2020'), 'fertility3');
+% load([paramDir , 'fertilityBy2020'] , 'fertility3');
+
+% Load background mortality matrix by age and gender from Excel
+file = [pwd , '/Config/Population_data.xlsx'];
+mue = xlsread(file , 'Demographics' , 'K85:L100');
+
+% Convert 5-year age groups to 1-year age groups
+if ~fivYrAgeGrpsOn
+    % Divide popInit age groups equally into five
+    popInit_orig = popInit;
+    [ageDim, valDim] = size(popInit_orig);
+    popInit = zeros(ageDim*5 , valDim);
+    for i = 1 : ageDim
+        popInit(((i-1)*5+1) : i*5 , :) = ones(5 , valDim) .* (popInit_orig(i , :)./5);
+    end
+
+    % Replicate rates across single age groups for other variables
+    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , 'fertility3' , ...
+                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
+    vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , fertility3 , ...
+                 partnersM , partnersF , maleActs , femaleActs};    
+    for j = 1 : length(vars5To1_vals)
+        valsA1 = age5To1(vars5To1_vals{j});
+        assignin('base', vars5To1_nms{j} , valsA1);
+    end
 end
 
-% CIN2 to CIN3 progression multiplier for HIV-positive women
-if calibBool && any(15 == pIdx)
-    idx = find(15 == pIdx);
-    c3c2Mults = zeros(4 , 1);
-    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+ageSexDebut = (10/max(1 , fivYrAgeGrpsOn*5)+1);
+
+% Initial population size
+mInit = popInit(: , 1); % initial male population size by age
+fInit = popInit(: , 2); % initial female population size by age
+
+% Risk distribution
+riskDist = zeros(age , risk , 2);
+riskDist(: , : , 1) = riskDistM;
+riskDist(: , : , 2) = riskDistF;
+
+% Mixing by age group
+if calibBool && any(6 == pIdx);
+    idx = find(6 == pIdx);
+    epsA = zeros(3 , 1);
+    %epsA = paramSet(paramsSub{idx}.inds(:));
+    epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    load([paramDir , 'calibratedParams'] , 'c3c2Mults');
+    epsA = [0.3 ; 0.3 ; 0.3];
+end
+% Mixing by risk group
+if calibBool && any(7 == pIdx);
+    idx = find(7 == pIdx);
+    epsR = zeros(3 , 1);
+    %epsR = paramSet(paramsSub{idx}.inds(:));
+    epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
+else
+    epsR = [0.3 ; 0.3 ; 0.3];
+end
+epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+epsR_vec = cell(size(yr , 1) - 1, 1);
+for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
+    period = [yr(i) , yr(i + 1)];
+    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
+    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
+        yr(i) : timeStep : yr(i + 1));
 end
 
-% CIN1 to CIN2 progression multiplier for HIV-positive women
-if calibBool && any(16 == pIdx)
-    idx = find(16 == pIdx);
-    c2c1Mults = zeros(4 , 1);
-    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
-else
-    load([paramDir , 'calibratedParams'] , 'c2c1Mults');
+% save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
+%     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'fertility3' , 'mue' , ...
+%     'epsA_vec' , 'epsR_vec' , 'yr');
+
+%% Save HIV natural history parameters
+hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
+
+load([paramDir , 'calibratedParams'] , 'muHIV' , 'circ' , 'yr' , ...
+     'circProtect' , 'condProtect' , 'MTCTRate');
+muHIV(11 , 2) = 0.02; % fix typo
+
+file = [pwd , '/Config/HIV_parameters.xlsx'];
+kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
+kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
+kVlmale = xlsread(file , 'Disease Data' , 'C84:F99');
+kVlfemale = xlsread(file , 'Disease Data' , 'C101:F116');
+
+% Convert 5-year age groups to 1-year age groups
+if ~fivYrAgeGrpsOn
+    % Replicate rates across single age groups for other variables
+    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
+    vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
+    for j = 1 : length(vars5To1_vals)
+        valsA1 = age5To1(vars5To1_vals{j});
+        assignin('base', vars5To1_nms{j} , valsA1);
+    end
 end
 
-% Natural immunity multiplier
-if calibBool && any(18 == pIdx)
-    idx = find(18 == pIdx);
-    lambdaMultImm = zeros(age , 1);
-    lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
-    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+% HIV Vl state transition matrices
+kVl = zeros(age , 4 , gender);
+kVl(: , : , 1) = kVlmale;
+kVl(: , : , 2) = kVlfemale;
+
+% HIV CD4 state transition matrices
+kCD4 = zeros(age , 4 , gender);
+kCD4(: , : , 1) = kCD4male;
+kCD4(: , : , 2) = kCD4female;
+
+% Baseline HIV vaginal transmission rate
+if calibBool && any(35 == pIdx);
+    idx = find(35 == pIdx);
+    baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    load([paramDir , 'calibratedParams'] , 'lambdaMultImm');
+    baseVagTrans = [0.0004 ; 0.0008];
 end
+
+% HIV tranmission rate
+analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
+vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
+transM = vagTransM .* (1 - analProp(: , 1));
+transF = vagTransF .* (1 - analProp(: , 2));
+betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
+betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transM);
+betaHIVF2M = zeros(age , risk , viral);
+betaHIVM2F = betaHIVF2M;
+for a = 1 : age % calculate per-partnership probability of HIV transmission
+    % force of infection: females to infect HIV-negative males, 
+    % affected by betaHIV_F2M (probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
+    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
+    % force of infection: males to infect HIV-negative females,
+    % affected by betaHIV_M2F (probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
+    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
+end
+betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
+betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+%save(fullfile(paramDir ,'hivParams'), 'hivOn' , 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
 
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
@@ -451,129 +533,18 @@ kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 % % kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
 % % kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
 
-%% Save demographic and behavioral parameters
-
-% Convert 5-year age groups to 1-year age groups
-if ~fivYrAgeGrpsOn
-    % Divide popInit age groups equally into five
-    popInit_orig = popInit;
-    [ageDim, valDim] = size(popInit_orig);
-    popInit = zeros(ageDim*5 , valDim);
-    for i = 1 : ageDim
-        popInit(((i-1)*5+1) : i*5 , :) = ones(5 , valDim) .* (popInit_orig(i , :)./5);
-    end
-
-    % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , 'fertility3' , ...
-                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
-    vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , fertility3 , ...
-                 partnersM , partnersF , maleActs , femaleActs};    
-    for j = 1 : length(vars5To1_vals)
-        valsA1 = age5To1(vars5To1_vals{j});
-        assignin('base', vars5To1_nms{j} , valsA1);
-    end
-end
-
-ageSexDebut = (10/max(1 , fivYrAgeGrpsOn*5)+1);
-
-% Initial population size
-mInit = popInit(: , 1); % initial male population size by age
-fInit = popInit(: , 2); % initial female population size by age
-
-% Risk distribution
-riskDist = zeros(age , risk , 2);
-riskDist(: , : , 1) = riskDistM;
-riskDist(: , : , 2) = riskDistF;
-
-% Mixing by age group
-if calibBool && any(6 == pIdx);
-    idx = find(6 == pIdx);
-    epsA = zeros(3 , 1);
-    %epsA = paramSet(paramsSub{idx}.inds(:));
-    epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-else
-    epsA = [0.3 ; 0.3 ; 0.3];
-end
-% Mixing by risk group
-if calibBool && any(7 == pIdx);
-    idx = find(7 == pIdx);
-    epsR = zeros(3 , 1);
-    %epsR = paramSet(paramsSub{idx}.inds(:));
-    epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
-else
-    epsR = [0.3 ; 0.3 ; 0.3];
-end
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
-for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
-    period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-    epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
-end
-
-% save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
-%     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'fertility3' , 'mue' , ...
-%     'epsA_vec' , 'epsR_vec' , 'yr');
-
-%% Save HIV natural history parameters
-hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
-
-% Convert 5-year age groups to 1-year age groups
-if ~fivYrAgeGrpsOn
-    % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
-    vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
-    for j = 1 : length(vars5To1_vals)
-        valsA1 = age5To1(vars5To1_vals{j});
-        assignin('base', vars5To1_nms{j} , valsA1);
-    end
-end
-
-% HIV Vl state transition matrices
-kVl = zeros(age , 4 , gender);
-kVl(: , : , 1) = kVlmale;
-kVl(: , : , 2) = kVlfemale;
-
-% HIV CD4 state transition matrices
-kCD4 = zeros(age , 4 , gender);
-kCD4(: , : , 1) = kCD4male;
-kCD4(: , : , 2) = kCD4female;
-
-% Baseline HIV vaginal transmission rate
-if calibBool && any(35 == pIdx);
-    idx = find(35 == pIdx);
-    baseVagTrans = paramSet(paramsSub{idx}.inds(:));
-else
-    baseVagTrans = [0.0004 ; 0.0008];
-end
-
-% HIV tranmission rate
-analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
-vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
-transM = vagTransM .* (1 - analProp(: , 1));
-transF = vagTransF .* (1 - analProp(: , 2));
-betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
-betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transM);
-betaHIVF2M = zeros(age , risk , viral);
-betaHIVM2F = betaHIVF2M;
-for a = 1 : age % calculate per-partnership probability of HIV transmission
-    % force of infection: females to infect HIV-negative males, 
-    % affected by betaHIV_F2M (probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
-    % force of infection: males to infect HIV-negative females,
-    % affected by betaHIV_M2F (probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
-end
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
-
-%save(fullfile(paramDir ,'hivParams'), 'hivOn' , 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
-
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
+
+% Natural immunity multiplier
+if calibBool && any(18 == pIdx)
+    idx = find(18 == pIdx);
+    lambdaMultImm = zeros(age , 1);
+    lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
+    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+else
+    load([paramDir , 'calibratedParams'] , 'lambdaMultImm');
+end
 
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
@@ -586,6 +557,44 @@ if ~fivYrAgeGrpsOn
         valsA1 = age5To1(vars5To1_vals{j});
         assignin('base', vars5To1_nms{j} , valsA1);
     end
+end
+
+% Load parameters previously saved in "calibratedParams" file
+load([paramDir , 'calibratedParams'] , 'rImmuneHiv' , 'muCC' , ...
+    'kRL' , 'kDR' , 'hpv_hivMult');
+
+% HPV clearance multiplier for HIV-positive persons
+if calibBool && any(14 == pIdx)
+    idx = find(14 == pIdx);
+    hpv_hivClear = zeros(4 , 1);
+    hpv_hivClear(1,1) = paramSet(paramsSub{idx}.inds(1));
+    hpv_hivClear(2,1) = hpv_hivClear(1,1)*paramSet(paramsSub{idx}.inds(2));
+    hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
+    hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
+else
+    load([paramDir , 'calibratedParams'] , 'hpv_hivClear');
+end
+
+% CIN2 to CIN3 progression multiplier for HIV-positive women
+if calibBool && any(15 == pIdx)
+    idx = find(15 == pIdx);
+    c3c2Mults = zeros(4 , 1);
+    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+else
+    load([paramDir , 'calibratedParams'] , 'c3c2Mults');
+end
+
+% CIN1 to CIN2 progression multiplier for HIV-positive women
+if calibBool && any(16 == pIdx)
+    idx = find(16 == pIdx);
+    c2c1Mults = zeros(4 , 1);
+    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
+    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+else
+    load([paramDir , 'calibratedParams'] , 'c2c1Mults');
 end
 
 % HPV tranmission rates
