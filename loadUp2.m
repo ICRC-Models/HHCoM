@@ -542,7 +542,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.00097 ; 0.00097];
+    baseVagTrans = [0.0004 ; 0.0008];
 end
 
 % HIV tranmission rate
