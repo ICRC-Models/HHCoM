@@ -694,6 +694,8 @@ for y = 1 : stepsPerYear : length(tVec)
         dFert = (fertility2 - fertility) ...
             ./ ((2000 - 1960) * stepsPerYear);
         fertilityAnl = fertility + dFert .* dt;
+    elseif year > 2000 && year <= 2010
+        fertilityAnl = fertility2;
     elseif year > 2010 && year <=2020
         dt = (year - 2010) * stepsPerYear;
         dFert = (fertility3 - fertility2) ...
