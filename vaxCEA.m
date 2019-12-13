@@ -47,7 +47,7 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_11Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop_saveCorrectFert']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -582,7 +582,7 @@ end
 % 
 % end
 
-%% Population Size
+%% Population size over time vs. validation data
 % All HIV-negative women
 hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
@@ -624,20 +624,61 @@ legend('Model prediction' , 'KZN historical estimates (SSA)' , 'KZN future proje
 %legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
 hold off
 
-%figure;
-% subplot(2,1,2);
-% popProp = zeros(length(tVec),13);
-% for a = 3 : 15
-%     popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
-%     popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
-%     popProp(:,a-2) = sum(noV.popVec(:,popAge),2) ./ sum(noV.popVec(:,popTot),2);
-% end
-% plot(tVec , popProp);
-% ylabel('Proportion'); xlabel('Year');
-% xlim([1950 2120]);
-% legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
+%% Population size by age vs. validation data
+
+% Load validation data from Excel
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+kzn_popByage_2019 = zeros(2 , age);
+kzn_popByage_2019(1 , :) = xlsread(file , 'Demographics' , 'F92:F107').*1000;    % males by age in 2019
+kzn_popByage_2019(2 , :) = xlsread(file , 'Demographics' , 'F112:F127').*1000;    % females by age in 2019
+sa_malesFemales_2100 = xlsread(file , 'Demographics' , 'Q81:Q82').*1000;
+
+ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
+popProp2019 = zeros(1,5);
+popProp2019_obs = zeros(1,5);
+ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
+for aInd = 1 : length(ageVec)
+    a = ageVec{aInd};
+    popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
+    popProp2019(1,aInd) = sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popAge),2) ./ sum(noV.popVec(((2019 - startYear) * stepsPerYear +1) , popTot),2);
+    
+    popProp2019_obs(1,aInd) = (sum(kzn_popByage_2019(1 , a)) + sum(kzn_popByage_2019(2 , a))) / sumall(kzn_popByage_2019(: , 3:15));  
+end
+
+ageGroup2 = {'0-24' , '25-69'};
+popProp2100 = zeros(1,2);
+popProp2100_obs = zeros(1,2);
+ageVec2 = {[1:5] , [6:14]};
+for aInd = 1 : length(ageVec2)
+    a = ageVec{aInd};
+    popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens, 1 : gender , 1 : 14 , 1 : risk));
+    popProp2100(1,aInd) = sum(noV.popVec(((2100 - startYear) * stepsPerYear +1) , popAge),2) ./ sum(noV.popVec(((2100 - startYear) * stepsPerYear +1) , popTot),2);
+    
+    popProp2100_obs(1,aInd) = sa_malesFemales_2100(aInd) / sum(sa_malesFemales_2100(:));  
+end
+
+figure;
+subplot(1,2,1);
+plot(popProp2019);
+hold all;
+plot(popProp2019_obs);
+ylabel('Population proportion'); xlabel('Age Group');
+set(gca , 'xtick' , 1 : 5 , 'xtickLabel' , ageGroup);
+legend('Model 2019' , 'SSA KZN observed data 2019');
+
+subplot(1,2,2);
+plot(popProp2100);
+hold all;
+plot(popProp2100_obs);
+ylabel('Population proportion'); xlabel('Age Group');
+set(gca , 'xtick' , 1 : 2 , 'xtickLabel' , ageGroup2);
+legend('Model 2100' , 'UN SA predicted data 2100');
 
 %% Fertility
 % Load validation data from Excel (years, values)
@@ -648,11 +689,13 @@ fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
     year = tVec(y);
     fertilityAnl = fertility;
-    if year > 1990 && year <= 2010
-        dt = (year - 1990) * stepsPerYear;
+    if year > 1960 && year <= 2000
+        dt = (year - 1960) * stepsPerYear;
         dFert = (fertility2 - fertility) ...
-            ./ ((2010 - 1990) * stepsPerYear);
+            ./ ((2000 - 1960) * stepsPerYear);
         fertilityAnl = fertility + dFert .* dt;
+    elseif year > 2000 && year <= 2010
+        fertilityAnl = fertility2;
     elseif year > 2010 && year <=2020
         dt = (year - 2010) * stepsPerYear;
         dFert = (fertility3 - fertility2) ...
