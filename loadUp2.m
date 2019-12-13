@@ -106,8 +106,14 @@ load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , 'fert
 riskDistF = riskDistM;
 
 % Calculate fertility2 and fertility3 matrices
-fertility2 = fertility .* 0.5;
-fertility3 = fertility2 .* 0.75;
+if calibBool && any(36 == pIdx);
+    idx = find(36 == pIdx);
+    fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
+else
+    fertDeclineProp = [0.5 ; 0.75];
+end
+fertility2 = fertility .* fertDeclineProp(1,1);
+fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -299,7 +305,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.0004 ; 0.0008];
+    baseVagTrans = [0.001; 0.001]; %[0.0004 ; 0.0008];
 end
 
 % HIV tranmission rate
