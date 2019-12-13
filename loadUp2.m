@@ -451,10 +451,10 @@ kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 % % kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
 % % kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
 
-%%
-if ~fivYrAgeGrpsOn
-    %% Convert 5-year age groups to 1-year age groups
+%% Save demographic and behavioral parameters
 
+% Convert 5-year age groups to 1-year age groups
+if ~fivYrAgeGrpsOn
     % Divide popInit age groups equally into five
     popInit_orig = popInit;
     [ageDim, valDim] = size(popInit_orig);
@@ -465,22 +465,15 @@ if ~fivYrAgeGrpsOn
 
     % Replicate rates across single age groups for other variables
     vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , 'fertility3' , ...
-                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs' , ...
-                 'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female' , ...
-                 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
-                 'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
     vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , fertility3 , ...
-                 partnersM , partnersF , maleActs , femaleActs , ...
-                 muHIV , kVlmale , kVlfemale , kCD4male , kCD4female , ...
-                 kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , ...
-                 rNormal_Inf , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};    
+                 partnersM , partnersF , maleActs , femaleActs};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
         assignin('base', vars5To1_nms{j} , valsA1);
     end
 end
 
-%% Save demographic and behavioral parameters
 ageSexDebut = (10/max(1 , fivYrAgeGrpsOn*5)+1);
 
 % Initial population size
@@ -527,6 +520,17 @@ end
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
+% Convert 5-year age groups to 1-year age groups
+if ~fivYrAgeGrpsOn
+    % Replicate rates across single age groups for other variables
+    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
+    vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
+    for j = 1 : length(vars5To1_vals)
+        valsA1 = age5To1(vars5To1_vals{j});
+        assignin('base', vars5To1_nms{j} , valsA1);
+    end
+end
+
 % HIV Vl state transition matrices
 kVl = zeros(age , 4 , gender);
 kVl(: , : , 1) = kVlmale;
@@ -570,6 +574,19 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
+
+% Convert 5-year age groups to 1-year age groups
+if ~fivYrAgeGrpsOn
+    % Replicate rates across single age groups for other variables
+    vars5To1_nms = {'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
+                 'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm'};
+    vars5To1_vals = {kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , ...
+                 rNormal_Inf , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm};    
+    for j = 1 : length(vars5To1_vals)
+        valsA1 = age5To1(vars5To1_vals{j});
+        assignin('base', vars5To1_nms{j} , valsA1);
+    end
+end
 
 % HPV tranmission rates
 if calibBool && any(10 == pIdx)
@@ -768,6 +785,8 @@ load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dO
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
     'hivPrevM_dObs' , 'hivPrevF_dObs');
+
+
 
 
 %% Load indices *****************************************************************************************************************************************************************************
