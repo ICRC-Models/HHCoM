@@ -287,7 +287,7 @@ disp('Done')
 %% import and save calibration data
 % dimensions = [pos , N]
 clear
-file = [pwd , '\Config\Calibration_targets.xlsx'];
+file = [pwd , '\Config\Calibration_targets_Kenya.xlsx'];
 savdir = [pwd , '\Params']; 
 cinPos2007_obs = xlsread(file , 'Calibration' , 'D2 : F4'); %CIN2/CIN3 Prevalence (HIV+) 2007, by age
 
