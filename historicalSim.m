@@ -26,7 +26,7 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %%
 %close all; clear all; clc;
 tic
-profile clear;
+% profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
@@ -238,7 +238,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
 % disp('Start up')
-profile on
+% profile on
 % disp(' ')
 
 % If starting from beginning
@@ -534,7 +534,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
 disp(' ')
 disp('Simulation complete.')
 toc
-profile viewer
+% profile viewer
 
 %% Calculate summed log-likelihood
 if calibBool    
