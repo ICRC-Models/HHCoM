@@ -1,23 +1,23 @@
 % Save all potentially calibrated parameters into structure
 function [paramsAll] = genParamStruct()
 
-numParams = 35;
+numParams = 36;
 paramsAll = cell(numParams,1);
 % partnersM, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 8; ... %1 %24;
-    paramsAll{1}.lb = ones(paramsAll{1}.length,1).*0.01; %ones(paramsAll{1}.length,1).*0.2; 
+    paramsAll{1}.lb = [ones(paramsAll{1}.length-2,1).*0.01; 0.01; 0.01]; %ones(paramsAll{1}.length,1).*0.2; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.01; ones(paramsAll{1}.length*(1/3),1).*0.01; ...
 		% ones(paramsAll{1}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{1}.ub = ones(paramsAll{1}.length,1).*60; %ones(paramsAll{1}.length,1).*5.0; 
+    paramsAll{1}.ub = [ones(paramsAll{1}.length-2,1).*60; 0.99; 0.99]; %ones(paramsAll{1}.length,1).*5.0; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.99; ones(paramsAll{1}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{1}.length*(1/3),1).*60.0]; %15;
 
 % partnersF, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 8; ... %1 %24;
-    paramsAll{2}.lb = ones(paramsAll{2}.length,1).*0.01; %ones(paramsAll{2}.length,1).*0.2; 
+    paramsAll{2}.lb = [ones(paramsAll{2}.length-2,1).*0.01; 0.01; 0.01]; %ones(paramsAll{2}.length,1).*0.2; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.01; ones(paramsAll{2}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{2}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{2}.ub = ones(paramsAll{2}.length,1).*60; %ones(paramsAll{2}.length,1).*5.0; 
+    paramsAll{2}.ub = [ones(paramsAll{2}.length-2,1).*60; 0.99; 0.99]; %ones(paramsAll{2}.length,1).*5.0; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.99; ones(paramsAll{2}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{2}.length*(1/3),1).*60.0]; %15;
 
@@ -174,3 +174,8 @@ paramsAll{34}.name = 'kCin2_Cin3Mult'; paramsAll{34}.length = 2; ...
 paramsAll{35}.name = 'baseVagTrans'; paramsAll{35}.length = 2; ...
     paramsAll{35}.lb = [0.0001 ; 0.0006]; ...
     paramsAll{35}.ub = [0.0110 ; 0.0063];
+
+% fertDeclineProp , [1 , 2]
+paramsAll{36}.name = 'fertDeclineProp'; paramsAll{36}.length = 2; ...
+    paramsAll{36}.lb = [0.25 ; 0.50]; ...
+    paramsAll{36}.ub = [0.75 ; 0.99];

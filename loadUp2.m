@@ -20,7 +20,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     ccInc2011_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
-    hivPrevM_dObs , hivPrevF_dObs , ...
+    hivPrevM_dObs , hivPrevF_dObs , popAgeDist_dObs , ...
     mCurr , fCurr , mCurrArt , fCurrArt , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
@@ -279,16 +279,10 @@ hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
     'kCD4female' , 'kVlmale' , 'kVlfemale');
 
-% file = [pwd , '/Config/HIV_parameters.xlsx'];
-% kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
-% kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
-% kVlmale = xlsread(file , 'Disease Data' , 'C84:F99');
-% kVlfemale = xlsread(file , 'Disease Data' , 'C101:F116');
-
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
     % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVlfemale' , 'kCD4male' , 'kCD4female'};
+    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
     vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
@@ -311,7 +305,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001; 0.001]; %[0.0004 ; 0.0008];
+    baseVagTrans = [0.009; 0.009]; %[0.0004 ; 0.0008];
 end
 
 % HIV tranmission rate
@@ -845,7 +839,7 @@ end
 load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
-    'hivPrevM_dObs' , 'hivPrevF_dObs');
+    'hivPrevM_dObs' , 'hivPrevF_dObs' , 'popAgeDist_dObs');
 
 
 
