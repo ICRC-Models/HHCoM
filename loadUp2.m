@@ -132,8 +132,8 @@ if calibBool && any(1 == pIdx)
     partnersM(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
     partnersM(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
     partnersM(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7));
-    partnersM(3 , 3) = paramSet(paramsSub{idx}.inds(8));
+    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 1);
+    partnersM(3 , 3) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
     for a = 4 : age
         partnersM(a , 2:3) = (partnersM(a , 1)/partnersM(a-1 , 1)) .* partnersM(a-1 , 2:3);
     end
@@ -158,8 +158,8 @@ if calibBool && any(2 == pIdx)
     partnersF(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
     partnersF(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
     partnersF(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7));
-    partnersF(3 , 3) = paramSet(paramsSub{idx}.inds(8));
+    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 1);
+    partnersF(3 , 3) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
     for a = 4 : age
         partnersF(a , 2:3) = (partnersF(a , 1)/partnersF(a-1 , 1)) .* partnersF(a-1 , 2:3);
     end
