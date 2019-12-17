@@ -26,13 +26,13 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %%
 %close all; clear all; clc;
 tic
-profile clear;
+% profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-%pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_13Dec19_sameAssum_sameHPVCINCCtrans_sameChanges_artVS_decFert2020_UNincBkrdMort_noARTtrackByHpv_revInitPop_saveCorrectFertFIXD_newHIVstates1910';
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+%pathModifier = 'toNow_16Dec19_HIVtransMF001_testLLwPopAgeDist';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -238,7 +238,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
 % disp('Start up')
-profile on
+% profile on
 % disp(' ')
 
 % If starting from beginning
@@ -534,7 +534,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
 disp(' ')
 disp('Simulation complete.')
 toc
-profile viewer
+% profile viewer
 
 %% Calculate summed log-likelihood
 if calibBool    
@@ -543,7 +543,7 @@ if calibBool
         hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
         cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , toInd , ...
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-        age , risk , startYear , stepsPerYear , annlz)
+        age , gender , risk , startYear , stepsPerYear , annlz)
 
     %delete([savdir , pathModifier , '.mat']);
 else
@@ -552,7 +552,7 @@ else
         hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
         cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , toInd , ...
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-        age , risk , startYear , stepsPerYear , annlz)
+        age , gender , risk , startYear , stepsPerYear , annlz)
 end
 
 %% Runtimes
