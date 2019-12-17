@@ -5,19 +5,19 @@ numParams = 36;
 paramsAll = cell(numParams,1);
 % partnersM, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 8; ... %1 %24;
-    paramsAll{1}.lb = ones(paramsAll{1}.length,1).*0.01; %ones(paramsAll{1}.length,1).*0.2; 
+    paramsAll{1}.lb = [ones(paramsAll{1}.length-2,1).*0.01; 0.01; 0.01]; %ones(paramsAll{1}.length,1).*0.2; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.01; ones(paramsAll{1}.length*(1/3),1).*0.01; ...
 		% ones(paramsAll{1}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{1}.ub = ones(paramsAll{1}.length,1).*60; %ones(paramsAll{1}.length,1).*5.0; 
+    paramsAll{1}.ub = [ones(paramsAll{1}.length-2,1).*60; 0.99; 0.99]; %ones(paramsAll{1}.length,1).*5.0; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.99; ones(paramsAll{1}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{1}.length*(1/3),1).*60.0]; %15;
 
 % partnersF, [3:age x risk], (hr 0.5 to 60, mr 1-99% of hr, lr 1-99% of mr)
 paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 8; ... %1 %24;
-    paramsAll{2}.lb = ones(paramsAll{2}.length,1).*0.01; %ones(paramsAll{2}.length,1).*0.2; 
+    paramsAll{2}.lb = [ones(paramsAll{2}.length-2,1).*0.01; 0.01; 0.01]; %ones(paramsAll{2}.length,1).*0.2; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.01; ones(paramsAll{2}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{2}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{2}.ub = ones(paramsAll{2}.length,1).*60; %ones(paramsAll{2}.length,1).*5.0; 
+    paramsAll{2}.ub = [ones(paramsAll{2}.length-2,1).*60; 0.99; 0.99]; %ones(paramsAll{2}.length,1).*5.0; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.99; ones(paramsAll{2}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{2}.length*(1/3),1).*60.0]; %15;
 
