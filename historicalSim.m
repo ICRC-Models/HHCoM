@@ -31,8 +31,8 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-%pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_16Dec19_HIVtransMF001_testLLwPopAgeDist';
+pathModifier = ['toNow_' , date , '_5yrAgeGrps_noBaseVax_baseScreen_nonVhpv_hpvCalibDat_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+%pathModifier = 'toNow_16Dec19_HIVtransMF001_testLLwPopAgeDist';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -377,8 +377,8 @@ for i = iStart : length(s) - 1
         % % toHivNonHpv = sort(toInd(allcomb(4 , 2 , 1 , 1 , 1 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
         % % fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk))); 
         % % toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
-        fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1:gender , 1 : age , 1:risk))); 
-        toHivAll = sort(toInd(allcomb(4 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1:gender , 1 : age , 1:risk)));
+        fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk))); 
+        toHivAll = sort(toInd(allcomb(3 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk)));
         
         % Distribute HIV infections 
         % % (HPV-)        
@@ -543,7 +543,7 @@ if calibBool
         hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
         cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , toInd , ...
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-        age , risk , startYear , stepsPerYear , annlz)
+        age , gender , risk , startYear , stepsPerYear , annlz)
 
     %delete([savdir , pathModifier , '.mat']);
 else
@@ -552,7 +552,7 @@ else
         hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
         cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , toInd , ...
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
-        age , risk , startYear , stepsPerYear , annlz)
+        age , gender , risk , startYear , stepsPerYear , annlz)
 end
 
 %% Runtimes
