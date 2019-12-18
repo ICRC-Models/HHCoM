@@ -282,7 +282,7 @@ load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
     % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
+    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVlfemale' , 'kCD4male' , 'kCD4female'};
     vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
