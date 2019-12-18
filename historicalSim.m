@@ -545,7 +545,10 @@ if calibBool
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
 
-    %delete([savdir , pathModifier , '.mat']);
+    if negSumLogL < -1500000.00
+        delete([savdir , pathModifier , '.mat']);
+    end
+    
 else
     negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
         hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
