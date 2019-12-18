@@ -29,16 +29,16 @@ for i in $(seq 1 4 ${LENGTH40}); do
     for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once
         SETIDX=${SEQ40[$j]}
 		export SETIDX
-		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40
+		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40 --mem=185G 
         SETIDX=${SEQ32[$j]}
 		export SETIDX
-		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32
+		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32 --mem=374G 
         SETIDX=${SEQ28p[$j]}
 		export SETIDX
-		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28 --mem=248G 
         SETIDX=${SEQ28s[$j]}
 		export SETIDX
-		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+		sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28 --mem=248G 
     done
 	sleep 19200    # give submitted simulations time to finish 
 done
@@ -60,25 +60,25 @@ while [ ! -z "$RERUN" ]; do
             SETIDX=${SEQ40[$j]}
 		    if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
 				export SETIDX
-		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40 --mem=185G
 				INT=$(($INT + 1))
 	        fi
             SETIDX=${SEQ32[$j]}
 			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
 		        export SETIDX
-	    	    sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32
+	    	    sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=32 --mem=374G
 				INT=$(($INT + 1))
 		    fi
             SETIDX=${SEQ28p[$j]}
 			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
 	    	    export SETIDX
-		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28 --mem=248G
 				INT=$(($INT + 1))
 			fi
             SETIDX=${SEQ28s[$j]}
 			if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
 	    	    export SETIDX
-		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28
+		        sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=28 --mem=248G
 				INT=$(($INT + 1))
 			fi
         done
