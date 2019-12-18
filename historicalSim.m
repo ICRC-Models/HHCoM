@@ -2,7 +2,7 @@
 % Runs simulation over the time period and time step specified by the user.
 
 function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '120619')
+%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
 % Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
@@ -378,7 +378,7 @@ for i = iStart : length(s) - 1
         % % fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk))); 
         % % toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
         fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk))); 
-        toHivAll = sort(toInd(allcomb(3 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk)));
+        toHivAll = sort(toInd(allcomb(4 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk)));
         
         % Distribute HIV infections 
         % % (HPV-)        
