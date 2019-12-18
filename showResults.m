@@ -382,7 +382,7 @@ for aInd = 1 : length(ageVec)
     popProp2019_obs(1,aInd) = (sum(kzn_popByage_2019(1 , a)) + sum(kzn_popByage_2019(2 , a))) / sumall(kzn_popByage_2019(: , 3:15));  
 end
 
-%figure;
+figure;
 hold all;
 plot(popProp2019);
 hold all;
