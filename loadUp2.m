@@ -305,13 +305,13 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001; 0.001]; %[0.0004 ; 0.0008];
+    baseVagTrans = [0.0004];
 end
 
 % HIV tranmission rate
 analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
-vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
+vagTransM = (baseVagTrans*2.0) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+vagTransF = baseVagTrans * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
 transM = vagTransM .* (1 - analProp(: , 1));
 transF = vagTransF .* (1 - analProp(: , 2));
 betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
