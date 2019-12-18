@@ -129,13 +129,13 @@ if calibBool && any(1 == pIdx)
     %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
     %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
     %partnersM(10:age , 3) = ones(7 , 1);
-    partnersM(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersM(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersM(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 1);
-    partnersM(3 , 3) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
+    partnersM(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
+    partnersM(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
+    partnersM(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
+    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
+    partnersM(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
     for a = 4 : age
-        partnersM(a , 2:3) = (partnersM(a , 1)/partnersM(a-1 , 1)) .* partnersM(a-1 , 2:3);
+        partnersM(a , 1:2) = (partnersM(a , 3)/partnersM(a-1 , 3)) .* partnersM(a-1 , 1:2);
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
@@ -155,13 +155,13 @@ if calibBool && any(2 == pIdx)
     %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
     %partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
     %partnersF(10:age , 3) = ones(7 , 1);
-    partnersF(3:6 , 1) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersF(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersF(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 1);
-    partnersF(3 , 3) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
+    partnersF(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
+    partnersF(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
+    partnersF(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
+    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
+    partnersF(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
     for a = 4 : age
-        partnersF(a , 2:3) = (partnersF(a , 1)/partnersF(a-1 , 1)) .* partnersF(a-1 , 2:3);
+        partnersF(a , 1:2) = (partnersF(a , 3)/partnersF(a-1 , 3)) .* partnersF(a-1 , 1:2);
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
