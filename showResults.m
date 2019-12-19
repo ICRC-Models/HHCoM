@@ -1254,11 +1254,11 @@ figure;
 subplot(2,3,1)
 plot(tVec , hpv_vax , 'k')
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 58.2 , 'ko')
+plot(tVec((2011 - startYear) * stepsPerYear) , 46.82 , 'ko')
 hold all;
 plot(tVec , hpv_nonVax);
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 41.8 , 'o');
+plot(tVec((2011 - startYear) * stepsPerYear) , 53.18 , 'o');
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
 title('HPV');
 ylim([0 100]);
@@ -1281,11 +1281,11 @@ cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
 subplot(2,3,2)
 plot(tVec , cin_vax , 'k')
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 67.1 , 'ko')
+plot(tVec((2011 - startYear) * stepsPerYear) , 51.92 , 'ko')
 hold all;
 plot(tVec , cin_nonVax);
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 32.9 , 'o')
+plot(tVec((2011 - startYear) * stepsPerYear) , 48.08 , 'o')
 ylim([0 100]);
 xlim([2000 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
@@ -1308,11 +1308,11 @@ cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
 subplot(2,3,3)
 plot(tVec , cin_vax , 'k')
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 75.0 , 'ko')
+plot(tVec((2011 - startYear) * stepsPerYear) , 62.81 , 'ko')
 hold all;
 plot(tVec , cin_nonVax);
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 25.0 , 'o')
+plot(tVec((2011 - startYear) * stepsPerYear) , 37.19 , 'o')
 ylim([0 100]);
 xlim([2000 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
@@ -1335,11 +1335,11 @@ cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
 subplot(2,3,4)
 plot(tVec , cin_vax , 'k')
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 82.9 , 'ko')
+plot(tVec((2011 - startYear) * stepsPerYear) , 73.71 , 'ko')
 hold all;
 plot(tVec , cin_nonVax);
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 17.1 , 'o')
+plot(tVec((2011 - startYear) * stepsPerYear) , 26.29 , 'o')
 ylim([0 100]);
 xlim([2000 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
@@ -1362,11 +1362,11 @@ cc_nonVax = sum(popVec(: , ccInds_nonVax) , 2)...
 subplot(2,3,5)
 plot(tVec , cc_vax , 'k')
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 94.8 , 'ko')
+plot(tVec((2011 - startYear) * stepsPerYear) , 85.78 , 'ko')
 hold all;
 plot(tVec , cc_nonVax);
 hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 5.2 , 'o')
+plot(tVec((2011 - startYear) * stepsPerYear) , 14.22 , 'o')
 ylim([0 100]);
 xlim([2000 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')

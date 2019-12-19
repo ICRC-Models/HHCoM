@@ -282,7 +282,7 @@ load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
     % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVLfemale' , 'kCD4male' , 'kCD4female'};
+    vars5To1_nms = {'muHIV' , 'kVlmale' , 'kVlfemale' , 'kCD4male' , 'kCD4female'};
     vars5To1_vals = {muHIV , kVlmale , kVlfemale , kCD4male , kCD4female};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
@@ -305,13 +305,13 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001; 0.001]; %[0.0004 ; 0.0008];
+    baseVagTrans = [0.0004];
 end
 
 % HIV tranmission rate
 analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = baseVagTrans(2,1) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
-vagTransF = baseVagTrans(1,1) * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
+vagTransM = (baseVagTrans*2.0) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+vagTransF = baseVagTrans * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
 transM = vagTransM .* (1 - analProp(: , 1));
 transF = vagTransF .* (1 - analProp(: , 2));
 betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
