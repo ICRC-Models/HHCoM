@@ -549,6 +549,10 @@ if calibBool
         delete([savdir , pathModifier , '.mat']);
     end
     
+    if isnan(negSumLogL)
+        negSumLogL = -10000000.00;
+    end
+    
 else
     negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
         hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
