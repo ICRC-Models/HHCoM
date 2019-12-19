@@ -22,7 +22,7 @@ parpool(pc , numCPUperNode)    % start the pool with max number workers
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
-nPrlSets = numCPUperNode; %28; %16;
+nPrlSets = 28; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);
 
