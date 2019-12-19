@@ -6,9 +6,9 @@ DATE=19Dec19
 echo "${DATE}"
 export DATE
 
-echo "Running MATLAB script to get matrix size."
-sbatch -p csde -A csde slurm_sizeMatrix.sbatch
-sleep 300
+#echo "Running MATLAB script to get matrix size."
+#sbatch -p csde -A csde slurm_sizeMatrix.sbatch
+#sleep 300
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
 echo "${NSETS}" 
@@ -27,8 +27,8 @@ LENGTH28=${#SEQ28all[@]}
 #echo "${LENGTH40}"
 #echo "${LENGTH32}"
 echo "${LENGTH28}"
-for i in $(seq 1 12 ${LENGTH28}); do
-    for j in $(seq $((${i}-1)) 1 $((${i}+11))); do    # submit 4 simulations for each target node at once
+for i in $(seq 1 5 ${LENGTH28}); do
+    for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once
         #SETIDX=${SEQ40[$j]}
 	#	export SETIDX
 	#	sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4 --ntasks-per-node=40 --mem=185G 
@@ -45,7 +45,7 @@ for i in $(seq 1 12 ${LENGTH28}); do
                 export SETIDX
                 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
     done
-    sleep 16200    # give submitted simulations time to finish 
+    sleep 5400    # give submitted simulations time to finish 
 done
 
 : <<'END'
@@ -60,8 +60,8 @@ echo "Re-running failed simulations."
 while [ ! -z "$RERUN" ]; do
     MISSING=($RERUN)
     INT=0
-    for i in $(seq 1 12 ${LENGTH28}); do
-	for j in $(seq $((${i}-1)) 1 $((${i}+11))); do    # submit 4 simulations for each target node at once
+    for i in $(seq 1 5 ${LENGTH28}); do
+	for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once
         #    SETIDX=${SEQ40[$j]}
         #    if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
 	#	export SETIDX
@@ -92,13 +92,13 @@ while [ ! -z "$RERUN" ]; do
                  sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
              fi
         done
-	if [ $INT -ge 12 ]; then 
-            sleep 16200    # give submitted simulations time to finish 
+	if [ $INT -ge 5 ]; then 
+            sleep 5400    # give submitted simulations time to finish 
 	    INT=0
 	fi
     done
-    if [ $INT -gt 0 ] && [ $INT lt 12 ]; then
-        sleep 16200    # give submitted simulations time to finish 
+    if [ $INT -gt 0 ] && [ $INT lt 5 ]; then
+        sleep 5400    # give submitted simulations time to finish 
     fi
 
     echo "Running MATLAB script to identify failed simulations, again."
