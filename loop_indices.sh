@@ -45,7 +45,7 @@ for i in $(seq 1 5 ${LENGTH28}); do
                 export SETIDX
                 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
     done
-    sleep 5400    # give submitted simulations time to finish 
+    sleep 7200    # give submitted simulations time to finish 
 done
 
 : <<'END'
@@ -93,12 +93,12 @@ while [ ! -z "$RERUN" ]; do
              fi
         done
 	if [ $INT -ge 5 ]; then 
-            sleep 5400    # give submitted simulations time to finish 
+            sleep 7200    # give submitted simulations time to finish 
 	    INT=0
 	fi
     done
     if [ $INT -gt 0 ] && [ $INT lt 5 ]; then
-        sleep 5400    # give submitted simulations time to finish 
+        sleep 7200    # give submitted simulations time to finish 
     fi
 
     echo "Running MATLAB script to identify failed simulations, again."
