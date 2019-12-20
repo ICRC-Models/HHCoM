@@ -320,10 +320,10 @@ betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
     % force of infection: females to infect HIV-negative males, 
-    % affected by betaHIV_F2M (probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
+    % affected by betaHIV_F2M, probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
     betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
     % force of infection: males to infect HIV-negative females,
-    % affected by betaHIV_M2F (probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
+    % affected by betaHIV_M2F, probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
     betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
 end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
