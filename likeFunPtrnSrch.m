@@ -1,5 +1,5 @@
 function negSumLogL = likeFunPtrnSrch(popVec ,  cinPos2007_obs , ...
-    hpv_2000_obs , hpv_hiv_obs , hivPrevM_obs , hivPrevF_obs ,...
+    hpv_2000_obs , hpv_hiv_obs , hivPrevM_obs , hivPrevF_obs , hivPrevF_ANC, ...
     disease , viral , gender , age , risk , ...
     hpvTypes , hpvStates , periods , startYear , stepsPerYear)
 
@@ -186,7 +186,7 @@ nPos = [nPos ; hpv_hiv_obs(: , 2)];
 % % nPos = [nPos ; 70 ; 20 ; 10];
 % % N =  [N ; 100 ; 100 ; 100];
 
-%% HIV
+%% HIV prevalence by age in men and women in 2003 and 2008
 hivYearVec = unique(hivPrevM_obs(: ,1));
 hivAgeM = zeros(7 , length(hivYearVec));
 hivAgeF = hivAgeM;
@@ -216,6 +216,25 @@ pPos = [pPos; hivAgeM(:) ; hivAgeF(:)];
 nPos = [nPos ; hivPrevM_obs(: , 2) ; hivPrevF_obs(: , 2)];
 N =  [N ;  hivPrevM_obs(: , 3) ; hivPrevF_obs(: , 3)];
 
+%% HIV prevalence by women attending ANC from 1990-2003
+hivYearVec = unique(hivPrevF_ANC(: ,1));
+hivANC = zeros(1, length(hivYearVec));
+
+for t = 1 : length(hivYearVec)
+     hivFInds = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , 4 : 10 , 1 : risk));
+     artFInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , 4 : 10 , 1 : risk));
+     totFInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
+            1 : periods , 2 , 4 : 10 , 1 : risk));
+     hivANC(t) =  (sum(popVec((hivYearVec(t) - startYear) * stepsPerYear , hivFInds)) ...
+            + sum(popVec((hivYearVec(t) - startYear) * stepsPerYear , artFInds))) ...
+            / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear , totFInds)) * 100;
+end
+
+pPos = [pPos; hivANC(:) ];
+nPos = [nPos ; hivPrevF_ANC(: , 2)];
+N =  [N ;  hivPrevF_ANC(: , 3) ];
 %% Likelihood function
 pPos = pPos ./ 100; % scale percent probabilities to decimals
 logL = nPos .* log(pPos) + (N - nPos) .* log(1 - pPos); % log likelihoods for binomial events
