@@ -12,6 +12,12 @@ t_prev = t-1;
 t_curr = t;
 t_next = t+1;
 
+%% Cluster information
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
+parpool(pc , numCPUperNode)    % start the pool with max number workers
+
 %% Load all particles 
 paramDir = [pwd , '/Params/'];
 paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
