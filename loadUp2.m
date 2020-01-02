@@ -4,7 +4,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , epsA_vec , epsR_vec , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , mue2 , epsA_vec , epsR_vec , ...
     yr , ...
     hivOn , betaHIVM2F , betaHIVF2M , muHIV , kCD4 , ...
     hpvOn , perPartnerHpv_vax , perPartnerHpv_nonV , fImm , rImmune , ...
@@ -36,7 +36,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
-    deathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    deathMat , deathMat2 , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -89,18 +89,24 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 % file = [pwd , '/Config/Population_data.xlsx'];
 % popInit = xlsread(file , 'Demographics' , 'D6:E21');
 % riskDistM = xlsread(file , 'Demographics' , 'B54:D69');
-% mue = xlsread(file , 'Demographics' , 'B84:C99');
+% mue = zeros(age , gender);
+% mue(: , 1) = xlsread(file , 'Demographics' , 'B84:B99');
+% mue(: , 2) = xlsread(file , 'Demographics' , 'L84:L99');
+% mue2 = zeros(age , gender);
+% mue2(: , 1) = xlsread(file , 'Demographics' , 'I84:I99');
+% mue2(: , 2) = xlsread(file , 'Demographics' , 'S84:S99');
 % fertility = xlsread(file , 'Demographics' , 'B115:G130');
 % partnersM = xlsread(file , 'Demographics' , 'B163:D178');
 % partnersF = xlsread(file , 'Demographics' , 'E163:G178');
 % maleActs = xlsread(file , 'Demographics' , 'D202:F217');
 % femaleActs = xlsread(file , 'Demographics' , 'D222:F237');
-% save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , 'mue' , ...
-%     'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
+% save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
+%     'mue' , 'mue2' , 'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
-load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , 'fertility');
+load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
+    'mue2' , 'fertility');
 
 % Set female risk distribution
 riskDistF = riskDistM;
@@ -210,10 +216,12 @@ if ~fivYrAgeGrpsOn
     end
 
     % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'fertility' , 'fertility2' , 'fertility3' , ...
-                 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
-    vars5To1_vals = {riskDistM , riskDistF , mue , fertility , fertility2 , fertility3 , ...
-                 partnersM , partnersF , maleActs , femaleActs};    
+    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'mue2' , ...
+        'fertility' , 'fertility2' , 'fertility3' , ...
+        'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
+    vars5To1_vals = {riskDistM , riskDistF , mue , mue2 , ...
+        fertility , fertility2 , fertility3 , ...
+        partnersM , partnersF , maleActs , femaleActs};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
         assignin('base', vars5To1_nms{j} , valsA1);
@@ -259,7 +267,7 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
 end
 
 % save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
-%     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'fertility3' , 'mue' , ...
+%     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'fertility3' , 'mue' , 'mue2' , ...
 %     'epsA_vec' , 'epsR_vec' , 'yr');
 
 %% Save HIV natural history parameters
@@ -1302,7 +1310,7 @@ hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop
 % save(fullfile(paramDir ,'fertMat3') , 'fertMat3')
 % save(fullfile(paramDir ,'hivFertMats3') , 'hivFertPosBirth3' , 'hivFertNegBirth3')
 
-%% Background deaths
+%% Background death rate before 1950
 % disp('Building death matrix')
 
 xInds = [];
@@ -1320,6 +1328,25 @@ deathMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
 % save(fullfile(paramDir ,'deathMat') , 'deathMat')
 % disp('Death matrix complete')
+
+%% Background death rate by 1985
+% disp('Building second death matrix')
+
+xInds = [];
+yInds = [];
+vals = [];
+for a = 1 : age
+    males = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+    females = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+    
+    xInds = [xInds; males; females];
+    yInds = [yInds; males; females];
+    vals = [vals; ones(length(males),1) .* ( -mue2(a,1) ); ones(length(females),1) .* ( -mue2(a,2) )];
+end
+deathMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+
+% save(fullfile(paramDir ,'deathMat2') , 'deathMat2')
+% disp('Second death matrix complete')
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
 % disp('Building circumcision matrix')

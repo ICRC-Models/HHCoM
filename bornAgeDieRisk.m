@@ -17,7 +17,7 @@
 function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
-        hivFertNegBirth3 , deathMat , circMat , circMat2 , ...
+        hivFertNegBirth3 , deathMat , deathMat2 , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
@@ -40,7 +40,7 @@ elseif year > 2004
 end
 
 %% Calculate births: HIV-negative and HIV-positive births
-if year > 1960 && year <= 2000
+if (year > 1960) && (year <= 2000)
     dt = (year - 1960) * stepsPerYear;
     dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
         ./ ((2000 - 1960) * stepsPerYear);
@@ -51,11 +51,11 @@ if year > 1960 && year <= 2000
     dFertMat = (fertMat2 - fertMat) ...
         ./ ((2000 - 1960) * stepsPerYear);
     fertMat = fertMat + dFertMat .* dt;
-elseif year > 2000 && year <= 2010
+elseif (year > 2000) && (year <= 2010)
     hivFertPosBirth = hivFertPosBirth2;
     hivFertNegBirth = hivFertNegBirth2;
     fertMat = fertMat2;
-elseif year > 2010 && year <= 2020
+elseif (year > 2010) && (year <= 2020)
     dt = (year - 2010) * stepsPerYear;
     dFertPos = (hivFertPosBirth3 - hivFertPosBirth2) ...
         ./ ((2020 - 2010) * stepsPerYear);
@@ -66,7 +66,7 @@ elseif year > 2010 && year <= 2020
     dFertMat = (fertMat3 - fertMat2) ...
         ./ ((2020 - 2010) * stepsPerYear);
     fertMat = fertMat2 + dFertMat .* dt;
-elseif year > 2020
+elseif (year > 2020)
     hivFertPosBirth = hivFertPosBirth3;
     hivFertNegBirth = hivFertNegBirth3;
     fertMat = fertMat3;
@@ -83,6 +83,14 @@ births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
 
 %% Calculate deaths
+if (year > 1950) && (year <= 1985)
+    dt = (year - 1950) * stepsPerYear;
+    dDeathMat = (deathMat2 - deathMat) ...
+        ./ ((1985 - 1950) * stepsPerYear);
+    deathMat = deathMat + dDeathMat .* dt;
+elseif year > 1985
+    deathMat = deathMat2;
+end
 deaths = deathMat * pop;
 
 %% Calculate males receiving neonatal circumcision
