@@ -13,7 +13,7 @@
 % went on treatment.
 
 function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , ... %artDist ,
-    kCD4 ,  maxRateM1 , maxRateF1 , maxRateM2 , maxRateF2 , disease , viral , ...
+    kCD4 ,  maxRateM , maxRateF , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year)
 
@@ -32,8 +32,8 @@ if year >= 2006 && year < 2013
     yrs = 2006 : 1/stepsPerYear : 2013;
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-        maxCover = {linspace(0 , maxRateM1 , length(yrs)) , ...
-            linspace(0 , maxRateF1 , length(yrs))};
+        maxCover = {linspace(0 , maxRateM(2) , length(yrs)) , ...
+            linspace(0 , maxRateF(2) , length(yrs))};
         onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
         aList = [];
         ageSubTots = [];
@@ -85,8 +85,8 @@ if year >= 2004 && year < 2013
     yrs = 2004 : 1 / stepsPerYear : 2006;
     ind = (round(yrs , 4) == round(year , 4));
     for g = 1 : gender
-        maxCover = {linspace(0 , maxRateM1 , length(yrs)) ,...
-            linspace(0 , maxRateF1 , length(yrs))};
+        maxCover = {linspace(0 , maxRateM(1) , length(yrs)) ,...
+            linspace(0 , maxRateF(1) , length(yrs))};
         onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
         aList = [];
         ageSubTots = [];
@@ -134,7 +134,7 @@ end
 % CD4 >= 200, from 2013 to 2015
 if year >= 2013 && year < 2015
     for g = 1 : gender  
-        maxCover = {maxRateM1 , maxRateF1};
+        maxCover = {maxRateM(2) , maxRateF(2)};
         onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
         aList = [];
         ageSubTots = [];
@@ -178,8 +178,8 @@ if year >= 2015
     yrs = 2015 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
     ind = round(yrs , 4) == round(year , 4);
     for g = 1 : gender
-        maxCover = {linspace(maxRateM1 , maxRateM2 , length(yrs)) ,...
-           linspace(maxRateF1 , maxRateF2 , length(yrs))};
+        maxCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) ,...
+           linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
         onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
         aList = [];
         ageSubTots = [];
