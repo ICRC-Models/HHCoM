@@ -483,6 +483,8 @@ artActual = [0	0	0	1	1	3	5	8   12, ...
 yrsArtActual = [2000	2001	2002	2003	2004	2005 ...
     2006	2007	2008	2009	2010	2011	2012	2013 ...
     2014	2015    2016    2017    2018];
+artActual2 = [0.0  1.0  3.8  8.3  14.3  20.1  24.7  30.7];
+yrsArtActual2 = [2004  2005  2006  2007  2008  2009  2010  2011];
 
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk));
@@ -491,42 +493,56 @@ hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStat
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk));
 hivPop = sum(popVec(: , hivInds) , 2);
 
-plot(tVec , 100 * artPop ./ (hivPop + artPop) , yrsArtActual , artActual , '*')
+plot(tVec , 100 * artPop ./ (hivPop + artPop) , yrsArtActual , artActual , '*' , ...
+    yrsArtActual2 , artActual2 , '*' , ...
+    2006 , 35 , '*' , ...
+    2012 , 32 , '*' , ...    
+    2013 , 62.5 , 'o' , ...
+    2013 , 65.8 , 'o' , ...
+    2014 , 58.7 , 'o' , ...
+    2014 , 63.0 , 'o')
 xlabel('Year')
 ylabel('Proportion of HIV Population')
-title('Proportion on ART')
-legend('Model' , 'Observed: World Bank, World Dev Indicators')
+title('Proportion on ART (note: dont think elig prop is consistent across val data')
+legend('Model' , 'Observed SA: World Bank, World Dev Indicators' , ...
+    'Observed KZN: Zaidi, AIDS, 2013' , ...
+    'Observed KZN: Epi Bulletin' , ...
+    'Observed KZN: vavn Rooyen, 2014' , ...
+    'Observed KZN (males, VS): Huerga, 2018' , ...
+    'Observed KZN (females , VS): Huerga, 2018' , ...
+    'Observed KZN (males , VS): Grobler, 2017' , ...
+    'Observed KZN (females , VS): Grobler, 2017')
 
-%% Proportion of HIV+ population on ART, by gender
+%% Proportion of HIV+ population on ART, by gender, 25-49
 figure()
-artActualM = [2005	0.00483	0.004493	0.005193
-2006	0.02004	0.018562	0.021656
-2007	0.046485	0.042782	0.050622
-2008	0.081635	0.074986	0.089097
-2009	0.116299	0.107197	0.126437
-2010	0.131834	0.122535	0.142661
-2011	0.162606	0.15032	0.177079
-2012	0.16853	0.154812	0.184915];
+artActualM = [2004	0.0	    0.0	  0.9
+2005	2.2	  1.0	  4.1
+2006	3.6	  2.0	  6.1
+2007	11.0  7.8	  15.1
+2008	16.6  12.7    21.2
+2009	21.8  17.4	  26.8
+2010	27.5  23.0    25.9
+2011	30.5  25.0    35.7];
 
-artActualF = [2005	0.009496	0.009117	0.009907
-2006	0.044063	0.04216	0.046146
-2007	0.085786	0.082091	0.08983
-2008	0.143365	0.137734	0.149967
-2009	0.200526	0.192269	0.210197
-2010	0.222291	0.214523	0.229979
-2011	0.271331	0.261925	0.281438
-2012	0.306655	0.294358	0.319155];
+artActualF = [2004	0.3	0.1 	0.9
+2005	2.7	            1.8	    4.0
+2006	7.8	            6.1	    9.8
+2007	14.2	        12.0    16.8
+2008	21.6            19.0    24.4
+2009	28.4            25.5    31.4
+2010	34.6            32.1    37.1
+2011	39.7            37.0    42.5];
 
-artActualM(: , 2 : 4) = artActualM(: , 2 : 4) .* 100;
-artActualF(: , 2 : 4) = artActualF(: , 2 : 4) .* 100;
+artActualM(: , 2 : 4) = artActualM(: , 2 : 4);
+artActualF(: , 2 : 4) = artActualF(: , 2 : 4);
 artAct = {artActualM , artActualF};
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , g , 4 : 15 , 1 : risk));
+        1 : endpoints , 1 : intervens , g , 6 : 10 , 1 : risk));
     artPop = sum(popVec(: , artInds) , 2);
     hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
-        1 : endpoints , 1 : intervens , g , 4 : 15 , 1 : risk));
+        1 : endpoints , 1 : intervens , g , 6 : 10 , 1 : risk));
     hivPop = sum(popVec(: , hivInds) , 2);
     plot(tVec , 100 * artPop ./ (hivPop + artPop))
     hold on
@@ -537,8 +553,51 @@ for g = 1 : 2
 end
 xlabel('Year')
 ylabel('Proportion of HIV Population')
-title('Proportion on ART')
-legend('Model (Male)' , 'Observed(Male)' , 'Model (Female)' , 'Observed (Female)')
+title('Proportion on ART ages 25-49')
+legend('Model (Male)' , 'Observed(Male): Zaidi, AIDS, 2013' , 'Model (Female)' , 'Observed (Female): Zaidi, AIDS, 2013')
+
+%% Proportion of HIV+ population on ART, by gender
+% figure()
+% artActualM = [2005	0.00483	0.004493	0.005193
+% 2006	0.02004	0.018562	0.021656
+% 2007	0.046485	0.042782	0.050622
+% 2008	0.081635	0.074986	0.089097
+% 2009	0.116299	0.107197	0.126437
+% 2010	0.131834	0.122535	0.142661
+% 2011	0.162606	0.15032	0.177079
+% 2012	0.16853	0.154812	0.184915];
+% 
+% artActualF = [2005	0.009496	0.009117	0.009907
+% 2006	0.044063	0.04216	0.046146
+% 2007	0.085786	0.082091	0.08983
+% 2008	0.143365	0.137734	0.149967
+% 2009	0.200526	0.192269	0.210197
+% 2010	0.222291	0.214523	0.229979
+% 2011	0.271331	0.261925	0.281438
+% 2012	0.306655	0.294358	0.319155];
+% 
+% artActualM(: , 2 : 4) = artActualM(: , 2 : 4) .* 100;
+% artActualF(: , 2 : 4) = artActualF(: , 2 : 4) .* 100;
+% artAct = {artActualM , artActualF};
+% 
+% for g = 1 : 2
+%     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , g , 4 : 15 , 1 : risk));
+%     artPop = sum(popVec(: , artInds) , 2);
+%     hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+%         1 : endpoints , 1 : intervens , g , 4 : 15 , 1 : risk));
+%     hivPop = sum(popVec(: , hivInds) , 2);
+%     plot(tVec , 100 * artPop ./ (hivPop + artPop))
+%     hold on
+%     errorbar(artAct{g}(: , 1) , artAct{g}(: , 2) , ...
+%         artAct{g}(: , 2) - artAct{g}(: , 3) , ...
+%         artAct{g}(: , 4) - artAct{g}(: , 2))
+%     hold on
+% end
+% xlabel('Year')
+% ylabel('Proportion of HIV Population')
+% title('Proportion on ART')
+% legend('Model (Male)' , 'Observed(Male)' , 'Model (Female)' , 'Observed (Female)')
 
 %% On ART by age
 aVec = {1:5,6:1011:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80}; %{10:15,16:25,26:35,36:50,51:75};
