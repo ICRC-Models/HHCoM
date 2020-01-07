@@ -3,7 +3,7 @@
 function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
-    cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , toInd , ...
+    cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , totPopSize_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
     age , gender , risk , startYear , stepsPerYear , annlz)
 
@@ -281,20 +281,32 @@ dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
 %% Population age distribution
 popYearVec = unique(popAgeDist_dObs(: ,1));
-popProp2019 = zeros(age, length(popYearVec));
+popProp = zeros(age, length(popYearVec));
 for t = 1 : length(popYearVec)
     for a = 1 : age
         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-        popProp2019(a,t) = sum(popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popAge),2) ./ ...
+        popProp(a,t) = sum(popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popAge),2) ./ ...
             sum(popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
     end
 end
-mObs = [mObs ; popProp2019(:)];
+mObs = [mObs ; popProp(:)];
 dMean = [dMean ; popAgeDist_dObs(: , 2)];
 dVar =  [dVar ;  popAgeDist_dObs(: , 3)];
+
+%% Total population size
+popYearVec = unique(totPopSize_dObs(: ,1));
+popSize = zeros(1 , length(popYearVec));
+for t = 1 : length(popYearVec)
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+    popSize(t) = sum(popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
+end
+mObs = [mObs ; popSize(:)];
+dMean = [dMean ; totPopSize_dObs(: , 2)];
+dVar =  [dVar ;  totPopSize_dObs(: , 3)];
 
 %% Likelihood function
 logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar)).*(mObs-dMean).^2);

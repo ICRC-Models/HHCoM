@@ -60,9 +60,9 @@ for i = 1 : length(screenAlgs)
                                             (screenAlgs{i}.testSens(2) * screenAlgs{i}.colpoRetain * (1 - screenAlgs{i}.cinTreatRetain)) + ...
                                             (screenAlgs{i}.testSens(2) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * (1-screenAlgs{i}.cinTreatEff(d))));
                                         toScreenTreatImmMult = screenAlgs{i}.testSens(2) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
-                                            (1.0-((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d)));
+                                            (1.0-(screenAlgs{i}.cinTreatHpvPersistHivNeg/screenAlgs{i}.cinTreatEff(d)));
                                         toScreenTreatHpvMult = screenAlgs{i}.testSens(2) * screenAlgs{i}.colpoRetain * screenAlgs{i}.cinTreatRetain * screenAlgs{i}.cinTreatEff(d) * ...
-                                            ((screenAlgs{i}.cinTreatHpvPersist - (1-screenAlgs{i}.cinTreatEff(d)))/screenAlgs{i}.cinTreatEff(d));
+                                            (screenAlgs{i}.cinTreatHpvPersistHivNeg/screenAlgs{i}.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
                                     % if you have cervical cancer
                                     elseif ( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)
