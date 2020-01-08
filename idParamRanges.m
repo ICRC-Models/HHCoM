@@ -39,4 +39,29 @@ end
 fileRanges = ['rangesVSbounds_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save ranges compared to bounds
 csvwrite([paramDir, fileRanges] , [minVals , maxVals , lbVals, ubVals]);
 
-
+%% Plot parameter posterior distributions
+% ***Note: may want to change to top 100 parameter sets for this plot***
+% figure;
+% titles = {'partnersM:10-14,hr' , 'partnersM:15-19,hr' , 'partnersM:20-24,hr' , 'partnersM:25-29,hr' , 'partnersM:30-44,hr' , 'partnersM:45-79,hr' , 'partnersM:10-14,mr' , 'partnersM:10-14,lr' , ...
+%     'partnersF' , 'partnersF' , 'partnersF' , 'partnersF' , 'partnersF' , 'partnersF' , 'partnersF' , 'partnersF' , ...
+%     'condUse' , 'epsA' , 'perPartnerHpv' , 'lambdaMultImm' , ...
+%     'Inf-CIN1, v' , 'Inf-CIN1, nv' , 'CIN1-CIN2, v' , 'CIN1-CIN2, nv' , 'CIN2-CIN3, v' , ...
+%     'CIN2-CIN3, nv' , 'CIN3-CC, v' , 'CIN3-CC, nv' , 'Inf-Well, v' , 'Inf-Well, nv' , ...
+%     'CIN1-Inf, v' , 'CIN1-Inf, nv' , 'CIN2-CIN1, v' , 'CIN2-CIN1, nv' , 'CIN3-CIN2, v' , ...
+%     'CIN3-CIN2, nv' , 'HIV transmission' , 'fert decline 1' , 'fert decline 2'};
+% for i = 1 : size(top50Params,1)
+%     subplot(5,8,i);
+%     prior = unifpdf([lb(i):((ub(i)-lb(i))/50):ub(i)] , lb(i) , ub(i));
+%     [N,edges] = histcounts(top50Params(i,:) , 5 , 'Normalization' , 'probability');
+%     edges = edges(2:end) - (edges(2)-edges(1))/2;
+%     hold all;
+%     plot(edges, N);
+%     hold all;
+%     %plot([lb(i):((ub(i)-lb(i))/50):ub(i)] , prior , 'r');
+%     %hold off;
+%     xlim([lb(i) ub(i)]);
+%     title(titles{i});
+%     if i == size(top50Params,1)
+%         legend('t0' , 't1');
+%     end
+% end
