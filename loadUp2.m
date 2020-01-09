@@ -843,8 +843,8 @@ end
 % popAgeDist_dObs(: , 2 : 3) = [xlsread(file , 'Calibration' , 'H191 : I206'); ...
 %     xlsread(file , 'Calibration' , 'H239 : I254')];
 % 
-% totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D272'); % Total population size in 2001 and 2011
-% totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I272');
+% totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D273'); % Total population size in 2001, 2011, and 2019
+% totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I273');
 % 
 % save(fullfile(paramDir , 'calibData'), 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
 %     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
