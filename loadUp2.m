@@ -700,8 +700,8 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 
 % Maximum ART coverage
 artOutMult = 1.0; %0.95;
-maxRateM = [0.35*artOutMult , 0.40*artOutMult , 0.729*artOutMult];
-maxRateF = [0.35*artOutMult , 0.55*artOutMult , 0.729*artOutMult];
+maxRateM = [0.15*artOutMult , 0.26*artOutMult , 0.55*artOutMult , 0.729*artOutMult];
+maxRateF = [0.20*artOutMult , 0.35*artOutMult , 0.70*artOutMult , 0.729*artOutMult];
 
 % Intervention start years
 hivStartYear = 1980;
