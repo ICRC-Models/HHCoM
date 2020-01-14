@@ -650,7 +650,7 @@ kRL = 0.02;
 kDR = 0.025;
 
 % Immunity
-rImmune = 0.024; % for HPV16, Johnson (2012)
+rImmune = 0.024; % Clearance rate from Immune to Normal; for HPV16, Johnson (2012)
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % HIV and ART multipliers
