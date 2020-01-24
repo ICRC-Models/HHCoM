@@ -40,40 +40,37 @@ if year >= 2004 && year < 2010
         popCover = {linspace(maxRateM(1) , maxRateM(2) , length(yrs)) ,...
             linspace(maxRateF(1) , maxRateF(2) , length(yrs))};
     end
+    ageVec = [1 : age];
+    dRange = [7];
     for g = 1 : gender
-        onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
-        aList = [];
-        ageHIVSubTots = [];
-        totBelow200QualAges = 0;
-        toRedisAge = [];
+        ageARTSubTots = zeros(1 , age); % number persons on ART by age
+        ageHIVSubTots = zeros(1 , age); % number HIV-positives by age
         for a = ageSexDebut : age
             onArtAge = sumall(pop(hivInds(8 , 6 , g , a , : , :)));
-            totBelow200Age = 0;
-            totBelow200 = 0;
+            totHivPosAge = 0;
             for v = 1 : 5
-                totBelow200Age = totBelow200Age + sumall(pop(hivInds(7 , v , g , a , : , :)));
-                totBelow200 = totBelow200 + sumall(pop(hivInds(7 , v , g , ageSexDebut : age , : , :)));
+                totHivPosAge = totHivPosAge + sumall(pop(hivInds(7 , v , g , a , : , :)));
             end
-            fracARTAge = onArtAge / (onArtAge + totBelow200Age);
-            if fracARTAge >= 1.0
-                toRedisAge = [toRedisAge totBelow200Age];
-            elseif fracARTAge < 1.0
-                aList = [aList a];
-                ageHIVSubTots = [ageHIVSubTots totBelow200Age];
-                totBelow200QualAges = totBelow200QualAges + totBelow200Age;
-            end
+            ageARTSubTots(1 , a) = onArtAge;
+            ageHIVSubTots(1 , a) = totHivPosAge;    
         end
-        fracART = onArt / (onArt + totBelow200);
-        fracQualAges = ageHIVSubTots ./ totBelow200QualAges;
-        if fracART < popCover{g}(ind)
-            cover = (popCover{g}(ind) - fracART) ./ (1 - fracART);
-            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
-            fracToRedis = totToRedis ./ ageHIVSubTots;
-            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
-            formatToRedis(:) = (max(cover , 0) + fracToRedis');
-            treat(7 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
-                ones(1 , 5 , 1 , length(aList) , risk) , formatToRedis);
-        end
+        fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVSubTots)); % fraction on ART by age
+        agePopSubTots = ageARTSubTots + ageHIVSubTots; % total HIV-positives (on/off ART) by age
+        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , g , risk , ageSexDebut , dRange);
+
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
     end
 end
 
@@ -90,42 +87,40 @@ if year >= 2010 && year < 2013
         popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) , ...
             linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
     end
+    ageVec = [1 : age];
+    dRange = [6 : 7];
     for g = 1 : gender   
-        onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
-        aList = [];
-        ageHIVSubTots = [];
-        totHivPosQualAges = 0; 
-        toRedisAge = [];
+        ageARTSubTots = zeros(1 , age); % number persons on ART by age
+        ageHIVSubTots = zeros(1 , age); % number HIV-positives by age
         for a = ageSexDebut : age 
             onArtAge = sumall(pop(hivInds(8 , 6 , g , a , : , :)));
             totHivPosAge = 0;
-            totHivPos = 0;
             for d = 6 : 7
                 for v = 1 : 5
                     totHivPosAge = totHivPosAge + sumall(pop(hivInds(d , v , g , a , : , :)));
-                    totHivPos = totHivPos + sumall(pop(hivInds(d , v , g , ageSexDebut : age , : , :)));
                 end
             end
-            fracARTAge = onArtAge / (onArtAge + totHivPosAge);
-            if fracARTAge >= 1.0
-                toRedisAge = [toRedisAge totHivPosAge];
-            elseif fracARTAge < 1.0
-                aList = [aList a];
-                ageHIVSubTots = [ageHIVSubTots totHivPosAge];
-                totHivPosQualAges = totHivPosQualAges + totHivPosAge;
-            end
+            ageARTSubTots(1 , a) = onArtAge;
+            ageHIVSubTots(1 , a) = totHivPosAge;  
         end 
-        fracART = onArt / (onArt + totHivPos);
-        fracQualAges = ageHIVSubTots ./ totHivPosQualAges;
-        if fracART < popCover{g}(ind)
-            cover = (popCover{g}(ind) - fracART) ./ (1 - fracART);
-            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
-            fracToRedis = totToRedis ./ ageHIVSubTots;
-            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
-            formatToRedis(:) = (max(cover , 0) + fracToRedis');
-            treat(6 : 7 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
-                ones(2 , 5 , 1 , length(aList) , risk) , formatToRedis);
-        end
+        fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVSubTots)); % fraction on ART by age
+        agePopSubTots = ageARTSubTots + ageHIVSubTots; % total HIV-positives (on/off ART) by age
+        
+        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , g , risk , ageSexDebut , dRange);
+
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
     end
 end
 
@@ -135,42 +130,40 @@ if year >= 2013 && year < 2015
     ind = round(yrs , 4) == round(year , 4);
     popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) , ...
         linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
+    ageVec = [1 : age];
+    dRange = [5 : 7];
     for g = 1 : gender    
-        onArt = sumall(pop(hivInds(8 , 6 , g , ageSexDebut : age , : , :)));
-        aList = [];
-        ageHIVSubTots = [];
-        totHivPosQualAges = 0;
-        toRedisAge = [];
+        ageARTSubTots = zeros(1 , age); % number persons on ART by age
+        ageHIVSubTots = zeros(1 , age); % number HIV-positives by age
         for a = ageSexDebut : age
             onArtAge = sumall(pop(hivInds(8 , 6 , g , a , : , :)));
             totHivPosAge = 0;
-            totHivPos = 0;
             for d = 5 : 7
                 for v = 1 : 5
                     totHivPosAge = totHivPosAge + sumall(pop(hivInds(d , v , g , a , : , :)));
-                    totHivPos = totHivPos + sumall(pop(hivInds(d , v , g , ageSexDebut : age , : , :)));
                 end
             end
-            fracARTAge = onArtAge / (onArtAge + totHivPosAge);
-            if fracARTAge >= 1.0
-                toRedisAge = [toRedisAge totHivPosAge];
-            elseif fracARTAge < 1.0
-                aList = [aList a];
-                ageHIVSubTots = [ageHIVSubTots totHivPosAge];
-                totHivPosQualAges = totHivPosQualAges + totHivPosAge;
-            end
+            ageARTSubTots(1 , a) = onArtAge;
+            ageHIVSubTots(1 , a) = totHivPosAge;       
         end
-        fracART = onArt / (onArt + totHivPos);
-        fracQualAges = ageHIVSubTots ./ totHivPosQualAges;
-        if fracART < popCover{g}(ind)
-            cover = (popCover{g}(ind) - fracART) ./ (1 - fracART);
-            totToRedis = fracQualAges .* sumall(toRedisAge .* max(cover , 0));
-            fracToRedis = totToRedis ./ ageHIVSubTots;
-            formatToRedis = ones(1 , 1 , 1 , length(aList) , 1);
-            formatToRedis(:) = (max(cover , 0) + fracToRedis');
-            treat(5 : 7 , 1 : 5 , g , aList , :) = bsxfun(@times , ...
-                ones(3 , 5 , 1 , length(aList) , risk) , formatToRedis);
-        end
+        fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVSubTots)); % fraction on ART by age
+        agePopSubTots = ageARTSubTots + ageHIVSubTots; % total HIV-positives (on/off ART) by age
+        
+        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , g , risk , ageSexDebut , dRange);
+
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
     end
 end
 
@@ -188,6 +181,7 @@ if year >= 2015
            linspace(maxRateF(3) , maxRateF(4) , length(yrs))};
     end
     ageVec = [1 : age];
+    dRange = [3 : 7];
     for g = 1 : gender
         ageARTSubTots = zeros(1 , age); % number persons on ART by age
         ageHIVSubTots = zeros(1 , age); % number HIV-positives by age
@@ -209,34 +203,22 @@ if year >= 2015
             minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
             maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
             popCoverInd = popCover{g}(ind); % desired population-level ART coverage
-            
-            % Calculate treat/artOut matrices to maintain ART coverage min/max by age
-            [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
-                artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
-                fracARTAge , ageVec , g , risk , ageSexDebut);
-            
-            % Calculate treat/artOut matrices to maintain population-level ART coverage
-            [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
-                excMinAges , popCoverInd , g , risk , ...
-                ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
-                fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , agePopSubTots);
-        
         elseif year >= 2030
             minCoverLim = popCover{g}(end) * minLim;
             maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);
-            
-            % Calculate treat/artOut matrices to maintain ART coverage min/max by age
-            [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
-                artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
-                fracARTAge , ageVec , g , risk , ageSexDebut);
-            
-            % Calculate treat/artOut matrices to maintain population-level ART coverage
-            [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
-                excMinAges , popCoverInd , g , risk , ...
-                ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
-                fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , agePopSubTots);
-        end
+        end     
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , g , risk , ageSexDebut , dRange);
+
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
     end  
 end
 

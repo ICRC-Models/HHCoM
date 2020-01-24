@@ -4,7 +4,7 @@
 
 function [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
     artMinMax(artOut , treat, minCoverLim , maxCoverLim , ageFracART , ageVec , ...
-    g , risk , ageSexDebut)
+    g , risk , ageSexDebut , dRange)
 
 % Discontinue persons from age groups with coverage > maxCover
 maxInds = ageFracART > maxCoverLim; % find inds of ages above max coverage
@@ -30,8 +30,8 @@ if sum(minInds) > 2
     coverMin = (minCoverLim - ageFracART) ./ (1 - ageFracART); % initiation needed to meet min coverage
     formatMin = ones(1 , 1 , 1 , length(minAges) , 1);
     formatMin(:) = coverMin(minAges); % set up matrix values by age
-    treat(3 : 7 , 1 : 5 , g , minAges , :) = treat(3 : 7 , 1 : 5 , g , minAges , :) + ...
-        bsxfun(@times , ones(5 , 5 , 1 , length(minAges) , risk) , formatMin); % initiation matrix by disease, VL, gender, age, risk
+    treat(dRange , 1 : 5 , g , minAges , :) = treat(dRange , 1 : 5 , g , minAges , :) + ...
+        bsxfun(@times , ones(length(dRange) , 5 , 1 , length(minAges) , risk) , formatMin); % initiation matrix by disease, VL, gender, age, risk
 else
     minAges = [];
     excMinAges = ageVec(ageSexDebut:end);
