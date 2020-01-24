@@ -13,7 +13,7 @@
 % went on treatment.
 
 function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , artDist , ...
-    kCD4 ,  maxRateM , maxRateF , disease , viral , ...
+    kCD4 ,  maxRateM , maxRateF , minLim , maxLim , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year)
 
@@ -206,8 +206,8 @@ if year >= 2015
         agePopSubTots = ageARTSubTots + ageHIVSubTots; % total HIV-positives (on/off ART) by age
         
         if year < 2030
-            minCoverLim = popCover{g}(ind)*(0.70/0.81); % minimum ART coverage by age
-            maxCoverLim = popCover{g}(ind)*((1-(0.78/0.81)) + 1); % maximum ART coverage by age
+            minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+            maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
             popCoverInd = popCover{g}(ind); % desired population-level ART coverage
             
             % Calculate treat/artOut matrices to maintain ART coverage min/max by age
@@ -222,8 +222,8 @@ if year >= 2015
                 fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , agePopSubTots);
         
         elseif year >= 2030
-            minCoverLim = popCover{g}(end)*(0.70/0.81);
-            maxCoverLim = popCover{g}(end)*((1-(0.78/0.81)) + 1);
+            minCoverLim = popCover{g}(end) * minLim;
+            maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);
             
             % Calculate treat/artOut matrices to maintain ART coverage min/max by age
