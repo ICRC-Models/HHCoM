@@ -25,10 +25,13 @@ if fracART > popCoverInd
     formatToRedis(:) = (max(cover , 0) + fracToRedis'); % set up matrix values by age
     formatModifier = ones(1 , length(excMinAges) , 1);
     formatModifier(:) = ageARTSubTots ./ ageHIVSubTots;
+    % Discontinuation matrix by gender, age, risk, accounting for min/max adjustment
+    % adjustment factor = ((HIVpop+#discont)/HIVpop) = (1 + #discont/HIVpop) 
+    % = (1 + ((artOut*ARTpop)/HIVpop)) = (1 + artOut * (ARTpop/HIVpop))
     artOut(g , excMinAges , :) = artOut(g , excMinAges , :) + ...
         bsxfun(@times , ones(1 , length(excMinAges) , risk) , formatToRedis) .* ...
         (1 + artOut(g , excMinAges , :) .* ...
-        bsxfun(@times , ones(1 , length(excMinAges) , risk) , formatModifier)); % discontinuation matrix by gender, age, risk, accounting for min/max adjustment
+        bsxfun(@times , ones(1 , length(excMinAges) , risk) , formatModifier));
 end
 
 fracExcMaxAges = ageHIVSubTots(excMaxAges) ./ sum(ageHIVSubTots(excMaxAges)); % population HIV proportion by age, for ages < MAX coverage
@@ -40,7 +43,9 @@ if fracART < popCoverInd
     fracToRedis = totToRedis ./ ageHIVSubTots(excMaxAges); % calculate initiation proportions
     formatToRedis = ones(1 , 1 , 1 , length(excMaxAges) , 1);
     formatToRedis(:) = (max(cover , 0) + fracToRedis'); % set up matrix values by age
+    % Initiation matrix by disease, VL, gender, age, risk, accounting for min/max adjustment
+    % adjustment factor = ((HIVpop-#init)/HIVpop) = = (1 - #init/HIVpop) = (1 - treat)
     treat(3 : 7 , 1 : 5 , g , excMaxAges , :) = treat(3 : 7 , 1 : 5 , g , excMaxAges , :) + ...
         bsxfun(@times , ones(5 , 5 , 1 , length(excMaxAges) , risk) , formatToRedis) .* ...
-        (1 - treat(3 : 7 , 1 : 5 , g , excMaxAges , :)); % initiation matrix by disease, VL, gender, age, risk, accounting for min/max adjustment
+        (1 - treat(3 : 7 , 1 : 5 , g , excMaxAges , :)); 
 end
