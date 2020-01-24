@@ -32,7 +32,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = 'toNow_09Jan20_ARTcovHSRC_1yrEarly4Equil';
+%pathModifier = 'toNow_24Jan20_tstARTminMax_1910';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -394,9 +394,11 @@ for i = iStart : length(s) - 1
     end
 
     if hpvOn
-        % Progression/regression from initial HPV infection to
-        % precancer stages and cervical cancer. Differential CC
-        % detection by CC stage and HIV status/CD4 count.
+        % HPV NATURAL HISTORY
+        % Progression and clearance of HPV
+        % Progression and regression of precancerous lesions
+        % Development and progression of cervical cancer
+        % Cervical cancer-associated mortality by stage and HIV status/CD4 count
         [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
@@ -417,6 +419,9 @@ for i = iStart : length(s) - 1
         end
         
         if (year >= hpvScreenStartYear)
+            % CERVICAL CANCER SCREENING AND TREATMENT
+            % Screening
+            % Treatment
             [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
                 newTreatImm(i , : , : , : , : , : , : , : , :) , ...
                 newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
@@ -436,8 +441,11 @@ for i = iStart : length(s) - 1
         end
     end
     
-    % HIV and HPV mixing and infection module. Protective effects of condom
-    % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
+    % HPV AND HIV TRANSMISSION
+    % Heterosexual mixing by gender, age, and risk group
+    % Partnership adjustment
+    % HPV infection by type
+    % HIV infection and protection provided by condoms, circumcision, and ART
     [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
         newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , : , : , : , :)] = ...
         ode4xtra(@(t , pop) mixInfect(t , pop , ...
@@ -455,11 +463,14 @@ for i = iStart : length(s) - 1
         break
     end
     
-    % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
-    % excess HIV mortality
+    % HIV NATURAL HISTORY
+    % CD4 progression
+    % Viral load progression
+    % ART initiation, dicontinuation, and scale-up by CD4 count
+    % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
         [~ , pop , hivDeaths(i , : , :) , artTreat] =...
-            ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , ... %artDist , 
+            ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , ... %artDist , ...
             kCD4 ,  maxRateM , maxRateF , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
             ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
@@ -477,7 +488,12 @@ for i = iStart : length(s) - 1
         end
     end
     
-    % Birth, aging, risk redistribution module
+    % DEMOGRAPHY
+    % Births
+    % Mother-to-child HIV transmission
+    % Neonatal male circumcision
+    % Aging and risk-group redistribution
+    % Natural deaths
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
@@ -493,7 +509,8 @@ for i = iStart : length(s) - 1
     end 
     
     if ((year >= vaxStartYear) && (vaxRate > 0))
-        % HPV vaccination module- school-based vaccination regimen
+        % HPV VACCINATION
+        % School-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
             vaxRate , toInd);
@@ -515,7 +532,7 @@ for i = iStart : length(s) - 1
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
             'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
             'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-            'newCC' , ... %'artDist' , 'artDistList' , 'artTreatTracker' , ...
+            'newCC' , ... %'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
             'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 end
@@ -529,7 +546,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , ... %'artDist' , 'artDistList' , 'artTreatTracker' , ...
+    'newCC' , ... %'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')
