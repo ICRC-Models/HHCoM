@@ -1,4 +1,4 @@
-% HIV Progression
+% HIV Natural History and ART initiation
 % Simulates progression through HIV states and takes treatments such as
 % ART into account
 % Accepts:
