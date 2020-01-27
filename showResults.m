@@ -640,6 +640,7 @@ hold all;
 ylabel('Percent females on ART in 2020 by age');
 ylim([0 100])
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+grid on;
 %legend('Without ART dropout' , 'With ART dropout');
 % legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');
 
