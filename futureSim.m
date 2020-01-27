@@ -393,9 +393,9 @@ parfor n = 1 : nTests
     vaxdCU = vaxdLmtd;
     
     % ART
-    % import java.util.LinkedList
-    % artDistList = historicalIn.artDistList;
-    % artDist = historicalIn.artDist;
+    import java.util.LinkedList
+    artDistList = historicalIn.artDistList;
+    artDist = historicalIn.artDist;
     % artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     
     %% Main body of simulation
@@ -470,18 +470,18 @@ parfor n = 1 : nTests
         % excess HIV mortality
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
-                ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , ... %artDist , 
+                ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , artDist , ... 
                 kCD4 , maxRateM , maxRateF , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
                 popIn = pop(end , :);    
             % artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
-            % artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
-            % if artDistList.size() >= stepsPerYear * 2
-            %     artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
-            % end
-            % artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            %     risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
+            artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
+            if artDistList.size() >= stepsPerYear * 2
+                artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
+            end
+            artDist = calcDist(artDistList , disease , viral , gender , age , ...
+                risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
             if any(pop(end , :) < 0)
                 disp('After hiv')
                 break
@@ -559,7 +559,7 @@ parfor n = 1 : nTests
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
-        newCC , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ... %artDist , artDistList , artTreatTracker , 
+        newCC , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker , 
         newTreatImm , newTreatHpv , newTreatHyst , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
