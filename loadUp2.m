@@ -36,6 +36,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+    dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
@@ -47,8 +48,8 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1910;
-currYear = 2020;
+startYear = 1979; %1910;
+currYear = 1989; %2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -1324,6 +1325,18 @@ hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop
 
 % save(fullfile(paramDir ,'fertMat3') , 'fertMat3')
 % save(fullfile(paramDir ,'hivFertMats3') , 'hivFertPosBirth3' , 'hivFertNegBirth3')
+
+%% Fertility scale-down
+dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
+dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
+dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
+
+dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
+dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
+dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 2010) * stepsPerYear);
+
+% save(fullfile(paramDir , 'fertScaleUp') , 'dFertPos1' , 'dFertNeg1' , ...
+% 'dFertMat1' , 'dFertPos2' , 'dFertNeg2' , 'dFertMat2')
 
 %% Background death rate before 1950
 % disp('Building death matrix')

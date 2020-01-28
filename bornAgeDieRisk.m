@@ -17,7 +17,8 @@
 function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
-        hivFertNegBirth3 , deathMat , deathMat2 , circMat , circMat2 , ...
+        hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
+        dFertNeg2 , dFertMat2 , deathMat , deathMat2 , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
@@ -42,30 +43,18 @@ end
 %% Calculate births: HIV-negative and HIV-positive births
 if (year > 1960) && (year <= 2000)
     dt = (year - 1960) * stepsPerYear;
-    dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
-        ./ ((2000 - 1960) * stepsPerYear);
-    hivFertPosBirth = hivFertPosBirth + dFertPos .* dt;
-    dFertNeg = (hivFertNegBirth2 - hivFertNegBirth) ...
-        ./ ((2000 - 1960) * stepsPerYear);
-    hivFertNegBirth = hivFertNegBirth + dFertNeg .* dt;
-    dFertMat = (fertMat2 - fertMat) ...
-        ./ ((2000 - 1960) * stepsPerYear);
-    fertMat = fertMat + dFertMat .* dt;
+    hivFertPosBirth = hivFertPosBirth + dFertPos1 .* dt;
+    hivFertNegBirth = hivFertNegBirth + dFertNeg1 .* dt;
+    fertMat = fertMat + dFertMat1 .* dt;
 elseif (year > 2000) && (year <= 2010)
     hivFertPosBirth = hivFertPosBirth2;
     hivFertNegBirth = hivFertNegBirth2;
     fertMat = fertMat2;
 elseif (year > 2010) && (year <= 2020)
     dt = (year - 2010) * stepsPerYear;
-    dFertPos = (hivFertPosBirth3 - hivFertPosBirth2) ...
-        ./ ((2020 - 2010) * stepsPerYear);
-    hivFertPosBirth = hivFertPosBirth2 + dFertPos .* dt;
-    dFertNeg = (hivFertNegBirth3 - hivFertNegBirth2) ...
-        ./ ((2020 - 2010) * stepsPerYear);
-    hivFertNegBirth = hivFertNegBirth2 + dFertNeg .* dt;
-    dFertMat = (fertMat3 - fertMat2) ...
-        ./ ((2020 - 2010) * stepsPerYear);
-    fertMat = fertMat2 + dFertMat .* dt;
+    hivFertPosBirth = hivFertPosBirth2 + dFertPos2 .* dt;
+    hivFertNegBirth = hivFertNegBirth2 + dFertNeg2 .* dt;
+    fertMat = fertMat2 + dFertMat2 .* dt;
 elseif (year > 2020)
     hivFertPosBirth = hivFertPosBirth3;
     hivFertNegBirth = hivFertNegBirth3;

@@ -26,13 +26,13 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %%
 %close all; clear all; clc;
 tic
-% profile clear;
+profile clear;
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = 'toNow_24Jan20_tstARTminMax_1910';
+%pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_28Jan20_tstARTminMax_1979-1989';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -83,6 +83,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+    dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Load saved parameters
@@ -239,7 +240,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 
 %% Simulation
 % disp('Start up')
-% profile on
+profile on
 % disp(' ')
 
 % If starting from beginning
@@ -498,7 +499,8 @@ for i = iStart : length(s) - 1
         bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
-        hivFertNegBirth3 , deathMat , deathMat2 , circMat , circMat2 , ...
+        hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
+        dFertNeg2 , dFertMat2 , deathMat , deathMat2 , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
@@ -552,7 +554,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
 disp(' ')
 disp('Simulation complete.')
 toc
-% profile viewer
+profile viewer
 
 %% Calculate summed log-likelihood
 if calibBool    
