@@ -77,12 +77,6 @@ toInd = @(x) (x(: , 9) - 1) * k(8) + (x(: , 8) - 1) * k(7) + (x(: , 7) - 1) * k(
 
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 
-% save(fullfile(paramDir ,'generalParams'), 'stepsPerYear' , 'timeStep' , ...
-%     'startYear' , 'currYear' , 'endYear' , 'years' , ...
-%     'disease' , 'viral' , 'hpvVaxStates' , 'hpvNonVaxStates' , 'endpoints' , ...
-%     'intervens' , 'gender' , 'age' , 'risk' , 'hpvTypeGroups' , 'dim' , 'k' , 'toInd' , ...
-%     'annlz');
-
 %% Save demographic and behavioral parameters
 
 % Import from Excel initial population size, male risk distribution, 
@@ -267,10 +261,6 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
         yr(i) : timeStep : yr(i + 1));
 end
 
-% save(fullfile(paramDir ,'demoBehavParams'), 'ageSexDebut' , 'mInit' , 'fInit' , 'partnersM' , 'partnersF' , ...
-%     'maleActs' , 'femaleActs' , 'riskDist' , 'fertility' , 'fertility2' , 'fertility3' , 'mue' , 'mue2' , ...
-%     'epsA_vec' , 'epsR_vec' , 'yr');
-
 %% Save HIV natural history parameters
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
@@ -338,8 +328,6 @@ end
 betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
 betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 
-%save(fullfile(paramDir ,'hivParams'), 'hivOn' , 'betaHIVM2F' , 'betaHIVF2M' , 'muHIV' , 'kVl' , 'kCD4');
-
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -371,10 +359,6 @@ betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
 % kInf_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'R25'); % CIN1 to HPV
 % kCin1_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'S25'); % CIN2 to CIN1
 % kCin2_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'T25'); % CIN3 to CIN2
-% 
-% save(fullfile(paramDir ,'hpvCinCCTransFrmExcel'), 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
-%     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
-%     'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
 
 %% Set HPV/CIN/CC transitions by age group based on pre-saved or calibrated values
 
@@ -670,12 +654,6 @@ else
     artHpvMult = 1.0;
 end
 
-% save(fullfile(paramDir ,'hpvParams'), 'hpvOn' , 'perPartnerHpv_vax' , 'perPartnerHpv_nonV' , ...
-%     'fImm' , 'rImmune' , 'kCin1_Inf' , 'kCin2_Cin1' , 'kCin3_Cin2' , 'kCC_Cin3' , ...
-%     'rNormal_Inf' , 'kInf_Cin1' , 'kCin1_Cin2' , 'kCin2_Cin3' , 'lambdaMultImm' , ...
-%     'hpv_hivClear' , 'rImmuneHiv' , 'c3c2Mults' , 'c2c1Mults' , 'muCC' , ...
-%     'kRL' , 'kDR' , 'artHpvMult' , 'hpv_hivMult' , 'maleHpvClearMult');
-
 %% Save intervention parameters
 
 % Import from Excel HIV intervention parameters
@@ -800,12 +778,6 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
     whob.screenCover_vec{i} = interp1(period , whob.screenCover(i : i + 1 , 1) , ...
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
-
-% save(fullfile(paramDir ,'intervenParams'), 'circ' , 'condUse' , ...
-%     'screenYrs' , 'hpvScreenStartYear' , 'waning' , ...
-%     'maxRateM' , 'maxRateF' , 'hivStartYear' , ...
-%     'circStartYear' , 'vaxStartYear' , 'baseline' , 'cisnet' , 'who' , 'whob' , ...
-%     'circProtect' , 'condProtect' , 'MTCTRate' , 'hyst' , 'OMEGA');
 
 %% Import and save calibration data
 % file = [pwd , '/Config/Calibration_targets.xlsx'];
@@ -980,10 +952,6 @@ for h = 1 : hpvVaxStates
         end
     end
 end
-% save([paramDir , 'mixInfectIndices'] , 'mCurr' , 'fCurr' , 'mCurrArt' , 'fCurrArt' , ...
-%     'gar' , 'hivSus' , 'hpvVaxSus' , 'hpvVaxImm' , ...
-%     'hpvNonVaxSus' , 'hpvNonVaxImm' , ...
-%     'toHiv' , 'vaxInds' , 'nonVInds' , 'hpvVaxInf' , 'hpvNonVaxInf');
 % disp('mixInfect indices loaded')
 
 %% hivNH.m indices
@@ -1006,9 +974,7 @@ for d = 1 : disease
 %         end
     end
 end
-
-% save([paramDir , 'hivIndices'] , 'hivInds')
-% disp('hiv2a indices loaded')
+% disp('hivNH indices loaded')
 
 %% hpvCCNH.m indices
 % disp('Preparing indices for HPV modules...')
@@ -1101,14 +1067,7 @@ end
 %     end
 % end
 
-% save([paramDir , 'hpvIndices'] , 'cin3hpvVaxIndsFrom' , 'ccLochpvVaxIndsTo' , ...
-%     'ccLochpvVaxIndsFrom' , 'ccReghpvVaxInds' , 'ccDisthpvVaxInds' , ...
-%     'cin3hpvNonVaxIndsFrom' , 'ccLochpvNonVaxIndsTo' , 'ccLochpvNonVaxIndsFrom' , ...
-%     'ccReghpvNonVaxInds' , 'ccDisthpvNonVaxInds' , 'cin1hpvVaxInds' , ...
-%     'cin2hpvVaxInds' , 'cin3hpvVaxInds' , 'cin1hpvNonVaxInds' , ...
-%     'cin2hpvNonVaxInds' , 'cin3hpvNonVaxInds' , 'normalhpvVaxInds' , 'immunehpvVaxInds' , ...
-%     'infhpvVaxInds' , 'normalhpvNonVaxInds' , 'immunehpvNonVaxInds' , 'infhpvNonVaxInds')
-% disp('hpvCCdet indices loaded')
+% disp('hpvCCNH indices loaded')
 
 %% ageRisk.m indices
 ageInd = zeros(gender , age , disease * viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens * risk);
@@ -1124,7 +1083,6 @@ for g = 1 : gender
     end
 end
 
-% save([paramDir , 'ageRiskInds'] , 'ageInd' , 'riskInd')
 
 
 
@@ -1166,8 +1124,6 @@ for g = 1 : gender
     end
 end
 vlAdvancer = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'vlAdvancer') , 'vlAdvancer' , '-v7.3')
 % disp('Finished building viral load progression matrix')
 
 %% Fertility prior to 1990
@@ -1219,9 +1175,6 @@ end
 hivFertPosBirth = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
 hivFertNegBirth = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
-% save(fullfile(paramDir ,'fertMat') , 'fertMat')
-% save(fullfile(paramDir ,'hivFertMats') , 'hivFertPosBirth' , 'hivFertNegBirth')
-
 %% Fertility by 2010
 
 % birth indices
@@ -1270,9 +1223,6 @@ for d = 3 : 7 % hiv infected
 end
 hivFertPosBirth2 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
 hivFertNegBirth2 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'fertMat2') , 'fertMat2')
-% save(fullfile(paramDir ,'hivFertMats2') , 'hivFertPosBirth2' , 'hivFertNegBirth2')
 
 %% Fertility by 2020
 
@@ -1323,9 +1273,6 @@ end
 hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
-% save(fullfile(paramDir ,'fertMat3') , 'fertMat3')
-% save(fullfile(paramDir ,'hivFertMats3') , 'hivFertPosBirth3' , 'hivFertNegBirth3')
-
 %% Fertility scale-down
 dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
 dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
@@ -1334,9 +1281,6 @@ dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
 dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 2010) * stepsPerYear);
-
-% save(fullfile(paramDir , 'fertScaleUp') , 'dFertPos1' , 'dFertNeg1' , ...
-% 'dFertMat1' , 'dFertPos2' , 'dFertNeg2' , 'dFertMat2')
 
 %% Background death rate before 1950
 % disp('Building death matrix')
@@ -1353,8 +1297,6 @@ for a = 1 : age
     vals = [vals; ones(length(males),1) .* ( -mue(a,1) ); ones(length(females),1) .* ( -mue(a,2) )];
 end
 deathMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'deathMat') , 'deathMat')
 % disp('Death matrix complete')
 
 %% Background death rate by 1985
@@ -1372,8 +1314,6 @@ for a = 1 : age
     vals = [vals; ones(length(males),1) .* ( -mue2(a,1) ); ones(length(females),1) .* ( -mue2(a,2) )];
 end
 deathMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'deathMat2') , 'deathMat2')
 % disp('Second death matrix complete')
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
@@ -1385,8 +1325,6 @@ xInds = [negCircMaleBirth; negMaleBirth];
 yInds = [negMaleBirth; negMaleBirth];
 vals = [ones(length(negCircMaleBirth),1) .* ( circ(1) ); ones(length(negMaleBirth),1) .* ( -circ(1) )];
 circMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'circMat') , 'circMat')
 % disp('Circumcision matrix complete')
 
 %% Make circumcision matrix after 2030
@@ -1398,8 +1336,6 @@ xInds = [negCircMaleBirth; negMaleBirth];
 yInds = [negMaleBirth; negMaleBirth];
 vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),1) .* ( -0.70 )];
 circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-
-% save(fullfile(paramDir ,'circMat2') , 'circMat2')
 % disp('Circumcision matrix after 2030 complete')
 
 toc

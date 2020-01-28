@@ -1,7 +1,6 @@
 function vaxCEA(pathModifier)
 
 %% Load parameters and results
-paramDir = [pwd , '\Params\'];
 
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
