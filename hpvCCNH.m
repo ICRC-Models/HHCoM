@@ -13,7 +13,7 @@ function[dPop , extraOut] = hpvCCNH(t , pop , ...
     cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
     cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
-    rImmune , fImm , kRL , kDR , disease , age , hpvVaxStates , ...
+    rImmune , fImm , kRL , kDR , maleHpvClearMult , disease , age , hpvVaxStates , ...
     hpvNonVaxStates , hpvTypeGroups)
 
 %% Initialize dPop and output vectors
@@ -99,11 +99,11 @@ for d = 1 : disease
         % normal, immune, and infected transitions
         dPop(normalFVax) = dPop(normalFVax) + fImm(a) * rImmune * rHiv * pop(immuneFVax)... % if fImm(a)=1, immuneF -> normalF 
             + (1 - fImm(a)) * rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infFVax); % if fImm(a)=0, infF -> normalF
-        dPop(normalMVax) = dPop(normalMVax) + rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infMVax);  % infM -> normalM
+        dPop(normalMVax) = dPop(normalMVax) + maleHpvClearMult * rNormal_Inf(a , 1) * rHivHpv_Clear .* pop(infMVax);  % infM -> normalM
         
         dPop(normalFNonVax) = dPop(normalFNonVax) + fImm(a) * rImmune * rHiv * pop(immuneFNonVax)... % if fImm(a)=1, immuneF -> normalF 
             + (1 - fImm(a)) * rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infFNonVax); % if fImm(a)=0, infF -> normalF
-        dPop(normalMNonVax) = dPop(normalMNonVax) + rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infMNonVax);  % infM -> normalM
+        dPop(normalMNonVax) = dPop(normalMNonVax) + maleHpvClearMult * rNormal_Inf(a , 2) * rHivHpv_Clear .* pop(infMNonVax);  % infM -> normalM
             
 
         dPop(immuneFVax) = dPop(immuneFVax)...
@@ -120,13 +120,13 @@ for d = 1 : disease
             + kInf_Cin1(a , 1) * pop(cin1Vax)... % CIN1 -> infF
             - (kCin1_Inf(a , 1) + ... % infF -> CIN1
             rNormal_Inf(a , 1) * rHivHpv_Clear) .* pop(infFVax); % infF -> immuneF or normalF
-        dPop(infMVax) = dPop(infMVax) - rNormal_Inf(a , 1) * rHivHpv_Clear * pop(infMVax); % regression to normal from infected males
+        dPop(infMVax) = dPop(infMVax) - maleHpvClearMult * rNormal_Inf(a , 1) * rHivHpv_Clear * pop(infMVax); % regression to normal from infected males
         
         dPop(infFNonVax) = dPop(infFNonVax) ...
             + kInf_Cin1(a , 2) * pop(cin1NonVax)... % CIN1 -> infF
             - (kCin1_Inf(a , 2) + ... % infF -> CIN1
             rNormal_Inf(a , 2) * rHivHpv_Clear) .* pop(infFNonVax); % infF -> immuneF or normalF
-        dPop(infMNonVax) = dPop(infMNonVax) - rNormal_Inf(a , 2) * rHivHpv_Clear * pop(infMNonVax); % regression to normal from infected males
+        dPop(infMNonVax) = dPop(infMNonVax) - maleHpvClearMult * rNormal_Inf(a , 2) * rHivHpv_Clear * pop(infMNonVax); % regression to normal from infected males
         
 
         % Infection and CIN progression in females only
@@ -234,7 +234,7 @@ for d = 1 : disease
                 ccDeath(d , a , 2) = ccDeath(d , a , 2) + ...
                     sum(deathCC(2) * pop(ccLocNonVaxFrom) ...
                     + deathCC(2) * pop(ccRegNonVax) + deathCC(3) * pop(ccDistNonVax));
-            end 
+            end
         end
     end   
 end
