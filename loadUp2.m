@@ -37,7 +37,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    deathMat , deathMat2 , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    deathMat , deathMat2 , dDeathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -1315,6 +1315,9 @@ for a = 1 : age
 end
 deathMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % disp('Second death matrix complete')
+
+%% Mortality scale-down
+dDeathMat = (deathMat2 - deathMat) ./ ((1985 - 1950) * stepsPerYear);
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
 % disp('Building circumcision matrix')
