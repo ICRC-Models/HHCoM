@@ -36,12 +36,12 @@ paramsAll{5}.name = 'condUse'; paramsAll{5}.length = 1; ...
     paramsAll{5}.lb = 0.11; ...
     paramsAll{5}.ub = 0.85;
 
-% epsA, [1 x 3], (0.1 to 1)
+% epsA, [1 x 1], (0.2 to 0.8)
 paramsAll{6}.name = 'epsA'; paramsAll{6}.length = 1; ... %3
-    paramsAll{6}.lb = ones(paramsAll{6}.length,1).*0.1; ...
-    paramsAll{6}.ub = ones(paramsAll{6}.length,1);
+    paramsAll{6}.lb = ones(paramsAll{6}.length,1).*0.2; ...
+    paramsAll{6}.ub = ones(paramsAll{6}.length,1).*0.8;
 
-% epsR, [1 x 3], (0.1 to 1)
+% epsR, [1 x 1], (0.1 to 1)
 paramsAll{7}.name = 'epsR'; paramsAll{7}.length = 1; ... %3
     paramsAll{7}.lb = ones(paramsAll{7}.length,1).*0.1; ...
     paramsAll{7}.ub = ones(paramsAll{7}.length,1);
