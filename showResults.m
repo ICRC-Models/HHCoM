@@ -1676,6 +1676,59 @@ for y = 1 : length(ccIncYears)
 %     legend('HIV-' , 'HIV+' , 'ART')
 end
 
+%% Cervical cancer incidence over time
+fScale = 10^5;
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
+annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+
+% Total population
+ageInds = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+    1 : intervens , 2 , 1 : age , 1 : risk));
+ccAgeRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
+    1 : disease , 1 : age , :) , 2) , 3) , 4)) ...
+    ./ (annlz(sum(popVec(1:end-1 , ageInds) , 2)) ...
+    ./ stepsPerYear) * fScale;
+
+% HIV Negative
+ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+    1 : intervens , 2 , 1 : age , 1 : risk));
+ccAgeNegRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
+    1 : 2 , 1 : age , :) , 2) , 3) , 4)) ...
+    ./ (annlz(sum(popVec(1:end-1 , ageNegInds) , 2)) ...
+    ./ stepsPerYear) * fScale;
+
+% All HIV+ no ART
+ ageAllPosInds = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+    1 : intervens , 2 , 1 : age , 1 : risk));
+ ccAgePosRel = annlz(sum(sum(sum(newCC(1:end-1 ...
+    , 3 : 7 , 1 : age , :), 2) , 3) , 4)) ...
+    ./ (annlz(sum(popVec(1:end-1 , ageAllPosInds) , 2)) ...
+    ./ stepsPerYear) * fScale;
+
+% On ART
+ageArtInds = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+    1 : intervens , 2 , 1 : age , 1 : risk));
+ccArtRel = annlz(sum(sum(sum(newCC(1:end-1 ...
+    , 8 , 1 : age , :) , 2) , 3) , 4)) ...
+    ./ (annlz(sum(popVec(1:end-1 , ageArtInds) , 2)) ...
+    ./ stepsPerYear) * fScale;
+
+figure()
+% Plot model outputs
+plot(tVec(1 : stepsPerYear : end-1) , ccAgeRel)
+hold all
+plot(tVec(1 : stepsPerYear : end-1) , ccAgeNegRel)
+hold all
+plot(tVec(1 : stepsPerYear : end-1) , ccAgePosRel)
+hold all
+plot(tVec(1 : stepsPerYear : end-1) , ccArtRel)
+hold all
+xlabel('Time'); ylabel('Incidence per 100,000');
+title('Cervical Cancer Incidence ');
+legend('General' , 'HIV-' , 'HIV+' , 'ART')
+
 %% CC Cumulative Probability of Incidence- early years
 % % ccIncYears = [1980,1990,2000,2010];
 % % ccAgeCI = zeros(1 , length(ccIncYears));
