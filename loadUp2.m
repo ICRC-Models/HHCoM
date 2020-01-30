@@ -48,8 +48,8 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1979; %1910;
-currYear = 1989; %2020;
+startYear = 1925;
+currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
