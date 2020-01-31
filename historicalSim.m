@@ -33,7 +33,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = 'toNow_29Jan20_1925start';
+%pathModifier = 'toNow_31Jan20_1925start_condCircHPVprotect_fixed';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -476,15 +476,15 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
     
-    if rem(year , 25) == 0.0
-        savdir = [pwd , '/HHCoM_Results/'];
-        save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-            'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
-            'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-            'newCC' , ... %'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3');
-    end
+    %if rem(year , 25) == 0.0
+    %    savdir = [pwd , '/HHCoM_Results/'];
+    %    save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+    %        'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+    %        'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
+    %        'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    %        'newCC' , ... %'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+    %        'startYear' , 'endYear' , 'i' , '-v7.3');
+    %end
 end
 popLast = popVec(end-1 , :);
 disp(['Reached year ' num2str(endYear)])
