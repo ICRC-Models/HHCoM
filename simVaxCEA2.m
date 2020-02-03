@@ -134,29 +134,30 @@ vaxStartYear = 2014;
 
 % ART
 import java.util.LinkedList
-maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
+artOutMult = 1.0; %0.95;
+maxRateM = [0.15*artOutMult , 0.26*artOutMult , 0.55*artOutMult , ...
+    0.57*artOutMult , 0.65*artOutMult]; % population-level ART coverage in males
+maxRateF = [0.20*artOutMult , 0.35*artOutMult , 0.66*artOutMult , ...
+    0.68*artOutMult , 0.75*artOutMult]; % population-level ART coverage in females
+minLim = (0.70/0.81); % minimum ART coverage by age
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_110719_singleAge_noBaseScreen_noBaseVax_2018']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_013120_singleAge_noBaseScreen_noBaseVax_2018_artLims']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '110719_noBaseScreen_noBaseVax_2018_Erasmus'; % ***SET ME***: name for simulation output file
+pathModifier = '013120_singleAge_noBaseScreen_noBaseVax_2018_artLims_Erasmus'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2080; %2121; % ***SET ME***: end year of simulation run
+lastYear = 2061; %2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -567,7 +568,7 @@ parfor n = 1 : nTests
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
-                kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
+                kCD4 ,  maxRateM , maxRateF , minLim , maxLim , disease , ...
                 viral , gender , age , risk , k , hivInds , ...
                 stepsPerYear , year) , tspan , popIn);
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;

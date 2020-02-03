@@ -1,6 +1,6 @@
 function vaxCEA_erasmus11219_singleAge %(pathModifier)
 
-pathModifier = '110719_noBaseScreen_noBaseVax_2018_Erasmus';
+pathModifier = '013120_singleAge_noBaseScreen_noBaseVax_2018_artLims_Erasmus';
 
 waning = 0;    % turn waning on or off
 
@@ -13,7 +13,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_110719_singleAge_noBaseScreen_noBaseVax_2018']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_013120_singleAge_noBaseScreen_noBaseVax_2018_artLims']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -40,8 +40,9 @@ parfor n = 1 : nSims
     vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : ,:)];
     vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , :) ; vaxResult{n}.newHiv(2 : end , : , : ,:)];
     vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :) ; vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
-    temp_tVec = linspace(1910 , 2018 , 649);
-    vaxResult{n}.tVec = [temp_tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
+    %temp_tVec = linspace(1910 , 2018 , 649);
+    %vaxResult{n}.tVec = [temp_tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
+    vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
 end
 
 noVaxInd = nSims;

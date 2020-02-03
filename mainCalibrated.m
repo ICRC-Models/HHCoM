@@ -145,20 +145,21 @@ hivStartYear = 1980;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
-% ART
+% ART coverage
 import java.util.LinkedList
 artDistList = LinkedList();
-maxRateM_vec = [0.40 , 0.40]; % Maximum ART coverage
-maxRateF_vec = [0.55 , 0.55];
-maxRateM1 = maxRateM_vec(1);
-maxRateM2 = maxRateM_vec(2);
-maxRateF1 = maxRateF_vec(1);
-maxRateF2 = maxRateF_vec(2);
+artOutMult = 1.0; %0.95;
+maxRateM = [0.15*artOutMult , 0.26*artOutMult , 0.55*artOutMult , ...
+    0.57*artOutMult , 0.65*artOutMult]; % population-level ART coverage in males
+maxRateF = [0.20*artOutMult , 0.35*artOutMult , 0.66*artOutMult , ...
+    0.68*artOutMult , 0.75*artOutMult]; % population-level ART coverage in females
+minLim = (0.70/0.81); % minimum ART coverage by age
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age
 
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_110719_singleAge_noBaseScreen_noBaseVax_2018'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_013120_singleAge_noBaseScreen_noBaseVax_2018_artLims'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
@@ -509,7 +510,7 @@ for i = 2 : length(s) - 1
     if (hivOn && (year >= hivStartYear))
         [~ , pop , hivDeaths(i , : , :) , artTreat] =...
             ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
-            kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
+            kCD4 ,  maxRateM , maxRateF , minLim , maxLim , disease , ...
             viral , gender , age , risk , k , hivInds , ...
             stepsPerYear , year) , tspan , popIn);
         popIn = pop(end , :);

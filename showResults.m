@@ -196,6 +196,7 @@ hivRaw(:,:,2) = hivPrevF_obs(: , 2:3);
 hivData(: , : , 1) = zeros(length(prevYears) , 1);
 hivData(: , : , 2) = zeros(length(prevYears) , 1);
 
+figure;
 for i = 1 : length(prevYears)
     for g = 1 : gender
         hivData(i,1,g) = sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g)) .* 100;
@@ -402,7 +403,7 @@ for aInd = 1 : length(aVec)
     aMatrix(aInd) = hiv_art;
 end
 
-%figure;
+figure;
 hold all;
 plot([1:length(aVec)] , aMatrix(1,:) , '--')
 hold all;
