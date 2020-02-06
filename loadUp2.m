@@ -310,10 +310,10 @@ end
 % HIV tranmission rate
 vagTransM = (baseVagTrans*2.0) * ones(risk , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
 vagTransF = baseVagTrans * ones(risk , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
-betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0] , vagTransF);
-betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0] , vagTransM);
-betaHIV_F2M_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0] , vagTransF);
-betaHIV_M2F_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0] , vagTransM);
+betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0] , vagTransF);
+betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0] , vagTransM);
+betaHIV_F2M_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0] , vagTransF);
+betaHIV_M2F_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0] , vagTransM);
 betaHIV = zeros(gender , age , risk , viral);
 betaHIV_red = zeros(gender , age , risk , viral);
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -649,10 +649,10 @@ end
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
 vagTrans_vax = ones(risk , 1) .* perPartnerHpv_vax; % [risk x 1]
 vagTrans_nonV = ones(risk , 1) .* perPartnerHpv_nonV; % [risk x 1]
-betaHPV_vax = bsxfun(@times , [1.0 0.5; 1.0 0.5; 1.0 0.5] , vagTrans_vax);
-betaHPV_nonV = bsxfun(@times , [1.0 0.5; 1.0 0.5; 1.0 0.5] , vagTrans_nonV);
-beta_hpvVax = zeros(gender , age , risk , 2); % age x risk x [normal transmission, reduced transmission (CC-regional / CC-distant / late-stage HIV)]
-beta_hpvNonVax = zeros(gender , age , risk , 2);
+betaHPV_vax = bsxfun(@times , [1.0 0.5 0.1; 1.0 0.5 0.1; 1.0 0.5 0.1] , vagTrans_vax);
+betaHPV_nonV = bsxfun(@times , [1.0 0.5 0.1; 1.0 0.5 0.1; 1.0 0.5 0.1] , vagTrans_nonV);
+beta_hpvVax = zeros(gender , age , risk , 3); % age x risk x [normal transmission , reduced transmission (CC-regional / CC-distant) , reduced transmission (late-stage HIV)]
+beta_hpvNonVax = zeros(gender , age , risk , 3);
 for a = 1 : age % calculate per-partnership probability of HPV transmission
     % VACCINE-TYPE HPV
     % force of infection: females to infect HPV-negative males 
@@ -678,7 +678,10 @@ for v = 1 : viral
         for g = 1 : gender
             for a = 1 : age
                 for r = 1 : risk
-                    if (x > 1) || (v == 5)
+                    if (v == 5)
+                        beta_hpvVax_mod(r , a , v , x , g) = beta_hpvVax(g , a , r , 3);
+                        beta_hpvNonVax_mod(r , a , v , x , g) = beta_hpvNonVax(g , a , r , 3);
+                    elseif (x > 1)
                         beta_hpvVax_mod(r , a , v , x , g) = beta_hpvVax(g , a , r , 2);
                         beta_hpvNonVax_mod(r , a , v , x , g) = beta_hpvNonVax(g , a , r , 2);
                     else
