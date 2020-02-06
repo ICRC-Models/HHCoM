@@ -723,12 +723,13 @@ end
 % circProtect = xlsread(file , 'Protection' , 'B18');
 % condProtect = xlsread(file , 'Protection' , 'B19');
 % MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+% artVScov = xlsread(file , 'Protection' , 'A33:C41');    % [years , females , males] 
 % save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
-%     'condProtect' , 'MTCTRate');
+%     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
-    'condProtect' , 'MTCTRate');
+    'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
 circProtect = [[circProtect; 0.0] , [0.30; 0.0]];    % HIV protection , HPV protection
