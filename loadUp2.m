@@ -732,7 +732,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
 
 % Protection from circumcision and condoms
 circProtect = [[circProtect; 0.0] , [0.30; 0.0]];    % HIV protection , HPV protection
-condProtect = [ones(gender,1).*condProtect , [0.0; 0.0]]; % [0.46; 0.70]    % HIV protection , HPV protection
+condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
 if calibBool && any(5 == pIdx);
