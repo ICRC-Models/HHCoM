@@ -6,8 +6,8 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , mue2 , epsA_vec , epsR_vec , ...
     yr , ...
-    hivOn , betaHIVM2F , betaHIVF2M , muHIV , kCD4 , ...
-    hpvOn , perPartnerHpv_vax , perPartnerHpv_nonV , fImm , rImmune , ...
+    hivOn , betaHIV_mod , muHIV , kCD4 , ...
+    hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
     c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
@@ -21,7 +21,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
     hivPrevM_dObs , hivPrevF_dObs , popAgeDist_dObs , totPopSize_dObs , ...
-    mCurr , fCurr , mCurrArt , fCurrArt , ...
+    hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
     hivInds , ...
@@ -308,25 +308,41 @@ else
 end
 
 % HIV tranmission rate
-analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = (baseVagTrans*2.0) * ones(size(analProp , 1) , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
-vagTransF = baseVagTrans * ones(size(analProp , 1) , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
-transM = vagTransM .* (1 - analProp(: , 1));
-transF = vagTransF .* (1 - analProp(: , 2));
-betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transF);
-betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0; 9.0 1.0 2.5 7.0 0.5 0.0] , transM);
-betaHIVF2M = zeros(age , risk , viral);
-betaHIVM2F = betaHIVF2M;
+vagTransM = (baseVagTrans*2.0) * ones(risk , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+vagTransF = baseVagTrans * ones(risk , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
+betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0] , vagTransF);
+betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0; 9.0 1.0 2.5 7.0 3.5 0.0] , vagTransM);
+betaHIV_F2M_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0] , vagTransF);
+betaHIV_M2F_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 3.5 0.0] , vagTransM);
+betaHIV = zeros(gender , age , risk , viral);
+betaHIV_red = zeros(gender , age , risk , viral);
 for a = 1 : age % calculate per-partnership probability of HIV transmission
     % force of infection: females to infect HIV-negative males, 
     % affected by betaHIV_F2M, probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
-    betaHIVF2M(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
+    betaHIV(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
+    betaHIV_red(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M_red , maleActs(a , :)'));
     % force of infection: males to infect HIV-negative females,
     % affected by betaHIV_M2F, probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
-    betaHIVM2F(a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
+    betaHIV(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
+    betaHIV_red(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F_red , femaleActs(a , :)')); 
 end
-betaHIVM2F = permute(betaHIVM2F , [2 1 3]); % risk, age, vl
-betaHIVF2M = permute(betaHIVF2M , [2 1 3]); % risk, age, vl
+
+betaHIV_mod = zeros(risk , age , viral , endpoints , gender);
+for v = 1 : viral
+    for x = 1 : endpoints
+        for g = 1 : gender
+            for a = 1 : age
+                for r = 1 : risk
+                    if (x > 1)
+                        betaHIV_mod(r , a , v , x , g) = betaHIV_red(g , a , r , v);
+                    else
+                        betaHIV_mod(r , a , v , x , g) = betaHIV(g , a , r , v);
+                    end
+                end
+            end
+        end
+    end
+end
 
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
@@ -630,6 +646,51 @@ else
     perPartnerHpv_nonV = perPartnerHpv_vax;
 end
 
+% Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
+vagTrans_vax = ones(risk , 1) .* perPartnerHpv_vax; % [risk x 1]
+vagTrans_nonV = ones(risk , 1) .* perPartnerHpv_nonV; % [risk x 1]
+betaHPV_vax = bsxfun(@times , [1.0 0.5; 1.0 0.5; 1.0 0.5] , vagTrans_vax);
+betaHPV_nonV = bsxfun(@times , [1.0 0.5; 1.0 0.5; 1.0 0.5] , vagTrans_nonV);
+beta_hpvVax = zeros(gender , age , risk , 2); % age x risk x [normal transmission, reduced transmission (CC-regional / CC-distant / late-stage HIV)]
+beta_hpvNonVax = zeros(gender , age , risk , 2);
+for a = 1 : age % calculate per-partnership probability of HPV transmission
+    % VACCINE-TYPE HPV
+    % force of infection: females to infect HPV-negative males 
+    % affected by betaHPV_F2M_vax, probability of transmission based on cervical cancer status/progression, and number of male acts
+    beta_hpvVax(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_vax , maleActs(a , :)'));
+    % force of infection: males to infect HPV-negative females,
+    % affected by betaHPV_M2F_vax, probability of transmission based on cervical cancer status/progression, and number of female acts
+    beta_hpvVax(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_vax , femaleActs(a , :)'));
+    
+    % NON-VACCINE-TYPE HPV
+    % force of infection: females to infect HPV-negative males 
+    % affected by betaHPV_F2M_nonV, probability of transmission based on cervical cancer status/progression, and number of male acts
+    beta_hpvNonVax(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_nonV , maleActs(a , :)'));
+    % force of infection: males to infect HPV-negative females,
+    % affected by betaHPV_M2F_nonV, probability of transmission based on cervical cancer status/progression, and number of female acts
+    beta_hpvNonVax(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_nonV , femaleActs(a , :)'));  
+end
+
+beta_hpvVax_mod = zeros(risk , age , viral , endpoints , gender);
+beta_hpvNonVax_mod = zeros(risk , age , viral , endpoints , gender);
+for v = 1 : viral
+    for x = 1 : endpoints
+        for g = 1 : gender
+            for a = 1 : age
+                for r = 1 : risk
+                    if (x > 1) || (v == 5)
+                        beta_hpvVax_mod(r , a , v , x , g) = beta_hpvVax(g , a , r , 2);
+                        beta_hpvNonVax_mod(r , a , v , x , g) = beta_hpvNonVax(g , a , r , 2);
+                    else
+                        beta_hpvVax_mod(r , a , v , x , g) = beta_hpvVax(g , a , r , 1);
+                        beta_hpvNonVax_mod(r , a , v , x , g) = beta_hpvNonVax(g , a , r , 1);
+                    end
+                end
+            end
+        end
+    end
+end
+
 % Cervical cancer progression
 kRL = 0.02;
 kDR = 0.025;
@@ -859,17 +920,21 @@ for g = 1 : gender
     end
 end
 
-vaxInds = zeros(gender , age , risk , disease * viral * 5 * hpvNonVaxStates * 3 * intervens);
-nonVInds = zeros(gender , age , risk , disease * viral * hpvVaxStates * 5 * 3 * intervens);
-for g = 1 : gender
-    for a = 1 : age
-        for r = 1 : risk
-            vaxInds(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 2 : 6 , ...
-                1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , g , a , r)));
-            nonVInds(g , a , r , :) = ...
-                sort(toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , ...
-                2 : 6 , 1 : 3 , 1 : intervens , g , a , r)));
+vaxInds = zeros(viral , endpoints , gender , age , risk , disease * 5 * hpvNonVaxStates * intervens); % 5 HPV+ states
+nonVInds = zeros(viral , endpoints , gender , age , risk , disease * hpvVaxStates * 5 * intervens);
+for v = 1 : viral
+    for x = 1 : endpoints
+        for g = 1 : gender
+            for a = 1 : age
+                for r = 1 : risk
+                    vaxInds(v , x , g , a , r , :) = ...
+                        sort(toInd(allcomb(1 : disease , v , 2 : 6 , ...
+                        1 : hpvNonVaxStates , x , 1 : intervens , g , a , r)));
+                    nonVInds(v , x , g , a , r , :) = ...
+                        sort(toInd(allcomb(1 : disease , v , 1 : hpvVaxStates , ...
+                        2 : 6 , x , 1 : intervens , g , a , r)));
+                end
+            end
         end
     end
 end
@@ -904,25 +969,20 @@ for d = 1 : disease
     end
 end
 
-mCurr = zeros(age , risk , viral , 5 * hpvVaxStates * hpvNonVaxStates * endpoints * intervens); % 5 HIV+ disease states
-fCurr = zeros(age , risk , viral , 5 * hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
-mCurrArt = zeros(age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens); % 1 HIV+ ART disease state
-fCurrArt = zeros(age , risk , hpvVaxStates * hpvNonVaxStates * endpoints * intervens);
-for a = 1 : age
-    for r = 1 : risk
-        for v = 1 : 5
-            mCurr(a , r , v , :) = toInd(allcomb(3 : 7 , v , 1 : hpvVaxStates , ...
-                1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , r));
-            fCurr(a , r , v , :) = toInd(allcomb(3 : 7 , v , 1 : hpvVaxStates , ...
-                1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , r));
+hivCurr = zeros(viral , endpoints , gender , age , risk , 6 * hpvVaxStates * hpvNonVaxStates * intervens); % 6 HIV+ disease states
+for v = 1 : viral
+    for x = 1 : endpoints
+        for g = 1 : gender
+            for a = 1 : age
+                for r = 1 : risk
+                    hivCurr(v , x , g , a , r , :) = toInd(allcomb(3 : 8 , v , 1 : hpvVaxStates , ...
+                        1 : hpvNonVaxStates , x , 1 : intervens , g , a , r));
+                end
+            end
         end
-        mCurrArt(a , r , :) = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , ...
-            1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , r));
-        fCurrArt(a , r , :) = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , ...
-            1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , r));
     end
 end
-
+ 
 hivSus = zeros(2 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , intervens);
 for d = 1 : 2
     for h = 1 : hpvVaxStates
