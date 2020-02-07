@@ -27,14 +27,14 @@ artOut = zeros(gender , age ,risk);
 artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(disease , viral , gender , age , risk);
 treat = zeros(disease , viral , gender , age ,risk);
 
-% CD4 <= 200, from 2004 to 2010
-if year >= 2004 && year < 2010
+% CD4 <= 200, from 2004 to 2011
+if year >= 2004 && year < 2011
     if year >= 2004 && year < 2007
         yrs = 2004 : 1 / stepsPerYear : 2007;
         ind = (round(yrs , 4) == round(year , 4));
         popCover = {linspace(0.0 , maxRateM(1) , length(yrs)) ,...
             linspace(0.0 , maxRateF(1) , length(yrs))};
-    elseif year >= 2007 && year < 2010
+    elseif year >= 2007 && year < 2011
         yrs = 2007 : 1 / stepsPerYear : 2011;
         ind = (round(yrs , 4) == round(year , 4));
         popCover = {linspace(maxRateM(1) , maxRateM(2) , length(yrs)) ,...
@@ -74,19 +74,12 @@ if year >= 2004 && year < 2010
     end
 end
 
-% CD4 <= 350, from 2010 to 2013
-if year >= 2010 && year < 2013
-    if year >= 2010 && year < 2011
-        yrs = 2007 : 1/stepsPerYear : 2011;
-        ind = round(yrs , 4) == round(year , 4);
-        popCover = {linspace(maxRateM(1) , maxRateM(2) , length(yrs)) , ...
-            linspace(maxRateF(1) , maxRateF(2) , length(yrs))};
-    elseif year >= 2011 && year < 2013
-        yrs = 2011 : 1/stepsPerYear : 2016;
-        ind = round(yrs , 4) == round(year , 4);
-        popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) , ...
-            linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
-    end
+% CD4 <= 350, from 2011 to 2015
+if year >= 2011 && year < 2015
+    yrs = 2011 : 1/stepsPerYear : 2016;
+    ind = round(yrs , 4) == round(year , 4);
+    popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) , ...
+        linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
     ageVec = [1 : age];
     dRange = [6 : 7];
     for g = 1 : gender   
@@ -124,8 +117,8 @@ if year >= 2010 && year < 2013
     end
 end
 
-% CD4 <= 500, from 2013 to 2015
-if year >= 2013 && year < 2015
+% CD4 <= 500, from 2015 to 2016
+if year >= 2015 && year < 2016
     yrs = 2011 : 1/stepsPerYear : 2016;
     ind = round(yrs , 4) == round(year , 4);
     popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) , ...
@@ -167,19 +160,12 @@ if year >= 2013 && year < 2015
     end
 end
 
-% Any CD4, after 2015
-if year >= 2015
-    if year >= 2015 && year < 2016
-        yrs = 2011 : 1 / stepsPerYear : 2016;
-        ind = round(yrs , 4) == round(year , 4);
-        popCover = {linspace(maxRateM(2) , maxRateM(3) , length(yrs)) ,...
-           linspace(maxRateF(2) , maxRateF(3) , length(yrs))};
-    elseif year >= 2016
-        yrs = 2016 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
-        ind = round(yrs , 4) == round(year , 4);
-        popCover = {linspace(maxRateM(3) , maxRateM(4) , length(yrs)) ,...
-           linspace(maxRateF(3) , maxRateF(4) , length(yrs))};
-    end
+% Any CD4, after 2016
+if year >= 2016
+    yrs = 2016 : 1 / stepsPerYear : 2030; % assuming 90-90-90 target reached by 2030
+    ind = round(yrs , 4) == round(year , 4);
+    popCover = {linspace(maxRateM(3) , maxRateM(4) , length(yrs)) ,...
+       linspace(maxRateF(3) , maxRateF(4) , length(yrs))};
     ageVec = [1 : age];
     dRange = [3 : 7];
     for g = 1 : gender
