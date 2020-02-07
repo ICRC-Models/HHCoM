@@ -116,6 +116,9 @@ fileALL = ['alphaLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save sor
 csvwrite([paramDir, fileALL] , alphaNegS_ordered);
 
 alphaWeights = masterWeights(inds(1:(masterNumFltrdSets*alpha)));
+fileB = ['alphaWeightsB4norm_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
+csvwrite([paramDir, fileB] , alphaWeights);
+
 %% Normalize weights
 normWeights = alphaWeights./sum(alphaWeights);
 fileW = ['alphaWeights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
