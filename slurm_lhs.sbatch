@@ -20,7 +20,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=19Dec19
+DATE=07Feb20
 echo "${DATE}"
 export DATE
 
