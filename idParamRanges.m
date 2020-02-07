@@ -69,6 +69,6 @@ for i = 1 : size(top50Params,1)
     %ylim([0.0 1.0]);
     title(titles{i});
     if i == size(top50Params,1)
-        legend('t0' , 't1' , 't2'); %'prior' , 
+        legend('t0' , 't1' , 't2' , 't3'); %'prior' , 
     end
 end
