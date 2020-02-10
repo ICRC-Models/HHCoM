@@ -759,13 +759,13 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age
-artYr = [artVScov(:,1); 2030]; % assuming 90-90-90 target reached by 2030
+artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult; % population-level ART coverage in males
 maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
-for i = 1 : size(artYr , 1) - 1    % interpolate ART viral suppression coverages at steps within period
+for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
     period = [artYr(i) , artYr(i + 1)];
     artYr_vec{i} = interp1(period , artYr(i : i + 1 , 1) , ...
         artYr(i) : timeStep : artYr(i + 1));

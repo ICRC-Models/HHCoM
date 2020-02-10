@@ -28,28 +28,31 @@ artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(dis
 treat = zeros(disease , viral , gender , age ,risk);
 
 % CD4 <= 200, from 2004 to 2011
-if year >= 2004 && year < 2011
-    if year >= 2004 && year < 2005 
+if year >= 2003 && year < 2011
+    if year >= 2003 && year < 2004 
         ind = (round(artYr_vec{1} , 4) == round(year , 4));
         popCover = {artM_vec{1} , artF_vec{1}};
-    elseif year >= 2005 && year < 2006
+    elseif year >= 2004 && year < 2005
         ind = (round(artYr_vec{2} , 4) == round(year , 4));
         popCover = {artM_vec{2} , artF_vec{2}};
-    elseif year >= 2006 && year < 2007
+    elseif year >= 2005 && year < 2006
         ind = (round(artYr_vec{3} , 4) == round(year , 4));
         popCover = {artM_vec{3} , artF_vec{3}};
-    elseif year >= 2007 && year < 2008
+    elseif year >= 2006 && year < 2007
         ind = (round(artYr_vec{4} , 4) == round(year , 4));
         popCover = {artM_vec{4} , artF_vec{4}};
-    elseif year >= 2008 && year < 2009
+    elseif year >= 2007 && year < 2008
         ind = (round(artYr_vec{5} , 4) == round(year , 4));
         popCover = {artM_vec{5} , artF_vec{5}};
-    elseif year >= 2009 && year < 2010
+    elseif year >= 2008 && year < 2009
         ind = (round(artYr_vec{6} , 4) == round(year , 4));
         popCover = {artM_vec{6} , artF_vec{6}};
-    elseif year >= 2010 && year < 2011
+    elseif year >= 2009 && year < 2010
         ind = (round(artYr_vec{7} , 4) == round(year , 4));
         popCover = {artM_vec{7} , artF_vec{7}};
+    elseif year >= 2010 && year < 2011
+        ind = (round(artYr_vec{8} , 4) == round(year , 4));
+        popCover = {artM_vec{8} , artF_vec{8}};
     end
     ageVec = [1 : age];
     dRange = [7];
@@ -174,13 +177,8 @@ end
 
 % Any CD4, after 2016
 if year >= 2016
-    if year >= 2016 && year < 2017 
-        ind = (round(artYr_vec{8} , 4) == round(year , 4));
-        popCover = {artM_vec{8} , artF_vec{8}};
-    elseif year >= 2017 && year < 2030 % assuming 90-90-90 target reached by 2030
-        ind = (round(artYr_vec{9} , 4) == round(year , 4));
-        popCover = {artM_vec{9} , artF_vec{9}};
-    end
+    ind = (round(artYr_vec{9} , 4) == round(year , 4));
+    popCover = {artM_vec{9} , artF_vec{9}};
     ageVec = [1 : age];
     dRange = [3 : 7];
     for g = 1 : gender
