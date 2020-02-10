@@ -758,7 +758,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % ART coverage
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult; % population-level ART coverage in males
 maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females
