@@ -32,15 +32,15 @@ if fracART > popCoverInd
 end
 
 fracExcMaxAges = ageHIVeligSubTots(excMaxAges) ./ sum(ageHIVeligSubTots(excMaxAges)); % population HIV proportion by age, for ages < MAX coverage
-toRedisMaxAges = sum(ageHIVeligSubTots(maxAges)); % summed HIV-positives of ages > MAX coverage to redistribute
+toRedisMaxAges = ageHIVeligSubTots(maxAges); % HIV-positives of ages > MAX coverage to redistribute
 % Initiate persons to match population coverage
 if fracART < popCoverInd
     cover = ((popCoverInd - fracART) ./ (1 - fracART)) .* ... % initiation fraction needed to meet population-level coverage
         (ageHIVallSubTots ./ ageHIVeligSubTots); % adjust coverage b/c only initiating persons with eligible CD4 = ((cover*HIVtot)/HIVelig)
-    totToRedis = fracExcMaxAges .* sumall(toRedisMaxAges .* max(cover , 0)); % calculate initiation #s, distributing persons that would have been from ages > MAX
+    totToRedis = fracExcMaxAges .* sumall(toRedisMaxAges .* max(cover(maxAges) , 0)); % calculate initiation #s, distributing persons that would have been from ages > MAX
     fracToRedis = totToRedis ./ ageHIVeligSubTots(excMaxAges); % calculate initiation proportions
     formatToRedis = ones(1 , 1 , 1 , length(excMaxAges) , 1);
-    formatToRedis(:) = (max(cover , 0) + fracToRedis'); % set up matrix values by age
+    formatToRedis(:) = (max(cover(excMaxAges) , 0)' + fracToRedis'); % set up matrix values by age
     % Initiation matrix by disease, VL, gender, age, risk, accounting for min/max adjustment
     % adjustment factor = ((HIVpop-#init)/HIVpop) = (1 - #init/HIVpop) = (1 - treat)
     treat(dRange , 1 : 5 , g , excMaxAges , :) = treat(dRange , 1 : 5 , g , excMaxAges , :) + ...
