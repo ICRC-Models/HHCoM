@@ -167,13 +167,13 @@ end
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_021120_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '021120_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_Erasmus'; % ***SET ME***: name for simulation output file
+pathModifier = '021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit_Erasmus'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end

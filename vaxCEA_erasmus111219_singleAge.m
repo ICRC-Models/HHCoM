@@ -1,6 +1,6 @@
 function vaxCEA_erasmus11219_singleAge %(pathModifier)
 
-pathModifier = '013120_singleAge_noBaseScreen_noBaseVax_2018_artLims_Erasmus';
+pathModifier = '021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit_Erasmus';
 
 waning = 0;    % turn waning on or off
 
@@ -13,7 +13,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_013120_singleAge_noBaseScreen_noBaseVax_2018_artLims']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values

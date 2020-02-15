@@ -178,7 +178,7 @@ end
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'toNow_021320_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_hivInit'; % ***SET ME***: name for historical run output file 
+pathModifier = 'toNow_021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit'; % ***SET ME***: name for historical run output file 
 
 % IMMUNITY
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
