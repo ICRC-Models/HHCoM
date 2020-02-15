@@ -132,26 +132,48 @@ hpvOn = 1;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
-% ART
+% ART coverage
 import java.util.LinkedList
+artDistList = LinkedList();
 artOutMult = 1.0; %0.95;
-maxRateM = [0.15*artOutMult , 0.26*artOutMult , 0.55*artOutMult , ...
-    0.57*artOutMult , 0.65*artOutMult]; % population-level ART coverage in males
-maxRateF = [0.20*artOutMult , 0.35*artOutMult , 0.66*artOutMult , ...
-    0.68*artOutMult , 0.75*artOutMult]; % population-level ART coverage in females
 minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
+artVScov = [2004 0.0 0.0; ...
+            2005 0.007745076 0.005731356; ...
+            2006 0.02943129 0.021779155; ...
+            2007 0.064284134 0.047570259; ...
+            2008 0.110754592 0.081958398; ...
+            2009 0.155676035 0.115200266; ...
+            2010 0.191303386 0.141564505; ...
+            2011 0.3485 0.2465; ...
+            2017 0.6375	0.5208; ...
+            2019 0.68 0.57]; % viral suppression among all PLHIV on ART in KZN, [year , females , males]
+artYr = [(artVScov(:,1) - 1); (2026 - 1)]; % assuming 90-90-90 target reached by 2030
+maxRateM = [artVScov(:,3) ; 0.65] .* artOutMult; % population-level ART coverage in males
+maxRateF = [artVScov(:,2) ; 0.75] .* artOutMult; % population-level ART coverage in females
+artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
+artM_vec = cell(size(artYr , 1) - 1, 1);
+artF_vec = cell(size(artYr , 1) - 1, 1);
+for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
+    period = [artYr(i) , artYr(i + 1)];
+    artYr_vec{i} = interp1(period , artYr(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+    artM_vec{i} = interp1(period , maxRateM(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+    artF_vec{i} = interp1(period , maxRateF(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+end
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_013120_singleAge_noBaseScreen_noBaseVax_2018_artLims']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_021120_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '013120_singleAge_noBaseScreen_noBaseVax_2018_artLims_Erasmus'; % ***SET ME***: name for simulation output file
+pathModifier = '021120_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_Erasmus'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
@@ -568,7 +590,7 @@ parfor n = 1 : nTests
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
-                kCD4 ,  maxRateM , maxRateF , minLim , maxLim , disease , ...
+                kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , ...
                 viral , gender , age , risk , k , hivInds , ...
                 stepsPerYear , year) , tspan , popIn);
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;

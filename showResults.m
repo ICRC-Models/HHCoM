@@ -263,7 +263,7 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
     '60-64' , '65-69' , '70-74' , '75-79'};
 
-%figure;
+figure;
 for g = 1 : gender
     aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
     for aInd = 1 : 16
@@ -384,13 +384,14 @@ title('Proportion on ART')
 legend('Model- males' , 'Observed- males (validation)' , 'Model- females' , 'Observed- females (validation)')
 
 %% On ART by age
-aVec = {1:5,6:1011:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80}; %{10:15,16:25,26:35,36:50,51:75};
+%aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80}; %{10:15,16:25,26:35,36:50,51:75};
+aVec = [1:age];
 ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
      '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
      '60-64' , '65-69' , '70-74' , '75-79'};
 aMatrix = zeros(1 , length(aVec));
-for aInd = 1 : length(aVec)
-    a = aVec{aInd};
+for aInd = 1 : age %length(aVec)
+    a = aInd; %aVec{aInd};
 
     artInds = toInd(allcomb(10 , 6 , 1 : hpvTypes , 1 : hpvStates , ...
         1 : periods , 2 , a , 1 : risk));
@@ -398,18 +399,18 @@ for aInd = 1 : length(aVec)
     hivInds = toInd(allcomb([2 : 6,10] , 1 : viral , 1 : hpvTypes , 1 : hpvStates, ...
         1 : periods , 2 , a , 1 : risk));
     hivPop = sum(popVec(end , hivInds) , 2);
-    hiv_art = [100 * artPop ./ hivPop];
+    hiv_art = [100 * (artPop / hivPop)];
 
-    aMatrix(aInd) = hiv_art;
+    aMatrix(1,aInd) = hiv_art;
 end
 
 figure;
 hold all;
-plot([1:length(aVec)] , aMatrix(1,:) , '--')
+plot([1:length(aVec)] , aMatrix(1,:) , '-')
 hold all;
 ylabel('Percent females on ART in 2020 by age');
-ylim([0 110])
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+%ylim([0 110])
+%set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 legend('Without ART dropout' , 'With ART dropout');
 
 %% HPV prevalence over time by HIV status and gender
@@ -2283,7 +2284,9 @@ xlim([1980 2020]);
 %% ART treatment tracker- cd4
 figure()
 cd4ARTFrac = zeros(length(tVec) , 5);
+aInd = 0;
 for a = 1 : 5 : age
+    aInd = aInd+1;
     for i = 1 : length(tVec)
     currTot = sumall(artTreatTracker(i , 2 : 6 , 1 : 5 , 1 : gender , a , 1 :risk));
         for d = 2 : 6
@@ -2291,9 +2294,10 @@ for a = 1 : 5 : age
             cd4ARTFrac(i , d - 1) = curr / currTot;
         end
     end
-    subplot(4,4,a)
+    subplot(4,4,aInd)
     area(tVec , cd4ARTFrac)
     xlabel('Year')
+    xlim([2000 2010]);
     ylabel('Initiated ART')
 end
 legend('Acute Infection' , 'CD4 > 500 cells/uL' , 'CD4 500 - 350 cells/uL' , 'CD4 350-200 cells/uL' ,...
