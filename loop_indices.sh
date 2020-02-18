@@ -1,8 +1,8 @@
-TCURR=0    # t_curr
+TCURR=1    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=07Feb20
+DATE=10Feb20
 echo "${DATE}"
 export DATE
 
@@ -44,7 +44,7 @@ while [ ! -z "$RERUN" ]; do
              SETIDX=${SEQ28all[$j]}
              if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
                  export SETIDX
-                 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
+                 sbatch -p csde -A csde slurm_batch.sbatch #--qos=MaxJobs4
                  INT=$(($INT + 1))
              fi
         done
