@@ -17,7 +17,7 @@ load([paramDir,'settings']);
 load([paramDir,'general']);
 paramSetMatrix = load([paramDir,'paramSets_patternSrch_', dateIn, '_0.dat']);
 
-pIdx = [1,2,3,4,5,6,7,8,9,10];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10];    % indices in paramsAll cell array
 file = ['pIdx_patternSrch_29Aug19_0.dat'];
 paramDir = [pwd , '\Params\'];
 csvwrite([paramDir, file] , pIdx)
@@ -32,8 +32,8 @@ for s = 1 : length(pIdx)
     lb = [lb; paramsSub{s}.lb];
     ub = [ub; paramsSub{s}.ub];
 end
-lb(86) = lb(86).*10; % re-scale perPartnerHpv to be more similar in scale to other params
-ub(86) = ub(86).*10;
+lb(8) = lb(8).*10; % re-scale perPartnerHpv to be more similar in scale to other params
+ub(8) = ub(8).*10;
 
 initParams = paramSetMatrix(:,1);
 
