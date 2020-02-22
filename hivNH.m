@@ -12,7 +12,7 @@
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
 
-function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue2 , artDist , ...
+function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
     kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year)
@@ -25,11 +25,11 @@ hivDeaths = zeros(gender , age , 1);
 %% Calculate background mortality rate for calculating HIV-associated mortality on ART
 if (year < 2003)
     muART = zeros(age , gender);
-elseif (year >= 2003) && (year < 2012)
-    dt = (year - 2003) * stepsPerYear;
-    mueYear = mue2 + dMue .* dt;
-elseif (year >= 2012)
-    mueYear = mue2;
+elseif (year >= 2003) && (year < 2020)
+    dt = (year - 2000) * stepsPerYear;
+    mueYear = mue3 + dMue .* dt;
+elseif (year >= 2020)
+    mueYear = mue4;
 end
 
 %% Calculate ART treatment coverage

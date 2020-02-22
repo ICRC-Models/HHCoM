@@ -18,7 +18,8 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
         hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
-        dFertNeg2 , dFertMat2 , deathMat , deathMat2 , dDeathMat , circMat , circMat2 , ...
+        dFertNeg2 , dFertMat2 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+        dDeathMat , dDeathMat2 , dDeathMat3 , circMat , circMat2 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
@@ -72,11 +73,17 @@ births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
 
 %% Calculate deaths
-if (year > 1950) && (year <= 1985)
+if (year >= 1950) && (year < 1985)
     dt = (year - 1950) * stepsPerYear;
     deathMat = deathMat + dDeathMat .* dt;
-elseif year > 1985
-    deathMat = deathMat2;
+elseif (year >= 1985) && (year < 2000)
+    dt = (year - 1985) * stepsPerYear;
+    deathMat = deathMat2 + dDeathMat2 .* dt;
+elseif (year >= 2000) && (year < 2020)
+    dt = (year - 2000) * stepsPerYear;
+    deathMat = deathMat3 + dDeathMat3 .* dt;
+elseif (year >= 2020)
+    deathMat = deathMat4;
 end
 deaths = deathMat * pop;
 
