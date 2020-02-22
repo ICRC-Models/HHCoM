@@ -33,7 +33,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = 'toNow_21Feb20_testMuART';
+%pathModifier = 'toNow_21Feb20_testMuART_1925Start';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -86,7 +86,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    deathMat , deathMat2 , dDeathMat , dMue , mue2 , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+    deathMat , deathMat2 , dDeathMat , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
 screenAlgorithm = 1;
