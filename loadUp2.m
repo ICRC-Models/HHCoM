@@ -904,10 +904,12 @@ end
 % hivPrevF_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H102 : I143');
 % hivPrevF_dObs(: , 4 : 5) = xlsread(file , 'Calibration' , 'E102 : F143'); % raw data
 % 
-% popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, 2016, and 2019
-%     xlsread(file , 'Calibration' , 'D223 : D270')];
+% popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, and 2019
+%     xlsread(file , 'Calibration' , 'D223 : D238');
+%     xlsread(file , 'Calibration' , 'D255 : D270')];
 % popAgeDist_dObs(: , 2 : 3) = [xlsread(file , 'Calibration' , 'H191 : I206'); ...
-%     xlsread(file , 'Calibration' , 'H223 : I270')];
+%     xlsread(file , 'Calibration' , 'H223 : I238');
+%     xlsread(file , 'Calibration' , 'H255 : I270')];
 % 
 % totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D273'); % Total population size in 2001, 2011, and 2019
 % totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I273');
