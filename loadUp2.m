@@ -81,23 +81,24 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 %% Save demographic and behavioral parameters
 
 % Import from Excel initial population size, male risk distribution, 
-% background mortality, fertility, partnerships, and acts per partnership
-% file = [pwd , '/Config/Population_data.xlsx'];
-% popInit = xlsread(file , 'Demographics' , 'D6:E21');
-% riskDistM = xlsread(file , 'Demographics' , 'B54:D69');
-% mue = zeros(age , gender);
-% mue(: , 1) = xlsread(file , 'Demographics' , 'B84:B99');
-% mue(: , 2) = xlsread(file , 'Demographics' , 'L84:L99');
-% mue2 = zeros(age , gender);
-% mue2(: , 1) = xlsread(file , 'Demographics' , 'I84:I99');
-% mue2(: , 2) = xlsread(file , 'Demographics' , 'S84:S99');
-% fertility = xlsread(file , 'Demographics' , 'B115:G130');
-% partnersM = xlsread(file , 'Demographics' , 'B163:D178');
-% partnersF = xlsread(file , 'Demographics' , 'E163:G178');
-% maleActs = xlsread(file , 'Demographics' , 'D202:F217');
-% femaleActs = xlsread(file , 'Demographics' , 'D222:F237');
-% save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
-%     'mue' , 'mue2' , 'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
+%background mortality, fertility, partnerships, and acts per partnership
+file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
+popInit = xlsread(file , 'Population' , 'C128:E143'); 
+popInit = popInit .* 1000 .* .8 ;
+riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88');
+mue = zeros(age , gender);
+mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109');
+mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
+mue2 = zeros(age , gender);
+mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109');
+mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
+fertility = xlsread(file , 'Fertility' , 'D104:I119');
+partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
+partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
+maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
+femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
+save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
+    'mue' , 'mue2' , 'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -141,6 +142,8 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
+    partnersM(4:6 , 3) = partnersM(4:6 , 3) .* 1.5;
+    
 end
 
 % Female partners per year by age and risk group
@@ -167,6 +170,8 @@ if calibBool && any(2 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
+    partnersF(4:6 , 3) = partnersF(4:6 , 3) .* 1.5;
+    partnersF(7:10 , 3) = partnersF(7:10 , 3) .* .75;
 end    
 
 % Male acts per partnership per year by age and risk group
@@ -759,7 +764,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
+artYr = [(artVScov(:,1) - 1); (2018 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult; % population-level ART coverage in males
 maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
@@ -793,7 +798,7 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.08; 0.19; 0.19; 0.48; 0.48; 0.48];
 baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
