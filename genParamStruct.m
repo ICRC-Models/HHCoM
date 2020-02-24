@@ -5,19 +5,19 @@ numParams = 37;
 paramsAll = cell(numParams,1);
 % partnersM, [age x risk], (hr range by age, mr % of hr, lr % of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 8; ... %1 %24;
-    paramsAll{1}.lb = [0.01; 5.0; 5.0; 5.0; 5.0; 0.01; 0.04; 0.02]; %ones(paramsAll{1}.length,1).*0.2; 
+    paramsAll{1}.lb = [1.0; 8.0; 5.0; 7.5; 5.0; 0.1; 0.04; 0.02]; %ones(paramsAll{1}.length,1).*0.2; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.01; ones(paramsAll{1}.length*(1/3),1).*0.01; ...
 		% ones(paramsAll{1}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{1}.ub = [36.0; 48.0; 50.0; 40.0; 20.0; 10.0; 0.60; 0.80]; %ones(paramsAll{1}.length,1).*5.0; 
+    paramsAll{1}.ub = [36.0; 48.0; 39.0; 30.0; 20.0; 10.0; 0.30; 0.70]; %ones(paramsAll{1}.length,1).*5.0; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.99; ones(paramsAll{1}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{1}.length*(1/3),1).*60.0]; %15;
 
 % partnersF, [age x risk], (hr range by age, mr % of hr, lr % of mr)
 paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 8; ... %1 %24;
-    paramsAll{2}.lb = [0.01; 5.0; 5.0; 5.0; 5.0; 0.01; 0.04; 0.02]; %ones(paramsAll{2}.length,1).*0.2; 
+    paramsAll{2}.lb = [1.0; 7.0; 7.0; 6.0; 5.0; 0.4; 0.04; 0.02]; %ones(paramsAll{2}.length,1).*0.2; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.01; ones(paramsAll{2}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{2}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{2}.ub = [36.0; 48.0; 50.0; 40.0; 20.0; 10.0; 0.60; 0.80]; %ones(paramsAll{2}.length,1).*5.0; 
+    paramsAll{2}.ub = [36.0; 48.0; 35.0; 39.0; 14.0; 10.0; 0.60; 0.70]; %ones(paramsAll{2}.length,1).*5.0; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.99; ones(paramsAll{2}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{2}.length*(1/3),1).*60.0]; %15;
 
@@ -34,12 +34,12 @@ paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 8; ... %1 %24;
 % condUse, [1 x 1], (0.11 to 0.85)
 paramsAll{5}.name = 'condUse'; paramsAll{5}.length = 1; ...
     paramsAll{5}.lb = 0.11; ...
-    paramsAll{5}.ub = 0.85;
+    paramsAll{5}.ub = 0.45;
 
 % epsA, [1 x 1], (0.2 to 0.8)
 paramsAll{6}.name = 'epsA'; paramsAll{6}.length = 1; ... %3
-    paramsAll{6}.lb = ones(paramsAll{6}.length,1).*0.2; ...
-    paramsAll{6}.ub = ones(paramsAll{6}.length,1).*0.8;
+    paramsAll{6}.lb = ones(paramsAll{6}.length,1).*0.1; ...
+    paramsAll{6}.ub = ones(paramsAll{6}.length,1).*0.6;
 
 % epsR, [1 x 1], (0.1 to 1)
 paramsAll{7}.name = 'epsR'; paramsAll{7}.length = 1; ... %3
@@ -62,8 +62,8 @@ paramsAll{9}.name = 'femaleActs'; paramsAll{9}.length = 1; ... %42; ...
 
 % perPartnerHpv_vax, [1 x 1], (0.001 to 1.0)
 paramsAll{10}.name = 'perPartnerHpv_vax'; paramsAll{10}.length = 1; ...
-    paramsAll{10}.lb = 0.001; ...
-    paramsAll{10}.ub = 1.0;
+    paramsAll{10}.lb = 0.01; ...
+    paramsAll{10}.ub = 0.85;
 
 % perPartnerHpv_nonV, [1 x 1], (0.001 to 1.0)
 paramsAll{11}.name = 'perPartnerHpv_nonV'; paramsAll{11}.length = 1; ...
@@ -153,14 +153,14 @@ paramsAll{34}.name = 'kCin2_Cin3Mult'; paramsAll{34}.length = 2; ...
 % baseVagTrans , [1 x 2]
 paramsAll{35}.name = 'baseVagTrans'; paramsAll{35}.length = 1; ...
     paramsAll{35}.lb = [0.0005]; ...
-    paramsAll{35}.ub = [0.0010];
+    paramsAll{35}.ub = [0.0008];
 
 % fertDeclineProp , [1 x 2]
 paramsAll{36}.name = 'fertDeclineProp'; paramsAll{36}.length = 2; ...
     paramsAll{36}.lb = [0.35 ; 0.50]; ...
-    paramsAll{36}.ub = [0.80 ; 0.99];
+    paramsAll{36}.ub = [0.75 ; 0.90];
 
 % maleHpvClearMult , [1 x 1]
 paramsAll{37}.name = 'maleHpvClearMult'; paramsAll{37}.length = 1; ...
-    paramsAll{37}.lb = [0.50]; ...
-    paramsAll{37}.ub = [0.99];
+    paramsAll{37}.lb = [1.0]; ...
+    paramsAll{37}.ub = [2.0];

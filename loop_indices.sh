@@ -1,8 +1,8 @@
-TCURR=1    # t_curr
+TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=10Feb20
+DATE=21Feb20
 echo "${DATE}"
 export DATE
 

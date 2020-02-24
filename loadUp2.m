@@ -4,7 +4,8 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , fertility3 , mue , mue2 , epsA_vec , epsR_vec , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , ...
+    mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
     yr , ...
     hivOn , betaHIV_mod , muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
@@ -38,7 +39,8 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    deathMat , deathMat2 , dDeathMat , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -81,6 +83,7 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 %% Save demographic and behavioral parameters
 
 % Import from Excel initial population size, male risk distribution, 
+
 %background mortality, fertility, partnerships, and acts per partnership
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
 popInit = xlsread(file , 'Population' , 'C128:E143'); 
@@ -92,18 +95,25 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109');
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
+% mue3 = zeros(age , gender);
+% mue3(: , 1) = xlsread(file , 'Demographics' , 'J84:J99'); % 2000
+% mue3(: , 2) = xlsread(file , 'Demographics' , 'W84:W99');
+% mue4 = zeros(age , gender);
+% mue4(: , 1) = xlsread(file , 'Demographics' , 'L84:L99'); % 2020
+% mue4(: , 2) = xlsread(file , 'Demographics' , 'Y84:Y99');
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
-    'mue' , 'mue2' , 'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
+    'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
+
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
 load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
-    'mue2' , 'fertility');
+    'mue2' , 'mue3' , 'mue4' , 'fertility');
 
 % Set female risk distribution
 riskDistF = riskDistM;
@@ -217,10 +227,10 @@ if ~fivYrAgeGrpsOn
     end
 
     % Replicate rates across single age groups for other variables
-    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'mue2' , ...
+    vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'mue2' , 'mue3' , 'mue4' , ...
         'fertility' , 'fertility2' , 'fertility3' , ...
         'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
-    vars5To1_vals = {riskDistM , riskDistF , mue , mue2 , ...
+    vars5To1_vals = {riskDistM , riskDistF , mue , mue2 , mue3 , mue4 , ...
         fertility , fertility2 , fertility3 , ...
         partnersM , partnersF , maleActs , femaleActs};    
     for j = 1 : length(vars5To1_vals)
@@ -909,10 +919,12 @@ end
 % hivPrevF_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H102 : I143');
 % hivPrevF_dObs(: , 4 : 5) = xlsread(file , 'Calibration' , 'E102 : F143'); % raw data
 % 
-% popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, 2016, and 2019
-%     xlsread(file , 'Calibration' , 'D223 : D270')];
+% popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, and 2019
+%     xlsread(file , 'Calibration' , 'D223 : D238');
+%     xlsread(file , 'Calibration' , 'D255 : D270')];
 % popAgeDist_dObs(: , 2 : 3) = [xlsread(file , 'Calibration' , 'H191 : I206'); ...
-%     xlsread(file , 'Calibration' , 'H223 : I270')];
+%     xlsread(file , 'Calibration' , 'H223 : I238');
+%     xlsread(file , 'Calibration' , 'H255 : I270')];
 % 
 % totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D273'); % Total population size in 2001, 2011, and 2019
 % totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I273');
@@ -1405,8 +1417,47 @@ end
 deathMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % disp('Second death matrix complete')
 
-%% Mortality scale-down
+%% Background death rate by 2000
+% disp('Building third death matrix')
+
+xInds = [];
+yInds = [];
+vals = [];
+for a = 1 : age
+    males = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+    females = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+    
+    xInds = [xInds; males; females];
+    yInds = [yInds; males; females];
+    vals = [vals; ones(length(males),1) .* ( -mue3(a,1) ); ones(length(females),1) .* ( -mue3(a,2) )];
+end
+deathMat3 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% disp('Third death matrix complete')
+
+%% Background death rate by 2020
+% disp('Building fourth death matrix')
+
+xInds = [];
+yInds = [];
+vals = [];
+for a = 1 : age
+    males = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+    females = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+    
+    xInds = [xInds; males; females];
+    yInds = [yInds; males; females];
+    vals = [vals; ones(length(males),1) .* ( -mue4(a,1) ); ones(length(females),1) .* ( -mue4(a,2) )];
+end
+deathMat4 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% disp('Fourth death matrix complete')
+
+%% Mortality matrix scale-down
 dDeathMat = (deathMat2 - deathMat) ./ ((1985 - 1950) * stepsPerYear);
+dDeathMat2 = (deathMat3 - deathMat2) ./ ((2000 - 1985) * stepsPerYear);
+dDeathMat3 = (deathMat4 - deathMat3) ./ ((2020 - 2000) * stepsPerYear);
+
+%% Mortality rate scale-down during the years of ART for use in calculation of HIV-associated mortality on ART
+dMue = (mue4 - mue3) ./ ((2020 - 2000) * stepsPerYear);
 
 %% Make circumcision matrix before current year (use when circumcision begins in model)
 % disp('Building circumcision matrix')
