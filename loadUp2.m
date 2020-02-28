@@ -86,21 +86,21 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 
 %background mortality, fertility, partnerships, and acts per partnership
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
-popInit = xlsread(file , 'Population' , 'C128:E143'); 
-popInit = popInit .* 1000 .* .8 ;
+popInit = xlsread(file , 'Population' , 'B169:C184'); 
+popInit = popInit .* 1000; 
 riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88');
 mue = zeros(age , gender);
-mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109');
+mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
 mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
-mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109');
+mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-% mue3 = zeros(age , gender);
-% mue3(: , 1) = xlsread(file , 'Demographics' , 'J84:J99'); % 2000
-% mue3(: , 2) = xlsread(file , 'Demographics' , 'W84:W99');
-% mue4 = zeros(age , gender);
-% mue4(: , 1) = xlsread(file , 'Demographics' , 'L84:L99'); % 2020
-% mue4(: , 2) = xlsread(file , 'Demographics' , 'Y84:Y99');
+mue3 = zeros(age , gender);
+mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
+mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
+mue4 = zeros(age , gender);
+mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
+mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
@@ -123,7 +123,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.6 ; 0.75];
+    fertDeclineProp = [0.6 ; 0.9];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -180,8 +180,8 @@ if calibBool && any(2 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
-    partnersF(4:6 , 3) = partnersF(4:6 , 3) .* 1.5;
-    partnersF(7:10 , 3) = partnersF(7:10 , 3) .* .75;
+    partnersF(4:6 , 1: 3) = partnersF(4:6 , 1:3) .* 1.25;
+    partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* .75;
 end    
 
 % Male acts per partnership per year by age and risk group
@@ -737,22 +737,22 @@ end
 %% Save intervention parameters
 
 % Import from Excel HIV intervention parameters
-% file = [pwd , '/Config/HIV_parameters.xlsx'];
-% circ = xlsread(file , 'Protection' , 'B4:C4');
-% circProtect = xlsread(file , 'Protection' , 'B18');
-% condProtect = xlsread(file , 'Protection' , 'B19');
-% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-% artVScov = xlsread(file , 'Protection' , 'A33:C41');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
-%     'condProtect' , 'MTCTRate' , 'artVScov');
+file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+circ = xlsread(file , 'Protection' , 'B4:C4');
+circProtect = xlsread(file , 'Protection' , 'B18');
+condProtect = xlsread(file , 'Protection' , 'B19');
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+artVScov = xlsread(file , 'Protection' , 'A33:C45');    % [years , females , males] 
+save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.0] , [0.30; 0.0]];    % HIV protection , HPV protection
-condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
+circProtect = [[circProtect; 0.0] , [0.45; 0.0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+condProtect = [ones(gender,1).*condProtect , [0.80; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
 if calibBool && any(5 == pIdx);
@@ -762,7 +762,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = 0.20;
+        condUse = 0.15; %changed from 20%
     end
 end
 
@@ -774,9 +774,9 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2018 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females
+artYr = [(artVScov(:,1) - 1); (2025 - 1)]; % assuming 90-90-90 target reached by 2030
+maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males
+maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
