@@ -33,7 +33,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_23Feb20_Ken';
+pathModifier = 'toNow_27Feb20_Ken';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -195,7 +195,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 % disp(' ')
 
 % If starting from beginning
-if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
+if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     
     % Initial Population 
     MpopStruc = riskDist(: , : , 1);
@@ -265,7 +265,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
-elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
+elseif isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
     chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
     
@@ -312,7 +312,7 @@ disp(' ')
 % progressbar('Simulation Progress')
 
 for i = iStart : length(s) - 1
-    year = startYear + s(i) - 1;
+    year = startYear + s(i) - 1
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
 %   currStep = round(s(i) * stepsPerYear);
@@ -480,15 +480,15 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
     
-    % if rem(year , 25) == 0.0
-    %     savdir = [pwd , '/HHCoM_Results/'];
-    %     save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-    %         'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-    %         'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
-    %         'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    %         'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
-    %         'startYear' , 'endYear' , 'i' , '-v7.3');
-    % end
+    if rem(year , 25) == 0.0
+        savdir = [pwd , '/HHCoM_Results/'];
+        save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+            'hivDeaths' , 'deaths' , 'ccDeath' , 'vaxdSchool' , ...
+            'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+            'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+            'startYear' , 'endYear' , 'i' , '-v7.3');
+    end
 
 end
 popLast = popVec(end-1 , :);
