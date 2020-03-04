@@ -518,7 +518,7 @@ if calibBool
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
 
-    if negSumLogL < -190000.00
+    if negSumLogL < -240000.00
         delete([savdir , pathModifier , '.mat']);
     end
     
