@@ -371,13 +371,15 @@ for y = 1 : length(years)
 end
 
 figure;
-h = plot(years , popPropYrs);
-set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
+plot(years , popPropYrs);
+set(gca,'ColorOrderIndex',1)
+%set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
 hold on;
 plot(years , popPropYrs_obs , 'o');
-ylabel('Population proportion'); xlabel('Year'); title('KZN age distribution in broad groups'); 
+ylim([0.1 0.3]);
+ylabel('Population proportion'); xlabel('Year'); title('KZN age distribution in broad groups');
 legend('9-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
-    '9-14, Observed' , '15-24' , '25-34' , '35-49' , '50-74');
+    '9-14, Observed' , '15-24' , '25-34' , '35-49' , '50-74' , 'Location' , 'EastOutside');
 %legend('Model 2019' , 'SSA KZN observed data 2019');
 %legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
 %    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
@@ -440,6 +442,7 @@ title('Total fertility rate');
 legend('Model prediction' , 'SA estimates & projections (UN)' , 'Lower 95' , ...
     'Lower 80' , 'Upper 80' , 'Upper 95');
 ylim([0 8]);
+xlabel('Year'); ylabel('Total fertility rate');
 
 %% Relative HIV prevalence for untreated and on ART
 figure()
@@ -532,9 +535,10 @@ plot(tVec , 100 * sum(popVec(: , artIndsF) , 2) ./ (sum(popVec(: , hivAllIndsF) 
     tVec , 100 * sum(popVec(: , artIndsM) , 2) ./ (sum(popVec(: , hivAllIndsM) , 2) + sum(popVec(: , artIndsM) , 2)) , ...
     (artYr + 1) , maxRateF .* 100 , 'o' , ...
     (artYr + 1) , maxRateM .* 100 , 'o')
+xlim([2000 2030]);
 xlabel('Year')
-ylabel('Proportion of HIV Population')
-title('Proportion on ART')
+ylabel('Percent of HIV-positive population')
+title('Percent of HIV-positives on ART and virally supressed')
 legend('Model KZN: Females' , ...
     'Model KZN: Males' , ...
     'Observed KZN: Females' , ...
