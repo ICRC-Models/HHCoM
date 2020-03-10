@@ -326,11 +326,11 @@ betaHIV_M2F_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*
 betaHIV = zeros(gender , age , risk , viral);
 betaHIV_red = zeros(gender , age , risk , viral);
 for a = 1 : age % calculate per-partnership probability of HIV transmission
-    % force of infection: females to infect HIV-negative males, 
+    % per-partnership beta: females to infect HIV-negative males, 
     % affected by betaHIV_F2M, probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
     betaHIV(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M , maleActs(a , :)'));
     betaHIV_red(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_F2M_red , maleActs(a , :)'));
-    % force of infection: males to infect HIV-negative females,
+    % per-partnership beta: males to infect HIV-negative females,
     % affected by betaHIV_M2F, probability of transmission from male (insertive) to female (receptive) based on male's disease state), and number of female acts
     betaHIV(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F , femaleActs(a , :)')); 
     betaHIV_red(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHIV_M2F_red , femaleActs(a , :)')); 
@@ -577,11 +577,14 @@ load([paramDir , 'hpvNHParamsFrmExcel'] , 'muCC' );
 % Natural immunity multiplier
 if calibBool && any(18 == pIdx)
     idx = find(18 == pIdx);
-    lambdaMultImm = zeros(age , 1);
     lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
-    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+    lambdaMultImm = zeros(age , 1);
+    lambdaMultImm(1 : 4) = 1 - 0.01;
+    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
+    lambdaMultImm(11 : 16) = lambdaMultImm(10);
+    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;   
 else
-    lambdaMultImm = zeros(16 , 1);
+    lambdaMultImm = zeros(age , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
     lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
     lambdaMultImm(11 : 16) = lambdaMultImm(10);
@@ -600,7 +603,7 @@ if ~fivYrAgeGrpsOn
     end
 end
 
-% HPV clearance multiplier for HIV-positive persons 
+% HPV immunity clearance multiplier for HIV-positive persons 
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
@@ -621,7 +624,7 @@ end
 % CIN2 to CIN3 progression multiplier for HIV-positive women
 if calibBool && any(15 == pIdx)
     idx = find(15 == pIdx);
-    c3c2Mults = zeros(4 , 1);
+    c3c2Mults = ones(4 , 1);
     c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
@@ -632,7 +635,7 @@ end
 % CIN1 to CIN2 progression multiplier for HIV-positive women
 if calibBool && any(16 == pIdx)
     idx = find(16 == pIdx);
-    c2c1Mults = zeros(4 , 1);
+    c2c1Mults = ones(4 , 1);
     c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
@@ -664,18 +667,18 @@ beta_hpvVax = zeros(gender , age , risk , 3); % age x risk x [normal transmissio
 beta_hpvNonVax = zeros(gender , age , risk , 3);
 for a = 1 : age % calculate per-partnership probability of HPV transmission
     % VACCINE-TYPE HPV
-    % force of infection: females to infect HPV-negative males 
+    % per-partnership beta: females to infect HPV-negative males 
     % affected by betaHPV_F2M_vax, probability of transmission based on cervical cancer status/progression, and number of male acts
     beta_hpvVax(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_vax , maleActs(a , :)'));
-    % force of infection: males to infect HPV-negative females,
+    % per-partnership beta: males to infect HPV-negative females,
     % affected by betaHPV_M2F_vax, probability of transmission based on cervical cancer status/progression, and number of female acts
     beta_hpvVax(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_vax , femaleActs(a , :)'));
     
     % NON-VACCINE-TYPE HPV
-    % force of infection: females to infect HPV-negative males 
+    % per-partnership beta: females to infect HPV-negative males 
     % affected by betaHPV_F2M_nonV, probability of transmission based on cervical cancer status/progression, and number of male acts
     beta_hpvNonVax(2 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_nonV , maleActs(a , :)'));
-    % force of infection: males to infect HPV-negative females,
+    % per-partnership beta: males to infect HPV-negative females,
     % affected by betaHPV_M2F_nonV, probability of transmission based on cervical cancer status/progression, and number of female acts
     beta_hpvNonVax(1 , a , : , :) = 1 - (bsxfun(@power, 1 - betaHPV_nonV , femaleActs(a , :)'));  
 end
