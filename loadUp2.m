@@ -582,6 +582,7 @@ if calibBool && any(18 == pIdx)
     lambdaMultImm(1 : 4) = 1 - 0.01;
     lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
     lambdaMultImm(11 : 16) = lambdaMultImm(10);
+    lambdaMultImm(:) = lambdaMultImm(10);
     lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;   
 else
     lambdaMultImm = zeros(age , 1);
