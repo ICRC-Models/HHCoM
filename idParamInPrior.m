@@ -5,7 +5,7 @@ date = date_abc;
 
 %% Load all particles
 paramDir = [pwd , '/Params/'];
-paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
+paramSetMatrix = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr) , '_7867mod17' , '.dat']); % load most recent parameter sample
 pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
 
 %% Find min and max of each parameter and compare to bounds
