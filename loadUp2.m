@@ -123,7 +123,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.6 ; 0.9];
+    fertDeclineProp = [0.6 ; 0.8];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -152,7 +152,7 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    partnersM(4:6 , 3) = partnersM(4:6 , 3) .* 1.5;
+    partnersM(3:6 , 3) = partnersM(3:6 , 3) .* 1.8;
     
 end
 
@@ -180,8 +180,9 @@ if calibBool && any(2 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
-    partnersF(4:6 , 1: 3) = partnersF(4:6 , 1:3) .* 1.25;
-    partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* .75;
+    partnersF(3 , 1: 3) = partnersF(3 , 1:3) .* 2.5;
+    partnersF(4:6 , 1: 3) = partnersF(3:6 , 1:3) .* 1.6;
+    partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* 1.2;
 end    
 
 % Male acts per partnership per year by age and risk group
@@ -198,6 +199,7 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
+    
 end
 
 % Female acts per partnership per year by age and risk group
@@ -323,8 +325,8 @@ else
     baseVagTrans = [0.001]; %[0.0004];
 end
 
-% HIV tranmission rate
-vagTransM = (baseVagTrans*2.0) * ones(risk , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
+% HIV tranmission rate % make HIV M-> F trans the smae 
+vagTransM = (baseVagTrans) * ones(risk , 1); % probability of transmission from male (insertive) to female (receptive) based on male's disease state; female acquisition 
 vagTransF = baseVagTrans * ones(risk , 1); % probability of transmission from female (receptive) to male (insertive) based on female's disease state; male acquisition 
 betaHIV_F2M = bsxfun(@times , [9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0] , vagTransF);
 betaHIV_M2F = bsxfun(@times , [9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0; 9.0 1.0 2.5 7.0 0.7 0.0] , vagTransM);
@@ -415,8 +417,8 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.6;
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) ;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*2.3; % original multiplier = 1.6
 end
 
 % CIN1 to CIN2, ages 10-24
@@ -427,7 +429,7 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.7;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*2.2; %original multiplier = 1.7
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -449,7 +451,7 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.8;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*2;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -737,14 +739,14 @@ end
 %% Save intervention parameters
 
 % Import from Excel HIV intervention parameters
-file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-circ = xlsread(file , 'Protection' , 'B4:C4');
-circProtect = xlsread(file , 'Protection' , 'B18');
-condProtect = xlsread(file , 'Protection' , 'B19');
-MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-artVScov = xlsread(file , 'Protection' , 'A33:C45');    % [years , females , males] 
-save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
+% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+% circ = xlsread(file , 'Protection' , 'B4:C4');
+% circProtect = xlsread(file , 'Protection' , 'B18');
+% condProtect = xlsread(file , 'Protection' , 'B19');
+% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
+%     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
@@ -808,7 +810,7 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.19; 0.19; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.48; 0.48; 0.48];
 baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
