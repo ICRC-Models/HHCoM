@@ -113,6 +113,9 @@ if year >= 2011 && year < 2015
     elseif year >= 2012 && year < 2014
         ind = (round(artYr_vec{10} , 4) == round(year , 4));
         popCover = {artM_vec{10} , artF_vec{10}}; 
+%     elseif year >= 2013 && year < 2014
+%         ind = (round(artYr_vec{10} , 4) == round(year , 4));
+%         popCover = {artM_vec{10} , artF_vec{10}};
     elseif year >= 2014 && year < 2015
         ind = (round(artYr_vec{11} , 4) == round(year , 4));
         popCover = {artM_vec{11} , artF_vec{11}};
@@ -162,8 +165,8 @@ if year >= 2015 && year < 2016
     % Calculate HIV-associated mortality on ART
     muART = 0.25 .* mueYear;
     % Calculate population-level ART coverage
-    ind = (round(artYr_vec{11} , 4) == round(year , 4));
-    popCover = {artM_vec{11} , artF_vec{11}};
+    ind = (round(artYr_vec{12} , 4) == round(year , 4));
+    popCover = {artM_vec{12} , artF_vec{12}};
     ageVec = [1 : age];
     dRange = [5 : 7];
     for g = 1 : gender    
@@ -209,11 +212,11 @@ if year >= 2016
     muART = 0.15 .* mueYear;
     % Calculate population-level ART coverage
    if year >= 2016 && year < 2017
-        ind = (round(artYr_vec{12} , 4) == round(year , 4));
-        popCover = {artM_vec{12} , artF_vec{12}};
-    elseif year >= 2017 
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
-        popCover = {artM_vec{13} , artF_vec{13}}; 
+        popCover = {artM_vec{13} , artF_vec{13}};
+    elseif year >= 2017 
+        ind = (round(artYr_vec{14} , 4) == round(year , 4));
+        popCover = {artM_vec{14} , artF_vec{14}}; 
    end
     ageVec = [1 : age];
     dRange = [3 : 7];
