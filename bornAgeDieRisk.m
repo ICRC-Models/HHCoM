@@ -27,15 +27,15 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
 %% Calculate MTCT rate
 kHiv = MTCTRate(1); % year <= 2004
 % linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant after 2008
-if year > 2008
+if year > 2013
     kHiv = MTCTRate(3);
-elseif year > 2005
-    yrs = 2005 : 1 / stepsPerYear : 2008;
+elseif year > 2007
+    yrs = 2007 : 1 / stepsPerYear : 2013;
     mtctVec = linspace(MTCTRate(2) , MTCTRate(3) , length(yrs));
     ind = yrs == year;
     kHiv = mtctVec(ind);
 elseif year > 2004
-    yrs = 2004 : 1 / stepsPerYear : 2005;
+    yrs = 2004 : 1 / stepsPerYear : 2007;
     mtctVec  = linspace(MTCTRate(1) , MTCTRate(2) , length(yrs));
     ind = yrs == year;
     kHiv = mtctVec(ind);
