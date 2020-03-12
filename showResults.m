@@ -356,41 +356,41 @@ legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future pr
 hold off
 
 %% Population size by age vs. validation data
-% 
+
 % % Load calibration data from Excel
 % file = [pwd , '/Config/Population_validation_targets.xlsx'];
 % years = xlsread(file , 'Demographics' , 'B91:F91');    % years
 % kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
-% 
-% ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
-% popPropYrs = zeros(5,5);
-% popPropYrs_obs = zeros(5,5);
-% ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
-% for y = 1 : length(years)
-%     yearCurr = years(y);
-%     for aInd = 1 : length(ageVec)
-%         a = ageVec{aInd};
-%         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%             1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
-%         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%             1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
-%         popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
-% 
-%         popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
-%     end
-% end
-% 
-% figure;
-% h = plot(years , popPropYrs);
-% set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
-% hold on;
-% plot(years , popPropYrs_obs , 'o');
-% ylabel('Population proportion'); xlabel('Year'); title('KZN age distribution in broad groups'); 
-% legend('9-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
-%     '9-14, Observed' , '15-24' , '25-34' , '35-49' , '50-74');
-% %legend('Model 2019' , 'SSA KZN observed data 2019');
-% %legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
-% %    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
+
+years = 2010:2020;
+ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
+popPropYrs = zeros(length(years),5);
+%popPropYrs_obs = zeros(5,5);
+ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
+for y = 1 : length(years)
+    yearCurr = years(y);
+    for aInd = 1 : length(ageVec)
+        a = ageVec{aInd};
+        popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
+        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
+
+        %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
+    end
+end
+
+figure;
+h = plot(years , popPropYrs);
+set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
+hold on;
+%plot(years , popPropYrs_obs , 'o');
+ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
+legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74' );
+%legend('Model 2019' , 'SSA KZN observed data 2019');
+%legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
+%    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
 
 %% Fertility
 % Load validation data from Excel (years, values)
@@ -1976,32 +1976,32 @@ legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'GBD Kenya 2018', 'Glo
 % % legend('Projected' , 'Actual')
 % 
 %% Population by age group over time
-% % popByAge = zeros(length(tVec) , age);
-% % for i = 1 : length(tVec)
-% %     for a = 1 : age
-% %         ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
-% %             1 : endpoints , 1 : gender , a , 1 : risk));
-% %         popByAge(i , a) = sum(popVec(i , ageInds) , 2);
-% %     end
-% % end
-% % %%
-% % figure()
-% % area(tVec , bsxfun(@rdivide , popByAge , sum(popVec , 2)))
-% % xlabel('Year'); ylabel('Relative Population Size'); title('Population')
-% % legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
-% %     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
-% %     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthEastOutside')
-% % 
-% % %%
-% % figure()
-% % ages = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
-% %     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-% %     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-% % surf(1 : age , tVec , popByAge);
-% % set(gca , 'xtickLabel' , ages);
-% % set(gca , 'xLim' , [1 age]);
-% % set(gca , 'yLim' , [tVec(1) tVec(end)]);
-% % xlabel('Ages'); ylabel('Year'); zlabel('Population Size'); title('Population by Age')
+popByAge = zeros(length(tVec) , age);
+%for i = 1 : length(tVec)
+    for a = 1 : age
+        ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+            1 : endpoints , 1: intervens, 1 : gender , a , 1 : risk));
+        popByAge(a) = sum(popVec((2020 - startYear) * stepsPerYear , ageInds), 2 );
+    end
+%end
+%
+figure()
+area(tVec(571), bsxfun(@rdivide , popByAge , sum(popVec(2020 - startYear) , 2)))
+xlabel('Year'); ylabel('Relative Population Size'); title('Population')
+legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
+    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthEastOutside')
+
+%%
+% figure()
+% ages = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
+%     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
+%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% surf(1 : age , tVec , popByAge);
+% set(gca , 'xtickLabel' , ages);
+% set(gca , 'xLim' , [1 age]);
+% set(gca , 'yLim' , [tVec(1) tVec(end)]);
+% xlabel('Ages'); ylabel('Year'); zlabel('Population Size'); title('Population by Age')
 % 
 %% HIV incidence by age and gender
 % % figure()
