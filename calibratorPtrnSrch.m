@@ -1,16 +1,15 @@
-function [negSumLogL] = calibratorPtrnSrch %(paramSet)
+function [negSumLogL] = calibratorPtrnSrch(paramSet)
 
 %% Load parameters
-paramDir = [pwd ,'\Params\'];
+paramDir = [pwd ,'/Params/'];
 % load([paramDir,'settings'])
-load([paramDir,'popData'])
 % load([paramDir,'HIVParams'])
 % load([paramDir,'mixInfectParams'])
 % load([paramDir,'vlBeta'])
 % load([paramDir,'hpvData'])
 % load([paramDir,'cost_weights'])
 load([paramDir, 'calibratedParams'])
-% paramDir = [pwd ,'\Params\'];
+% paramDir = [pwd ,'/Params/'];
 % load([paramDir , 'negSumLogL_patternSrch_29Aug19_0_params.dat'])
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
@@ -18,8 +17,9 @@ epsA = [0.3 ; 0.3 ; 0.3];
 epsR = [0.3 ; 0.3 ; 0.3];
 muHIV(11,2) = 0.02;
 OMEGA = zeros(age , 1); % hysterectomy rate
-paramDir = [pwd ,'\Params\'];
+paramDir = [pwd ,'/Params/'];
 % Load parameters
+load([paramDir,'popData'])
 load([paramDir,'general'])
 load([paramDir,'calibData'])
 % Load indices
@@ -39,7 +39,7 @@ load([paramDir,'circMat'])
 load([paramDir,'circMat2'])
 
 % Load calibration parameter information
-pIdx = load([paramDir,'pIdx_patternSrch_29Aug19_0.dat']);
+pIdx = load([paramDir,'pIdx_patternSrch_16DEC19_0.dat']);
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
 startIdx = 1;
@@ -55,17 +55,17 @@ hpvOn = 1;
 hivOn = 1;
 
 % % Use newly calibrated parameters
-paramSet = load([paramDir , 'negSumLogL_patternSrch_' , dateIn, '_0_params.dat']); % load most recent parameter sample
-pIdx = [1,2,3,4,5,6,7,8,9,10];
+%paramSet = load([paramDir , 'negSumLogL_patternSrch_' , dateIn, '_0_params.dat']); % load most recent parameter sample
+%pIdx = [1,2,5,6,7,8,9,10];
 % 
-[paramsAll] = genParamStruct();
-paramsSub = cell(length(pIdx),1);
-startIdx = 1;
-for s = 1 : length(pIdx)
-    paramsSub{s}.length = paramsAll{pIdx(s)}.length;
-    paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
-    startIdx = startIdx + paramsSub{s}.length;
-end
+%[paramsAll] = genParamStruct();
+%paramsSub = cell(length(pIdx),1);
+%startIdx = 1;
+%for s = 1 : length(pIdx)
+%    paramsSub{s}.length = paramsAll{pIdx(s)}.length;
+%    paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+%    startIdx = startIdx + paramsSub{s}.length;
+%end
 
 % Time
 c = fix(clock);
@@ -162,7 +162,7 @@ end
 % femaleActs(3:age , 1:risk) = [paramSet(218:231) , paramSet(232:245) , paramSet(246:259)];
 if any(10 == pIdx)
     idx = find(10 == pIdx);
-    perPartnerHpv = paramSet(paramsSub{idx}.inds(:)).*0.1;
+    perPartnerHpv = paramSet(paramsSub{idx}.inds(:)).* 0.1;
 end
 % perPartnerHpv = paramSet(260);
 % perPartnerHpv_lr = paramSet(261);
@@ -650,15 +650,15 @@ else
     %    (annlz(sum(popVec(end , allF) , 2) ./ stepsPerYear))* (10 ^ 5);
 end
 
-negSumLogL
-pathModifier = 'toNow_calibrated_7Oct19'; %file for saving natural history runs with calibrated params
-savdir = [pwd , '\HHCoM_Results\'];
-save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
-    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
-    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
-    'startYear' , 'endYear' , 'popLast');
+%negSumLogL
+%pathModifier = 'toNow_calibrated_16Dec19'; %file for saving natural history runs with calibrated params
+%savdir = [pwd , '\HHCoM_Results\'];
+%save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
+%    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
+%    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+%    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+%    'startYear' , 'endYear' , 'popLast');
 %
-pathModifier = 'toNow_calibrated_7Oct19';
-showResults_ken(pathModifier)
+%pathModifier = 'toNow_calibrated_16Dec19';
+%showResults_ken(pathModifier)
 
