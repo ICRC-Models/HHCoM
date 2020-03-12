@@ -1708,6 +1708,77 @@ for y = 1 : length(ccIncYears)
 %     legend('HIV-' , 'HIV+' , 'ART')
 end
 
+%% CC incidence over time (age-standardized)
+inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
+fac = 10 ^ 5;
+plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
+% worldStandard_WP2015 = [325428 (311262/5.0) 295693 287187 291738 299655 272348 ...
+%         247167 240167 226750 201603 171975 150562 113118 82266 64484];
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+        247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+        23477 9261 2155];
+
+figure();
+
+for i = 1 : length(inds)
+    
+    ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+           
+    for aInd = 1 : age + 4
+        if aInd >= age
+            a = age;
+        else
+            a = aInd;
+        end
+        
+        % General
+        allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-negative women
+        hivNeg = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % HIV-positive women not on ART
+        hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % Women on ART
+        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-positive women
+        hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
+        
+        % Calculate incidence
+        if aInd <= age
+            ccIncRef = ...
+                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
+                .* (worldStandard_WP2015(a));
+            if (i == 4) && (a < 3) && (max(annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4))) == 0.0)
+                ccIncRef = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+            end
+        elseif aInd > age
+            ccIncRef = ...
+                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+            ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
+            ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+        end
+        ccIncRefVec = ccIncRefVec + ccIncRef;
+
+    end
+    
+    ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
+ 
+    plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
+    legend('-DynamicLegend');
+    grid on;
+    xlim([1925 2020]);
+    ylim([0 150]);
+    hold all;
+end    
+
 %% Cervical cancer incidence over time
 % fScale = 10^5;
 % ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
