@@ -48,7 +48,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_9Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_11Mar20_Ken.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -124,9 +124,9 @@ xlim([1980 2020])
 figure()
 hivObsGender = zeros(4,3)
 
-hivObsGender(:,3) = [1998 2003 2007 2008] 
-hivObsGender(:,1) = [19.8 12.28 11.0 11.6] 
-hivObsGender(:,2) = [30.1 18.25 18.0 15.97] 
+hivObsGender(:,3) = [1998 2003 2007 2008]; 
+hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
+hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk));
@@ -358,14 +358,15 @@ hold off
 %% Population size by age vs. validation data
 
 % % Load calibration data from Excel
-% file = [pwd , '/Config/Population_validation_targets.xlsx'];
+file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
 % years = xlsread(file , 'Demographics' , 'B91:F91');    % years
 % kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
 
 years = 2010:2020;
 ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
 popPropYrs = zeros(length(years),5);
-%popPropYrs_obs = zeros(5,5);
+popPropYrs_obs = zeros(3,6);
+popPropYrs_obs = xlsread(file , 'Population' , 'H169:M171');
 ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
 for y = 1 : length(years)
     yearCurr = years(y);
@@ -380,14 +381,21 @@ for y = 1 : length(years)
         %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
     end
 end
-
+%%
 figure;
-h = plot(years , popPropYrs);
-set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
+plot(years , popPropYrs);
+newcolors = {'#F00','#F80','#FF0','#0B0','#00F'};
+colororder(newcolors);
+%set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
 hold on;
-%plot(years , popPropYrs_obs , 'o');
+plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o');
+colororder(newcolors)
 ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
-legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74' );
+legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74', '9-14 obs' , '15-24 obs' , '25-34 obs' , '35-49 obs' , '50-74 obs');
 %legend('Model 2019' , 'SSA KZN observed data 2019');
 %legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
 %    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
