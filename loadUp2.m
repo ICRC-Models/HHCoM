@@ -181,7 +181,7 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 1: 3) = partnersF(3 , 1:3) .* 2.5;
-    partnersF(4:6 , 1: 3) = partnersF(3:6 , 1:3) .* 1.6;
+    partnersF(4:6 , 1: 3) = partnersF(4:6 , 1:3) .* 1.6;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* 1.2;
 end    
 
@@ -199,7 +199,7 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 2; 
 end
 
 % Female acts per partnership per year by age and risk group
@@ -216,6 +216,7 @@ if calibBool && any(9 == pIdx)
     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 2;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -401,7 +402,7 @@ load([paramDir , 'hpvCinCCTransFrmExcel'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig'
     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
     'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
 
-kCin1_Inf = zeros(16,2);
+kCin1_Inf = zeros(16,2);  %(:, 1) 9vHPV, (:, 2) non-9vHPV
 kCin2_Cin1 = zeros(16,2);
 kCin3_Cin2 = zeros(16,2);
 kCC_Cin3 = zeros(16,2);
@@ -428,8 +429,8 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*2.2; %original multiplier = 1.7
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*1.2;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*2.0; %original multiplier = 1.7
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -440,7 +441,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.7;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.8; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -450,8 +451,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*2;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.2;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 2.3;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -654,7 +655,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0045;
+    perPartnerHpv_vax = 0.0060;
 end
 
 if calibBool && any(11 == pIdx)
@@ -738,7 +739,7 @@ end
 
 %% Save intervention parameters
 
-Import from Excel HIV intervention parameters
+%Import from Excel HIV intervention parameters
 file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
 circ = xlsread(file , 'Protection' , 'B4:C4');
 circProtect = xlsread(file , 'Protection' , 'B18');
