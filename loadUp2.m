@@ -738,15 +738,15 @@ end
 
 %% Save intervention parameters
 
-% Import from Excel HIV intervention parameters
-% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-% circ = xlsread(file , 'Protection' , 'B4:C4');
-% circProtect = xlsread(file , 'Protection' , 'B18');
-% condProtect = xlsread(file , 'Protection' , 'B19');
-% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
-%     'condProtect' , 'MTCTRate' , 'artVScov');
+Import from Excel HIV intervention parameters
+file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+circ = xlsread(file , 'Protection' , 'B4:C4');
+circProtect = xlsread(file , 'Protection' , 'B18');
+condProtect = xlsread(file , 'Protection' , 'B19');
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
