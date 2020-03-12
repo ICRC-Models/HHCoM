@@ -1,3 +1,4 @@
+
 function [negSumLogL] = calibratorPtrnSrch(paramSet)
 
 %% Load parameters
@@ -9,8 +10,12 @@ paramDir = [pwd ,'/Params/'];
 % load([paramDir,'hpvData'])
 % load([paramDir,'cost_weights'])
 load([paramDir, 'calibratedParams'])
+
 % paramDir = [pwd ,'/Params/'];
 % load([paramDir , 'negSumLogL_patternSrch_29Aug19_0_params.dat'])
+
+
+
 perPartnerHpv = 0.0045;
 condUse = 0.5 * 0.5;
 epsA = [0.3 ; 0.3 ; 0.3];
@@ -55,8 +60,13 @@ hpvOn = 1;
 hivOn = 1;
 
 % % Use newly calibrated parameters
+
 %paramSet = load([paramDir , 'negSumLogL_patternSrch_' , dateIn, '_0_params.dat']); % load most recent parameter sample
 %pIdx = [1,2,5,6,7,8,9,10];
+=======
+paramSet = load([paramDir , 'negSumLogL_patternSrch_30DEC19_0_params.dat']); % load most recent parameter sample
+pIdx = [1,2,5,6,7,8,9,10];
+
 % 
 %[paramsAll] = genParamStruct();
 %paramsSub = cell(length(pIdx),1);
@@ -642,8 +652,8 @@ if error
     %ccInc = -1;
 else
     negSumLogL = likeFunPtrnSrch(popVec ,  cinPos2007_obs , ...
-    hpv_2000_obs , hpv_hiv_obs , hivPrevM_obs , hivPrevF_obs ,...
-    disease , viral , gender , age , risk , ...
+    hpv_2000_obs, hpv_hiv_obs, hivPrevM_obs, hivPrevF_obs, hivPrevF_ANC, ...
+    disease, viral, gender , age , risk , ...
     hpvTypes , hpvStates , periods , startYear , stepsPerYear);
 
     %ccInc = annlz(sum(sum(sum(newCC(end , ':' , : , 4 : age),2),3),4)) ./ ...
@@ -661,4 +671,18 @@ end
 %
 %pathModifier = 'toNow_calibrated_16Dec19';
 %showResults_ken(pathModifier)
+=======
+
+negSumLogL
+pathModifier = 'toNow_calibrated_30Dec19'; %file for saving natural history runs with calibrated params
+savdir = [pwd , '\HHCoM_Results\'];
+save(fullfile(savdir , pathModifier) , 'tVec' ,  'popVec' , 'newHiv' ,...
+    'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , 'deaths' , ...
+    'vaxdSchool' , 'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
+    'startYear' , 'endYear' , 'popLast');
+%
+pathModifier = 'toNow_calibrated_30Dec19';
+showResults_ken(pathModifier)
+
 

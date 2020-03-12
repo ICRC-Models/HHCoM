@@ -115,13 +115,19 @@ paramsAll{25}.name = 'kCC_Cin3'; paramsAll{25}.length = 1; ...
 
 
 %% output bounds to excel  
-% fname = ['H:\Kenya_model_optim_calib\HHCoM\Params\paramSets_patternSrch_29Aug19_bounds.xlsx'];
-% sheet = 'Bounds';
-% xlswrite(fname, paramsAll{1}.ub , sheet, 'B1');
-% 
-% cellnum=1;
-% for i = 2: 10
-%     cellnum = (cellnum + paramsAll{i - 1}.length) ;
-%     cellname = ['B' num2str(cellnum)];
-%     xlswrite(fname, paramsAll{i}.ub , sheet, cellname);  
-% end
+fname = ['H:\Kenya_model_optim_calib\HHCoM\Params\paramSets_patternSrch_16Dec19_bounds.xlsx'];
+sheet = 'Bounds_new';
+% xlswrite(fname, paramsAll{1}.lb , sheet, 'A1');
+pIdx = [1,2,5,6,7,8,9,10];
+cellnum=1;
+for i = pIdx
+    cellnum = (cellnum + paramsAll{i}.length) ;
+    cellname = ['A' num2str(cellnum)];
+    xlswrite(fname, paramsAll{i}.lb , sheet, cellname);  
+end
+cellnum=1;
+for i = pIdx
+    cellnum = (cellnum + paramsAll{i}.length) ;
+    cellname = ['B' num2str(cellnum)];
+    xlswrite(fname, paramsAll{i}.ub , sheet, cellname);  
+end

@@ -29,7 +29,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 
 %% Latin hypercube sampling of parameter space
 nSets = 1;
-pIdx = [1,2,3,4,5,6,7,8,9,10];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10];    % indices in paramsAll cell array
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -45,8 +45,8 @@ for s = 1 : length(pIdx)
     lb = [lb; paramsSub{s}.lb];
     ub = [ub; paramsSub{s}.ub];
 end
-lb(86) = lb(86).*10; % re-scale perPartnerHpv to be more similar in scale to other params
-ub(86) = ub(86).*10;
+lb(8) = lb(8).*10; % re-scale perPartnerHpv to be more similar in scale to other params
+ub(8) = ub(8).*10;
 
 sampleNorm = lhsdesign(nSets , p , 'smooth' , 'off');    % latin hypercube sampling
 
