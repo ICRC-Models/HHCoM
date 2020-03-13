@@ -48,7 +48,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_12Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_12Mar20_Ken_b.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
