@@ -48,7 +48,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_11Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_12Mar20_Ken.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -381,7 +381,7 @@ for y = 1 : length(years)
         %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
     end
 end
-%%
+
 figure;
 plot(years , popPropYrs);
 newcolors = {'#F00','#F80','#FF0','#0B0','#00F'};
@@ -1210,10 +1210,13 @@ end
 
 figure()
 cinGroup = {'CIN 1' , 'CIN 2' , 'CIN 3'};
-plot(1 : length(cinHiv2010) , cinHiv2010 , 'o-' , 1 : length(cinHiv2010), cinHivNeg2010, 'o-' ,...
-    1: length(cinGroup) , cinHiv_ccScreen , '+',  1: length(cinGroup),cinHiv_ccScreen2, '+',  ...
+plot(1 : length(cinHiv2010) , cinHiv2010 , 'o-' , 1 : length(cinHiv2010), cinHivNeg2010, 'o-')
+hold on
+p = plot(1: length(cinGroup) , cinHiv_ccScreen , '+',  1: length(cinGroup),cinHiv_ccScreen2, '+',...
     1 : length(cinGroup), cinHIV_FSW, 'g+', 1 : length(cinGroup), cinNeg_FSW, 'go',...
     1 : length(cinGroup), cinHIV_FSW2, 'm+', 1 : length(cinGroup), cinNeg_FSW2, 'mo');
+p(1).MarkerSize = 10;
+p(2).MarkerSize = 8;
 ylabel('Prevalence (%)')
 set(gca , 'XTick', 1:3, 'xtickLabel' , cinGroup);
 xlabel('CIN Stage')
@@ -1291,7 +1294,7 @@ legend('Model CIN 1', 'Model CIN 2/3' , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3')
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age Specific CIN Prevalence among all women in 2000')
-ylim([0 20])
+ylim([0 30])
 % 
 
 %% HPV prevalence by age and gender over time
