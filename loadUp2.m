@@ -118,8 +118,8 @@ load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
     'mue2' , 'mue3' , 'mue4' , 'fertility');
 
 % Set female risk distribution
-riskDistM(3, 1:3) = [0.971839	0.02640375	0.00175725]; % 95% of the original 15-19 dist
-riskDistM(4, 1:3) = [0.924904	0.07041	0.004686]; % 200% of the original 15-19 dist
+riskDistM(3, 1:3) = [0.971839 0.02640375 0.00175725]; % 95% of the original 15-19 dist
+riskDistM(4, 1:3) = [0.924904 0.07041 0.004686]; % 200% of the original 15-19 dist
 riskDistF = riskDistM;
 
 % Calculate fertility2 and fertility3 matrices
