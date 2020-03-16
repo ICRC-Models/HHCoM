@@ -42,8 +42,8 @@ elseif year > 2004
 end
 
 %% Calculate births: HIV-negative and HIV-positive births
-if (year > 1960) && (year <= 2000)
-    dt = (year - 1960) * stepsPerYear;
+if (year > 1965) && (year <= 2000)
+    dt = (year - 1965) * stepsPerYear;
     hivFertPosBirth = hivFertPosBirth + dFertPos1 .* dt;
     hivFertNegBirth = hivFertNegBirth + dFertNeg1 .* dt;
     fertMat = fertMat + dFertMat1 .* dt;
