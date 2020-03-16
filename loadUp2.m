@@ -98,11 +98,11 @@ mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(:, :)= mue3(: , :) * 1.05;
+mue3(1:6, :)= mue3(1:6 , :) * 1.15;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(:, :)= mue4(: , :) * 1.05;
+mue4(1:6, :)= mue4(1:6 , :) * 1.15;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
@@ -156,7 +156,8 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    partnersM(3:6 , 3) = partnersM(3:6 , 3) .* 1.8;
+    partnersM(3:4 , 2:3) = partnersM(3:4, 2:3) + .5;
+    partnersM(5:6 , 3) = partnersM(5:6 , 3) .* 1.8;
     
 end
 
@@ -184,8 +185,8 @@ if calibBool && any(2 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
-    partnersF(3 , 1: 3) = partnersF(3 , 1:3) .* 2.5;
-    partnersF(4:6 , 1: 3) = partnersF(4:6 , 1:3) .* 1.6;
+    partnersF(3:4 , 2: 3) = partnersF(3:4 , 2:3) + 1;
+    partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) .* 1.6;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* 1.2;
 end    
 
@@ -500,7 +501,7 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.3;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.4;
 end
 
 % Apply age trends to 9v HPV transitions
@@ -516,7 +517,7 @@ kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
 kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
 kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4) * 1.25;
-rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5);
+rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5) .* 0.8;
 kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
 kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
 kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
@@ -524,7 +525,7 @@ kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
 kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
 kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
 kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4) * 1.25;
-rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5);
+rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5 .* 0.8);
 kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
 kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
 kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
@@ -542,7 +543,7 @@ kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
 kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
 kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4) *1.25;
-rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
+rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5) .* 0.8;
 kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
 kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
 kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
@@ -550,7 +551,7 @@ kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
 kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
 kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
 kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4) * 1.25;
-rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5);
+rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5) .* 0.8;
 kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
 kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
 kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
@@ -1382,9 +1383,9 @@ hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
 %% Fertility scale-down
-dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
-dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
-dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
+dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1965) * stepsPerYear);
+dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1965) * stepsPerYear); 
+dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1965) * stepsPerYear);
 
 dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
