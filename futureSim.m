@@ -1,22 +1,23 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
-%%
-%close all; clear all; clc
+function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
+%Run from the Command Window: futureSim(0 , [] , [] , [] , [] , 0 , '24Feb20')
+
 % profile clear;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+%pc = parcluster('local');    % create a local cluster object
+%pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+%parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-36incInitPop3-fixImmMult-clearAgeDist12-decFacts4-decMacts1-decCIN2reg-incCINprog_030920']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-36incInitPop3-fixImmMult-clearAgeDist12-decFacts4-decMacts1-decCIN2reg-incCINprog_030920_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -106,7 +107,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , 0 , [] , [] , []);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
 
@@ -298,7 +299,7 @@ end
 %% Simulation
 %profile on
 
-parfor n = 1 : nTests
+for n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -522,5 +523,3 @@ disp('Done')
 
 %%
 %vaxCEA(pathModifier)
-
-exit(0)
