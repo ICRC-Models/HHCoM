@@ -119,7 +119,7 @@ load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
 
 % Set female risk distribution
 riskDistM(3, 1:3) = [0.971839 0.02640375 0.00175725]; % 95% of the original 15-19 dist
-riskDistM(4, 1:3) = [0.924904 0.07041 0.004686]; % 200% of the original 15-19 dist
+riskDistM(4, 1:3) = [0.887356 0.105615 0.007029]; % 300% of the original 15-19 dist
 riskDistF = riskDistM;
 
 % Calculate fertility2 and fertility3 matrices
@@ -156,7 +156,8 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    partnersM(3:4 , 2:3) = partnersM(3:4, 2:3) + .5;
+    partnersM(3 , 2:3) = partnersM(3, 2:3) + .5;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 3;
     partnersM(5:6 , 3) = partnersM(5:6 , 3) .* 1.8;
     
 end
@@ -185,7 +186,8 @@ if calibBool && any(2 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
-    partnersF(3:4 , 2: 3) = partnersF(3:4 , 2:3) + 1;
+    partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* 3;
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) .* 1.6;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* 1.2;
 end    
@@ -446,7 +448,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*2; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*2.5; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -456,8 +458,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.2;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 2.5;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 2.5;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 3;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -1383,9 +1385,9 @@ hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
 %% Fertility scale-down
-dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1965) * stepsPerYear);
-dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1965) * stepsPerYear); 
-dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1965) * stepsPerYear);
+dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
+dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
+dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
 
 dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
