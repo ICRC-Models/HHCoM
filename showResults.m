@@ -48,12 +48,169 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_16Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_16Mar20_Ken_b.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
+
+%% Population size by gender
+figure()
+mInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 , 1 : age , 1 : risk));
+fInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
+plot(tVec , sum(popVec(: , mInds) , 2))
+hold on
+plot(tVec , sum(popVec(: , fInds) , 2))
+legend('Males' , 'Females')
+xlabel('Year'); ylabel('Population')
+
+%% Population size over time vs. validation data
+% All HIV-negative women
+hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
+% HIV-positive women not on ART
+hivNoART = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
+% Women on ART
+art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
+
+genArray = {hivNeg , hivNoART , art};
+
+totalPop0_79 = sum(popVec(:,genArray{1}),2) + sum(popVec(:,genArray{2}),2) + sum(popVec(:,genArray{3}),2);
+
+% Load calibration data from Excel (years, values)
+file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
+historicalPop0_79 = zeros(15,2);
+futurePop = zeros(16,2);
+historicalPop0_79(:,1) = xlsread(file , 'Demographics' , 'B80:P80'); % years
+historicalPop0_79(:,2) = xlsread(file , 'Demographics' , 'B97:P97') .* 1000; % estimates
+futurePop(:,1) = xlsread(file , 'Demographics' , 'B101:Q101'); % years
+futurePop(:,2) = xlsread(file , 'Demographics' , 'B102:Q102') .* 1000; % projections
+
+figure()
+plot(tVec , totalPop0_79 , '-');
+hold all;
+plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
+hold all;
+plot(futurePop(:,1) , futurePop(:,2) , 'o');
+title('Kenya Population Size Ages 0-79')
+xlabel('Year'); ylabel('Individuals')
+xlim([1920 2120]);
+legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
+    'Location', 'Northwest')
+hold off
+
+%% Population size by age vs. validation data
+
+% % Load calibration data from Excel
+file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
+% years = xlsread(file , 'Demographics' , 'B91:F91');    % years
+% kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
+
+years = 2010:2020;
+ageGroup = {'0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79'};
+popPropYrs = zeros(length(years),5);
+popPropYrs_obs = zeros(3,8);
+popPropYrs_obs = xlsread(file , 'Population' , 'H169:O171');
+ageVec = {[1:2], [3:4] , [5:6] , [7:8] , [9:10] , [11:12], [13:16]};
+for y = 1 : length(years)
+    yearCurr = years(y);
+    for aInd = 1 : length(ageVec)
+        a = ageVec{aInd};
+        popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1:2 , a , 1 : risk));
+        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 : gender  , 1 : age , 1 : risk));
+        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
+
+        %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
+    end
+end
+
+figure;
+plot(years , popPropYrs);
+newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
+colororder(newcolors);
+%set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
+hold on;
+plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 7) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 8) , 'o');
+colororder(newcolors)
+ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
+legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
+    '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs');
+%legend('Model 2019' , 'SSA KZN observed data 2019');
+%legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
+%    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
+
+%% Fertility
+% Load validation data from Excel (years, values)
+file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
+fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
+
+fertilityVec = [];
+for y = 1 : stepsPerYear : length(tVec)
+    year = tVec(y);
+    fertilityAnl = fertility;
+    if year > 1960 && year <= 2000
+        dt = (year - 1960) * stepsPerYear;
+        dFert = (fertility2 - fertility) ...
+            ./ ((2000 - 1960) * stepsPerYear);
+        fertilityAnl = fertility + dFert .* dt;
+    elseif year > 2000 && year <= 2010
+        fertilityAnl = fertility2;
+    elseif year > 2010 && year <=2020
+        dt = (year - 2010) * stepsPerYear;
+        dFert = (fertility3 - fertility2) ...
+            ./ ((2020 - 2010) * stepsPerYear);
+        fertilityAnl = fertility2 + dFert .* dt;
+    elseif year > 2020
+        fertilityAnl = fertility3;
+    end
+    
+    diseaseVec = {[1:2,8] , 3 , 4 , 5 , 6 , 7};
+    aSum = 0;        
+    for a = 4 : 10
+        allDinds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+        allTot = sumall(popVec(y,allDinds));
+        for d = 1 : length(diseaseVec)
+            subDinds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+            dProp = sumall(popVec(y,subDinds)) / allTot;
+            aSum = aSum + fertilityAnl(a,d)*dProp*5;
+        end
+    end
+    
+    fertilityVec = [fertilityVec; [year aSum]];
+end
+
+figure;
+plot(fertilityVec(:,1) , fertilityVec(:,2) , '-');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,2) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,3) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,4) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,5) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,6) , 'o');
+title('Total fertility rate');
+legend('Model' , 'UN estimates (Kenya)' , 'Lower 95' , ...
+    'Lower 80' , 'Upper 80' , 'Upper 95');
+ylim([0 10]);
+xlim([1920 2100]);
 
 %% HIV prevalence vs. HIV data by year
 % Total HIV positive
@@ -84,7 +241,6 @@ hold on
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
 legend('Model' , 'ANC data (Kisumu)', 'Spectrum data (Nyanza)')
 xlim([1980 2020])
-
 
 
 %% HIV prevalence by gender vs. AC data
@@ -164,6 +320,34 @@ xlabel('Year')
 ylabel('Prevalence')
 xlim([1980 2020])
 title('HIV Prevalence (aged 14-59)')
+
+%% HIV prevalence overall
+figure()
+
+years = 1980:2020;
+ageGroup = {'0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79'};
+hivPrevYrs = zeros(length(years),7);
+ageVec = {[1:2], [3:4] , [5:6] , [7:8] , [9:10] , [11:12], [13:16]};
+
+for y = 1 : length(years)
+    yearCurr = years(y);
+    for aInd = 1 : length(ageVec)
+        a = ageVec{aInd};
+        hivAge = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2   , 1 : age , 1 : risk));
+        hivPrevYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , hivAge),2) ...
+            ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
+    end
+end
+plot(years , hivPrevYrs);
+xlabel('Year')
+ylabel('Prevalence')
+legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79')
+xlim([1980 2020])
+title('HIV Prevalence by age in women')
+
 
 %% Circumcision prevalence among HIV-negative men 
 figure()
@@ -299,166 +483,12 @@ end
 %     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
 %     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthWest')
 % figure()
-% bar(tVec , bsxfun(@rdivide , squeeze(hivDeaths(:,2,:)) , sum(popVec , 2)) , 'stacked')
+% bar(tVec , bsxfun(@rdivide , squeeze(hivDeaths(:,2,:)) , sum(popVec , 2)) .* 100, 'stacked')
 % xlim([1980 2020])
-% xlabel('Year'); ylabel('Deaths relative to population'); title('Female HIV-associated Deaths')
+% xlabel('Year'); ylabel('Deaths relative to population (%)'); title('Female HIV-associated Deaths')
 % legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
 %     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
 %     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthWest')
-
-%% Population size by gender
-figure()
-mInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 1 , 1 : age , 1 : risk));
-fInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
-plot(tVec , sum(popVec(: , mInds) , 2))
-hold on
-plot(tVec , sum(popVec(: , fInds) , 2))
-legend('Males' , 'Females')
-xlabel('Year'); ylabel('Population')
-
-%% Population size over time vs. validation data
-% All HIV-negative women
-hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
-% HIV-positive women not on ART
-hivNoART = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
-% Women on ART
-art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 1 : gender , 1 : 16 , 1 : risk));
-
-genArray = {hivNeg , hivNoART , art};
-
-totalPop0_79 = sum(popVec(:,genArray{1}),2) + sum(popVec(:,genArray{2}),2) + sum(popVec(:,genArray{3}),2);
-
-% Load calibration data from Excel (years, values)
-file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
-historicalPop0_79 = zeros(15,2);
-futurePop = zeros(16,2);
-historicalPop0_79(:,1) = xlsread(file , 'Demographics' , 'B80:P80'); % years
-historicalPop0_79(:,2) = xlsread(file , 'Demographics' , 'B97:P97') .* 1000; % estimates
-futurePop(:,1) = xlsread(file , 'Demographics' , 'B101:Q101'); % years
-futurePop(:,2) = xlsread(file , 'Demographics' , 'B102:Q102') .* 1000; % projections
-
-figure()
-plot(tVec , totalPop0_79 , '-');
-hold all;
-plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
-hold all;
-plot(futurePop(:,1) , futurePop(:,2) , 'o');
-title('Kenya Population Size Ages 0-79')
-xlabel('Year'); ylabel('Individuals')
-xlim([1920 2120]);
-legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
-    'Location', 'Northwest')
-hold off
-
-%% Population size by age vs. validation data
-
-% % Load calibration data from Excel
-file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
-% years = xlsread(file , 'Demographics' , 'B91:F91');    % years
-% kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
-
-years = 2010:2020;
-ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
-popPropYrs = zeros(length(years),5);
-popPropYrs_obs = zeros(3,6);
-popPropYrs_obs = xlsread(file , 'Population' , 'H169:M171');
-ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
-for y = 1 : length(years)
-    yearCurr = years(y);
-    for aInd = 1 : length(ageVec)
-        a = ageVec{aInd};
-        popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
-        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
-        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
-
-        %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
-    end
-end
-
-figure;
-plot(years , popPropYrs);
-newcolors = {'#F00','#F80','#FF0','#0B0','#00F'};
-colororder(newcolors);
-%set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
-hold on;
-plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o');
-colororder(newcolors)
-ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
-legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74', '9-14 obs' , '15-24 obs' , '25-34 obs' , '35-49 obs' , '50-74 obs');
-%legend('Model 2019' , 'SSA KZN observed data 2019');
-%legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
-%    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
-
-%% Fertility
-% Load validation data from Excel (years, values)
-file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
-fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
-
-fertilityVec = [];
-for y = 1 : stepsPerYear : length(tVec)
-    year = tVec(y);
-    fertilityAnl = fertility;
-    if year > 1960 && year <= 2000
-        dt = (year - 1960) * stepsPerYear;
-        dFert = (fertility2 - fertility) ...
-            ./ ((2000 - 1960) * stepsPerYear);
-        fertilityAnl = fertility + dFert .* dt;
-    elseif year > 2000 && year <= 2010
-        fertilityAnl = fertility2;
-    elseif year > 2010 && year <=2020
-        dt = (year - 2010) * stepsPerYear;
-        dFert = (fertility3 - fertility2) ...
-            ./ ((2020 - 2010) * stepsPerYear);
-        fertilityAnl = fertility2 + dFert .* dt;
-    elseif year > 2020
-        fertilityAnl = fertility3;
-    end
-    
-    diseaseVec = {[1:2,8] , 3 , 4 , 5 , 6 , 7};
-    aSum = 0;        
-    for a = 4 : 10
-        allDinds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : 3 , 1 : intervens , 2 , a , 1 : risk));
-        allTot = sumall(popVec(y,allDinds));
-        for d = 1 : length(diseaseVec)
-            subDinds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-                1 : 3 , 1 : intervens , 2 , a , 1 : risk));
-            dProp = sumall(popVec(y,subDinds)) / allTot;
-            aSum = aSum + fertilityAnl(a,d)*dProp*5;
-        end
-    end
-    
-    fertilityVec = [fertilityVec; [year aSum]];
-end
-
-figure;
-plot(fertilityVec(:,1) , fertilityVec(:,2) , '-');
-hold all;
-plot(fertilityVal(:,1) , fertilityVal(:,2) , 'o');
-hold all;
-plot(fertilityVal(:,1) , fertilityVal(:,3) , 'o');
-hold all;
-plot(fertilityVal(:,1) , fertilityVal(:,4) , 'o');
-hold all;
-plot(fertilityVal(:,1) , fertilityVal(:,5) , 'o');
-hold all;
-plot(fertilityVal(:,1) , fertilityVal(:,6) , 'o');
-title('Total fertility rate');
-legend('Model' , 'UN estimates (Kenya)' , 'Lower 95' , ...
-    'Lower 80' , 'Upper 80' , 'Upper 95');
-ylim([0 10]);
-xlim([1920 2100]);
 
 %% Relative HIV prevalence for untreated and on ART
 figure()
