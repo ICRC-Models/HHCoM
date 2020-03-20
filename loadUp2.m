@@ -98,11 +98,11 @@ mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1:6, :)= mue3(1:6 , :) ;
+mue3(1:6, :)= mue3(1:6 , :) .* 1.15 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(1:6, :)= mue4(1:6 , :) ;
+mue4(1:6, :)= mue4(1:6 , :) .* 1.15 ;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
@@ -127,7 +127,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.9];
+    fertDeclineProp = [0.7 ; 0.7];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -157,7 +157,7 @@ if calibBool && any(1 == pIdx)
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 4;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 3;
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
