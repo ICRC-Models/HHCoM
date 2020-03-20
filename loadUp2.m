@@ -98,11 +98,11 @@ mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1:6, :)= mue3(1:6 , :) .* 1.15;
+mue3(1:6, :)= mue3(1:6 , :) ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(1:6, :)= mue4(1:6 , :) .* 1.15;
+mue4(1:6, :)= mue4(1:6 , :) ;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
@@ -127,7 +127,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.6 ; 0.8];
+    fertDeclineProp = [0.7 ; 0.9];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -157,8 +157,8 @@ if calibBool && any(1 == pIdx)
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 5;
-    partnersM(5:6 , 3) = partnersM(5:6 , 3) .* 1.8;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 4;
+    partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
 
@@ -188,8 +188,8 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
     partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* 5;
-    partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) .* 1.6;
-    partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) .* 1.2;
+    partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
+    partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
 
 % Male acts per partnership per year by age and risk group
@@ -459,7 +459,7 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 2.5;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 3;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 3.5;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -662,14 +662,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0060;
+    perPartnerHpv_vax = 0.0050;
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.25;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -1385,9 +1385,9 @@ hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
 %% Fertility scale-down
-dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
-dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
-dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
+dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1970) * stepsPerYear);
+dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1970) * stepsPerYear); 
+dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1970) * stepsPerYear);
 
 dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
