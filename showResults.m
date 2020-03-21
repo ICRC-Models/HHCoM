@@ -48,7 +48,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_18Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_20Mar20_Ken.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -161,17 +161,17 @@ fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
     year = tVec(y);
     fertilityAnl = fertility;
-    if year > 1960 && year <= 2000
-        dt = (year - 1960) * stepsPerYear;
+    if year > 1970 && year <= 2000
+        dt = (year - 1970) * stepsPerYear;
         dFert = (fertility2 - fertility) ...
-            ./ ((2000 - 1960) * stepsPerYear);
+            ./ ((2000 - 1970) * stepsPerYear);
         fertilityAnl = fertility + dFert .* dt;
-    elseif year > 2000 && year <= 2010
-        fertilityAnl = fertility2;
-    elseif year > 2010 && year <=2020
-        dt = (year - 2010) * stepsPerYear;
+%     elseif year > 2000 && year <= 2010
+%         fertilityAnl = fertility2;
+    elseif year > 2000 && year <=2020
+        dt = (year - 2000) * stepsPerYear;
         dFert = (fertility3 - fertility2) ...
-            ./ ((2020 - 2010) * stepsPerYear);
+            ./ ((2020 - 2000) * stepsPerYear);
         fertilityAnl = fertility2 + dFert .* dt;
     elseif year > 2020
         fertilityAnl = fertility3;
