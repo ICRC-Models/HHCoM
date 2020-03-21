@@ -127,7 +127,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.7];
+    fertDeclineProp = [0.7 ; 0.6];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -157,7 +157,7 @@ if calibBool && any(1 == pIdx)
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 3;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 2.5;
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -187,7 +187,7 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
-    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* 5;
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* 5.5;
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
@@ -511,7 +511,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5);
+rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) .* 1.25;
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
@@ -537,7 +537,7 @@ kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5);
+rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) .* 1.25;
 kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
@@ -654,7 +654,7 @@ if calibBool && any(16 == pIdx)
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c2c1Mults = [1.00; 1.75; 2.30; 2.66];
+    c2c1Mults = [1.00; 2.00; 2.45; 2.75 ]; % orginal values [1.00; 1.75; 2.30; 2.66];
 end
 
 % HPV tranmission rates
@@ -824,12 +824,12 @@ baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.72;
+baseline.colpoRetain = 0.361; % 0.721
 baseline.cinTreatEff = [0.905 , 0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
-baseline.cinTreatRetain = 0.51;
+baseline.cinTreatRetain = 0.25; % 0.51
 baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP including treatment failure
 baseline.cinTreatHpvPersistHivNeg = baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1)); % 0.185; proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
-baseline.ccTreatRetain = 0.40;
+baseline.ccTreatRetain = 0.2; % 0.40
 baseline.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
@@ -1385,13 +1385,13 @@ hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
 %% Fertility scale-down
-dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1970) * stepsPerYear);
-dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1970) * stepsPerYear); 
-dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1970) * stepsPerYear);
+dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((1990 - 1970) * stepsPerYear);
+dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((1990 - 1970) * stepsPerYear); 
+dFertMat1 = (fertMat2 - fertMat) ./ ((1990 - 1970) * stepsPerYear);
 
-dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
-dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
-dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 2010) * stepsPerYear);
+dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 1990) * stepsPerYear);
+dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 1990) * stepsPerYear);
+dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
