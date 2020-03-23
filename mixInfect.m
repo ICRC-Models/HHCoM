@@ -47,14 +47,14 @@ if fivYrAgeGrpsOn
     deltaR = eye(3 , 3);
     deltaAF = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , 1);
     deltaAM = eye(16) .* 0.3 + diag(ones(15 , 1) .* 0.7 , -1);
-    deltaAF(4 , 4) = 1;
-    deltaAF(3 , 4) = 0;
-    deltaAF(4 , 5) = 0;
-    deltaAF(3 , 3) = 1;
-    deltaAM(4 , 4) = 1;
-    deltaAM(4 , 3) = 0;
-    deltaAM(3 , 2) = 0;
-    deltaAM(3 , 3) = 1;
+    deltaAF(1 , 1) = 0.0;
+    deltaAF(1 , 2) = 0.0;
+    deltaAF(2 , 2) = 0.0;
+    deltaAF(2 , 3) = 0.0;
+    deltaAM(1 , 1) = 0.0;
+    deltaAM(2 , 1) = 0.0;
+    deltaAM(2 , 2) = 0.0;
+    deltaAM(3 , 2) = 0.0;
 else
     %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
     deltaR = eye(3 , 3);
