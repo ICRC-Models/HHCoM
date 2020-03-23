@@ -48,7 +48,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_20Mar20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_20Mar20_Ken_c.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -161,17 +161,17 @@ fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
     year = tVec(y);
     fertilityAnl = fertility;
-    if year > 1970 && year <= 2000
+    if year > 1970 && year <= 1990
         dt = (year - 1970) * stepsPerYear;
         dFert = (fertility2 - fertility) ...
-            ./ ((2000 - 1970) * stepsPerYear);
+            ./ ((1990 - 1970) * stepsPerYear);
         fertilityAnl = fertility + dFert .* dt;
 %     elseif year > 2000 && year <= 2010
 %         fertilityAnl = fertility2;
-    elseif year > 2000 && year <=2020
-        dt = (year - 2000) * stepsPerYear;
+    elseif year > 1990 && year <=2020
+        dt = (year - 1990) * stepsPerYear;
         dFert = (fertility3 - fertility2) ...
-            ./ ((2020 - 2000) * stepsPerYear);
+            ./ ((2020 - 1990) * stepsPerYear);
         fertilityAnl = fertility2 + dFert .* dt;
     elseif year > 2020
         fertilityAnl = fertility3;
@@ -242,39 +242,6 @@ xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (A
 legend('Model' , 'ANC data (Kisumu)', 'Spectrum data (Nyanza)')
 xlim([1980 2020])
 
-
-%% HIV prevalence by gender vs. AC data
-% figure;
-% prevYears = unique(hivPrevF_dObs(: , 1));
-% hivRaw(:,:,1) = hivPrevM_dObs(: , 4:5);
-% hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
-% 
-% hivData(: , : , 1) = zeros(length(prevYears) , 1);
-% hivData(: , : , 2) = zeros(length(prevYears) , 1);
-% 
-% for i = 1 : length(prevYears)
-%     for g = 1 : gender
-%         hivData(i,1,g) = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g))) .* 100;
-%     end
-% end
-% 
-% gen = {'Male' , 'Female'};
-% for g = 1 : gender
-%     hivInds = [toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-%         1 : intervens , g , 4 : 10 , 1 : risk)); toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-%         1 : intervens , g , 4 : 10 , 1 : risk))];
-%     totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-%         1 : intervens , g , 4 : 10 , 1 : risk));
-%     hivPop = sum(popVec(: , hivInds) , 2);
-%     hivPopPrev = bsxfun(@rdivide , hivPop , sum(popVec(: , totInds) , 2)) * 100;
-%     subplot(1,2,g)
-%     plot(tVec' , hivPopPrev);
-%     hold all;
-%     plot(prevYears , hivData(:,:,g) , 'ro');
-%     xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
-%     xlim([1980 2020])
-%     legend('Model' , 'Africa Center Data (Calibration)')
-% end
 
 %% HIV prevalance, all ages by gender
 figure()
@@ -2021,7 +1988,7 @@ popByAge = zeros(length(tVec) , age);
     for a = 1 : age
         ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
             1 : endpoints , 1: intervens, 1 : gender , a , 1 : risk));
-        popByAge(a) = sum(popVec((2020 - startYear) * stepsPerYear , ageInds), 2 );
+        popByAge(a) = sum(popVec((2010 - startYear) * stepsPerYear , ageInds), 2 );
     end
 %end
 %
