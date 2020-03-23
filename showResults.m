@@ -49,7 +49,6 @@ paramDir = [pwd , '\Params\'];
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
 load([resultsDir , pathModifier])
-annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
 reset(0)
@@ -136,6 +135,11 @@ legend('9-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
 % Load validation data from Excel (years, values)
 file = [pwd , '/Config/Population_validation_targets.xlsx'];
 fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
+
+disp('Remember to update fertility multipliers if calibrating!!!!');
+fertDeclineProp = [0.36055 ; 0.57528];
+fertility2 = fertility .* fertDeclineProp(1,1);
+fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
