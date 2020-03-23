@@ -14,10 +14,10 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-36incInitPop3-fixImmMult-clearAgeDist12-decFacts4-decMacts1-decCIN2reg-incCINprog_030920']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-noBaseScrn_030920']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-36incInitPop3-fixImmMult-clearAgeDist12-decFacts4-decMacts1-decCIN2reg-incCINprog_030920_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '24Feb20_noBaseVax_noBaseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-decFacts6---incCINprog-delta_030920_WHOP1_SCES012-test'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -299,7 +299,7 @@ end
 %% Simulation
 %profile on
 
-for n = 1 : nTests
+parfor n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);

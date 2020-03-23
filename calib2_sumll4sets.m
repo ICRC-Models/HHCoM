@@ -13,7 +13,7 @@ function calib2_sumll4sets(paramSetIdx , tstep_abc , date_abc)
 t_curr = tstep_abc;
 date = date_abc;
 
-createParamSet(tstep_abc , date_abc);
+%createParamSet(tstep_abc , date_abc);
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
@@ -23,7 +23,7 @@ parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
-paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr) , '_7867mod40' , '.dat']);
+paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr) , '_7867mod45' , '.dat']);
 nPrlSets = 1; %28; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);
