@@ -127,7 +127,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.665];
+    fertDeclineProp = [0.7 ; 0.66];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -157,7 +157,7 @@ if calibBool && any(1 == pIdx)
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 2;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 2.5;
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
