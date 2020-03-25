@@ -221,6 +221,7 @@ disp('Remember to update fertility multipliers if calibrating!!!!');
 fertDeclineProp = [0.36055 ; 0.57528];
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
+fertility4 = fertility3 .* 0.90;
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
