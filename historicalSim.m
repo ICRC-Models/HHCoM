@@ -91,6 +91,20 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
+%% Changes in sexual behavirs
+tspan = 1995 : 1 / stepsPerYear : 2005;
+partnersMmultStart = 1995;
+partnersMmultPlat = 2005;
+partnersMmultStartInd = round((partnersMmultStart - startYear) * stepsPerYear) + 1 ;
+partnersMmultInd = round((partnersMmultPlat - startYear) * stepsPerYear) + 1; 
+partnersMmultTarget = 2.5; %1-exp(-0.45); % Hypothetical HIV treatment rate
+partnersMmultInit = 5;
+d_partnersMmult = (partnersMmultTarget - partnersMmultInit) ./ (partnersMmultInd - partnersMmultStartInd);
+hpartnersMmult = zeros(length(tspan) , 1);
+hpartnersMmult(partnersMmultStartInd : end) = partnersMmultInd - partnersMmultStartInd;
+hpartnersMmult(partnersMmultStartInd : partnersMmultInd) = [0 : partnersMmultInd - partnersMmultStartInd];
+
+
 %% Screening
 screenAlgorithm = 1;
 screenAlgs{1} = baseline;
