@@ -275,6 +275,29 @@ legend('Model prediction' , 'SA estimates & projections (UN)' , 'Lower 95' , ...
     'Lower 80' , 'Upper 80' , 'Upper 95');
 ylim([0 8]);
 
+%% Population size by age over historical and future time
+figure()
+popProp = zeros(length(tVec),5);
+ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
+for aInd = 1 : length(ageVec)
+    a = ageVec{aInd};
+    ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+    totalInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+    popProp(:,aInd) = sum(vaxResult{noVaxInd}.popVec(: , ageInds) , 2) ./ ...
+        sum(vaxResult{noVaxInd}.popVec(: , totalInds) , 2);
+    
+    plot(tVec , popProp(:,aInd));
+    hold all;
+end
+title('Age distribution over time')
+xlabel('Year'); ylabel('Population proportion')
+xlim([1925 2125]);
+ylim([0 0.5]);
+grid on;
+legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
+
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
 %% HIV prevalence by gender over time vs. Africa Centre data
@@ -1151,31 +1174,6 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %     legend('HIV-' , 'HIV+ noART' , 'ART' )
 %     hold all;
 % end
-
-%% Population Size by age
-% figure()
-% for a = 1: age  
-%     subplot(4,4,a)
-%     % HIV-positive women not on ART
-%     hivNoART = toInd(allcomb(2 : 6 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : intervens , 2 , a , 1 : risk));
-%     % All HIV-negative women
-%     hivNeg = toInd(allcomb(1 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : intervens , ...
-%         2 , a , 1 : risk));
-%     % Women on ART
-%     art = toInd(allcomb(10 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : intervens , 2 , a , 1 : risk));
-%     genArray = {hivNoART , hivNeg , art};
-% 
-%     for i = 1 : length(genArray)
-%         plot(tVec , sum(vaxResult{2}.popVec(: , genArray{i}) , 2),'-')
-%         hold all;
-%     end
-%     title('Population Size')
-%     xlabel('Year'); ylabel('Individuals')
-%     xlim([1910 2200]);
-% end
-% legend('HIV+ , no ART' , 'HIV-' , 'HIV+ , ART');
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ***************************************************
 
