@@ -12,6 +12,7 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIV_mod , ...
+    d_partnersMmult, parntersMmultScale, partnersMmultInit, ...
     hivSus , toHiv , hivCurr)
 
 %% Initialize dPop and output vectors
@@ -102,6 +103,18 @@ end
 
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
+parntersMmultScale = interp1(tSpan , parntersMmultScale , t);
+hPartnersM = parntersMmultScale .* d_partnersMmult + partnersMmultInit;
+
+if year < 1995
+    partnersMmult = 5;
+elseif (year >= 1995) && (year < 2005)
+    partnersMmult = hPartnersM;
+elseif year >= 2005
+    partnersMmult = 2.5 ;
+end
+partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult;
+
 % males
 c(1 , : , :) = partnersM;
 % females
