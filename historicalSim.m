@@ -92,7 +92,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Changes in sexual behavirs
-tspan = 1995 : 1 / stepsPerYear : 2005;
+PartnersMtspan = 1995 : 1 / stepsPerYear : 2005;
 partnersMmultStart = 1995;
 partnersMmultPlat = 2005;
 partnersMmultStartInd = round((partnersMmultStart - startYear) * stepsPerYear) + 1 ;
@@ -100,11 +100,11 @@ partnersMmultInd = round((partnersMmultPlat - startYear) * stepsPerYear) + 1;
 partnersMmultTarget = 2.5; %1-exp(-0.45); % Hypothetical HIV treatment rate
 partnersMmultInit = 5;
 d_partnersMmult = (partnersMmultTarget - partnersMmultInit) ./ (partnersMmultInd - partnersMmultStartInd);
-hpartnersMmult = zeros(length(tspan) , 1);
-hpartnersMmult(partnersMmultStartInd : end) = partnersMmultInd - partnersMmultStartInd;
-hpartnersMmult(partnersMmultStartInd : partnersMmultInd) = [0 : partnersMmultInd - partnersMmultStartInd];
+hpartnersMmultscale = zeros(length(PartnersMtspan) , 1);
+hpartnersMmultscale(partnersMmultStartInd : end) = partnersMmultInd - partnersMmultStartInd;
+hpartnersMmultscale(partnersMmultStartInd : partnersMmultInd) = [0 : partnersMmultInd - partnersMmultStartInd];
 
-
+ 
 %% Screening
 screenAlgorithm = 1;
 screenAlgs{1} = baseline;
@@ -423,7 +423,7 @@ for i = iStart : length(s) - 1
         lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , ...
-        d_partnersMmult, parntersMmultScale, partnersMmultInit, tSpan, ...
+        d_partnersMmult, parntersMmultScale, partnersMmultInit, PartnersMtspan, ...
         hivSus , toHiv , hivCurr) , tspan , popIn);
     popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
