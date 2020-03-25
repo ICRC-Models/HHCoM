@@ -4,7 +4,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , fertility3 , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4 , ...
     mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
     yr , ...
     hivOn , betaHIV_mod , muHIV , kCD4 , ...
@@ -38,8 +38,9 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+    fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+    dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
@@ -124,6 +125,7 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
+fertility4 = fertility3 .* 0.90;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -239,10 +241,10 @@ if ~fivYrAgeGrpsOn
 
     % Replicate rates across single age groups for other variables
     vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'mue2' , 'mue3' , 'mue4' , ...
-        'fertility' , 'fertility2' , 'fertility3' , ...
+        'fertility' , 'fertility2' , 'fertility3' , 'fertility4' , ...
         'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
     vars5To1_vals = {riskDistM , riskDistF , mue , mue2 , mue3 , mue4 , ...
-        fertility , fertility2 , fertility3 , ...
+        fertility , fertility2 , fertility3 , fertility4 , ...
         partnersM , partnersF , maleActs , femaleActs};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
@@ -1389,6 +1391,55 @@ end
 hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
+%% Fertility by 2060
+
+% birth indices
+negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+negFemaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
+posMaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
+posFemaleBirth = toInd(allcomb(3 , 1 , 1 , 1 , 1 , 1 , 2 , 1 , 1));
+
+% fertility matrix for uninfected mothers
+% disp('Building fertility4 matrix for uninfected mothers')
+xInds = [];
+yInds = [];
+vals = [];
+for a = 1 : age
+    hivUninf = toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , ...
+        1 : intervens , 2 , a , 1 : risk));
+    hivPosArt = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , ...
+        1 : intervens , 2 , a , 1 : risk));
+    xInds = [xInds; ones(length(hivUninf),1).*negMaleBirth; ones(length(hivUninf),1).*negFemaleBirth; ...
+        ones(length(hivPosArt),1).*negMaleBirth; ones(length(hivPosArt),1).*negFemaleBirth];
+    yInds = [yInds; hivUninf; hivUninf; hivPosArt; hivPosArt];
+    vals = [vals; ones((length(hivUninf)*2+length(hivPosArt)*2),1) .* ( 0.5*fertility4(a,1) )];
+end
+fertMat4 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+
+% fertility matrix for infected mothers
+% disp('Building fertility3 matrix for HIV-infected mothers')
+xIndsPos = [];
+yIndsPos = [];
+valsPos = [];
+xIndsNeg = [];
+yIndsNeg = [];
+valsNeg = [];
+for d = 3 : 7 % hiv infected
+    for v = 1 : viral % hiv infected
+        for a = 1 : age
+            hivInfected = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+            xIndsPos = [xInds; ones(length(hivInfected),1).*posMaleBirth; ones(length(hivInfected),1).*posFemaleBirth];
+            yIndsPos = [yInds; hivInfected; hivInfected];
+            valsPos = [vals; ones((length(hivInfected)*2),1) .* ( 0.5*fertility4(a,d-1) )];
+            xIndsNeg = [xInds; ones(length(hivInfected),1).*negMaleBirth; ones(length(hivInfected),1).*negFemaleBirth];
+            yIndsNeg = [yInds; hivInfected; hivInfected];
+            valsNeg = [vals; ones((length(hivInfected)*2),1) .* ( 0.5*fertility4(a,d-1) )];
+        end
+    end
+end
+hivFertPosBirth4 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
+hivFertNegBirth4 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
+
 %% Fertility scale-down
 dFertPos1 = (hivFertPosBirth2 - hivFertPosBirth) ./ ((2000 - 1960) * stepsPerYear);
 dFertNeg1 = (hivFertNegBirth2 - hivFertNegBirth) ./ ((2000 - 1960) * stepsPerYear); 
@@ -1397,6 +1448,10 @@ dFertMat1 = (fertMat2 - fertMat) ./ ((2000 - 1960) * stepsPerYear);
 dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 2010) * stepsPerYear);
+
+dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2060 - 2020) * stepsPerYear);
+dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2060 - 2020) * stepsPerYear);
+dFertMat3 = (fertMat4 - fertMat3) ./ ((2060 - 2020) * stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
