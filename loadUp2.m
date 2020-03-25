@@ -156,8 +156,9 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
+    %partnersMmult = 5;
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* 2.5;
+    partnersM(4 , 2:3) = partnersM(4, 2:3);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
