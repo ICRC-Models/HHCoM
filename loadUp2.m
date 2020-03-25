@@ -1394,6 +1394,11 @@ dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 1990) * stepsPerYe
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 1990) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
+
+%% partnersM multiplier 
+d_partnersMmult = (5 - 2.5) ./ ((2005 - 1995) * stepsPerYear);
+
+
 %% Background death rate before 1950
 % disp('Building death matrix')
 
