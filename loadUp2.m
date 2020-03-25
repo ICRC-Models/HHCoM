@@ -157,9 +157,9 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    %partnersMmult = 5;
+    partnersMmult = 5;
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3);
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult;
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -1397,7 +1397,7 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 
 %% partnersM multiplier 
-d_partnersMmult = (5 - 2.5) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult = (2.5 - 5) ./ ((2005 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
