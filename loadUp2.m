@@ -3,7 +3,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
     annlz , ...
-    ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
+    ageSexDebut , mInit , fInit , partnersM , partnersF , partnersMmult, maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , ...
     mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
     yr , ...
@@ -157,9 +157,9 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    partnersMmult = 5;
+    partnersMmult = [4.5 5];
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult;
+    partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult(1);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -189,7 +189,7 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
-    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* 5.5;
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* partnersMmult(2);
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
@@ -1397,7 +1397,9 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 
 %% partnersM multiplier 
-d_partnersMmult = (2.5 - 5) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult = ones(1, 2);
+d_partnersMmult(1) = (1.5 - 4.5) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.5 - 5) ./ ((2005 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
