@@ -128,7 +128,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.7];
+    fertDeclineProp = [0.75 ; 0.65];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -1398,8 +1398,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 2);
-d_partnersMmult(1) = (1.5 - 4.5) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2.5 - 5) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.2 - 3.8) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.5 - 5.5) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
