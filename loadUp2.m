@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [2 4];
+partnersMmult = [3.5 5.5];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -160,7 +160,7 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult(1);
+    partnersM(4 , 2:3) = partnersM(4, 2:3); % .* partnersMmult(1);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -190,7 +190,7 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
-    partnersF(4 , 2: 3) = partnersF(4 , 2:3) .* partnersMmult(2);
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3); % .* partnersMmult(2);
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
@@ -1399,7 +1399,7 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 2);
-d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((1998 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.5 - partnersMmult(1)) ./ ((1998 - 1995) * stepsPerYear);
 d_partnersMmult(2) = (2.5 - partnersMmult(2)) ./ ((1998 - 1995) * stepsPerYear);
 
 
