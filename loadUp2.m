@@ -128,11 +128,12 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.65];
+    fertDeclineProp = [0.75 ; 0.68];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
+partnersMmult = [2.5 5];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -157,7 +158,7 @@ if calibBool && any(1 == pIdx)
     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
-    partnersMmult = [3.8 5.5];
+    
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
     partnersM(4 , 2:3) = partnersM(4, 2:3) .* partnersMmult(1);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
@@ -1398,8 +1399,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 2);
-d_partnersMmult(1) = (1.2 - 3.8) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2.5 - 5.5) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((1998 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.5 - partnersMmult(2)) ./ ((1998 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
