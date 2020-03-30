@@ -124,8 +124,8 @@ elseif year >= 1998
     partnersMmult(1) = 1.2;
     partnersMmult(2) = 2.5;
 end
-partnersM(4, 2:3) = partnersM(4, 2:3) .* partnersMmult(1);
-partnersF(4, 2:3) = partnersF(4, 2:3) .* partnersMmult(2);
+partnersM(4:5, 2:3) = partnersM(4:5, 2:3) .* partnersMmult(1);
+partnersF(4:5, 2:3) = partnersF(4:5, 2:3) .* partnersMmult(2);
 
 % males
 c(1 , : , :) = partnersM;
