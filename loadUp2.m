@@ -1399,8 +1399,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 2);
-d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1998 - 1993) * stepsPerYear);
-d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((1998 - 1993) * stepsPerYear);
+d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
