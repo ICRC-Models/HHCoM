@@ -89,15 +89,15 @@ deaths = deathMat * pop;
 
 %% Calculate males receiving neonatal circumcision
 circBirths = births * 0;
-if (year > circStartYear) && (year <= currYear)
+if (year > circStartYear) && (year <= 2007)
     circBirths = circMat * births;
-elseif (year > currYear) && (year <= 2030)
-    dt = (year - currYear) * stepsPerYear;
+elseif (year > 2007) && (year <= 2014)
+    dt = (year - 2007) * stepsPerYear;
     dCircMat = (circMat2 - circMat) ...
-        ./ ((2030 - currYear) * stepsPerYear);
+        ./ ((2014 - 2007) * stepsPerYear);
     circMat = circMat + dCircMat .* dt;
     circBirths = circMat * births;
-elseif year > 2030
+elseif year > 2014
     circBirths = circMat2 * births;
 end
 
