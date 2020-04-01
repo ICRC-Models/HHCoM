@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [3 5.2];
+partnersMmult = [4 6];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -764,7 +764,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.0] , [0.45; 0.0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0.0] , [0.2; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0.80; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
@@ -1399,8 +1399,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 2);
-d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.5 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.5 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
 
 
 %% Background death rate before 1950
@@ -1490,15 +1490,16 @@ vals = [ones(length(negCircMaleBirth),1) .* ( circ(1) ); ones(length(negMaleBirt
 circMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % disp('Circumcision matrix complete')
 
-%% Make circumcision matrix after 2030
-% disp('Building circumcision matrix after 2030')
+
+%% Make circumcision matrix after 2014
+% disp('Building circumcision matrix after 2014')
 
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 xInds = [negCircMaleBirth; negMaleBirth];
 yInds = [negMaleBirth; negMaleBirth];
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),1) .* ( -0.70 )];
+vals = [ones(length(negCircMaleBirth),1) .* ( circ(2) ); ones(length(negMaleBirth),1) .* ( -circ(2) )];
 circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% disp('Circumcision matrix after 2030 complete')
+% disp('Circumcision matrix after 2014 complete')
 
 toc
