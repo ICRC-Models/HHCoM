@@ -128,12 +128,12 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.62];
+    fertDeclineProp = [0.75 ; 0.60];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [3 6];
+partnersMmult = [3 5];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -765,7 +765,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
 
 % Protection from circumcision and condoms
 circProtect = [[circProtect; 0.0] , [0.2; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
-condProtect = [ones(gender,1).*condProtect , [0.80; 0.70]];    % HIV protection , HPV protection
+condProtect = [ones(gender,1).*condProtect , [0.70; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
 if calibBool && any(5 == pIdx);
