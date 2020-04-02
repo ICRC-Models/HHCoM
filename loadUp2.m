@@ -41,7 +41,8 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
+    circMat , circMat2 , circMat3 , circMat4 , circMat5] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -125,7 +126,7 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.90;
+fertility4 = fertility3 .* 1.0; %0.65;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -1529,26 +1530,28 @@ dDeathMat3 = (deathMat4 - deathMat3) ./ ((2020 - 2000) * stepsPerYear);
 %% Mortality rate scale-down during the years of ART for use in calculation of HIV-associated mortality on ART
 dMue = (mue4 - mue3) ./ ((2020 - 2000) * stepsPerYear);
 
-%% Make circumcision matrix before current year (use when circumcision begins in model)
+%% Make circumcision matrices
 % disp('Building circumcision matrix')
-
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
 xInds = [negCircMaleBirth; negMaleBirth];
 yInds = [negMaleBirth; negMaleBirth];
-vals = [ones(length(negCircMaleBirth),1) .* ( circ(1) ); ones(length(negMaleBirth),1) .* ( -circ(1) )];
+
+% By 2002
+vals = [ones(length(negCircMaleBirth),1) .* ( 0.188 ); ones(length(negMaleBirth),1) .* ( -0.188 )];
 circMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% disp('Circumcision matrix complete')
-
-%% Make circumcision matrix after 2030
-% disp('Building circumcision matrix after 2030')
-
-negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-xInds = [negCircMaleBirth; negMaleBirth];
-yInds = [negMaleBirth; negMaleBirth];
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),1) .* ( -0.70 )];
+% By 2008
+vals  = [ones(length(negCircMaleBirth),1) .* ( 0.208 ); ones(length(negMaleBirth),1) .* ( -0.208 )];
 circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% disp('Circumcision matrix after 2030 complete')
+% By 2012
+vals = [ones(length(negCircMaleBirth),1) .* ( 0.265 ); ones(length(negMaleBirth),1) .* ( -0.265 )];
+circMat3 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% By 2017
+vals = [ones(length(negCircMaleBirth),1) .* ( 0.44 ); ones(length(negMaleBirth),1) .* ( -0.44 )];
+circMat4 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% By 2030
+vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),1) .* ( -0.70 )];
+circMat5 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% disp('Circumcision matrix complete')
 
 toc
