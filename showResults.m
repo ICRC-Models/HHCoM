@@ -141,7 +141,7 @@ disp('Remember to update fertility multipliers if calibrating!!!!');
 fertDeclineProp = [0.36055 ; 0.57528];
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.90;
+fertility4 = fertility3 .* 1.0; %0.65;
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
@@ -371,6 +371,21 @@ grid on;
 %legend('Without ART dropout' , 'With ART dropout');
 % legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART
 % dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');1
+
+%% Proportion 0-4 HIV-negative males circumcised over time
+figure()
+circInds = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    1 : endpoints , 1 : intervens , 1 , 1 , 1 : risk));
+circPop = sum(popVec(: , circInds) , 2);
+hivNegInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+    1 : endpoints , 1 : intervens , 1 , 1 , 1 : risk));
+hivNegPop = sum(popVec(: , hivNegInds) , 2);
+circProp = 100 * circPop ./ hivNegPop;
+plot(tVec , circProp);
+xlabel('Year')
+ylabel('Proportion of HIV-Negative Males ages 0-4 Circumcised (%)')
+title('Circumcision Indicator')
+xlim([1980 2020]);
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
