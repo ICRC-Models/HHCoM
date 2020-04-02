@@ -21,7 +21,8 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
         dFertPos3 , dFertNeg3 , dFertMat3 , ...
         deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-        dDeathMat , dDeathMat2 , dDeathMat3 , circMat , circMat2 , ...
+        dDeathMat , dDeathMat2 , dDeathMat3 , ...
+        circMat , circMat2 , circMat3 , circMat4 , circMat5 , ...
         MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
@@ -96,16 +97,38 @@ deaths = deathMat * pop;
 
 %% Calculate males receiving neonatal circumcision
 circBirths = births * 0;
-if (year > circStartYear) && (year <= currYear)
+if (year > circStartYear) && (year <= 2002)
+    dt = (year - circStartYear) * stepsPerYear;
+    dCircMat = (circMat) ...
+        ./ ((2002 - circStartYear) * stepsPerYear);
+    circMat = dCircMat .* dt;
     circBirths = circMat * births;
-elseif (year > currYear) && (year <= 2030)
-    dt = (year - currYear) * stepsPerYear;
+elseif (year > 2002) && (year <= 2008)
+    dt = (year - 2002) * stepsPerYear;
     dCircMat = (circMat2 - circMat) ...
-        ./ ((2030 - currYear) * stepsPerYear);
+        ./ ((2008 - 2002) * stepsPerYear);
     circMat = circMat + dCircMat .* dt;
     circBirths = circMat * births;
+elseif (year > 2008) && (year <= 2012)
+    dt = (year - 2008) * stepsPerYear;
+    dCircMat = (circMat3 - circMat2) ...
+        ./ ((2012 - 2008) * stepsPerYear);
+    circMat = circMat2 + dCircMat .* dt;
+    circBirths = circMat * births;
+elseif (year > 2012) && (year <= 2017)
+    dt = (year - 2012) * stepsPerYear;
+    dCircMat = (circMat4 - circMat3) ...
+        ./ ((2017 - 2012) * stepsPerYear);
+    circMat = circMat3 + dCircMat .* dt;
+    circBirths = circMat * births
+elseif (year > 2017) && (year <= 2030)
+    dt = (year - 2017) * stepsPerYear;
+    dCircMat = (circMat5 - circMat4) ...
+        ./ ((2030 - 2017) * stepsPerYear);
+    circMat = circMat4 + dCircMat .* dt;
+    circBirths = circMat * births;
 elseif year > 2030
-    circBirths = circMat2 * births;
+    circBirths = circMat5 * births;
 end
 
 %% Aging and risk proportion redistribution
