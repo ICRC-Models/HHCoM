@@ -466,8 +466,8 @@ for a = 4 : 12
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     hpv2002(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , hpvInds))...
         ./ sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    hpv2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpv2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec(end , hpvInds))...
+        ./ sum(vaxResult{noVaxInd}.popVec(end , ageInds)) * 100;
     
     % HIV+
     hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
@@ -477,8 +477,8 @@ for a = 4 : 12
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     hpvHIV2002(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , hpvInds))...
         ./ sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    hpvHIV2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpvHIV2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec(end , hpvInds))...
+        ./ sum(vaxResult{noVaxInd}.popVec(end , ageInds)) * 100;
     
     % HIV-
     hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
@@ -488,8 +488,8 @@ for a = 4 : 12
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     hpvNeg2002(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , hpvInds))...
         ./ sum(vaxResult{noVaxInd}.popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    hpvNeg2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(vaxResult{noVaxInd}.popVec((2120 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpvNeg2120(a - 3 , 1) = sum(vaxResult{noVaxInd}.popVec(end , hpvInds))...
+        ./ sum(vaxResult{noVaxInd}.popVec(end , ageInds)) * 100;
 end
 
 % McDonald 2014
@@ -555,7 +555,7 @@ hpvNegObs(: , 3) = [0.67
 
 hpvHivObs = hpvHivObs * 100;
 hpvNegObs = hpvNegObs * 100;
-figure()
+figure();
 % plot(1 : length(hpv2002) , hpv2002 , 'o-')
 % hold all;
 plot(1 : length(hpvHIV2002) , hpvHIV2002 , 'o-');
