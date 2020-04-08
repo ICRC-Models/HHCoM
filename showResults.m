@@ -94,7 +94,7 @@ xlim([1950 2120]);
 legend('Model prediction' , 'KZN historical estimates (SSA)' , 'KZN future projections (UN & SSA)')
 hold off
 
-%% Population size by age over time vs. SSA data
+%% Population size by broad age groups over time vs. SSA data
 
 % Load calibration data from Excel
 file = [pwd , '/Config/Population_validation_targets.xlsx'];
@@ -132,6 +132,62 @@ legend('9-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
 %legend('Model 2019' , 'SSA KZN observed data 2019');
 %legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
 %    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
+
+%% Population size by 5-year age groups over time vs. SSA data
+
+% Load calibration data from Excel
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+years = xlsread(file , 'Demographics' , 'B91:F91');    % years
+kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
+
+popPropYrs = zeros(5,age);
+popPropYrs_obs = zeros(5,age);
+for y = 1 : length(years)
+    yearCurr = years(y);
+    for a = 1 : age
+        popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
+        popPropYrs(y,a) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
+
+        popPropYrs_obs(y,a) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(1 : end , y));
+    end
+end
+
+figure;
+subplot(1,3,1);
+plot(years , popPropYrs(: , 1:7));
+set(gca,'ColorOrderIndex',1)
+%set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
+hold on;
+plot(years , popPropYrs_obs(: , 1:7) , 'o');
+ylim([0.0 0.2]);
+ylabel('Population proportion by age'); xlabel('Year');
+legend('0-4, Model' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
+    '0-4, Observed' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
+    'Location' , 'EastOutside');
+
+subplot(1,3,2);
+plot(years , popPropYrs(: , 8:14));
+set(gca,'ColorOrderIndex',1)
+hold on;
+plot(years , popPropYrs_obs(: , 8:14) , 'o');
+ylim([0.0 0.1]);
+ylabel('Population proportion by age'); xlabel('Year');
+legend('35-39, Model' , '40-44' , '45-49' , '50-54' , '55-59' , '60-64' , '65-69' , ...
+    '35-39, Model' , '40-44' , '45-49' , '50-54' , '55-59' , '60-64' , '65-69' , ...
+    'Location' , 'EastOutside');
+
+subplot(1,3,3);
+plot(years , popPropYrs(: , 15:16));
+set(gca,'ColorOrderIndex',1)
+hold on;
+plot(years , popPropYrs_obs(: , 15:16) , 'o');
+ylim([0.0 0.025]);
+ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
+legend('70-74, Model' , '75-79' , '70-74, Observed' , '75-79' , ...
+    'Location' , 'EastOutside');
 
 %% Fertility over time vs. UN data
 % Load validation data from Excel (years, values)
@@ -373,18 +429,18 @@ grid on;
 % legend('Without ART dropout' , 'With ART dropout: 6.19%' , 'With ART
 % dropout: 11.8%' , 'With ART dropout: 11.8%, HIV mort on ART');1
 
-%% Proportion 0-4 HIV-negative males circumcised over time
+%% Proportion HIV-negative males circumcised over time by age group
 figure()
 circInds = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-    1 : endpoints , 1 : intervens , 1 , 1 , 1 : risk));
+    1 : endpoints , 1 : intervens , 1 , 4 , 1 : risk));
 circPop = sum(popVec(: , circInds) , 2);
 hivNegInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
-    1 : endpoints , 1 : intervens , 1 , 1 , 1 : risk));
+    1 : endpoints , 1 : intervens , 1 , 4 , 1 : risk));
 hivNegPop = sum(popVec(: , hivNegInds) , 2);
 circProp = 100 * circPop ./ hivNegPop;
 plot(tVec , circProp);
 xlabel('Year')
-ylabel('Proportion of HIV-Negative Males ages 0-4 Circumcised (%)')
+ylabel('Proportion of HIV-Negative Males ages 15-19 Circumcised (%)')
 title('Circumcision Indicator')
 xlim([1980 2020]);
 
