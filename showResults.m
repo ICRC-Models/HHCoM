@@ -148,7 +148,7 @@ for y = 1 : length(years)
         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
+            1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
         popPropYrs(y,a) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
 
         popPropYrs_obs(y,a) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(1 : end , y));
@@ -162,7 +162,7 @@ set(gca,'ColorOrderIndex',1)
 %set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
 hold on;
 plot(years , popPropYrs_obs(: , 1:7) , 'o');
-ylim([0.0 0.2]);
+ylim([0.05 0.15]);
 ylabel('Population proportion by age'); xlabel('Year');
 legend('0-4, Model' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
     '0-4, Observed' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
@@ -184,7 +184,7 @@ plot(years , popPropYrs(: , 15:16));
 set(gca,'ColorOrderIndex',1)
 hold on;
 plot(years , popPropYrs_obs(: , 15:16) , 'o');
-ylim([0.0 0.025]);
+ylim([0.0 0.02]);
 ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
 legend('70-74, Model' , '75-79' , '70-74, Observed' , '75-79' , ...
     'Location' , 'EastOutside');
