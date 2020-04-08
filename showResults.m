@@ -44,11 +44,11 @@ paramDir = [pwd , '\Params\'];
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2, circMat3] = loadUp2(1 , 0 , [] , [] , []);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , circMat , circMat2] = loadUp2(1 , 0 , [] , [] , []);
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_1Apr20_Ken.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_7Apr20_Ken_NoCircProtectHpvMen.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -316,6 +316,9 @@ title('HIV Prevalence by age in women')
 
 
 %% Circumcision prevalence among HIV-negative men 
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
 figure()
 circInds = toInd(allcomb(2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 :3 , 1 : risk));
@@ -2111,27 +2114,32 @@ legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
 % xlabel('Ages'); ylabel('Year'); zlabel('Population Size'); title('Population by Age')
 % 
 %% HIV incidence by age and gender
-% % figure()
-% % for a = 1 : age
-% %     subplot(9,9,a)
-% %     for r = 1 : risk
-% % %     for g = 1 : 2
-% %         hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-% %             1 : endpoints , 2 , a , r)); ...
-% %             toInd(allcomb(7 : 9 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-% %             1 : endpoints , 2 , a , r))];
-% %         hivSus = annlz(sum(popVec(1:end-1 , hivSusInds) , 2)) ./ stepsPerYear;
-% %         plot(tVec(1 : stepsPerYear : end-1) , ...
-% %             annlz(sum(sum(newHiv(1:end-1 , 2 , a , r) ...
-% %             , 3) , 4)) ./ hivSus * 100)
-% %         %axis([startYear , endYear , 0 , 100])
-% %         hold all
-% % %     end
-% %     end
-% %     xlabel('Year'); ylabel('Rate Per 100'); title('HIV Incidence: Females')
-% % end
-% % %legend('Male' , 'Female')
-% % legend('lr' , 'mr' , 'hr')
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+     '60-64' , '65-69' , '70-74' , '75-79'};
+figure()
+for a = 1 : age
+    subplot(4,4,a)
+   % for r = 1 : risk
+%     for g = 1 : 2
+        hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens, 2 , a , 1: risk)); ...
+            toInd(allcomb(7 : 9 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens, 2 , a , 1: risk))];
+        hivSus = annlz(sum(popVec(1:end-1 , hivSusInds) , 2)) ./ stepsPerYear;
+       % plot(tVec(1 : stepsPerYear : end-1) , ...
+        %    annlz(sum(newHiv(1:end-1 , 2 , a), 3)) ./ hivSus * 100000)
+         plot(tVec(1 : stepsPerYear : end-1) , ...
+              annlz(sum(sum(sum(sum(sum(newHiv(1:end-1 , : , : , : , 2 , a , :), 2), 3), 4), 6), 7)) ./ hivSus * 100)
+        %axis([startYear , endYear , 0 , 100])
+        hold all
+%     end
+  %  end
+    xlabel('Year'); ylabel('Rate Per 100'); title(['HIV incidence: Females ', ageGroup(a)])
+    xlim([1980 2020]);
+end
+%legend('Male' , 'Female')
+% title('HIV incidence')
 % 
 %% HPV incidence by gender
 % % figure()
