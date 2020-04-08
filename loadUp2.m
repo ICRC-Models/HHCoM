@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [3 5];
+partnersMmult = [3 5 2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -294,7 +294,7 @@ end
 hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 
 % Import from Excel HIV-associated death rate and CD4/VL transition rates
-% file = [pwd , '/Config/HIV_parameters.xlsx'];
+% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
 % muHIV = xlsread(file , 'Disease Data' , 'B20:G35');
 % kCD4male = xlsread(file , 'Disease Data' , 'C45:F60');
 % kCD4female = xlsread(file , 'Disease Data' , 'C62:F77');
@@ -764,7 +764,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.3] , [0.2; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0.3] , [0; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use
@@ -1398,9 +1398,11 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 
 %% partnersM multiplier 
-d_partnersMmult = ones(1, 2);
+d_partnersMmult = ones(1, 3);
 d_partnersMmult(1) = (1.5 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
 d_partnersMmult(2) = (2.5 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1999 - 1995) * stepsPerYear);
+
 
 
 %% Background death rate before 1950
