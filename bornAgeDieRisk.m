@@ -120,7 +120,7 @@ elseif (year > 2012) && (year <= 2017)
     dCircMat = (circMat4 - circMat3) ...
         ./ ((2017 - 2012) * stepsPerYear);
     circMat = circMat3 + dCircMat .* dt;
-    circBirths = circMat * births
+    circBirths = circMat * births;
 elseif (year > 2017) && (year <= 2030)
     dt = (year - 2017) * stepsPerYear;
     dCircMat = (circMat5 - circMat4) ...
