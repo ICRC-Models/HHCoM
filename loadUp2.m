@@ -13,12 +13,13 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
     c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
-    circ , condUse , screenYrs , hpvScreenStartYear , waning , ...
+    condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
-    artYr_vec , artM_vec , artF_vec , minLim , maxLim , hivStartYear , ...
-    circStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
-    circProtect , condProtect , MTCTRate , hyst , ...
-    OMEGA , ...
+    artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
+    circ_aVec , vmmcYr_vec , vmmc_vec , ...
+    hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
+    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
+    hyst , OMEGA , ...
     ccInc2011_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
@@ -33,16 +34,15 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     ccDisthpvNonVaxInds , cin1hpvVaxInds , cin2hpvVaxInds , cin3hpvVaxInds , ...
     cin1hpvNonVaxInds , cin2hpvNonVaxInds , cin3hpvNonVaxInds , normalhpvVaxInds , ...
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
-    infhpvNonVaxInds , ...
-    ageInd , riskInd , ...
+    infhpvNonVaxInds , ageInd , riskInd , ...
+    hivNegNonVMMCinds , hivNegVMMCinds , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
-    circMat , circMat2 , circMat3 , circMat4 , circMat5] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -756,17 +756,22 @@ end
 
 % Import from Excel HIV intervention parameters
 % file = [pwd , '/Config/HIV_parameters.xlsx'];
-% circ = xlsread(file , 'Protection' , 'B4:C4');
 % circProtect = xlsread(file , 'Protection' , 'B18');
 % condProtect = xlsread(file , 'Protection' , 'B19');
 % MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
 % artVScov = xlsread(file , 'Protection' , 'A33:C41');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
+% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
 %     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
-load([paramDir , 'hivIntParamsFrmExcel'] , 'circ' , 'circProtect' , ...
+load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
+
+% Intervention start years
+hivStartYear = 1980;
+circStartYear = 1960; % Year VMMC begins in ages 15-19
+circNatStartYear = 2010; % Year SA National VMMC program begins, older men circumcised
+vaxStartYear = 2014;
 
 % Protection from circumcision and condoms
 circProtect = [[circProtect; 0.0] , [0.30; 0.0]];    % HIV protection , HPV protection
@@ -808,10 +813,26 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
         artYr(i) : timeStep : artYr(i + 1));
 end
 
-% Intervention start years
-hivStartYear = 1980;
-circStartYear = 1990;
-vaxStartYear = 2014;
+% VMMC coverage
+vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2017; 2030];
+circ_aVec = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-29), (50+)
+vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960
+            0.10 0.13 0.0 0.0; ... % 2000
+            0.114 0.161 0.0 0.0; ... % 2008
+            0.143 0.201 0.14 0.12; ... % 2010
+            0.172 0.242 0.191 0.143; ... % 2012
+            0.459 0.42 0.318  0.204; ... % 2017 
+            0.70  0.70 0.70   0.70];   % 2030 [year x age group]
+vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
+vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
+for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
+    period = [vmmcYr(i) , vmmcYr(i + 1)];
+    xq = [vmmcYr(i) : timeStep : vmmcYr(i + 1)];
+    vmmcYr_vec{i} = interp1(period , vmmcYr(i : i + 1 , 1) , xq);
+    for aInd = 1 : length(circ_aVec)
+        vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
+    end
+end
 
 % Vaccination
 waning = 0;    % bool to turn waning on or off
@@ -1202,6 +1223,17 @@ for g = 1 : gender
     end
 end
 
+%% vmmc.m indices
+hivNegNonVMMCinds = zeros(age , hpvVaxStates * hpvNonVaxStates * intervens  * risk);
+hivNegVMMCinds = hivNegNonVMMCinds;
+for a = 1 : age
+    hivNegNonVMMCinds(a , :) = toInd(allcomb(1 , 1 , 1 : hpvVaxStates , ...
+        1 : hpvNonVaxStates , 1 , 1 : intervens , 1 , a , 1 : risk));
+    hivNegVMMCinds(a , :) = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , ...
+        1 : hpvNonVaxStates , 1 , 1 : intervens , 1 , a , 1 : risk));
+end
+
+
 
 
 
@@ -1529,29 +1561,5 @@ dDeathMat3 = (deathMat4 - deathMat3) ./ ((2020 - 2000) * stepsPerYear);
 
 %% Mortality rate scale-down during the years of ART for use in calculation of HIV-associated mortality on ART
 dMue = (mue4 - mue3) ./ ((2020 - 2000) * stepsPerYear);
-
-%% Make circumcision matrices
-% disp('Building circumcision matrix')
-negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-negCircMaleBirth = toInd(allcomb(2 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
-xInds = [negCircMaleBirth; negMaleBirth];
-yInds = [negMaleBirth; negMaleBirth];
-
-% By 2002
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.188 ); ones(length(negMaleBirth),1) .* ( -0.188 )];
-circMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% By 2008
-vals  = [ones(length(negCircMaleBirth),1) .* ( 0.208 ); ones(length(negMaleBirth),1) .* ( -0.208 )];
-circMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% By 2012
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.265 ); ones(length(negMaleBirth),1) .* ( -0.265 )];
-circMat3 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% By 2017
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.44 ); ones(length(negMaleBirth),1) .* ( -0.44 )];
-circMat4 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% By 2030
-vals = [ones(length(negCircMaleBirth),1) .* ( 0.70 ); ones(length(negMaleBirth),1) .* ( -0.70 )];
-circMat5 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
-% disp('Circumcision matrix complete')
 
 toc
