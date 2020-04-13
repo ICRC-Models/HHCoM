@@ -50,9 +50,9 @@ for aInd = 1 : ageGroups
         (sumall(pop(hivNegNonVMMCinds(a , :))) + sumall(pop(hivNegVMMCinds(a , :))));
     if vmmc_vec{periodInd , aInd}(ind) - fracVMMC > 10 ^ -6 % proportion medically circumcised is below target level
         vmmcCover = max(0 , (vmmc_vec{periodInd , aInd}(ind) - fracVMMC) ./ (1 - fracVMMC)); % cirucmcise enough HIV-negative men in age group to reach target
-        toCirc = vmmcCover .* pop(hivNegNonVMMCinds);
-        dPop(hivNegNonVMMCinds) = dPop(hivNegNonVMMCinds) - toCirc;
-        dPop(hivNegVMMCinds) = dPop(hivNegVMMCinds) + toCirc;
+        toCirc = vmmcCover .* pop(hivNegNonVMMCinds(a , :));
+        dPop(hivNegNonVMMCinds(a , :)) = dPop(hivNegNonVMMCinds(a , :)) - toCirc;
+        dPop(hivNegVMMCinds(a , :)) = dPop(hivNegVMMCinds(a , :)) + toCirc;
         hivNegCirc = hivNegCirc + sumall(toCirc);
     end
 end
