@@ -444,6 +444,30 @@ ylabel('Proportion of HIV-Negative Males ages 15-19 Circumcised (%)')
 title('Circumcision Indicator')
 xlim([1980 2020]);
 
+%% Proportion HIV-negative males circumcised by broad age groups over time
+ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-29), (50+)
+circProp = zeros(length(tVec) , length(ageVec));
+
+figure()
+for aInd = 1 : length(ageVec)
+    a = ageVec{aInd};
+    circInds = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+    circPop = sum(popVec(: , circInds) , 2);
+    hivNegInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+        1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+    hivNegPop = sum(popVec(: , hivNegInds) , 2);
+    circProp(: , aInd) = 100 * circPop ./ hivNegPop;
+end
+hold on;
+plot(tVec , circProp);
+xlabel('Year')
+ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
+title('Circumcision Indicator')
+xlim([1960 2020]);
+grid on;
+legend('0-4' , '15-19' , '20-24' , '25-29' , '50+');
+
 %% ********************************** HPV FIGURES **********************************************************************************************
 
 %% HPV Prevalence by age in 2002 vs. McDonald 2014 data
