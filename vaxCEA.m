@@ -430,7 +430,7 @@ grid on;
 ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-29), (50+)
 circProp = zeros(length(vaxResult{noVaxInd}.tVec) , length(ageVec));
 
-%figure()
+figure()
 for aInd = 1 : length(ageVec)
     a = ageVec{aInd};
     circInds = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -448,7 +448,7 @@ ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
 title('Circumcision Indicator')
 xlim([1980 2120]);
 grid on;
-%legend('0-4' , '15-19' , '20-24' , '25-29' , '50+');
+legend('0-4' , '15-19' , '20-24' , '25-29' , '50+');
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
