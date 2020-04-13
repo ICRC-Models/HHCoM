@@ -98,7 +98,7 @@ deaths = deathMat * pop;
 % Initialize dPop
 dPop = zeros(size(pop));
 
-% prospective population after accounting for births, deaths, and circumcision
+% prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
 
 for g = 1 : gender
@@ -212,7 +212,7 @@ for g = 1 : gender
     dPop(r3To) = dPop(r3To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3To);
 end
 
-% Account for births, deaths, circumcision, and aging
+% Account for births, deaths, and aging
 dPop = dPop + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
