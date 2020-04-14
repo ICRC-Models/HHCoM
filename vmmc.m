@@ -6,7 +6,7 @@
 % 1) dPop, a matrix of derivatives that describes the change in the
 % population's subgroups due to VMMC scale-up.
 
-function[dPop , extraOuts] = vmmc(t , pop , circStartYear , circNatStartYear , ...
+function[dPop , hivNegCirc] = vmmc(pop , circStartYear , circNatStartYear , ...
     vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
     ageSexDebut , year)
 
@@ -58,7 +58,5 @@ for aInd = 1 : ageGroups
 end
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
-extraOuts{1} = hivNegCirc;
-
 dPop = sparse(dPop);
 

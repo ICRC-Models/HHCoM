@@ -444,24 +444,9 @@ for i = iStart : length(s) - 1
         end
     end
     
-    % VOLUNTARY MALE MEDICAL CIRCUMCISION
-    % Scale-up of VMMC by age
-    if (year >= circStartYear)
-        [~ , pop , menCirc(i , :)] = ...
-            ode4xtra(@(t , pop) vmmc(t , pop , circStartYear , circNatStartYear , ...
-            vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
-            ageSexDebut , year) , tspan , popIn);
-        popIn = pop(end , :);
-        if any(pop(end , :) < 0)
-            disp('After vmmc')
-            break
-        end
-    end
-    
     % DEMOGRAPHY
     % Births
     % Mother-to-child HIV transmission
-    % Neonatal male circumcision
     % Aging and risk-group redistribution
     % Natural deaths
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
@@ -480,7 +465,21 @@ for i = iStart : length(s) - 1
     if any(pop(end , :) < 0)
         disp('After bornAgeDieRisk')
         break
-    end 
+    end
+    
+    % VOLUNTARY MALE MEDICAL CIRCUMCISION
+    % Scale-up of VMMC by age
+    if (year >= circStartYear)
+        [dPop , menCirc(i , :)] = vmmc(popIn , circStartYear , circNatStartYear , ...
+            vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
+            ageSexDebut , year);
+        pop(end , :) = pop(end , :) + dPop;
+        popIn = pop(end , :);
+        if any(pop(end , :) < 0)
+            disp('After vmmc')
+            break
+        end
+    end
     
     if ((year >= vaxStartYear) && (vaxRate > 0))
         % HPV VACCINATION
@@ -517,7 +516,7 @@ popVec = sparse(popVec); % compress population vectors
 
 %% Save results
 savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , [pathModifier , '_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge_033120']) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+save(fullfile(savdir , [pathModifier , '_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver_033120']) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...

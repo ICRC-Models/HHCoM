@@ -14,10 +14,10 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge_033120']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver_033120']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-decFacts6---incCINprog-delta-circByAge_033120_WHOP1_SCES012-test'; % ***SET ME***: name for simulation output file
+pathModifier = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-decFacts6---incCINprog-delta-circByAge-circAfterDemo-outSolver_033120_WHOP1_SCES012-test'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -443,20 +443,6 @@ parfor n = 1 : nTests
             end
         end
         
-        % VOLUNTARY MALE MEDICAL CIRCUMCISION
-        % Scale-up of VMMC by age
-        if (year >= circStartYear)
-            [~ , pop , menCirc(i , :)] = ...
-                ode4xtra(@(t , pop) vmmc(t , pop , circStartYear , circNatStartYear , ...
-                vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
-                ageSexDebut , year) , tspan , popIn);
-            popIn = pop(end , :);
-            if any(pop(end , :) < 0)
-                disp('After vmmc')
-                break
-            end
-        end
-        
         % Birth, aging, risk redistribution module
         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , ...
@@ -474,6 +460,20 @@ parfor n = 1 : nTests
         if any(pop(end , :) < 0)
             disp('After bornAgeDieRisk')
             break
+        end
+        
+        % VOLUNTARY MALE MEDICAL CIRCUMCISION
+        % Scale-up of VMMC by age
+        if (year >= circStartYear)
+            [dPop , menCirc(i , :)] = vmmc(popIn , circStartYear , circNatStartYear , ...
+                vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
+                ageSexDebut , year);
+            pop(end , :) = pop(end , :) + dPop;
+            popIn = pop(end , :);
+            if any(pop(end , :) < 0)
+                disp('After vmmc')
+                break
+            end
         end
         
         if (year >= vaxStartYear)
