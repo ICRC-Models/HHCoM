@@ -19,7 +19,7 @@ function vaxCEA(pathModifier)
     condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
-    circ_aVec , vmmcYr_vec , vmmc_vec , ...
+    circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
     baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
     hyst , OMEGA , ...
@@ -427,7 +427,10 @@ set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 grid on;
 
 %% Proportion HIV-negative males circumcised by broad age groups over time
-ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-29), (50+)
+circPropYr_obs = vmmcYr;
+circProp_obs = vmmcRate' .* 100;
+
+ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(vaxResult{noVaxInd}.tVec) , length(ageVec));
 
 figure()
@@ -441,14 +444,17 @@ for aInd = 1 : length(ageVec)
     hivNegPop = sum(vaxResult{noVaxInd}.popVec(: , hivNegInds) , 2);
     circProp(: , aInd) = 100 * circPop ./ hivNegPop;
 end
-hold on;
 plot(tVec , circProp);
+set(gca,'ColorOrderIndex',1)
+hold on;
+plot(circPropYr_obs , circProp_obs , 'o');
 xlabel('Year')
 ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
 title('Circumcision Indicator')
-xlim([1980 2120]);
+xlim([1960 2120]);
 grid on;
-legend('0-4' , '15-19' , '20-24' , '25-29' , '50+');
+legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
+    '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 

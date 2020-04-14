@@ -20,7 +20,7 @@ paramDir = [pwd , '\Params\'];
     condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
-    circ_aVec , vmmcYr_vec , vmmc_vec , ...
+    circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
     baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
     hyst , OMEGA , ...
@@ -101,9 +101,9 @@ file = [pwd , '/Config/Population_validation_targets.xlsx'];
 years = xlsread(file , 'Demographics' , 'B91:F91');    % years
 kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
 
-ageGroup = {'9-14' , '15-24' , '25-34' , '35-49' , '50-74'};
-popPropYrs = zeros(5,5);
-popPropYrs_obs = zeros(5,5);
+ageGroup = {'10-14' , '15-24' , '25-34' , '35-49' , '50-74'};
+popPropYrs = zeros(length(tVec) , 6);
+popPropYrs_obs = zeros(5 , 5);
 ageVec = {3 , [4:5] , [6:7] , [8:10] , [11:15]};
 for y = 1 : length(years)
     yearCurr = years(y);
@@ -113,22 +113,23 @@ for y = 1 : length(years)
             1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 1 : gender , 3 : 15 , 1 : risk));
-        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
+        popPropYrs(:,aInd) = sum(popVec(: , popAge),2) ./ sum(popVec(: , popTot),2);
 
         popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
     end
 end
 
 figure;
-plot(years , popPropYrs);
+plot(tVec , popPropYrs);
 set(gca,'ColorOrderIndex',1)
 %set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
 hold on;
 plot(years , popPropYrs_obs , 'o');
 ylim([0.1 0.3]);
+xlim([1995 2020]);
 ylabel('Population proportion'); xlabel('Year'); title('KZN age distribution in broad groups');
-legend('9-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
-    '9-14, Observed' , '15-24' , '25-34' , '35-49' , '50-74' , 'Location' , 'EastOutside');
+legend('10-14, Model' , '15-24' , '25-34' , '35-49' , '50-74' , ...
+    '10-14, Observed' , '15-24' , '25-34' , '35-49' , '50-74' , 'Location' , 'EastOutside');
 %legend('Model 2019' , 'SSA KZN observed data 2019');
 %legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
 %    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
@@ -445,7 +446,10 @@ title('Circumcision Indicator')
 xlim([1980 2020]);
 
 %% Proportion HIV-negative males circumcised by broad age groups over time
-ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-29), (50+)
+circPropYr_obs = vmmcYr;
+circProp_obs = vmmcRate' .* 100;
+
+ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(tVec) , length(ageVec));
 
 figure()
@@ -459,14 +463,17 @@ for aInd = 1 : length(ageVec)
     hivNegPop = sum(popVec(: , hivNegInds) , 2);
     circProp(: , aInd) = 100 * circPop ./ hivNegPop;
 end
-hold on;
 plot(tVec , circProp);
+set(gca,'ColorOrderIndex',1)
+hold on;
+plot(circPropYr_obs , circProp_obs , 'o');
 xlabel('Year')
 ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
 title('Circumcision Indicator')
-xlim([1960 2020]);
+xlim([1960 2030]);
 grid on;
-legend('0-4' , '15-19' , '20-24' , '25-29' , '50+');
+legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
+    '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
