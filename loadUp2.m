@@ -52,7 +52,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1925;
+startYear = 1955;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
