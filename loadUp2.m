@@ -751,12 +751,11 @@ end
 
 %Import from Excel HIV intervention parameters
 file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-circ = xlsread(file , 'Protection' , 'B4:C4');
 circProtect = xlsread(file , 'Protection' , 'B18');
 condProtect = xlsread(file , 'Protection' , 'B19');
 MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
 artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circ' , 'circProtect' , ...
+save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
@@ -805,20 +804,19 @@ end
 
 % Intervention start years
 hivStartYear = 1980;
-circStartYear = 1988;
+circStartYear = 1960;
 circNatStartYear = 2008;
 vaxStartYear = 2014;
 
 % VMMC coverage
-vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2017; 2030];
-circ_aVec = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
-vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960
-            0.10 0.13 0.0 0.0; ... % 2000
-            0.114 0.161 0.0 0.0; ... % 2008
-            0.143 0.201 0.14 0.12; ... % 2010
-            0.172 0.242 0.191 0.143; ... % 2012
-            0.459 0.42 0.318  0.204; ... % 2017 
-            0.70  0.70 0.70   0.70];   % 2030 [year x age group]
+vmmcYr = [circStartYear; 2003; 2007; 2012; 2014; 2030];
+circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
+vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1960
+            0.2998 0.5047 0.4604 0.309825 0.2240865 0.192258; ... % 2003
+            0.402 0.548 0.453 0.348 0.335 0.31; ... % 2007
+            0.526 0.718 0.69 0.493 0.391 0.445; ... % 2012
+            0.718 0.727 0.709 0.538 0.5175 0.456; ... % 2014 
+            0.80 0.80 0.80 0.80 0.8 0.8];   % 2030 [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
