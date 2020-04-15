@@ -48,13 +48,16 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_7Apr20_Ken_NoCircProtectHpvMen.mat']) %change from pathModifier to file name
+load([resultsDir , 'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b.mat']) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 
+%% excel output file 
+filename = [pwd, '\Calibration_comparison.xlsx'];
+%% 
 %% Population size by gender
 % figure()
 % mInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -91,18 +94,28 @@ historicalPop0_79(:,2) = xlsread(file , 'Demographics' , 'B97:P97') .* 1000; % e
 futurePop(:,1) = xlsread(file , 'Demographics' , 'B101:Q101'); % years
 futurePop(:,2) = xlsread(file , 'Demographics' , 'B102:Q102') .* 1000; % projections
 
-figure()
-plot(tVec , totalPop0_79 , '-');
-hold all;
-plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
-hold all;
-plot(futurePop(:,1) , futurePop(:,2) , 'o');
-title('Kenya Population Size Ages 0-79')
-xlabel('Year'); ylabel('Individuals')
-xlim([1920 2120]);
-legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
-    'Location', 'Northwest')
-hold off
+% figure()
+% plot(tVec , totalPop0_79 , '-');
+% hold all;
+% plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
+% hold all;
+% plot(futurePop(:,1) , futurePop(:,2) , 'o');
+% title('Kenya Population Size Ages 0-79')
+% xlabel('Year'); ylabel('Individuals')
+% xlim([1920 2120]);
+% legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
+%     'Location', 'Northwest')
+% hold off
+
+sheet = ['population'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year', 'Model pop', 'UN pop'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', totalPop0_79(1 : stepsPerYear * 5 : end)], sheet, 'A3')
+xlswrite(filename, [historicalPop0_79(:, 2)], sheet,'C8')
+xlswrite(filename, [futurePop(:, 1)], sheet,'A23')
+xlswrite(filename, [futurePop(:, 2)], sheet,'C23')
 
 %% Population size by age vs. validation data
 
@@ -131,27 +144,34 @@ for y = 1 : length(years)
     end
 end
 
-figure;
-plot(years , popPropYrs);
-newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
-colororder();
-%set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
-hold on;
-plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o', ...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 7) , 'o', ...
-    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 8) , 'o');
-colororder()
-ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
-legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
-    '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs', ...
-    'Location', 'NorthEastOutside');
-%legend('Model 2019' , 'SSA KZN observed data 2019');
-%legend('Model 1919' , 'SSA KZN observed data 2019' , 'Model 1960' , ...
-%    'SSA KZN observed data 2019' ,'Model 1990' , 'SSA KZN observed data 2019' ,'Model 2019' , 'SSA KZN observed data 2019');
+% figure;
+% plot(years , popPropYrs);
+% newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
+% colororder();
+% %set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
+% hold on;
+% plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o', ...
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 7) , 'o', ...
+%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 8) , 'o');
+% colororder()
+% ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
+% legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
+%     '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs', ...
+%     'Location', 'NorthEastOutside');
+
+sheet = ['Pop_by_Age'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year','0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
+    '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [years(1: 5 : end)', popPropYrs(1 : 5 : end, :)], sheet, 'A3')
+xlswrite(filename, [popPropYrs_obs(:, 2:8)], sheet, 'I3')
+
 
 %% Fertility
 % Load validation data from Excel (years, values)
@@ -211,6 +231,16 @@ legend('Model' , 'UN estimates (Kenya)' , 'Lower 95' , ...
 ylim([0 10]);
 xlim([1920 2100]);
 
+
+sheet = ['Fertility'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year', 'Model', 'Year', 'UN', 'Lower 95', 'Lower 80', 'Upper 80', 'Upper 95'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [fertilityVec(1:5:end, :)], sheet, 'A3')
+xlswrite(filename, [fertilityVal], sheet, 'C8')
+
+
 %% HIV prevalence vs. HIV data by year
 % Total HIV positive
 hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
@@ -219,19 +249,22 @@ hivPop = sum(popVec(: , hivInds) , 2);
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
     1 : endpoints , 1 : intervens , 1 : 2 , 4 : 10 , 1 : risk));
 art = sum(popVec(: , artInds) , 2);
-% % Compared to ANC data
+popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+    1 : intervens , 1 : 2 , 4 : 10 , 1 : risk)));
+hivPrev = (hivPop + art) ./ sum(popTot , 2) * 100;
+
+% Compared to ANC data
 HIV_ANC_Kisumu(1 , :) = [1990 1991 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2008 2010 2011 ] ;
 HIV_ANC_Kisumu(2 , :) = [18 18 19 19 29 24 26 32 27 25 33 29 26 26 11.2 15.1 18.5 16.9 18.5 15.5];
 % 
-% % Compared to National AIDS Control Council (Kenya)
+% Compared to National AIDS Control Council (Kenya)
 HIV_Kenya_spectrum(1, :) = [1983 1987 1990 1994 1999 2003 2007 2011 2015 2019];
 HIV_Kenya_spectrum(2, :) = [0.002 0.0209 0.1233 0.2431 0.2302 0.171 0.1372 0.1419 0.1456 0.1252 ] .* 100;
 % 
 % 
 figure()
-popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-    1 : intervens , 1 : 2 , 4 : 10 , 1 : risk)));
-plot(tVec , (hivPop + art) ./ sum(popTot , 2) * 100 , HIV_ANC_Kisumu(1 , :) , HIV_ANC_Kisumu(2 , :) , '*', ...
+
+plot(tVec , hivPrev , HIV_ANC_Kisumu(1 , :) , HIV_ANC_Kisumu(2 , :) , '*', ...
     HIV_Kenya_spectrum(1, :), HIV_Kenya_spectrum(2, :), 'o')
 hold on 
 % yPosError = abs(upper_prevVal - prevVal);
@@ -240,15 +273,31 @@ hold on
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
 legend('Model' , 'ANC data (Kisumu)', 'Spectrum data (Nyanza)')
 xlim([1980 2020])
+ylim([0, 40])
 
+%
+sheet = ['HIV_prev'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year', 'Model', 'Year', 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [tVec(331:stepsPerYear:end)', hivPrev(331:stepsPerYear:end) ], sheet, 'A3')
+xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
+xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
 
 %% HIV prevalance, all ages by gender
 figure()
 hivObsGender = zeros(4,3)
-
 hivObsGender(:,3) = [1998 2003 2007 2008]; 
 hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
 hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
+
+sheet = ['HIV_prev_by_sex'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year', 'Model - male', 'Year', 'Model - female', 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk));
@@ -259,16 +308,24 @@ for g = 1 : 2
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk)); 
     hivPop = sum(popVec(: , hivInds) , 2);
     allPop = sum(popVec(: , allInds) , 2);
-    plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+    hivPrev_sex =  100 * (hivPop + artPop) ./ allPop;
+    plot(tVec , hivPrev_sex)
     hold on
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
+    cell1 = ['A', 'C'];
+    cell = ([cell1(g) +'3']);
+    xlswrite(filename, [tVec(331:stepsPerYear:end)', hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
 xlabel('Year')
 xlim([1980 2020])
 ylabel('Prevalence')
 title('HIV Prevalence (aged 14-59)')
 legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS')
+
+xlswrite(filename, [hivObsGender(:, 3), hivObsGender(:, 1:2)], sheet, 'E3')
+
+
 %% HIV prevalence overall
 figure()
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -287,7 +344,7 @@ ylabel('Prevalence')
 xlim([1980 2020])
 title('HIV Prevalence (aged 14-59)')
 
-%% HIV prevalence overall
+%% HIV prevalence by age group
 figure()
 
 years = 1980:2020;
@@ -459,21 +516,52 @@ hold all;
     grid on;
     
 
+sheet = ['HIV_prev_by_age'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Age group', 'Male (1998)', 'Female (1998)', ' Male (Kisumu 1998)', 'Female (Kisumu 1998)', ...
+    'Male (2003)', 'Female (2003)', 'Female (DHS 2003)', 'Female - LB (DHS 2003)', 'Female - UB (DHS 2003)',...
+    'Male (DHS 2003)', 'Male - LB (DHS 2003)', 'Male - UB (DHS 2003)',...
+    'Male (2008)', 'Female (2008)', 'Female (DHS 2008)', 'Female - LB (DHS 2008)', 'Female - UB (DHS 2008)',...
+    'Male (DHS 2008)', 'Male - LB (DHS 2008)', 'Male - UB (DHS 2008)'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, ageGroup(4:10)', sheet, 'A3')
+xlswrite(filename, [hiv1998], sheet, 'B3')
+xlswrite(filename, [Glynn1998_Kisumu], sheet, 'D3')
+xlswrite(filename, [hiv2003], sheet, 'F3')
+xlswrite(filename, [DHS2003_Nyanza], sheet, 'H3')
+xlswrite(filename, [hiv2008], sheet, 'N3')
+xlswrite(filename, [DHS2008_Nyanza], sheet, 'P3')
+
 %% HIV mortality by age
-% figure()
-% bar(tVec , squeeze(hivDeaths(:,2,:)) , 'stacked')
-% xlim([1980 2020])
-% xlabel('Year'); ylabel('Deaths'); title('Female HIV-associated Deaths')
-% legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
-%     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthWest')
-% figure()
-% bar(tVec , bsxfun(@rdivide , squeeze(hivDeaths(:,2,:)) , sum(popVec , 2)) .* 100, 'stacked')
-% xlim([1980 2020])
-% xlabel('Year'); ylabel('Deaths relative to population (%)'); title('Female HIV-associated Deaths')
-% legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
-%     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthWest')
+figure()
+subplot(2, 1, 1)
+plot(tVec , squeeze(hivDeaths(:,2, 4:10)) )
+xlim([1980 2020])
+xlabel('Year'); ylabel('Deaths'); title('Female HIV-associated Deaths, 15-49')
+legend('15 - 19' , '20 -24' , '25 - 29' ,...
+    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , 'Location' , 'NorthEastOutside')
+subplot(2,1, 2)
+plot(tVec , bsxfun(@rdivide , squeeze(hivDeaths(:,2,4:10)) , sum(popVec , 2)) .* 100)
+xlim([1980 2020])
+xlabel('Year'); ylabel('Deaths relative to population (%)'); title('Female HIV-associated deaths, 15-49')
+legend('15 - 19' , '20 -24' , '25 - 29' ,...
+    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , 'Location' , 'NorthEastOutside')
+
+
+figure()
+subplot(2, 1, 1)
+plot(tVec , squeeze(hivDeaths(:,2, 11:16)) )
+xlim([1980 2020])
+xlabel('Year'); ylabel('Deaths'); title('Female HIV-associated Deaths, 50+')
+legend('50 - 54' , '55 - 59' , ...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthEastOutside')
+subplot(2,1, 2)
+plot(tVec , bsxfun(@rdivide , squeeze(hivDeaths(:,2,11:16)) , sum(popVec , 2)) .* 100)
+xlim([1980 2020])
+xlabel('Year'); ylabel('Deaths relative to population (%)'); title('Female HIV-associated Deaths, 50+')
+legend('50 - 54' , '55 - 59' , ...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79' , 'Location' , 'NorthEastOutside')
 
 %% Relative HIV prevalence for untreated and on ART
 figure()
@@ -760,6 +848,7 @@ for g = 1 : gender
     hpvPop = sum(popVec(: , hpvInds) , 2);
     popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk)));
+    genPopHPV = 100 * hpvPop ./ sum(popTot , 2);
     % HIV+
     hpvHivInds = unique([toInd(allcomb(3 : 7 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
         1 , 1 : intervens , g , 4 : age , 1 : risk)); toInd(allcomb(3 : 7 , 1 : viral , ...
@@ -767,6 +856,7 @@ for g = 1 : gender
     hpvHivPop = sum(popVec(: , hpvHivInds) , 2);
     popHivTot = popVec(: , toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk)));
+    hivPosHPV = 100 * hpvHivPop ./ sum(popHivTot , 2);
     %ART
     hpvArtInds = unique([toInd(allcomb(8 , 6 , 2 : 5 , [1 : 5 , 7] , ...
         1 , 1 : intervens , g , 4 : age , 1 : risk)); toInd(allcomb(8 , 6 , ...
@@ -774,6 +864,7 @@ for g = 1 : gender
     hpvArtPop = sum(popVec(: , hpvArtInds) , 2);
     popArtTot = popVec(: , toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk)));
+    artHPV =  100 * hpvArtPop ./ sum(popArtTot , 2);
     %HIV-
     hpvHivNegInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
         1 , 1 : intervens , g , 4 : age , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
@@ -781,17 +872,30 @@ for g = 1 : gender
     hpvHivNegPop = sum(popVec(: , hpvHivNegInds) , 2);
     popHivNegTot = popVec(: , toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : age , 1 : risk)));
+    hivNegHPV = 100 * hpvHivNegPop ./ sum(popHivNegTot , 2);
 
     subplot(2 , 1 , g)
-    plot(tVec , 100 * hpvPop ./ sum(popTot , 2))
+    plot(tVec , genPopHPV)
     hold on
-    plot(tVec , 100 * hpvHivNegPop ./ sum(popHivNegTot , 2))
-    plot(tVec , 100 * hpvHivPop ./ sum(popHivTot , 2))
-    plot(tVec , 100 * hpvArtPop ./ sum(popArtTot , 2))
+    plot(tVec , hivNegHPV)
+    plot(tVec , hivPosHPV)
+    plot(tVec , artHPV)
     %axis([tVec(1) tVec(end) 0 100])
     % axis([-inf inf 0 min(max(hpvPop./sum(popTot , 2) * 100) + 10 , 100)])
     xlabel('Year'); ylabel('Prevalence (%)'); title([genders{g} , ' HPV Prevalence (ages 15+)'])
-    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthEast')
+    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
+
+sheet = ['hpvPrev'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Year', [genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
+xlswrite(filename, cols1, sheet, 'A1')
+cell = ['A', 'F'];
+
+xlswrite(filename, cols2, sheet, [cell(g) +'2'])
+xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', genPopHPV(1 : stepsPerYear * 5 : end), ...
+    hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
+    artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
+
 end
 
 %% HPV Prevalence by age in 2005 vs. Yamada and Luchter data
@@ -880,20 +984,6 @@ plot(1 : length(hpvNeg2005) , hpvNeg2005 , 'o-')
 hold all;
 set(gca , 'xtickLabel' , ageGroup);
 
-% % general
-% yPosError = abs(hrHpvObs(: , 3) - hrHpvObs(: , 1));
-% yNegError = abs(hrHpvObs(: , 2) - hrHpvObs(: , 1));
-% errorbar(1 : length(hrHpvObs) , hrHpvObs(: , 1) , yNegError , yPosError , 'rs')
-% HIV+
-% yPosError = abs(hpvHivObs(: , 3) - hpvHivObs(: , 1));
-% yNegError = abs(hpvHivObs(: , 2) - hpvHivObs(: , 1));
-% errorbar(1 : length(hpvHivObs) , hpvHivObs(: , 1) , yNegError , yPosError , 'bs')
-% hold all;
-% %HIV-
-% yPosError = abs(hpvNegObs(: , 3) - hpvNegObs(: , 1));
-% yNegError = abs(hpvNegObs(: , 2) - hpvNegObs(: , 1));
-% errorbar(1 : length(hpvNegObs) , hpvNegObs(: , 1) , yNegError , yPosError , 'rs')
-
 plot(1 : length(hpvHivObs) , hpvHivObs(: ,1) , '*--')
 plot(1 : length(hpvHivObs) , hpvHivObs(: ,2) , '+--')
 plot(1 : length(hpvHivObs) , hpvHivObs(: ,3) , '+--')
@@ -905,7 +995,14 @@ legend('Model HIV-pos' , 'Model HIV-neg' ,...
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence in women by HIV status (2005)')
 ylim([0 100])
-%title('Age Specific hrHPV Prevalence in 2002')
+
+sheet = ['HPV_prev_by_age_2005'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
+cols2 = {'Age', 'Model HIV+', 'Model HIV-', 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, ageGroup(1:9)', sheet, 'A3')
+xlswrite(filename, [hpvHIV2005, hpvNeg2005, hpvHivObs], sheet, 'B3')
 
 %% Age specific HPV prevalence data 
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
@@ -931,7 +1028,7 @@ end
 
 % DeVuyst, 2003 (data collected 1998-2000)
 % Gen pop, prevalence
-hpvHivObs(: , 1) = [NaN
+hpvHivObs2(: , 1) = [NaN
 NaN
 0.414
 0.277
@@ -942,7 +1039,7 @@ NaN
 NaN];
 
 % HIV+ 
-hpvHivObs(: , 2) = [NaN
+hpvHivObs2(: , 2) = [NaN
 NaN
 0.613
 0.535
@@ -952,26 +1049,31 @@ NaN
 NaN
 NaN];
 
-hpvHivObs = hpvHivObs * 100;
+hpvHivObs2 = hpvHivObs2 * 100;
 % hpvNegObs = hpvNegObs * 100;
 figure()
 plot(1 : length(hpv2000) , hpv2000 , 'o-')
 hold all;
-% plot(1 : length(hpvHIV2002) , hpvHIV2002 , 'o-');
-% hold all;
-% plot(1 : length(hpvNeg2002) , hpvNeg2002 , 'o-')
-% hold all;
 set(gca , 'xtickLabel' , ageGroup);
 
-plot(1 : length(hpvHivObs) , hpvHivObs(: ,1) , '*--')
+plot(1 : length(hpvHivObs2) , hpvHivObs2(: ,1) , '*--')
 %plot(1 : length(hpvHivObs) , hpvHivObs(: ,2) , '+--')
 
-set(gca , 'xtick' , 1 : length(hpvHivObs) , 'xtickLabel' , ageGroup);
+set(gca , 'xtick' , 1 : length(hpvHivObs2) , 'xtickLabel' , ageGroup);
 legend('Model General pop' ,...
     'Obs gen pop: DeVuyst (Nairobi, 2000)')
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence among women in 2000')
 ylim([0 100])
+%%
+sheet = ['HPV_prev_by_age_2000'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b','HPV prevalence among women in 2000'};
+cols2 = {'Age', 'Model Gen Pop', 'DeVuyst gen pop', 'DeVuyst HIV+'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, ageGroup(1:9)', sheet, 'A3')
+xlswrite(filename, [hpv2000, hpvHivObs2], sheet, 'B3')
+
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
 yearPrev = 2008;
@@ -1004,183 +1106,24 @@ smithHPV = zeros(4,1);
 smithHPV(:, 1) = [0.353 NaN NaN NaN ];
 
 figure()
-subplot(2,1,1)
+
 plot([1 : length(ageVec)] , hpv_hivM2008(: , 1)' , 'b-');
 hold all;
-plot([1 : length(ageVec)] , hpv_hivM2008_dObs(: , 2)' .* 100 , 'bo');
-set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup2);
-legend('Model' , 'Mbulawa 2008 (Cape Town)');
-xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); 
-title('HPV prevalence in 2008 among HIV+ men');
-ylim([0 100]);
-
-subplot(2,1,2)
 plot([1 : length(ageVec)] , hpv_hivM2008(: , 2)' , 'r-')
+hold all;
+plot([1 : length(ageVec)] , hpv_hivM2008_dObs(: , 2)' .* 100 , 'bo');
 hold all;
 plot([1 : length(ageVec)] , hpv_hivMNeg2008_dObs(: , 2)' .* 100 , 'ro', ...
     [1 : length(ageVec)] , smithHPV(: , 1)' .* 100, '*');
 set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup2);
-legend('Model' , 'Mbulawa 2008 (Cape Town)', 'Smith 2010 (Kisumu)');
+legend('HIV+ Model', 'HIV- Model', 'HIV+ Mbulawa 2008 (Cape Town)', ...
+    'HIV- Mbulawa 2008 (Cape Town)', 'HIV- Smith 2010 (Kisumu)');
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); 
-title('HPV prevalence in 2008 among HIV- men');
+title('HPV prevalence in 2008 men by HIV status');
 ylim([0 100]);
 
-%% HPV prevalence by HIV status over time vs. Mbulawa data
-% figure()
-% popGen = sum(popVec(: , popGenInd) , 2);
-% popHiv = sum(popVec(: , popHivInd) , 2);
-% popNeg = sum(popVec(: , popNegInd) , 2);
-% hpvHivPos = sum(popVec(: , hpvHivPosInd) , 2) ./ popHiv * 100;
-% hpvHivNeg = sum(popVec(:, hpvHivNegInd) , 2) ./ popNeg * 100;
-% genHpv = sum(popVec(: , genHpvInd) , 2) ./ popGen * 100; 
-% plot(tVec , genHpv)
-% hold on
-% plot(tVec , hpvHivPos)
-% hold on
-% plot(tVec , hpvHivNeg)
-% hold on
-% % plot([tVec(1) , tVec(end)] , [kzn_HpvData(1 , 1) , kzn_HpvData(1 , 1)] , 'r-'); 
-% plot(tVec , ones(length(tVec) , 1) .* kzn_HpvData(1 , 1) , 'r-')
-% hold on
-% plot(tVec , ones(length(tVec) , 1) .* kzn_HpvData(2 , 1) , 'b-')
-% hold on
-% plot(tVec , ones(length(tVec) , 1) .* kzn_HpvData(3 , 1) , 'c-')
-% xlabel('Year'); ylabel('HPV Prevalence'); title('HPV Prevalence by HIV Status')
-% legend('General Population' , 'HIV+' , 'HIV-' , 'Mbulawa (General)' , ...
-%     'Mbulawa (HIV+)' , 'Mbulawa (HIV-)' , 'location' , 'NorthEastOutside')
-% 
-%% CIN2/3 prevalence by HIV status, HPV type, and age in 2002 vs. McDonald 2014 data and Firnhaber data
-% cinPos2002 = zeros(hpvTypeGroups - 1 , 10);
-% cinNeg2002 = cinPos2002;
-% ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
-%     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
-%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-% %aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
-% %for aInd = 1 : 13
-% for a = 4 : 13 % note, age group 4 is 17-19 in the data
-%     %a = aVec{aInd};
-%     % HIV-positive (on and not on ART)
-%     cinInds_vax = toInd(allcomb(3 : 8 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
-%         1 , 1 : intervens , 2 , a , 1 : risk));
-%     cinInds_nonVax = toInd(allcomb(3 : 8 , 1 : viral , [1 : 3 , 7] , 4 : 5 , ...
-%         1 , 1 : intervens , 2 , a , 1 : risk));
-%     ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-%     cinPos2002(1 , a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinInds_vax)))...
-%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-%     cinPos2002(2 , a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinInds_nonVax)))...
-%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-%     % HIV-negative
-%     cinNegInds_vax = toInd(allcomb(1 : 2 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
-%         1 , 1 : intervens , 2 , a , 1 : risk));
-%     cinNegInds_nonVax = toInd(allcomb(1 : 2 , 1 : viral , [1 : 3 , 7] , 4 : 5 , ...
-%         1 , 1 : intervens , 2 , a , 1 : risk));
-%     ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-%     cinNeg2002(1 , a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinNegInds_vax)))...
-%         ./ (sum(popVec((2002 - startYear) * stepsPerYear , ageNegInds))) * 100;
-%     cinNeg2002(2 , a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinNegInds_nonVax)))...
-%         ./ (sum(popVec((2002 - startYear) * stepsPerYear , ageNegInds))) * 100;
-% end
-% 
-% % McDonald 2014
-% cinPosAct(: , 1) = [0.125
-% 0.054
-% 0.128
-% 0.154
-% 0.081
-% 0.054
-% 0.079
-% 0.071
-% 0.077
-% 0.077]; % mean
-% 
-% cinPosAct(: , 2) = [0.03
-% 0.02
-% 0.09
-% 0.10
-% 0.05
-% 0.02
-% 0.02
-% 0.00
-% 0.00
-% 0.00
-% ]; % lb
-% 
-% cinPosAct(: , 3) = [0.22
-% 0.08
-% 0.17
-% 0.21
-% 0.11
-% 0.09
-% 0.14
-% 0.17
-% 0.22
-% 0.22]; % ub
-% 
-% %figure()
-% hold all;
-% subplot(2 , 1 , 1)
-% cinPosAct = cinPosAct .* 100; % convert to %
-% yPosError = abs(cinPosAct(: , 3) - cinPosAct(: , 1));
-% yNegError = abs(cinPosAct(: , 2) - cinPosAct(: , 1));
-% plot(1 : length(cinPos2002) , cinPos2002 ,'ko-')
-% hold on
-% errorbar(1 : length(cinPosAct) , cinPosAct(: , 1) , yNegError , yPosError , 'rs')
-% %legend('9v' , 'non-9v' , 'McDonald 2014')
-% legend('HIV-Positive (year 2002)' , 'Observed HIV-Positive: McDonald 2014' , 'HIV-Positive, 9v (year 2002)' , 'HIV-Positive, non-9v (year 2002)')
-% set(gca , 'xtick' , 1 : length(cinPosAct) , 'xtickLabel' , ageGroup);
-% xlabel('Age Group'); ylabel('CIN2/3 Prevalence (%)')
-% title('HIV-Positive')
-% ylim([0 25])
-% 
-% cinNegAct(: , 1) = [0.016
-% 0.027
-% 0.021
-% 0.036
-% 0.029
-% 0.031
-% 0.031
-% 0.021
-% 0.014
-% 0.014]; % mean
-% 
-% cinNegAct(: , 2) = [0.00
-% 0.02
-% 0.01
-% 0.02
-% 0.02
-% 0.02
-% 0.02
-% 0.01
-% 0.00
-% 0.00]; % lb
-% 
-% cinNegAct(: , 3) = [0.03
-% 0.04
-% 0.03
-% 0.05
-% 0.04
-% 0.04
-% 0.04
-% 0.03
-% 0.03
-% 0.03]; % ub
-% 
-% subplot(2 , 1 , 2)
-% cinNegAct = cinNegAct .* 100; % convert to %
-% plot(1 : length(cinNeg2002) , cinNeg2002 , 'ko-')
-% hold on
-% yPosError = abs(cinNegAct(: , 3) - cinNegAct(: , 1));
-% yNegError = abs(cinNegAct(: , 2) - cinNegAct(: , 1));
-% errorbar(1 : length(cinNegAct) , cinNegAct(: , 1) , yNegError , yPosError , 'rs')
-% %legend('9v' , 'non-9v' , 'McDonald 2014')
-% legend('HIV-Negative (year 2002)' , 'Observed HIV-Negative: McDonald 2014' , 'HIV-Negative, 9v (year 2002)' , 'HIV-Negative, non-9v (year 2002)')
-% set(gca , 'xtick' , 1 : length(cinNegAct) , 'xtickLabel' , ageGroup);
-% xlabel('Age Group'); ylabel('CIN2/3 Prevalence (%)')
-% title('HIV-Negative')
-% ylim([0 25])
-%%  CIN Prevalence among HIV+ Women
+
+%%  CIN Prevalence by HIV stat among women
 
 cinHiv_ccScreen = [0.18	0.105 0.089] .* 100; % Observed, HIV+, Nairobi, Memiah, 2013
 cinHiv_ccScreen2 = [33.1 10.5 12.8]; %Observed, HIV clinic, De Vuyst 2013
@@ -1190,7 +1133,6 @@ cinHIV_FSW2 = [17.9 NaN 11.9]; %Observed, HIV+ FSW, Nairobi, Njagi 2013
 cinNeg_FSW2 = [9.0 NaN 1.88]; %Observed, HIV- FSW, Nairobi, Njagi 2013
 cinHiv2010 = zeros(3 , 1);
 cinHivNeg2010 = cinHiv2010;
-aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 
 for cin = 3 : 5
         % HIV+
@@ -1224,7 +1166,6 @@ end
 %             ./ (sum(popVec((2017 - startYear) * stepsPerYear , ageInds)) + sum(popVec((2017 - startYear) * stepsPerYear , ageArtInds)))* 100;
 % end
 
-
 figure()
 cinGroup = {'CIN 1' , 'CIN 2' , 'CIN 3'};
 plot(1 : length(cinHiv2010) , cinHiv2010 , 'o-' , 1 : length(cinHiv2010), cinHivNeg2010, 'o-')
@@ -1242,6 +1183,18 @@ legend('Model HIV+' , 'Model HIV-', 'HIV+ screening pop (Memiah)', 'HIV+ screeni
 title('CIN Prevalence by HIV status in 2010')
 text(2.2, -3.25, 'Note: All observed data are from Nairobi')
 %annotation('textbox', [0, 0, 0.5, 0.1], 'string', 'All observed data are from Nairobi')
+
+
+sheet = ['CIN_prev_by_HIV_2010'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b', 'CIN Prevalence by HIV status in 2010'};
+cols2 = {'CIN grade', 'Model HIV+', 'Model HIV-', 'HIV+ screening pop (Memiah)',...
+    'HIV+ screening pop (DeVuyst)', ...
+    'HIV+ FSW (Sweet)', 'HIV- FSW (Sweet)', 'HIV+ FSW (Njagi)', 'HIV- FSW (Njagi)'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, cinGroup', sheet, 'A3')
+xlswrite(filename, [cinHiv2010, cinHivNeg2010, cinHiv_ccScreen',cinHiv_ccScreen2',...
+    cinHIV_FSW', cinNeg_FSW', cinHIV_FSW2', cinNeg_FSW2'], sheet, 'B3')
  
 %% CIN2/3 prevalence for All HR HPV types combined by age in 2000 vs. deVuyst 2003 data
 cin1Pos2000 = zeros(10 , 1);
@@ -1310,9 +1263,19 @@ plot(1 : length(cinPosAct) , cinPosAct(: , 2), '+--')
 legend('Model CIN 1', 'Model CIN 2/3' , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3')
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
-title('Age Specific CIN Prevalence among all women in 2000')
+title('Age specific CIN prevalence among all women in 2000')
 ylim([0 30])
 % 
+
+sheet = ['CIN_prev_by_age_2000'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
+    'Age specific CIN prevalence among all women in 2000'};
+cols2 = {'Age', 'Model CIN 1', 'Model CIN 2/3' , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, ageGroup', sheet, 'A3')
+xlswrite(filename, [cin1Pos2000, cin3Pos2000, cinPosAct], sheet, 'B3')
+
 
 %% HPV prevalence by age and gender over time
 % % hivAge = zeros(age , length(tVec));
@@ -1640,7 +1603,6 @@ for a = 1 : age
     end
 end
 
-
 % Nairobi and Eldoret cancer registion 2007-2011 (N), 2008-2011 (E), and
 % 2004-2008 (N)
 ken_canreg =[1		2	0
@@ -1673,11 +1635,6 @@ for y = 1 : length(ccIncYears)
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence by age in ' num2str(ccIncYear)]);
        legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-11' , 'Eldoret 2008-11' )
-   % legend('General' , 'HIV-' , 'HIV+' , 'ART')% , 'Combined SA: upper bound' , 'Combined SA: lower bound' , 'NCR KZN (2011)')
-    % legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
-    %     'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
-    %     'Location' , 'NorthEastOutside')
-
 %     figure()
 %     bar(1 : length(ccNegPosArt(: , : , y)) , ccNegPosArt(: , : , y), 'stacked')
 %     xlabel('Age Group'); ylabel('Incidence per 100,000')
@@ -1685,6 +1642,16 @@ for y = 1 : length(ccIncYears)
 %     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
 %     legend('HIV-' , 'HIV+' , 'ART')
 end
+
+sheet = ['CC_inc_by_age_2009'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
+    'Cervical Cancer Incidence by age in 2009'};
+cols2 = {'Age', 'General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-11' , 'Eldoret 2008-11'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, ageGroup', sheet, 'A3')
+xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtRel], sheet, 'B3')
+xlswrite(filename, [ken_canreg], sheet, 'F6')
 
 %% Cervical cancer incidence over time
 fScale = 10^5;
@@ -1788,6 +1755,19 @@ xlim([1970 2020]);
 legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...
     'Location', 'NorthWest')
 
+%%
+sheet = ['CC_inc'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
+    'Cervical Cancer Incidence'};
+cols2 = {'Year', 'General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART',...
+    'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [tVec(1: stepsPerYear :end-1)' , ccAgeRel', ccAgeNegRel', ccAgePosRel',...
+    ccArtRel'], sheet, 'A3')
+xlswrite(filename, [gbd_cc], sheet, 'F68')
+xlswrite(filename, globocan_Ken, sheet, 'J86')
+
 
 %% CC incidence over time (age-standardized)
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
@@ -1797,15 +1777,20 @@ linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290,
 % worldStandard_WP2015 = [325428 (311262/5.0) 295693 287187 291738 299655 272348 ...
 %         247167 240167 226750 201603 171975 150562 113118 82266 64484];
 worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
-        247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
-        23477 9261 2155];
+        247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 23477 9261 2155];
+sheet = ['CC_inc_standardized'];
+cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
+    'Age-standardized cervical cancer incidence'};
+cols2 = {'Year', 'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all',...
+    'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [tVec(1: stepsPerYear :end-1)'] , sheet, 'A3')
 
 figure();
-
-for i = 1 : length(inds)
-   
+for i = 1 : length(inds)  
     ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
-           
+          
     for aInd = 1 : age + 4
         if aInd >= age
             a = age;
@@ -1814,17 +1799,15 @@ for i = 1 : length(inds)
         end
        
         % General
-        allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+        allF = toInd(allcomb(1 : disease, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
             1 , 1 : intervens , 2 , a , 1 : risk));
         % All HIV-negative women
-        hivNeg = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
+        hivNeg = toInd(allcomb(1 : 2, 1 : viral, [1 : 5 , 7], [1 : 5 , 7], 1, 1 : intervens, 2, a, 1 : risk));
         % HIV-positive women not on ART
-        hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
+        hivNoARTF = toInd(allcomb(3 : 7, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
+            1, 1 : intervens, 2, a, 1 : risk));
         % Women on ART
-        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
+        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , 1 : intervens , 2 , a , 1 : risk));
         % All HIV-positive women
         hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
             1 , 1 : intervens , 2 , a , 1 : risk));
@@ -1847,13 +1830,16 @@ for i = 1 : length(inds)
             ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
         end
         ccIncRefVec = ccIncRefVec + ccIncRef;
-
     end
    
     ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
  
     plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
     hold all;
+    
+    cell = ['B':'F'];
+    xlswrite(filename, ccInc', sheet, [cell(i) +'3'])
+
 end
     errorbar(gbd_cc(:, 1) , gbd_cc(:, 2), gbd_cc(:, 2) - gbd_cc(: , 3), ...
     gbd_cc(:, 4)-gbd_cc(: , 2))
@@ -1869,6 +1855,9 @@ end
     xlim([1925 2020]);
     %ylim([0 150]);
     
+xlswrite(filename, [gbd_cc], sheet, 'G68')
+xlswrite(filename, globocan_Ken, sheet, 'K86')
+
     
 %% CC Cumulative Probability of Incidence- early years
 % % ccIncYears = [1980,1990,2000,2010];
@@ -2117,27 +2106,30 @@ legend('0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 -24' , '25 - 29' ,...
 ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
      '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
      '60-64' , '65-69' , '70-74' , '75-79'};
+sex = {'males ', 'females '};
+ for g = 1 : gender
 figure()
 for a = 1 : age
     subplot(4,4,a)
    % for r = 1 : risk
 %     for g = 1 : 2
         hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens, 2 , a , 1: risk)); ...
+            1 : endpoints , 1 : intervens, g , a , 1: risk)); ...
             toInd(allcomb(7 : 9 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens, 2 , a , 1: risk))];
+            1 : endpoints , 1 : intervens, g , a , 1: risk))];
         hivSus = annlz(sum(popVec(1:end-1 , hivSusInds) , 2)) ./ stepsPerYear;
        % plot(tVec(1 : stepsPerYear : end-1) , ...
         %    annlz(sum(newHiv(1:end-1 , 2 , a), 3)) ./ hivSus * 100000)
          plot(tVec(1 : stepsPerYear : end-1) , ...
-              annlz(sum(sum(sum(sum(sum(newHiv(1:end-1 , : , : , : , 2 , a , :), 2), 3), 4), 6), 7)) ./ hivSus * 100)
+              annlz(sum(sum(sum(sum(sum(newHiv(1:end-1 , : , : , : , g , a , :), 2), 3), 4), 6), 7)) ./ hivSus * 100)
         %axis([startYear , endYear , 0 , 100])
         hold all
 %     end
   %  end
-    xlabel('Year'); ylabel('Rate Per 100'); title(['HIV incidence: Females ', ageGroup(a)])
+    xlabel('Year'); ylabel('Rate Per 100'); title(['HIV incidence: ', sex(g), ageGroup(a)])
     xlim([1980 2020]);
 end
+ end
 %legend('Male' , 'Female')
 % title('HIV incidence')
 % 
