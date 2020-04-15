@@ -807,7 +807,7 @@ hivStartYear = 1980;
 circStartYear = 1960;
 circNatStartYear = 2008;
 vaxStartYear = 2014;
-
+%%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2007; 2012; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
@@ -827,7 +827,7 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
         vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
     end
 end
-
+%%
 % Vaccination
 waning = 0;    % bool to turn waning on or off
 
