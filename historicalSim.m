@@ -317,7 +317,7 @@ disp(' ')
 % progressbar('Simulation Progress')
 
 for i = iStart : length(s) - 1
-    year = startYear + s(i) - 1;
+    year = startYear + s(i) - 1
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
 %   currStep = round(s(i) * stepsPerYear);
