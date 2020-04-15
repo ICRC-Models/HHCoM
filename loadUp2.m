@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [3 5 2];
+partnersMmult = [1.9 4.5 1.5];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -775,7 +775,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = 0.25; %changed from 20%
+        condUse = 0; %changed from 20%
     end
 end
 
@@ -805,7 +805,7 @@ end
 
 % Intervention start years
 hivStartYear = 1980;
-circStartYear = 1990;
+circStartYear = 1988;
 vaxStartYear = 2014;
 
 % Vaccination
@@ -821,7 +821,7 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
 baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
@@ -1399,8 +1399,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.5 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2.5 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.0 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1999 - 1995) * stepsPerYear);
 
 
