@@ -19,8 +19,8 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
         hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
         dFertNeg2 , dFertMat2 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-        dDeathMat , dDeathMat2 , dDeathMat3 , circMat , circMat2 , ...
-        MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
+        dDeathMat , dDeathMat2 , dDeathMat3 , ...
+        MTCTRate  , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 
@@ -87,26 +87,13 @@ elseif (year >= 2020)
 end
 deaths = deathMat * pop;
 
-%% Calculate males receiving neonatal circumcision
-circBirths = births * 0;
-if (year > circStartYear) && (year <= 2007)
-    circBirths = circMat * births;
-elseif (year > 2007) && (year <= 2014)
-    dt = (year - 2007) * stepsPerYear;
-    dCircMat = (circMat2 - circMat) ...
-        ./ ((2014 - 2007) * stepsPerYear);
-    circMat = circMat + dCircMat .* dt;
-    circBirths = circMat * births;
-elseif year > 2014
-    circBirths = circMat2 * births;
-end
 
 %% Aging and risk proportion redistribution
 % Initialize dPop
 dPop = zeros(size(pop));
 
-% prospective population after accounting for births, deaths, and circumcision
-prosPop = pop + circBirths + births + hivBirths + deaths;
+% prospective population after accounting for births, and deaths
+prosPop = pop + births + hivBirths + deaths;
 
 for g = 1 : gender
     for a = 2 : age
@@ -219,8 +206,8 @@ for g = 1 : gender
     dPop(r3To) = dPop(r3To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3To);
 end
 
-% Account for births, deaths, circumcision, and aging
-dPop = dPop + circBirths + births + hivBirths + deaths;
+% Account for births, deaths, and aging
+dPop = dPop + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = abs(deaths);
