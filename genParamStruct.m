@@ -4,20 +4,20 @@ function [paramsAll] = genParamStruct()
 numParams = 37;
 paramsAll = cell(numParams,1);
 % partnersM, [age x risk], (hr range by age, mr % of hr, lr % of mr)
-paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 8; ... %1 %24;
-    paramsAll{1}.lb = [1.0; 8.0; 5.0; 7.5; 5.0; 0.1; 0.04; 0.02]; %ones(paramsAll{1}.length,1).*0.2; 
+paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 7; ... %1 %24;
+    paramsAll{1}.lb = [8.0; 5.0; 7.5; 5.0; 0.1; 0.04; 0.02]; %ones(paramsAll{1}.length,1).*0.2; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.01; ones(paramsAll{1}.length*(1/3),1).*0.01; ...
 		% ones(paramsAll{1}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{1}.ub = [36.0; 48.0; 39.0; 30.0; 20.0; 10.0; 0.30; 0.70]; %ones(paramsAll{1}.length,1).*5.0; 
+    paramsAll{1}.ub = [48.0; 39.0; 30.0; 20.0; 10.0; 0.30; 0.70]; %ones(paramsAll{1}.length,1).*5.0; 
         %[ones(paramsAll{1}.length*(1/3),1).*0.99; ones(paramsAll{1}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{1}.length*(1/3),1).*60.0]; %15;
 
 % partnersF, [age x risk], (hr range by age, mr % of hr, lr % of mr)
-paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 8; ... %1 %24;
-    paramsAll{2}.lb = [1.0; 7.0; 7.0; 6.0; 5.0; 0.4; 0.04; 0.02]; %ones(paramsAll{2}.length,1).*0.2; 
+paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 7; ... %1 %24;
+    paramsAll{2}.lb = [7.0; 7.0; 6.0; 5.0; 0.4; 0.04; 0.02]; %ones(paramsAll{2}.length,1).*0.2; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.01; ones(paramsAll{2}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{2}.length*(1/3),1).*0.5]; ... %0.1;
-    paramsAll{2}.ub = [36.0; 48.0; 35.0; 39.0; 14.0; 10.0; 0.60; 0.70]; %ones(paramsAll{2}.length,1).*5.0; 
+    paramsAll{2}.ub = [48.0; 35.0; 39.0; 14.0; 10.0; 0.60; 0.70]; %ones(paramsAll{2}.length,1).*5.0; 
         %[ones(paramsAll{2}.length*(1/3),1).*0.99; ones(paramsAll{2}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{2}.length*(1/3),1).*60.0]; %15;
 
@@ -47,18 +47,22 @@ paramsAll{7}.name = 'epsR'; paramsAll{7}.length = 1; ... %3
     paramsAll{7}.ub = ones(paramsAll{7}.length,1);
 
 % maleActs, [3:age x risk], (lr 1 to 90, mr 1-99% of lr, hr 1-99% of mr) 
-paramsAll{8}.name = 'maleActs'; paramsAll{8}.length = 1; ... %42; 
-    paramsAll{8}.lb = ones(paramsAll{8}.length,1).*0.2; %[ones(paramsAll{8}.length*(1/3),1).*1.0; ones(paramsAll{8}.length*(1/3),1).*0.01; ...
-                    % ones(paramsAll{8}.length*(1/3),1).*0.01]; ... %0.1;
-    paramsAll{8}.ub = ones(paramsAll{8}.length,1).*2.0; %[ones(paramsAll{8}.length*(1/3),1).*90.0; ones(paramsAll{8}.length*(1/3),1).*0.99; ...
-                    % ones(paramsAll{8}.length*(1/3),1).*0.99]; %15;
+paramsAll{8}.name = 'maleActs'; paramsAll{8}.length = 2; ... %1 %42; 
+    paramsAll{8}.lb = [0.8; 1.1]; %ones(paramsAll{8}.length,1).*0.2; 
+        %[ones(paramsAll{8}.length*(1/3),1).*1.0; ones(paramsAll{8}.length*(1/3),1).*0.01; ...
+        % ones(paramsAll{8}.length*(1/3),1).*0.01]; ... %0.1;
+    paramsAll{8}.ub = [0.8; 1.1]; %ones(paramsAll{8}.length,1).*2.0; 
+        %[ones(paramsAll{8}.length*(1/3),1).*90.0; ones(paramsAll{8}.length*(1/3),1).*0.99; ...
+        % ones(paramsAll{8}.length*(1/3),1).*0.99]; %15;
 
 % femaleActs, [3:age x risk], (lr 1 to 90, mr 1-99% of lr, hr 1-99% of mr)
-paramsAll{9}.name = 'femaleActs'; paramsAll{9}.length = 1; ... %42; ...
-    paramsAll{9}.lb = ones(paramsAll{9}.length,1).*0.2; %[ones(paramsAll{9}.length*(1/3),1).*1.0; ones(paramsAll{9}.length*(1/3),1).*0.01; ...
-                    % ones(paramsAll{9}.length*(1/3),1).*0.01]; ... %0.1;
-    paramsAll{9}.ub = ones(paramsAll{9}.length,1).*2.0; %[ones(paramsAll{9}.length*(1/3),1).*90.0; ones(paramsAll{9}.length*(1/3),1).*0.99; ...
-                    % ones(paramsAll{9}.length*(1/3),1).*0.99]; %15;
+paramsAll{9}.name = 'femaleActs'; paramsAll{9}.length = 5; ... %1 %42; ...
+    paramsAll{9}.lb = [39.80; 39.30; 28.10; 27.30; 26.35]; %ones(paramsAll{9}.length,1).*0.2; 
+        %[ones(paramsAll{9}.length*(1/3),1).*1.0; ones(paramsAll{9}.length*(1/3),1).*0.01; ...
+        % ones(paramsAll{9}.length*(1/3),1).*0.01]; ... %0.1;
+    paramsAll{9}.ub = [139.30; 137.55; 98.35; 95.55; 92.23]; %ones(paramsAll{9}.length,1).*2.0; 
+        %[ones(paramsAll{9}.length*(1/3),1).*90.0; ones(paramsAll{9}.length*(1/3),1).*0.99; ...
+        % ones(paramsAll{9}.length*(1/3),1).*0.99]; %15;
 
 % perPartnerHpv_vax, [1 x 1], (0.001 to 1.0)
 paramsAll{10}.name = 'perPartnerHpv_vax'; paramsAll{10}.length = 1; ...
