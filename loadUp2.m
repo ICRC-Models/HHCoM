@@ -186,14 +186,23 @@ end
 if calibBool && any(9 == pIdx)
     idx = find(9 == pIdx);
     femaleActs = zeros(age , risk);
-    femaleActsmult = paramSet(paramsSub{idx}.inds(:));
+    %femaleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
     femaleActs(1:2 , 1:risk) = zeros(2 , risk);
     %femaleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    femaleActs(3:age , 1:risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+    %femaleActs(3:age , 1:risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+    femaleActs(4:6 , 1) = paramSet(paramsSub{idx}.inds(1:3));
+    femaleActs(3 , 1) = femaleActs(4 , 1) .* 0.5;
+    femaleActs(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(4));
+    femaleActs(10:age , 1) = ones(7,1).(paramSet(paramsSub{idx}.inds(5));
+    femaleActs(3 , 2) = 0.6 .* femaleActs(3 , 1);
+    femaleActs(3 , 3) = 0.6 .* femaleActs(3 , 2);
+    for a = 4 : age
+        femaleActs(a , 2:3) = (femaleActs(a , 1)/femaleActs(a-1 , 1)) .* femaleActs(a-1 , 2:3);
+    end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 , 1:risk) = femaleActs(3 , 1:risk) .* 5.1; 
@@ -215,15 +224,18 @@ end
 % Male acts per partnership per year by age and risk group
 if calibBool && any(8 == pIdx)
     idx = find(8 == pIdx);
-    maleActs = zeros(age , risk);
-    maleActsmult = paramSet(paramsSub{idx}.inds(:));
+    maleActs = femaleActs;
+    %maleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    maleActs(1:2 , 1:risk) = zeros(2 , risk);
+    %maleActs(1:2 , 1:risk) = zeros(2 , risk);
     %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+    %maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+    maleActs(4:5 , 1:risk) = maleActs(4:5 , 1:risk) .* 0.80;
+    maleActs(3 , 1:risk) = maleActs(4 , 1:risk) .* 0.50;
+    maleActs(6:10 , 1:risk) = maleActs(6:10 , 1:risk) .* 1.10;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs = femaleActs;
