@@ -2,7 +2,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=24Feb20
+DATE=16Apr20
 echo "${DATE}"
 export DATE
 
@@ -22,9 +22,9 @@ for i in $(seq 1 5 ${LENGTH28}); do
     for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once 
         SETIDX=${SEQ28all[$j]}
                 export SETIDX
-                sbatch -p csde -A csde slurm_batch.sbatch #--qos=MaxJobs4
+                sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
     done
-    sleep 7200    # give submitted simulations time to finish 
+    sleep 10800    # give submitted simulations time to finish 
 done
 
 : <<'END'
@@ -44,17 +44,17 @@ while [ ! -z "$RERUN" ]; do
              SETIDX=${SEQ28all[$j]}
              if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
                  export SETIDX
-                 sbatch -p csde -A csde slurm_batch.sbatch #--qos=MaxJobs4
+                 sbatch -p csde -A csde slurm_batch.sbatch --qos=MaxJobs4
                  INT=$(($INT + 1))
              fi
         done
 	if [ $INT -ge 5 ]; then 
-            sleep 7200    # give submitted simulations time to finish 
+            sleep 10800    # give submitted simulations time to finish 
 	    INT=0
 	fi
     done
     if [ $INT -gt 0 ] && [ $INT lt 5 ]; then
-        sleep 7200    # give submitted simulations time to finish 
+        sleep 10800    # give submitted simulations time to finish 
     fi
 
     echo "Running MATLAB script to identify failed simulations, again."

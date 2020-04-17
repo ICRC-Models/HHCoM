@@ -11,8 +11,9 @@
 #SBATCH --nodes=1   		 		                 # Node resources
 #SBATCH --mem=185G   		                         # Memory per node
 #SBATCH --time=06:00:00 	                         # Wall clock time limit hrs:min:sec
+#SBATCH --qos=MaxJobs4
 
-pwd; hostname; date  #--qos=MaxJobs4
+pwd; hostname; date
 
 echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
 echo "${SETIDX}" 

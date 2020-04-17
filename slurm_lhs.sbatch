@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=lhs   			    # Job name
-#SBATCH --chdir=/gscratch/csde/carajb/HHCoM       # Working directory
+#SBATCH --chdir=/gscratch/csde/carajb/HHCoM         # Working directory
 #SBATCH --mail-type=FAIL           		    # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                                # Export environment variables to the batch job session
@@ -20,7 +20,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=24Feb20
+DATE=16Apr20
 echo "${DATE}"
 export DATE
 
