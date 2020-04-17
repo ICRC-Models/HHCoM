@@ -233,8 +233,7 @@ if calibBool && any(8 == pIdx)
     %maleActs(1:2 , 1:risk) = zeros(2 , risk);
     %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
     %maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
-    maleActs(4:5 , 1:risk) = maleActs(4:5 , 1:risk) .* 0.80;
-    maleActs(3 , 1:risk) = maleActs(4 , 1:risk) .* 0.50;
+    maleActs(3:5 , 1:risk) = maleActs(3:5 , 1:risk) .* 0.80;
     maleActs(6:10 , 1:risk) = maleActs(6:10 , 1:risk) .* 1.10;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
