@@ -197,7 +197,7 @@ if calibBool && any(9 == pIdx)
     femaleActs(4:6 , 1) = paramSet(paramsSub{idx}.inds(1:3));
     femaleActs(3 , 1) = femaleActs(4 , 1) .* 0.5;
     femaleActs(7:9 , 1) = ones(3,1).*paramSet(paramsSub{idx}.inds(4));
-    femaleActs(10:age , 1) = ones(7,1).(paramSet(paramsSub{idx}.inds(5));
+    femaleActs(10:age , 1) = ones(7,1).*paramSet(paramsSub{idx}.inds(5));
     femaleActs(3 , 2) = 0.6 .* femaleActs(3 , 1);
     femaleActs(3 , 3) = 0.6 .* femaleActs(3 , 2);
     for a = 4 : age
