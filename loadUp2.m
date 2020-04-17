@@ -453,7 +453,7 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * 1.4
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * 1.4;
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * 2.0;
 end
 
@@ -656,7 +656,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 2.0; 2.7; 6.0]; %[1.0; 1.8; 2.6; 5.5];
+    c3c2Mults = [1.0; 2.0; 2.7; 3.5];
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -667,7 +667,7 @@ if calibBool && any(16 == pIdx)
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c2c1Mults = [1.0; 1.9; 2.4; 2.7]; %[1.00; 1.75; 2.30; 2.66];
+    c2c1Mults = [1.0; 1.9; 2.4; 2.7];
 end
 
 % HPV tranmission rates
