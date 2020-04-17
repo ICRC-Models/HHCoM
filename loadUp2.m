@@ -104,8 +104,8 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 % fertility = xlsread(file , 'Demographics' , 'B115:G130');
 % partnersM = xlsread(file , 'Demographics' , 'B163:D178');
 % partnersF = xlsread(file , 'Demographics' , 'E163:G178');
-% maleActs = xlsread(file , 'Demographics' , 'D202:F217');
-% femaleActs = xlsread(file , 'Demographics' , 'D222:F237');
+% maleActs = xlsread(file , 'Demographics' , 'B202:D217');
+% femaleActs = xlsread(file , 'Demographics' , 'B222:D237');
 % save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
 %     'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs');
 
@@ -283,7 +283,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.3 ; 0.3 ; 0.3];
+    epsA = [0.4921 ; 0.4921 ; 0.4921];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -347,7 +347,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001]; %[0.0004];
+    baseVagTrans = [0.000575];
 end
 
 % HIV tranmission rate
@@ -442,8 +442,8 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1);
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2)*1.6;
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 0.8;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2.0;
 end
 
 % CIN1 to CIN2, ages 10-24
@@ -453,8 +453,8 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*1.7;
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * 1.4
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * 2.0;
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -464,8 +464,8 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)*1.7;
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.3;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 2.0;
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -475,8 +475,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2)*1.8;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.0;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 5.0;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -486,8 +486,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1)*1.25;
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2)*0.75;
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * 2.60;
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * 1.41;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -497,8 +497,8 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2)*0.4;
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.80;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * 0.97;
 end
 
 % CIN2 to CIN1, ages 10-24
@@ -508,8 +508,8 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2)*0.3;
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.4;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * 0.2;
 end
 
 % CIN3 to CIN2, ages 10-24
@@ -519,8 +519,8 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2)*0.3;
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * 1.0;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.2;
 end
 
 % Apply age trends to 9v HPV transitions
@@ -614,10 +614,7 @@ if calibBool && any(18 == pIdx)
     lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
     lambdaMultImm = ones(age , 1) .* lambdaMultImmmult;   
 else
-    lambdaMultImm = zeros(age , 1);
-    lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
-    lambdaMultImm(11 : 16) = lambdaMultImm(10);
+    lambdaMultImm = ones(age , 1) .* (0.57479*0.90);
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -678,7 +675,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0045;
+    perPartnerHpv_vax = 0.01;
 end
 
 if calibBool && any(11 == pIdx)
@@ -749,7 +746,7 @@ if calibBool && any(37 == pIdx)
     idx = find(37 == pIdx);
     maleHpvClearMult = paramSet(paramsSub{idx}.inds(:));
 else
-    maleHpvClearMult = 1.0;
+    maleHpvClearMult = 3.5;
 end
 
 % HIV and ART multipliers
