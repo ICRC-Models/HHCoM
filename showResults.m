@@ -448,6 +448,7 @@ xlim([1980 2020]);
 %% Proportion HIV-negative males circumcised by broad age groups over time
 circPropYr_obs = vmmcYr;
 circProp_obs = vmmcRate' .* 100;
+circProp_obs = [0.0 0.0 0.0 0.0 0.0 0.0 0.0; circProp_obs];
 
 ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(tVec) , length(ageVec));
