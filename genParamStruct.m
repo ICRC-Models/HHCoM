@@ -48,19 +48,19 @@ paramsAll{7}.name = 'epsR'; paramsAll{7}.length = 1; ... %3
 
 % maleActs, [age x risk], (10-24 multiplier on females, 25-49 multiplier on females) 
 paramsAll{8}.name = 'maleActs'; paramsAll{8}.length = 2; ... %1 %42; 
-    paramsAll{8}.lb = [0.5; 0.5]; %ones(paramsAll{8}.length,1).*0.2; 
+    paramsAll{8}.lb = [0.75; 0.75]; %ones(paramsAll{8}.length,1).*0.2; 
         %[ones(paramsAll{8}.length*(1/3),1).*1.0; ones(paramsAll{8}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{8}.length*(1/3),1).*0.01]; ... %0.1;
-    paramsAll{8}.ub = [1.5; 1.5]; %ones(paramsAll{8}.length,1).*2.0; 
+    paramsAll{8}.ub = [1.25; 1.25]; %ones(paramsAll{8}.length,1).*2.0; 
         %[ones(paramsAll{8}.length*(1/3),1).*90.0; ones(paramsAll{8}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{8}.length*(1/3),1).*0.99]; %15;
 
 % femaleActs, [age x risk], (lr range by age (15-19,20-24,25-29,30-44,45-79))
 paramsAll{9}.name = 'femaleActs'; paramsAll{9}.length = 5; ... %1 %42; ...
-    paramsAll{9}.lb = [59.70; 58.95; 42.15; 40.95; 39.53]; %ones(paramsAll{9}.length,1).*0.2; 
+    paramsAll{9}.lb = [53.13; 52.47; 42.15; 40.95; 39.53]; %ones(paramsAll{9}.length,1).*0.2; 
         %[ones(paramsAll{9}.length*(1/3),1).*1.0; ones(paramsAll{9}.length*(1/3),1).*0.01; ...
         % ones(paramsAll{9}.length*(1/3),1).*0.01]; ... %0.1;
-    paramsAll{9}.ub = [99.50; 98.25; 70.25; 68.25; 65.88]; %ones(paramsAll{9}.length,1).*2.0; 
+    paramsAll{9}.ub = [88.56; 87.44; 70.25; 68.25; 65.88]; %ones(paramsAll{9}.length,1).*2.0; 
         %[ones(paramsAll{9}.length*(1/3),1).*90.0; ones(paramsAll{9}.length*(1/3),1).*0.99; ...
         % ones(paramsAll{9}.length*(1/3),1).*0.99]; %15;
 
