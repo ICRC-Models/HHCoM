@@ -27,7 +27,7 @@ date = date_abc;
 %p = 84; 398;    % number of parameters
 
 pIdx = [1,2,5,6,9,10,18,31,35,37];    % indices in paramsAll cell array
-prtnrActMults = 1;
+% prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -52,50 +52,50 @@ sampleNorm = sampleNorm';
 sample = lb + (sampleNorm .* (ub-lb));
 
 %% Apply parameter constraints
-
-% partnersM, partnersF (if calibrating actual values vs. multipliers)
-if (any(1 == pIdx) && ~prtnrActMults)
-    idx = find(1 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0)); % mr partners < hr partners, > lr partners
-    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:)); % lr partners < mr partners
-end
-if (any(2 == pIdx) && ~prtnrActMults) 
-    idx = find(2 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
-    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
-end
-
-% maleActs, femaleActs (if calibrating actual values vs. multipliers)
-if (any(8 == pIdx) && ~prtnrActMults)
-    idx = find(8 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
-    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
-end
-if (any(9 == pIdx) && ~prtnrActMults)
-    idx = find(9 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
-    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
-end
+% 
+% % partnersM, partnersF (if calibrating actual values vs. multipliers)
+% if (any(1 == pIdx) && ~prtnrActMults)
+%     idx = find(1 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+%         (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0)); % mr partners < hr partners, > lr partners
+%     sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:)); % lr partners < mr partners
+% end
+% if (any(2 == pIdx) && ~prtnrActMults) 
+%     idx = find(2 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+%         (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
+%     sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
+% end
+% 
+% % maleActs, femaleActs (if calibrating actual values vs. multipliers)
+% if (any(8 == pIdx) && ~prtnrActMults)
+%     idx = find(8 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+%         (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+%     sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
+% end
+% if (any(9 == pIdx) && ~prtnrActMults)
+%     idx = find(9 == pIdx);
+%     rowL = paramsSub{idx}.length/3;
+%     rl = paramsSub{idx}.inds(1:rowL);
+%     rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
+%     rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
+%     sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
+%         (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
+%     sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
+% end
 
 %% Save parameter sets and negSumLogL values
 file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '.dat'];
