@@ -205,26 +205,11 @@ if calibBool && any(9 == pIdx)
     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
-    femaleActs(3 , 1:risk) = femaleActs(3 , 1:risk) .* 5.1; 
-    femaleActs(4 , 1:risk) = femaleActs(4 , 1:risk) .* 4.25;
-    femaleActs(5 , 1:risk) = femaleActs(5 , 1:risk) .* 1.05;
-    femaleActs(6 , 1:risk) = femaleActs(6 , 1:risk) .* 0.40;
-    femaleActs(7 , 1:risk) = femaleActs(7 , 1:risk) .* 0.55;
-    femaleActs(8 , 1:risk) = femaleActs(7 , 1:risk);
-    femaleActs(9 , 1:risk) = femaleActs(9 , 1:risk) .* 1.08;
-    femaleActs(10 , 1:risk) = femaleActs(10 , 1:risk) .* 1.5;
-    femaleActs(11 , 1:risk) = femaleActs(10 , 1:risk);
-    femaleActs(12 , 1:risk) = femaleActs(10 , 1:risk);
-    femaleActs(13 , 1:risk) = femaleActs(10 , 1:risk);
-    femaleActs(14 , 1:risk) = femaleActs(10 , 1:risk);
-    femaleActs(15 , 1:risk) = femaleActs(10 , 1:risk);
-    femaleActs(16 , 1:risk) = femaleActs(10 , 1:risk);
 end
 
 % Male acts per partnership per year by age and risk group
 if calibBool && any(8 == pIdx)
     idx = find(8 == pIdx);
-    maleActs = femaleActs;
     %maleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
@@ -233,14 +218,15 @@ if calibBool && any(8 == pIdx)
     %maleActs(1:2 , 1:risk) = zeros(2 , risk);
     %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
     %maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
-    maleActs(3:5 , 1:risk) = maleActs(3:5 , 1:risk) .* 0.80;
-    maleActs(6:10 , 1:risk) = maleActs(6:10 , 1:risk) .* 1.10;
-else
-    load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs = femaleActs;
-    maleActs(3 , 1:risk) = maleActs(3 , 1:risk) .* 0.4;
-    maleActs(4:5 , 1:risk) = maleActs(4:5 , 1:risk) .* 0.80;
-    maleActs(6:10 , 1:risk) = maleActs(6:10 , 1:risk) .* 1.10;
+    maleActs(3:5 , 1:risk) = maleActs(3:5 , 1:risk) .* paramSet(paramsSub{idx}.inds(1));
+    maleActs(6:10 , 1:risk) = maleActs(6:10 , 1:risk) .* paramSet(paramsSub{idx}.inds(2));
+else
+    %load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
+    maleActs(1:4 , 1:risk) = femaleActs(1:4 , 1:risk);
+    for a = 5 : age
+        maleActs(a , 1:risk) = femaleActs(a-1 , 1:risk);
+    end
 end
 
 % Convert 5-year age groups to 1-year age groups
