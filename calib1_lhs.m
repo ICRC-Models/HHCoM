@@ -15,9 +15,9 @@ t_curr = tstep_abc;
 date = date_abc;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Load structure of all potentially calibrated parameters
 [paramsAll] = genParamStruct();
@@ -26,7 +26,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
-pIdx = [1,2,5,6,8,9,10,18,27,28,29,30,31,32,33,34,35,37];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,9,10,18,31,35,37];    % indices in paramsAll cell array
 prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
