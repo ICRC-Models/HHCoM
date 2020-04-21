@@ -52,7 +52,7 @@ function vaxCEA(pathModifier)
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-incCircScaleUp_033120']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver_033120']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -221,7 +221,7 @@ file = [pwd , '/Config/Population_validation_targets.xlsx'];
 fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
 
 disp('Remember to update fertility multipliers if calibrating!!!!');
-fertDeclineProp = [0.36055 ; 0.57528]; %[0.36055 ; 0.68]
+fertDeclineProp = [0.37 ; 0.75]; %[0.36055 ; 0.68]
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* 1.0;

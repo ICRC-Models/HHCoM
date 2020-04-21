@@ -51,9 +51,9 @@ paramDir = [pwd , '\Params\'];
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
 
 %% LOAD SAVED RESULTS
-curr = load([pwd , '\HHCoM_Results\toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta_030920']); % ***SET ME***: name for historical run file
+curr = load([pwd , '\HHCoM_Results\toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver_033120']); % ***SET ME***: name for historical run file
 % ***SET ME***: save names of potential scenarios to analyze as variables
-dirName_reductBaseline = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-decFacts6---incCINprog-delta-10fertDec2060_030920_WHOP1_SCES012-test';
+dirName_reductBaseline = '24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-decFacts6---incCINprog-delta-circByAge-circAfterDemo-outSolver_033120_WHOP1_SCES012-test';
 dirName_P1_SCE3 = '090519_WHOP1_SCES34';
 dirName_P1_SCE5 = '090519_WHOP1_SCES56';
 dirName_P2_SCE1 = '090519_WHOP2_SCE1';
@@ -266,6 +266,7 @@ for j = 1 : nResults
     figure;
     for i = 1 : length(inds)
         % General
+        
         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
             1 : intervens , 2 , 3 : age-1 , 1 : risk));
         % All HIV-negative women

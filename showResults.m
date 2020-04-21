@@ -196,7 +196,7 @@ file = [pwd , '/Config/Population_validation_targets.xlsx'];
 fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
 
 disp('Remember to update fertility multipliers if calibrating!!!!');
-fertDeclineProp = [0.36055 ; 0.57528];
+fertDeclineProp = [0.37 ; 0.75];
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* 1.0; %0.65;
