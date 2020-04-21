@@ -197,7 +197,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 % disp(' ')
 
 % If starting from beginning
-if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '_mod' , '.mat'])
+if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     
     % Initial Population 
     MpopStruc = riskDist(: , : , 1);
@@ -268,7 +268,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '_mod' , '.mat'])
     %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
-elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '_mod' , '.mat'])
+elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
     chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
     
@@ -516,7 +516,7 @@ popVec = sparse(popVec); % compress population vectors
 
 %% Save results
 savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , [pathModifier , '_mod7867-60incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver-mfSameActs_033120']) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
@@ -537,9 +537,9 @@ if calibBool
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
 
-%     if negSumLogL < -240000.00
-%         delete([savdir , pathModifier , '.mat']);
-%     end
+    if negSumLogL < -260000.00
+        delete([savdir , pathModifier , '.mat']);
+    end
     
     if isnan(negSumLogL)
         negSumLogL = -10000000.00;
