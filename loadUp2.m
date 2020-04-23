@@ -128,7 +128,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.60];
+    fertDeclineProp = [0.75 ; 0.57];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -774,7 +774,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = 0; %changed from 20%
+        condUse = .15; %changed from 20%
     end
 end
 
@@ -804,18 +804,17 @@ end
 
 % Intervention start years
 hivStartYear = 1980;
-circStartYear = 1960;
+circStartYear = 1980;
 circNatStartYear = 2008;
 vaxStartYear = 2014;
 %%
 % VMMC coverage
-vmmcYr = [circStartYear; 2003; 2007; 2012; 2014; 2030];
+vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
 vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1960
-            0.2998 0.5047 0.4604 0.309825 0.2240865 0.192258; ... % 2003
-            0.402 0.548 0.453 0.348 0.335 0.31; ... % 2007
-            0.526 0.718 0.69 0.493 0.391 0.445; ... % 2012
-            0.718 0.727 0.709 0.538 0.5175 0.456; ... % 2014 
+            0.2998 0.5047 0.3554 0.309825 0.2240865 0.192258; ... % 2003
+            0.3717 0.4683 0.3956 0.3592 0.4032 0.1939; ... %2008
+            0.7154 0.7274 0.5088 0.4378 0.4167 0.4064; ... %2014 
             0.80 0.80 0.80 0.80 0.8 0.8];   % 2030 [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
@@ -1425,11 +1424,9 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((1999 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2.0 - partnersMmult(2)) ./ ((1999 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1999 - 1995) * stepsPerYear);
-
-
+d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2.0 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
