@@ -49,7 +49,8 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow_7Apr20_Ken_NoCircProtectHpvMen.mat']) %change from pathModifier to file name
+toNowName = ['toNow_16Apr20_Ken_PartnersMultAllAges_circAllAges_IncreaseFMult']
+load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
 % Plot settings
@@ -58,6 +59,7 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 %% excel output file 
 filename = [pwd, '\Calibration_comparison.xlsx'];
+
 %% 
 %% Population size by gender
 % figure()
@@ -95,28 +97,28 @@ historicalPop0_79(:,2) = xlsread(file , 'Demographics' , 'B97:P97') .* 1000; % e
 futurePop(:,1) = xlsread(file , 'Demographics' , 'B101:Q101'); % years
 futurePop(:,2) = xlsread(file , 'Demographics' , 'B102:Q102') .* 1000; % projections
 
-% figure()
-% plot(tVec , totalPop0_79 , '-');
-% hold all;
-% plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
-% hold all;
-% plot(futurePop(:,1) , futurePop(:,2) , 'o');
-% title('Kenya Population Size Ages 0-79')
-% xlabel('Year'); ylabel('Individuals')
-% xlim([1920 2120]);
-% legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
-%     'Location', 'Northwest')
-% hold off
-
-sheet = ['population'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year', 'Model pop', 'UN pop'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', totalPop0_79(1 : stepsPerYear * 5 : end)], sheet, 'A3')
-xlswrite(filename, [historicalPop0_79(:, 2)], sheet,'C8')
-xlswrite(filename, [futurePop(:, 1)], sheet,'A23')
-xlswrite(filename, [futurePop(:, 2)], sheet,'C23')
+figure()
+plot(tVec , totalPop0_79 , '-');
+hold all;
+plot(historicalPop0_79(:,1) , historicalPop0_79(:,2) , 'o');
+hold all;
+plot(futurePop(:,1) , futurePop(:,2) , 'o');
+title('Kenya Population Size Ages 0-79')
+xlabel('Year'); ylabel('Individuals')
+xlim([1920 2120]);
+legend('Model prediction' , 'Kenya historical estimates (UN)' , 'Kenya future projections (UN)', ...
+    'Location', 'Northwest')
+hold off
+%%
+sheet = ['pop'];
+cols1 = {toNowName};
+cols2 = {'Year', 'Model pop'}; %, 'UN pop'};
+xlswrite(filename, cols1, sheet, 'I1')
+xlswrite(filename, cols2, sheet, 'I2')
+xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', totalPop0_79(1 : stepsPerYear * 5 : end)], sheet, 'I3')
+% xlswrite(filename, [historicalPop0_79(:, 2)], sheet,'G8')
+% xlswrite(filename, [futurePop(:, 1)], sheet,'E23')
+% xlswrite(filename, [futurePop(:, 2)], sheet,'G23')
 
 %% Population size by age vs. validation data
 
@@ -129,49 +131,49 @@ years = 1990:2020;
 ageGroup = {'0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79'};
 popPropYrs = zeros(length(years),5);
 popPropYrs_obs = zeros(7,8);
-popPropYrs_obs = xlsread(file , 'Population' , 'H169:O175');
+popPropYrs_obs = xlsread(file , 'Population' , 'H188:O194');
 ageVec = {[1:2], [3:4] , [5:6] , [7:8] , [9:10] , [11:12], [13:16]};
 for y = 1 : length(years)
     yearCurr = years(y);
     for aInd = 1 : length(ageVec)
         a = ageVec{aInd};
         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1:2 , a , 1 : risk));
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 : gender  , 1 : age , 1 : risk));
-        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2);
-
-        %popPropYrs_obs(y,aInd) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(3:15 , y));  
+            1 : endpoints , 1 : intervens , 2  , 1 : age , 1 : risk));
+%         popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ...
+%             ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2); 
+        popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2);            
     end
 end
 
-% figure;
-% plot(years , popPropYrs);
-% newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
-% colororder();
-% %set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
-% hold on;
-% plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o', ...
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 7) , 'o', ...
-%     popPropYrs_obs(:, 1) , popPropYrs_obs(:, 8) , 'o');
-% colororder()
-% ylabel('Population proportion'); xlabel('Year'); title('Age distribution in broad groups'); 
-% legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
-%     '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs', ...
-%     'Location', 'NorthEastOutside');
-
+figure;
+plot(years , popPropYrs);
+newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
+colororder();
+%set(gca, 'ColorOrder') %, circshift(get(gca, 'ColorOrder'), numel(h)))
+hold on;
+plot(popPropYrs_obs(:, 1) , popPropYrs_obs(:, 2) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 3) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 4) , 'o',...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 5) , 'o', ... 
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 6) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 7) , 'o', ...
+    popPropYrs_obs(:, 1) , popPropYrs_obs(:, 8) , 'o');
+colororder()
+ylabel('Number of women'); xlabel('Year'); title('Age distribution in broad groups'); 
+legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
+    '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs', ...
+    'Location', 'NorthEastOutside');
+%%
 sheet = ['Pop_by_Age'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year','0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
-    '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [years(1: 5 : end)', popPropYrs(1 : 5 : end, :)], sheet, 'A3')
-xlswrite(filename, [popPropYrs_obs(:, 2:8)], sheet, 'I3')
+cols1 = {toNowName};
+cols2 = {'Year','0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79'}; %,...
+    %'0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs'};
+xlswrite(filename, cols1, sheet, 'A22')
+xlswrite(filename, cols2, sheet, 'A23')
+xlswrite(filename, [years(1: 5 : end)', popPropYrs(1 : 5 : end, :)], sheet, 'A24')
+%xlswrite(filename, [popPropYrs_obs(:, 2:8)], sheet, 'I3')
 
 
 %% Fertility
@@ -232,14 +234,14 @@ legend('Model' , 'UN estimates (Kenya)' , 'Lower 95' , ...
 ylim([0 10]);
 xlim([1920 2100]);
 
-
+%%
 sheet = ['Fertility'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year', 'Model', 'Year', 'UN', 'Lower 95', 'Lower 80', 'Upper 80', 'Upper 95'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [fertilityVec(1:5:end, :)], sheet, 'A3')
-xlswrite(filename, [fertilityVal], sheet, 'C8')
+cols1 = {toNowName};
+%cols2 = {'Year', 'Model'} %, 'Year', 'UN', 'Lower 95', 'Lower 80', 'Upper 80', 'Upper 95'};
+xlswrite(filename, cols1, sheet, 'M1')
+%xlswrite(filename, cols2, sheet, 'M2')
+xlswrite(filename, [fertilityVec(1:5:end, :)], sheet, 'M3')
+%xlswrite(filename, [fertilityVal], sheet, 'C8')
 
 
 %% HIV prevalence vs. HIV data by year
@@ -276,15 +278,15 @@ legend('Model' , 'ANC data (Kisumu)', 'Spectrum data (Nyanza)')
 xlim([1980 2020])
 ylim([0, 40])
 
-%
+%%
 sheet = ['HIV_prev'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year', 'Model', 'Year', 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [tVec(331:stepsPerYear:end)', hivPrev(331:stepsPerYear:end) ], sheet, 'A3')
-xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
-xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
+cols1 = {toNowName};
+%cols2 = {'Year', 'Model', 'Year'} %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(filename, cols1, sheet, 'K1')
+%xlswrite(filename, cols2, sheet, 'K2')
+xlswrite(filename, [tVec(331:stepsPerYear:end)', hivPrev(331:stepsPerYear:end) ], sheet, 'K3')
+%xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
+%xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
 
 %% HIV prevalance, all ages by gender
 figure()
@@ -292,12 +294,12 @@ hivObsGender = zeros(4,3)
 hivObsGender(:,3) = [1998 2003 2007 2008]; 
 hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
 hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
-
-sheet = ['HIV_prev_by_sex'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year', 'Model - male', 'Year', 'Model - female', 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
+% 
+sheet = ['HIV_by_sex'];
+cols1 = {toNowName};
+% cols2 = {'Year', 'Model - male', 'Year', 'Model - female'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+xlswrite(filename, cols1, sheet, 'N1')
+% xlswrite(filename, cols2, sheet, 'N2')
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -314,7 +316,7 @@ for g = 1 : 2
     hold on
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
-    cell1 = ['A', 'C'];
+    cell1 = ['N', 'P'];
     cell = ([cell1(g) +'3']);
     xlswrite(filename, [tVec(331:stepsPerYear:end)', hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
@@ -324,7 +326,7 @@ ylabel('Prevalence')
 title('HIV Prevalence (aged 14-59)')
 legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS')
 
-xlswrite(filename, [hivObsGender(:, 3), hivObsGender(:, 1:2)], sheet, 'E3')
+%xlswrite(filename, [hivObsGender(:, 3), hivObsGender(:, 1:2)], sheet, 'E3')
 
 
 %% HIV prevalence overall
@@ -409,10 +411,13 @@ plot(1 : size(circ2003 , 1) , circ2003(: , :) , '-' );
     title('2003 Circumcision by age')
     
 %% Proportion HIV-negative males circumcised by broad age groups over time  - CHANGE vmmcYr
-circPropYr_obs = vmmcYr;
-circProp_obs = vmmcRate' .* 100;
+circPropYr_obs = vmmcYr(1:5);
+circProp_obs = vmmcRate(1:5, :)' .* 100;
 
-ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
+
+%circProp_obs = [0.0 0.0 0.0 0.0 0.0 0.0 0.0; circProp_obs];
+
+ageVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(tVec) , length(ageVec));
 
 figure()
@@ -433,10 +438,13 @@ plot(circPropYr_obs , circProp_obs , 'o');
 xlabel('Year')
 ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
 title('Circumcision Indicator')
-xlim([1960 2030]);
+xlim([1960 2020]);
 grid on;
-legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
-    '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');
+legend('15-19, model' , '20-24, model ' , '25-29, model' ,...
+    '30-39, model', '40-49, model', '50+, model' , ...
+    '15-19, observed' , '20-24, observed' , '25-29, observed' ,...
+    '30-39, observed', '40-49, observed', '50+, observed' ,...
+    'Location' , 'NorthWest');
    
 %% HIV prevalence by age on x-axis
 genderVec = {'Males (on and off ART)' , 'Females (on and off ART)'};
@@ -483,7 +491,6 @@ end
     ylim([0 70])
     legend({'Males (model)', 'Females (model)', '1998 Kisumu survey males', '1998 Kisumu survey females'}, ...
         'Location' , 'northeast')
-    %legend('Without ART dropout' , 'With ART dropout');
     grid on;
     
 for g = 1 : gender
@@ -513,11 +520,9 @@ end
     ylim([0 70])
     legend('Males (model)', 'Females (model)', '2003 DHS males', '2003 DHS females', ...
         'Location' , 'northeast')
-    %legend('Without ART dropout' , 'With ART dropout');
     grid on;
     
 for g = 1 : gender
-    %aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
     for a = 4: 10
         %a = aVec{aInd};
         ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -546,23 +551,26 @@ hold all;
     %legend('Without ART dropout' , 'With ART dropout');
     grid on;
     
-
-sheet = ['HIV_prev_by_age'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Age group', 'Male (1998)', 'Female (1998)', ' Male (Kisumu 1998)', 'Female (Kisumu 1998)', ...
-    'Male (2003)', 'Female (2003)', 'Female (DHS 2003)', 'Female - LB (DHS 2003)', 'Female - UB (DHS 2003)',...
-    'Male (DHS 2003)', 'Male - LB (DHS 2003)', 'Male - UB (DHS 2003)',...
-    'Male (2008)', 'Female (2008)', 'Female (DHS 2008)', 'Female - LB (DHS 2008)', 'Female - UB (DHS 2008)',...
-    'Male (DHS 2008)', 'Male - LB (DHS 2008)', 'Male - UB (DHS 2008)'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, ageGroup(4:10)', sheet, 'A3')
-xlswrite(filename, [hiv1998], sheet, 'B3')
-xlswrite(filename, [Glynn1998_Kisumu], sheet, 'D3')
-xlswrite(filename, [hiv2003], sheet, 'F3')
-xlswrite(filename, [DHS2003_Nyanza], sheet, 'H3')
-xlswrite(filename, [hiv2008], sheet, 'N3')
-xlswrite(filename, [DHS2008_Nyanza], sheet, 'P3')
+%%
+sheet = ['HIV_by_age'];
+cols1 = {toNowName};
+% cols2 = {'Age group', 'Male (1998)', 'Female (1998)', ' Male (Kisumu 1998)', 'Female (Kisumu 1998)', ...
+%     'Male (2003)', 'Female (2003)', 'Female (DHS 2003)', 'Female - LB (DHS 2003)', 'Female - UB (DHS 2003)',...
+%     'Male (DHS 2003)', 'Male - LB (DHS 2003)', 'Male - UB (DHS 2003)',...
+%     'Male (2008)', 'Female (2008)', 'Female (DHS 2008)', 'Female - LB (DHS 2008)', 'Female - UB (DHS 2008)',...
+%     'Male (DHS 2008)', 'Male - LB (DHS 2008)', 'Male - UB (DHS 2008)'};
+cols2 = {'Age group', 'Male (1998)', 'Female (1998)', ...
+    'Male (2003)', 'Female (2003)', ...
+    'Male (2008)', 'Female (2008)'};
+xlswrite(filename, cols1, sheet, 'A25')
+% xlswrite(filename, cols2, sheet, 'A26')
+xlswrite(filename, ageGroup(4:10)', sheet, 'A28')
+xlswrite(filename, [hiv1998], sheet, 'B28')
+%xlswrite(filename, [Glynn1998_Kisumu], sheet, 'D3')
+xlswrite(filename, [hiv2003], sheet, 'D28')
+%xlswrite(filename, [DHS2003_Nyanza], sheet, 'H3')
+xlswrite(filename, [hiv2008], sheet, 'F28')
+%xlswrite(filename, [DHS2008_Nyanza], sheet, 'P3')
 
 %% HIV mortality by age
 figure()
@@ -753,7 +761,6 @@ ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
      '60-64' , '65-69' , '70-74' , '75-79'};
 gVec = {'men', 'women'};
 
-    
 for g = 1 : 2
     figure()
     
@@ -911,23 +918,21 @@ for g = 1 : gender
     plot(tVec , hivNegHPV)
     plot(tVec , hivPosHPV)
     plot(tVec , artHPV)
-    %axis([tVec(1) tVec(end) 0 100])
-    % axis([-inf inf 0 min(max(hpvPop./sum(popTot , 2) * 100) + 10 , 100)])
+   
     xlabel('Year'); ylabel('Prevalence (%)'); title([genders{g} , ' HPV Prevalence (ages 15+)'])
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
-
+end
+%%
 sheet = ['hpvPrev'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Year', [genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
-xlswrite(filename, cols1, sheet, 'A1')
+cols1 = {toNowName};
+%cols2 = {'Year', [genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
+xlswrite(filename, cols1, sheet, 'A50')
 cell = ['A', 'F'];
 
-xlswrite(filename, cols2, sheet, [cell(g) +'2'])
+%xlswrite(filename, cols2, sheet, [cell(g) +'50'])
 xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', genPopHPV(1 : stepsPerYear * 5 : end), ...
     hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
-    artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
-
-end
+    artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'51'])
 
 %% HPV Prevalence by age in 2005 vs. Yamada and Luchter data
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
@@ -1027,13 +1032,13 @@ xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence in women by HIV status (2005)')
 ylim([0 100])
 
-sheet = ['HPV_prev_by_age_2005'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b'};
-cols2 = {'Age', 'Model HIV+', 'Model HIV-', 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, ageGroup(1:9)', sheet, 'A3')
-xlswrite(filename, [hpvHIV2005, hpvNeg2005, hpvHivObs], sheet, 'B3')
+sheet = ['HPV_by_age_2005'];
+cols1 = {toNowName};
+%cols2 = {'Age', 'Model HIV+', 'Model HIV-'}; %, 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
+xlswrite(filename, cols1, sheet, 'L1')
+%xlswrite(filename, cols2, sheet, 'L2')
+xlswrite(filename, ageGroup(1:9)', sheet, 'L3')
+xlswrite(filename, [hpvHIV2005, hpvNeg2005], sheet, 'M3')
 
 %% Age specific HPV prevalence data 
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
@@ -1096,14 +1101,14 @@ legend('Model General pop' ,...
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence among women in 2000')
 ylim([0 100])
-%%
-sheet = ['HPV_prev_by_age_2000'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b','HPV prevalence among women in 2000'};
-cols2 = {'Age', 'Model Gen Pop', 'DeVuyst gen pop', 'DeVuyst HIV+'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, ageGroup(1:9)', sheet, 'A3')
-xlswrite(filename, [hpv2000, hpvHivObs2], sheet, 'B3')
+
+sheet = ['HPV_by_age_2000'];
+cols1 = {toNowName,'HPV prevalence among women in 2000'};
+%cols2 = {'Age', 'Model Gen Pop'}; %, 'DeVuyst gen pop', 'DeVuyst HIV+'};
+xlswrite(filename, cols1, sheet, 'I1')
+%xlswrite(filename, cols2, sheet, 'I2')
+xlswrite(filename, ageGroup(1:9)', sheet, 'I3')
+xlswrite(filename, [hpv2000], sheet, 'J3')
 
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
@@ -1130,14 +1135,12 @@ for aV = 1 : length(ageVec)
         1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
     hpv_hivM2008(aV , 2) = (sum(popVec((yearPrev - startYear) * stepsPerYear +1 , hpvHivNegInd)) ...
         ./ sum(popVec((yearPrev - startYear) * stepsPerYear +1 , popNegInd))) * 100;
-    
 end
 
 smithHPV = zeros(4,1);
 smithHPV(:, 1) = [0.353 NaN NaN NaN ];
 
 figure()
-
 plot([1 : length(ageVec)] , hpv_hivM2008(: , 1)' , 'b-');
 hold all;
 plot([1 : length(ageVec)] , hpv_hivM2008(: , 2)' , 'r-')
@@ -1215,17 +1218,18 @@ title('CIN Prevalence by HIV status in 2010')
 text(2.2, -3.25, 'Note: All observed data are from Nairobi')
 %annotation('textbox', [0, 0, 0.5, 0.1], 'string', 'All observed data are from Nairobi')
 
-
-sheet = ['CIN_prev_by_HIV_2010'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b', 'CIN Prevalence by HIV status in 2010'};
-cols2 = {'CIN grade', 'Model HIV+', 'Model HIV-', 'HIV+ screening pop (Memiah)',...
-    'HIV+ screening pop (DeVuyst)', ...
-    'HIV+ FSW (Sweet)', 'HIV- FSW (Sweet)', 'HIV+ FSW (Njagi)', 'HIV- FSW (Njagi)'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, cinGroup', sheet, 'A3')
-xlswrite(filename, [cinHiv2010, cinHivNeg2010, cinHiv_ccScreen',cinHiv_ccScreen2',...
-    cinHIV_FSW', cinNeg_FSW', cinHIV_FSW2', cinNeg_FSW2'], sheet, 'B3')
+%%
+sheet = ['CIN_by_HIV_2010'];
+cols1 = {toNowName, 'CIN Prevalence by HIV status in 2010'};
+%cols2 = {'CIN grade', 'Model HIV+', 'Model HIV-'}; %, 'HIV+ screening pop (Memiah)',...
+    %'HIV+ screening pop (DeVuyst)', ...
+    %'HIV+ FSW (Sweet)', 'HIV- FSW (Sweet)', 'HIV+ FSW (Njagi)', 'HIV- FSW (Njagi)'};
+xlswrite(filename, cols1, sheet, 'A14')
+%xlswrite(filename, cols2, sheet, 'A15')
+xlswrite(filename, cinGroup', sheet, 'A16')
+xlswrite(filename, [cinHiv2010, cinHivNeg2010], sheet, 'B16')
+% xlswrite(filename, [cinHiv2010, cinHivNeg2010, cinHiv_ccScreen',cinHiv_ccScreen2',...
+%     cinHIV_FSW', cinNeg_FSW', cinHIV_FSW2', cinNeg_FSW2'], sheet, 'B9')
  
 %% CIN2/3 prevalence for All HR HPV types combined by age in 2000 vs. deVuyst 2003 data
 cin1Pos2000 = zeros(10 , 1);
@@ -1298,14 +1302,14 @@ title('Age specific CIN prevalence among all women in 2000')
 ylim([0 30])
 % 
 
-sheet = ['CIN_prev_by_age_2000'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
-    'Age specific CIN prevalence among all women in 2000'};
-cols2 = {'Age', 'Model CIN 1', 'Model CIN 2/3' , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, ageGroup', sheet, 'A3')
-xlswrite(filename, [cin1Pos2000, cin3Pos2000, cinPosAct], sheet, 'B3')
+sheet = ['CIN_by_age_2000'];
+cols1 = {toNowName, 'Age specific CIN prevalence among all women in 2000'};
+%cols2 = {'Age', 'Model CIN 1', 'Model CIN 2/3'}; % , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3'};
+xlswrite(filename, cols1, sheet, 'K1')
+%xlswrite(filename, cols2, sheet, 'K2')
+xlswrite(filename, ageGroup', sheet, 'K3')
+xlswrite(filename, [cin1Pos2000, cin3Pos2000], sheet, 'L3')
+% xlswrite(filename, [cin1Pos2000, cin3Pos2000, cinPosAct], sheet, 'H3')
 
 
 %% HPV prevalence by age and gender over time
@@ -1675,14 +1679,13 @@ for y = 1 : length(ccIncYears)
 end
 
 sheet = ['CC_inc_by_age_2009'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
-    'Cervical Cancer Incidence by age in 2009'};
-cols2 = {'Age', 'General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-11' , 'Eldoret 2008-11'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, ageGroup', sheet, 'A3')
-xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtRel], sheet, 'B3')
-xlswrite(filename, [ken_canreg], sheet, 'F6')
+cols1 = {toNowName, 'Cervical Cancer Incidence by age in 2009'};
+cols2 = {'Age', 'General' , 'HIV-' , 'HIV+' , 'ART'}; % , 'Nairobi 2007-11' , 'Eldoret 2008-11'};
+xlswrite(filename, cols1, sheet, 'P1')
+xlswrite(filename, cols2, sheet, 'P2')
+xlswrite(filename, ageGroup', sheet, 'P3')
+xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtRel], sheet, 'Q3')
+% xlswrite(filename, [ken_canreg], sheet, 'F6')
 
 %% Cervical cancer incidence over time
 fScale = 10^5;
@@ -1722,7 +1725,6 @@ ccArtRel = annlz(sum(sum(sum(newCC(1:end-1 ...
     , 8 , 1 : age , :) , 2) , 3) , 4)) ...
     ./ (annlz(sum(popVec(1:end-1 , ageArtInds) , 2)) ...
     ./ stepsPerYear) * fScale;
-
 
 gbd_cc= zeros(28, 4);
 gbd_cc = [
@@ -1788,16 +1790,15 @@ legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'GBD Kenya 2018', 'Glo
 
 %%
 sheet = ['CC_inc'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
-    'Cervical Cancer Incidence'};
-cols2 = {'Year', 'General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART',...
-    'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
+cols1 = {toNowName, 'Cervical Cancer Incidence'};
+%cols2 = {'Year', 'General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART'}; %,...
+   % 'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
+xlswrite(filename, cols1, sheet, 'S1')
+%xlswrite(filename, cols2, sheet, 's2')
 xlswrite(filename, [tVec(1: stepsPerYear :end-1)' , ccAgeRel', ccAgeNegRel', ccAgePosRel',...
-    ccArtRel'], sheet, 'A3')
-xlswrite(filename, [gbd_cc], sheet, 'F68')
-xlswrite(filename, globocan_Ken, sheet, 'J86')
+    ccArtRel'], sheet, 'S3')
+% xlswrite(filename, [gbd_cc], sheet, 'F68')
+% xlswrite(filename, globocan_Ken, sheet, 'J86')
 
 
 %% CC incidence over time (age-standardized)
@@ -1810,13 +1811,12 @@ linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290,
 worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 23477 9261 2155];
 sheet = ['CC_inc_standardized'];
-cols1 = {'toNow_9Apr20_Ken_ApplyPartnersMultOlderAdults_circStartearly_b',...
-    'Age-standardized cervical cancer incidence'};
-cols2 = {'Year', 'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all',...
-    'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [tVec(1: stepsPerYear :end-1)'] , sheet, 'A3')
+cols1 = {toNowName, 'Age-standardized cervical cancer incidence'};
+%cols2 = {'Year', 'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' }; %,...
+   % 'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
+xlswrite(filename, cols1, sheet, 'U1')
+%xlswrite(filename, cols2, sheet, 'U2')
+xlswrite(filename, [tVec(1: stepsPerYear :end-1)'] , sheet, 'U3')
 
 figure();
 for i = 1 : length(inds)  
@@ -1868,7 +1868,7 @@ for i = 1 : length(inds)
     plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
     hold all;
     
-    cell = ['B':'F'];
+    cell = ['U':'Y'];
     xlswrite(filename, ccInc', sheet, [cell(i) +'3'])
 
 end
@@ -1886,8 +1886,8 @@ end
     xlim([1925 2020]);
     %ylim([0 150]);
     
-xlswrite(filename, [gbd_cc], sheet, 'G68')
-xlswrite(filename, globocan_Ken, sheet, 'K86')
+% xlswrite(filename, [gbd_cc], sheet, 'G68')
+% xlswrite(filename, globocan_Ken, sheet, 'K86')
 
     
 %% CC Cumulative Probability of Incidence- early years
