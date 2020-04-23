@@ -18,21 +18,18 @@ hivNegCirc = 0;
 if year >= circStartYear && year < 2003
     ind = (round(vmmcYr_vec{1} , 4) == round(year , 4));
     periodInd = 1;
-elseif year >= 2003 && year < 2007
+elseif year >= 2003 && year < 2008
     ind = (round(vmmcYr_vec{2} , 4) == round(year , 4));
     periodInd = 2;
-elseif year >= 2007 && year < 2012
+elseif year >= 2008 && year < 2014
     ind = (round(vmmcYr_vec{3} , 4) == round(year , 4));
     periodInd = 3;
-elseif year >= 2012 && year < 2014
+elseif year >= 2014 && year < 2030
     ind = (round(vmmcYr_vec{4} , 4) == round(year , 4));
     periodInd = 4;
-elseif year >= 2014 && year < 2030
-    ind = (round(vmmcYr_vec{5} , 4) == round(year , 4));
-    periodInd = 5;
 elseif year >= 2030
-    ind = length(vmmcYr_vec{5});
-    periodInd = 5;
+    ind = length(vmmcYr_vec{4});
+    periodInd = 4;
 end
 
 %% Apply VMMC
