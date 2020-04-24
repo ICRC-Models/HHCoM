@@ -52,7 +52,7 @@ function vaxCEA(pathModifier)
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_24Feb20_noBaseVax_baseScreen_hpvHIVcalib_0_1_mod7867-45incInitPop3-fixImmMult-clearAgeDist12-decFacts6-decMacts1-decCIN2reg-incCINprog-delta-circByAge-circAfterDemo-outSolver_033120']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -224,7 +224,7 @@ disp('Remember to update fertility multipliers if calibrating!!!!');
 fertDeclineProp = [0.37 ; 0.75]; %[0.36055 ; 0.68]
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 1.0;
+fertility4 = fertility3 .* 0.50; %1.0;
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
@@ -429,6 +429,7 @@ grid on;
 %% Proportion HIV-negative males circumcised by broad age groups over time
 circPropYr_obs = vmmcYr;
 circProp_obs = vmmcRate' .* 100;
+circProp_obs = [0.0 0.0 0.0 0.0 0.0 0.0 0.0; circProp_obs];
 
 ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(vaxResult{noVaxInd}.tVec) , length(ageVec));
