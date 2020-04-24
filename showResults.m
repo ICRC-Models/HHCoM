@@ -610,6 +610,7 @@ xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
 yearPrev = 2008;
+ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
 ageVec = {[4:5],[6:7],[8:9],[10:13]};
 hpv_hivM2008 = zeros(length(ageVec) , 2);
 
