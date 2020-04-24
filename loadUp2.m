@@ -126,7 +126,7 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 1.0; %0.65;
+fertility4 = fertility3 .* 0.50; %1.0;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
