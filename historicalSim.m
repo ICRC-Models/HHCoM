@@ -499,15 +499,15 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
     
-    % if rem(year , 25) == 0.0
-    %     savdir = [pwd , '/HHCoM_Results/'];
-    %     save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-    %         'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-    %         'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-    %         'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    %         'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
-    %         'startYear' , 'endYear' , 'i' , '-v7.3');
-    % end
+    if rem(year , 50) == 0.0
+        savdir = [pwd , '/HHCoM_Results/'];
+        save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+            'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
+            'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+            'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+            'startYear' , 'endYear' , 'i' , '-v7.3');
+    end
 
 end
 popLast = popVec(end-1 , :);
@@ -537,9 +537,9 @@ if calibBool
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
 
-    if negSumLogL < -220000.00
-        delete([savdir , pathModifier , '.mat']);
-    end
+    %if negSumLogL < -220000.00
+    %    delete([savdir , pathModifier , '.mat']);
+    %end
     
     if isnan(negSumLogL)
         negSumLogL = -10000000.00;
