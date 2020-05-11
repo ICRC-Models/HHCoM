@@ -13,7 +13,7 @@ close all;clear all;clc
 % addOptional(p , 't_wane' , 0);
 % parse(p , endYear, vaxCover , vaxEff, vaxAge , varargin{:})
 % close all; clear all; clc
-lastYear = 2097; %endYear;
+lastYear = 2081; %endYear;
 % if nargin
 %     origEffVec = varargin{1};
 %     t_wane = varargin{2};
@@ -49,7 +49,7 @@ load([paramDir,'ageRiskInds'])
 load([paramDir,'vlBeta'])
 
 % load population
-popIn = load([pwd , '\HHCoM_Results\toNow']);
+popIn = load([pwd , '\HHCoM_Results\toNow_Erasmus_NickTanModel_050820']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -62,10 +62,10 @@ load([paramDir , 'popData'])
 load([paramDir , 'General'])
 load([paramDir , 'calibratedParams'])
 
-vaxCover = [0.4 , 0.6 , 0.8];
-vaxEff = [0.6 , 0.65 , 0.85 , 0.8 * 0.9 , 0.85 * 0.9];
-vaxAge = 3;
-waning = 1; % turn waning on or off
+vaxCover = [0.3 , 0.6 , 0.9];
+vaxEff = [0.7];
+vaxAge = 2;
+waning = 0; % turn waning on or off
 vaxLimit = 0;
 vaxRemain = 500000;
 
@@ -78,7 +78,7 @@ maxRateF1 = maxRateF_vec(1);
 maxRateF2 = maxRateF_vec(2);
 
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2018; %c(1); % get the current year
 % 90% efficacy against 70% of CC types, 100% efficacy against 70% of types, ...
 % 100% efficacy against 90% of types
 % vaxEff = [0.9 * 0.7 , 0.7 , 0.9]; 

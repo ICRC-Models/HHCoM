@@ -25,7 +25,7 @@ if hivOn
     disp('HIV module activated')
 end
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2018; %c(1); % get the current year
 startYear = 1980;
 endYear = currYear;
 years = endYear - startYear;
@@ -266,7 +266,7 @@ if ~ exist([pwd , '\HHCoM_Results\'])
 end
 
 savdir = [pwd , '\HHCoM_Results\'];%'H:\HHCoM_Results';
-save(fullfile(savdir , 'toNow') , 'tVec' ,  'popVec' , 'newHiv' ,...
+save(fullfile(savdir , 'toNow_Erasmus_NickTanModel_050820') , 'tVec' ,  'popVec' , 'newHiv' ,...
     'newImmHpv' , 'newVaxHpv' , 'newHpv' , 'hivDeaths' , ...
     'deaths' , 'newCC' , 'artTreatTracker' , 'artDist' , 'artDistList' , ... 
     'startYear' , 'endYear' , 'popLast');
