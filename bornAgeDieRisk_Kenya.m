@@ -102,7 +102,7 @@ elseif year >= 1996
     riskAdj = 0;
 end
 riskDist(:, 1, :) = riskDist(:, 1, :) - riskAdj;
-riskDist(:, 3, :) = riskDist(:, 1, :) + riskAdj;
+riskDist(:, 3, :) = riskDist(:, 3, :) + riskAdj;
 
 for g = 1 : gender
     for a = 2 : age
