@@ -1430,7 +1430,7 @@ d_partnersMmult(2) = (1 - partnersMmult(2)) ./ ((1996 - 1991) * stepsPerYear);
 d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((1996 - 1991) * stepsPerYear);
 
 %% risk adjustment multiplier
-riskAdj = 0.02;
+riskAdj = 0.005;
 d_riskAdj = (0 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 %% Background death rate before 1950
