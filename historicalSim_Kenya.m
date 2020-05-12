@@ -417,7 +417,7 @@ for i = iStart : length(s) - 1
         hivSus , toHiv , hivCurr) , tspan , popIn);
     popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
-        disp('After mixInfect')
+        disp('After mixInfect Kenya')
         break
     end
     
@@ -458,12 +458,12 @@ for i = iStart : length(s) - 1
         hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
         dFertNeg2 , dFertMat2 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
         dDeathMat , dDeathMat2 , dDeathMat3 , ...
-        MTCTRate , ageInd , riskInd , riskDist , riskAdj, d_riskAdj, ......
+        MTCTRate , ageInd , riskAdj, d_riskAdj, riskInd , riskDist ,......
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     popIn = pop(end , :);
     if any(pop(end , :) < 0)
-        disp('After bornAgeDieRisk')
+        disp('After bornAgeDieRisk Kenya')
         break
     end 
     
