@@ -2,7 +2,7 @@
 % Runs simulation over the time period and time step specified by the user.
 
 function [negSumLogL] = historicalSim_Kenya(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
+%Run from the Command Window: historicalSim_Kenya(0 , [] , [] , [] , [] , 0 , '17Dec19')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
 % Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_9May20_Ken_circAllAges_demoCalib_110pctFertFrom1920_2xMort';
+pathModifier = 'toNow_12May20_KenNatClaib_riskDist005pct';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
