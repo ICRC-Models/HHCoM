@@ -37,7 +37,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     hivNegNonVMMCinds , hivNegVMMCinds , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
-    d_partnersMmult, ...
+    d_partnersMmult, riskAdj, d_riskAdj, ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
@@ -134,7 +134,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.5 2.5 1.2];
+partnersMmult = [1.2 2 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1426,8 +1426,12 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
 d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1996 - 1991) * stepsPerYear);
-d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((1996 - 1991) * stepsPerYear);
+d_partnersMmult(2) = (1 - partnersMmult(2)) ./ ((1996 - 1991) * stepsPerYear);
 d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((1996 - 1991) * stepsPerYear);
+
+%% risk adjustment multiplier
+riskAdj = 0.02;
+d_riskAdj = (0 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
