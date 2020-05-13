@@ -99,11 +99,11 @@ mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-%mue3(1:6, :)= mue3(1:6 , :)  ;
+mue3(1, :)= mue3(1 , :) .* 2 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-%mue4(1:6, :)= mue4(1:6 , :)  ;
+mue4(1, :)= mue4(1 , :) .* 2 ;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 %fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
@@ -112,7 +112,6 @@ maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
     'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
-
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -129,7 +128,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.5];
+    fertDeclineProp = [0.7 ; 0.4];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -161,7 +160,7 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3); % .* partnersMmult(1);
+    partnersM(4 , 2:3) = partnersM(4, 2:3);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
