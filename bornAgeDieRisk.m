@@ -20,7 +20,7 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
         dFertNeg2 , dFertMat2 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
         dDeathMat , dDeathMat2 , dDeathMat3 , ...
-        MTCTRate  , ageInd , riskInd , riskDist , ...
+        MTCTRate  , ageInd , riskAdj, d_riskAdj , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 
@@ -94,6 +94,15 @@ dPop = zeros(size(pop));
 
 % prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
+
+if (year >= 1991) && (year < 1996)
+    dt = (year - 1991) * stepsPerYear;
+    riskAdj = riskAdj + d_riskAdj .* dt;
+elseif year >= 1996
+    riskAdj = 0.005;
+end
+riskDist(:, 1, :) = riskDist(:, 1, :) - riskAdj;
+riskDist(:, 3, :) = riskDist(:, 3, :) + riskAdj;
 
 for g = 1 : gender
     for a = 2 : age
