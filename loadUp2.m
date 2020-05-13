@@ -105,7 +105,7 @@ mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
 mue4(1, :)= mue4(1 , :) .* 2 ; %set childhood mortality to be 1.5 times higher 
 fertility = xlsread(file , 'Fertility' , 'D104:J119');
-fertility = fertility .* 1.1; 
+
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
@@ -129,12 +129,12 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.4];
+    fertDeclineProp = [0.7 ; 0.5];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.9 4.5 1.5];
+partnersMmult = [1.2 2 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -147,7 +147,7 @@ if calibBool && any(1 == pIdx)
     partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
     %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
     %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-    %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
+    %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) ;
     %partnersM(10:age , 3) = ones(7 , 1);
     partnersM(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
     partnersM(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
@@ -161,7 +161,7 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3); % .* partnersMmult(1);
+    partnersM(4 , 2:3) = partnersM(4, 2:3); 
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -191,7 +191,7 @@ if calibBool && any(2 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
-    partnersF(4 , 2: 3) = partnersF(4 , 2:3); % .* partnersMmult(2);
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3); 
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
@@ -1440,8 +1440,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.2 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2.0 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
 d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 %% risk distribution multiplier
