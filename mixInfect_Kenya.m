@@ -144,6 +144,7 @@ for g = 1 : gender
         end
     end
 end
+
 ageNum = sum(c .* popSum , 3); % numerator for age portion, sum by r -> dim [g x a]
 den = sum(ageNum , 2); % sum across a -> dim [g x 1]
 
