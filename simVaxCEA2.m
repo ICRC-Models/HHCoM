@@ -49,7 +49,7 @@ load([paramDir,'ageRiskInds'])
 load([paramDir,'vlBeta'])
 
 % load population
-popIn = load([pwd , '\HHCoM_Results\toNow_Erasmus_NickTanModel_050820']);
+popIn = load([pwd , '\HHCoM_Results\toNow_Erasmus_NickTanModel_050820_incARTobsYrs']);
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
@@ -67,7 +67,6 @@ vaxEff = [0.7];
 vaxAge = 2;
 waning = 0; % turn waning on or off
 vaxLimit = 0;
-vaxRemain = 500000;
 
 maxRateM_vec = [0.4 , 0.4];% as of 2013. Scales up from this value in hiv2a.
 maxRateF_vec = [0.5 , 0.5];% as of 2013. Scales up from this value in hiv2a.
@@ -91,7 +90,7 @@ dim = [disease , viral , hpvTypes , hpvStates , periods , gender , age ,risk];
 % run analyses
 stepsPerYear = 6;
 c = fix(clock);
-currYear = c(1); % get the current year
+currYear = 2018; %c(1); % get the current year
 
 % Initialize vectors
 timeStep = 1 / stepsPerYear;
@@ -144,12 +143,12 @@ toV = toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , 1 , ...
 import java.util.LinkedList
 % artDistList = LinkedList();
 artDistList = popIn.artDistList;
-if ~ exist([pwd , '\HHCoM_Results\Vaccine\'])
-    mkdir ([pwd, '\HHCoM_Results\Vaccine\'])
+if ~ exist([pwd , '\HHCoM_Results\VaccineErasmus_NickTanModel_050820_incARTobsYrs\'])
+    mkdir ([pwd, '\HHCoM_Results\VaccineErasmus_NickTanModel_050820_incARTobsYrs\'])
 end
 
 %%
-for n = 1 : nTests
+parfor n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -171,6 +170,9 @@ for n = 1 : nTests
     tVec = linspace(currYear , lastYear , size(popVec , 1));
     k = cumprod([disease , viral , hpvTypes , hpvStates , periods , gender , age]);
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
+    if vaxLimit
+        vaxRemain = 500000;
+    end
     %%
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;

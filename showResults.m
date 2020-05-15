@@ -5,7 +5,7 @@ load([paramDir,'actual'])
 load([paramDir,'calibData'])
 % load('C:\Users\nicktzr\Google Drive\ICRC\CISNET\Results\to2017')
 resultsDir = [pwd , '\HHCoM_Results\'];
-load([resultsDir , 'toNow'])
+load([resultsDir , 'toNow_Erasmus_NickTanModel_050820'])
 %% Plot Settings
 
 % colors = [241, 90, 90;
