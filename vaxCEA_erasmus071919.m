@@ -1,6 +1,6 @@
 function vaxCEA_erasmus071919 %(pathModifier)
 
-pathModifier = '072919_noBaseVax_baseScreen_Erasmus_vaxA59_2018Vax';
+pathModifier = 'Erasmus_NickTanModel_050820_incARTobsYrs';
 
 waning = 0;    % turn waning on or off
 
@@ -13,7 +13,7 @@ sumall = @(x) sum(x(:));
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_072919_noBaseVax_baseScreen_Erasmus_2018Vax']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_Erasmus_NickTanModel_050820_incARTobsYrs']); % Population up to current year
 
 % Helper functions
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); % sums 1 year worth of values
@@ -33,15 +33,15 @@ parfor n = 1 : nSims
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to current year to population
     % matrices for years past current year
-    vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end , :)];
-    vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :) ; vaxResult{n}.newHpv(2 : end , : , : , : ,:)];
-    vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :) ; vaxResult{n}.newImmHpv(2 : end , : , : , : , :)];
-    vaxResult{n}.newVaxHpv= [curr.newVaxHpv(1 : end , : , : , : , :) ; vaxResult{n}.newVaxHpv(2 : end , : , : , : , :)];
-    vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end , : , : ,:)];
-    vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , :) ; vaxResult{n}.newHiv(2 : end , : , : ,:)];
-    vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :) ; vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
-    temp_tVec = linspace(1910 , 2018 , 649);
-    vaxResult{n}.tVec = [temp_tVec(1 : end) , vaxResult{n}.tVec(2 : end)];
+    vaxResult{n}.popVec = [curr.popVec(1 : end  , :) ; vaxResult{n}.popVec(2 : end-5 , :)];
+    vaxResult{n}.newHpv= [curr.newHpv(1 : end , : , : , : , :) ; vaxResult{n}.newHpv(2 : end-5 , : , : , : ,:)];
+    vaxResult{n}.newImmHpv= [curr.newImmHpv(1 : end , : , : , : , :) ; vaxResult{n}.newImmHpv(2 : end-5 , : , : , : , :)];
+    vaxResult{n}.newVaxHpv= [curr.newVaxHpv(1 : end , : , : , : , :) ; vaxResult{n}.newVaxHpv(2 : end-5 , : , : , : , :)];
+    vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :) ; vaxResult{n}.newCC(2 : end-5 , : , : ,:)];
+    vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , :) ; vaxResult{n}.newHiv(2 : end-5 , : , : ,:)];
+    vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :) ; vaxResult{n}.artTreatTracker(2 : end-5 , : , : , : , : , :)];
+    %temp_tVec = linspace(1910 , 2018 , 649);
+    vaxResult{n}.tVec = [curr.tVec(1 : end) , vaxResult{n}.tVec(2 : end-5)];
 end
 
 noVaxInd = nSims;
@@ -380,15 +380,15 @@ for n = 1 : nSims
         for i = 1 : length(inds)
             % General
             vax = [toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , ...
-                2 : 5 , g , 4:age , 1 : risk)); ...
+                2 : 3 , g , 4:age , 1 : risk)); ...
                 toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 10 , ...
-                2 : 5 , g , 4:age , 1 : risk)); ...
+                2 : 3 , g , 4:age , 1 : risk)); ...
                 toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , ...
-                [1,6] , g , 4:age , 1 : risk))];
+                1 , g , 4:age , 1 : risk))];
             nVax = [toInd(allcomb(1 : disease , 1 : viral , 1 , 1 , ...
-                [1,6] , g , 4:age , 1 : risk)); ...
+                1 , g , 4:age , 1 : risk)); ...
                 toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 10 , ...
-                [1,6] , g , 4:age , 1 : risk))];
+                1 , g , 4:age , 1 : risk))];
 
             hpvIncRef_vax = ...
                 (annlz(sum(sum(sum(sum(vaxResult{n}.newVaxHpv(: , g , : , 4:age , :),2),3),4),5)) ./ ...
@@ -419,16 +419,16 @@ for n = 1 : nSims
     for gInd = 1
         g = inds{gInd};
         hpvVaxInds = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 7 , ...
-            2 : 5 , g , 4 : 10 , 1 : risk));
+            2 : 3 , g , 4 : 10 , 1 : risk));
         allVaxInds = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-            2 : 5 , g , 4:10 , 1 : risk)); ...
+            2 : 3 , g , 4:10 , 1 : risk)); ...
             toInd(allcomb(1 : disease , 1 : viral , 1 , 9 , ...
-            [1,6] , g , 4:10 , 1 : risk))];
+            1 , g , 4:10 , 1 : risk))];
             
         hpvNvaxInds = toInd(allcomb(1 : disease , 1 : viral , 2 : hpvTypes , 1 : 7 , ...
-            [1,6] , g , 4 : 10 , 1 : risk));
+            1 , g , 4 : 10 , 1 : risk));
         allNvaxInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvTypes , 1 : hpvStates , ...
-            [1,6] , g , 4 : 10 , 1 : risk));
+            1 , g , 4 : 10 , 1 : risk));
 
         hpvPop = sum(vaxResult{n}.popVec(: , hpvVaxInds) , 2);
         allPop = sum(vaxResult{n}.popVec(: , allVaxInds) , 2);
