@@ -1424,9 +1424,9 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1996 - 1991) * stepsPerYear);
-d_partnersMmult(2) = (1 - partnersMmult(2)) ./ ((1996 - 1991) * stepsPerYear);
-d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((1996 - 1991) * stepsPerYear);
+d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
 riskAdj = 0.004;
