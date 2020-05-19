@@ -9,8 +9,8 @@
 #SBATCH --account=csde                              # Allocation Definition
 #SBATCH --partition=csde
 #SBATCH --nodes=1                                   # Node resources
-#SBATCH --mem=120G                                  # Memory per node
-#SBATCH --time=04:00:00                             # Wall clock time limit hrs:min:sec
+#SBATCH --mem=185G                                  # Memory per node
+#SBATCH --time=06:00:00                             # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
 
@@ -19,7 +19,7 @@ echo "Running MATLAB script futureSim for simulation predictions."
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "futureSim"
+matlab -nodisplay -nosplash -r "futureSim(0 , [] , [] , [] , [] , 0 , '19May20')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 

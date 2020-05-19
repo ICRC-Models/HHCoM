@@ -9,7 +9,7 @@
 #SBATCH --account=csde      	 		    # Allocation Definition
 #SBATCH --partition=csde
 #SBATCH --nodes=1   		 		    # Node resources
-#SBATCH --mem=120G   		 		    # Memory per node
+#SBATCH --mem=185G   		 		    # Memory per node
 #SBATCH --time=04:00:00 	 		    # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
@@ -19,7 +19,7 @@ echo "Running MATLAB script historicalSim for historical simulation."
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "historicalSim(0 , [] , [] , [] , [] , 0 , '10Dec19')"
+matlab -nodisplay -nosplash -r "historicalSim(0 , [] , [] , [] , [] , 0 , '19May20')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID 
 
