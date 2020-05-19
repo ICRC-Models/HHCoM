@@ -96,6 +96,7 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
+mue2(1, :)= mue2(1 , :) .* 1.5 ;
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
@@ -134,7 +135,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2 1.2];
+partnersMmult = [1.2 4 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1441,11 +1442,11 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.8 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
 d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 %% risk distribution multiplier
-riskAdj = 0.01;
+riskAdj = 0.05;
 d_riskAdj = (0 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 
