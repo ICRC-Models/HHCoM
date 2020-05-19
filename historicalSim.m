@@ -1,8 +1,9 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
+function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)    % input variables when using a calibration parameter set
+historicalSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
+% Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
 % Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
@@ -36,14 +37,14 @@ pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
-fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
+fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % VACCINATION
 vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+vaxAge = 2;
+vaxRate = 0.0; %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types))
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -536,10 +537,6 @@ if calibBool
         cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , totPopSize_dObs , toInd , ...
         disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
-
-    %if negSumLogL < -220000.00
-    %    delete([savdir , pathModifier , '.mat']);
-    %end
     
     if isnan(negSumLogL)
         negSumLogL = -10000000.00;
