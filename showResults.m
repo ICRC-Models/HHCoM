@@ -49,7 +49,8 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_19May20_NyanCalib_10riskAdj_3xPt3']
+toNowName = ['toNow_18May20_nyanCalib_05riskAdj005_4xpartnersMult18']
+
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -314,10 +315,11 @@ ylim([0, 40])
 %%
 sheet = ['HIV_prev'];
 cols1 = {toNowName};
-cols2 = {'0.1_riskaAdj + 2x pt'}; %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
-xlswrite(filename, cols1, sheet, 'H1')
-xlswrite(filename, cols2, sheet, 'H2')
-xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'H3')
+
+cols2 = {'0.05_riskaAdj'}; %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(filename, cols1, sheet, 'F1')
+xlswrite(filename, cols2, sheet, 'F2')
+xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'F3')
 %xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
 %xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
 
@@ -328,12 +330,12 @@ hivObsGender = zeros(4,3)
 hivObsGender(:,3) = [1998 2003 2007 2008]; 
 hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
 hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
-% 
-% sheet = ['HIV_by_sex'];
-% cols1 = {toNowName};
-% cols2 = {'M, 0.1riskAdj + 2xPt', 'F, 0.1riskAdj + 2xPt'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-% xlswrite(filename, cols1, sheet, 'O1')
-% xlswrite(filename, cols2, sheet, 'O2')
+
+sheet = ['HIV_by_sex'];
+cols1 = {toNowName};
+cols2 = {'Male, 0.05riskAdj', 'Female, 0.05riskAdj'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+xlswrite(filename, cols1, sheet, 'K1')
+xlswrite(filename, cols2, sheet, 'K2')
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -350,9 +352,10 @@ for g = 1 : 2
     hold on
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
-%     cell1 = ['O', 'P'];
-%     cell = ([cell1(g) +'3']);
-%     xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
+
+    cell1 = ['K', 'L'];
+    cell = ([cell1(g) +'3']);
+    xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
 xlabel('Year')
 xlim([1980 2020])
@@ -559,6 +562,7 @@ cols1 = {toNowName};
 cols2 = {'Male (1998)', 'Female (1998)', ...
     'Male (2003)', 'Female (2003)', ...
     'Male (2008)', 'Female (2008)'};
+
 xlswrite(filename, cols1, sheet, 'A32')
 xlswrite(filename, cols2, sheet, 'A33')
 % xlswrite(filename, ageGroup(4:10)', sheet, 'A24')
@@ -567,7 +571,6 @@ xlswrite(filename, [hiv1998], sheet, 'A34')
 xlswrite(filename, [hiv2003], sheet, 'C34')
 %xlswrite(filename, [DHS2003_Nyanza], sheet, 'H3')
 xlswrite(filename, [hiv2008], sheet, 'E34')
-%xlswrite(filename, [DHS2008_Nyanza], sheet, 'P3')
 
 %% HIV prevalance, by sex and age over time 
 figure()
@@ -604,7 +607,7 @@ end
    sex_label = repmat(["M" "F"], 41, 1)
     xlswrite(filename, [yr', sex_label(:, 1), squeeze(hivSexAge(331:stepsPerYear:end, 1, :))], sheet, "K14")
     xlswrite(filename, [yr', sex_label(:, 2), squeeze(hivSexAge(331:stepsPerYear:end, 2, :))], sheet, "K55")
-    
+
 xlabel('Year')
 xlim([1980 2020])
 ylabel('Prevalence')
