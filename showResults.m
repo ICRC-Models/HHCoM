@@ -49,7 +49,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_18May20_nyanCalib_05riskAdj005_4xpartnersMult18']
+toNowName = ['toNow_19May20_NyanCalib_HPVtrans002_2xSexActs20-24']
 
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
@@ -331,11 +331,11 @@ hivObsGender(:,3) = [1998 2003 2007 2008];
 hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
 hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
 
-sheet = ['HIV_by_sex'];
-cols1 = {toNowName};
-cols2 = {'Male, 0.05riskAdj', 'Female, 0.05riskAdj'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-xlswrite(filename, cols1, sheet, 'K1')
-xlswrite(filename, cols2, sheet, 'K2')
+% sheet = ['HIV_by_sex'];
+% cols1 = {toNowName};
+% cols2 = {'Male, 0.05riskAdj', 'Female, 0.05riskAdj'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+% xlswrite(filename, cols1, sheet, 'K1')
+% xlswrite(filename, cols2, sheet, 'K2')
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -353,9 +353,9 @@ for g = 1 : 2
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
 
-    cell1 = ['K', 'L'];
-    cell = ([cell1(g) +'3']);
-    xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
+%     cell1 = ['K', 'L'];
+%     cell = ([cell1(g) +'3']);
+%     xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
 xlabel('Year')
 xlim([1980 2020])

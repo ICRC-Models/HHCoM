@@ -665,7 +665,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0010;
+    perPartnerHpv_vax = 0.00250;
 end
 
 if calibBool && any(11 == pIdx)
