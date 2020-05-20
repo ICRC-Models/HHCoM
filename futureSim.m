@@ -2,7 +2,7 @@
 % Accepts population vector from calibrated natural history model as input
 
 function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)    % input variables when using a calibration parameter set
-%Run from the Command Window: futureSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
+% futureSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
 % Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
 % profile clear;
@@ -15,10 +15,10 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_19May20_baseVax_baseScreen_handCalibModel']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCES01toNow_19May20_baseVax_baseScreen_handCalibModel'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -43,7 +43,7 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];
-vaxCoverB = 0.0; %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types))
+vaxCoverB = 0.0; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
