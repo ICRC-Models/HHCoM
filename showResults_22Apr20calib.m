@@ -57,6 +57,7 @@ fileInds = {'2_3407' , '2_499' , '2_846' , '2_947' , '4_2361' , '4_635' , ...
     '4_711' , '5_1822' , '5_4018' , '6_746' , '7_1817' , '7_1869' , ...
     '7_2249' , '7_678' , '8_2043' , '8_3465' , '9_2333' , '9_334' , ...
     '9_334'};
+ % {'2_846' , '9_334' , '4_711' , '4_2361'}
 nRuns = length(fileInds);
 
 resultsDir = [pwd , '\HHCoM_Results\'];
@@ -474,9 +475,9 @@ for j = 1 : nRuns
 
     set(gca , 'xtick' , 1 : length(hpvNegObs) , 'xtickLabel' , ageGroup);
     legend('HIV-Positive (year 2002)' , 'HIV-Negative (year 2002)' , ...
-        'Observed HIV-Positive: McDonald 2014 bounds ?' , 'Observed HIV-Negative: McDonald 2014 bounds ?' , ...
-        'Observed HIV-Positive: Calibration SD' , 'Observed HIV-Negative: Calibration SD')
-    xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
+        'Observed HIV-Positive: McDonald 2014 bounds ?' , 'Observed HIV-Positive: Calibration SD' , ...
+        'Observed HIV-Negative: McDonald 2014 bounds ?' , 'Observed HIV-Negative: Calibration SD');
+    xlabel('Age Group'); ylabel('hrHPV Prevalence (%)');
     %title('Age Specific hrHPV Prevalence in 2002')
 
     %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
