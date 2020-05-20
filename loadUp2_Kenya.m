@@ -472,8 +472,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1);
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2);
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1);
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2);
 end
 
 % CIN1 to HPV, ages 10-24
@@ -514,7 +514,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ;
+rNormal_Inf(5 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for 20-24
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
@@ -665,7 +665,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00450;
+    perPartnerHpv_vax = 0.0010;
 end
 
 if calibBool && any(11 == pIdx)
