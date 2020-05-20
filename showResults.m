@@ -49,7 +49,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_19May20_NyanCalib_HPVtrans0045']
+toNowName = ['toNow_19May20_NyanCalib_10riskAdj_3xPt3']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -328,12 +328,12 @@ hivObsGender = zeros(4,3)
 hivObsGender(:,3) = [1998 2003 2007 2008]; 
 hivObsGender(:,1) = [19.8 12.28 11.0 11.6]; 
 hivObsGender(:,2) = [30.1 18.25 18.0 15.97]; 
-
-sheet = ['HIV_by_sex'];
-cols1 = {toNowName};
-cols2 = {'M, 0.1riskAdj + 2xPt', 'F, 0.1riskAdj + 2xPt'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-xlswrite(filename, cols1, sheet, 'O1')
-xlswrite(filename, cols2, sheet, 'O2')
+% 
+% sheet = ['HIV_by_sex'];
+% cols1 = {toNowName};
+% cols2 = {'M, 0.1riskAdj + 2xPt', 'F, 0.1riskAdj + 2xPt'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+% xlswrite(filename, cols1, sheet, 'O1')
+% xlswrite(filename, cols2, sheet, 'O2')
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -350,9 +350,9 @@ for g = 1 : 2
     hold on
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
-    cell1 = ['O', 'P'];
-    cell = ([cell1(g) +'3']);
-    xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
+%     cell1 = ['O', 'P'];
+%     cell = ([cell1(g) +'3']);
+%     xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
 xlabel('Year')
 xlim([1980 2020])
@@ -1021,7 +1021,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2005;
+yr = 2000;
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
 hpvNeg2005 = hpv2005;
@@ -1113,7 +1113,7 @@ legend('Model HIV-pos' , 'Model HIV-neg' ,...
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence in women by HIV status (2005)')
 ylim([0 100])
-
+%%
 sheet = ['HPV_by_age_2005'];
 cols1 = {toNowName};
 cols2 = {'HIV+, 5% riskAdj', 'HIV-, 5% riskAdj'}; %, 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
