@@ -136,7 +136,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 
-partnersMmult = [1.2 4 1.2];
+partnersMmult = [1.2 2 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -213,6 +213,7 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4.5; 
+    maleActs(5:6, 1:risk) = maleActs(5 : 6, 1:risk) .* 4.5; 
 end
 
 % Female acts per partnership per year by age and risk group
@@ -230,6 +231,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
+    femaleActs(5 : 6, 1:risk) = femaleActs(5 : 6, 1:risk) .* 5;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -668,7 +670,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00450;
+    perPartnerHpv_vax = 0.0010; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
