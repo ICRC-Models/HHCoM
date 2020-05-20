@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2 1.2];
+partnersMmult = [1.2 1.2 2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1424,8 +1424,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(1) = (1.1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.1 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
