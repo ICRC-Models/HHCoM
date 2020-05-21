@@ -209,9 +209,10 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4.5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7;
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -228,9 +229,10 @@ if calibBool && any(9 == pIdx)
     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
-    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.5;
-    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk) .* 0.7;
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 2 ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.7 ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -432,8 +434,8 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) ;
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 1.6; % original multiplier = 1.6
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 1.5;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2; % original multiplier = 1.6
 end
 
 % CIN1 to CIN2, ages 10-24
@@ -476,8 +478,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1);
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2);
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) .* 0.85;
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) .* 0.85;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -518,7 +520,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(5 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for 20-24
+rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ;
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
@@ -676,7 +678,7 @@ if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.45;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.3;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
