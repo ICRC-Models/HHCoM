@@ -5,6 +5,8 @@ fileB = [pwd , '\HHCoM_Results\Vaccine082119_WHOP1_SCE1\P1_SCE1Coverage0_AgeStan
 p1S0 = xlsread(fileB , 'General' , 'B1:B101');
 years = xlsread(fileB , 'General' , 'A1:A101');
 hpvReduct = (p1S1 - p1S0) ./ p1S0 * 100;
+
+figure;
 plot(years , hpvReduct)
 grid on
 
