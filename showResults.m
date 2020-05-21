@@ -49,7 +49,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_19May20_NyanCalib_HPVtrans002_2xSexActs20-24']
+toNowName = ['toNow_20May20_NyanCalib_HPVtrans0025_3xSexActs']
 
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
@@ -1187,13 +1187,13 @@ xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 title('HPV prevalence among women in 2000')
 ylim([0 100])
 
-sheet = ['HPV_by_age_2000'];
-cols1 = {toNowName,'HPV prevalence among women in 2000'};
-%cols2 = {'Age', 'Model Gen Pop'}; %, 'DeVuyst gen pop', 'DeVuyst HIV+'};
-xlswrite(filename, cols1, sheet, 'I1')
-%xlswrite(filename, cols2, sheet, 'I2')
-xlswrite(filename, ageGroup(1:9)', sheet, 'I3')
-xlswrite(filename, [hpv2000], sheet, 'J3')
+% sheet = ['HPV_by_age_2000'];
+% cols1 = {toNowName,'HPV prevalence among women in 2000'};
+% %cols2 = {'Age', 'Model Gen Pop'}; %, 'DeVuyst gen pop', 'DeVuyst HIV+'};
+% xlswrite(filename, cols1, sheet, 'I1')
+% %xlswrite(filename, cols2, sheet, 'I2')
+% xlswrite(filename, ageGroup(1:9)', sheet, 'I3')
+% xlswrite(filename, [hpv2000], sheet, 'J3')
 
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data

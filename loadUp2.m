@@ -213,7 +213,8 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4.5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk).* 3 ; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk).* 2 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk).* 0.7 ;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -231,7 +232,8 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 3;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 2 ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.7 ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -477,8 +479,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1); 
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2);
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1); 
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2);
 end
 
 % CIN1 to HPV, ages 10-24
@@ -519,7 +521,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for ages 20-24
+rNormal_Inf(5 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for ages 20-24
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);

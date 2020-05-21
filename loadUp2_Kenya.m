@@ -210,6 +210,8 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4.5; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -227,6 +229,8 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.5;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk) .* 0.7;
 end
 
 % Convert 5-year age groups to 1-year age groups
