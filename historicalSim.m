@@ -40,6 +40,12 @@ pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % VACCINATION
+% Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
+%   Otherwise, set it to 0.86 (the historical coverage level for 9 year-olds) times an adjustment for the bivalent vaccine. We are 
+%   adjusting coverage rather than efficacy because we don't track vaccination by vaccine type and age cohorts can have mixed vaccine
+%   types, particularly if catch-up vaccination is applied in future years.
+
+% Common parameters
 vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
