@@ -115,7 +115,7 @@ end
 
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
-% partnersMmult = [2 4];
+% partnersMmult = [1.2 2 1.1 ];
 if (year >= 1990) && (year < 1994)
     dt = (year - 1994) * stepsPerYear;
     partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1) .* dt;

@@ -818,9 +818,9 @@ vaxStartYear = 2014;
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
 vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
-            0.615 0.75 0.75 0.75 0.75 0.75; ... % 2003
-            0.70 0.80 0.80 0.80 0.80 0.80; ... %2008
-            0.77 0.86 0.86 0.86 0.86 0.86; ... %2014 
+            0.5 0.70 0.75 0.70 0.6 0.50; ... % 2003
+            0.60 0.70 0.75 0.70 0.60 0.60; ... %2008
+            0.70 0.75 0.80 0.75 0.70 0.60; ... %2014 
             0.90 0.90 0.90 0.90 0.90 0.90];   % 2030 [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
@@ -1430,8 +1430,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.1 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.3 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier

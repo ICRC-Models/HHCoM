@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_20May20_KenCalib_HPVtrans003_2xA5-70pctA6-7-150pctA10SexActs']
+toNowName = ['toNow_20May20_KenCalib_HPVtrans003_2xA5-70pctA6-7-150pctA10SexActs_pt']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
