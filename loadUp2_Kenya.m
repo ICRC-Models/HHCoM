@@ -769,7 +769,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.3] , [0; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use
