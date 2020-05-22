@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_20May20_KenCalib_HPVtrans003_2xA5-70pctA6-7-150pctA10SexActs_pt']
+toNowName = ['toNow_22May20_KenCalib_HPVtrans003_2xA5-70pctA6-7-150pctA10SexActs_reduceVMMC_fixPt']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -963,28 +963,29 @@ for g = 1 : gender
     plot(tVec , hivNegHPV)
     plot(tVec , hivPosHPV)
     plot(tVec , artHPV)
-   
-    xlabel('Year'); ylabel('Prevalence (%)'); title([genders{g} , ' HPV Prevalence (ages 15+)'])
+     xlim([1975 2020])
+    ylim([0 80])
+    xlabel('Year'); ylabel('Prevalence (%)'); title(['Kenya ', genders{g} , ' HPV Prevalence (ages 15+)'])
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
 
 
-sheet = ['hpvPrev'];
-cols1 = {toNowName};
-cols2 = {'Year', [genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
-xlswrite(filename, cols1, sheet, 'A1')
-cell = ['A', 'F'];
-
-xlswrite(filename, cols2, sheet, [cell(g) +'2'])
-xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', genPopHPV(1 : stepsPerYear * 5 : end), ...
-    hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
-    artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
+% sheet = ['hpvPrev'];
+% cols1 = {toNowName};
+% cols2 = {'Year', [genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
+% xlswrite(filename, cols1, sheet, 'A1')
+% cell = ['A', 'F'];
+% 
+% xlswrite(filename, cols2, sheet, [cell(g) +'2'])
+% xlswrite(filename, [tVec(1 : stepsPerYear * 5  : end)', genPopHPV(1 : stepsPerYear * 5 : end), ...
+%     hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
+%     artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
 end
 %% HPV Prevalence by age in 2005 vs. Yamada and Luchter data
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 1994;
+yr = 2010;
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
 hpvNeg2005 = hpv2005;
@@ -1074,7 +1075,7 @@ legend('Model HIV-pos' , 'Model HIV-neg' ,...
     'Obs HIV-pos: DeVuyst (CC screening 2009)' ,...
     'Obs HIV-pos: Yamada (Nairobi, clinic)','Obs HIV-neg: Yamada (Nairobi, clinic)')
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
-title('HPV prevalence in women by HIV status (2005)')
+title(['Kenya HPV prevalence in women in ', yr])
 ylim([0 100])
 %%
 sheet = ['HPV_by_age_2005'];

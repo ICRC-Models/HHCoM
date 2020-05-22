@@ -481,8 +481,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 0.85; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 0.85;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) ; 
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) ;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -674,14 +674,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00250; %original value 0.005
+    perPartnerHpv_vax = 0.0030; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.3;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.25;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -745,7 +745,7 @@ if calibBool && any(37 == pIdx)
     idx = find(37 == pIdx);
     maleHpvClearMult = paramSet(paramsSub{idx}.inds(:));
 else
-    maleHpvClearMult = 1.0;
+    maleHpvClearMult = 0.8;
 end
 
 % HIV and ART multipliers
