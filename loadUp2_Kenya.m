@@ -671,14 +671,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.008;
+    perPartnerHpv_vax = 0.006;
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.25;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.55;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -1435,7 +1435,7 @@ d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
-riskAdj = 0.005;
+riskAdj = 0.01;
 d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
