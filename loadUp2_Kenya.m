@@ -210,8 +210,8 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.1;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
 
@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 1.5 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 2.1 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.7 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -478,8 +478,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) ;
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) ;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 1.2;
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -671,7 +671,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0030;
+    perPartnerHpv_vax = 0.010;
 end
 
 if calibBool && any(11 == pIdx)
