@@ -214,7 +214,7 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
     maleActs(5, 1:risk) = maleActs(5, 1:risk).* 2 ;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk).* 0.7 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk).* 0.6 ;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
 
@@ -234,7 +234,7 @@ else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
     femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 2 ;
-    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.7 ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
 
@@ -481,8 +481,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) ; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) ;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 1.5 ; 
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5 ;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -633,7 +633,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32];
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.1;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
@@ -674,14 +674,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0030; %original value 0.005
+    perPartnerHpv_vax = 0.00450; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.25;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.6;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -1457,7 +1457,7 @@ d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 %% risk distribution multiplier
 
 riskAdj = 0.1;
-d_riskAdj = (0 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
+d_riskAdj = (0.01 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 
 %% Background death rate before 1950
