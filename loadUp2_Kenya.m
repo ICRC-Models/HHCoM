@@ -209,7 +209,7 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 6; 
     maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
@@ -1436,7 +1436,7 @@ d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
 riskAdj = 0.01;
-d_riskAdj = (0.005 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
+d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
