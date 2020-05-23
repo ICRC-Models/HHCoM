@@ -49,7 +49,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_21May20_N_sexAct_HPVclear_fixPt']
+toNowName = ['toNow_22May20_N_ HPVtrans003_sexAct_HPVclear_mClear']
 
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
@@ -316,10 +316,10 @@ ylim([0, 40])
 sheet = ['HIV_prev'];
 cols1 = {toNowName};
 
-cols2 = {'0.05_riskaAdj'}; %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
-xlswrite(filename, cols1, sheet, 'F1')
-xlswrite(filename, cols2, sheet, 'F2')
-xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'F3')
+cols2 = {'HPVCalib_sexActs'}; %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(filename, cols1, sheet, 'I1')
+xlswrite(filename, cols2, sheet, 'I2')
+xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'I3')
 %xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
 %xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
 
@@ -1025,7 +1025,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2005;
+yr = 2020;
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
 hpvNeg2005 = hpv2005;
