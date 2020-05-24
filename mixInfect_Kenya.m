@@ -124,7 +124,7 @@ if (year >= 1990) && (year < 1994)
 elseif year >= 1994
     partnersMmult(1) = 1.1;
     partnersMmult(2) = 1.15;
-    partnersMmult(3) = 0.85;
+    partnersMmult(3) = 0.8;
 end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
 partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
