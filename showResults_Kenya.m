@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_22May20_K_ HPVtrans008_2-5xsexAct_1-5xHPVclear_08mClear']
+toNowName = ['toNow_23May20_K_HPVtrans0045_01riskAdj005_20pctHIVmult_1-1pt[3]08_2-5xSexActs20-24']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -985,7 +985,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2005;
+yr = 2000;
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
 hpvNeg2005 = hpv2005;
@@ -1075,7 +1075,7 @@ legend('Model HIV-pos' , 'Model HIV-neg' ,...
     'Obs HIV-pos: DeVuyst (CC screening 2009)' ,...
     'Obs HIV-pos: Yamada (Nairobi, clinic)','Obs HIV-neg: Yamada (Nairobi, clinic)')
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
-title(['Kenya HPV prevalence in women in ', yr])
+title(['Kenya HPV prevalence in women in 2020'])
 ylim([0 100])
 %%
 sheet = ['HPV_by_age_2005'];
@@ -1090,6 +1090,7 @@ xlswrite(filename, [hpvHIV2005, hpvNeg2005], sheet, 'B3')
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+yr = 1994;
 hpv2000 = zeros(9 , 1);
 hpvHIV2000 = hpv2000;
 hpvNeg2000 = hpv2000;
@@ -1103,8 +1104,8 @@ for a = 4 : 12
         [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    hpv2000(a - 3 , 1) = sum(popVec((2000 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(popVec((2000 - startYear) * stepsPerYear , ageInds)) * 100;
+    hpv2000(a - 3 , 1) = sum(popVec((yr - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
 %  
 end
 

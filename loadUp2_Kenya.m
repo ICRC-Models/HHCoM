@@ -630,7 +630,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.2;
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.3;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
@@ -1430,9 +1430,9 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.15 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(3) = (0.8 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(1) = (1.1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.1 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(3) = (0.75 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
 riskAdj = 0.01;
