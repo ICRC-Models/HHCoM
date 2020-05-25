@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_23May20_K_HPVtrans0045_01riskAdj005_20pctHIVmult_1-1pt[3]08_2-5xSexActs20-24']
+toNowName = ['toNow_24May20_K_HPVtrans0045_01riskAdj005_30pctHIVmult_1-1pt[3]075_2pt[2]1-2']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -985,7 +985,8 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2000;
+yr = 2020;
+year = {yr};
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
 hpvNeg2005 = hpv2005;
@@ -1075,7 +1076,7 @@ legend('Model HIV-pos' , 'Model HIV-neg' ,...
     'Obs HIV-pos: DeVuyst (CC screening 2009)' ,...
     'Obs HIV-pos: Yamada (Nairobi, clinic)','Obs HIV-neg: Yamada (Nairobi, clinic)')
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
-title(['Kenya HPV prevalence in women in 2020'])
+title(['Kenya HPV prevalence in women in', year ])
 ylim([0 100])
 %%
 sheet = ['HPV_by_age_2005'];
@@ -1090,7 +1091,7 @@ xlswrite(filename, [hpvHIV2005, hpvNeg2005], sheet, 'B3')
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-yr = 1994;
+yr = 2020;
 hpv2000 = zeros(9 , 1);
 hpvHIV2000 = hpv2000;
 hpvNeg2000 = hpv2000;
@@ -1205,7 +1206,7 @@ ylim([0 100]);
 
 
 %%  CIN Prevalence by HIV stat among women
-
+yr = 2020;
 cinHiv_ccScreen = [0.18	0.105 0.089] .* 100; % Observed, HIV+, Nairobi, Memiah, 2013
 cinHiv_ccScreen2 = [33.1 10.5 12.8]; %Observed, HIV clinic, De Vuyst 2013
 cinHIV_FSW = [19.1 NaN 13.1]; %Observed, HIV+ FSW, Nairobi, Sweet 2020
@@ -1222,8 +1223,8 @@ for cin = 3 : 5
         [1 : 5 , 7] , cin , 1 , 1 : intervens , 2 , 5:12 , 1 : risk))]);
         ageInds = toInd(allcomb(3 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , 5:12 , 1 : risk));
-        cinHiv2010(cin-2) = (sum(popVec((2010 - startYear) * stepsPerYear , cinPosInds)))...
-        ./ sum(popVec((2010 - startYear) * stepsPerYear , ageInds)) * 100;
+        cinHiv2010(cin-2) = (sum(popVec((yr - startYear) * stepsPerYear , cinPosInds)))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
     
         % HIV-
         cinNegInds = unique([toInd(allcomb(1 : 2 , 1 : viral , cin , [1 : 5 , 7] , ...
@@ -1231,8 +1232,8 @@ for cin = 3 : 5
         [1 : 5 , 7] , cin , 1 , 1 : intervens , 2 , 5:12 , 1 : risk))]);
         ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , 5:12 , 1 : risk));
-        cinHivNeg2010(cin-2) = (sum(popVec((2010 - startYear) * stepsPerYear , cinNegInds)))...
-        ./ sum(popVec((2010 - startYear) * stepsPerYear , ageInds)) * 100;
+        cinHivNeg2010(cin-2) = (sum(popVec((yr - startYear) * stepsPerYear , cinNegInds)))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
         
 end    
 %     cinInds = toInd(allcomb(3 :7 , 1 : viral , 2 : hpvVaxStates , cin - 1, ...

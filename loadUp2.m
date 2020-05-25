@@ -772,6 +772,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
+circProtect = circProtect .* 0.5;
 circProtect = [[circProtect; 0.3] , [0; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
@@ -783,7 +784,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = .15; %changed from 20%
+        condUse = 0; %changed from 20%
     end
 end
 
@@ -815,7 +816,7 @@ end
 hivStartYear = 1980;
 circStartYear = 1980;
 circNatStartYear = 2008;
-vaxStartYear = 2014;
+vaxStartYear = 2020;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
