@@ -674,14 +674,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00450; %original value 0.005
+    perPartnerHpv_vax = 0.00550; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.6;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.65;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -796,7 +796,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2025 - 1)]; % assuming 90-90-90 target reached by 2030
+artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males
 maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
@@ -1451,8 +1451,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.3 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.1 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (0.85 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% risk distribution multiplier
