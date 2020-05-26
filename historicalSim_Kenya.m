@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_25May20_K_HPVtrans0055_01riskAdj_2Pt[2]1-15_immuneMult_2xclear';
+pathModifier = 'toNow_26May20_K_HPVtrans0055_01riskAdj_2Pt[2]1-15_2xSecAct20-24';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
