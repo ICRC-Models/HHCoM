@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2 1.2];
+partnersMmult = [1.2 2.8 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -210,7 +210,7 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 6; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5 ;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 3 ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.65;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.5 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 3 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.65 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -478,8 +478,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 1.5;
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2;
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 2;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -1432,12 +1432,12 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
-riskAdj = 0.01;
-d_riskAdj = (0.005 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
+riskAdj = 0.005;
+d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')

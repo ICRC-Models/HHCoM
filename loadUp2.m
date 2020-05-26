@@ -481,8 +481,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 1.5 ; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5 ;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2 ; 
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 2 ;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -1452,7 +1452,7 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.8 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
 d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 

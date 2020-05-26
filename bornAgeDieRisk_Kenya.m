@@ -99,7 +99,7 @@ if (year >= 1990) && (year < 1994)
     dt = (year - 1990) * stepsPerYear;
     riskAdj = riskAdj + d_riskAdj .* dt;
 elseif year >= 1994
-    riskAdj = 0.005;
+    riskAdj = 0;
 end
 
 riskDist(:, 1, :) = riskDist(:, 1, :) - riskAdj;
