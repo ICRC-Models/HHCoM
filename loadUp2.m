@@ -612,7 +612,7 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.3) , log10(0.405) , 4);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.33) , log10(0.405) , 4);
     lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
     lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
@@ -1459,7 +1459,7 @@ d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 %% risk distribution multiplier
 
 riskAdj = 0.1;
-d_riskAdj = (0.01 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
+d_riskAdj = (0.005 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 
 %% Background death rate before 1950

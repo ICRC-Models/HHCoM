@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2.8 1.2];
+partnersMmult = [1.2 2.3 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -609,7 +609,7 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.3) , log10(0.405) , 4);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.33) , log10(0.405) , 4);
     lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
     lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
@@ -1432,8 +1432,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.5 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.3 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(3) = (0.8 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
 riskAdj = 0.005;
