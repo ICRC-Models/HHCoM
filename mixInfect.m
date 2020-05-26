@@ -124,14 +124,14 @@ if (year >= 1995) && (year < 2000)
 elseif year >= 2000
 
     partnersMmult(1) = 1.0;
-    partnersMmult(2) = 1.3;
-    partnersMmult(3) = 0.9;
+    partnersMmult(2) = 1.8;
+    partnersMmult(3) = 1.0;
 end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
-partnersF(4:6, 1:3) = partnersF(4:6, 1:3) .* partnersMmult(2);
+partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
 
 partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
-partnersF(7:10, 1:3) = partnersF(7:10, 1:3) .* partnersMmult(3);
+partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
 
 % males
 c(1 , : , :) = partnersM;

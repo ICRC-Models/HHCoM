@@ -136,7 +136,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 
-partnersMmult = [1.2 2.2 1.0];
+partnersMmult = [1.2 4 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -470,8 +470,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 3 ;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 3;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 2.5 ;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 2.5;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -656,7 +656,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.8; 2.3; 3]; %original values [1.0; 1.8; 2.6; 5.5]
+    c3c2Mults = [1.0; 1.8; 2; 2.5]; %original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -667,7 +667,7 @@ if calibBool && any(16 == pIdx)
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c2c1Mults = [1.00; 1.75; 2.30; 2.66]; % orginal values [1.00; 1.75; 2.30; 2.66];
+    c2c1Mults = [1.00; 1.75; 2.3; 2.66]; % orginal values [1.00; 1.75; 2.30; 2.66];
 end
 
 % HPV tranmission rates
@@ -1452,13 +1452,13 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.3 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.8 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (1.0 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% risk distribution multiplier
 
-riskAdj = 0.08;
+riskAdj = 0.1;
 d_riskAdj = (0.01 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 

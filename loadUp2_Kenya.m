@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2 1.1];
+partnersMmult = [1.2 2 1.2];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -210,7 +210,7 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 6; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) ;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5 ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.65;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.5 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.65 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -467,8 +467,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 2;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2.5;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 2.5;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -609,7 +609,7 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.25) , log10(0.405) , 4);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.3) , log10(0.405) , 4);
     lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
     lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
