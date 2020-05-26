@@ -215,7 +215,7 @@ else
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
     maleActs(5, 1:risk) = maleActs(5, 1:risk) ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7 ;
-    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.5 ;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -235,7 +235,7 @@ else
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
     femaleActs(5, 1:risk) = femaleActs(5, 1:risk) ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk) .* 0.7 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.25 ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.5 ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -549,7 +549,7 @@ kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
+rNormal_Inf(5 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
 kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
@@ -634,7 +634,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.4;
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.5;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
@@ -645,7 +645,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.60; 0.55; 0.45; 0.30];
+    hpv_hivClear = [0.55; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
@@ -656,7 +656,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.8; 2; 2.5]; %original values [1.0; 1.8; 2.6; 5.5]
+    c3c2Mults = [1.0; 1.5; 1.8; 2]; %original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -667,7 +667,7 @@ if calibBool && any(16 == pIdx)
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c2c1Mults = [1.00; 1.75; 2.3; 2.66]; % orginal values [1.00; 1.75; 2.30; 2.66];
+    c2c1Mults = [1.00; 1.8; 2.4; 2.7]; % orginal values [1.00; 1.75; 2.30; 2.66];
 end
 
 % HPV tranmission rates
