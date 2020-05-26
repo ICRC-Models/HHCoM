@@ -136,7 +136,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 
-partnersMmult = [1.2 2.2 1.2];
+partnersMmult = [1.2 2.2 1.1];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -213,8 +213,8 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk).* 1.8 ;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk).* 0.6 ;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) ;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
 
@@ -233,9 +233,9 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 1.8 ;
-    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk) ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -612,8 +612,9 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
-    lambdaMultImm(11 : 16) = lambdaMultImm(10);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.25) , log10(0.405) , 4);
+    lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
+    lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -655,7 +656,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.8; 2.6; 5.5];
+    c3c2Mults = [1.0; 1.8; 2.6; 4]; %original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -745,7 +746,7 @@ if calibBool && any(37 == pIdx)
     idx = find(37 == pIdx);
     maleHpvClearMult = paramSet(paramsSub{idx}.inds(:));
 else
-    maleHpvClearMult = 0.8;
+    maleHpvClearMult = 0.7;
 end
 
 % HIV and ART multipliers
@@ -1451,8 +1452,8 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.1 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.85 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.3 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% risk distribution multiplier

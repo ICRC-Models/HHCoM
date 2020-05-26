@@ -210,7 +210,7 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 6; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 3.5;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 3;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.65;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 3.5 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk).* 3 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.65 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.25 ;
 end
@@ -434,7 +434,7 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 2;
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 1.6;
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2.5; % original multiplier = 1.6
 end
 
@@ -457,7 +457,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.5;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 3; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 2; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -467,8 +467,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 3;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 3;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 2;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -609,8 +609,9 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 10) = 1 - logspace(log10(0.01) , log10(0.1) , 6);
-    lambdaMultImm(11 : 16) = lambdaMultImm(10);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.25) , log10(0.405) , 4);
+    lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
+    lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -652,7 +653,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.8; 2.6; 5.5];
+    c3c2Mults = [1.0; 1.8; 2.6; 4]; % original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -1430,12 +1431,12 @@ dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
 %% partnersM multiplier 
 d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.1 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.2 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(3) = (0.75 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
 
 %% risk adjustment multiplier
-riskAdj = 0.005;
+riskAdj = 0.01;
 d_riskAdj = (0.005 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950

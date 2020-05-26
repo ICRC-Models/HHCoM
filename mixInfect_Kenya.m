@@ -122,9 +122,9 @@ if (year >= 1990) && (year < 1994)
     partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2) .* dt;
     partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3) .* dt;
 elseif year >= 1994
-    partnersMmult(1) = 1.1;
-    partnersMmult(2) = 1.2;
-    partnersMmult(3) = 0.75;
+    partnersMmult(1) = 1.0;
+    partnersMmult(2) = 1.0;
+    partnersMmult(3) = 0.9;
 end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
 partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);

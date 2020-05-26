@@ -95,14 +95,13 @@ dPop = zeros(size(pop));
 % prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
 
-% if (year >= 1990) && (year < 1994)
-%     dt = (year - 1990) * stepsPerYear;
-%     riskAdj = riskAdj + d_riskAdj .* dt;
-% elseif year >= 1994
-%     riskAdj = 0.005;
-% end
+if (year >= 1990) && (year < 1994)
+    dt = (year - 1990) * stepsPerYear;
+    riskAdj = riskAdj + d_riskAdj .* dt;
+elseif year >= 1994
+    riskAdj = 0.005;
+end
 
-riskAdj = 0.005;
 riskDist(:, 1, :) = riskDist(:, 1, :) - riskAdj;
 riskDist(:, 3, :) = riskDist(:, 3, :) + riskAdj;
 

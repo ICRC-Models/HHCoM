@@ -35,7 +35,7 @@ tic
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
-pathModifier = 'toNow_25May20_N_HPVtrans0055_01riskAdj001_2-1xPt[2]1-2_1-5SexAct20-24'; %Decrease HPV transmisson (0.0045), increase non-vax type transmission multuplier (1.45)
+pathModifier = 'toNow_25May20_N_HPVtrans0055_01riskAdj001_imuneMult'; %Decrease HPV transmisson (0.0045), increase non-vax type transmission multuplier (1.45)
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
