@@ -133,7 +133,7 @@ end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
-partnersMmult = [1.2 2.2 1.1];
+partnersMmult = [1.2 2.2 1.05];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.8 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.5 ;
 end
@@ -631,7 +631,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.5;
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.6;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
@@ -642,7 +642,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.55; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
+    hpv_hivClear = [0.5; 0.45; 0.42; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
@@ -653,7 +653,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.5; 1.8; 2]; %original values [1.0; 1.8; 2.6; 5.5]
+    c3c2Mults = [1.0; 1.5; 1.7; 1.9]; %original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women

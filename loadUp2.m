@@ -634,7 +634,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.5;
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.6;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
@@ -645,7 +645,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.55; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
+    hpv_hivClear = [0.5; 0.45; 0.42; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
@@ -656,7 +656,7 @@ if calibBool && any(15 == pIdx)
     c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c3c2Mults = [1.0; 1.5; 1.8; 2]; %original values [1.0; 1.8; 2.6; 5.5]
+    c3c2Mults = [1.0; 1.5; 1.7; 1.9]; %original values [1.0; 1.8; 2.6; 5.5]
 end
 
 % CIN1 to CIN2 progression multiplier for HIV-positive women
@@ -1459,7 +1459,7 @@ d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 %% risk distribution multiplier
 
 riskAdj = 0.1;
-d_riskAdj = (0.005 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
+d_riskAdj = (0.01 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
 
 
 %% Background death rate before 1950
