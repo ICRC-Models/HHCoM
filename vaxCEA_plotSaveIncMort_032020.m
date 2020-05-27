@@ -49,21 +49,21 @@ paramDir = [pwd , '\Params\'];
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
 
 %% LOAD SAVED RESULTS
-curr = load([pwd , '\HHCoM_Results\toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run file
+curr = load([pwd , '\HHCoM_Results\toNow_19May20_baseVax_baseScreen_handCalibModel']); % ***SET ME***: name for historical run file
 % ***SET ME***: save names of potential scenarios to analyze as variables
-dirName_reductBaseline = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012';
-dirName_P1_SCE3 = '090519_WHOP1_SCES34';
-dirName_P1_SCE5 = '090519_WHOP1_SCES56';
-dirName_P2_SCE1 = '090519_WHOP2_SCE1';
-dirName_P2_SCE2 = '090519_WHOP2_SCE2';
+dirName_reductBaseline = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCES01';
+dirName_P1_SCE3 = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCE2';
+dirName_P1_SCE5 = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCE3';
+dirName_P2_SCE1 = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCE4';
+dirName_P2_SCE2 = '19May20_baseVax_baseScreen_handCalibModel_IPVC_SCE5';
 dirName_P2_SCE3 = '090519_WHOP2_SCE3';
 dirName_P2_SCE4 = '090519_WHOP2_SCE4';
 dirName_P2_SCE5 = '090519_WHOP2_SCE5';
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
+simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2}; % , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
+fileTits = {'IPVC_SCES01' , 'IPVC_SCE2' , 'IPVC_SCE3' , 'IPVC_SCE4' , 'IPVC_SCE5'}; %{'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
 
 nResults = length(simVec);
 
@@ -129,7 +129,7 @@ for j = 1 : nResults
         % Save incidence
         for n = 1 : nSims
             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawInc_ages9-79' , '.xlsx'];
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawInc_ages9-79' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
@@ -153,6 +153,16 @@ for j = 1 : nResults
     end     
     
     %% CC INCIDENCE - age standardized
+    % Note: the age-standardization process shifts the incidence rate of the
+    % last modelled age group to the next age group in the following year.
+    % However, CC incidence is NaN prior to HIV introduction in the
+    % HIV-positive no ART group, and NaN prior to ART introduction in the
+    % HIV-positive ART group. Since we have four age groups past the 16 we
+    % model, a NaN value is present for four years past the introduction of
+    % HIV/ART, leading to a NaN value for summed incidence during these 
+    % years. We therefore lack data in this four-year interval in the
+    % saved/plotted results.
+    
     inds = {':' , [1:2] , [3 : 7] , 8 , [3:8]}; % HIV state inds
     plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
     fac = 10 ^ 5;
@@ -217,7 +227,7 @@ for j = 1 : nResults
         % Save incidence
         for n = 1 : nSims
             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandInc_ages0-99' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
@@ -276,7 +286,7 @@ for j = 1 : nResults
         % Save mortality
         for n = 1 : nSims
             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawMort_ages9-79' , '.xlsx'];
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawMort_ages9-79' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
@@ -299,7 +309,17 @@ for j = 1 : nResults
         
     end
 
-%% CC MORTALITY - age standardized
+    %% CC MORTALITY - age standardized
+    % Note: the age-standardization process shifts the mortality rate of the
+    % last modelled age group to the next age group in the following year.
+    % However, CC mortality is NaN prior to HIV introduction in the
+    % HIV-positive no ART group, and NaN prior to ART introduction in the
+    % HIV-positive ART group. Since we have four age groups past the 16 we
+    % model, a NaN value is present for four years past the introduction of
+    % HIV/ART, leading to a NaN value for summed mortality during these 
+    % years. We therefore lack data in this four-year interval in the
+    % saved/plotted results.
+
     inds = {':' , [1:2] , [3 : 7] , 8 , [3:8]}; % HIV state inds
     plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
     fac = 10 ^ 5;
@@ -365,7 +385,7 @@ for j = 1 : nResults
         % Save mortality
         for n = 1 : nSims
             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandMort_ages0-99' , '.xlsx'];
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandMort_ages0-99' , '.xlsx'];
             sname = plotTits1{i};
             if exist(fname , 'file') == 2
                 M = xlsread(fname);
@@ -376,15 +396,15 @@ for j = 1 : nResults
             end
         end
 
-        % Plot baseline mortality
-        figure;
-        hold all;
-        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
-        hold all;
-        axis([1980 2120 0 150])
-        grid on;
-        xlabel('Year'); ylabel('Mortality rates (per 100K) - AS'); 
-        legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+%         % Plot baseline mortality
+%         figure;
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
+%         hold all;
+%         axis([1980 2120 0 150])
+%         grid on;
+%         xlabel('Year'); ylabel('Mortality rates (per 100K) - AS'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
 
     end
 
