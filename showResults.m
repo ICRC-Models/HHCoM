@@ -236,7 +236,7 @@ disp('Remember to update fertility multipliers if calibrating!!!!');
 fertDeclineProp = [0.37 ; 0.75];
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 1.0; %0.65;
+fertility4 = fertility3 .* 1.0; %0.60
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
@@ -254,12 +254,12 @@ for y = 1 : stepsPerYear : length(tVec)
         dFert = (fertility3 - fertility2) ...
             ./ ((2020 - 2010) * stepsPerYear);
         fertilityAnl = fertility2 + dFert .* dt;
-    elseif year > 2020 && year <= 2060
+    elseif year > 2020 && year <= 2035
         dt = (year - 2020) * stepsPerYear;
         dFert = (fertility4 - fertility3) ...
-            ./ ((2060 - 2020) * stepsPerYear);
+            ./ ((2035 - 2020) * stepsPerYear);
         fertilityAnl = fertility3 + dFert .* dt;
-    elseif year > 2060
+    elseif year > 2035
         fertilityAnl = fertility4;
     end
     

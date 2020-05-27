@@ -52,7 +52,7 @@ function vaxCEA(pathModifier)
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_19May20_baseVax_baseScreen_handCalibModel']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -125,7 +125,7 @@ plot(futurePop0_69(:,1) , futurePop0_69(:,2) , 'o');
 % end
 title('KZN Population Size Ages 0-69')
 xlabel('Year'); ylabel('Individuals')
-xlim([1950 2120]);
+xlim([1950 2200]);
 ylim([0.2*(10^7) 2.2*(10^7)]);
 legend('Model prediction' , 'KZN historical estimates (SSA)' , 'KZN future projections (UN & SSA)')
 %legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
@@ -224,7 +224,7 @@ disp('Remember to update fertility multipliers if calibrating!!!!');
 fertDeclineProp = [0.37 ; 0.75]; %[0.36055 ; 0.68]
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.50; %1.0;
+fertility4 = fertility3 .* 0.60;
 
 fertilityVec = [];
 for y = 1 : stepsPerYear : length(tVec)
@@ -242,12 +242,12 @@ for y = 1 : stepsPerYear : length(tVec)
         dFert = (fertility3 - fertility2) ...
             ./ ((2020 - 2010) * stepsPerYear);
         fertilityAnl = fertility2 + dFert .* dt;
-    elseif year > 2020 && year <= 2060
+    elseif year > 2020 && year <= 2035
         dt = (year - 2020) * stepsPerYear;
         dFert = (fertility4 - fertility3) ...
-            ./ ((2060 - 2020) * stepsPerYear);
+            ./ ((2035 - 2020) * stepsPerYear);
         fertilityAnl = fertility3 + dFert .* dt;
-    elseif year > 2060
+    elseif year > 2035
         fertilityAnl = fertility4;
     end
     
@@ -685,15 +685,15 @@ for i = 1 : length(inds)
         vaxResult{n}.ccInc = vaxResult{n}.ccIncRef ./ (sum(worldStandard_WP2015(1:age+4)));
     end
         
-%     plot(tVec(1 : stepsPerYear : end) , vaxResult{noVaxInd}.ccInc ,'DisplayName' , ...
-%          [plotTits1{i} , ': Efficacy: ' , num2str(round(noV.vaxEff * 100)) '% ,', ...
-%          'Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
-%     legend('-DynamicLegend');
-%     grid on;
-%     xlim([1980 2120]);
-%     ylim([0 150]);
-%     xticks([1980 : 20 : 2120]);
-%     hold all;
+    plot(tVec(1 : stepsPerYear : end) , vaxResult{noVaxInd}.ccInc ,'DisplayName' , ...
+         [plotTits1{i} , ': Efficacy: ' , num2str(round(noV.vaxEff * 100)) '% ,', ...
+         'Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
+    legend('-DynamicLegend');
+    grid on;
+    xlim([1980 2200]);
+    ylim([0 150]);
+    xticks([1980 : 20 : 2200]);
+    hold all;
 
     for n = 1 : length(vaxResult) - 1
 %         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
@@ -702,16 +702,16 @@ for i = 1 : length(inds)
         
         % Reduction
         vaxResult{n}.ccRed = (vaxResult{n}.ccInc - vaxResult{noVaxInd}.ccInc) ./ vaxResult{noVaxInd}.ccInc * 100;
-        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , ...
-            'LineStyle' , linStyle{n} , 'Color' , linColor{i} , 'DisplayName' , [plotTits1{i} , ...
-            ': Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-            % ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,' , ...
-        grid on
-        legend('-DynamicLegend')
-        xlim([2020 2120]);
-        %ylim([-100 0]);
-        xticks([2020 : 20 : 2120]);
-        hold all     
+%         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , ...
+%             'LineStyle' , linStyle{n} , 'Color' , linColor{i} , 'DisplayName' , [plotTits1{i} , ...
+%             ': Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+%             % ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,' , ...
+%         grid on
+%         legend('-DynamicLegend')
+%         xlim([2020 2120]);
+%         %ylim([-100 0]);
+%         xticks([2020 : 20 : 2120]);
+%         hold all     
      end
 % %     title(' Cervical Cancer Incidence')
 % %     xlabel('Year'); ylabel('Incidence per 100,000')
