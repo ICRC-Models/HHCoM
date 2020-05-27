@@ -1,4 +1,4 @@
-function vaxCEA_whoReport_032020()
+function vaxCEA_plotSaveIncMort_032020()
 
 %% LOAD PARAMETERS
 paramDir = [pwd , '\Params\'];
