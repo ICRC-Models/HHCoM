@@ -230,7 +230,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.5 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.8 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.5 ;
 end
@@ -672,7 +672,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0055;
+    perPartnerHpv_vax = 0.006;
 end
 
 if calibBool && any(11 == pIdx)

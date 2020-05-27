@@ -136,7 +136,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 
 
-partnersMmult = [1.2 3.8 1.1];
+partnersMmult = [1.2 3.8 1.0];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -675,7 +675,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00550; %original value 0.005
+    perPartnerHpv_vax = 0.0060; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
