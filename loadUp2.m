@@ -126,7 +126,7 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.50; %1.0;
+fertility4 = fertility3 .* 0.60;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -1415,7 +1415,7 @@ end
 hivFertPosBirth3 = sparse(xIndsPos , yIndsPos , valsPos , numel(pop) , numel(pop));
 hivFertNegBirth3 = sparse(xIndsNeg , yIndsNeg , valsNeg , numel(pop) , numel(pop));
 
-%% Fertility by 2060
+%% Fertility by 2035
 
 % birth indices
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
@@ -1473,9 +1473,9 @@ dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 2010) * stepsPerYe
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 2010) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 2010) * stepsPerYear);
 
-dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2060 - 2020) * stepsPerYear);
-dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2060 - 2020) * stepsPerYear);
-dFertMat3 = (fertMat4 - fertMat3) ./ ((2060 - 2020) * stepsPerYear);
+dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2035 - 2020) * stepsPerYear);
+dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2035 - 2020) * stepsPerYear);
+dFertMat3 = (fertMat4 - fertMat3) ./ ((2035 - 2020) * stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')
