@@ -1,6 +1,4 @@
-function vaxCEA_whoReport_101819()
-
-waning = 0;    % turn waning on or off
+function vaxCEA_whoReport_032020()
 
 %% LOAD PARAMETERS
 paramDir = [pwd , '\Params\'];
@@ -63,9 +61,9 @@ dirName_P2_SCE4 = '090519_WHOP2_SCE4';
 dirName_P2_SCE5 = '090519_WHOP2_SCE5';
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline}; % , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
+simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'P1_SCES12'}; % , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
+fileTits = {'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
 
 nResults = length(simVec);
 
@@ -102,73 +100,55 @@ for j = 1 : nResults
     plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
     fac = 10 ^ 5;
     
-    figure;
     for i = 1 : length(inds)
         % General
         allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % All HIV-negative women
         hivNeg = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % HIV-positive women not on ART
         hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % Women on ART
         artF = toInd(allcomb(8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % All HIV-positive women
         hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
 
         % Calculate incidence
-        %Increased vaccination scenarios
         for n = 1 : nSims
             ccIncRef = ...
-                (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , 3 : age-1 , :),2),3),4)) ./ ...
+                (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , 3 : age , :),2),3),4)) ./ ...
                 (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear)) * fac);
             vaxResult{n}.ccInc = ccIncRef;
         end
 
-        % Save incidence results
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawInc_ages9-74' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
-%             end
-%         end
-        hold all;
-        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc')
-        hold all;
-        axis([1980 2120 0 150])
-        grid on;
-        xlabel('Year'); ylabel('Incidence rates (per 100K) - Raw'); 
-        legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
-
-%         for n = 1 : 2
-%             if (n == 1)
-%                 s = 2;
-%             end
-%             if (n == 2)
-%                 s = 1;
-%             end
-%             if ((j == 1) && (i == 1)) || ((i == 1) && (s == 1))
-%                 hold all;
-%                 plot(tVec(1 : stepsPerYear : end)' , vaxResult{s}.ccInc')
-%                
-%                 hold all;
-%                 axis([2020 2120 0 70])
-%                 xlabel('Year'); ylabel('Cervical cancer incidence rate (per 100K)'); 
-%                 legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5');
-%                 %legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
-%             end
-%         end
+        % Save incidence
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawInc_ages9-79' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+            end
+        end
+        
+%         % Plot baseline incidence
+%         figure;
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc')
+%         hold all;
+%         axis([1980 2120 0 150])
+%         grid on;
+%         xlabel('Year'); ylabel('Incidence rates (per 100K) - Raw, ages 9-79'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
         
     end     
     
@@ -183,7 +163,6 @@ for j = 1 : nResults
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
         23477 9261 2155];
     
-    figure;
     for i = 1 : length(inds)
         for n = 1 : nSims
             vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
@@ -235,27 +214,30 @@ for j = 1 : nResults
             vaxResult{n}.ccInc = vaxResult{n}.ccIncRef ./ (sum(worldStandard_WP2015(1:age+4)));
         end
         
-        % Save incidence results
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
-%             end
-%         end
-        hold all;
-        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '-')
-        hold all;
-        axis([1980 2120 0 150])
-        grid on;
-        xlabel('Year'); ylabel('Incidence rates (per 100K) - AS'); 
-        legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
+        % Save incidence
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandInc_ages0-99' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+            end
+        end
         
+%         % Plot baseline incidence
+%         figure;
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '-')
+%         hold all;
+%         axis([1980 2120 0 150])
+%         grid on;
+%         xlabel('Year'); ylabel('Incidence rates (per 100K) - AS'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
+
     end  
 
     %% CC MORTALITY - not age standardized
@@ -263,55 +245,57 @@ for j = 1 : nResults
     plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
     fac = 10 ^ 5;
    
-    figure;
     for i = 1 : length(inds)
         % General
         
         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % All HIV-negative women
         hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % HIV-positive women not on ART
         hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % Women on ART
         artF = toInd(allcomb(8 , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         % All HIV-positive women
         hivAllF = toInd(allcomb(3 : 8 , 1 : viral , 1 : 7 , 1 : 7 , 1 : 3 , ...
-            1 : intervens , 2 , 3 : age-1 , 1 : risk));
+            1 : intervens , 2 , 3 : age , 1 : risk));
         genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
 
         % Calculate mortality
         % Increased vaccination scenarios
         for n = 1 : nSims
             ccMortRef = ...
-                (annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , 3 : age-1 , :),2),3),4)) ./ ...
+                (annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , inds{i} , 3 : age , :),2),3),4)) ./ ...
                 (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear)) * fac);
             vaxResult{n}.ccMort = ccMortRef;
         end
 
-%         % Save mortality results
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawMort_ages9-74' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
-%             end
-%         end
-          hold all;
-          plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
-          hold all;
-          axis([1980 2120 0 150])
-          grid on;
-          xlabel('Year'); ylabel('Mortality rates (per 100K) - Raw'); 
-          legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+        % Save mortality
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_RawMort_ages9-79' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
+            end
+        end
+
+%         % Plot baseline mortality
+%         figure;
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
+%         hold all;
+%         axis([1980 2120 0 150])
+%         grid on;
+%         xlabel('Year'); ylabel('Mortality rates (per 100K) - Raw, Ages 9-79'); 
+%         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
         
     end
 
@@ -326,7 +310,6 @@ for j = 1 : nResults
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
         23477 9261 2155];
     
-    figure;
     for i = 1 : length(inds)
         for n = 1 : nSims
             vaxResult{n}.ccMortRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
@@ -379,26 +362,29 @@ for j = 1 : nResults
             vaxResult{n}.ccMort = vaxResult{n}.ccMortRef ./ (sum(worldStandard_WP2015(1:age+4)));
         end
 
-        % Save mortality results
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandMort_ages0-99' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
-%             end
-%         end
-          hold all;
-          plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
-          hold all;
-          axis([1980 2120 0 150])
-          grid on;
-          xlabel('Year'); ylabel('Mortality rates (per 100K) - AS'); 
-          legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
+        % Save mortality
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_AgeStandMort_ages0-99' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
+            end
+        end
+
+        % Plot baseline mortality
+        figure;
+        hold all;
+        plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccMort')
+        hold all;
+        axis([1980 2120 0 150])
+        grid on;
+        xlabel('Year'); ylabel('Mortality rates (per 100K) - AS'); 
+        legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
 
     end
 
