@@ -851,7 +851,7 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
+baseline.screenCover = [0.0; 0.08; 0.16; 0.20; 0.20; 0.20; 0.20]; %[0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
 baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
