@@ -798,8 +798,8 @@ artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females
+maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males
+maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -826,7 +826,7 @@ vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1960
             0.2998 0.5047 0.3554 0.309825 0.2240865 0.192258; ... % 2003
             0.3717 0.4683 0.3956 0.3592 0.4032 0.1939; ... %2008
             0.7154 0.7274 0.5088 0.4378 0.4167 0.4064; ... %2014 
-            0.80 0.80 0.80 0.80 0.8 0.8];   % 2030 [year x age group]
+            0.72 0.73 0.51 0.44 0.42 0.41];   % 2030 --> 80% [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
