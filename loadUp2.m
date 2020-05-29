@@ -316,6 +316,7 @@ hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
     'kCD4female' , 'kVlmale' , 'kVlfemale');
 
+muHIV = muHIV .* 1.1;
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
     % Replicate rates across single age groups for other variables

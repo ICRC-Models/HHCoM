@@ -41,7 +41,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2_Kenya(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -312,6 +312,8 @@ hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 % Load pre-saved HIV-associated death rate and CD4/VL transition matrices by age and gender
 load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
     'kCD4female' , 'kVlmale' , 'kVlfemale');
+
+muHIV = muHIV .* 1.1;
 
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
