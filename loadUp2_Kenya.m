@@ -52,7 +52,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1975;
+startYear = 1925;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -312,8 +312,6 @@ hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 % Load pre-saved HIV-associated death rate and CD4/VL transition matrices by age and gender
 load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
     'kCD4female' , 'kVlmale' , 'kVlfemale');
-
-muHIV = muHIV .* 1.1;
 
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn

@@ -35,10 +35,14 @@ tic
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
-pathModifier = 'toNow_28May20_N_higherHIVmort_muART'; %Decrease HPV transmisson (0.0045), increase non-vax type transmission multuplier (1.45)
+pathModifier = 'toNow_28May20_N_diffScreenHIV'; %Decrease HPV transmisson (0.0045), increase non-vax type transmission multuplier (1.45)
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
+
+screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
+hivPosScreen = 1; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
+screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
 
 % VACCINATION
 vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
@@ -95,13 +99,63 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue ] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
-screenAlgorithm = 1;
-screenAlgs{1} = baseline;
+
+if (screenAlgorithm == 1)
+    % Baseline screening algorithm
+    screenAlgs{1} = baseline;
+elseif (screenAlgorithm == 2)
+    % CISNET screening algorithm
+    screenAlgs{1} = cisnet;
+elseif (screenAlgorithm == 3)
+    % WHO screening algorithm - version a
+    screenAlgs{1} = who;
+elseif (screenAlgorithm == 4)
+    % WHO screening algorithm - version b
+    screenAlgs{1} = whob;
+end
+
+if hivPosScreen
+    if (screenAlgorithmNeg == 1)
+        % Baseline screening algorithm
+        screenAlgs{2} = baseline;
+    elseif (screenAlgorithmNeg == 2)
+        % CISNET screening algorithm
+        screenAlgs{2} = cisnet;
+    elseif (screenAlgorithmNeg == 3)
+        % WHO screening algorithm - version a
+        screenAlgs{2} = who;
+    elseif (screenAlgorithmNeg == 4)
+        % WHO screening algorithm - version b
+        screenAlgs{2} = whob;
+    end
+    screenAlgs{2}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+    for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+        period = [screenYrs(i) , screenYrs(i + 1)];
+        screenAlgs{2}.screenCover_vec{i} = interp1(period , screenAlgs{2}.screenCover(i : i + 1 , 1) , ...
+            screenYrs(i) : timeStep : screenYrs(i + 1));
+    end
+    screenAlgs{1}.diseaseInds = [3 : 8];
+    screenAlgs{2}.diseaseInds = [1 : 2];
+else
+    screenAlgs{1}.diseaseInds = [1 : disease];
+end
+
+screenAlgs{1}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+    period = [screenYrs(i) , screenYrs(i + 1)];
+    screenAlgs{1}.screenCover_vec{i} = interp1(period , screenAlgs{1}.screenCover(i : i + 1 , 1) , ...
+        screenYrs(i) : timeStep : screenYrs(i + 1));
+end
 
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
 agesComb = screenAlgs{1}.screenAge;
 ageMultsComb = screenAlgs{1}.screenAgeMults;
+if hivPosScreen
+    numScreenAge = numScreenAge + length(screenAlgs{2}.screenAge);
+    agesComb = [agesComb , screenAlgs{2}.screenAge];
+    ageMultsComb = [ageMultsComb , screenAlgs{2}.screenAgeMults];
+end
 screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
 screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
