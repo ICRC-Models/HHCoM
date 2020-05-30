@@ -1,6 +1,7 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
+function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date) 
 %%
 %close all; clear all; clc
 % profile clear;
@@ -540,4 +541,3 @@ disp('Done')
 %%
 %vaxCEA(pathModifier)
 
-exit(0)
