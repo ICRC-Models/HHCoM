@@ -438,8 +438,8 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 1.6 ;
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2.5; % original multiplier = 1.6
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 1.5 ;
+    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2.6; % original multiplier = 1.6
 end
 
 % CIN1 to CIN2, ages 10-24
@@ -450,7 +450,7 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*1.5;
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*2; %original multiplier = 1.7
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*2.5; %original multiplier = 1.7
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -461,7 +461,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) .* 1.2;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) *2; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 2.5; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -471,8 +471,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.3;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 2;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 5;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -482,8 +482,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2 ; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 2 ;
+    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2.5 ; 
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -493,8 +493,8 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1);
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2);
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.5;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * .9;
 end
 
 % CIN2 to CIN1, ages 10-24
@@ -504,8 +504,8 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1);
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2);
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.2;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * .5;
 end
 
 % CIN3 to CIN2, ages 10-24
@@ -516,7 +516,7 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2);
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * .5;
 end
 
 % Apply age trends to 9v HPV transitions

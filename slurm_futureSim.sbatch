@@ -1,7 +1,7 @@
   
 #!/bin/bash
 
-#SBATCH --job-name=futureSim_mox                    # Job name
+#SBATCH --job-name=NyanFutureSim_mox                    # Job name
 #SBATCH --chdir=/gscratch/csde/guiliu/HHCoM         # Working directory
 #SBATCH --mail-type=ALL                            # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=guiliu@uw.edu
