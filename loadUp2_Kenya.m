@@ -52,7 +52,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1925;
+startYear = 1975;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -849,8 +849,8 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.16; 0.18; 0.18; 0.18; 0.18]; %[0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
-baseline.diseaseInds = [1 : disease];
+baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16]; %[0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
+%baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
@@ -869,16 +869,16 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cisnet.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-cisnet.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
-cisnet.testSens = hpvSens;
-cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
+cisnet.screenCover = [0.0; 0.1; 0.30; 0.30; 0.30; 0.30; 0.30];
+cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
+cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
+cisnet.testSens = cytoSens;
+cisnet.colpoRetain = 0.361; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
-cisnet.cinTreatRetain = 1.0;
-cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy including treatment failure
+cisnet.cinTreatRetain = 0.25;
+cisnet.cinTreatHpvPersist = 0.28; % HPV persistence with cryotherapy including treatment failure
 cisnet.cinTreatHpvPersistHivNeg = cisnet.cinTreatHpvPersist - (1-cisnet.cinTreatEff(1)); % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy
-cisnet.ccTreatRetain = 1.0;
+cisnet.ccTreatRetain = 0.2;
 cisnet.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
