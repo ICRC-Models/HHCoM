@@ -456,7 +456,7 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.5;
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.2;
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 2; %original multiplier 1.7
 end
 
@@ -467,8 +467,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 1.8;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 1.8;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 1.3;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 2;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
