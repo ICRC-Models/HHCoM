@@ -449,8 +449,8 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*1.8;
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*3.8; %original multiplier = 1.7
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*2;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*4; %original multiplier = 1.7
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -471,8 +471,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.8;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 6;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 2;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 6.4;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -668,7 +668,7 @@ if calibBool && any(16 == pIdx)
     c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
     c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
-    c2c1Mults = [1.0; 1.5; 1.9; 2.4]; % orginal values [1.00; 1.75; 2.30; 2.66];
+    c2c1Mults = [1.0; 1.4; 1.8; 2.2]; % orginal values [1.00; 1.75; 2.30; 2.66];
 end
 
 % HPV tranmission rates
