@@ -99,9 +99,6 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue ] = loadUp2_Kenya(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
-screenAlgorithm = 1;
-screenAlgs{1} = baseline;
-
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
     screenAlgs{1} = baseline;
