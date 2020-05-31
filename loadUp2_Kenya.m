@@ -489,8 +489,8 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.5;
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * .8;
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.65;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * .88;
 end
 
 % CIN2 to CIN1, ages 10-24
@@ -500,8 +500,8 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.1;
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * 0.2;
+    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.25;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * 0.35;
 end
 
 % CIN3 to CIN2, ages 10-24
@@ -512,7 +512,7 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1)* 1 ;
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.3;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.4;
 end
 
 % Apply age trends to 9v HPV transitions
