@@ -2,7 +2,7 @@
 
 function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
-    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2011_dObs , cc_dist_dObs , ...
+    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2012_dObs , cc_dist_dObs , ...
     cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , popAgeDist_dObs , totPopSize_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
     age , gender , risk , startYear , stepsPerYear , annlz)
@@ -235,23 +235,23 @@ end
 % dMean = [dMean ; 43.0];
 % dVar =  [dVar ; ___];
 
-%% Cervical cancer incidence in 2011 by age
-incTimeSpan = [((2011 - startYear) * stepsPerYear +1) : ((2011 - startYear) * stepsPerYear +6)];
+%% Cervical cancer incidence in 2012 by age
+incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
 fac = 10 ^ 5;
 
-ccInc2011 = zeros(13 , 1);
+ccInc2012 = zeros(13 , 1);
 for a = 4 : age
     allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     % Calculate incidence
-    ccInc2011(a - 3 , 1) = ...
+    ccInc2012(a - 3 , 1) = ...
         (annlz(sum(sum(sum(newCC(incTimeSpan , : , a , :),2),3),4)) ./ ...
         (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
 end
 
-% mObs = [mObs ; ccInc2011];
-% dMean = [dMean ; ccInc2011_dObs(: , 2)];
-% dVar =  [dVar ; ccInc2011_dObs(: , 3)];
+% mObs = [mObs ; ccInc2012];
+% dMean = [dMean ; ccInc2012_dObs(: , 2)];
+% dVar =  [dVar ; ccInc2012_dObs(: , 3)];
 
 %% HIV prevalence
 hivYearVec = unique(hivPrevM_dObs(: ,1));

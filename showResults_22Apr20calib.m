@@ -24,7 +24,7 @@ paramDir = [pwd , '\Params\'];
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
     baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
     hyst , OMEGA , ...
-    ccInc2011_dObs , cc_dist_dObs , cin3_dist_dObs , ...
+    ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
     hivPrevM_dObs , hivPrevF_dObs , popAgeDist_dObs , totPopSize_dObs , ...
@@ -769,8 +769,8 @@ for j = 1 : nRuns
     % 52.01];
     % 
     % % Calibration error bars
-    % mean = ccInc2011_dObs(: , 2);
-    % sdev = (ccInc2011_dObs(: , 3).^(1/2));
+    % mean = ccInc2012_dObs(: , 2);
+    % sdev = (ccInc2012_dObs(: , 3).^(1/2));
     % 
     % for y = 1 : length(ccIncYears)
     %     ccIncYear = ccIncYears(y);
@@ -787,7 +787,7 @@ for j = 1 : nRuns
     %         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
     %     hold on
     %     % Plot observed data
-    %     plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2011_dObs(: , 2) , 'r-');
+    %     plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2012_dObs(: , 2) , 'r-');
     %     hold on; 
     %     errorbar(4 : age , mean , sdev , 'rs')
     %     xlabel('Age Group'); ylabel('Incidence per 100,000');
