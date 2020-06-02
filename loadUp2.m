@@ -482,8 +482,8 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2.7; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * 2.7; 
+    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -524,7 +524,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for ages 20-24
+rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ;
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
@@ -646,7 +646,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.6; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
+    hpv_hivClear = [0.6; 0.55; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
@@ -676,14 +676,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0090; %original value 0.005
+    perPartnerHpv_vax = 0.0080; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.65;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.6;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -786,7 +786,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = 0; %changed from 20%
+        condUse = 0.15; %changed from 20%
     end
 end
 

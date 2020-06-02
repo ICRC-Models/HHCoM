@@ -642,7 +642,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.6; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
+    hpv_hivClear = [0.6; 0.55; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
@@ -672,14 +672,14 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.009;
+    perPartnerHpv_vax = 0.008;
 end
 
 if calibBool && any(11 == pIdx)
     idx = find(11 == pIdx);
     perPartnerHpv_nonV = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.65;
+    perPartnerHpv_nonV = perPartnerHpv_vax .* 1.6;
 end
 
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
@@ -781,7 +781,7 @@ else
     if fivYrAgeGrpsOn
         condUse = 0.5 * 0.5;
     else
-        condUse = .5; %changed from 20%
+        condUse = .25; %changed from 20%
     end
 end
 

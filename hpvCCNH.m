@@ -40,8 +40,8 @@ for d = 1 : disease
     if d > 3 && d < 8
         rHivHpv_Clear = hpv_hivClear(d - 3); % Infection clearance multiplier
         rHiv = rImmuneHiv(d - 3); % Multiplier for immunity clearance for HIV+
-        c3c2Mult = c3c2Mults(d - 3) .* .5; % CIN2 -> CIN3 progression multiplier
-        c2c1Mult = c2c1Mults(d - 3); % CIN1 -> CIN2 progression multiplier
+        c3c2Mult = c3c2Mults(d - 3) .* .6; % CIN2 -> CIN3 progression multiplier
+        c2c1Mult = c2c1Mults(d - 3) * 1.05; % CIN1 -> CIN2 progression multiplier
         c1c2Mult = hpv_hivClear(d - 3)  *1.55; % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1; %hpv_hivClear(d - 3);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
         c2c3Mult = hpv_hivClear(d - 3) * 1.7; % CIN3 -> CIN2 regression multiplier
