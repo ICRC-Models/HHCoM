@@ -449,8 +449,8 @@ if calibBool && any(28 == pIdx)
     kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
     kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*2.3;
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*4.3; %original multiplier = 1.7
+    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1)*2.5;
+    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2)*4.5; %original multiplier = 1.7
 end
 
 % CIN2 to CIN3, ages 10-24
@@ -483,7 +483,7 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
     rNormal_Inf(1 : 4 , 1) = rNormal_Inf_orig(1 , 1) * 2.7; 
-    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.7;
+    rNormal_Inf(1 : 4 , 2) = rNormal_Inf_orig(1 , 2) * 1.5;
 end
 
 % CIN1 to HPV, ages 10-24
@@ -493,8 +493,8 @@ if calibBool && any(32 == pIdx)
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.65;
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * .88;
+    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.7;
+    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * .93;
 end
 
 % CIN2 to CIN1, ages 10-24
@@ -524,7 +524,7 @@ kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(5 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for ages 20-24
+rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %reduced clearance for ages 20-24
 kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
@@ -550,7 +550,7 @@ kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
 kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
 kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
 kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(5 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
+rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
 kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
 kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
 kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
@@ -646,7 +646,7 @@ if calibBool && any(14 == pIdx)
     hpv_hivClear(3,1) = hpv_hivClear(2,1)*paramSet(paramsSub{idx}.inds(3));
     hpv_hivClear(4,1) = hpv_hivClear(3,1)*paramSet(paramsSub{idx}.inds(4));
 else
-    hpv_hivClear = [0.6; 0.55; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
+    hpv_hivClear = [0.6; 0.5; 0.45; 0.30]; %original values [0.60; 0.55; 0.45; 0.30]
 end
 
 % CIN2 to CIN3 progression multiplier for HIV-positive women
