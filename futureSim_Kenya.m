@@ -319,7 +319,8 @@ parfor n = 1 : nTests
     popIn = historicalIn.popLast; % initial population to "seed" model
     
     % Initialize time vector
-    s = 1 : timeStep : years + 1;
+    yearsF = lastYear - currYear;
+    s = 1 : timeStep : yearsF + 1;
     tVec = linspace(currYear , lastYear-timeStep , length(s)-1);
     
     % Initialize other vectors
