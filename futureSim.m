@@ -14,7 +14,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_N_increaseClearHIV_increasekCC_4']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_N_increaseClearHIV_increasekCC_5']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '28May20_80VaxCov'; % ***SET ME***: name for simulation output file
