@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --job-name=futureSim_mox                    # Job name
-#SBATCH --chdir=/gscratch/csde/carajb/HHCoM         # Working directory
+#SBATCH --chdir=/gscratch/csde/dpwhite/HHCoM         # Working directory
 #SBATCH --mail-type=FAIL                            # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
-#SBATCH --mail-user=carajb@uw.edu
+#SBATCH --mail-user=dpwhite@uw.edu
 #SBATCH --export=all                                # Export environment variables to the batch job session
 
 #SBATCH --account=csde                              # Allocation Definition
@@ -18,10 +18,10 @@ echo "Running MATLAB script futureSim for simulation predictions."
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
-mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
+mkdir -p /gscratch/csde/dpwhite/$SLURM_JOB_ID
 matlab -nodisplay -nosplash -r "futureSim(0 , [] , [] , [] , [] , 0 , '19May20')"
 
-rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
+rm -r /gscratch/csde/dpwhite/$SLURM_JOB_ID
 
 date
 
