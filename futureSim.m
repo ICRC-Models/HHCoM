@@ -9,16 +9,16 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/dpwhite' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_19May20_BaseVax_baseScreen_hpvHIVcalib_0_']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = 'Jun022020_scenario3'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -32,11 +32,11 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
-screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
-whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
-whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
+screenAlgorithm = 4; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv). If hivPosScreen = 1, this will be the algorithm applied to HIV+
+hivPosScreen = 1; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
+screenAlgorithmNeg = 3; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv) 
+posScreenAges = [6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the hiv-specific algorithms
+posScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
 
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
@@ -59,13 +59,13 @@ vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = [2];    % age groups to vaccinate
-vaxCoverB = 0.0; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
-vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxAgeB = [2]; %[2] for S0-S3,  [2 , 3] for scenario S4/S5   % age groups to vaccinate
+vaxCoverB = 0.0; %0.0 for S0-s3,  0.57 for S4/S5  %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
+vaxGB = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-vaxCover = [0.8 , 0.9];    % vaccine coverages
+vaxCover = [0.57]; % 0.57 for S0-S3, 0.9 for S4/S5   % vaccine coverages
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
@@ -103,7 +103,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
+    baseline , cyt0 , cytgen , cythiv , hpvgen , hpvhiv , circProtect , condProtect , MTCTRate , ...
     hyst , OMEGA , ...
     ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
@@ -131,22 +131,31 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
 %% Screening
 
-% WHO screening algorithm - version a
-who.screenAge = whoScreenAges;
-who.screenAgeMults = whoScreenAgeMults;
+% HIV-positive screening ages
+cythiv.screenAge = posScreenAges;
+cythiv.screenAgeMults = posScreenAgeMults;
+
+hpvhiv.screenAge = posScreenAges;
+hpvhiv.screenAgeMults = posScreenAgeMults;
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
     screenAlgs{1} = baseline;
 elseif (screenAlgorithm == 2)
-    % CISNET screening algorithm
-    screenAlgs{1} = cisnet;
+    % 2-time cytology without scaleup
+    screenAlgs{1} = cyt0;
 elseif (screenAlgorithm == 3)
-    % WHO screening algorithm - version a
-    screenAlgs{1} = who;
+    % 2-time cytology with scale-up
+    screenAlgs{1} = cytgen;
 elseif (screenAlgorithm == 4)
-    % WHO screening algorithm - version b
-    screenAlgs{1} = whob;
+    % More frequent cytology for HIV-positive
+    screenAlgs{1} = cythiv;
+elseif (screenAlgorithm == 5)
+    % 2-time HPV screening with scale-up
+    screenAlgs{1} = hpvgen;
+elseif (screenAlgorithm == 6)
+    % More frequent HPV screening for HIV-positive
+    screenAlgs{1} = hpvhiv;
 end
 
 if hivPosScreen
@@ -154,14 +163,20 @@ if hivPosScreen
         % Baseline screening algorithm
         screenAlgs{2} = baseline;
     elseif (screenAlgorithmNeg == 2)
-        % CISNET screening algorithm
-        screenAlgs{2} = cisnet;
+        % 2-time cytology without scaleup
+        screenAlgs{2} = cyt0;
     elseif (screenAlgorithmNeg == 3)
-        % WHO screening algorithm - version a
-        screenAlgs{2} = who;
+        % 2-time cytology with scale-up
+        screenAlgs{2} = cytgen;
     elseif (screenAlgorithmNeg == 4)
-        % WHO screening algorithm - version b
-        screenAlgs{2} = whob;
+        % More frequent cytology for HIV-positive
+        screenAlgs{2} = cythiv;
+    elseif (screenAlgorithmNeg == 5)
+        % 2-time HPV screening with scale-up
+        screenAlgs{2} = hpvgen;
+    elseif (screenAlgorithmNeg == 6)
+        % More frequent HPV screening for HIV-positive
+        screenAlgs{2} = hpvhiv;
     end
     screenAlgs{2}.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
     for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
