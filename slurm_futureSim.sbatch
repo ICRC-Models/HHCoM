@@ -1,4 +1,3 @@
-  
 #!/bin/bash
 
 #SBATCH --job-name=NyanFutureSim_mox                    # Job name
