@@ -200,7 +200,7 @@ end
 
 %% If on Phase 2 of calibration, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
 %  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
-ph1_top50Sets = load([paramDir,'alphaParamSets_calib_' , date , '_20_top50Sets.dat']);
+ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20_20_top50Sets.dat']);
 ph1sample = datasample(ph1_top50Sets, round(n_new_particles) , 2); % resample
 ph1sampleSubset = [ph1sample(1:21,:); ph1sample(26,:)]; % keep subset of resampled parameter set
 
