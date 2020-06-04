@@ -54,7 +54,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1925;
+startYear = 1975;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -139,7 +139,7 @@ fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* 0.80;
 
 
-partnersMmult = [1.2 3.8 1.0];
+partnersMmult = [1.2 2.5 1.5];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1514,7 +1514,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2050 - 2020) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.8 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (2 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
 d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 
