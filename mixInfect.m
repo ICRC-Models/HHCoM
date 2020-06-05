@@ -121,7 +121,7 @@ if (year >= 1995) && (year < 2005)
     partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1) .* dt; %M, 15-19
     partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2) .* dt; %F, 15-29
     partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3) .* dt; %M, 20-49 & F, 30-49
-elseif year >= 2000
+elseif year >= 2005
 
     partnersMmult(1) = 1.2;
     partnersMmult(2) = 2.3;
