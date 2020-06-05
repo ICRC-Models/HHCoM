@@ -139,7 +139,7 @@ fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* 0.80;
 
 
-partnersMmult = [1.2 2.5 1.5];
+partnersMmult = [1.2 2.45 1.4];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1515,7 +1515,7 @@ d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2005 - 1995) * stepsPerYear);
 d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.7 - partnersMmult(3)) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (0.5 - partnersMmult(3)) ./ ((2005 - 1995) * stepsPerYear);
 
 
 %% risk distribution multiplier
