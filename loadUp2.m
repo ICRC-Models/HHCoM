@@ -1514,8 +1514,8 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2050 - 2020) * stepsPerYear);
 d_partnersMmult = ones(1, 3);
 
 d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (2 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.9 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((2000 - 1995) * stepsPerYear);
+d_partnersMmult(3) = (0.7 - partnersMmult(3)) ./ ((2000 - 1995) * stepsPerYear);
 
 
 %% risk distribution multiplier
