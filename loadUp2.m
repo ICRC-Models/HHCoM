@@ -54,7 +54,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1975;
+startYear = 1925;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -136,7 +136,7 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.80;
+fertility4 = fertility3 .* 0.20;
 
 
 partnersMmult = [1.2 2.45 1.4];
@@ -1505,17 +1505,21 @@ dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 1990) * stepsPerYe
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 1990) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
-dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2050 - 2020) * stepsPerYear);
-dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2050 - 2020) * stepsPerYear);
-dFertMat3 = (fertMat4 - fertMat3) ./ ((2050 - 2020) * stepsPerYear);
+dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2070 - 2020) * stepsPerYear);
+dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2070 - 2020) * stepsPerYear);
+dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 
 %% partnersM multiplier 
-d_partnersMmult = ones(1, 3);
+d_partnersMmult = ones(3, 3);
 
-d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(2) = (1.0 - partnersMmult(2)) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(3) = (0.5 - partnersMmult(3)) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2005 - 1995) * stepsPerYear);
+d_partnersMmult(1, 3) = (0.5 - partnersMmult(3)) ./ ((2005 - 1995) * stepsPerYear);
+
+d_partnersMmult(2, 1:3) = -logspace(log10(0.2), log10(0.02), 3);
+d_partnersMmult(3, 1:3) = -logspace(log10(0.12), log10(0.028) , 3);
+
 
 
 %% risk distribution multiplier

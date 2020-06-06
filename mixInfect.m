@@ -116,16 +116,21 @@ end
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
 % partnersMmult = [2 4];
-if (year >= 1995) && (year < 2005)
+if (year >= 1995) && (year < 2006)
     dt = (year - 1995) * stepsPerYear;
-    partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1) .* dt; %M, 15-19
-    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2) .* dt; %F, 15-29
-    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3) .* dt; %M, 20-49 & F, 30-49
-elseif year >= 2005
-
+    partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1, 1) .* dt; %M, 15-19
+    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(1, 2) .* dt; %F, 15-29
+    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(1, 3) .* dt; %M, 20-49 & F, 30-49
+elseif (year >= 2006) && (year < 2008)
+    yearInd = round(year - 2005);
+    dt = (year - 2005) * stepsPerYear;
+    partnersMmult(1) = 1.2; %M, 15-19
+    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2, yearInd) .* dt; %F, 15-29
+    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3, yearInd) .* dt; %M, 20-49 & F, 30-49
+elseif year >= 2008
     partnersMmult(1) = 1.2;
-    partnersMmult(2) = 2.3;
-    partnersMmult(3) = 0.9;
+    partnersMmult(2) = 2.5;
+    partnersMmult(3) = 1.0;
 end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
 partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
