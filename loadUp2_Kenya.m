@@ -134,9 +134,9 @@ else
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.80;
+fertility4 = fertility3 .* 0.20;
 
-partnersMmult = [1.2 2.2 1.05];
+partnersMmult = [1.2 2.4 1.1];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1485,15 +1485,17 @@ dFertPos2 = (hivFertPosBirth3 - hivFertPosBirth2) ./ ((2020 - 1990) * stepsPerYe
 dFertNeg2 = (hivFertNegBirth3 - hivFertNegBirth2) ./ ((2020 - 1990) * stepsPerYear);
 dFertMat2 = (fertMat3 - fertMat2) ./ ((2020 - 1990) * stepsPerYear);
 
-dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2050 - 2020) * stepsPerYear);
-dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2050 - 2020) * stepsPerYear);
-dFertMat3 = (fertMat4 - fertMat3) ./ ((2050 - 2020) * stepsPerYear);
+dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2070 - 2020) * stepsPerYear);
+dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2070 - 2020) * stepsPerYear);
+dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
-d_partnersMmult = ones(1, 3);
-d_partnersMmult(1) = (1.0 - partnersMmult(1)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(2) = (1.15 - partnersMmult(2)) ./ ((1994 - 1990) * stepsPerYear);
-d_partnersMmult(3) = (0.8 - partnersMmult(3)) ./ ((1994 - 1990) * stepsPerYear);
+d_partnersMmult = ones(2, 5);
+d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2004 - 1994) * stepsPerYear);
+d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
+d_partnersMmult(1, 3) = (0.5 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
+
+d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
 riskAdj = 0.005;

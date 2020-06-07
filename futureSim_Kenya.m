@@ -14,13 +14,13 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_K_increaseClearHIV_increasekCC_5_muART']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_K_increaseClearHIV_increasekCC_5_muART_final']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '3Jun20_80VaxCov_muART_Kenya'; % ***SET ME***: name for simulation output file
 % Directory to save results
-if ~ exist([pwd , '/HHCoM_Results/Vaccine_' , pathModifier, '/'])
-    mkdir ([pwd, '/HHCoM_Results/Vaccine_' , pathModifier, '/'])
+if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % AGE GROUPS
@@ -109,7 +109,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , dFertMat3 , dFertPos3 , dFertNeg3 ,  ...
     d_partnersMmult, riskAdj, d_riskAdj, ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2_Kenya(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2_Kenya(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
 
