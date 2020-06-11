@@ -15,10 +15,10 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_19May20_BaseVax_baseScreen_hpvHIVcalib_0_']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_June092020_baseVax_baseScreen_ARTscaleup.mat']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'Jun022020_scenario3'; % ***SET ME***: name for simulation output file
+pathModifier = 'Jun092020_scenario4_ARTscaleup'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -28,13 +28,13 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % LAST YEAR
-lastYear = 2121; % ***SET ME***: end year of simulation run
+lastYear = 2071; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
-screenAlgorithm = 4; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv). If hivPosScreen = 1, this will be the algorithm applied to HIV+
+screenAlgorithm = 6; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv). If hivPosScreen = 1, this will be the algorithm applied to HIV+
 hivPosScreen = 1; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
-screenAlgorithmNeg = 3; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv) 
+screenAlgorithmNeg = 5; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv) 
 posScreenAges = [6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the hiv-specific algorithms
 posScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
 
@@ -58,14 +58,14 @@ posScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector o
 vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
-% Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = [2]; %[2] for S0-S3,  [2 , 3] for scenario S4/S5   % age groups to vaccinate
-vaxCoverB = 0.0; %0.0 for S0-s3,  0.57 for S4/S5  %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
+% Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination
+vaxAgeB = [2];   % age groups to vaccinate -- [2] for 9-year olds
+vaxCoverB = 0.57;  %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
 vaxGB = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-vaxCover = [0.57]; % 0.57 for S0-S3, 0.9 for S4/S5   % vaccine coverages
+vaxCover = [0.90];   % vaccine coverages
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
