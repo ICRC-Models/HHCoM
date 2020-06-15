@@ -861,8 +861,6 @@ end
 
 % Cytology, gen pop screening algorithm without scaleup
 cyt0.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
-cyt0.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-cyt0.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 cyt0.testSens = cytoSens;
 cyt0.colpoRetain = 0.72;
 cyt0.cinTreatEff = baseline.cinTreatEff;
@@ -878,7 +876,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % Cytology, gen pop screening algorithm with scaleup
-cytgen.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
+cytgen.screenCover = [0.0; 0.18; 0.48; 0.70; 0.70; 0.70; 0.70];
 cytgen.testSens = cytoSens;
 cytgen.colpoRetain = 0.72;
 cytgen.cinTreatEff = baseline.cinTreatEff;
@@ -894,7 +892,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % Cytology, HIV-positive
-cythiv.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
+cythiv.screenCover = [0.0; 0.18; 0.48; 0.70; 0.70; 0.70; 0.70]; % CJB note: removed 90% screening compliance beginning in current year
 cythiv.testSens = cytoSens;
 cythiv.colpoRetain = 0.72;
 cythiv.cinTreatEff = baseline.cinTreatEff;
@@ -910,7 +908,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % HPV screening, general pop
-hpvgen.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
+hpvgen.screenCover = [0.0; 0.18; 0.48; 0.70; 0.70; 0.70; 0.70];
 hpvgen.testSens = hpvSens;
 hpvgen.colpoRetain = 0.81*0.85; %assume 81% compliance *85% of CIN2+ corrected identified by same-day colpo
 hpvgen.cinTreatEff = baseline.cinTreatEff;
@@ -926,7 +924,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % HPV screening, HIV-positive
-hpvhiv.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
+hpvhiv.screenCover = [0.0; 0.18; 0.48; 0.70; 0.70; 0.70; 0.70];
 hpvhiv.testSens = hpvSens;
 hpvhiv.colpoRetain = 0.81*0.85; %assume 81% compliance *85% of CIN2+ corrected identified by same-day colpo
 hpvhiv.cinTreatEff = baseline.cinTreatEff;
@@ -1523,6 +1521,10 @@ for a = 1 : age
     yInds = [yInds; males; females];
     vals = [vals; ones(length(males),1) .* ( -mue(a,1) ); ones(length(females),1) .* ( -mue(a,2) )];
 end
+deathMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
+% disp('Death matrix complete')
+
+%% Background death rate by 1985
 deathMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % disp('Death matrix complete')
 
