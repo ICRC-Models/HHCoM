@@ -788,11 +788,11 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 95-95-95 target reached by 2030
-maxRateM = [artVScov(:,3) ; 0.857] .* artOutMult;  % population-level ART coverage in males with scale-up to 95-95-95
-%maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult; % population-level ART coverage in males without scale-up to 95-95-95
-maxRateF = [artVScov(:,2) ; 0.857] .* artOutMult; % population-level ART coverage in females with scale-up to 95-95-95
-%maxRateF = [artVScov(:,2) ; artVScov(end,2)] .*artOutMult;  % population-level ART coverage in females without scale-up to 95-95-95
+artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
+%maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult;  % population-level ART coverage in males with scale-up to 90-90-90
+maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult; % population-level ART coverage in males without scale-up to 90-90-90
+%maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females with scale-up to 90-90-90
+maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult;  % population-level ART coverage in females without scale-up to 90-90-90
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -879,8 +879,6 @@ end
 
 % Cytology, gen pop screening algorithm with scaleup
 cytgen.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cytgen.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-cytgen.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 cytgen.testSens = cytoSens;
 cytgen.colpoRetain = 0.72;
 cytgen.cinTreatEff = baseline.cinTreatEff;
@@ -913,8 +911,6 @@ end
 
 % HPV screening, general pop
 hpvgen.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-hpvgen.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-hpvgen.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 hpvgen.testSens = hpvSens;
 hpvgen.colpoRetain = 0.81*0.85; %assume 81% compliance *85% of CIN2+ corrected identified by same-day colpo
 hpvgen.cinTreatEff = baseline.cinTreatEff;
