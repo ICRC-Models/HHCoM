@@ -15,11 +15,11 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
-%historicalIn = load([pwd , '/HHCoM_Results/toNow_June092020_baseVax_baseScreen_ARTscaleup.mat']); % ***SET ME***: name for historical run input file 
+%historicalIn = load([pwd , '/HHCoM_Results/toNow_June122020_baseVax_baseScreen_ARTscaleup.mat']); % ***SET ME***: name for historical run input file 
 historicalIn = load([pwd , '/HHCoM_Results/toNow_19May20_BaseVax_baseScreen_hpvHIVcalib_0_']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = 'Jun122020_S0'; % ***SET ME***: name for simulation output file
+pathModifier = 'OptAge_June14_Age20Cyt'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -33,9 +33,11 @@ lastYear = 2071; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
-screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv). If hivPosScreen = 1, this will be the algorithm applied to HIV+
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv). If hivPosScreen = 1, this will be the algorithm applied to HIV+
+ScrnAges = [5];
+ScrnAgeMults = [0.2];
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
-screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv) 
+screenAlgorithmNeg = 2; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for cyt0 (2x cytology with no scale-up), 3 for cytgen, 4 for cythiv, 5 for hpvgen, 6 for hpvhiv) 
 posScreenAges = [6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the hiv-specific algorithms
 posScreenAgeMults = [0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
 
@@ -72,8 +74,8 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 1;    % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 : 10];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)-1).*0.50 , 0.50*0.20];   % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age, *adjustment factor if fraction of 5-year cohort
+vaxAgeCU = [4, 5];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [0.5 , 0.5];  % [ones(1,length(vaxAgeCU)-1).*0.50 , 0.50*0.20];   % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age, *adjustment factor if fraction of 5-year cohort
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -131,6 +133,13 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
+
+% Screening ages
+cytgen.screenAge = ScrnAges;
+hpvgen.screenAge = ScrnAges;
+
+cytgen.screenAgeMults = ScrnAgeMults;
+hpvgen.screenAgeMults = ScrnAgeMults;
 
 % HIV-positive screening ages
 cythiv.screenAge = posScreenAges;
