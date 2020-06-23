@@ -12,9 +12,9 @@ paramSetCurr = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr
 paramSetNext = load([paramDir , 'paramSets_calib_' , date , '_' , num2str(t_curr+1) , '.dat']); % load next parameter sample
 
 %% Get indices and parameter values of top fifty sets --> as applied now, actually all accepted particles
-numSets60 = size(orderedLL , 1)*0.60;
+numSets60 = size(orderedLL , 1)*0.60; %0.0024
 top50Inds = orderedLL(1:numSets60,1);
-top50Params = masterSetMatrix(:,top50Inds); %masterSetMatrix(:,top50Inds);
+top50Params = masterSetMatrix(:,top50Inds);
 
 %% Find min and max of each parameter and compare to bounds
 [paramsAll] = genParamStruct();
@@ -77,39 +77,48 @@ figure;
 %          'Inf->Well, vax' , 'Inf->Well, nv' , 'CIN1->Inf, vax' , 'CIN1->Inf, nv' , ...
 %          'CIN2->CIN1, vax' , 'CIN2->CIN1, nv' , 'CIN3->CIN2, vax' , 'CIN3->CIN2, nv' , ...
 %          'HIV transmission' , 'fert decline 1' , 'fert decline 2' , 'maleHpvClearMult'};
-titles = {'partnersM:15-19,hr' , 'partnersM:20-24,hr' , ...    % 22Apr20 calibration
-         'partnersM:25-29,hr' , 'partnersM:30-44,hr' , 'partnersM:45-79,hr' , ...
-         'partnersM:10-14,mr' , 'partnersM:10-14,lr' , ...
-         'partnersF:15-19,hr' , 'partnersF:20-24,hr' , ...
-         'partnersF:25-29,hr' , 'partnersF:30-44,hr' , 'partnersF:45-79,hr' , ...
-         'partnersF:10-14,mr' , 'partnersF:10-14,lr' , ...
-         'condUse' , 'epsA' , ...
-         'femaleActs:15-19,lr' , 'femaleActs:20-24,lr' , 'femaleActs:25-29,lr' , ...
-         'femaleActs:30-44,lr' , 'femaleActs:45-79,lr' , ...
-         'perPartnerHpv' , 'lambdaMultImm' , ...
-         'Inf->Well, vax' , 'Inf->Well, nv' , ...
-         'HIV transmission' , 'maleHpvClearMult'};
+% titles = {'partnersM:15-19,hr' , 'partnersM:20-24,hr' , ...    % 22Apr20 calibration Phase 1
+%          'partnersM:25-29,hr' , 'partnersM:30-44,hr' , 'partnersM:45-79,hr' , ...
+%          'partnersM:10-14,mr' , 'partnersM:10-14,lr' , ...
+%          'partnersF:15-19,hr' , 'partnersF:20-24,hr' , ...
+%          'partnersF:25-29,hr' , 'partnersF:30-44,hr' , 'partnersF:45-79,hr' , ...
+%          'partnersF:10-14,mr' , 'partnersF:10-14,lr' , ...
+%          'condUse' , 'epsA' , ...
+%          'femaleActs:15-19,lr' , 'femaleActs:20-24,lr' , 'femaleActs:25-29,lr' , ...
+%          'femaleActs:30-44,lr' , 'femaleActs:45-79,lr' , ...
+%          'perPartnerHpv' , 'lambdaMultImm' , ...
+%          'Inf->Well, vax' , 'Inf->Well, nv' , ...
+%          'HIV transmission' , 'maleHpvClearMult'};
+titles = {'perPartnerHpv' , 'lambdaMultImm' , ...    % 22Apr20 calibration Phase 2
+          'Inf->CIN1, vax' , 'Inf->CIN1, nv' , 'CIN1->CIN2, vax' , 'CIN1->CIN2, nv' , ...
+          'CIN2->CIN3, vax' , 'CIN2->CIN3, nv' , 'CIN3->CC, vax' , 'CIN3->CC, nv' , ...
+          'Inf->Well, vax' , 'Inf->Well, nv' , 'CIN1->Inf, vax' , 'CIN1->Inf, nv' , ...
+          'CIN2->CIN1, vax' , 'CIN2->CIN1, nv' , 'CIN3->CIN2, vax' , 'CIN3->CIN2, nv' , ...
+          'maleHpvClearMult'};
 for i = 1 : size(top50Params,1)
-    subplot(4,7,i);
-    [N2,edges2] = histcounts(paramSetCurr(i,:) , 100 , 'Normalization' , 'probability');
-    edges2 = edges2(2:end) - (edges2(2)-edges2(1))/2;
-    plot(edges2 , N2);
-    %[f_curr,xi_curr] = ksdensity(paramSetCurr(i,:) , linspace(lb(i) , ub(i) , 100));
-    %plot(xi_curr,f_curr);
-    hold all;
-    [N3,edges3] = histcounts(paramSetNext(i,:) , 100, 'Normalization' , 'probability');
-    edges3 = edges3(2:end) - (edges3(2)-edges3(1))/2;
-    plot(edges3 , N3);
-    %[f_next,xi_next] = ksdensity(paramSetNext(i,:) , linspace(lb(i) , ub(i) , 100));
-    %plot(xi_next,f_next);
-    %hold off;
+    subplot(4,5,i);
+%     hold all; 
+%     [N2,edges2] = histcounts(paramSetCurr(i,:) , 100 , 'Normalization' , 'probability');
+%     edges2 = edges2(2:end) - (edges2(2)-edges2(1))/2;
+%     plot(edges2 , N2);
+%     %[f_curr,xi_curr] = ksdensity(paramSetCurr(i,:) , linspace(lb(i) , ub(i) , 100));
+%     %plot(xi_curr,f_curr);
+%     hold all;
+     
+%     [N3,edges3] = histcounts(paramSetNext(i,:) , 100, 'Normalization' , 'probability');
+%     edges3 = edges3(2:end) - (edges3(2)-edges3(1))/2;
+%     plot(edges3 , N3);
+%     %[f_next,xi_next] = ksdensity(paramSetNext(i,:) , linspace(lb(i) , ub(i) , 100));
+%     %plot(xi_next,f_next);
+%     %hold off;
     
-    prior = unifpdf(linspace(lb(i) , ub(i) , 100) , lb(i) , ub(i)); %[lb(i):((ub(i)-lb(i))/length(top50Inds)):ub(i)]
-    plot(linspace(lb(i) , ub(i) , 100) , prior , 'k');
+    %prior = unifpdf(linspace(lb(i) , ub(i) , 100) , lb(i) , ub(i)); %[lb(i):((ub(i)-lb(i))/length(top50Inds)):ub(i)]
+    %plot(linspace(lb(i) , ub(i) , 100) , prior , 'c');
     hold all;
     [N,edges] = histcounts(top50Params(i,:) , 100 , 'Normalization' , 'probability');
     edges = edges(2:end) - (edges(2)-edges(1))/2;
-    plot(edges , N , 'g');
+    p1 = plot(edges , N , 'k' , 'LineWidth' , 1);
+    p1.Color(4) = 1.0;
     %hold all;
     %[f,xi] = ksdensity(top50Params(i,:) , linspace(lb(i) , ub(i) , 100));
     %plot(xi,f);
@@ -118,11 +127,12 @@ for i = 1 : size(top50Params,1)
     %xlim([min(top50Params(i,:)) max(top50Params(i,:))]);
     %ylim([0.0 max(f)*1.25]);
     ylim([0.0 max(N)*1.25]);
-    %ylim([0.0 max(N3)*1.25]);
     title(titles{i});
     if i == size(top50Params,1)
-        %legend('paramSetCurr' , 'paramSetNext');
-        %legend('prior' , 't0' , 't1' , 't2' , 't3');
-        legend('paramSetCurr' , 'paramSetNext' , 'prior' , 't0');
+        %legend('paramSet-t0' , 'paramSet-t1' , 'paramSet-t2' , 'paramSet-t3' , 'paramSet-t4' , 'paramSet-t5' , 'paramSet-t6');
+        legend('t0' , 't1' , 't2' , 't3' , 't4' , 't5' , 't6' , 't7' , 't8' , ...
+            't9' , 't10' , 't11' , 't12' , 't13' , 't14' , 't15' , 't16' , ...
+            't17' , 't18' , 't19' , 't20' , 't21' , 't22');
+        %legend('paramSetCurr' , 'paramSetNext' , 't0'); % 'prior' , 'paramSetNext-fixedWeights');
     end
 end
