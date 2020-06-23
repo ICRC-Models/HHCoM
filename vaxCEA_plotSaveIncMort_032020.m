@@ -49,25 +49,25 @@ paramDir = [pwd , '\Params\'];
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
 
 %% LOAD SAVED RESULTS
-curr = load([pwd , '\HHCoM_Results\toNow_19May20_baseVax_baseScreen_handCalibModel']); %toNow_27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc % ***SET ME***: name for historical run file
+curr = load([pwd , '\HHCoM_Results\toNow_04Jun20_baseVax057_baseScreen_handCalibModel']); % ***SET ME***: name for historical run file
 % ***SET ME***: save names of potential scenarios to analyze as variables
-dirName_reductBaseline = '19May20_baseVax_baseScreen_handCalibModel_060Fert2035_IPVC_SCES01'; %'27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc_060Fert2035_IPVC_SCES01';
-dirName_P1_SCE3 = '27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc_060Fert2035_IPVC_SCE2';
-dirName_P1_SCE5 = '27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc_060Fert2035_IPVC_SCE3';
-dirName_P2_SCE1 = '27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc_060Fert2035_IPVC_SCE4';
-dirName_P2_SCE2 = '27May20_baseVax_baseScreen_handCalibModel_baseARTvmmc_060Fert2035_IPVC_SCE5';
+dirName_reductBaseline = '04Jun20_baseVax057_baseScreen_handCalibModel_060Fert2035_IPVC_SCES01';
+dirName_P1_SCE3 = '04Jun20_baseVax057_baseScreen_handCalibModel_060Fert2035_IPVC_SCE2';
+dirName_P1_SCE5 = '04Jun20_baseVax057_baseScreen_handCalibModel_060Fert2035_IPVC_SCE4';
+dirName_P2_SCE1 = '27May20_baseVax_baseScreen_handCalibModel_060Fert2035_IPVC_SCE4';
+dirName_P2_SCE2 = '27May20_baseVax_baseScreen_handCalibModel_060Fert2035_IPVC_SCE5';
 dirName_P2_SCE3 = '090519_WHOP2_SCE3';
 dirName_P2_SCE4 = '090519_WHOP2_SCE4';
 dirName_P2_SCE5 = '090519_WHOP2_SCE5';
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5 , dirName_P2_SCE1 , dirName_P2_SCE2}; % , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
+simVec = {dirName_reductBaseline , dirName_P1_SCE3 , dirName_P1_SCE5}; % , dirName_P2_SCE1 , dirName_P2_SCE2 , dirName_P2_SCE3 , dirName_P2_SCE4 , dirName_P2_SCE5};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'IPVC_SCES01' , 'IPVC_SCE2' , 'IPVC_SCE3' , 'IPVC_SCE4' , 'IPVC_SCE5'}; %{'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
+fileTits = {'IPVC_SCES01' , 'IPVC_SCE2' , 'IPVC_SCE4'}; %{'P1_SCES12' , 'P1_SCES34' , 'P1_SCES56' , 'P2_SCE1' , 'P2_SCE2' , 'P2_SCE3' , 'P2_SCE4' , 'P2_SCE5'};
 
 nResults = length(simVec);
 
-%% SAVE INCIDENCE AND MORTALITY
+%% SAVE CC INCIDENCE AND MORTALITY; NEW CC CASES; HIV PREVALENCE
 for j = 1 : nResults 
     % Load results
     pathModifier = simVec{j};
@@ -127,18 +127,34 @@ for j = 1 : nResults
         end
 
         % Save incidence
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawInc_ages9-79' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
-%             end
-%         end
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawInc_ages9-79' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+            end
+        end
+        
+        % Save number of new cancer cases
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_NewCases_Crude_ages9-79' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , ...
+                    annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , 3 : age , :),2),3),4))'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , ...
+                    annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , 3 : age , :),2),3),4))'] , sname)
+            end
+        end
              
         % Plot baseline incidence
         if (j == 1) && (i == 1)
@@ -156,7 +172,7 @@ for j = 1 : nResults
             grid on;
             xlabel('Year'); ylabel('Incidence rates (per 100K) - Raw, ages 9-79'); 
             %legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
-            legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5');
+            legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3'); %'Scenario 3' , 'Scenario 5'
         end
      
     end     
@@ -234,18 +250,18 @@ for j = 1 : nResults
         end
         
         % Save incidence
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandInc_ages0-99' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
-%             end
-%         end
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandInc_ages0-99' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccInc'] , sname)
+            end
+        end
         
         % Plot baseline incidence
 %         if (j == 1) && (i == 1)
@@ -264,6 +280,8 @@ for j = 1 : nResults
 %             xlabel('Year'); ylabel('Incidence rates (per 100K) - AS'); 
 %             %legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' , 'General-ARToff' , 'HIV-negative-ARToff' , 'HIV-positive no ART-ARToff' , 'HIV-positive ART-ARToff' , 'HIV all-ARToff');
 %             legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5');
+%             %legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5' , ...
+%             %    'Elimination: <4/100K' , 'Benchmark: <10/100K' , 'Scenario 0 - HIV intervention scale-up' );
 %         end
 
     end  
@@ -302,18 +320,18 @@ for j = 1 : nResults
         end
 
         % Save mortality
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawMort_ages9-79' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
-%             end
-%         end
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_RawMort_ages9-79' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
+            end
+        end
 
 %         % Plot baseline mortality
 %         figure;
@@ -401,18 +419,18 @@ for j = 1 : nResults
         end
 
         % Save mortality
-%         for n = 1 : nSims
-%             fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
-%                 '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandMort_ages0-99' , '.xlsx'];
-%             sname = plotTits1{i};
-%             if exist(fname , 'file') == 2
-%                 M = xlsread(fname);
-%                 M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
-%                 xlswrite(fname , M , sname)
-%             else
-%                 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
-%             end
-%         end
+        for n = 1 : nSims
+            fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+                '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_AgeStandMort_ages0-99' , '.xlsx'];
+            sname = plotTits1{i};
+            if exist(fname , 'file') == 2
+                M = xlsread(fname);
+                M = catpad(2 , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , M);
+                xlswrite(fname , M , sname)
+            else
+                xlswrite(fname , [tVec(1 : stepsPerYear : end)' , vaxResult{n}.ccMort'] , sname)
+            end
+        end
 
 %         % Plot baseline mortality
 %         figure;
@@ -425,6 +443,44 @@ for j = 1 : nResults
 %         legend('General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all');
 
     end
+    
+    %% FEMALE HIV PREVALENCE     
+    
+%     for n = 1 : nSims
+%         hivInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%             1 : endpoints , 1 : intervens , 2 , 4 : 10 , 1 : risk)); 
+%         totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%             1 : endpoints , 1 : intervens , 2 , 4 : 10 , 1 : risk));
+%         hivPop = sum(vaxResult{n}.popVec(: , hivInds) , 2);
+%         totPop = sum(vaxResult{n}.popVec(: , totInds) , 2);
+%         hivPopPrev = bsxfun(@rdivide , hivPop , totPop);
+%         
+%         % Save female HIV prevalence   
+%         fname = [pwd , '\HHCoM_Results\Vaccine' , dirName_reductBaseline , '\' , fileTits{j} , ...
+%             '_Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_vaxResult' , num2str(n) , '_HIVprev_female_ages10-49' , '.xlsx'];
+%         sname = 'HIV all';
+%         if exist(fname , 'file') == 2
+%             M = xlsread(fname);
+%             M = catpad(2 , [tVec(1 : stepsPerYear : end)' , hivPopPrev(1 : stepsPerYear : end)] , M);
+%             xlswrite(fname , M , sname)
+%         else
+%             xlswrite(fname , [tVec(1 : stepsPerYear : end)' , hivPopPrev(1 : stepsPerYear : end)] , sname)
+%         end
+%         
+%         % Plot female HIV prevalence
+%         if (j == 1) && (n == 1)
+%             figure;
+%             plot(tVec(1 : stepsPerYear : end)' , hivPopPrev(1 : stepsPerYear : end) , 'b-')
+%         end
+%         if (n > 1)
+%             hold all;
+%             plot(tVec(1 : stepsPerYear : end)' , hivPopPrev(1 : stepsPerYear : end) , '-')
+%         end
+%         axis([1980 2120 0 1])
+%         grid on;
+%         xlabel('Year'); ylabel('Female HIV Prevalence - ages 10-49'); 
+%         legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3'); %'Scenario 3' , 'Scenario 5'
+%     end
 
 %     clear vaxResult; 
 end
@@ -435,7 +491,8 @@ if j == nResults
     plot (tVec(1 : stepsPerYear : end)' , ones(length(tVec(1 : stepsPerYear : end)),1).*4.0 , 'r:')
     hold all;
     plot (tVec(1 : stepsPerYear : end)' , ones(length(tVec(1 : stepsPerYear : end)),1).*10.0 , 'r--')
-    legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , 'Scenario 4' , 'Scenario 5' , ...
-        'Elimination: <4/100K' , 'Benchmark: <10/100K' );
+    legend('Scenario 0' , 'Scenario 1' , 'Scenario 2' , 'Scenario 3' , ...
+        'Elimination: <4/100K' , 'Benchmark: <10/100K');
+        % 'Scenario 0 - baseline ART, VMMC' , 'Scenario 1 - baseline ART, VMMC' , 'Scenario 2 - baseline ART, VMMC' , 'Scenario 3 - baseline ART, VMMC' , ...
 end
 
