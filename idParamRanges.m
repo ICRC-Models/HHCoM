@@ -28,7 +28,7 @@ handCalib = [0.80; 12.2; 25.0; 25.0; 12.0; 0.22; 0.50; ...    % 22Apr20 Phase 1 
              3.5];
 
 %% Get indices and parameter values of top 25 sets (*0.0024), or all accepted particles (*0.60)
-numSets60 = size(orderedLL , 1)*0.0024; %0.60 %0.00489237
+numSets60 = size(orderedLL , 1)*0.4; %0.0024; %0.60 %0.00489237
 top50Inds = orderedLL(1:numSets60,1);
 top50Params = masterSetMatrix(:,top50Inds);
 
