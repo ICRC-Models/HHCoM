@@ -7,7 +7,7 @@ echo "${DATE}"
 export DATE
 
 echo "Running MATLAB script to get matrix size."
-sbatch -p csde -A csde slurm_sizeMatrix.sbatch
+sbatch -p ckpt -A csde-ckpt slurm_sizeMatrix.sbatch
 sleep 180
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
@@ -29,6 +29,14 @@ for i in $(seq 1 5 ${LENGTH28}); do
     if [ $i -ge 73 ] && [ $i -lt 77 ]; then
         echo "${i}"
         sleep 5400    # give submitted simulations time to finish 
+    fi
+    if [ $i -ge 154 ] && [ $i -lt 158 ]; then
+        echo "${i}"
+        sleep 5400
+    fi
+    if [ $i -ge 234 ] && [ $i -lt 238 ]; then
+        echo "${i}"
+        sleep 5400
     fi
 done
 
@@ -53,8 +61,8 @@ echo "Re-running failed simulations."
                  INT=$(($INT + 1))
              fi
         done
-	if [ $INT -ge 5 ]; then 
-            sleep 5 #10800    # give submitted simulations time to finish 
+	if [ $INT -ge 50 ]; then 
+            sleep 7200 #10800    # give submitted simulations time to finish 
 	    INT=0
 	fi
     done
