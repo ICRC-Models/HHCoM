@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Plot settings
 reset(0)
-set(0 , 'defaultlinelinewidth' , 1)
+set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
 fileInds = {'12_3346' , '12_2618' , '11_932' , '16_3038' , '8_597' , '12_2550' , ...  % 22Apr20Ph2
@@ -91,7 +91,7 @@ cinNeg2002 = cinPos2002;
 % CC incidence
 ccInc2012 = zeros(nRuns , age);
 % HPV/CIN/CC type distribution
-typeDistYearVec = [2012];
+typeDistYearVec = [2010 , 2011 , 2012 , 2013 , 2014 , 2015];
 cc_vax = zeros(nRuns , length(typeDistYearVec));
 cc_nonVax = cc_vax;
 cin3_vax = cc_vax;
@@ -243,7 +243,7 @@ for j = 1 : nRuns
     %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
     
     %% HPV type distribution by state over time (coinfections grouped as 9v-type HPV)
-    typeDistYearVec = [2012];
+    typeDistYearVec = [2010 , 2011 , 2012 , 2013 , 2014 , 2015];
     ccInds_vax = toInd(allcomb(1 : disease , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
         1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
     ccInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , 6 , ...
@@ -314,18 +314,21 @@ futurePop0_69(:,1) = xlsread(file , 'Demographics' , 'C144:R144'); % years
 futurePop0_69(:,2) = xlsread(file , 'Demographics' , 'C146:R146') .* 1000; % projections
 
 % Calibration error bars
-mean = totPopSize_dObs(: , 2);
-sdev = (totPopSize_dObs(: , 3).^(1/2));
+meanObs = totPopSize_dObs(: , 2);
+sdevObs = (totPopSize_dObs(: , 3).^(1/2)).*2;
 
 figure;
-errorbar(totPopSize_dObs(: , 1) , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(totPopSize_dObs(: , 1) , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot(popSize , 'Positions' , popYearVec , 'Labels' , popYearVec , 'Color' , 'k' , 'Whisker' , 5);
+%boxplot(popSize , 'Positions' , popYearVec , 'Labels' , popYearVec , 'Color' , 'k' , 'Whisker' , 5);
+plot(totPopSize_dObs(: , 1) , mean(popSize,1)' , 'k-' , ...
+    totPopSize_dObs(: , 1) , min(popSize,[],1)' , 'k--' , ...
+    totPopSize_dObs(: , 1) , max(popSize,[],1)' , 'k--' , 'LineWidth' , 1.5);
 title('KZN Population Size Ages 0-79')
 xlabel('Year'); ylabel('Individuals')
 xlim([2000 2020]); ylim([0 (14*10^6)]);
-legend('Observed KZN ages 0-79: mean, SD');
+legend('Observed KZN ages 0-79: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 grid on;
 
 %% Population size by 5-year age groups over time vs. SSA data
@@ -409,9 +412,9 @@ hivPrevM_val = [1.60	1.85	2.75	3.46	2.87	3.95	4.50
 
 % Calibration error bars
 hivM(: , 1) = hivPrevM_dObs(: , 2) .* 100; % mean
-hivM(: , 2) = (hivPrevM_dObs(: , 3).^(1/2)) .* 100; % calibration SD
+hivM(: , 2) = (hivPrevM_dObs(: , 3).^(1/2)).*2 .* 100; % calibration SD
 hivF(: , 1) = hivPrevF_dObs(: , 2) .* 100; % mean
-hivF(: , 2) = (hivPrevF_dObs(: , 3).^(1/2)) .* 100; % calibration SD
+hivF(: , 2) = (hivPrevF_dObs(: , 3).^(1/2)).*2 .* 100; % calibration SD
 
 prevYears = unique(hivPrevF_dObs(: , 1));
 prevYears2 = [2010 : 2016];
@@ -433,19 +436,25 @@ for g = 1 : gender
         hold all;
         if a <= 11            
             errorbar(prevYears , hivPrevs(((a-3) : 7 : end) , 1) , hivPrevs(((a-3) : 7 : end) , 2) , ...
-                'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+                'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
             hold on;
-            boxplot((squeeze(hivModel(: , a-3 , :)) .* 100) , ...
-                'Positions' , prevYears , 'Labels' , prevYears , 'Color' , 'k' , 'Whisker' , 5);
+            %boxplot((squeeze(hivModel(: , a-3 , :)) .* 100) , ...
+            %    'Positions' , prevYears , 'Labels' , prevYears , 'Color' , 'k' , 'Whisker' , 5);
+            plot(prevYears , mean((squeeze(hivModel(: , a-3 , :)) .* 100),1)' , 'k-' , ...
+                prevYears , min((squeeze(hivModel(: , a-3 , :)) .* 100),[],1)' , 'k--' , ...
+                prevYears , max((squeeze(hivModel(: , a-3 , :)) .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
         else
-            boxplot((squeeze(hivModel(: , a-3 , :)) .* 100) , ...
-                'Positions' , prevYears , 'Labels' , prevYears , 'Color' , 'k' , 'Whisker' , 5);
+            %boxplot((squeeze(hivModel(: , a-3 , :)) .* 100) , ...
+            %    'Positions' , prevYears , 'Labels' , prevYears , 'Color' , 'k' , 'Whisker' , 5);
+            plot(prevYears , mean((squeeze(hivModel(: , a-3 , :)) .* 100),1)' , 'k-' , ...
+                prevYears , min((squeeze(hivModel(: , a-3 , :)) .* 100),[],1)' , 'k--' , ...
+                prevYears , max((squeeze(hivModel(: , a-3 , :)) .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
         end
         xlabel('Year'); ylabel('Prevalence (%)'); title([gen{g} , 's ages ' , ageGroup{a-3}]) % , ' HIV Prevalence'])
         xlim([2000 2010]); ylim([0 60]);
         grid on;
     end
-    legend('Observed KZN: mean, SD')
+    legend('Observed KZN: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum')
 end
 
 %% ********************************** HPV FIGURES **********************************************************************************************
@@ -456,34 +465,40 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
 % Calibration error bars
-mean = hpv_hiv_dObs(: , 2) .* 100;
-sdev = (hpv_hiv_dObs(: , 3).^(1/2)) .* 100;
+meanObs = hpv_hiv_dObs(: , 2) .* 100;
+sdevObs = (hpv_hiv_dObs(: , 3).^(1/2)).*2 .* 100;
 meanNeg = hpv_hivNeg_dObs(: , 2) .* 100;
-sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)) .* 100;
+sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)).*2 .* 100;
 
 figure;
 subplot(2,1,1);
-errorbar(1 : length(mean) , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(1 : length(meanObs) , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((hpv_hiv .* 100) , 'Color' , 'k' , 'Whisker' , 5);
+%boxplot((hpv_hiv .* 100) , 'Color' , 'k' , 'Whisker' , 5);
+plot(1 : length(meanObs) , mean((hpv_hiv .* 100),1)' , 'k-' , ...
+    1 : length(meanObs) , min((hpv_hiv .* 100),[],1)' , 'k--' , ...
+    1 : length(meanObs) , max((hpv_hiv .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 set(gca , 'xtickLabel' , ageGroup);
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)');
 ylim([0 100]);
-legend('Observed HIV-Positive Females: mean, SD');
+legend('Observed HIV-Positive Females: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 title('HPV Prevalence in 2002 - Females, HIV+');
 
 subplot(2,1,2);
-errorbar(1 : length(mean) , meanNeg , sdevNeg , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(1 : length(meanObs) , meanNeg , sdevNeg , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((hpv_hivNeg .* 100) , 'Color' , 'k' , 'Whisker' , 5);
+%boxplot((hpv_hivNeg .* 100) , 'Color' , 'k' , 'Whisker' , 5);
+plot(1 : length(meanObs) , mean((hpv_hivNeg .* 100),1)' , 'k-' , ...
+    1 : length(meanObs) , min((hpv_hivNeg .* 100),[],1)' , 'k--' , ...
+    1 : length(meanObs) , max((hpv_hivNeg .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 set(gca , 'xtickLabel' , ageGroup);
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)');
 ylim([0 100]);
-legend('Observed HIV-Negative Females: mean, SD');
+legend('Observed HIV-Negative Females: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 title('HPV Prevalence in 2002 - Females, HIV-');
 grid on;
 
@@ -491,30 +506,36 @@ grid on;
 ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
 
 % Calibration error bars
-mean = hpv_hivM2008_dObs(: , 2) .* 100;
-sdev = (hpv_hivM2008_dObs(: , 3).^(1/2)) .* 100;
+meanObs = hpv_hivM2008_dObs(: , 2) .* 100;
+sdevObs = (hpv_hivM2008_dObs(: , 3).^(1/2)).*2 .* 100;
 meanNeg = hpv_hivMNeg2008_dObs(: , 2) .* 100;
-sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)) .* 100;
+sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)).*2 .* 100;
 
 figure;
 subplot(2,1,1)
-errorbar(1 : length(mean) , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(1 : length(meanObs) , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((hpv_hivM2008 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
+%boxplot((hpv_hivM2008 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
+plot(1 : length(meanObs) , mean((hpv_hivM2008 .* 100),1)' , 'k-' , ...
+    1 : length(meanObs) , min((hpv_hivM2008 .* 100),[],1)' , 'k--' , ...
+    1 : length(meanObs) , max((hpv_hivM2008 .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
-legend('Observed HIV-Positive Males: mean, SD');
+legend('Observed HIV-Positive Males: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
 title('HPV Prevalence in 2008 - Males, HIV+');
 grid on;
 
 subplot(2,1,2)
-errorbar(1 : length(mean) , meanNeg , sdevNeg , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(1 : length(meanObs) , meanNeg , sdevNeg , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((hpv_hivMNeg2008 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
+%boxplot((hpv_hivMNeg2008 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
+plot(1 : length(meanObs) , mean((hpv_hivMNeg2008 .* 100),1)' , 'k-' , ...
+    1 : length(meanObs) , min((hpv_hivMNeg2008 .* 100),[],1)' , 'k--' , ...
+    1 : length(meanObs) , max((hpv_hivMNeg2008 .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
-legend('Observed HIV-Negative Males: mean, SD');
+legend('Observed HIV-Negative Males: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
 title('HPV Prevalence in 2008 - Males, HIV-');
 grid on;
@@ -528,17 +549,20 @@ ageGroup = {'17-19' , '20-24' , '25-29' ,...
 
 % Calibration error bars
 cinPos_mean = cinPos2002_dObs(: , 2) .* 100;
-cinPos_sdev = (cinPos2002_dObs(: , 3).^(1/2)) .* 100;
+cinPos_sdev = (cinPos2002_dObs(: , 3).^(1/2)).*2 .* 100;
 cinNeg_mean = cinNeg2002_dObs(: , 2) .* 100;
-cinNeg_sdev = (cinNeg2002_dObs(: , 3).^(1/2)) .* 100;
+cinNeg_sdev = (cinNeg2002_dObs(: , 3).^(1/2)).*2 .* 100;
 
 figure;
 subplot(2 , 1 , 1);
 errorbar(1 : length(cinPos_mean) , cinPos_mean , cinPos_sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((cinPos2002 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
-legend('Observed HIV-positive Females: mean, SD');
+%boxplot((cinPos2002 .* 100) , 'Color' , 'k' , 'Whisker' , 5)
+plot(1 : length(cinPos_mean) , mean((cinPos2002 .* 100),1)' , 'k-' , ...
+    1 : length(cinPos_mean) , min((cinPos2002 .* 100),[],1)' , 'k--' , ...
+    1 : length(cinPos_mean) , max((cinPos2002 .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
+legend('Observed HIV-positive Females: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('CIN 2/3 Prevalence in 2002 - HIV+')
@@ -547,10 +571,13 @@ grid on;
 
 subplot(2 , 1 , 2)
 errorbar(1 : length(cinNeg_mean) , cinNeg_mean , cinNeg_sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot((cinNeg2002 .* 100) , 'Color' , 'k' , 'Whisker' , 5);
-legend('Observed HIV-negative Females: mean, SD');
+%boxplot((cinNeg2002 .* 100) , 'Color' , 'k' , 'Whisker' , 5);
+plot(1 : length(cinNeg_mean) , mean((cinNeg2002 .* 100),1)' , 'k-' , ...
+    1 : length(cinNeg_mean) , min((cinNeg2002 .* 100),[],1)' , 'k--' , ...
+    1 : length(cinNeg_mean) , max((cinNeg2002 .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
+legend('Observed HIV-negative Females: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('CIN 2/3 Prevalence in 2002 - HIV-')
@@ -607,24 +634,27 @@ combined_lb = [0.00
 52.01];
 
 % Calibration error bars
-mean = ccInc2012_dObs(: , 2);
-sdev = (ccInc2012_dObs(: , 3).^(1/2));
+meanObs = ccInc2012_dObs(: , 2);
+sdevObs = (ccInc2012_dObs(: , 3).^(1/2)).*2;
 
 figure;    
 % Plot observed data
 plot(4 : age , combined_ub , 'r-' , 4 : age , combined_lb , 'r-'); % , ...
     %'Color' , [0.9290, 0.6940, 0.1250]);
 hold on; 
-errorbar(4 : age , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+errorbar(4 : age , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-boxplot(ccInc2012 , 'Color' , 'k' , 'Whisker' , 5);
+%boxplot(ccInc2012 , 'Color' , 'k' , 'Whisker' , 5);
+plot(1 : age , mean(ccInc2012,1)' , 'k-' , ...
+    1 : age , min(ccInc2012,[],1)' , 'k--' , ...
+    1 : age , max(ccInc2012,[],1)' , 'k--' , 'LineWidth' , 1.5);
 xlabel('Age Group'); ylabel('Incidence per 100,000');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 ylim([0 160]);
 title(['Cervical Cancer Incidence in 2012']);
 legend('Combined SA: upper bound' , 'Combined SA: lower bound' , ...
-    'Observed Females: mean, SD');
+    'Observed Females: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 grid on;
 
 %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
@@ -633,23 +663,29 @@ grid on;
 
 % HPV infected
 % Calibration error bars
-mean = hpv_dist_dObs(: , 2) .* 100;
-sdev = (hpv_dist_dObs(: , 3).^(1/2)) .* 100;
+meanObs = hpv_dist_dObs(: , 2) .* 100;
+sdevObs = (hpv_dist_dObs(: , 3).^(1/2)).*2 .* 100;
 
 figure;
 subplot(2,3,1)
+errorbar([2012, 2012] , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+hold on;
 plot(2012 , 46.82 , 'k*');
 hold on;
 plot(2012 , 53.18 , 'b*');
 hold on;
-errorbar([2012, 2012] , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+%boxplot(hpv_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'k' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((hpv_vax .* 100),1)' , 'k-' , ...
+    typeDistYearVec , min((hpv_vax .* 100),[],1)' , 'k--' , ...
+    typeDistYearVec , max((hpv_vax .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold on;
-boxplot(hpv_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'k' , 'Whisker' , 5);
-hold on;
-boxplot(hpv_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'b' , 'Whisker' , 5);
+%boxplot(hpv_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'b' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((hpv_nonVax .* 100),1)' , 'b-' , ...
+    typeDistYearVec , min((hpv_nonVax .* 100),[],1)' , 'b--' , ...
+    typeDistYearVec , max((hpv_nonVax .* 100),[],1)' , 'b--' , 'LineWidth' , 1.5);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
 title('HPV');
 ylim([0 100]);
@@ -658,22 +694,28 @@ grid on;
 
 % CIN1
 % Calibration error bars
-mean = cin1_dist_dObs(: , 2) .* 100;
-sdev = (cin1_dist_dObs(: , 3).^(1/2)) .* 100;
+meanObs = cin1_dist_dObs(: , 2) .* 100;
+sdevObs = (cin1_dist_dObs(: , 3).^(1/2)).*2 .* 100;
 
 subplot(2,3,2)
+errorbar([2012, 2012] , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+hold on;
 plot(2012 , 51.92 , 'k*');
 hold on;
 plot(2012 , 48.08 , 'b*');
 hold on;
-errorbar([2012, 2012] , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+%boxplot(cin1_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'k' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cin1_vax .* 100),1)' , 'k-' , ...
+    typeDistYearVec , min((cin1_vax .* 100),[],1)' , 'k--' , ...
+    typeDistYearVec , max((cin1_vax .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold on;
-boxplot(cin1_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'k' , 'Whisker' , 5);
-hold on;
-boxplot(cin1_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'b' , 'Whisker' , 5);
+%boxplot(cin1_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'b' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cin1_nonVax .* 100),1)' , 'b-' , ...
+    typeDistYearVec , min((cin1_nonVax .* 100),[],1)' , 'b--' , ...
+    typeDistYearVec , max((cin1_nonVax .* 100),[],1)' , 'b--' , 'LineWidth' , 1.5);
 ylim([0 100]);
 xlim([2010 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
@@ -693,22 +735,28 @@ grid on;
 
 % CIN3
 % Calibration error bars
-mean = cin3_dist_dObs(: , 2) .* 100;
-sdev = (cin3_dist_dObs(: , 3).^(1/2)) .* 100;
+meanObs = cin3_dist_dObs(: , 2) .* 100;
+sdevObs = (cin3_dist_dObs(: , 3).^(1/2)).*2 .* 100;
 
 subplot(2,3,4)
+errorbar([2012, 2012] , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+hold on;
 plot(2012 , 73.71 , 'k*');
 hold on;
 plot(2012 , 26.29 , 'b*');
 hold on;
-errorbar([2012, 2012] , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+%boxplot(cin3_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'k' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cin3_vax .* 100),1)' , 'k-' , ...
+    typeDistYearVec , min((cin3_vax .* 100),[],1)' , 'k--' , ...
+    typeDistYearVec , max((cin3_vax .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold on;
-boxplot(cin3_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'k' , 'Whisker' , 5);
-hold on;
-boxplot(cin3_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'b' , 'Whisker' , 5);
+%boxplot(cin3_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'b' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cin3_nonVax .* 100),1)' , 'b-' , ...
+    typeDistYearVec , min((cin3_nonVax .* 100),[],1)' , 'b--' , ...
+    typeDistYearVec , max((cin3_nonVax .* 100),[],1)' , 'b--' , 'LineWidth' , 1.5);
 ylim([0 100]);
 xlim([2010 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
@@ -717,25 +765,33 @@ grid on;
 
 % CC
 % Calibration error bars
-mean = cc_dist_dObs(: , 2) .* 100;
-sdev = (cc_dist_dObs(: , 3).^(1/2)) .* 100;
+meanObs = cc_dist_dObs(: , 2) .* 100;
+sdevObs = (cc_dist_dObs(: , 3).^(1/2)).*2 .* 100;
 
 subplot(2,3,5)
+errorbar([2012, 2012] , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+hold on;
 plot(2012 , 85.78 , 'k*');
 hold on;
 plot(2012 , 14.22 , 'b*');
 hold on;
-errorbar([2012, 2012] , mean , sdev , ...
-    'rs'); % , 'Color' , [0.9290, 0.6940, 0.1250])
+%boxplot(cc_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'k' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cc_vax .* 100),1)' , 'k-' , ...
+    typeDistYearVec , min((cc_vax .* 100),[],1)' , 'k--' , ...
+    typeDistYearVec , max((cc_vax .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold on;
-boxplot(cc_vax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'k' , 'Whisker' , 5);
-hold on;
-boxplot(cc_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
-    'Colors' , 'b' , 'Whisker' , 5);
+%boxplot(cc_nonVax .* 100 , 'Positions' , 2012 , 'Labels' , num2str(2012) , ...
+%    'Colors' , 'b' , 'Whisker' , 5);
+plot(typeDistYearVec , mean((cc_nonVax .* 100),1)' , 'b-' , ...
+    typeDistYearVec , min((cc_nonVax .* 100),[],1)' , 'b--' , ...
+    typeDistYearVec , max((cc_nonVax .* 100),[],1)' , 'b--' , 'LineWidth' , 1.5);
 ylim([0 100]);
 xlim([2010 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
 title('Cervical Cancer')
-legend('9v-type HPV' , 'Non-9v-type HPV' , 'Observed 2011: 9v' , 'Observed 2011: non-9v');
+legend('Observed 2012: mean, 2SD' , 'Observed 2012- 9v' , 'Observed 2012- non-9v' , ...
+    'Model- 9v: 25-sets mean' , 'Model- 9v: 25-sets minimum' , 'Model- 9v: 25-sets maximum' , ...
+    'Model- non-9v: 25-sets mean' , 'Model- non-9v: 25-sets minimum' , 'Model- non-9v: 25-sets maximum');
 grid on;

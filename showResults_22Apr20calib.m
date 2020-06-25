@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Plot settings
 reset(0)
-set(0 , 'defaultlinelinewidth' , 2)
+set(0 , 'defaultlinelinewidth' , 1)
 
 % Indices of calib runs to plot
 fileInds = {'12_3346' , '12_2618' , '11_932' , '16_3038' , '8_597' , '12_2550' , ...  % 22Apr20Ph2
@@ -902,9 +902,10 @@ end
     end
     
     %% Cervical cancer incidence in 2011 vs. Globocan 2012 data and other sources
-    ccIncYears = [2010, 2011 , 2012];
+    ccIncYears = [2011 , 2012 , 2013 , 2014 , 2015 , 2016 , 2017 , 2018 , 2019];
     ccCrude = zeros(1,length(ccIncYears));
     ccCrudeObs = zeros(1,length(ccIncYears));
+    ccCrudeObs_2018 = zeros(1,length(ccIncYears));
     fScale = 10^5;
     ccYrs = ((ccIncYears - startYear) * stepsPerYear : ...
         (ccIncYears + 1 - startYear) * stepsPerYear);
@@ -923,6 +924,22 @@ end
     82.7
     88.6
     95.2];
+
+    globocan2018 = [0.00
+    3.91
+    19.72
+    35.82
+    53.75
+    71.18
+    85.09
+    95.44
+    96.10
+    94.85
+    97.49
+    101.99
+    110.43
+    110.43]; %set to be the same as 70-74 age group
+    
     
     for y = 1 : length(ccIncYears)
         % Year
@@ -948,6 +965,18 @@ end
         ccCrudeObs(1,y) = (ccCases ./ ...
             (annlz(sum(popVec(yr_start : yr_end , ageIndsAll) , 2)) ...
             ./ stepsPerYear));
+        
+        ccCases2018 = 0;
+        for a = 3 : age
+            ageInds = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+            1 : intervens , 2 , a , 1 : risk));
+            ccCases2018 = ccCases2018 + ...
+                (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ./ stepsPerYear) ...
+                .* globocan2018(a-2 , 1);
+        end
+        ccCrudeObs_2018(1,y) = (ccCases2018 ./ ...
+            (annlz(sum(popVec(yr_start : yr_end , ageIndsAll) , 2)) ...
+            ./ stepsPerYear));
     end
             
     if j ==1
@@ -958,13 +987,16 @@ end
 
     % Plot model outputs
     hold all;
-    p1 = plot([2010 , 2011 , 2012] , ccCrude(1 , :) , '-b');
+    p1 = plot(ccIncYears , ccCrude(1 , :) , '-b');
     p1.Color(4) = 0.6;
     hold all;
-    plot(2011 , ccCrudeObs(1,2) , 'ok')
+    plot(2012 , ccCrudeObs(1,2) , 'ok')
+    hold all;
+    plot(2018 , ccCrudeObs_2018(1,8) , 'ok')
     xlabel('Year'); ylabel('Incidence per 100,000');
-    xlim([2010 2012]); ylim([0 200]);
-    title(['Cervical Cancer Incidence in 2011']);
+    xlim([2011 2019]); ylim([0 200]);
+    legend('Model' , 'Globocan 2012, crude' , 'Globocan 2018, crude');
+    title(['Cervical cancer incidence over time']);
 
         
     
