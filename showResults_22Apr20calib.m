@@ -401,6 +401,33 @@ else
     figure(fig13);
 end
 
+hivInc_obs(: , : , 1) = [2005 2.14 1.57 2.93; % AHRI KZN: (Vandormael, 2019)
+                         2006 2.24 1.69 2.96;
+                         2007 2.30 1.74 3.05;
+                         2008 2.35 1.78 3.09;
+                         2009 2.45 1.85 3.24;
+                         2010 2.45 1.85 3.25;
+                         2011 2.30 1.70 3.11;
+                         2012 2.49 1.83 3.37;
+                         2013 2.22 1.64 3.01;
+                         2014 1.83 1.29 2.59;
+                         2015 1.39 0.94 2.07;
+                         2016 1.24 0.79 1.95;
+                         2017 1.01 0.58 1.76];
+hivInc_obs(: , : , 2) = [2005 4.08 3.40 4.90;
+                         2006 4.45 3.77 5.27;
+                         2007 4.56 3.86 5.39;
+                         2008 4.58 3.89 5.40;
+                         2009 4.58 3.85 5.44;
+                         2010 4.72 3.98 5.61;
+                         2011 4.59 3.85 5.47;
+                         2012 4.95 4.14 5.92;
+                         2013 4.85 4.05 5.81;
+                         2014 4.89 4.09 5.84;
+                         2015 4.31 3.58 5.20;
+                         2016 3.74 3.04 4.61;
+                         2017 3.06 2.38 3.94];
+
 gen = {'Male' , 'Female'};
 for g = 1 : gender
     hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
@@ -412,10 +439,16 @@ for g = 1 : gender
     subplot(1,2,g)
     plot(tVec(1:stepsPerYear:end-1) , hivInc , 'b-');
     hold all;
-    %observed data
+    errorbar(hivInc_obs(: , 1 , g) , hivInc_obs(: , 2 , g) , ...
+        hivInc_obs(: , 2 , g) - hivInc_obs(: , 3 , g) , hivInc_obs(: , 4 , g) - hivInc_obs(: , 2 , g) , ...
+        'rs' , 'LineWidth' , 1.5);
     xlabel('Year'); ylabel('Incidence per 100'); title(gen{g});
     xlim([1980 2020])
-    legend('Model'); % , 'Africa Center Data (Calibration)')
+    if g == 1 
+        legend('Model: ages 15-49' , '(Vandormael, 2019) Observed KZN, ages 15-54: 95% CI');
+    elseif g == 2
+        legend('Model: ages 15-49' , '(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI');
+    end
 end
 
 %% HIV incidence by age and gender vs. Barnighausen data --> ***VALIDATION***
@@ -901,7 +934,7 @@ end
     %     legend('HIV-' , 'HIV+' , 'ART')
     end
     
-    %% Cervical cancer incidence in 2011 vs. Globocan 2012 data and other sources
+    %% Cervical cancer incidence in 2012 vs. Globocan 2012 data and other sources
     ccIncYears = [2011 , 2012 , 2013 , 2014 , 2015 , 2016 , 2017 , 2018 , 2019];
     ccCrude = zeros(1,length(ccIncYears));
     ccCrudeObs = zeros(1,length(ccIncYears));
