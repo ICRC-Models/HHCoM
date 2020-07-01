@@ -142,10 +142,11 @@ for y = 1 : length(years)
 end
 
 figure;
+set(gca,'ColorOrderIndex',1)
 plot(tVec , popPropYrs);
+hold on;
 set(gca,'ColorOrderIndex',1)
 %set(gca, 'ColorOrder', circshift(get(gca, 'ColorOrder'), numel(h)))
-hold on;
 plot(years , popPropYrs_obs , 'o');
 ylim([0.1 0.3]);
 xlim([1995 2020]);
@@ -196,7 +197,7 @@ errorbar(calibYrs , mean(: , 1:7) , sdev(: , 1:7) , 'ks')
 ylim([0.05 0.15]);
 ylabel('Population proportion by age'); xlabel('Year');
 legend('0-4, Model' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
-    '0-4, Observed' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
+    '0-4, Observed KZN (SSA)' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' , '30-34' , ...
     'Calibration SD' , 'Location' , 'EastOutside');
 
 subplot(1,3,2);
@@ -211,7 +212,7 @@ errorbar(calibYrs , mean(: , 8:14) , sdev(: , 8:14) , 'ks')
 ylim([0.0 0.1]);
 ylabel('Population proportion by age'); xlabel('Year');
 legend('35-39, Model' , '40-44' , '45-49' , '50-54' , '55-59' , '60-64' , '65-69' , ...
-    '35-39, Model' , '40-44' , '45-49' , '50-54' , '55-59' , '60-64' , '65-69' , ...
+    '35-39, Observed KZN (SSA)' , '40-44' , '45-49' , '50-54' , '55-59' , '60-64' , '65-69' , ...
     'Calibration SD' , 'Location' , 'EastOutside');
 
 subplot(1,3,3);
@@ -224,7 +225,7 @@ calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1))];
 errorbar(calibYrs , mean(: , 15:16) , sdev(: , 15:16) , 'ks')
 ylim([0.0 0.02]);
 ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
-legend('70-74, Model' , '75-79' , '70-74, Observed' , '75-79' , ...
+legend('70-74, Model' , '75-79' , '70-74, Observed KZN (SSA)' , '75-79' , ...
     'Calibration SD' , 'Location' , 'EastOutside');
 
 %% Fertility over time vs. UN data
@@ -394,8 +395,8 @@ for g = 1 : gender
     hold all;
     plot(prevYears , hivData(:,:,g) , 'ro');
     xlabel('Year'); ylabel('Prevalence (%)'); title(gen{g});
-    xlim([1980 2020])
-    legend('Model' , 'Africa Center Data (Calibration)')
+    xlim([1980 2020]); ylim([0 40]);
+    legend('Model' , 'AHRI DHHS (Calibration)')
 end
 
 %% Relative HIV prevalence for untreated and persons on ART and virally supressed
@@ -412,8 +413,8 @@ popTot = sum(popVec(: , popInds) , 2);
 hiv_art = [100 * hivPop ./ popTot , 100 * artPop ./ popTot];
 area(tVec , hiv_art); %art ./ sum(popVec , 2) , tVec , hiv ./ sum(popVec , 2))
 xlabel('Year')
-ylabel('Proportion of Population ages 15-49 (%)')
-title('Relative HIV Prevalence')
+ylabel('Prevalence, ages 15-49 (%)')
+title('HIV Prevalence by ART treatment status')
 legend('Untreated', 'On ART + VS' , 'Location' , 'NorthWest')
 xlim([1980 2020]);
 
@@ -602,9 +603,9 @@ errorbar(1 : length(mean) , meanNeg , sdevNeg , 'ks')
 
 set(gca , 'xtick' , 1 : length(hpvNegObs) , 'xtickLabel' , ageGroup);
 legend('HIV-Positive (year 2002)' , 'HIV-Negative (year 2002)' , ...
-    'Observed HIV-Positive: McDonald 2014 bounds ?' , 'Observed HIV-Negative: McDonald 2014 bounds ?' , ...
-    'Observed HIV-Positive: Calibration SD' , 'Observed HIV-Negative: Calibration SD')
-xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
+    'Observed HIV-Positive (McDonald, 2014): 2SD' , 'Observed HIV-Positive: Calibration SD' , ...
+    'Observed HIV-Negative (McDonald, 2014): 2SD' , 'Observed HIV-Negative: Calibration SD')
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
 %title('Age Specific hrHPV Prevalence in 2002')
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
@@ -711,7 +712,7 @@ hold on;
 errorbar(1 : length(cinPosAct) , cinPosAct(: , 1) , yNegError , yPosError , 'rs')
 hold on;
 errorbar(1 : length(mean) , mean , sdev , 'ks')
-legend('HR HPV CIN 2/3' , 'McDonald 2014 bounds ?' , 'Calibration SD')
+legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age Specific CIN 2/3 Prevalence Among HIV+ in 2002')
@@ -735,7 +736,7 @@ hold on;
 errorbar(1 : length(cinNegAct) , cinNegAct(: , 1) , yNegError , yPosError , 'rs')
 hold on;
 errorbar(1 : length(mean) , mean , sdev , 'ks')
-legend('HR HPV CIN 2/3' , 'McDonald 2014 bounds ?' , 'Calibration SD')
+legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age Specific CIN 2/3 Prevalence Among HIV- in 2002')
@@ -743,9 +744,9 @@ ylim([0 25])
 
 %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
 
-%% Cervical cancer incidence in 2011 by age vs. NCR KZN data and other sources
+%% Cervical cancer incidence in 2012 by age vs. NCR KZN data and other sources
 %ccIncYears = [2017 , 2003 , 1994 , 2012];
-ccIncYears = [2011];
+ccIncYears = [2012];
 ccAgeRel = zeros(age , length(ccIncYears));
 ccAgeNegRel = ccAgeRel;
 ccAgePosRel = zeros(age , 5 , length(ccIncYears));
@@ -898,6 +899,7 @@ for y = 1 : length(ccIncYears)
     errorbar(4 : age , mean , sdev , 'rs')
     xlabel('Age Group'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
+    ylim([0 350]);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)]);
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Combined SA: upper bound' , 'Combined SA: lower bound' , ...
         'Globocan SA (2012)' , 'Calibration SD')
@@ -977,6 +979,7 @@ for i = 1 : length(inds)
     ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
  
     plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
+    xlabel('Year'); ylabel('Cervical cancer incidence per 100K- age-standardized');
     legend('-DynamicLegend');
     grid on;
     xlim([1925 2020]);
