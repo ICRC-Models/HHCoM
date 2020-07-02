@@ -60,26 +60,26 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 %% Population size over time vs. UN/SSA data
 % Ages 0-79
-% All HIV-negative women
+% All HIV-negatives
 hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-% HIV-positive women not on ART
+% HIV-positives not on ART
 hivNoART = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-% Women on ART
+% HIV-positives on ART
 art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
 genArray = {hivNeg , hivNoART , art};
 totalPop0_79 = sum(popVec(:,genArray{1}),2) + sum(popVec(:,genArray{2}),2) + sum(popVec(:,genArray{3}),2);
 
 % Ages 0-69 (future projections only up to age 69)
-% All HIV-negative women
+% All HIV-negatives
 hivNeg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
-% HIV-positive women not on ART
+% HIV-positives not on ART
 hivNoART = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
-% Women on ART
+% HIV-positives on ART
 art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 1 : 14 , 1 : risk));
 genArray = {hivNeg , hivNoART , art};
