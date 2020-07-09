@@ -23,7 +23,7 @@ paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr
 nPrlSets = 3; % # of trials, or different parameter sets you want to run in parallel (should be <= 12) 
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)]; % list of indices for the columns in paramSetMatrix holding the parameter sets you will run in parallel
 
-pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);  % load indices into paramsAll cell array for parameters you want to include in calibration
+pIdx = load([paramDir,'pIdx_calib_' , date , '_' , num2str(tstep_abc) , '.dat']);  % load indices into paramsAll cell array for parameters you want to include in calibration
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct(); % load cell array holding information about all parameters that are able to be calibrated
