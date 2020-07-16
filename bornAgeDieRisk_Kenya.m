@@ -15,11 +15,13 @@
 % to aging.
 
 function [dPop , extraOut] = bornAgeDieRisk_Kenya(t , pop , year , ...
-        gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , hivFertPosBirth ,...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
-        hivFertNegBirth3 , dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
-        dFertNeg2 , dFertMat2 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-        dDeathMat , dDeathMat2 , dDeathMat3 , ...
+        gender , age , fivYrAgeGrpsOn , fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
+    hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+    fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
+    dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
+    dFertPos3 , dFertNeg3  , dFertMat3,  ...
+    deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+        dDeathMat , dDeathMat2 , dDeathMat3, ...
         MTCTRate  , ageInd , riskAdj, d_riskAdj, riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
@@ -56,10 +58,15 @@ elseif (year > 1990) && (year <= 2020)
     hivFertPosBirth = hivFertPosBirth2 + dFertPos2 .* dt;
     hivFertNegBirth = hivFertNegBirth2 + dFertNeg2 .* dt;
     fertMat = fertMat2 + dFertMat2 .* dt;
-elseif (year > 2020)
-    hivFertPosBirth = hivFertPosBirth3;
-    hivFertNegBirth = hivFertNegBirth3;
+elseif (year > 2020) && (year <= 2070)
+    dt = (year - 2020) * stepsPerYear;
+    hivFertPosBirth = hivFertPosBirth3 + dFertPos3 .* dt;
+    hivFertNegBirth = hivFertNegBirth3 + dFertNeg3 .* dt;
     fertMat = fertMat3;
+elseif (year > 2070)
+    hivFertPosBirth = hivFertPosBirth4;
+    hivFertNegBirth = hivFertNegBirth4;
+    fertMat = fertMat4;
 end
 
 hivFertPosBirth = hivFertPosBirth .* kHiv;
@@ -95,12 +102,13 @@ dPop = zeros(size(pop));
 % prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
 
-if (year >= 1991) && (year < 1996)
-    dt = (year - 1991) * stepsPerYear;
+if (year >= 1990) && (year < 1994)
+    dt = (year - 1990) * stepsPerYear;
     riskAdj = riskAdj + d_riskAdj .* dt;
-elseif year >= 1996
+elseif year >= 1994
     riskAdj = 0;
 end
+
 riskDist(:, 1, :) = riskDist(:, 1, :) - riskAdj;
 riskDist(:, 3, :) = riskDist(:, 3, :) + riskAdj;
 

@@ -40,7 +40,7 @@ treat = zeros(disease , viral , gender , age ,risk);
 % CD4 <= 200, from 2004 to 2011
 if year >= 2003 && year < 2011
     % Calculate HIV-associated mortality on ART
-    muART = 0.75 .* mueYear;
+    muART = 0.5 .* mueYear;
     % Calculate population-level ART coverage
     if year >= 2003 && year < 2004
         ind = (round(artYr_vec{1} , 4) == round(year , 4));
@@ -105,7 +105,7 @@ end
 % CD4 <= 350, from 2011 to 2015
 if year >= 2011 && year < 2015
     % Calculate HIV-associated mortality on ART
-    muART = 0.5 .* mueYear;
+    muART = 0.4 .* mueYear; %0.5
     % Calculate population-level ART coverage
    if year >= 2011 && year < 2012
         ind = (round(artYr_vec{9} , 4) == round(year , 4));
@@ -163,7 +163,7 @@ end
 % CD4 <= 500, from 2015 to 2016
 if year >= 2015 && year < 2016
     % Calculate HIV-associated mortality on ART
-    muART = 0.25 .* mueYear;
+    muART = 0.25 .* mueYear; %.25
     % Calculate population-level ART coverage
     ind = (round(artYr_vec{12} , 4) == round(year , 4));
     popCover = {artM_vec{12} , artF_vec{12}};
