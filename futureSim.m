@@ -16,9 +16,11 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
+%historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+%pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -370,7 +372,7 @@ parfor n = 1 : nTests
     import java.util.LinkedList
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
-    % artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    artTreatTracker = historicalIn.artTreatTracker;
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
@@ -443,14 +445,16 @@ parfor n = 1 : nTests
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
         if hivOn
-            [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+            [~ , pop , hivDeaths(i , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
                 ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
                 popIn = pop(end , :);    
-            % artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
-            artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
+            %artTreatTracker(i , : , : , : , : , :) = artTreat;
+            artTreat = artTreatTracker(i , : , : , : , : , :);
+            artTreat = reshape(artTreat , [numel(artTreat) , 1]);
+            artDistList.add(artTreat); %sum(sum(sum(artTreat , 3) , 4) , 5)
             if artDistList.size() >= stepsPerYear * 2
                 artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
             end
@@ -551,7 +555,7 @@ parfor n = 1 : nTests
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker , 
+        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
