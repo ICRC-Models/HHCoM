@@ -7,7 +7,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4,...
     mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
     yr , ...
-    hivOn , betaHIV_mod , muHIV , kCD4 , ...
+    hivOn , betaHIV_mod , hiv_hpvMult, muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
@@ -91,7 +91,8 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
 popInit = xlsread(file , 'Population' , 'B169:C184'); 
 popInit = popInit .* 1000; 
-riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88');
+riskDistM = xlsread(file , 'Sexual behavior' , 'F259:H274');
+riskDistF = xlsread(file , 'Sexual behavior' , 'C259:E274');
 mue = zeros(age , gender);
 mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
 mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
@@ -121,20 +122,20 @@ load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
     'mue2' , 'mue3' , 'mue4' , 'fertility');
 
 % Set female risk distribution
-riskDistM(3, 1:3) = [0.971839 0.02640375 0.00175725]; % 95% of the original 15-19 dist
-riskDistM(4, 1:3) = [0.887356 0.105615 0.007029]; % 300% of the original 15-19 dist
-riskDistF = riskDistM;
+% riskDistM(3, 1:3) = [0.971839 0.02640375 0.00175725]; % 95% of the original 15-19 dist
+% riskDistM(4, 1:3) = [0.887356 0.105615 0.007029]; % 300% of the original 15-19 dist
+% riskDistF = riskDistM;
 
 % Calculate fertility2 and fertility3 matrices
 if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.4];
+    fertDeclineProp = [0.7 ; 0.4; 0.2];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.20;
+fertility4 = fertility3 .* fertDeclineProp(3,1);
 
 partnersMmult = [1.2 2.4 1.1];
 % Male partners per year by age and risk group
@@ -382,6 +383,7 @@ for v = 1 : viral
     end
 end
 
+hiv_hpvMult = 1.99 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -1498,7 +1500,7 @@ d_partnersMmult(1, 3) = (0.5 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYea
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0.005;
+riskAdj = 0;
 d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
