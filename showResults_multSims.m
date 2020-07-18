@@ -53,10 +53,18 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1)
 
 % Indices of calib runs to plot
-fileInds = {'12_3346' , '12_2618' , '11_932' , '16_3038' , '8_597' , '12_2550' , ...  % 22Apr20Ph2
-    '12_3895' , '22_487' , '8_2705' , '22_3250' , '15_2550' , '14_563' , ...
-    '4_1887' , '10_688' , '18_3391' , '14_2659' , '19_2814' , '18_903' , ...
-    '22_2697' , '4_1676' , '4_2471' , '15_2517' , '16_1709' , '12_2481' , '16_3992'};
+fileInds = {'11_2946' , '11_4738' , '7_1476' , '2_1779' , '6_1657' , '11_2200' , ...
+    '10_3755' , '5_1279' , '0_6202' , '6_452' , '4_4034' , '5_2720' , '10_1939' , ...
+    '0_2605' , '11_2511' , '9_3353' , '4_3559' , '6_2571' , '10_2890' , '7_180' , ...
+    '5_5825' , '1_4859' , '4_4147' , '2_2314' , '7_741'}; % , ... %  % 22Apr20Ph2V2
+%     '10_3270' , '10_3664' , '8_2827' , '11_2175' , '7_1426' , '2_1833' , '3_2610' , ...
+%     '7_240' , '6_3972' , '10_4629' , '7_5509' , '6_1931' , '8_4473' , '0_2709' , ...
+%     '7_3753' , '0_845' , '2_3468' , '8_2502' , '9_3299' , '11_669' , '9_4007' , ...
+%     '8_5698' , '7_2004' , '5_33' , '8_1372'};
+% fileInds = {'12_3346' , '12_2618' , '11_932' , '16_3038' , '8_597' , '12_2550' , ...  % 22Apr20Ph2
+%     '12_3895' , '22_487' , '8_2705' , '22_3250' , '15_2550' , '14_563' , ...
+%     '4_1887' , '10_688' , '18_3391' , '14_2659' , '19_2814' , '18_903' , ...
+%     '22_2697' , '4_1676' , '4_2471' , '15_2517' , '16_1709' , '12_2481' , '16_3992'};
 % {'2_846' , '14_947' , '16_3127' , '12_689' , ...  % 22Apr20Ph1, top 50 sets
 %     '10_2727' , '17_3986' , '16_2194' , '15_3850' , '9_334' , '0_6657' , ...
 %     '16_2364' , '4_711' , '19_1017' , '4_2361' , '15_2155' , '17_594' , ...
@@ -71,7 +79,7 @@ nRuns = length(fileInds);
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_22Apr20Ph2_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
+    pathModifier = ['toNow_22Apr20Ph2V2_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
 
@@ -908,20 +916,20 @@ end
         end     
     
         % Plot model outputs
-        p1 = plot(1 : size(ccCrude , 1) , ccCrude(: , y) , '-k'); % , 1 : size(ccAgeNegRel(: , y) , 1) , ...
+        p1 = plot(1 : size(ccCrude , 1) , ccCrude(: , y) , 'k-'); % , 1 : size(ccAgeNegRel(: , y) , 1) , ...
             %ccAgeNegRel(: , y) , '-kp' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , 5 , y) , '-k+' , ...
             %1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
         p1.Color(4) = 0.6;
         hold on;
         % Plot observed data
         plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2012_dObs(: , 2) , 'r-');
-        hold on; 
+        hold on;
         errorbar(4 : age , mean , sdev , 'rs')
         xlabel('Age Group'); ylabel('Incidence per 100,000');
         set(gca , 'xtick' , 1 : length(ccCrude) , 'xtickLabel' , ageGroup);
         title(['Cervical Cancer Incidence in ' num2str(ccIncYear)]);
         legend('General' , 'Combined SA: upper bound' , 'Combined SA: lower bound' , ...
-            'Globocan SA (2012)' , 'Calibration SD') % 'HIV-' , 'HIV+' , 'ART' , 
+            'Globocan SA (2012)' , 'Calibration SD'); % 'HIV-' , 'HIV+' , 'ART' , 
         % legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
         %     'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
         %     'Location' , 'NorthEastOutside')
@@ -1020,7 +1028,7 @@ end
 
     % Plot model outputs
     hold all;
-    p1 = plot(ccIncYears , ccCrude(1 , :) , '-b');
+    p1 = plot(ccIncYears , ccCrude(1 , :) , 'b-');
     p1.Color(4) = 0.6;
     hold all;
     plot(2012 , ccCrudeObs(1,2) , 'ok')
@@ -1071,7 +1079,7 @@ end
     p1.Color(4) = 0.6;
     hold all;
     plot(tVec((2011 - startYear) * stepsPerYear) , 53.18 , 'bo');
-    hold all; 
+    hold all;
     errorbar([2011, 2011] , mean , sdev , 'ks');
     xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
     title('HPV');
