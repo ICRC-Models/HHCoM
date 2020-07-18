@@ -6,8 +6,8 @@
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                                 # Export environment variables to the batch job session
 
-#SBATCH --account=csde-ckpt                          # Allocation Definition
-#SBATCH --partition=ckpt
+#SBATCH --account=csde                          # Allocation Definition
+#SBATCH --partition=csde
 #SBATCH --nodes=1                                    # Node resources
 #SBATCH --ntasks-per-node=1                          # CPUs per node
 #SBATCH --mem=100G                                   # Memory per node

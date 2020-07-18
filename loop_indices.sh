@@ -42,7 +42,7 @@ done
 
 : <<'END'
 echo "Running MATLAB script to identify failed simulations."
-sbatch -p ckpt -A csde-ckpt slurm_idMissing.sbatch
+sbatch -p csde -A csde slurm_idMissing.sbatch
 #sleep 300
 #FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
 #RERUN=$(<$FILE)
@@ -80,7 +80,7 @@ echo "Re-running failed simulations."
 END
 
 #echo "Running MATLAB abc_smc script to get next set of particles."
-#sbatch -p csde -A csde slurm_abc.sbatch
+#sbatch -p ckpt -A csde-ckpt slurm_abc.sbatch
 #sleep 21600
  
 #echo "Running MATLAB idParamRanges script to get ranges of parameters in best-fitting sets."
