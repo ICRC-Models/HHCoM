@@ -20,7 +20,7 @@ function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 artTreat = zeros(disease , viral , gender , age , risk); %zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-hivDeaths = zeros(gender , age , 1);
+hivDeaths = zeros(disease , gender , age);
 
 %% Calculate background mortality rate for calculating HIV-associated mortality on ART
 if (year < 2003)
@@ -268,7 +268,7 @@ for g = 1 : gender
                     + treat(3 , v , g , a , r)... % rate of going on ART
                     .* pop(acuteInf); % going on ART   
 
-                hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
+                hivDeaths(3 , g , a) = hivDeaths(3 , g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
                 artTreat(3 , v , g , a , r) = treat(3 , v , g , a , r) .* sumall(pop(acuteInf)); % keep track of distribution of people going on ART
 
                 % CD4 progression for HIV-positives advanced to decreased CD4 count
@@ -293,7 +293,7 @@ for g = 1 : gender
                         + treat(d , v , g , a , r)... % rate of going on ART
                         .* pop(cd4Curr); % going on ART
 
-                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
+                    hivDeaths(d , g , a) = hivDeaths(d , g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
                     artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART                    
                 end
             end
@@ -302,6 +302,7 @@ for g = 1 : gender
             % Dropout from ART (d = 8)
             dPop(hivPositiveArt) = dPop(hivPositiveArt)...
                 - (artOut(g , a , r) + muART(a , g)) .* pop(hivPositiveArt); % artOut to d = 3:7 as determined by distribution matrix
+            hivDeaths(8 , g , a) = hivDeaths(8 , g , a) + sumall(muART(a , g) .* pop(hivPositiveArt));
         end
     end
 end
