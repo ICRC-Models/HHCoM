@@ -770,9 +770,9 @@ end
 
     %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
 
-    %% Cervical cancer incidence in 2011 by age vs. Globocan 2012 data and other sources
+    %% Cervical cancer incidence in 2012 by age vs. Globocan 2012 data and other sources
     %ccIncYears = [2017 , 2003 , 1994 , 2012];
-    ccIncYears = [2011];
+    ccIncYears = [2012];
     ccCrude = zeros(age , length(ccIncYears));
     ccAgeNegRel = ccCrude;
     ccAgePosRel = zeros(age , 5 , length(ccIncYears));
