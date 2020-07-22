@@ -1,8 +1,8 @@
-TCURR=0    # t_curr
+TCURR=11    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=16Apr20
+DATE=22Apr20Ph2V2
 echo "${DATE}"
 export DATE
 
@@ -15,5 +15,5 @@ export NSETS
 echo "Running specified simulation."
 SETIDX=1
 export SETIDX
-sbatch -p csde -A csde slurm_batch.sbatch
+sbatch -p csde -A csde slurm_runMultSims.sbatch
 
