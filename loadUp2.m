@@ -122,11 +122,11 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.37 ; 0.75];
+    fertDeclineProp = [0.4 ; 0.8];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.60;
+fertility4 = fertility3 .* 0.50;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
