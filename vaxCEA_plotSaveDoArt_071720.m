@@ -1,0 +1,444 @@
+function vaxCEA_plotSaveDoArt_071720()
+
+%% LOAD PARAMETERS
+paramDir = [pwd , '\Params\'];
+
+[stepsPerYear , timeStep , startYear , currYear , endYear , ...
+    years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
+    intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
+    annlz , ...
+    ageSexDebut , mInit , fInit , partnersM , partnersF , maleActs , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4 , ...
+    mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
+    yr , ...
+    hivOn , betaHIV_mod , muHIV , kCD4 , ...
+    hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
+    kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
+    kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
+    c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
+    hpv_hivMult , maleHpvClearMult , ...
+    condUse , screenYrs , hpvScreenStartYear , waning , ...
+    artYr , maxRateM , maxRateF , ...
+    artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
+    circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
+    hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
+    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
+    hyst , OMEGA , ...
+    ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , ...
+    cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
+    hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
+    hivPrevM_dObs , hivPrevF_dObs , popAgeDist_dObs , totPopSize_dObs , ...
+    hivCurr , ...
+    gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
+    toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
+    hivInds , ...
+    cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
+    ccReghpvVaxInds , ccDisthpvVaxInds , cin3hpvNonVaxIndsFrom , ...
+    ccLochpvNonVaxIndsTo , ccLochpvNonVaxIndsFrom , ccReghpvNonVaxInds , ...
+    ccDisthpvNonVaxInds , cin1hpvVaxInds , cin2hpvVaxInds , cin3hpvVaxInds , ...
+    cin1hpvNonVaxInds , cin2hpvNonVaxInds , cin3hpvNonVaxInds , normalhpvVaxInds , ...
+    immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
+    infhpvNonVaxInds , ageInd , riskInd , ...
+    hivNegNonVMMCinds , hivNegVMMCinds , ...
+    vlAdvancer , ...
+    fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
+    hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+    fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
+    dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
+    dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
+
+%% LOAD SAVED RESULTS
+
+lastYear = 2061;
+% Indices of calib runs to plot
+fileInds = {'7_1'}; % , '7_2' , '7_3' , '7_4' , '7_5'}; % , '7_6' , '7_7' , '7_8' , ...
+%     '7_9' , '7_10' , '7_11' , '7_12' , '7_13' , '7_14' , '7_15' , '7_16' , ...
+%     '7_17' , '7_18' , '7_19' , '7_20' , '7_21' , '7_22' , '7_23' , '7_24' , '7_25'};  % DO ART, 22Apr20Ph2V2, t=11
+% fileInds = {'7_1' , '7_2' , '7_3' , '11_4' , '11_5' , '11_6' , '11_7' , '11_8' , ...
+%     '11_9' , '11_10' , '11_11' , '11_12' , '11_13' , '11_14' , '11_15' , '11_16' , ...
+%     '11_17' , '11_18' , '11_19' , '11_20' , '11_21' , '11_22' , '11_23' , '11_24' , '11_25'};  % DO ART, 22Apr20Ph2V2, t=11
+nRuns = length(fileInds);
+
+hivIncF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+hivIncM_multSims = hivIncF_multSims;
+hivPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 6);
+hivPrevM_multSims = hivPrevF_multSims;
+artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+artPrevM_multSims = artPrevF_multSims;
+hivMortF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+hivMortM_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+
+resultsDir = [pwd , '\HHCoM_Results\'];
+%%
+for j = 1 : nRuns
+    %%
+    % Load results
+    baseFileName = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_DoART_S2_';
+    pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
+    nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+    curr = load([pwd , '/HHCoM_Results/toNow_' , baseFileName , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    
+    vaxResult = cell(nSims , 1);
+    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+    if waning
+        resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
+    end
+    parfor n = 1 : nSims
+        % load results from vaccine run into cell array
+        vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+        % concatenate vectors/matrices of population up to current year to population
+        % matrices for years past current year
+        vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
+        vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
+        vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , :); vaxResult{n}.hivDeaths(2 : end , : , :)];
+        vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
+        vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
+    end
+    noVaxInd = nSims;
+    noV = vaxResult{noVaxInd};
+    tVec = noV.tVec;
+    tVecYr = tVec(1 : stepsPerYear : end);
+    
+     %% HIV INCIDENCE
+%     % Validation data
+%     hivInc_obs(: , : , 1) = [2005 2.14 1.57 2.93; % AHRI KZN: (Vandormael, 2019)
+%                          2006 2.24 1.69 2.96;
+%                          2007 2.30 1.74 3.05;
+%                          2008 2.35 1.78 3.09;
+%                          2009 2.45 1.85 3.24;
+%                          2010 2.45 1.85 3.25;
+%                          2011 2.30 1.70 3.11;
+%                          2012 2.49 1.83 3.37;
+%                          2013 2.22 1.64 3.01;
+%                          2014 1.83 1.29 2.59;
+%                          2015 1.39 0.94 2.07;
+%                          2016 1.24 0.79 1.95;
+%                          2017 1.01 0.58 1.76];
+%     hivInc_obs(: , : , 2) = [2005 4.08 3.40 4.90;
+%                          2006 4.45 3.77 5.27;
+%                          2007 4.56 3.86 5.39;
+%                          2008 4.58 3.89 5.40;
+%                          2009 4.58 3.85 5.44;
+%                          2010 4.72 3.98 5.61;
+%                          2011 4.59 3.85 5.47;
+%                          2012 4.95 4.14 5.92;
+%                          2013 4.85 4.05 5.81;
+%                          2014 4.89 4.09 5.84;
+%                          2015 4.31 3.58 5.20;
+%                          2016 3.74 3.04 4.61;
+%                          2017 3.06 2.38 3.94];
+% 
+%     % Calculate female HIV incidence
+%     hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 2 , 4 : age , 1 : risk));
+%     hivSus = annlz(sum(noV.popVec(: , hivSusInds) , 2)) ./ stepsPerYear;
+%     hivIncF = annlz(sum(sum(sum(sum(sum(noV.newHiv(: , : , : , : , 2 , 4 : age , ...
+%         1 : risk), 2), 3), 4), 6), 7)) ./ hivSus * 100;
+%     hivIncF_multSims(: , j) = hivIncF(1 : end)';
+%  
+%     % Plot female HIV incidence            
+% %     if (j == 1)
+% %         fig1 = figure;
+% %         errorbar(hivInc_obs(: , 1 , 2) , hivInc_obs(: , 2 , 2) , ...
+% %         hivInc_obs(: , 2 , 2) - hivInc_obs(: , 3 , 2) , hivInc_obs(: , 4 , 2) - hivInc_obs(: , 2 , 2) , ...
+% %         'rs' , 'LineWidth' , 1.5);
+% %     else
+% %         figure(fig1);
+% %     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , hivIncF(1 : end)' , 'b-')
+%     xlabel('Year'); ylabel('Incidence per 100'); title('Female HIV incidence, ages 15-79');
+%     xlim([1980 2060])
+%     legend('(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 'Model: ages 15-79');
+%     %%
+%     % Calculate male HIV incidence
+%     hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 1 , 4 : age , 1 : risk));
+%     hivSus = annlz(sum(noV.popVec(: , hivSusInds) , 2)) ./ stepsPerYear;
+%     hivIncM = annlz(sum(sum(sum(sum(sum(noV.newHiv(: , : , : , : , 1 , 4 : age , ...
+%         1 : risk), 2), 3), 4), 6), 7)) ./ hivSus * 100;
+%     hivIncM_multSims(: , j) = hivIncM(1 : end)';
+% 
+%     % Plot male HIV incidence            
+% %     if (j == 1)
+% %         fig2 = figure;
+% %         errorbar(hivInc_obs(: , 1 , 1) , hivInc_obs(: , 2 , 1) , ...
+% %         hivInc_obs(: , 2 , 1) - hivInc_obs(: , 3 , 1) , hivInc_obs(: , 4 , 1) - hivInc_obs(: , 2 , 1) , ...
+% %         'rs' , 'LineWidth' , 1.5);
+% %     else
+% %         figure(fig2);
+% %     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , hivIncM(1 : end)' , 'b-')
+%     xlabel('Year'); ylabel('Incidence per 100'); title('Male HIV incidence, ages 15-79');
+%     xlim([1980 2060])
+%     legend('(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 'Model: ages 15-79');
+%     
+%     %% HIV PREVALENCE
+%     cInds = {3 : 8 , 3 , 4 , 5 , 6 , 7};
+%     cTits = {'All PLWHIV' , 'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+%         'CD4_200_350' , 'CD4_below200'};
+%     
+%     % Plot female HIV prevalence      
+% %     if (j == 1)
+% %         fig3 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig3);
+% %     end
+%     for c = 1 : length(cInds)
+%         % Calculate female HIV prevalence
+%         hivIndsF = toInd(allcomb(cInds{c} , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%             1 : intervens , 2 , 4 : age , 1 : risk));
+%         totIndsF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%             1 : intervens , 2 , 4 : age , 1 : risk));
+%         hivPopF = sum(noV.popVec(: , hivIndsF) , 2);
+%         totPopF = sum(noV.popVec(: , totIndsF) , 2);
+%         hivPrevF = bsxfun(@rdivide , hivPopF , totPopF);
+%         hivPrevF_multSims(: , j , c) = hivPrevF(1 : stepsPerYear : end);
+%         
+%         subplot(2 , 3 , c);
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , hivPrevF(1 : stepsPerYear : end) , 'b-')
+%         xlabel('Year'); ylabel('Female HIV prevalence, ages 15-79'); title(cTits{c});
+%         xlim([1980 2060])
+%         legend('All PLWHIV' , 'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+%             'CD4_200_350' , 'CD4_below200'); % Insert observed data description
+%     end
+% %%
+%     % Plot male HIV prevalence      
+% %     if (j == 1)
+% %         fig4 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig4);
+% %     end
+%     for c = 1 : length(cInds)
+%         % Calculate male HIV prevalence
+%         hivIndsM = toInd(allcomb(cInds{c} , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%             1 : intervens , 1 , 4 : age , 1 : risk));
+%         totIndsM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%             1 : intervens , 1 , 4 : age , 1 : risk));
+%         hivPopM = sum(noV.popVec(: , hivIndsM) , 2);
+%         totPopM = sum(noV.popVec(: , totIndsM) , 2);
+%         hivPrevM = bsxfun(@rdivide , hivPopM , totPopM);
+%         hivPrevM_multSims(: , j , c) = hivPrevM(1 : stepsPerYear : end);
+%      
+%         subplot(2 , 3 , c);
+%         hold all;
+%         plot(tVec(1 : stepsPerYear : end)' , hivPrevM(1 : stepsPerYear : end) , 'b-')
+%         xlabel('Year'); ylabel('Male HIV prevalence, ages 15-79'); title(cTits{c});
+%         xlim([1980 2060])
+%         legend('All PLWHIV' , 'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+%             'CD4_200_350' , 'CD4_below200'); % Insert observed data description
+%     end
+%     
+%     %% ART PREVALENCE 
+%     % Calculate female ART prevalence
+%     artIndsF = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 2 , 4 : age , 1 : risk));
+%     hivIndsF = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 2 , 4 : age , 1 : risk));
+%     artPopF = sum(noV.popVec(: , artIndsF) , 2);
+%     hivPopF = sum(noV.popVec(: , hivIndsF) , 2);
+%     artPrevF = bsxfun(@rdivide , artPopF , hivPopF);
+%     artPrevF_multSims(: , j) = artPrevF(1 : stepsPerYear : end);
+% 
+%     % Plot female ART prevalence      
+% %     if (j == 1)
+% %         fig5 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig5);
+% %     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , artPrevF(1 : stepsPerYear : end) , 'b-')
+%     xlabel('Year'); ylabel('Female ART prevalence, ages 15-79'); title('Female ART prevalence, ages 15-79');
+%     xlim([1980 2060])
+%     legend('Model: ages 15-79'); % Insert observed data description
+% %%
+%     % Calculate male ART prevalence
+%     artIndsM = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 1 , 4 : age , 1 : risk));
+%     hivIndsM = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+%         1 : intervens , 1 , 4 : age , 1 : risk));
+%     artPopM = sum(noV.popVec(: , artIndsM) , 2);
+%     hivPopM = sum(noV.popVec(: , hivIndsM) , 2);
+%     artPrevM = bsxfun(@rdivide , artPopM , hivPopM);
+%     artPrevM_multSims(: , j) = artPrevM(1 : stepsPerYear : end);
+% 
+%     % Plot male ART prevalence      
+% %     if (j == 1)
+% %         fig6 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig6);
+% %     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , artPrevM(1 : stepsPerYear : end) , 'b-')
+%     xlabel('Year'); ylabel('Male ART prevalence, ages 15-79'); title('Male ART prevalence, ages 15-79');
+%     xlim([1980 2060])
+%     legend('Model: ages 15-79'); % Insert observed data description
+%     
+%         %% CD4 DISTRIBUTION AT ART INITIATION
+% %     cInds = {3 , 4 , 5 , 6 , 7};
+% %     cTits = {'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+% %         'CD4_200_350' , 'CD4_below200'};
+% %     
+% %     Plot female distribution
+% %     if (j == 1)
+% %         fig7 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig7);
+% %     end
+% %     for c = 1 : length(cInds)
+% %         % Calculate female distribution
+% %         init_subF = sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 2 , 4 : age , 1 : risk), 2), 3), 5), 6);
+% %         init_allCD4F = sum(sum(sum(sum(noV.artTreatTracker(: , 3 : 7 , : , 2 , 4 : age , 1 : risk), 2), 3), 5), 6);
+% %         cd4DistF = init_subF ./ init_allCD4F;
+% % 
+% %         % Save female distribution
+% %         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+% %             ['CD4_dist_initART_females_aged15-79'] , '.xlsx'];
+% %         sname = 'ARTdistF';
+% %         if exist(fname , 'file') == 2
+% %             M = xlsread(fname);
+% %             M = catpad(2 , cd4DistF(1 : stepsPerYear : end)' , M);
+% %             xlswrite(fname , M , sname)
+% %         else
+% %             xlswrite(fname , [tVec(1 : stepsPerYear : end)' , cd4DistF(1 : stepsPerYear : end)'] , sname)
+% %         end
+% % 
+% %         subplot(2 ,3 , c);
+% %         hold all;
+% %         plot(tVec(1 : stepsPerYear : end)' , cd4DistF(1 : stepsPerYear : end)' , '-')
+% %         xlabel('Year'); ylabel('Proportion of females initiating ART, ages 15-79'); title(['Proportion CD4: ' , cTits{c}]);
+% %         xlim([1980 2060])
+% %         legend('Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+% %             'CD4_200_350' , 'CD4_below200'); % Insert observed data description
+% %    end
+% 
+% %     Plot male distribution
+% %     if (j == 1)
+% %         fig8 = figure;
+% %         %insert observed data
+% %     else
+% %         figure(fig8);
+% %     end
+% %     for c = 1 : length(cInds)
+% %         % Calculate male distribution
+% %         init_subM = sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 1 , 4 : age , 1 : risk), 2), 3), 5), 6);
+% %         init_allCD4M = sum(sum(sum(sum(noV.artTreatTracker(: , 3 : 7 , : , 1 , 4 : age , 1 : risk), 2), 3), 5), 6);
+% %         cd4DistM = init_subM ./ init_allCD4M;
+% % 
+% %         % Save male distribution
+% %         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+% %             ['CD4_dist_initART_males_aged15-79'] , '.xlsx'];
+% %         sname = 'ARTdistM';
+% %         if exist(fname , 'file') == 2
+% %             M = xlsread(fname);
+% %             M = catpad(2 , cd4DistM(1 : stepsPerYear : end)' , M);
+% %             xlswrite(fname , M , sname)
+% %         else
+% %             xlswrite(fname , [tVec(1 : stepsPerYear : end)' , cd4DistM(1 : stepsPerYear : end)'] , sname)
+% %         end
+% % 
+% %         subplot(3 , 2 , c);
+% %         hold all;
+% %         plot(tVec(1 : stepsPerYear : end)' , cd4DistM(1 : stepsPerYear : end)' , '-')
+% %         xlabel('Year'); ylabel('Proportion of males initiating ART, ages 15-79'); title(['Proportion CD4: ' , cTits{c}]);
+% %         xlim([1980 2060])
+% %         legend('Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+% %             'CD4_200_350' , 'CD4_below200'); % Insert observed data description
+% %     end
+    
+    %% HIV-ASSOCIATED MORTALITY
+    cInds = {3 : 7 , 3 , 4 , 5 , 6 , 7 , 8};
+    cTits = {'All untreated PLWHIV' , 'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+        'CD4_200_350' , 'CD4_below200' , 'On ART'};
+
+    %for c = 1 : length(cInds)
+    % Calculate female HIV-associated mortality
+    popIndsF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+        1 : intervens , 2 , 4 : age , 1 : risk));
+    popTotF = annlz(sum(noV.popVec(: , popIndsF) , 2)) ./ stepsPerYear;
+    hivMortF = annlz(sum(noV.hivDeaths(: , 2 , 4 : age), 3)) ./ popTotF * 100000;
+    hivMortF_multSims(: , j) = hivMortF(1 : end)';
+
+    % Plot female HIV-associated mortality
+%     if (j == 1)
+%         fig9 = figure;
+%         %insert observed data
+%     else
+%         figure(fig9);
+%     end
+    hold all;
+    plot(tVec(1 : stepsPerYear : end)' , hivMortF(1 : end)' , 'b-')
+    xlabel('Year'); ylabel('Mortality per 100K'); title('Female HIV-associated mortality, ages 15-79');
+    xlim([1980 2060])
+    legend('Model: ages 15-79');
+%%
+    % Calculate male HIV-associated mortality
+    popIndsM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+        1 : intervens , 1 , 4 : age , 1 : risk));
+    popTotM = annlz(sum(noV.popVec(: , popIndsM) , 2)) ./ stepsPerYear;
+    hivMortM = annlz(sum(noV.hivDeaths(: , 1 , 4 : age), 3)) ./ popTotM * 100000;
+    hivMortM_multSims(: , j) = hivMortM(1 : end)';
+
+%     % Plot male HIV-associated mortality
+%     if (j == 1)
+%         fig10 = figure;
+%         %insert observed data
+%     else
+%         figure(fig10);
+%     end
+    hold all;
+    plot(tVec(1 : stepsPerYear : end)' , hivMortM(1 : end)' , 'b-')
+    xlabel('Year'); ylabel('Mortality per 100K'); title('Male HIV-associated mortality, ages 15-79');
+    xlim([1980 2060])
+    legend('Model: ages 15-79');
+
+end
+    
+% % Save female HIV incidence
+% fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%     ['HIV_incidence_females_aged15-79'] , '.xlsx'];
+% sname = 'HIVincF';
+% xlswrite(fname , [tVec(1 : stepsPerYear : end)' , hivIncF_multSims] , sname)
+% 
+% % Save male HIV incidence
+% fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%     'HIV_incidence_males_aged15-79' , '.xlsx'];
+% sname = 'HIVincM';
+% xlswrite(fname , [tVec(1 : stepsPerYear : end)' , hivIncM_multSims] , sname)
+% 
+% cInds = {3 : 8 , 3 , 4 , 5 , 6 , 7};
+% cTits = {'All PLWHIV' , 'Acute' , 'CD4_500plus' , 'CD4_350_500' , ...
+%     'CD4_200_350' , 'CD4_below200'};
+% for c = 1 : length(cInds)
+%     % Save female HIV prevalence
+%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%         'HIV_prevalence_females_aged15-79_' , cTits{c} , '.xlsx'];
+%     sname = 'HIVprevF';
+%     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , hivPrevF_multSims(: , : , c)] , sname)
+% 
+%     % Save male HIV prevalence
+%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%         'HIV_prevalence_males_aged15-79_' , cTits{c} , '.xlsx'];
+%     sname = 'HIVprevM';
+%     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , hivPrevM_multSims(: , : , c)] , sname)
+% end
+% 
+% % Save female ART prevalence
+% fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%     'ART_prevalence_females_aged15-79.xlsx'];
+% sname = 'ARTprevF';
+% xlswrite(fname , [tVec(1 : stepsPerYear : end)' , artPrevF_multSims] , sname)
+% 
+% % Save male ART prevalence
+% fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{j} , '\' , ...
+%     'ART_prevalence_males_aged15-79.xlsx'];
+% sname = 'ARTprevM';
+% xlswrite(fname , [tVec(1 : stepsPerYear : end)' , artPrevM_multSims] , sname)
