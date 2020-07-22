@@ -2,12 +2,12 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2V3
+DATE=22Apr20Ph2V4
 echo "${DATE}"
 export DATE
 
 echo "Running MATLAB script to get matrix size."
-sbatch -p ckpt -A csde-ckpt slurm_sizeMatrix.sbatch
+sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 sleep 180
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
