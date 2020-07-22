@@ -960,16 +960,16 @@ for g = 1 : gender
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
 
 
-sheet = ['hpvPrev'];
-cols1 = {toNowName, "2.2xC3toCC"};
-cols2 = {[genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
-xlswrite(filename, cols1, sheet, 'R')
-cell = ['R', 'V'];
+% sheet = ['hpvPrev'];
+% cols1 = {toNowName, "2.2xC3toCC"};
+% cols2 = {[genders{g},' Gen Pop'], [genders{g},' HIV-neg'], [genders{g},' HIV-pos'], [genders{g},' ART']};
+% xlswrite(filename, cols1, sheet, 'R')
+% cell = ['R', 'V'];
 
-xlswrite(filename, cols2, sheet, [cell(g) +'2'])
-xlswrite(filename, [genPopHPV(1 : stepsPerYear * 5 : end), ...
-    hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
-    artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
+% xlswrite(filename, cols2, sheet, [cell(g) +'2'])
+% xlswrite(filename, [genPopHPV(1 : stepsPerYear * 5 : end), ...
+%     hivNegHPV(1 : stepsPerYear * 5 : end), hivPosHPV(1 : stepsPerYear * 5 : end), ...
+%     artHPV(1 : stepsPerYear * 5 : end)], sheet, [cell(g) +'3'])
 end
 %% HPV Prevalence by age in 2005 vs. Yamada and Luchter data
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
@@ -2208,7 +2208,7 @@ for a = 1 : age
   %  end
     xlabel('Year'); ylabel('Rate Per 100'); title(['HIV incidence: ', sex(g), ageGroup(a)])
     xlim([1980 2020]);
-    ylim([0 50]);
+    ylim([0 10]);
 end
  end
 %legend('Male' , 'Female')

@@ -131,7 +131,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.4; 0.2];
+    fertDeclineProp = [0.75 ; 0.4; 0.2];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -213,9 +213,9 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5 ;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.2 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) ;
 end
 
@@ -233,8 +233,8 @@ if calibBool && any(9 == pIdx)
     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
-    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.6 ;
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) ;
 end
@@ -343,7 +343,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001]; %[0.0004];
+    baseVagTrans = [0.0007]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -383,7 +383,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 1.99 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 1.54 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -784,7 +784,7 @@ if calibBool && any(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
-        condUse = 0.5 * 0.5;
+        condUse = 0.15;
     else
         condUse = .05; %changed from 20%
     end
