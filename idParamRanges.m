@@ -136,7 +136,7 @@ titles = {'partnersM:15-19,hr' , 'partnersM:20-24,hr' , ...    % 22Apr20 calibra
 %tempIdx = [1:22];
 for i = 1 : size(top50Params,1) %idx = 1 : size(tempIdx,2)
     %i = tempIdx(idx);
-    subplot(6,7,i);
+    subplot(6,7,i); %subplot(4,7,i);
     %if idx == size(tempIdx,2)
     %    subplot(4,7,26);
     %end
