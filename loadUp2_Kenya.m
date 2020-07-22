@@ -109,8 +109,8 @@ mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
 mue4(1, :)= mue4(1 , :) .* 2 ;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 %fertility =fertility ;
-partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
-partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
+partnersM = xlsread(file , 'Sexual behavior' , 'C279:E294');
+partnersF = xlsread(file , 'Sexual behavior' , 'F279:H294');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
