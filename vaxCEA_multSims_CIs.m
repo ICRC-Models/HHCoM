@@ -1,4 +1,4 @@
-% function [] = vaxCEA_22Apr20calib_bw()
+% function [] = vaxCEA_multSims_CI()
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
