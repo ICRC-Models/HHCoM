@@ -12,8 +12,8 @@ function [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
 fracARTAge_adj = fracARTAge; % baseline matrix
 fracARTAge_adj(1 , minAges) = minCoverLim; % adjust for ages brought up to min coverage
 fracARTAge_adj(1 , maxAges) = maxCoverLim; % adjust for ages brought down to max coverage
-fracART = sum(fracARTAge_adj(1 , ageSexDebut:end) .* ...
-    (agePopSubTots(1 , ageSexDebut:end) ./ sum(agePopSubTots(1 , ageSexDebut:end)))); % calculate weighted average of adjusted age-level coverages
+fracART = sum(fracARTAge_adj(1 , ageSexDebut+1:end) .* ...
+    (agePopSubTots(1 , ageSexDebut+1:end) ./ sum(agePopSubTots(1 , ageSexDebut+1:end)))); % calculate weighted average of adjusted age-level coverages
 
 fracExcMinAges = ageARTSubTots(excMinAges) ./ sum(ageARTSubTots(excMinAges)); % population ART proportion by age, for ages > MIN coverage
 toRedisMinAges = sum(ageARTSubTots(minAges)); % summed HIV-positives on ART of ages < MIN to redistribute
