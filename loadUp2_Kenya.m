@@ -137,7 +137,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* fertDeclineProp(3,1);
 
-partnersMmult = [1.1 1.4 1.2];
+partnersMmult = [1.0 1.0 1.0];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -213,10 +213,10 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.5 ;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
-    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.5 ;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 4; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.7;
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) ;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -233,10 +233,10 @@ if calibBool && any(9 == pIdx)
     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
-    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 5;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 1.6 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.5 ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -1494,7 +1494,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 %% partnersM multiplier 
 d_partnersMmult = ones(2, 5);
 d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2004 - 1994) * stepsPerYear);
-d_partnersMmult(1, 2) = (1.1 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
+d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
 d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
 
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);

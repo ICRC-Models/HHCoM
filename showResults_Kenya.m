@@ -976,7 +976,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2020;
+yr = 2000;
 year = {yr};
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
@@ -2208,7 +2208,7 @@ for a = 1 : age
   %  end
     xlabel('Year'); ylabel('Rate Per 100'); title(['HIV incidence: ', sex(g), ageGroup(a)])
     xlim([1980 2020]);
-    ylim([0 10]);
+    ylim([0 50]);
 end
  end
 %legend('Male' , 'Female')
