@@ -50,7 +50,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_28May20_K_higherHIVmort_muART']
+toNowName = ['toNow_21Jul_RR_1-99']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -299,7 +299,7 @@ hold on
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
 legend('Model' , 'Kenya (Spectrum)')
 xlim([1980 2020])
-ylim([0, 25])
+ylim([0, 100])
 %%
 sheet = ['HIV_prev'];
 cols1 = {toNowName};
