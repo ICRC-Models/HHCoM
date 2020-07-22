@@ -1,4 +1,4 @@
-% function[] = showResults_22Apr20calib_bw()
+% function[] = showResults_multSims_CIs()
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -53,6 +53,9 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
+fileInds = {'0_3292' , '0_7871' , '0_4325' , '1_3259' , '0_1474' , ...
+    '1_4214' , '0_2709' , '1_1367' , ...
+    '2_3899' , '2_4116' , '2_413' , '2_4577'};    % 22Apr20Ph2V3
 % fileInds = {'11_1' , '11_2' , '11_3' , '11_4' , '11_5' , '11_6' , ...
 %     '11_7' , '11_8' , '11_9' , '11_10' , '11_11' , '11_12' , '11_13' , ...
 %     '11_14' , '11_15' , '11_16' , '11_17' , '11_18' , '11_19' , '11_20' , ...
@@ -64,7 +67,7 @@ set(0 , 'defaultlinelinewidth' , 1.5)
 %     '10_3664' , '11_2175' , '3_2610' , ...
 %     '7_240' , '10_4629' , '7_5509' , '8_4473' , '0_2709' , ...
 %     '2_3468' , '9_3299' , '11_669'};  % 22Apr20Ph2V2, t11, 25 best-fitting CC inc sets
-fileInds = {'11_2946'}; % , '11_4738' , '7_1476' , '2_1779' , '6_1657' , '11_2200' , ...
+% fileInds = {'11_2946' , '11_4738' , '7_1476' , '2_1779' , '6_1657' , '11_2200' , ...
 %     '10_3755' , '5_1279' , '0_6202' , '6_452' , '4_4034' , '5_2720' , '10_1939' , ...
 %     '0_2605' , '11_2511' , '9_3353' , '4_3559' , '6_2571' , '10_2890' , '7_180' , ...
 %     '5_5825' , '1_4859' , '4_4147' , '2_2314' , '7_741'};  % 22Apr20Ph2V2
@@ -137,10 +140,9 @@ hpv_nonVax = cc_vax;
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_22Apr20Ph2V2_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
+    pathModifier = ['toNow_22Apr20Ph2V3_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
-
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
     %% Population size over time vs. Statistics South Africa data (calibration)
