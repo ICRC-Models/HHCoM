@@ -425,141 +425,141 @@ kCin2_Cin3 = zeros(16,2);
 if calibBool && any(27 == pIdx)
     idx = find(27 == pIdx);
     kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
+    kCin1_Inf(1 : 6 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
+    kCin1_Inf(1 : 6 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 0.8;
-    kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 2.0;
+    kCin1_Inf(1 : 6 , 1) = kCin1_Inf_orig(1 , 1) * 0.8;
+    kCin1_Inf(1 : 6 , 2) = kCin1_Inf_orig(1 , 2) * 2.0;
 end
 
 % CIN1 to CIN2, ages 10-24
 if calibBool && any(28 == pIdx)
     idx = find(28 == pIdx);
     kCin2_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
+    kCin2_Cin1(1 : 6 , 1) = kCin2_Cin1_orig(1 , 1) * kCin2_Cin1Mult(1);
+    kCin2_Cin1(1 : 6 , 2) = kCin2_Cin1_orig(1 , 2) * kCin2_Cin1Mult(2);
 else
-    kCin2_Cin1(1 : 5 , 1) = kCin2_Cin1_orig(1 , 1) * 1.4;
-    kCin2_Cin1(1 : 5 , 2) = kCin2_Cin1_orig(1 , 2) * 2.0;
+    kCin2_Cin1(1 : 6 , 1) = kCin2_Cin1_orig(1 , 1) * 1.4;
+    kCin2_Cin1(1 : 6 , 2) = kCin2_Cin1_orig(1 , 2) * 2.0;
 end
 
 % CIN2 to CIN3, ages 10-24
 if calibBool && any(29 == pIdx)
     idx = find(29 == pIdx);
     kCin3_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
+    kCin3_Cin2(1 : 6 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
+    kCin3_Cin2(1 : 6 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.3;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 2.0;
+    kCin3_Cin2(1 : 6 , 1) = kCin3_Cin2_orig(1 , 1) * 1.3;
+    kCin3_Cin2(1 : 6 , 2) = kCin3_Cin2_orig(1 , 2) * 2.0;
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
 if calibBool && any(30 == pIdx)
     idx = find(30 == pIdx);
     kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
+    kCC_Cin3(1 : 6 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
+    kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 1.0;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 5.0;
+    kCC_Cin3(1 : 6 , 1) = kCC_Cin3_orig(1 , 1) * 1.0;
+    kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * 5.0;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
 if calibBool && any(31 == pIdx)
     idx = find(31 == pIdx);
     rNormal_InfMult = paramSet(paramsSub{idx}.inds(:));
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
+    rNormal_Inf(1 : 6 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
+    rNormal_Inf(1 : 6 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * 2.60;
-    rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * 1.41;
+    rNormal_Inf(1 : 6 , 1) = rNormal_Inf_orig(1 , 1) * 2.60;
+    rNormal_Inf(1 : 6 , 2) = rNormal_Inf_orig(1 , 2) * 1.41;
 end
 
 % CIN1 to HPV, ages 10-24
 if calibBool && any(32 == pIdx)
     idx = find(32 == pIdx);
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
+    kInf_Cin1(1 : 6 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
+    kInf_Cin1(1 : 6 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
 else
-    kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * 1.80;
-    kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * 0.97;
+    kInf_Cin1(1 : 6 , 1) = kInf_Cin1_orig(1 , 1) * 1.80;
+    kInf_Cin1(1 : 6 , 2) = kInf_Cin1_orig(1 , 2) * 0.97;
 end
 
 % CIN2 to CIN1, ages 10-24
 if calibBool && any(33 == pIdx)
     idx = find(33 == pIdx);
     kCin1_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
+    kCin1_Cin2(1 : 6 , 1) = kCin1_Cin2_orig(1 , 1) * kCin1_Cin2Mult(1);
+    kCin1_Cin2(1 : 6 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
-    kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.4;
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * 0.2;
+    kCin1_Cin2(1 : 6 , 1) = kCin1_Cin2_orig(1 , 1) * 1.4;
+    kCin1_Cin2(1 : 6 , 2) = kCin1_Cin2_orig(1 , 2) * 0.2;
 end
 
 % CIN3 to CIN2, ages 10-24
 if calibBool && any(34 == pIdx)
     idx = find(34 == pIdx);
     kCin2_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
+    kCin2_Cin3(1 : 6 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
+    kCin2_Cin3(1 : 6 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * 1.0;
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.2;
+    kCin2_Cin3(1 : 6 , 1) = kCin2_Cin3_orig(1 , 1) * 1.0;
+    kCin2_Cin3(1 : 6 , 2) = kCin2_Cin3_orig(1 , 2) * 0.2;
 end
 
 % Apply age trends to 9v HPV transitions
-kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * 1.05; %ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * 1.0; %ageTrends(1,5);
-kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * 1.10; %ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4);
-rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5);
-kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * 1.15; %ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4);
-rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5);
-kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
+kCin1_Inf(7 : 10 , 1) = kCin1_Inf(1 , 1) * 1.05; %ageTrends(1,1); % ages 25-49
+kCin2_Cin1(7 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
+kCin3_Cin2(7 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
+kCC_Cin3(7 : 10 , 1) = kCC_Cin3(1 , 1) * 8.0; %ageTrends(1,4);
+rNormal_Inf(7 : 10 , 1) = rNormal_Inf(1 , 1) * 1.0; %ageTrends(1,5);
+kInf_Cin1(7 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
+kCin1_Cin2(7 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
+kCin2_Cin3(7 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
+kCin1_Inf(11 : 16 , 1) = kCin1_Inf(1 , 1) * 1.10; %ageTrends(2,1); % ages 50-69
+kCin2_Cin1(11 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
+kCin3_Cin2(11 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
+kCC_Cin3(11 : 16 , 1) = kCC_Cin3(1 , 1) * 15.0; %ageTrends(2,4);
+rNormal_Inf(11 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5);
+kInf_Cin1(11 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
+kCin1_Cin2(11 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
+kCin2_Cin3(11 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
+%kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * 1.15; %ageTrends(3,1); % ages 70-79
+%kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
+%kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
+%kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * 20.0; %ageTrends(3,4);
+%rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5);
+%kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
+%kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
+%kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
 
 % Apply age trends to non-9v HPV transitions
-kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * 1.05; %ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * 1.0; %ageTrends(1,5);
-kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * 1.10; %ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4);
-rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
-kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * 1.15; %ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4);
-rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5);
-kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
+kCin1_Inf(7 : 10 , 2) = kCin1_Inf(1 , 2) * 1.05; %ageTrends(1,1); % ages 25-49
+kCin2_Cin1(7 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
+kCin3_Cin2(7 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
+kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * 8.0; %ageTrends(1,4);
+rNormal_Inf(7 : 10 , 2) = rNormal_Inf(1 , 2) * 1.0; %ageTrends(1,5);
+kInf_Cin1(7 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
+kCin1_Cin2(7 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
+kCin2_Cin3(7 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
+kCin1_Inf(11 : 16 , 2) = kCin1_Inf(1 , 2) * 1.10; %ageTrends(2,1); % ages 50-69
+kCin2_Cin1(11 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
+kCin3_Cin2(11 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
+kCC_Cin3(11 : 16 , 2) = kCC_Cin3(1 , 2) * 15.0; %ageTrends(2,4);
+rNormal_Inf(11 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
+kInf_Cin1(11 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
+kCin1_Cin2(11 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
+kCin2_Cin3(11 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
+%kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * 1.15; %ageTrends(3,1); % ages 70-79
+%kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
+%kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
+%kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * 20.0; %ageTrends(3,4);
+%rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5);
+%kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
+%kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
+%kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
 % % if calibBool && any(25 == pIdx) % CJB note: old code
 % %     idx = find(25 == pIdx);
@@ -841,7 +841,7 @@ hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
 baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
-baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
+baseline.screenAgeMults = [1.0]; % / max(1 , fivYrAgeGrpsOn*5)
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72;

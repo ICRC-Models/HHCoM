@@ -34,6 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+%pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
@@ -251,7 +252,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     popVec(1 , :) = popIn;
     deaths = popVec; 
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-    hivDeaths = zeros(length(s) - 1 , gender , age);
+    hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -272,7 +273,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     import java.util.LinkedList
     artDistList = LinkedList();
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
 elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
@@ -311,7 +312,7 @@ elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     import java.util.LinkedList
     artDistList = chckPntIn.artDistList;
     artDist = chckPntIn.artDist;
-    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    artTreatTracker = chckPntIn.artTreatTracker; %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 end
 
 %% Main body of simulation
@@ -432,19 +433,19 @@ for i = iStart : length(s) - 1
     % ART initiation, dicontinuation, and scale-up by CD4 count
     % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
-        [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+        [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
             ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
             kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
             ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
         popIn = pop(end , :);
-        %artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
-        artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
+        artTreat = artTreatTracker(i , : , : , : , : , :);
+        artTreat = reshape(artTreat , [numel(artTreat) , 1]);
+        artDistList.add(artTreat); %sum(sum(sum(artTreat , 3) , 4) , 5)
         if artDistList.size() >= stepsPerYear * 2
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
-        artDist = calcDist(artDistList , disease , viral , gender , age , ...
-            risk);
+        artDist = calcDist(artDistList , disease , viral , gender , age , risk);
         if any(pop(end , :) < 0)
             disp('After hiv')
             break
@@ -512,7 +513,7 @@ for i = iStart : length(s) - 1
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
             'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
             'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-            'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+            'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
             'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 
@@ -527,7 +528,7 @@ save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , '
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')

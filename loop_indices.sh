@@ -2,7 +2,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2
+DATE=22Apr20Ph2V4
 echo "${DATE}"
 export DATE
 
@@ -30,6 +30,14 @@ for i in $(seq 1 5 ${LENGTH28}); do
         echo "${i}"
         sleep 5400    # give submitted simulations time to finish 
     fi
+    if [ $i -ge 154 ] && [ $i -lt 158 ]; then
+        echo "${i}"
+        sleep 5400
+    fi
+    if [ $i -ge 234 ] && [ $i -lt 238 ]; then
+        echo "${i}"
+        sleep 5400
+    fi
 done
 
 : <<'END'
@@ -53,8 +61,8 @@ echo "Re-running failed simulations."
                  INT=$(($INT + 1))
              fi
         done
-	if [ $INT -ge 5 ]; then 
-            sleep 5 #10800    # give submitted simulations time to finish 
+	if [ $INT -ge 50 ]; then 
+            sleep 7200 #10800    # give submitted simulations time to finish 
 	    INT=0
 	fi
     done
@@ -72,7 +80,7 @@ echo "Re-running failed simulations."
 END
 
 #echo "Running MATLAB abc_smc script to get next set of particles."
-#sbatch -p csde -A csde slurm_abc.sbatch
+#sbatch -p ckpt -A csde-ckpt slurm_abc.sbatch
 #sleep 21600
  
 #echo "Running MATLAB idParamRanges script to get ranges of parameters in best-fitting sets."
