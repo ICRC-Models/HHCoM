@@ -216,7 +216,7 @@ else
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
     maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.2 ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
-    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) ;
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) .* 1.2;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -236,7 +236,7 @@ else
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
     femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.2;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -343,7 +343,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.0007]; %[0.001, 0.0004];
+    baseVagTrans = [0.0009]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -636,7 +636,7 @@ end
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
-hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.6;
+hpv_hivMult = [1.78; 1.99; 2.12; 2.32] .* 1.2;
 
 % HPV clearance multiplier for HIV-positive persons
 if calibBool && any(14 == pIdx)
