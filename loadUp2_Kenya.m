@@ -784,7 +784,7 @@ if calibBool && any(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
-        condUse = 0.15;
+        condUse = 0.25;
     else
         condUse = .05; %changed from 20%
     end
@@ -824,8 +824,8 @@ vaxStartYear = 2014;
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
 vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
-            0.5 0.70 0.75 0.70 0.6 0.50; ... % 2003
-            0.60 0.70 0.75 0.70 0.60 0.60; ... %2008
+            0.5 0.50 0.65 0.60 0.6 0.50; ... % 2003
+            0.60 0.60 0.75 0.70 0.60 0.50; ... %2008
             0.70 0.75 0.80 0.75 0.70 0.60; ... %2014 
             0.70 0.75 0.80 0.75 0.70 0.60];   % 2030 ideal: 90% [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
