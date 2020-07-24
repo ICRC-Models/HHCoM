@@ -18,7 +18,7 @@ numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %%
-nPrlSets = 25; %numCPUperNode;
+nPrlSets = 5; %numCPUperNode;
 
 %% Load all particles
 paramDir = [pwd , '/Params/'];
@@ -49,19 +49,21 @@ for s = 1 : length(pIdx)
 end
 
 %% Obtain model output for each set of sampled parameters
-negSumLogLSetAll = zeros(numBestFits,1);
-for m = 1 : nPrlSets : numBestFits
-    negSumLogLSet = zeros(nPrlSets,1);
-    subMatrixInds = [m : (m + nPrlSets - 1)];
+%negSumLogLSetAll = zeros(numBestFits,1);
+%for m = 1 : nPrlSets : numBestFits
+    %negSumLogLSet = zeros(nPrlSets,1);
+    subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
+    %subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
         paramSet = top25Params(:,subMatrixInds(n));
-        %futureSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
-        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
-        negSumLogLSet(n,1) = negSumLogL;
+        futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+        %[negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
+        %negSumLogLSet(n,1) = negSumLogL;
     end
-    negSumLogLSetAll(m : (m + nPrlSets - 1) , 1) = negSumLogLSet;
-end
+    %negSumLogLSetAll(m : (m + nPrlSets - 1) , 1) = negSumLogLSet;
+%end
+
 %% Save negSumLogL values
-file = ['negSumLogL_runSims_' , date , '_' , num2str(t_curr) , '.dat'];
-paramDir = [pwd , '/Params/'];
-csvwrite([paramDir, file] , negSumLogLSetAll)
+%file = ['negSumLogL_runSims_' , date , '_' , num2str(t_curr) , '.dat'];
+%paramDir = [pwd , '/Params/'];
+%csvwrite([paramDir, file] , negSumLogLSetAll)

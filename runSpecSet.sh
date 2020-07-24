@@ -13,7 +13,9 @@ echo "${NSETS}"
 export NSETS
 
 echo "Running specified simulation."
-SETIDX=1
-export SETIDX
-sbatch -p csde -A csde slurm_runMultSims.sbatch
+for i in $(seq 1 5 25); do
+    SETIDX=$i  #1
+    export SETIDX
+    sbatch -p csde -A csde slurm_runMultSims.sbatch
+done
 
