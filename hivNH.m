@@ -221,11 +221,11 @@ if year >= 2016
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
-        if year < (2030-1)
+        if year < (2020-1)
             minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
             maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
             popCoverInd = popCover{g}(ind); % desired population-level ART coverage
-        elseif year >= (2030-1)
+        elseif year >= (2020-1)
             minCoverLim = popCover{g}(end) * minLim;
             maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);
