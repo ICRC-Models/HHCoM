@@ -214,7 +214,7 @@ if calibBool && any(8 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.2 ;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2 ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) .* 1.2;
 end
@@ -234,7 +234,7 @@ if calibBool && any(9 == pIdx)
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.2 ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
     femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.2;
 end
@@ -1500,7 +1500,7 @@ d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYea
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0;
+riskAdj = 0.1;
 d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
