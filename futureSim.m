@@ -373,7 +373,7 @@ parfor n = 1 : nTests
     import java.util.LinkedList
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
-    artTreatTracker = historicalIn.artTreatTracker;
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
