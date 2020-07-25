@@ -8,19 +8,19 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 % profile clear;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+%pc = parcluster('local');    % create a local cluster object
+%pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+%parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec04-08_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec04-08-05_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -30,7 +30,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % LAST YEAR
-lastYear = 2121; % ***SET ME***: end year of simulation run
+lastYear = 2061; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
@@ -62,12 +62,12 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];    % age groups to vaccinate
-vaxCoverB = 0.0; %0.57; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020); last dose, first dose pilot
+vaxCoverB = 0.57; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020); last dose, first dose pilot
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-vaxCover = [0.8 , 0.9];    % vaccine coverages
+vaxCover = [0.57];    % vaccine coverages
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
@@ -321,7 +321,7 @@ end
 %% Simulation
 %profile on
 
-parfor n = 1 : nTests
+for n = nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);

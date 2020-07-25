@@ -33,8 +33,8 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec04-08_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-%pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+%pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec042-076_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
@@ -51,7 +51,7 @@ vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compar
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.57*(2/7); %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types)); last dose, first dose pilot
+vaxRate = 0.57*(2/7); %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
