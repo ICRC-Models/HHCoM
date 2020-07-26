@@ -62,8 +62,6 @@ set(0 , 'defaultlinelinewidth' , 2)
 % excel output file 
 filename = [pwd, '\Calibration_comparison_Kenya.xlsx']
 
-%% 
-
 
 %% Population size over time vs. validation data
 totalPop0_79 = zeros(2, length(tVec));
@@ -962,7 +960,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2005;
+yr = 2020;
 year = {yr};
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
