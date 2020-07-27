@@ -1,0 +1,5 @@
+Title: ICER Calculator
+Author: Miqdad Asaria
+AuthorUrl: https://www.york.ac.uk/che/staff/research/miqdad-asaria/
+License: GPL-3
+DisplayMode: Showcase
