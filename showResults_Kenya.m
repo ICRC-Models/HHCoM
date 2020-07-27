@@ -51,7 +51,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_21Jul_RR_1-5_HIVtrans-0009']
+toNowName = ['toNow_21Jul_RR_1-5_HIVtrans-0008']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -960,7 +960,7 @@ ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
-yr = 2020;
+yr = 2005;
 year = {yr};
 hpv2005 = zeros(9 , 1);
 hpvHIV2005 = hpv2005;
@@ -1271,6 +1271,7 @@ cin3Pos2000 = cin1Pos2000;
 ageGroup = {'17-19' , '20-24' , '25-29' ,...
     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
     '60-64' , '65-69' , '70-74' , '75-79'};
+year = 2000;
 %aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 for a = 4 : 13  %note, age group 4 is 17-19 in the data
     %a = aVec{aInd};
@@ -1280,16 +1281,16 @@ for a = 4 : 13  %note, age group 4 is 17-19 in the data
         [1 : 5 , 7] , 3 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    cin1Pos2000(a - 3) = (sum(popVec((2000 - startYear) * stepsPerYear , cin1Inds)))...
-        ./ sum(popVec((2000 - startYear) * stepsPerYear , ageInds)) * 100;
+    cin1Pos2000(a - 3) = (sum(popVec((year - startYear) * stepsPerYear , cin1Inds)))...
+        ./ sum(popVec((year - startYear) * stepsPerYear , ageInds)) * 100;
     % CIN 2/3 prevalence 
     cin3Inds = unique([toInd(allcomb(1 : disease , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
         [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    cin3Pos2000(a - 3) = (sum(popVec((2000 - startYear) * stepsPerYear , cin3Inds)))...
-        ./ sum(popVec((2000 - startYear) * stepsPerYear , ageInds)) * 100;
+    cin3Pos2000(a - 3) = (sum(popVec((year - startYear) * stepsPerYear , cin3Inds)))...
+        ./ sum(popVec((year - startYear) * stepsPerYear , ageInds)) * 100;
 end
 
 % DeVuyst 2003
@@ -1334,7 +1335,7 @@ set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age specific CIN prevalence among all women in 2000')
 ylim([0 30])
-% 
+%% 
 
 sheet = ['CIN_by_age_2000'];
 cols1 = {toNowName, 'Age specific CIN prevalence among all women in 2000'};
