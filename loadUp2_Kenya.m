@@ -131,7 +131,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.4; 0.2];
+    fertDeclineProp = [0.75 ; 0.38; 0.2];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -343,7 +343,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.0008]; %[0.001, 0.0004];
+    baseVagTrans = [0.00075]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
