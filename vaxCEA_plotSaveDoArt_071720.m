@@ -77,10 +77,10 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 
 for j = 1 : nRuns
     % Load results
-    baseFileName = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART_S3_';
+    baseFileName = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART_S2_';
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S3_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S2_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -154,6 +154,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Incidence per 100'); title('Female HIV incidence, ages 15-79');
     xlim([1980 2060]); ylim([0 10]);
     legend('Model: ages 15-79'); %'(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 
+    grid on;
 
     % Calculate male HIV incidence
     hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
@@ -177,6 +178,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Incidence per 100'); title('Male HIV incidence, ages 15-79');
     xlim([1980 2060]); ylim([0 10]);
     legend('Model: ages 15-79'); %'(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 
+    grid on;
     
     %% HIV PREVALENCE
     cInds = {3 : 5 , 6 , 7 , 8};
@@ -205,6 +207,7 @@ for j = 1 : nRuns
         plot(tVec(1 : stepsPerYear : end)' , hivPrevF(1 : stepsPerYear : end) , 'b-')
         xlabel('Year'); ylabel('Female HIV prevalence, ages 15-79'); title(cTits{c});
         xlim([1980 2060]); ylim([0.0 0.5]);
+        grid on;
     end
 
     % Plot male HIV prevalence      
@@ -230,6 +233,7 @@ for j = 1 : nRuns
         plot(tVec(1 : stepsPerYear : end)' , hivPrevM(1 : stepsPerYear : end) , 'b-')
         xlabel('Year'); ylabel('Male HIV prevalence, ages 15-79'); title(cTits{c});
         xlim([1980 2060]); ylim([0.0 0.5]);
+        grid on;
     end
     
     %% ART PREVALENCE 
@@ -255,6 +259,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Proportion WLWHIV on ART, ages 15-79'); title('Proportion WLWHIV on ART, ages 15-79');
     xlim([1980 2060]); ylim([0.0 1.0]);
     legend('Model: ages 15-79'); % Insert observed data description
+    grid on;
 
     % Calculate male ART prevalence
     artIndsM = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
@@ -278,6 +283,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Proportion MLWHIV on ART, ages 15-79'); title('Proportion MLWHIV on ART, ages 15-79');
     xlim([1980 2060]); ylim([0.0 1.0]);
     legend('Model: ages 15-79'); % Insert observed data description
+    grid on;
     
     %% CD4 DISTRIBUTION AT ART INITIATION
     cInds = {3 : 5 , 6 , 7};
@@ -302,6 +308,7 @@ for j = 1 : nRuns
         plot(tVec(1 : stepsPerYear : end)' , cd4DistF(1 : stepsPerYear : end)' , 'b-')
         xlabel('Year'); ylabel('Proportion of females initiating ART, ages 15-79'); title(['Proportion CD4: ' , cTits{c}]);
         xlim([1980 2060]); ylim([0.0 1.0]);
+        grid on;
     end
 
     % Plot male distribution
@@ -323,6 +330,7 @@ for j = 1 : nRuns
         plot(tVec(1 : stepsPerYear : end)' , cd4DistM(1 : stepsPerYear : end)' , 'b-')
         xlabel('Year'); ylabel('Proportion of males initiating ART, ages 15-79'); title(['Proportion CD4: ' , cTits{c}]);
         xlim([1980 2060]); ylim([0.0 1.0]);
+        grid on;
     end
     
     %% HIV-ASSOCIATED MORTALITY
@@ -346,6 +354,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Mortality per 100K'); title('Female HIV-associated mortality, ages 15-79');
     xlim([1980 2060]); ylim([0 5000]);
     legend('Model: ages 15-79');
+    grid on;
 
     % Calculate male HIV-associated mortality
     popIndsM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
@@ -366,6 +375,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Mortality per 100K'); title('Male HIV-associated mortality, ages 15-79');
     xlim([1980 2060]); ylim([0 5000]);
     legend('Model: ages 15-79');
+    grid on;
     
     %% TOTAL POPULATION SIZE
     
@@ -387,6 +397,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Individuals'); title('Female population size, ages 15-79');
     xlim([1980 2060])
     legend('Model: ages 15-79');
+    grid on;
 
     % Calculate male population size
     popTotM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -406,6 +417,7 @@ for j = 1 : nRuns
     xlabel('Year'); ylabel('Individuals'); title('Male population size, ages 15-79');
     xlim([1980 2060])
     legend('Model: ages 15-79');
+    grid on;
 
 end
     
