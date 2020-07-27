@@ -54,9 +54,13 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'7_1' , '7_2' , '7_3' , '7_4' , '7_5' , '7_6' , '7_7' , '7_8' , ...
-    '7_9' , '7_10' , '7_11' , '7_12' , '7_13' , '7_14' , '7_15' , '7_16' , ...
-    '7_17' , '7_18' , '7_19' , '7_20' , '7_21' , '7_22' , '7_23' , '7_24' , '7_25'};  % DO ART, 22Apr20Ph2V2, t=7
+fileInds = {'11_1' , '11_2' , '11_3' , '11_4' , '11_5' , '11_6' , ...
+    '11_7' , '11_8' , '11_9' , '11_10' , '11_11' , '11_12' , '11_13' , ...
+    '11_14' , '11_15' , '11_16' , '11_17' , '11_18' , '11_19' , '11_20' , ...
+    '11_21' , '11_22' , '11_23' , '11_24' , '11_25'};  % DO ART, 22Apr20Ph2V2, t=11
+% fileInds = {'7_1' , '7_2' , '7_3' , '7_4' , '7_5' , '7_6' , '7_7' , '7_8' , ...
+%     '7_9' , '7_10' , '7_11' , '7_12' , '7_13' , '7_14' , '7_15' , '7_16' , ...
+%     '7_17' , '7_18' , '7_19' , '7_20' , '7_21' , '7_22' , '7_23' , '7_24' , '7_25'};  % DO ART, 22Apr20Ph2V2, t=7
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -108,18 +112,18 @@ hivInc = zeros(nRuns , gender , length(hivIncYearVec));
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_DoART_S2_' , fileInds{j}]; % ***SET ME***: name for simulation output file
+    pathModifier = ['22Apr20Ph2V2_noBaseVax_baseScreen_hpvHIVcalib_fertDec042-076-052_' , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_DoART_S2_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_noBaseVax_baseScreen_hpvHIVcalib_fertDec042-076_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
     if waning
         resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
     end
-    parfor n = 1 : nSims
+    for n = nSims
         % load results from vaccine run into cell array
-        vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+        vaxResult{n} = load([resultFileName , num2str(3), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
         % matrices for years past current year
         vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
@@ -145,7 +149,7 @@ for j = 1 : nRuns
         popSize(j , t) = sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
     end
 
-%     %% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
+    %% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
 %     popYearVec = unique(popAgeDist_dObs(: ,1));
 %     for t = 1 : length(popYearVec)
 %         for a = 1 : age
@@ -201,7 +205,7 @@ for j = 1 : nRuns
         end
     end
     
-%     %% HIV prevalence over time for ages 15-49 vs. AHRI (validation) and HSRC data (validation)
+    %% HIV prevalence over time for ages 15-49 vs. AHRI (validation) and HSRC data (validation)
 %     hivYearVec2 = [2002 , 2005 , 2008 , 2012 , 2017];
 %     
 %     for t = 1 : length(hivYearVec2)
@@ -214,7 +218,7 @@ for j = 1 : nRuns
 %         hivPrevTot(j , t) = (sum(noV.popVec(prevYear , hivInds) , 2) / sum(noV.popVec(prevYear , totInds) , 2)) * 100;
 %     end
     
-%     %% HIV prevalence over time for ages 25+ vs. HSRC data (validation)
+    %% HIV prevalence over time for ages 25+ vs. HSRC data (validation)
 %     hivYearVec2 = [2002 , 2005 , 2008 , 2012 , 2017];
 %     
 %     for t = 1 : length(hivYearVec2)
@@ -256,7 +260,7 @@ for j = 1 : nRuns
         end
     end
     
-%     %% HIV incidence by gender over time for ages 15-29 vs. (Vandormael, 2019) AHRI data (validation)
+     %% HIV incidence by gender over time for ages 15-29 vs. (Vandormael, 2019) AHRI data (validation)
 %     hivIncYearVec = [2005 : 2017];
 %     
 %     hivIncAgeInds = {4:6 , 4:6};
@@ -272,7 +276,7 @@ for j = 1 : nRuns
 %         end
 %     end
         
-%     %% HIV incidence by gender over time for ages 30-49/54 vs. (Vandormael, 2019) AHRI data (validation)
+    %% HIV incidence by gender over time for ages 30-49/54 vs. (Vandormael, 2019) AHRI data (validation)
 %     hivIncYearVec = [2005 : 2017];
 %     
 %     hivIncAgeInds = {7:11 , 7:10};
@@ -288,7 +292,7 @@ for j = 1 : nRuns
 %         end
 %     end
     
-%     %% HIV incidence by gender and 5-year age groups over time vs. IHME model data (validation)
+    %% HIV incidence by gender and 5-year age groups over time vs. IHME model data (validation)
 %     hivIncYearVec2 = [2000 : 2017];
 %  
 %     for t = 1 : length(hivIncYearVec2)
@@ -330,7 +334,7 @@ for j = 1 : nRuns
 %             ./ sum(noV.popVec((yr - startYear) * stepsPerYear +1 , ageInds_hivNeg));
 %     end
 
-%     %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data (calibration)
+    %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data (calibration)
 %     ageVec = {[4:5],[6:7],[8:9],[10:13]};
 %     for aV = 1 : length(ageVec)
 %         a = ageVec{aV};
@@ -450,9 +454,9 @@ end
 
 %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
-%% Population size over time vs. Statistics South Africa data (calibration)
+%% Population size over time vs. Statistics South Africa data (calibration/validation)
 popYearVec = unique(totPopSize_dObs(: ,1));
-% Load calibration data from Excel (years, values)
+% Load calibration/validation data from Excel (years, values)
 file = [pwd , '/Config/Population_validation_targets.xlsx'];
 historicalPop0_69 = zeros(5,2);
 futurePop0_69 = zeros(16,2);
@@ -468,18 +472,19 @@ sdevObs = (totPopSize_dObs(: , 3).^(1/2)).*2;
 figure;
 errorbar(totPopSize_dObs(: , 1) , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
-hold on;
+hold all;
+plot(futurePop0_69(:,1) , futurePop0_69(:,2) , 'o');
 %boxplot(popSize , 'Positions' , popYearVec , 'Labels' , popYearVec , 'Color' , 'k' , 'Whisker' , 5);
 plot([1980 : 10 : 2060]' , mean(popSize,1)' , 'k-' , ...
     [1980 : 10 : 2060]' , min(popSize,[],1)' , 'k--' , ...
     [1980 : 10 : 2060]' , max(popSize,[],1)' , 'k--' , 'LineWidth' , 1.5);
 title('KZN Population Size Ages 0-79')
 xlabel('Year'); ylabel('Individuals')
-xlim([1980 2060]); ylim([0 (14*10^6)]);
+xlim([1980 2060]); ylim([0 (20*10^6)]);
 legend('(Statistics SA) Observed KZN, ages 0-79: mean, 2SD' , 'Model, ages 0-79: 25-sets mean' , 'Model, ages 0-79: 25-sets minimum' , 'Model, ages 0-79: 25-sets maximum');
 grid on;
 
-% %% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
+%% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
 % % Load calibration data from Excel
 % file = [pwd , '/Config/Population_validation_targets.xlsx'];
 % years = xlsread(file , 'Demographics' , 'B91:F91');    % years
@@ -583,7 +588,7 @@ grid on;
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
-% %% HIV prevalence by age over time vs. AHRI (calibration, validation) and IHME model data (validation)
+%% HIV prevalence by age over time vs. AHRI (calibration, validation) and IHME model data (validation)
 % hivYearVec = [unique(hivPrevM_dObs(: ,1)) ; [2010 : 2016]'];
 % prevYears2 = [2010 : 2016];
 % 
@@ -727,7 +732,7 @@ for g = 1 : gender
     end
 end
 
-% %% HIV prevalence over time for ages 15-49 vs. AHRI (validation) and HSRC data (validation)
+%% HIV prevalence over time for ages 15-49 vs. AHRI (validation) and HSRC data (validation)
 % hivYearVec2 = [2002 , 2005 , 2008 , 2012 , 2017];
 % hivPrev_obs = [2002 15.7 11.6 21.1
 %                2005 21.9 18.3 25.9
@@ -753,7 +758,7 @@ end
 % legend('(HSRC SABSSM) Observed KZN, ages 15-49: 95% CI' , '(AHRI data request) Observed KZN, ages 15-49' , ...
 %     'Model, ages 15-49: 25-sets mean' , 'Model, ages 15-49: 25-sets minimum' , 'Model, ages 15-49: 25-sets maximum');
 
-% %% HIV prevalence over time for ages 25+ vs. HSRC data (validation)
+%% HIV prevalence over time for ages 25+ vs. HSRC data (validation)
 % hivYearVec2 = [2002 , 2005 , 2008 , 2012 , 2017];
 % 
 % hivPrev_obs = [2002 14.9 10.1 21.5
@@ -775,7 +780,7 @@ end
 % legend('(HSRC SABSSM) Observed KZN, ages 25+: 95% CI' , 'Model, ages 25-79: 25-sets mean' , ...
 %     'Model, ages 25-79: 25-sets minimum' , 'Model, ages 25-79: 25-sets maximum');
 
-% %% HIV prevalence over time for ages 50+ vs. HSRC data (validation)
+%% HIV prevalence over time for ages 50+ vs. HSRC data (validation)
 % hivYearVec2 = [2002 , 2005 , 2008 , 2012 , 2017];
 % 
 % hivPrev_obs = [2002 11.0 4.5 24.3
@@ -877,7 +882,7 @@ for g = 1 : gender
 %         'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 end
 
-% %% HIV incidence by gender and 5-year age groups over time vs. IHME model data (validation)
+%% HIV incidence by gender and 5-year age groups over time vs. IHME model data (validation)
 % hivIncYearVec2 = [2000 : 2017];
 % 
 % % IHME model prevalence estimates for KZN, ages 15-49 in 5-year age groups
@@ -974,7 +979,7 @@ end
 % title('hrHPV Prevalence in 2002 - Females, HIV-');
 % grid on;
 
-% %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data (calibration)
+%% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data (calibration)
 % ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
 % 
 % % Calibration error bars
@@ -1058,7 +1063,7 @@ end
 
 %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
 
-% %% Cervical cancer incidence in 2012 by age vs. Globocan 2012 data and other sources (calibration)
+%% Cervical cancer incidence in 2012 by age vs. Globocan 2012 data and other sources (calibration)
 % ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
 %     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
 %     '60-64' , '65-69' , '70-74' , '75-79'};
@@ -1131,7 +1136,7 @@ end
 
 %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
 
-% %% HPV type distribution by state over time (coinfections grouped as 9v-type HPV) (calibration)
+%% HPV type distribution by state over time (coinfections grouped as 9v-type HPV) (calibration)
 % 
 % % HPV infected
 % % Calibration error bars
