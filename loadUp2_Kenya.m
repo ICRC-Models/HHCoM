@@ -343,7 +343,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.00075]; %[0.001, 0.0004];
+    baseVagTrans = [0.0007]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -1500,7 +1500,7 @@ d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYea
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0.2;
+riskAdj = 0;
 d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
