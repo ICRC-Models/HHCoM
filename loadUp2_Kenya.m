@@ -343,7 +343,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.0007]; %[0.001, 0.0004];
+    baseVagTrans = [0.00075]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -677,7 +677,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.008;
+    perPartnerHpv_vax = 0.009;
 end
 
 if calibBool && any(11 == pIdx)
