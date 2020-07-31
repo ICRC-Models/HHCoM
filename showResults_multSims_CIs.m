@@ -130,6 +130,10 @@ hivIncOlder = hivInc;
 hivIncYearVec2 = [2000 : 2017];
 hivIncM = zeros(nRuns , 7 , length(hivIncYearVec2));
 hivIncF = zeros(nRuns , 7 , length(hivIncYearVec2));
+% HIV mortality
+hivMortYearVec2 = [2000 : 2017];
+hivMortM = zeros(nRuns , 7 , length(hivMortYearVec2));
+hivMortF = zeros(nRuns , 7 , length(hivMortYearVec2));
 % Female HPV prevalence
 hpv_hiv = zeros(nRuns , 9);
 hpv_hivNeg = hpv_hiv;
@@ -346,6 +350,24 @@ for j = 1 : nRuns
             hivSusF = annlz(sum(popVec(incTimeSpan , hivSusIndsF) , 2)) ./ stepsPerYear;
             hivIncF(j , a - 3 , t) = annlz(sum(sum(sum(sum(newHiv(incTimeSpan , ...
                 : , : , : , 2 , a , 1 : risk), 2), 3), 4), 7)) ./ hivSusF * 100;
+        end
+    end
+    
+    %% HIV mortality by gender and 5-year age groups over time vs. IHME model data (validation)
+    hivMortYearVec2 = [2000 : 2017];
+ 
+    for t = 1 : length(hivMortYearVec2)
+        for a = 4 : 10
+            mortYear = hivMortYearVec2(t);
+            mortTimeSpan = [((mortYear - startYear) * stepsPerYear +1) : ((mortYear - startYear) * stepsPerYear +6)];
+            popIndsF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                1 : intervens , 2 , a , 1 : risk));
+            popTotF = annlz(sum(popVec(mortTimeSpan , popIndsF) , 2)) ./ stepsPerYear;
+            hivMortF(j , a - 3 , t) = annlz(sum(hivDeaths(mortTimeSpan , : , 2 , a), 2)) ./ popTotF .* 100000;
+            popIndsM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                1 : intervens , 1 , a , 1 : risk));
+            popTotM = annlz(sum(popVec(mortTimeSpan , popIndsM) , 2)) ./ stepsPerYear;
+            hivMortM(j , a - 3 , t) = annlz(sum(hivDeaths(mortTimeSpan , : , 1 , a), 2)) ./ popTotM .* 100000;
         end
     end
     
@@ -1118,6 +1140,58 @@ for g = 1 : gender
         end
         xlabel('Year'); ylabel('HIV incidence per 100'); title([gen{g} , 's ages ' , ageGroup{a-3}])
         xlim([2000 2020]); ylim([0 10]);
+        grid on;
+    end
+    legend('(IHME model) Observed KZN: val, lower lb, upper lb' , ...
+        'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum')
+end
+
+%% HIV mortality by gender and 5-year age groups over time vs. IHME model data (validation)
+hivMortYearVec2 = [2000 : 2017];
+
+% IHME model death rate estimates for KZN, ages 15-49 in 5-year age groups
+file = [pwd , '/Config/ihme_hiv_kzn_deaths.xlsx'];
+hivMortF_val = xlsread(file , 'Mortality' , 'L128:N253').*100000; % 2000-2017 (val, upper, lower)
+hivMortM_val = xlsread(file , 'Mortality' , 'L2:N127').*100000; % 2000-2017 (val, upper, lower)
+
+ageGroup = {'15 - 19' , '20 - 24' , '25 - 29' ,...
+    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' , ...
+    '60 - 64' , '65 - 69' , '70 - 74'};
+
+gen = {'Male' , 'Female'};
+for g = 1 : gender
+    hivMortR = hivMortM_val;
+    hivModel = hivMortM;
+    if g == 2
+        hivMortR = hivMortF_val;
+        hivModel = hivMortF;
+    end
+
+    figure; 
+    for a = 4 : 10
+        subplot(3 , 3 , a-3)
+        hold all;
+        if a <= 11            
+            errorbar(hivMortYearVec2 , hivMortR(((a-3) : 7 : end) , 1)' , ...
+                hivMortR(((a-3) : 7 : end) , 1)' - hivMortR(((a-3) : 7 : end) , 3)' , ...
+                hivMortR(((a-3) : 7 : end) , 2)' - hivMortR(((a-3) : 7 : end) , 1)' , ...
+                'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+            hold on;
+            plot(hivMortYearVec2 , mean(squeeze(hivModel(: , a-3 , :)),1)' , 'k-' , ...
+                hivMortYearVec2 , min(squeeze(hivModel(: , a-3 , :)),[],1)' , 'k--' , ...
+                hivMortYearVec2 , max(squeeze(hivModel(: , a-3 , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
+        else
+            errorbar(hivMortYearVec2 , hivMortR(((a-3) : 7 : end) , 1)' , ...
+                hivMortR(((a-3) : 7 : end) , 1)' - hivMortR(((a-3) : 7 : end) , 3)' , ...
+                hivMortR(((a-3) : 7 : end) , 2)' - hivMortR(((a-3) : 7 : end) , 1)' , ...
+                'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+            hold on;
+            plot(hivMortYearVec2 , mean(squeeze(hivModel(: , a-3 , :)),1)' , 'k-' , ...
+                hivMortYearVec2 , min(squeeze(hivModel(: , a-3 , :)),[],1)' , 'k--' , ...
+                hivMortYearVec2 , max(squeeze(hivModel(: , a-3 , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
+        end
+        xlabel('Year'); ylabel('HIV mortality per 100K'); title([gen{g} , 's ages ' , ageGroup{a-3}])
+        xlim([2000 2020]); %ylim([0 10]);
         grid on;
     end
     legend('(IHME model) Observed KZN: val, lower lb, upper lb' , ...
