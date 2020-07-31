@@ -83,7 +83,8 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 
 for j = 1 : nRuns
     % Load results
-    baseFileName = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART_S3_';
+    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART';
+    baseFileName = [baseFileNameShort , '_S3_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
     curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S3_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
@@ -509,18 +510,18 @@ for j = 1 : nRuns
     popSizeF_multSims(: , j) = popSizeF(1 : stepsPerYear : end);
 
     % Plot female population size
-    if (j == 1)
-        fig11 = figure;
-        %insert observed data
-    else
-        figure(fig11);
-    end
-    hold all;
-    plot(tVec(1 : stepsPerYear : end)' , popSizeF(1 : stepsPerYear : end) , 'b-')
-    xlabel('Year'); ylabel('Individuals'); title('Female population size, ages 15-79');
-    xlim([1980 2060])
-    legend('Model: ages 15-79');
-    grid on;
+%     if (j == 1)
+%         fig11 = figure;
+%         %insert observed data
+%     else
+%         figure(fig11);
+%     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , popSizeF(1 : stepsPerYear : end) , 'b-')
+%     xlabel('Year'); ylabel('Individuals'); title('Female population size, ages 15-79');
+%     xlim([1980 2060])
+%     legend('Model: ages 15-79');
+%     grid on;
 
     % Calculate male population size
     popTotM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -529,18 +530,18 @@ for j = 1 : nRuns
     popSizeM_multSims(: , j) = popSizeM(1 : stepsPerYear : end);
 
     % Plot female population size
-    if (j == 1)
-        fig12 = figure;
-        %insert observed data
-    else
-        figure(fig12);
-    end
-    hold all;
-    plot(tVec(1 : stepsPerYear : end)' , popSizeM(1 : stepsPerYear : end) , 'b-')
-    xlabel('Year'); ylabel('Individuals'); title('Male population size, ages 15-79');
-    xlim([1980 2060])
-    legend('Model: ages 15-79');
-    grid on;
+%     if (j == 1)
+%         fig12 = figure;
+%         %insert observed data
+%     else
+%         figure(fig12);
+%     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , popSizeM(1 : stepsPerYear : end) , 'b-')
+%     xlabel('Year'); ylabel('Individuals'); title('Male population size, ages 15-79');
+%     xlim([1980 2060])
+%     legend('Model: ages 15-79');
+%     grid on;
     
     % Calculate combined population size
     popTotC = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -549,40 +550,40 @@ for j = 1 : nRuns
     popSizeC_multSims(: , j) = popSizeC(1 : stepsPerYear : end);
 
     % Plot combined population size
-    if (j == 1)
-        fig18 = figure;
-        %insert observed data
-    else
-        figure(fig18);
-    end
-    hold all;
-    plot(tVec(1 : stepsPerYear : end)' , popSizeC(1 : stepsPerYear : end) , 'b-')
-    xlabel('Year'); ylabel('Individuals'); title('Combined population size, ages 15-79');
-    xlim([1980 2060])
-    legend('Model: ages 15-79');
-    grid on;
+%     if (j == 1)
+%         fig18 = figure;
+%         %insert observed data
+%     else
+%         figure(fig18);
+%     end
+%     hold all;
+%     plot(tVec(1 : stepsPerYear : end)' , popSizeC(1 : stepsPerYear : end) , 'b-')
+%     xlabel('Year'); ylabel('Individuals'); title('Combined population size, ages 15-79');
+%     xlim([1980 2060])
+%     legend('Model: ages 15-79');
+%     grid on;
 
 end
     
 %% Save HIV incidence
 % female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    ['HIV_incidence_females_aged15-79'] , '.xlsx'];
-sname = 'HIVincF';
+    'HIV_incidence_females_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivIncF_multSims , 2) , ...
-    min(hivIncF_multSims , [] , 2) , max(hivIncF_multSims , [] , 2)] , sname)
+    min(hivIncF_multSims , [] , 2) , max(hivIncF_multSims , [] , 2) , ...
+    hivIncF_multSims])
 % male
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'HIV_incidence_males_aged15-79' , '.xlsx'];
-sname = 'HIVincM';
+    'HIV_incidence_males_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivIncM_multSims , 2) , ...
-    min(hivIncM_multSims , [] , 2) , max(hivIncM_multSims , [] , 2)] , sname)
+    min(hivIncM_multSims , [] , 2) , max(hivIncM_multSims , [] , 2) , ...
+    hivIncM_multSims])
 % combined
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'HIV_incidence_combined_aged15-79' , '.xlsx'];
-sname = 'HIVincC';
+    'HIV_incidence_combined_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivIncC_multSims , 2) , ...
-    min(hivIncC_multSims , [] , 2) , max(hivIncC_multSims , [] , 2)] , sname)
+    min(hivIncC_multSims , [] , 2) , max(hivIncC_multSims , [] , 2) , ...
+    hivIncC_multSims])
 
 %% Save HIV prevalence
 cInds = {3 : 5 , 6 , 7 , 8};
@@ -590,43 +591,43 @@ cTits = {'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onA
 for c = 1 : length(cInds)
     % female
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'HIV_prevalence_females_aged15-79_' , cTits{c} , '.xlsx'];
-    sname = 'HIVprevF';
+        'HIV_prevalence_females_aged15-79_' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivPrevF_multSims(: , : , c) , 2) , ...
-        min(hivPrevF_multSims(: , : , c) , [] , 2) , max(hivPrevF_multSims(: , : , c) , [] , 2)] , sname)
+        min(hivPrevF_multSims(: , : , c) , [] , 2) , max(hivPrevF_multSims(: , : , c) , [] , 2) , ...
+        hivPrevF_multSims(: , : , c)])
     % male
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'HIV_prevalence_males_aged15-79_' , cTits{c} , '.xlsx'];
-    sname = 'HIVprevM';
+        'HIV_prevalence_males_aged15-79_' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivPrevM_multSims(: , : , c) , 2) , ...
-        min(hivPrevM_multSims(: , : , c) , [] , 2) , max(hivPrevM_multSims(: , : , c) , [] , 2)] , sname)
+        min(hivPrevM_multSims(: , : , c) , [] , 2) , max(hivPrevM_multSims(: , : , c) , [] , 2) , ...
+        hivPrevM_multSims(: , : , c)])
     % combined
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'HIV_prevalence_combined_aged15-79_' , cTits{c} , '.xlsx'];
-    sname = 'HIVprevC';
+        'HIV_prevalence_combined_aged15-79_' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivPrevC_multSims(: , : , c) , 2) , ...
-        min(hivPrevC_multSims(: , : , c) , [] , 2) , max(hivPrevC_multSims(: , : , c) , [] , 2)] , sname)
+        min(hivPrevC_multSims(: , : , c) , [] , 2) , max(hivPrevC_multSims(: , : , c) , [] , 2) , ...
+        hivPrevC_multSims(: , : , c)])
 end
 
 %% Save ART prevalence
 % female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'Proportion_WLWHIV_onART_aged15-79.xlsx'];
-sname = 'ARTprevF';
+    'Proportion_WLWHIV_onART_aged15-79.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(artPrevF_multSims , 2) , ...
-    min(artPrevF_multSims , [] , 2) , max(artPrevF_multSims , [] , 2)] , sname)
+    min(artPrevF_multSims , [] , 2) , max(artPrevF_multSims , [] , 2) , ...
+    artPrevF_multSims])
 % male
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'Proportion_MLWHIV_onART_aged15-79.xlsx'];
-sname = 'ARTprevM';
+    'Proportion_MLWHIV_onART_aged15-79.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(artPrevM_multSims , 2) , ...
-    min(artPrevM_multSims , [] , 2) , max(artPrevM_multSims , [] , 2)] , sname)
-combined
+    min(artPrevM_multSims , [] , 2) , max(artPrevM_multSims , [] , 2) , ...
+    artPrevM_multSims])
+% combined
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'Proportion_PLWHIV_onART_aged15-79.xlsx'];
-sname = 'ARTprevC';
+    'Proportion_PLWHIV_onART_aged15-79.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(artPrevC_multSims , 2) , ...
-    min(artPrevC_multSims , [] , 2) , max(artPrevC_multSims , [] , 2)] , sname)
+    min(artPrevC_multSims , [] , 2) , max(artPrevC_multSims , [] , 2) , ...
+    artPrevC_multSims])
 
 %% Save CD4 distribution at ART initiation
 cInds = {3 : 5 , 6 , 7};
@@ -634,61 +635,360 @@ cTits = {'CD4 350plus' , 'CD4 200-350' , 'CD4 below200'};
 for c = 1 : length(cInds)
     % female
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'CD4_dist_initART_females_aged15-79_' , cTits{c} , '.xlsx'];
-    sname = 'ARTdistF';
+        'CD4_dist_initART_females_aged15-79_' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(cd4DistF_multSims(: , : , c) , 2) , ...
-        min(cd4DistF_multSims(: , : , c) , [] , 2) , max(cd4DistF_multSims(: , : , c) , [] , 2)] , sname)
+        min(cd4DistF_multSims(: , : , c) , [] , 2) , max(cd4DistF_multSims(: , : , c) , [] , 2) , ...
+        cd4DistF_multSims(: , : , c)])
     % male 
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'CD4_dist_initART_males_aged15-79' , cTits{c} , '.xlsx'];
-    sname = 'ARTdistM';
+        'CD4_dist_initART_males_aged15-79' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(cd4DistM_multSims(: , : , c) , 2) , ...
-        min(cd4DistM_multSims(: , : , c) , [] , 2) , max(cd4DistM_multSims(: , : , c) , [] , 2)] , sname)
+        min(cd4DistM_multSims(: , : , c) , [] , 2) , max(cd4DistM_multSims(: , : , c) , [] , 2) , ...
+        cd4DistM_multSims(: , : , c)])
     % combined 
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'CD4_dist_initART_combined_aged15-79' , cTits{c} , '.xlsx'];
-    sname = 'ARTdistC';
+        'CD4_dist_initART_combined_aged15-79' , cTits{c} , '.csv'];
     xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(cd4DistC_multSims(: , : , c) , 2) , ...
-        min(cd4DistC_multSims(: , : , c) , [] , 2) , max(cd4DistC_multSims(: , : , c) , [] , 2)] , sname)
+        min(cd4DistC_multSims(: , : , c) , [] , 2) , max(cd4DistC_multSims(: , : , c) , [] , 2) , ...
+        cd4DistC_multSims(: , : , c)])
 end
 
 %% Save HIV mortality
 % female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    ['HIV_mortality_females_aged15-79'] , '.xlsx'];
-sname = 'HIVmortF';
+    'HIV_mortality_females_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivMortF_multSims , 2) , ...
-    min(hivMortF_multSims , [] , 2) , max(hivMortF_multSims , [] , 2)] , sname)
+    min(hivMortF_multSims , [] , 2) , max(hivMortF_multSims , [] , 2) , ...
+    hivMortF_multSims])
 % male
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'HIV_mortality_males_aged15-79' , '.xlsx'];
-sname = 'HIVmortM';
+    'HIV_mortality_males_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivMortM_multSims , 2) , ...
-    min(hivMortM_multSims , [] , 2) , max(hivMortM_multSims , [] , 2)] , sname)
+    min(hivMortM_multSims , [] , 2) , max(hivMortM_multSims , [] , 2) , ...
+    hivMortM_multSims])
 % combined
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'HIV_mortality_combined_aged15-79' , '.xlsx'];
-sname = 'HIVmortC';
+    'HIV_mortality_combined_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(hivMortC_multSims , 2) , ...
-    min(hivMortC_multSims , [] , 2) , max(hivMortC_multSims , [] , 2)] , sname)
+    min(hivMortC_multSims , [] , 2) , max(hivMortC_multSims , [] , 2) , ...
+    hivMortC_multSims])
 
 %% Save population size
 % female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'PopulationSize_females_aged15-79' , '.xlsx'];
-sname = 'ARTdistF';
+    'PopulationSize_females_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(popSizeF_multSims , 2) , ...
-    min(popSizeF_multSims , [] , 2) , max(popSizeF_multSims , [] , 2)] , sname)
+    min(popSizeF_multSims , [] , 2) , max(popSizeF_multSims , [] , 2) , ...
+    popSizeF_multSims])
 % male 
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'PopulationSize_males_aged15-79' , '.xlsx'];
-sname = 'ARTdistM';
+    'PopulationSize_males_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(popSizeM_multSims , 2) , ...
-    min(popSizeM_multSims , [] , 2) , max(popSizeM_multSims , [] , 2)] , sname)
+    min(popSizeM_multSims , [] , 2) , max(popSizeM_multSims , [] , 2) , ...
+    popSizeM_multSims])
 % combined
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'PopulationSize_combined_aged15-79' , '.xlsx'];
-sname = 'ARTdistC';
+    'PopulationSize_combined_aged15-79' , '.csv'];
 xlswrite(fname , [tVec(1 : stepsPerYear : end)' , mean(popSizeC_multSims , 2) , ...
-    min(popSizeC_multSims , [] , 2) , max(popSizeC_multSims , [] , 2)] , sname)
+    min(popSizeC_multSims , [] , 2) , max(popSizeC_multSims , [] , 2) , ...
+    popSizeC_multSims])
 
+
+%% PLOT SCENARIOS COMPARED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+colorList = {'k' , 'b' , 'r'};
+
+%% Plot HIV incidence
+figure;
+
+% female
+subplot(1 ,3 , 1);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_incidence_females_aged15-79' , '.csv'];
+    hivIncF = xlsread(fname);
+    hold all;
+    plot(hivIncF(: , 1) , hivIncF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivIncF(: , 1) , hivIncF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(hivIncF(: , 1) , hivIncF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('HIV incidence per 100'); title('Females, aged 15-79');
+xlim([1980 2060]); ylim([0 10]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% male
+subplot(1 ,3 , 2);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_incidence_males_aged15-79' , '.csv'];
+    hivIncM = xlsread(fname);
+    hold all;
+    plot(hivIncM(: , 1) , hivIncM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivIncM(: , 1) , hivIncM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(hivIncM(: , 1) , hivIncM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('HIV incidence per 100'); title('Males, aged 15-79');
+xlim([1980 2060]); ylim([0 10]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% combined
+subplot(1 ,3 , 3);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_incidence_combined_aged15-79' , '.csv'];
+    hivIncC = xlsread(fname);
+    hold all;
+    plot(hivIncC(: , 1) , hivIncC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivIncC(: , 1) , hivIncC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(hivIncC(: , 1) , hivIncC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('HIV incidence per 100'); title('Females + Males, aged 15-79');
+xlim([1980 2060]); ylim([0 10]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+%% Plot HIV prevalence
+cInds = {3 : 5 , 6 , 7 , 8};
+cTits = {'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onART'};
+
+% female
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 2 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+            'HIV_prevalence_females_aged15-79_' , cTits{c} , '.csv'];
+        hivPrevF = xlsread(fname);
+        hold all;
+        plot(hivPrevF(: , 1) , hivPrevF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevF(: , 1) , hivPrevF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevF(: , 1) , hivPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('HIV prevalence'); title(cTits{c}); 
+    xlim([1980 2060]); ylim([0.0 0.35]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end
+sgtitle('Females, aged 15-79');
+
+% male
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 2 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+            'HIV_prevalence_males_aged15-79_' , cTits{c} , '.csv'];
+        hivPrevM = xlsread(fname);
+        hold all;
+        plot(hivPrevM(: , 1) , hivPrevM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevM(: , 1) , hivPrevM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevM(: , 1) , hivPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('HIV prevalence'); title(cTits{c}); 
+    xlim([1980 2060]); ylim([0.0 0.25]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end   
+sgtitle('Males, aged 15-79');
+    
+% combined
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 2 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+            'HIV_prevalence_combined_aged15-79_' , cTits{c} , '.csv'];
+        hivPrevC = xlsread(fname);
+        hold all;
+        plot(hivPrevC(: , 1) , hivPrevC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevC(: , 1) , hivPrevC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevC(: , 1) , hivPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('HIV prevalence'); title(cTits{c}); 
+    xlim([1980 2060]); ylim([0.0 0.3]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end   
+sgtitle('Females + Males, aged 15-79');
+
+%% Plot ART prevalence
+figure;
+
+% female
+subplot(1 , 3 , 1);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'Proportion_WLWHIV_onART_aged15-79.csv'];
+    artPrevF = xlsread(fname);
+    hold all;
+    plot(artPrevF(: , 1) , artPrevF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(artPrevF(: , 1) , artPrevF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(artPrevF(: , 1) , artPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Proportion WLWHIV on ART'); title('WLWHIV on ART, ages 15-79');
+xlim([2000 2060]); ylim([0.0 1.0]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% male
+subplot(1 , 3 , 2);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'Proportion_MLWHIV_onART_aged15-79.csv'];
+    artPrevM = xlsread(fname);
+    hold all;
+    plot(artPrevM(: , 1) , artPrevM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(artPrevM(: , 1) , artPrevM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(artPrevM(: , 1) , artPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Proportion MLWHIV on ART'); title('MLWHIV on ART, ages 15-79');
+xlim([2000 2060]); ylim([0.0 1.0]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% combined
+subplot(1 , 3 , 3);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'Proportion_PLWHIV_onART_aged15-79.csv'];
+    artPrevC = xlsread(fname);
+    hold all;
+    plot(artPrevC(: , 1) , artPrevC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(artPrevC(: , 1) , artPrevC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(artPrevC(: , 1) , artPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Proportion PLWHIV on ART'); title('PLWHIV on ART, ages 15-79');
+xlim([2000 2060]); ylim([0.0 1.0]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+%% Plot CD4 distribution at ART initiation
+cInds = {3 : 5 , 6 , 7};
+cTits = {'CD4 350plus' , 'CD4 200-350' , 'CD4 below200'};
+
+% female
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 3 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+            'CD4_dist_initART_females_aged15-79_' , cTits{c} , '.csv'];
+        cd4DistF = xlsread(fname);
+        hold all;
+        plot(artPrevF(: , 1) , artPrevF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
+            artPrevF(: , 1) , artPrevF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
+            artPrevF(: , 1) , artPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('Proportion of females initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlim([1980 2060]); ylim([0.0 1.0]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end
+sgtitle('Females, aged 15-79');
+   
+% male 
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 3 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+            'CD4_dist_initART_males_aged15-79_' , cTits{c} , '.csv'];
+        cd4DistM = xlsread(fname);
+        hold all;
+        plot(artPrevM(: , 1) , artPrevM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
+            artPrevM(: , 1) , artPrevM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
+            artPrevM(: , 1) , artPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('Proportion of males initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlim([1980 2060]); ylim([0.0 1.0]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end
+sgtitle('Males, aged 15-79');
+   
+% combined 
+figure;
+for c = 1 : length(cInds)
+    subplot(2 , 3 , c);
+    for i = 1 : 3
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+            'CD4_dist_initART_combined_aged15-79_' , cTits{c} , '.csv'];
+        cd4DistC = xlsread(fname);
+        hold all;
+        plot(artPrevC(: , 1) , artPrevC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
+            artPrevC(: , 1) , artPrevC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
+            artPrevC(: , 1) , artPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+    xlabel('Year'); ylabel('Proportion of persons initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlim([1980 2060]); ylim([0.0 1.0]);
+    legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+        'Scenario 3, mean' , 'min' , 'max');
+    grid on;
+end
+sgtitle('Females + Males, aged 15-79');
+
+%% Plot HIV mortality
+figure;
+
+% female
+subplot(1 , 3 , 1);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_mortality_females_aged15-79' , '.csv'];
+    hivMortF = xlsread(fname);
+    hold all;
+    plot(hivMortF(: , 1) , hivMortF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivMortF(: , 1) , hivMortF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(hivMortF(: , 1) , hivMortF(: , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Mortality per 100K'); title('Females, aged 15-79');
+xlim([1980 2060]); ylim([0 5000]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% male
+subplot(1 , 3 , 2);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_mortality_males_aged15-79' , '.csv'];
+    hivMortM = xlsread(fname);
+    hold all;
+    plot(hivMortM(: , 1) , hivMortM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivMortM(: , 1) , hivMortM(: , 3) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
+    plot(hivMortM(: , 1) , hivMortM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Mortality per 100K'); title('Males, aged 15-79');
+xlim([1980 2060]); ylim([0 5000]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+
+% combined
+subplot(1 , 3 , 3);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'HIV_mortality_combined_aged15-79' , '.csv'];
+    hivMortC = xlsread(fname);
+    hold all;
+    plot(hivMortC(: , 1) , hivMortC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+    plot(hivMortC(: , 1) , hivMortC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    plot(hivMortC(: , 1) , hivMortC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+end
+xlabel('Year'); ylabel('Mortality per 100K'); title('Females + Males, aged 15-79');
+xlim([1980 2060]); ylim([0 5000]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
