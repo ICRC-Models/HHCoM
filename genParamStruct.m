@@ -84,18 +84,18 @@ paramsAll{14}.name = 'hpv_hivClear'; paramsAll{14}.length = 4; ...
     paramsAll{14}.lb = [0.5 ; 0.01; 0.01; 0.01]; ... %ones(paramsAll{15}.length,1).*0.25;
     paramsAll{14}.ub = [1.0; 0.99; 0.99; 0.99]; %ones(paramsAll{15}.length,1).*4.0;
 
-% c3c2Mults, [dec CD4], (0.25x to 4x)
-paramsAll{15}.name = 'c3c2Mults'; paramsAll{15}.length = 3; ... %4;
-    paramsAll{15}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{16}.length,1).*0.25;
-    paramsAll{15}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{16}.length,1).*4.0;
+% c3c2Mults, [dec CD4], (0.5x to 1x)
+paramsAll{15}.name = 'c3c2Mults'; paramsAll{15}.length = 1; ...
+    paramsAll{15}.lb = 0.5; ...
+    paramsAll{15}.ub = 1.0;
 
-% c2c1Mults, [dec CD4], (0.25x to 4x)
-paramsAll{16}.name = 'c2c1Mults'; paramsAll{16}.length = 3; ... %4
-    paramsAll{16}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{17}.length,1).*0.25;
-    paramsAll{16}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{17}.length,1).*4.0;
+% c2c1Mults, [dec CD4], (0.55x to 1x)
+paramsAll{16}.name = 'c2c1Mults'; paramsAll{16}.length = 1; ...
+    paramsAll{16}.lb = 0.55; ... 
+    paramsAll{16}.ub = 1.0;
 
 % lambdaMultImm, [age x 1], (0.5 to 1.0)
-paramsAll{18}.name = 'lambdaMultImm'; paramsAll{18}.length = 1; ... %16;
+paramsAll{18}.name = 'lambdaMultImm'; paramsAll{18}.length = 1; ...
     paramsAll{18}.lb = ones(paramsAll{18}.length,1).*0.5; ...
     paramsAll{18}.ub = ones(paramsAll{18}.length,1).*1.0;
 
@@ -169,12 +169,12 @@ paramsAll{37}.name = 'maleHpvClearMult'; paramsAll{37}.length = 1; ...
     paramsAll{37}.lb = [1.0]; ...
     paramsAll{37}.ub = [3.5];
 
-% c2c3Mults, [dec CD4], (0.25x to 4x)
-paramsAll{38}.name = 'c2c3Mults'; paramsAll{38}.length = 3; ... %4;
-    paramsAll{38}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{38}.length,1).*0.25;
-    paramsAll{38}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{38}.length,1).*4.0;
+% c2c3Mults, [dec CD4], (1x to 1.66x)
+paramsAll{38}.name = 'c2c3Mults'; paramsAll{38}.length = 1; ...
+    paramsAll{38}.lb = 1.0; ...
+    paramsAll{38}.ub = 1.66;
 
-% c1c2Mults, [dec CD4], (0.25x to 4x)
-paramsAll{39}.name = 'c1c2Mults'; paramsAll{39}.length = 3; ... %4
-    paramsAll{39}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{39}.length,1).*0.25;
-    paramsAll{39}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{39}.length,1).*4.0;
+% c1c2Mults, [dec CD4], (1x to 1.66x)
+paramsAll{39}.name = 'c1c2Mults'; paramsAll{39}.length = 1; ...
+    paramsAll{39}.lb = 1.0; ...
+    paramsAll{39}.ub = 1.66;

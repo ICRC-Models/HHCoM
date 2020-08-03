@@ -638,10 +638,9 @@ end
 % CIN2 to CIN3 progression multiplier for HIV-positive women
 if calibBool && any(15 == pIdx)
     idx = find(15 == pIdx);
-    c3c2Mults = ones(4 , 1);
-    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+    c3c2multiplier = paramSet(paramsSub{idx}.inds(:));
+    c3c2Mults = [1.0; 2.0; 2.7; 3.5];
+    c3c2Mults(2 : end) = c3c2Mults(2 : end).*c3c2multiplier;
 else
     c3c2Mults = [1.0; 2.0; 2.7; 3.5];
 end
@@ -649,10 +648,9 @@ end
 % CIN1 to CIN2 progression multiplier for HIV-positive women
 if calibBool && any(16 == pIdx)
     idx = find(16 == pIdx);
-    c2c1Mults = ones(4 , 1);
-    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c2c1Mults(3,1) = c2c1Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c1Mults(2,1) = c2c1Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+    c2c1multiplier = paramSet(paramsSub{idx}.inds(:));
+    c2c1Mults = [1.0; 1.9; 2.4; 2.7];
+    c2c1Mults(2 : end) = c2c1Mults(2 : end).*c2c1multiplier;
 else
     c2c1Mults = [1.0; 1.9; 2.4; 2.7];
 end
@@ -660,11 +658,8 @@ end
 % CIN3 to CIN2 regression multiplier for HIV-positive women
 if calibBool && any(38 == pIdx)
     idx = find(38 == pIdx);
-    c2c3Mults = zeros(4 , 1);
-    c2c3Mults(1,1) = paramSet(paramsSub{idx}.inds(1));
-    c2c3Mults(2,1) = c2c3Mults(1,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c3Mults(3,1) = c2c3Mults(2,1)*paramSet(paramsSub{idx}.inds(3));
-    c2c3Mults(4,1) = c2c3Mults(3,1)*paramSet(paramsSub{idx}.inds(4));
+    c2c3multiplier = paramSet(paramsSub{idx}.inds(:));
+    c2c3Mults = [0.60; 0.55; 0.45; 0.30].*c2c3multiplier;
 else
     c2c3Mults = [0.60; 0.55; 0.45; 0.30];
 end
@@ -672,11 +667,8 @@ end
 % CIN2 to CIN1 regression multiplier for HIV-positive women
 if calibBool && any(39 == pIdx)
     idx = find(39 == pIdx);
-    c1c2Mults = zeros(4 , 1);
-    c1c2Mults(1,1) = paramSet(paramsSub{idx}.inds(1));
-    c1c2Mults(2,1) = c1c2Mults(1,1)*paramSet(paramsSub{idx}.inds(2));
-    c1c2Mults(3,1) = c1c2Mults(2,1)*paramSet(paramsSub{idx}.inds(3));
-    c1c2Mults(4,1) = c1c2Mults(3,1)*paramSet(paramsSub{idx}.inds(4));
+    c1c2multiplier = paramSet(paramsSub{idx}.inds(:));
+    c1c2Mults = [0.60; 0.55; 0.45; 0.30].*c1c2multiplier;
 else
     c1c2Mults = [0.60; 0.55; 0.45; 0.30];
 end
