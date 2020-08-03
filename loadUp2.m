@@ -11,7 +11,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
@@ -651,10 +651,34 @@ if calibBool && any(16 == pIdx)
     idx = find(16 == pIdx);
     c2c1Mults = ones(4 , 1);
     c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+    c2c1Mults(3,1) = c2c1Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
+    c2c1Mults(2,1) = c2c1Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
 else
     c2c1Mults = [1.0; 1.9; 2.4; 2.7];
+end
+
+% CIN3 to CIN2 regression multiplier for HIV-positive women
+if calibBool && any(38 == pIdx)
+    idx = find(38 == pIdx);
+    c2c3Mults = zeros(4 , 1);
+    c2c3Mults(1,1) = paramSet(paramsSub{idx}.inds(1));
+    c2c3Mults(2,1) = c2c3Mults(1,1)*paramSet(paramsSub{idx}.inds(2));
+    c2c3Mults(3,1) = c2c3Mults(2,1)*paramSet(paramsSub{idx}.inds(3));
+    c2c3Mults(4,1) = c2c3Mults(3,1)*paramSet(paramsSub{idx}.inds(4));
+else
+    c2c3Mults = [0.60; 0.55; 0.45; 0.30];
+end
+
+% CIN2 to CIN1 regression multiplier for HIV-positive women
+if calibBool && any(39 == pIdx)
+    idx = find(39 == pIdx);
+    c1c2Mults = zeros(4 , 1);
+    c1c2Mults(1,1) = paramSet(paramsSub{idx}.inds(1));
+    c1c2Mults(2,1) = c1c2Mults(1,1)*paramSet(paramsSub{idx}.inds(2));
+    c1c2Mults(3,1) = c1c2Mults(2,1)*paramSet(paramsSub{idx}.inds(3));
+    c1c2Mults(4,1) = c1c2Mults(3,1)*paramSet(paramsSub{idx}.inds(4));
+else
+    c1c2Mults = [0.60; 0.55; 0.45; 0.30];
 end
 
 % HPV tranmission rates

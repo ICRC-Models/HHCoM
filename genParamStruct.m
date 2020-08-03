@@ -1,7 +1,7 @@
 % Save all potentially calibrated parameters into structure
 function [paramsAll] = genParamStruct()
 
-numParams = 37;
+numParams = 39;
 paramsAll = cell(numParams,1);
 % partnersM, [age x risk], (hr range by age(15-19,20-24,25-29,30-44,45-79), mr % of hr, lr % of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 7; ... %1 %24;
@@ -168,3 +168,13 @@ paramsAll{36}.name = 'fertDeclineProp'; paramsAll{36}.length = 2; ...
 paramsAll{37}.name = 'maleHpvClearMult'; paramsAll{37}.length = 1; ...
     paramsAll{37}.lb = [1.0]; ...
     paramsAll{37}.ub = [3.5];
+
+% c2c3Mults, [dec CD4], (0.25x to 4x)
+paramsAll{38}.name = 'c2c3Mults'; paramsAll{38}.length = 3; ... %4;
+    paramsAll{38}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{38}.length,1).*0.25;
+    paramsAll{38}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{38}.length,1).*4.0;
+
+% c1c2Mults, [dec CD4], (0.25x to 4x)
+paramsAll{39}.name = 'c1c2Mults'; paramsAll{39}.length = 3; ... %4
+    paramsAll{39}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{39}.length,1).*0.25;
+    paramsAll{39}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{39}.length,1).*4.0;
