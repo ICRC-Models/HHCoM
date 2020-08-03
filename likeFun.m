@@ -282,14 +282,12 @@ end
 incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
 fac = 10 ^ 5;
 
-ccInc2012 = zeros(9 , 1);
-ageVec = {[4:8],9,10,11,12,13,14,15,16};
-for aV = 1 : length(ageVec)
-    a = ageVec{aV};
+ccInc2012 = zeros(13 , 1);
+for a = 4 : age
     allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     % Calculate incidence
-    ccInc2012(aV , 1) = ...
+    ccInc2012(a - 3 , 1) = ...
         (annlz(sum(sum(sum(newCC(incTimeSpan , : , a , :),2),3),4)) ./ ...
         (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
 end

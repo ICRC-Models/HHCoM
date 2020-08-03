@@ -895,15 +895,15 @@ for y = 1 : length(ccIncYears)
         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
     hold on
     % Plot observed data
-    plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 8 : age , ccInc2012_dObs(: , 2) , 'r-');
+    plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2012_dObs(: , 2) , 'r-');
     hold on; 
-    errorbar(8 : age , mean , sdev , 'rs')
+    errorbar(4 : age , mean , sdev , 'rs')
     xlabel('Age Group'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     ylim([0 350]);
     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)]);
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Combined SA: upper bound' , 'Combined SA: lower bound' , ...
-        'Globocan SA (2012) (ages 15-39 comb)' , 'Calibration SD')
+        'Globocan SA (2012)' , 'Calibration SD')
     % legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
     %     'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
     %     'Location' , 'NorthEastOutside')
