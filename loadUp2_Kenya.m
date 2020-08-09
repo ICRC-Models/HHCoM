@@ -113,12 +113,12 @@ partnersM = xlsread(file , 'Sexual behavior' , 'C279:E294');
 partnersF = xlsread(file , 'Sexual behavior' , 'F279:H294');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
-save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
+save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , 'riskDistF', ...
     'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
-load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'mue' , ...
+load([paramDir , 'demoParamsFrmExcel'] , 'popInit' , 'riskDistM' , 'riskDistF', 'mue' , ...
     'mue2' , 'mue3' , 'mue4' , 'fertility');
 
 % Set female risk distribution
@@ -1500,7 +1500,7 @@ d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYea
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0.15;
+riskAdj = .10;
 d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
