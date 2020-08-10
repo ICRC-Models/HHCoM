@@ -83,11 +83,11 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 
 for j = 1 : nRuns
     % Load results
-    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_DoART';
+    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ART_DoART';
     baseFileName = [baseFileNameShort , '_S1_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ART_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -641,13 +641,13 @@ for c = 1 : length(cInds)
         cd4DistF_multSims(: , : , c)] , fname)
     % male 
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'CD4_dist_initART_males_aged15-79' , cTits{c} , '.csv'];
+        'CD4_dist_initART_males_aged15-79_' , cTits{c} , '.csv'];
     writematrix([tVec(1 : stepsPerYear : end)' , mean(cd4DistM_multSims(: , : , c) , 2) , ...
         min(cd4DistM_multSims(: , : , c) , [] , 2) , max(cd4DistM_multSims(: , : , c) , [] , 2) , ...
         cd4DistM_multSims(: , : , c)] , fname)
     % combined 
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-        'CD4_dist_initART_combined_aged15-79' , cTits{c} , '.csv'];
+        'CD4_dist_initART_combined_aged15-79_' , cTits{c} , '.csv'];
     writematrix([tVec(1 : stepsPerYear : end)' , mean(cd4DistC_multSims(: , : , c) , 2) , ...
         min(cd4DistC_multSims(: , : , c) , [] , 2) , max(cd4DistC_multSims(: , : , c) , [] , 2) , ...
         cd4DistC_multSims(: , : , c)] , fname)
@@ -713,9 +713,9 @@ for i = 1 : 3
         plot(hivIncF(: , 1) , hivIncF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivIncF((2016-startYear)+1 : end , 1) , hivIncF((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivIncF((2016-startYear)+1 : end , 1) , hivIncF((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivIncF((2016-startYear)+1 : end , 1) , hivIncF((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncF((2019-startYear)+1 : end , 1) , hivIncF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivIncF((2019-startYear)+1 : end , 1) , hivIncF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncF((2019-startYear)+1 : end , 1) , hivIncF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV incidence per 100'); title('Females, aged 15-79');
@@ -737,9 +737,9 @@ for i = 1 : 3
         plot(hivIncM(: , 1) , hivIncM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivIncM((2016-startYear)+1 : end , 1) , hivIncM((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivIncM((2016-startYear)+1 : end , 1) , hivIncM((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivIncM((2016-startYear)+1 : end , 1) , hivIncM((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncM((2019-startYear)+1 : end , 1) , hivIncM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivIncM((2019-startYear)+1 : end , 1) , hivIncM((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncM((2019-startYear)+1 : end , 1) , hivIncM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV incidence per 100'); title('Males, aged 15-79');
@@ -761,9 +761,9 @@ for i = 1 : 3
         plot(hivIncC(: , 1) , hivIncC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivIncC((2016-startYear)+1 : end , 1) , hivIncC((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivIncC((2016-startYear)+1 : end , 1) , hivIncC((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivIncC((2016-startYear)+1 : end , 1) , hivIncC((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncC((2019-startYear)+1 : end , 1) , hivIncC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivIncC((2019-startYear)+1 : end , 1) , hivIncC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivIncC((2019-startYear)+1 : end , 1) , hivIncC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV incidence per 100'); title('Females + Males, aged 15-79');
@@ -793,9 +793,9 @@ for c = 1 : length(cInds)
             plot(hivPrevF(: , 1) , hivPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         else
             hold all;
-            plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-            plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-            plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         end
     end
     xlabel('Year'); ylabel('HIV prevalence'); title(cTitsPlot{c}); 
@@ -821,9 +821,9 @@ for c = 1 : length(cInds)
             plot(hivPrevM(: , 1) , hivPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         else
             hold all;
-            plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-            plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-            plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         end
     end
     xlabel('Year'); ylabel('HIV prevalence'); title(cTitsPlot{c}); 
@@ -849,9 +849,9 @@ for c = 1 : length(cInds)
             plot(hivPrevC(: , 1) , hivPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         else
             hold all;
-            plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-            plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-            plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
         end
     end
     xlabel('Year'); ylabel('HIV prevalence'); title(cTitsPlot{c}); 
@@ -878,9 +878,9 @@ for i = 1 : 3
         plot(hivPrevF(: , 1) , hivPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivPrevF((2016-startYear)+1 : end , 1) , hivPrevF((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevF((2019-startYear)+1 : end , 1) , hivPrevF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV prevalence'); title('Females, aged 15-79'); 
@@ -902,9 +902,9 @@ for i = 1 : 3
         plot(hivPrevM(: , 1) , hivPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivPrevM((2016-startYear)+1 : end , 1) , hivPrevM((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevM((2019-startYear)+1 : end , 1) , hivPrevM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV prevalence'); title('Males, aged 15-79'); 
@@ -926,9 +926,9 @@ for i = 1 : 3
         plot(hivPrevC(: , 1) , hivPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivPrevC((2016-startYear)+1 : end , 1) , hivPrevC((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivPrevC((2019-startYear)+1 : end , 1) , hivPrevC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('HIV prevalence'); title('Females + Males, aged 15-79'); 
@@ -954,12 +954,12 @@ for i = 1 : 3
         plot(artPrevF(: , 1) , artPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(artPrevF((2016-startYear)+1 : end , 1) , artPrevF((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(artPrevF((2016-startYear)+1 : end , 1) , artPrevF((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(artPrevF((2016-startYear)+1 : end , 1) , artPrevF((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevF((2019-startYear)+1 : end , 1) , artPrevF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(artPrevF((2019-startYear)+1 : end , 1) , artPrevF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevF((2019-startYear)+1 : end , 1) , artPrevF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
-xlabel('Year'); ylabel('Proportion WLWHIV on ART'); title('WLWHIV on ART, ages 15-79');
+xlabel('Year'); ylabel('Proportion WLWHIV VS on ART'); title('WLWHIV on ART, ages 15-79');
 xlim([2000 2060]); ylim([0.0 1.0]);
 legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
     'Scenario 3, mean' , 'min' , 'max' , 'Location' , 'SouthEast');
@@ -978,12 +978,12 @@ for i = 1 : 3
         plot(artPrevM(: , 1) , artPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(artPrevM((2016-startYear)+1 : end , 1) , artPrevM((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(artPrevM((2016-startYear)+1 : end , 1) , artPrevM((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(artPrevM((2016-startYear)+1 : end , 1) , artPrevM((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevM((2019-startYear)+1 : end , 1) , artPrevM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(artPrevM((2019-startYear)+1 : end , 1) , artPrevM((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevM((2019-startYear)+1 : end , 1) , artPrevM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
-xlabel('Year'); ylabel('Proportion MLWHIV on ART'); title('MLWHIV on ART, ages 15-79');
+xlabel('Year'); ylabel('Proportion MLWHIV VS on ART'); title('MLWHIV on ART, ages 15-79');
 xlim([2000 2060]); ylim([0.0 1.0]);
 legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
     'Scenario 3, mean' , 'min' , 'max' , 'Location' , 'SouthEast');
@@ -1002,36 +1002,44 @@ for i = 1 : 3
         plot(artPrevC(: , 1) , artPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(artPrevC((2016-startYear)+1 : end , 1) , artPrevC((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(artPrevC((2016-startYear)+1 : end , 1) , artPrevC((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(artPrevC((2016-startYear)+1 : end , 1) , artPrevC((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevC((2019-startYear)+1 : end , 1) , artPrevC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(artPrevC((2019-startYear)+1 : end , 1) , artPrevC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(artPrevC((2019-startYear)+1 : end , 1) , artPrevC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
-xlabel('Year'); ylabel('Proportion PLWHIV on ART'); title('PLWHIV on ART, ages 15-79');
+xlabel('Year'); ylabel('Proportion PLWHIV VS on ART'); title('PLWHIV on ART, ages 15-79');
 xlim([2000 2060]); ylim([0.0 1.0]);
 legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
     'Scenario 3, mean' , 'min' , 'max' , 'Location' , 'SouthEast');
 grid on;
-sgtitle('ART Coverage');
+sgtitle('Coverage of PLWHIV on ART and virally suppressed');
 
 %% Plot CD4 distribution at ART initiation
 cInds = {3 : 5 , 6 , 7};
-cTits = {'CD4 350plus' , 'CD4 200-350' , 'CD4 below200'};
+cTits = {'CD4_350plus' , 'CD4_200-350' , 'CD4_below200'};
+cTitsPlot = {'CD4 350plus' , 'CD4 200-350' , 'CD4 below200'};
 
 % female
 figure;
 for c = 1 : length(cInds)
-    subplot(2 , 3 , c);
+    subplot(1 , 3 , c);
     for i = 1 : 3
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
             'CD4_dist_initART_females_aged15-79_' , cTits{c} , '.csv'];
         cd4DistF = xlsread(fname);
-        hold all;
-        plot(artPrevF(: , 1) , artPrevF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
-            artPrevF(: , 1) , artPrevF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
-            artPrevF(: , 1) , artPrevF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        if i == 1
+            hold all;
+            plot(cd4DistF(: , 1) , cd4DistF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistF(: , 1) , cd4DistF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i})'
+            plot(cd4DistF(: , 1) , cd4DistF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        else
+            hold all;
+            plot(cd4DistF((2019-startYear)+1 : end , 1) , cd4DistF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistF((2019-startYear)+1 : end , 1) , cd4DistF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(cd4DistF((2019-startYear)+1 : end , 1) , cd4DistF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        end
     end
-    xlabel('Year'); ylabel('Proportion of females initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlabel('Year'); ylabel('Proportion of females initiating ART'); title(['Proportion CD4: ' , cTitsPlot{c}]);
     xlim([1980 2060]); ylim([0.0 1.0]);
     legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
         'Scenario 3, mean' , 'min' , 'max');
@@ -1042,17 +1050,24 @@ sgtitle('Females, aged 15-79');
 % male 
 figure;
 for c = 1 : length(cInds)
-    subplot(2 , 3 , c);
+    subplot(1 , 3 , c);
     for i = 1 : 3
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
             'CD4_dist_initART_males_aged15-79_' , cTits{c} , '.csv'];
         cd4DistM = xlsread(fname);
-        hold all;
-        plot(artPrevM(: , 1) , artPrevM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
-            artPrevM(: , 1) , artPrevM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
-            artPrevM(: , 1) , artPrevM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        if i == 1 
+            hold all;
+            plot(cd4DistM(: , 1) , cd4DistM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistM(: , 1) , cd4DistM(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(cd4DistM(: , 1) , cd4DistM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        else
+            hold all;
+            plot(cd4DistM((2019-startYear)+1 : end , 1) , cd4DistM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistM((2019-startYear)+1 : end , 1) , cd4DistM((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(cd4DistM((2019-startYear)+1 : end , 1) , cd4DistM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        end
     end
-    xlabel('Year'); ylabel('Proportion of males initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlabel('Year'); ylabel('Proportion of males initiating ART'); title(['Proportion CD4: ' , cTitsPlot{c}]);
     xlim([1980 2060]); ylim([0.0 1.0]);
     legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
         'Scenario 3, mean' , 'min' , 'max');
@@ -1063,17 +1078,24 @@ sgtitle('Males, aged 15-79');
 % combined 
 figure;
 for c = 1 : length(cInds)
-    subplot(2 , 3 , c);
+    subplot(1 , 3 , c);
     for i = 1 : 3
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '11_1' , '\' , ...
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
             'CD4_dist_initART_combined_aged15-79_' , cTits{c} , '.csv'];
         cd4DistC = xlsread(fname);
-        hold all;
-        plot(artPrevC(: , 1) , artPrevC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , ...
-            artPrevC(: , 1) , artPrevC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i} , ...
-            artPrevC(: , 1) , artPrevC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        if i == 1
+            hold all;
+            plot(cd4DistC(: , 1) , cd4DistC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistC(: , 1) , cd4DistC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(cd4DistC(: , 1) , cd4DistC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        else
+            hold all;
+            plot(cd4DistC((2019-startYear)+1 : end , 1) , cd4DistC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+            plot(cd4DistC((2019-startYear)+1 : end , 1) , cd4DistC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+            plot(cd4DistC((2019-startYear)+1 : end , 1) , cd4DistC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        end
     end
-    xlabel('Year'); ylabel('Proportion of persons initiating ART'); title(['Proportion CD4: ' , cTits{c}]);
+    xlabel('Year'); ylabel('Proportion of persons initiating ART'); title(['Proportion CD4: ' , cTitsPlot{c}]);
     xlim([1980 2060]); ylim([0.0 1.0]);
     legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
         'Scenario 3, mean' , 'min' , 'max');
@@ -1097,9 +1119,9 @@ for i = 1 : 3
         plot(hivMortF(: , 1) , hivMortF(: , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivMortF((2016-startYear)+1 : end , 1) , hivMortF((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivMortF((2016-startYear)+1 : end , 1) , hivMortF((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivMortF((2016-startYear)+1 : end , 1) , hivMortF((2016-startYear)+1 : end , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
+        plot(hivMortF((2019-startYear)+1 : end , 1) , hivMortF((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivMortF((2019-startYear)+1 : end , 1) , hivMortF((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivMortF((2019-startYear)+1 : end , 1) , hivMortF((2019-startYear)+1 : end , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('Mortality per 100K'); title('Females, aged 15-79');
@@ -1121,9 +1143,9 @@ for i = 1 : 3
         plot(hivMortM(: , 1) , hivMortM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivMortM((2016-startYear)+1 : end , 1) , hivMortM((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivMortM((2016-startYear)+1 : end , 1) , hivMortM((2016-startYear)+1 : end , 3) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
-        plot(hivMortM((2016-startYear)+1 : end , 1) , hivMortM((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivMortM((2019-startYear)+1 : end , 1) , hivMortM((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivMortM((2019-startYear)+1 : end , 1) , hivMortM((2019-startYear)+1 : end , 3) , 'LineStyle' ,  '--' , 'Color' , colorList{i});
+        plot(hivMortM((2019-startYear)+1 : end , 1) , hivMortM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('Mortality per 100K'); title('Males, aged 15-79');
@@ -1145,9 +1167,9 @@ for i = 1 : 3
         plot(hivMortC(: , 1) , hivMortC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     else
         hold all;
-        plot(hivMortC((2016-startYear)+1 : end , 1) , hivMortC((2016-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
-        plot(hivMortC((2016-startYear)+1 : end , 1) , hivMortC((2016-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
-        plot(hivMortC((2016-startYear)+1 : end , 1) , hivMortC((2016-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivMortC((2019-startYear)+1 : end , 1) , hivMortC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(hivMortC((2019-startYear)+1 : end , 1) , hivMortC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(hivMortC((2019-startYear)+1 : end , 1) , hivMortC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
 xlabel('Year'); ylabel('Mortality per 100K'); title('Females + Males, aged 15-79');
