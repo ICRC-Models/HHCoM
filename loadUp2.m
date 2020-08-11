@@ -992,7 +992,7 @@ load([paramDir , 'calibData'], 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dO
     'cinPos2015_dObs' , 'cinNeg2015_dObs' , 'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , ...
     'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , 'hivPrevM_dObs' , 'hivPrevF_dObs' , ...
     'popAgeDist_dObs' , 'totPopSize_dObs');
-
+ccInc2012_dObs(4:end , 3) = ccInc2012_dObs(4:end , 3) .* 0.5;
 
 
 
