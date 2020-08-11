@@ -1045,7 +1045,7 @@ for c = 1 : length(cInds)
         'Scenario 3, mean' , 'min' , 'max');
     grid on;
 end
-sgtitle('Females, aged 15-79');
+sgtitle('Proportion of persons initiating ART: Females, aged 15-79');
    
 % male 
 figure;
@@ -1073,7 +1073,7 @@ for c = 1 : length(cInds)
         'Scenario 3, mean' , 'min' , 'max');
     grid on;
 end
-sgtitle('Males, aged 15-79');
+sgtitle('Proportion of persons initiating ART: Males, aged 15-79');
    
 % combined 
 figure;
@@ -1101,7 +1101,7 @@ for c = 1 : length(cInds)
         'Scenario 3, mean' , 'min' , 'max');
     grid on;
 end
-sgtitle('Females + Males, aged 15-79');
+sgtitle('Proportion of persons initiating ART: Females + Males, aged 15-79');
 
 %% Plot HIV mortality
 figure;
