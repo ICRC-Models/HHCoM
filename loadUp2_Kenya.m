@@ -924,7 +924,7 @@ ccInc2012_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H10:I22');
 
 cc_dist_dObs = zeros(2, 3);
 cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E2:E3'); % CC type distribution for 9v and non-9v HPV types
-cc_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H2: I3');
+cc_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H2:I3');
 
 cin3_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E8:E9'); % CIN3 type distribution for 9v and non-9v HPV types
 cin3_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H8:I9');
