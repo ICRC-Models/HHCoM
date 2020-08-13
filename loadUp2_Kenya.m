@@ -1505,8 +1505,8 @@ d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYea
 d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0.1;
-d_riskAdj_vec = nonLinspace(0, riskAdj, ((1994 - 1990) .* stepsPerYear), 'cos');
+riskAdj = 0.05;
+d_riskAdj_vec = nonLinspace(0, riskAdj, ((1994 - 1990) .* stepsPerYear), 'log10');
 d_riskAdj = [d_riskAdj_vec, flip(d_riskAdj_vec)];
 %d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 

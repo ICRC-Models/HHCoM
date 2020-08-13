@@ -103,9 +103,9 @@ dPop = zeros(size(pop));
 prosPop = pop + births + hivBirths + deaths;
 
 riskAdj = 0;
-if (year >= 1986) && (year < 1994)
-    yearInd = round((year - (1986 - (1/6))) * 6);
-    dt = (year - 1986) ;
+if (year >= 1982) && (year < 1990)
+    yearInd = round((year - (1982 - (1/6))) * 6);
+    dt = (year - 1982) ;
     riskAdj = d_riskAdj(yearInd) .* dt;
 end
 
