@@ -118,7 +118,7 @@ end
 % partnersMmult = [1.2 2 1.1 ];
 if (year >= 1988) && (year < 1994)
    yearInd = round((year - (1988 - (1/6))) * 6);
-   partnersMmult = d_riskAdj(yearInd) .* dt;
+   partnersMmult = d_partnersMmult(yearInd) .* dt;
 end
 
 partnersM(6:7, 1:3) = partnersM(6:7, 1:3) .* partnersMmult;
