@@ -7,9 +7,9 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 % profile clear;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
@@ -17,7 +17,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_N_increaseClearHIV_increasekCC_5_muART_final']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '3Jun20_80VaxCov_muART'; % ***SET ME***: name for simulation output file
+pathModifier = '12Jun20_80VaxCov_CU15-24'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -27,7 +27,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2070; % ***SET ME***: end year of simulation run
+lastYear = 2071; % ***SET ME***: end year of simulation run
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -37,7 +37,7 @@ whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; %[26 , 29 , 32 , 35 , 38 , 41 ,
 whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 
 % VACCINATION
-vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
+vaxEff = 0.95;    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -53,7 +53,7 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 % Parameters for catch-up vaccination regimen
 vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 : 6]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxAgeCU = [4 : 5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
 vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.80]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
@@ -356,7 +356,7 @@ parfor n = 1 : nTests
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
-        year = currYear + s(i) - 1;
+        year = currYear + s(i) - 1
         tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
         popIn = popVec(i - 1 , :);
         
@@ -448,11 +448,13 @@ parfor n = 1 : nTests
         % Birth, aging, risk redistribution module
         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , ...
-            gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4, hivFertPosBirth ,...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , hivFertPosBirth3 , ...
-        hivFertNegBirth3, hivFertPosBirth4, hivFertNegBirth4, dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , ...
-        dFertNeg2 , dFertMat2 , dFertPos3, dFertNeg3, dFertMat3, deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-        dDeathMat , dDeathMat2 , dDeathMat3 , ...
+            gender , age , fivYrAgeGrpsOn , fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
+            hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+            fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
+            dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
+            dFertPos3 , dFertNeg3  , dFertMat3,  ...
+            deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+            dDeathMat , dDeathMat2 , dDeathMat3, ...
             MTCTRate , ageInd , riskAdj, d_riskAdj , riskInd , riskDist , ...
             stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
             vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);

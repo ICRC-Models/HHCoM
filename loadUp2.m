@@ -132,11 +132,11 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.5];
+    fertDeclineProp = [0.7 ; 0.5; 0.6];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.20;
+fertility4 = fertility3 .* fertDeclineProp(3,1);
 
 
 partnersMmult = [1.2 2.45 1.4];
@@ -463,8 +463,8 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) .* 1.4;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 3.4; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) .* 1.3;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 3.3; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -679,7 +679,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0080; %original value 0.005
+    perPartnerHpv_vax = 0.00780; %original value 0.005
 end
 
 if calibBool && any(11 == pIdx)
@@ -787,9 +787,9 @@ if calibBool && any(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
-        condUse = 0.5 * 0.5;
+        condUse = 0.05; % * 0.5;
     else
-        condUse = 0.15; %changed from 20%
+        condUse = 0.05; %changed from 20%
     end
 end
 

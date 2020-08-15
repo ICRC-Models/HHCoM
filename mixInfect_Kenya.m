@@ -128,8 +128,8 @@ elseif (year >= 2000) && (year < 2005)
     partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2, yearInd) .* dt;
     partnersMmult(3) = 0.65;
 elseif year >= 2005
-    partnersMmult(1) = 1.1;
-    partnersMmult(2) = 1.8;
+    partnersMmult(1) = 1.0;
+    partnersMmult(2) = 1.4;
     partnersMmult(3) = 0.8;
 end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);

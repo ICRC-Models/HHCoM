@@ -44,7 +44,7 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(d - 3) * 1.05; % CIN1 -> CIN2 progression multiplier
         c1c2Mult = hpv_hivClear(d - 3)  *1.55; % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1; %hpv_hivClear(d - 3);%hpvClearMult(d - 2); % Regression multiplier, compounds c1c2Mult
-        c2c3Mult = hpv_hivClear(d - 3) * 1.7; % CIN3 -> CIN2 regression multiplier
+        c2c3Mult = hpv_hivClear(d - 3) * 1.3; % CIN3 -> CIN2 regression multiplier
         deathCC = muCC(d - 3 , :); % HIV-positive CC-associated mortality     
     % Multipliers for HIV-positives on ART equivalent to those for CD4>500; ...
     % set CC-associated mortality equivalent to CD4>500
@@ -55,7 +55,7 @@ for d = 1 : disease
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 progression multiplier
         c1c2Mult = hpv_hivClear(1) * 1.45; % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1; %hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier, compounds c1c2Mult
-        c2c3Mult = hpv_hivClear(1) * 1.55 ; % CIN3 -> CIN2 regression multiplier
+        c2c3Mult = hpv_hivClear(1) * 1.2 ; % CIN3 -> CIN2 regression multiplier
         deathCC = muCC(5 , :); % HIV-positive on ART CC-associated mortality
     end
     
