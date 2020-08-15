@@ -923,7 +923,7 @@ ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidenc
 ccInc2012_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H10:I22');
 cc_dist_dObs = zeros(2, 3);
 cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E2:E3'); % CC type distribution for 9v and non-9v HPV types
-cc_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H2: I3');
+cc_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H2:I3');
 
 cin3_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E8:E9'); % CIN3 type distribution for 9v and non-9v HPV types
 cin3_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H8:I9');
@@ -1497,12 +1497,13 @@ dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2070 - 2020) * stepsPerYe
 dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
-d_partnersMmult = ones(2, 5);
-d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2004 - 1994) * stepsPerYear);
-d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
-d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
-
-d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
+%d_partnersMmult = ones(2, 5);
+d_partnersMmultVec = nonLinspace(0, 1.8, ((1993 - 1990) .* stepsPerYear), 'log10');
+d_partnersMmult = [d_partnersMmultVec, flip(d_partnersMmultVec)];
+% d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
+% d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
+% 
+% d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
 riskAdj = 0.05;

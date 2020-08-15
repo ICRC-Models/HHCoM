@@ -1628,7 +1628,7 @@ plot(globocan_EA(: ,1) , globocan_EA(: ,2), 'o', ...
 hold all
 xlabel('Time'); ylabel('Incidence per 100,000');
 title('Cervical Cancer Incidence ');
-xlim([1980 2020]);
+xlim([1970 2020]);
 legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...
     'Location', 'NorthWest')
 
