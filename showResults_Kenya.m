@@ -279,8 +279,8 @@ hold on
 % errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
 legend('Model' , 'Kenya (Spectrum)')
-xlim([1980 2020])
-ylim([0, 50])
+xlim([1972 2020])
+ylim([0, 20])
 %%
 sheet = ['HIV_prev'];
 cols1 = {toNowName};
@@ -840,7 +840,7 @@ for g = 1 : gender
     plot(tVec , hivNegHPV)
     plot(tVec , hivPosHPV)
     plot(tVec , artHPV)
-     xlim([1975 2020])
+     xlim([1925 2020])
     ylim([0 80])
     xlabel('Year'); ylabel('Prevalence (%)'); title(['Kenya ', genders{g} , ' HPV Prevalence (ages 15+)'])
     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Location' , 'NorthWest')
@@ -890,10 +890,10 @@ for a = 4 : 12
         ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
     
     % HIV-
-    hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
+    hpvInds = unique([toInd(allcomb(1 : 2 , 1  , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 , ...
         [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+    ageInds = toInd(allcomb(1 : 2 , 1  , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
     hpvNeg2005(a - 3 , 1) = sum(popVec((yr - startYear) * stepsPerYear , hpvInds))...
         ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
@@ -1135,8 +1135,8 @@ end
 
 figure()
 cinGroup = {'CIN 1' , 'CIN 2' , 'CIN 3'};
-plot(1 : length(cinHiv2010) , cinHiv2010 , 'o-' , 1 : length(cinHiv2010), cinHivNeg2010, 'o-' ,...
-    1 : length(cinHiv2010), cinART2010, '--', 1 : length(cinHiv2010), cinNoART2010, '--*')
+plot(1 : length(cinHiv2010) , cinHiv2010 , '-' , 1 : length(cinHiv2010), cinHivNeg2010, '-' ,...
+    1 : length(cinHiv2010), cinART2010, '--', 1 : length(cinHiv2010), cinNoART2010, '--')
 hold on
 p = plot(1: length(cinGroup) , cinHiv_ccScreen , '+',  1: length(cinGroup),cinHiv_ccScreen2, '+',...
     1 : length(cinGroup), cinHIV_FSW, 'g+', 1 : length(cinGroup), cinNeg_FSW, 'go',...
@@ -1497,7 +1497,7 @@ for y = 1
         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
     hold on
     % Plot observed data
-     plot(4 : age ,  ken_canreg(:, 2)  , 'r--' , 4 : age ,  ken_canreg(:, 3), '--' );
+     plot(4 : age ,  ken_canreg(:, 2)  , '--' , 4 : age ,  ken_canreg(:, 3), '--' );
     xlabel('Year'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence by age in ' num2str(ccIncYear)]);
@@ -1514,11 +1514,11 @@ for y = 2
         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
     hold on
     % Plot observed data
-     plot(4 : age ,  ken_canreg(:, 2)  , 'r--' , 4 : age ,  ken_canreg(:, 5), '--' );
+     plot(4 : age ,  ken_canreg(:, 2)  , '--' , 4 : age ,  ken_canreg(:, 4), '--', 4 : age ,  ken_canreg(:, 5), '--' );
     xlabel('Year'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence by age in ' num2str(ccIncYear)]);
-       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Eldoret 2012-2016' , 'Globocan 2012' )
+       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-2011' , 'Eldoret 2012-2016', 'Globocan 2012' )
 end
 
 %%
