@@ -206,10 +206,10 @@ if calibBool && any(8 == pIdx)
     maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
-    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.1 ;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.56;
-    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) .* 1.5;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 3.5; 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.5;
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk) .* 1.3;
 end
 
 % Female acts per partnership per year by age and risk group
@@ -226,10 +226,10 @@ if calibBool && any(9 == pIdx)
     femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
-    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.2 ;
-    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.56 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.5;
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 4.5;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2 ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.5 ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.3;
 end
 
 % Convert 5-year age groups to 1-year age groups

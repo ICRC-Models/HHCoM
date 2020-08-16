@@ -1247,8 +1247,6 @@ xlswrite(filename, ageGroup', sheet, 'O3')
 xlswrite(filename, [cin1Pos2000, cin3Pos2000], sheet, 'P3')
 % xlswrite(filename, [cin1Pos2000, cin3Pos2000, cinPosAct], sheet, 'H3')
 
-
-
 %% HPV type distribution by state over time (coinfections grouped as 9v-type HPV)
 % HPV infected
 hpvInds_vax = toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , ...
