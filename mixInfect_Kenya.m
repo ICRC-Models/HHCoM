@@ -122,7 +122,7 @@ if (year >= 1988) && (year < 1994)
 end
 
 partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
-partnersF(7:8, 1:3) = partnersF(7:8, 1:3) .* partnersMmult;
+partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
 
 % males
 c(1 , : , :) = partnersM;

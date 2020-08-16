@@ -92,10 +92,10 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue3 = zeros(age , gender);
+mue3 = zeros(age , gender) .* 2;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) ;
+mue3(1, :)= mue3(1 , :) .* 1.7 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
@@ -376,7 +376,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 1.54 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 1.99 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
