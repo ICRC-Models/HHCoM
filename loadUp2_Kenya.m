@@ -376,7 +376,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 1.99 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 1.75 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -817,10 +817,10 @@ vaxStartYear = 2014;
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
 vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
-            0.5 0.50 0.65 0.60 0.6 0.50; ... % 2003
-            0.60 0.60 0.75 0.70 0.60 0.50; ... %2008
-            0.70 0.75 0.80 0.75 0.70 0.60; ... %2014 
-            0.70 0.75 0.80 0.75 0.70 0.60];   % 2030 ideal: 90% [year x age group]
+            0.715 0.89 0.883 0.893 0.83 0.50; ... % 2003
+            0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
+            0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
+            0.90 0.90 0.90 0.90 0.90 0.90];   % 2030 ideal: 90% [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
@@ -831,6 +831,7 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
         vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
     end
 end
+
 %%
 % Vaccination
 waning = 0;    % bool to turn waning on or off
@@ -1498,7 +1499,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
 %d_partnersMmult = ones(2, 5);
-d_partnersMmultVec = nonLinspace(0, 1.8, ((1993 - 1990) .* stepsPerYear), 'log10');
+d_partnersMmultVec = nonLinspace(0, 1.5, ((1993 - 1990) .* stepsPerYear), 'log10');
 d_partnersMmult = [d_partnersMmultVec, flip(d_partnersMmultVec)];
 % d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
 % d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
