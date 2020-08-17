@@ -530,6 +530,44 @@ for j = 1 : nRuns
             (annlz(sum(sum(sum(newCC(incTimeSpan , 8 , a , :),2),3),4)) ./ ...
             (annlz(sum(popVec(incTimeSpan , allFart) , 2) ./ stepsPerYear)) * fac);
     end
+    
+    %% Cervical cancer incidence in 2018 by age vs. Globocan 2018 data and other sources (calibration)
+    incTimeSpan = [((2018 - startYear) * stepsPerYear +1) : ((2018 - startYear) * stepsPerYear +6)];
+    fac = 10 ^ 5;
+
+    for a = 1 : age
+        % General population
+        allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        % Calculate incidence
+        ccInc2018(j , a) = ...
+            (annlz(sum(sum(sum(newCC(incTimeSpan , : , a , :),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
+        
+        % HIV-negative
+        allFneg = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        % Calculate incidence
+        ccInc2018neg(j , a) = ...
+            (annlz(sum(sum(sum(newCC(incTimeSpan , 1 : 2 , a , :),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allFneg) , 2) ./ stepsPerYear)) * fac);
+        
+        % HIV-positive untreated
+        allFpos = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        % Calculate incidence
+        ccInc2018pos(j , a) = ...
+            (annlz(sum(sum(sum(newCC(incTimeSpan , 3 : 7 , a , :),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allFpos) , 2) ./ stepsPerYear)) * fac);
+        
+        % HIV-positive on ART
+        allFart = toInd(allcomb(8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        % Calculate incidence
+        ccInc2018art(j , a) = ...
+            (annlz(sum(sum(sum(newCC(incTimeSpan , 8 , a , :),2),3),4)) ./ ...
+            (annlz(sum(popVec(incTimeSpan , allFart) , 2) ./ stepsPerYear)) * fac);
+    end
    
     %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
     
@@ -1400,6 +1438,64 @@ ylim([0 300]);
 title(['Cervical Cancer Incidence in 2012']);
 legend('Combined SA: upper bound' , 'Combined SA: lower bound' , ...
     '(Globocan, 2012) Observed SA: mean, 2SD' , 'Model, general: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+    'Model, HIV-negative: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+    'Model, WLWHIV untreated: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+    'Model, WLWHIV on ART: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
+grid on;
+
+%% Cervical cancer incidence in 2018 by age vs. Globocan 2018 data and other sources (calibration)
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+    '60-64' , '65-69' , '70-74' , '75-79'};
+
+globocan = [3.91
+19.72
+35.82
+53.75
+71.18
+85.09
+95.44
+96.10
+94.85
+97.49
+101.99
+110.43];
+
+% Calibration error bars
+meanObs = globocan;
+sdevObs = (globocan.^(1/2)).*2;
+
+figure;    
+% Plot observed data
+errorbar(4 : age-1 , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+hold on;
+%boxplot(ccInc2018 , 'Color' , 'k' , 'Whisker' , 5);
+% General
+plot(1 : age , mean(ccInc2018,1)' , 'k-' , ...
+    1 : age , min(ccInc2018,[],1)' , 'k--' , ...
+    1 : age , max(ccInc2018,[],1)' , 'k--' , 'LineWidth' , 1.5);
+hold all;
+% HIV-negative
+plot(1 : age , mean(ccInc2018neg,1)' , 'g-' , ...
+    1 : age , min(ccInc2018neg,[],1)' , 'g--' , ...
+    1 : age , max(ccInc2018neg,[],1)' , 'g--' , 'LineWidth' , 1.5);
+hold all;
+% HIV-positive untreated
+plot(1 : age , mean(ccInc2018pos,1)' , 'm-' , ...
+    1 : age , min(ccInc2018pos,[],1)' , 'm--' , ...
+    1 : age , max(ccInc2018pos,[],1)' , 'm--' , 'LineWidth' , 1.5);
+hold all;
+% HIV-positive on ART
+plot(1 : age , mean(ccInc2018art,1)' , 'c-' , ...
+    1 : age , min(ccInc2018art,[],1)' , 'c--' , ...
+    1 : age , max(ccInc2018art,[],1)' , 'c--' , 'LineWidth' , 1.5);
+hold all;
+xlabel('Age Group'); ylabel('Cervical cancer incidence per 100K');
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+ylim([0 300]);
+title(['Cervical Cancer Incidence in 2018']);
+legend('(Globocan, 2018) Observed SA: mean, 2SD' , 'Model, general: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
     'Model, HIV-negative: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
     'Model, WLWHIV untreated: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
     'Model, WLWHIV on ART: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
