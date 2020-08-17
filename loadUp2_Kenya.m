@@ -1499,7 +1499,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
 %d_partnersMmult = ones(2, 5);
-d_partnersMmultVec = nonLinspace(0, 1.5, ((1993 - 1990) .* stepsPerYear), 'log10');
+d_partnersMmultVec = nonLinspace(1, 1.5, ((1993 - 1990) .* stepsPerYear), 'log10');
 d_partnersMmult = [d_partnersMmultVec, flip(d_partnersMmultVec)];
 % d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
 % d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
