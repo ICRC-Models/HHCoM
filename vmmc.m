@@ -27,10 +27,10 @@ elseif year >= 2008 && year < 2010
 elseif year >= 2010 && year < 2012
     ind = (round(vmmcYr_vec{4} , 4) == round(year , 4));
     periodInd = 4;
-elseif year >= 2012 && year < 2017
+elseif year >= 2012 && year < 2020
     ind = (round(vmmcYr_vec{5} , 4) == round(year , 4));
     periodInd = 5;
-elseif year >= 2017 && year < 2030
+elseif year >= 2020 && year < 2030
     ind = (round(vmmcYr_vec{6} , 4) == round(year , 4));
     periodInd = 6;
 elseif year >= 2030

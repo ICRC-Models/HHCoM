@@ -790,7 +790,7 @@ minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2020 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(1:end-1,3) ; 0.3978 ; 0.3978] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult; % population-level ART coverage in females
+maxRateF = [artVScov(1:end-1,2) ; 0.6223 ; 0.6223] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -805,15 +805,15 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
 end
 
 % VMMC coverage
-vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2017; 2030];
+vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2020; 2030];
 circ_aVec = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960
             0.10 0.13 0.0 0.0; ... % 2000
             0.114 0.161 0.0 0.0; ... % 2008
             0.143 0.201 0.14 0.12; ... % 2010
             0.172 0.242 0.191 0.143; ... % 2012
-            0.459 0.42 0.318  0.204; ... % 2017 
-            0.459  0.42 0.318   0.204];   % 2030 [year x age group]
+            0.631 0.527 0.394 0.241; ... % 2020 
+            0.631 0.527 0.394 0.241];   % 2030 [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
