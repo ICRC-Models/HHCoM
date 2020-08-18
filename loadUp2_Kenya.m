@@ -95,7 +95,7 @@ mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue3 = zeros(age , gender) .* 2;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) .* 1.7 ;
+mue3(1, :)= mue3(1 , :) .* 2 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
@@ -790,7 +790,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % ART coverage
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
+maxLim = ((1-(0.70/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
 maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
