@@ -380,7 +380,7 @@ hiv_hpvMult = 1.75 ; %multiplier from Houlihan et al - combined estimate 1.99, 9
 %% Import HPV/CIN/CC transition data from Excel
 file = [pwd , '/Config/HPV_parameters.xlsx'];
 
-ageTrends = xlsread(file , 'CIN transitions by type' , 'C45 : J55');
+ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
 % 
 % kCin1_Inf_orig = zeros(1,2);
 % kCin2_Cin1_orig = zeros(1,2);
