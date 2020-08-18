@@ -378,9 +378,9 @@ end
 
 hiv_hpvMult = 1.75 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
-file = [pwd , '/Config/HPV_parameters.xlsx'];
-
-ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
+% file = [pwd , '/Config/HPV_parameters.xlsx'];
+% 
+% ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
 % 
 % kCin1_Inf_orig = zeros(1,2);
 % kCin2_Cin1_orig = zeros(1,2);
@@ -414,7 +414,10 @@ ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
 % Set transitions in first age group from pre-saved or calibrated values
 load([paramDir , 'hpvCinCCTransFrmExcel'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
-    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
+    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig'); % , 'ageTrends');
+
+file = [pwd , '/Config/HPV_parameters.xlsx'];
+ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
 
 kCin1_Inf = zeros(16,2);  %(:, 1) 9vHPV, (:, 2) non-9vHPV
 kCin2_Cin1 = zeros(16,2);
@@ -565,7 +568,7 @@ end
 % kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
 % kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
-
+%%
 for a = 1 : length(ageTrends)
     % Apply age trends to 9v HPV transitions
     kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1); % ages 25-49
