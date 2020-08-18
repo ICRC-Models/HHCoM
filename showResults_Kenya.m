@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_21Jul_RR_1-5_HIVtrans-00075']
+toNowName = ['toNow_RR_1-75_HIVtrans-00075']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -157,7 +157,6 @@ legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
     '0-9 obs', '10-19 obs', '20-29 obs', '30-39 obs', '40-49 obs', ...
     '50-59 obs', '60-79 obs', 'Location', 'NorthEastOutside');
 %%
-
 figure()
 plot(years , popNumYrs);
 newcolors = {'#F00','#F80','#FF0','#0B0','#00F','#50F','#A0F'};
@@ -185,7 +184,6 @@ xlswrite(filename, cols2, sheet, 'A13')
 xlswrite(filename, cols2, sheet, 'J13')
 xlswrite(filename, [years(1: 5 : end)', popPropYrs(1 : 5 : end, :)], sheet, 'A14')
 xlswrite(filename,[years(1: 5 : end)', popNumYrs(1 : 5 : end, :)], sheet, 'J14')
-
 
 %% Fertility
 % Load validation data from Excel (years, values)
@@ -1082,7 +1080,7 @@ ylim([0 100]);
 
 
 %%  CIN Prevalence by HIV stat among women
-yr = 2020;
+yr = 2015;
 year = {yr};
 cinHiv_ccScreen = [0.18	0.105 0.089] .* 100; % Observed, HIV+, Nairobi, Memiah, 2013
 cinHiv_ccScreen2 = [33.1 10.5 12.8]; %Observed, HIV clinic, De Vuyst 2013
@@ -1172,7 +1170,7 @@ cin3Pos2000 = cin1Pos2000;
 ageGroup = {'17-19' , '20-24' , '25-29' ,...
     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
     '60-64' , '65-69' , '70-74' , '75-79'};
-year = 2000;
+year = 2003;
 %aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
 for a = 4 : 13  %note, age group 4 is 17-19 in the data
     %a = aVec{aInd};
@@ -1499,7 +1497,8 @@ for y = 1
     xlabel('Year'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence by age in ' num2str(ccIncYear)]);
-       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-11' , 'Eldoret 2008-11' )
+       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-11' , 'Eldoret 2008-11', ...
+           'Location', 'Northwest')
 end
 
 for y = 2 
@@ -1516,7 +1515,8 @@ for y = 2
     xlabel('Year'); ylabel('Incidence per 100,000');
     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
     title(['Cervical Cancer Incidence by age in ' num2str(ccIncYear)]);
-       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-2011' , 'Eldoret 2012-2016', 'Globocan 2012' )
+       legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Nairobi 2007-2011' , 'Eldoret 2012-2016', 'Globocan 2012', ...
+            'Location', 'Northwest')
 end
 
 %%
@@ -1772,9 +1772,7 @@ riskgroup = {'low ', 'medium ', 'high'};
 figure()
 for r = 1 : risk
         hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens, 2 , 4:16 , r)); ...
-            toInd(allcomb(7 : 9 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens, 2 , 4:16 , r))];
+            1 : endpoints , 1 : intervens, 2 , 4:16 , r))]; 
         hivSus = annlz(sum(popVec(1:end-1 , hivSusInds) , 2)) ./ stepsPerYear;
          plot(tVec(1 : stepsPerYear : end-1) , ...
               annlz(sum(sum(sum(sum(sum(newHiv(1:end-1 , : , : , : , 2 , 4:16 , r), 2), 3), 4), 6), 7)) ./ hivSus * 100)
@@ -1836,7 +1834,7 @@ for r = 1 : risk
 end
 legend('HIV- Low' , 'HIV+ Low',  'HIV- Medium', 'HIV+ Medium', 'HIV- high', 'HIV+ high')
 %ylim([0 50])
-xlabel('Year'); ylabel('Rate Per 100'); title('HPV Incidence by risk group and HIV status')
+xlabel('Year'); ylabel('Rate Per 100'); title('HPV Incidence by risk group and HIV status ')
 
 
 %% HIV+ HPV incidence no ART by gender

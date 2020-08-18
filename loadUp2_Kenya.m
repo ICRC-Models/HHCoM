@@ -92,7 +92,7 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue3 = zeros(age , gender) .* 2;
+mue3 = zeros(age , gender) .* 2.2;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
 mue3(1, :)= mue3(1 , :) .* 2 ;
@@ -124,7 +124,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.38; 0.2];
+    fertDeclineProp = [0.75 ; 0.37; 0.2];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -378,9 +378,9 @@ end
 
 hiv_hpvMult = 1.75 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
-% file = [pwd , '/Config/HPV_parameters.xlsx'];
-% 
-% ageTrends = xlsread(file , 'CIN transitions by type' , 'C38 : J40');
+file = [pwd , '/Config/HPV_parameters.xlsx'];
+
+ageTrends = xlsread(file , 'CIN transitions by type' , 'C45 : J55');
 % 
 % kCin1_Inf_orig = zeros(1,2);
 % kCin2_Cin1_orig = zeros(1,2);
@@ -513,79 +513,81 @@ else
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.4;
 end
 
-% Apply age trends to 9v HPV transitions
-kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %include 20-24
-kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4) * .8;
-rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5) ;
-kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4) * .9 ;
-rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5) ;
-kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
+% % Apply age trends to 9v HPV transitions
+% kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
+% kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
+% kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
+% kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
+% rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %include 20-24
+% kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
+% kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
+% kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
+% kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
+% kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
+% kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
+% kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4) * .8;
+% rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5) ;
+% kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
+% kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
+% kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
+% kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
+% kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
+% kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
+% kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4) * .9 ;
+% rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5) ;
+% kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
+% kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
+% kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
+% 
+% % Apply age trends to non-9v HPV transitions
+% kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
+% kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
+% kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
+% kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
+% rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
+% kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
+% kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
+% kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
+% kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
+% kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
+% kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
+% kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4) * .8 ;
+% rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
+% kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
+% kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
+% kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
+% kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
+% kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
+% kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
+% kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4) * .9 ;
+% rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5) ;
+% kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
+% kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
+% kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
-% Apply age trends to non-9v HPV transitions
-kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
-kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4) * .8 ;
-rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
-kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4) * .9 ;
-rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5) ;
-kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
-% % if calibBool && any(25 == pIdx) % CJB note: old code
-% %     idx = find(25 == pIdx);
-% %     kProgrsMult = paramSet(paramsSub{idx}.inds(:));
-% % else
-% %     kProgrsMult = 1.0;
-% % end
-% % 
-% % if calibBool && any(26 == pIdx)
-% %     idx = find(26 == pIdx);
-% %     kRegrsMult = paramSet(paramsSub{idx}.inds(:));
-% % else
-% %     kRegrsMult = 1.0;
-% % end
-% % kCin1_Inf = [kCin1_Inf , kCin1_Inf .* kProgrsMult];
-% % kCin2_Cin1 = [kCin2_Cin1 , kCin2_Cin1 .* kProgrsMult];
-% % kCin3_Cin2 = [kCin3_Cin2 , kCin3_Cin2 .* kProgrsMult];
-% % kCC_Cin3 = [kCC_Cin3 , kCC_Cin3 .* kProgrsMult];
-% % rNormal_Inf = [rNormal_Inf , rNormal_Inf .* kRegrsMult];
-% % kInf_Cin1 = [kInf_Cin1 , kInf_Cin1 .* kRegrsMult];
-% % kCin1_Cin2 = [kCin1_Cin2 , kCin1_Cin2 .* kRegrsMult];
-% % kCin2_Cin3 = [kCin2_Cin3 , kCin2_Cin3 .* kRegrsMult];
+for a = 1 : length(ageTrends)
+    % Apply age trends to 9v HPV transitions
+    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1); % ages 25-49
+    kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2);
+    kCin3_Cin2(a + 5 , 1) = kCin3_Cin2(1, 1) * ageTrends(a,3);
+    kCC_Cin3(a + 5 , 1) = kCC_Cin3(1 , 1) * ageTrends(a,4);
+    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) ; %include 20-24
+    kInf_Cin1(a + 5 , 1) = kInf_Cin1(1 , 1) * ageTrends(a,6);
+    kCin1_Cin2(a + 5 , 1) = kCin1_Cin2(1 , 1) * ageTrends(a,7);
+    kCin2_Cin3(a + 5 , 1) = kCin2_Cin3(1 , 1) * ageTrends(a,8);
+    
+    % Apply age trends to non-9v HPV transitions 
+    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1); % ages 25-49
+    kCin2_Cin1(a + 5 , 2) = kCin2_Cin1(1 , 2) * ageTrends(a,2);
+    kCin3_Cin2(a + 5 , 2) = kCin3_Cin2(1, 2) * ageTrends(a,3); 
+    kCC_Cin3(a + 5, 2) = kCC_Cin3(1 , 2) * ageTrends(a,4);
+    rNormal_Inf(a + 5 , 2) = rNormal_Inf(1 , 2) * ageTrends(a,5) ;
+    kInf_Cin1(a + 5 , 2) = kInf_Cin1(1 , 2) * ageTrends(a,6);
+    kCin1_Cin2(a + 5 , 2) = kCin1_Cin2(1 , 2) * ageTrends(a,7);
+    kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8);
+end
+
 
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
@@ -790,7 +792,7 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 % ART coverage
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.70/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
 maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
 maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
