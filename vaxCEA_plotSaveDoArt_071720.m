@@ -83,11 +83,11 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 
 for j = 1 : nRuns
     % Load results
-    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ART_DoART';
+    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_DoART';
     baseFileName = [baseFileNameShort , '_S1_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ART_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
