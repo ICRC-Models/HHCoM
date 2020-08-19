@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_1-75_HIVtrans-00075']
+toNowName = ['toNow_RR_1-75_HIVtrans-00075_hpvProgAge ']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -326,7 +326,8 @@ xlabel('Year')
 xlim([1980 2020])
 ylabel('Prevalence')
 title('HIV Prevalence (aged 14-59)')
-legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS')
+legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS', ...
+    'Location', 'Northwest')
 
 %xlswrite(filename, [hivObsGender(:, 3), hivObsGender(:, 1:2)], sheet, 'E3')
 
@@ -1032,6 +1033,46 @@ xlswrite(filename, cols1, sheet, 'I1')
 %xlswrite(filename, cols2, sheet, 'I2')
 xlswrite(filename, ageGroup(1:9)', sheet, 'I3')
 xlswrite(filename, [hpv2000], sheet, 'J3')
+
+%% HPV prevalence among high risk women by HIV status 
+yr = 2006;
+ageGroup = {'17-24', '25-29', '30-39', '40-49'};
+ageVec = {[4:5],[6],[7:8],[9:10]};
+for aV = 1 : length(ageVec)
+    a = ageVec{aV};
+    %HIV-positive
+    hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 1 , a , 3)); toInd(allcomb(3 : 8 , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 1 , a , 3))]);
+    ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 , a , 3));
+    hpv_hiv(aV) = sum(popVec((yr - startYear) * stepsPerYear +1 , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear+1 , ageInds));
+    %HIV-negative
+    hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 1 , a , 3)); toInd(allcomb(1:2 , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5, 1 , 1 : intervens , 1 , a , 3))]);
+    ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 , a , 3));
+    hpv_hivNeg(aV) = sum(popVec((yr - startYear) * stepsPerYear +1 , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear+1 , ageInds));
+end
+
+figure()
+plot(1 : length(hpv_hiv) , hpv_hiv , '--')
+hold all;
+plot(1 : length(hpv_hivNeg) , hpv_hivNeg , '+-')
+hold all;
+set(gca , 'xtickLabel' , ageGroup);
+
+plot(1 : length(hpv_hiv_dObs), hpv_hiv_dObs(:, 2), 'o')
+plot(1 : length(hpv_hivNeg_dObs), hpv_hivNeg_dObs(:, 2), '*')
+set(gca , 'xtick' , 1 : length(hpv_hiv_dObs) , 'xtickLabel' , ageGroup);
+legend('Model HIV+' , 'Model HIV-' , 'Obs HIV+ (Nairobi, 2000)', ...
+    'Obs HIV-', 'Location', 'Southwest')
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
+title('HPV prevalence among high risk women in 2006')
+ylim([0 1])
 
 
 %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data

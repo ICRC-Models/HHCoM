@@ -92,10 +92,10 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue3 = zeros(age , gender) .* 2.2;
+mue3 = zeros(age , gender) .* 2.5;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) .* 2 ;
+mue3(1, :)= mue3(1 , :) .* 2.2 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
@@ -570,25 +570,29 @@ end
 
 %%
 for a = 1 : length(ageTrends)
+    mult = 1;
+    if a >= 7
+        mult = 1.3 .* (1 - (1/a));
+    end
     % Apply age trends to 9v HPV transitions
-    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1); % ages 25-49
-    kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2);
-    kCin3_Cin2(a + 5 , 1) = kCin3_Cin2(1, 1) * ageTrends(a,3);
-    kCC_Cin3(a + 5 , 1) = kCC_Cin3(1 , 1) * ageTrends(a,4);
-    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) ; %include 20-24
-    kInf_Cin1(a + 5 , 1) = kInf_Cin1(1 , 1) * ageTrends(a,6);
-    kCin1_Cin2(a + 5 , 1) = kCin1_Cin2(1 , 1) * ageTrends(a,7);
-    kCin2_Cin3(a + 5 , 1) = kCin2_Cin3(1 , 1) * ageTrends(a,8);
+    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; % ages 25-49
+    kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2) * mult;
+    kCin3_Cin2(a + 5 , 1) = kCin3_Cin2(1, 1) * ageTrends(a,3) * mult;
+    kCC_Cin3(a + 5 , 1) = kCC_Cin3(1 , 1) * ageTrends(a,4) * mult;
+    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) * mult ; %include 20-24
+    kInf_Cin1(a + 5 , 1) = kInf_Cin1(1 , 1) * ageTrends(a,6) * mult;
+    kCin1_Cin2(a + 5 , 1) = kCin1_Cin2(1 , 1) * ageTrends(a,7) * mult;
+    kCin2_Cin3(a + 5 , 1) = kCin2_Cin3(1 , 1) * ageTrends(a,8) * mult;
     
     % Apply age trends to non-9v HPV transitions 
-    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1); % ages 25-49
-    kCin2_Cin1(a + 5 , 2) = kCin2_Cin1(1 , 2) * ageTrends(a,2);
-    kCin3_Cin2(a + 5 , 2) = kCin3_Cin2(1, 2) * ageTrends(a,3); 
-    kCC_Cin3(a + 5, 2) = kCC_Cin3(1 , 2) * ageTrends(a,4);
-    rNormal_Inf(a + 5 , 2) = rNormal_Inf(1 , 2) * ageTrends(a,5) ;
-    kInf_Cin1(a + 5 , 2) = kInf_Cin1(1 , 2) * ageTrends(a,6);
-    kCin1_Cin2(a + 5 , 2) = kCin1_Cin2(1 , 2) * ageTrends(a,7);
-    kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8);
+    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1) * mult; % ages 25-49
+    kCin2_Cin1(a + 5 , 2) = kCin2_Cin1(1 , 2) * ageTrends(a,2) * mult;
+    kCin3_Cin2(a + 5 , 2) = kCin3_Cin2(1, 2) * ageTrends(a,3) * mult; 
+    kCC_Cin3(a + 5, 2) = kCC_Cin3(1 , 2) * ageTrends(a,4) * mult;
+    rNormal_Inf(a + 5 , 2) = rNormal_Inf(1 , 2) * ageTrends(a,5) * mult ;
+    kInf_Cin1(a + 5 , 2) = kInf_Cin1(1 , 2) * ageTrends(a,6) * mult;
+    kCin1_Cin2(a + 5 , 2) = kCin1_Cin2(1 , 2) * ageTrends(a,7) * mult;
+    kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
 end
 
 
@@ -675,7 +679,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.009;
+    perPartnerHpv_vax = 0.0095;
 end
 
 if calibBool && any(11 == pIdx)
