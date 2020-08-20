@@ -2,7 +2,7 @@
 
 function negSumLogL = likeFun(popVec , newCC , cinPos2002_dObs , cinNeg2002_dObs ,...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
-    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2012_dObs , cc_dist_dObs , ...
+    hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , ...
     cin3_dist_dObs , cin1_dist_dObs , hpv_dist_dObs , ...
     popAgeDist_dObs , totPopSize_dObs , cinPos2015_dObs , cinNeg2015_dObs , toInd , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
@@ -292,9 +292,27 @@ for a = 4 : age
         (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
 end
 
-mObs = [mObs ; ccInc2012];
-dMean = [dMean ; ccInc2012_dObs(: , 2)];
-dVar =  [dVar ; ccInc2012_dObs(: , 3)];
+% mObs = [mObs ; ccInc2012];
+% dMean = [dMean ; ccInc2012_dObs(: , 2)];
+% dVar =  [dVar ; ccInc2012_dObs(: , 3)];
+
+%% Cervical cancer incidence in 2018 by age
+incTimeSpan = [((2018 - startYear) * stepsPerYear +1) : ((2018 - startYear) * stepsPerYear +6)];
+fac = 10 ^ 5;
+
+ccInc2018 = zeros(12 , 1);
+for a = 4 : age-1
+    allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+    % Calculate incidence
+    ccInc2018(a - 3 , 1) = ...
+        (annlz(sum(sum(sum(newCC(incTimeSpan , : , a , :),2),3),4)) ./ ...
+        (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
+end
+
+mObs = [mObs ; ccInc2018];
+dMean = [dMean ; ccInc2018_dObs(: , 2)];
+dVar =  [dVar ; ccInc2018_dObs(: , 3)];
 
 %% HIV prevalence
 hivYearVec = unique(hivPrevM_dObs(: ,1));
