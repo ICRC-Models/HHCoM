@@ -22,7 +22,7 @@ for i in $(seq 1 5 ${LENGTH28}); do
     for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once 
         SETIDX=${SEQ28all[$j]}
             export SETIDX
-            sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch #--qos=MaxJobs4
+            sbatch -p csde -A csde slurm_batch.sbatch #--qos=MaxJobs4
     done
     
     sleep 10
