@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_1-75_HIVtrans-00075_hpvProgAge ']
+toNowName = ['toNow_RR_1-75_HIVtrans-00075_hpvProgAge_HPVtrans-00095']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -54,7 +54,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 2)
 
 % excel output file 
-filename = [pwd, '\Calibration_comparison_Kenya.xlsx']
+filename = [pwd, '\Calibration_comparison_national.xlsx']
 
 
 %% Population size over time vs. validation data
@@ -101,9 +101,9 @@ totalPopVec = sum(totalPop0_79(1 : 2, :),1);
 sheet = ['pop'];
 cols1 = {toNowName};
 cols2 = {'Year', 'Model pop'}; %, 'UN pop'};
-xlswrite(filename, cols1, sheet, 'D1')
-xlswrite(filename, cols2, sheet, 'D2')
-xlswrite(filename, [totalPopVec(1 : stepsPerYear * 5 : end)'], sheet, 'E3')
+xlswrite(filename, cols1, sheet, 'A1')
+xlswrite(filename, cols2, sheet, 'A2')
+xlswrite(filename, [totalPopVec(1 : stepsPerYear * 5 : end)'], sheet, 'B3')
 % xlswrite(filename, [historicalPop0_79(:, 2)], sheet,'G8')
 % xlswrite(filename, [futurePop(:, 1)], sheet,'E23')
 % xlswrite(filename, [futurePop(:, 2)], sheet,'G23')
@@ -255,29 +255,34 @@ xlswrite(filename, [fertilityVec(1:5:end, :)], sheet, 'H3')
 %% Kenya HIV prevalence vs. observed data by year
 % Total HIV positive
 hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
-    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 10 , 1 : risk));
+    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 11, 1 : risk));
 hivPop = sum(popVec(: , hivInds) , 2);
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
-    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 10 , 1 : risk));
+    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 11 , 1 : risk));
 art = sum(popVec(: , artInds) , 2);
 popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-    1 : intervens , 1 : 2 , 4 : 10 , 1 : risk)));
+    1 : intervens , 1 : 2 , 4 : 11 , 1 : risk)));
 hivPrev = (hivPop + art) ./ sum(popTot , 2) * 100;
 
 % Compared to national HIV data
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
 HIV_Ken_spectrum = xlsread(file , ['HIV ' 'prevalence'] , 'B184:E212');
+DHS_KAIS = [2003 6.7 5.8 7.6;
+    2007 7.1 6.6 7.9;
+    2009 6.4 5.4 7.3;
+    2012 5.6 4.9 6.3];
 
 figure()
 
-plot(tVec , hivPrev , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '*')
+plot(tVec , hivPrev , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
+    DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')
 hold on 
 % yPosError = abs(upper_prevVal - prevVal);
 % yNegError = abs(lower_prevVal - prevVal);
 % errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
-xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-49)')
-legend('Model' , 'Kenya (Spectrum)')
-xlim([1972 2020])
+xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-54)')
+legend('Model' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
+xlim([1980 2020])
 ylim([0, 20])
 %%
 sheet = ['HIV_prev'];
@@ -659,11 +664,11 @@ hivAllIndsM = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVax
 plot(tVec , 100 * sum(popVec(: , artIndsF) , 2) ./ (sum(popVec(: , hivAllIndsF) , 2) + sum(popVec(: , artIndsF) , 2)) , ...
     tVec , 100 * sum(popVec(: , artIndsM) , 2) ./ (sum(popVec(: , hivAllIndsM) , 2) + sum(popVec(: , artIndsM) , 2)) , ...
     (artYr + 1) , maxRateF .* 100 , 'o' , ...
-    (artYr + 1) , maxRateM .* 100 , 'o', ...
-    yrsUNAIDS , artUNAIDS , 'v' , ...
-    2018 , 78.8 , '+' , ...
-    2012 , 38.3 , '+' , ...    
-    yrsMOH , artMOH , 'v')
+    (artYr + 1) , maxRateM .* 100 , 'o' ) %, ...
+    %yrsUNAIDS , artUNAIDS , 'v' , ...
+   % 2018 , 78.8 , '+' , ...
+   % 2012 , 38.3 , '+' , ...    
+   % yrsMOH , artMOH , 'v')
 xlabel('Year')
 xlim([2000 2020])
 ylabel('Proportion of HIV Population')
@@ -671,12 +676,12 @@ title('Viral suppression coverage')
 legend('Model: Females' , ...
     'Model: Males' , ...
     'Observed Kenya: Females' , ...
-    'Observed Kenya: Males', ...
-    'UNAIDS (Nyanza, ART)' , ...
-    'PHIA (Nyanza)' , ...
-    'KAIS (Nyanza)' , ...
-    'MOH reports (Nyanza, ART)',...
-    'Location', 'Northwest')
+    'Observed Kenya: Males' ,  'Location', 'Northwest') % ...
+   % 'UNAIDS (Nyanza, ART)' , ...
+   % 'PHIA (Nyanza)' , ...
+  %  'KAIS (Nyanza)' , ...
+   % 'MOH reports (Nyanza, ART)',...
+   
 
 %% Proportion of HIV+ population on ART, by age
 ageGroup = {'0-4','5-9' ,'10-14' , '15-19' , '20-24' , '25-29' ,...
@@ -987,7 +992,7 @@ for a = 4 : 12
 end
 
 % DeVuyst, 2003 (data collected 1998-2000)
-% Gen pop, prevalence
+% Gen pop, prevalence; HIV prevalence in study pop was 11%
 hpvHivObs2(: , 1) = [NaN
 NaN
 0.414
@@ -1494,7 +1499,7 @@ for a = 1 : age
         % On ART
         ageArtInds = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
             1 : intervens , 2 , a , 1 : risk));
-        ccArtRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
+        ccArtAgeRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
             , 8 , a , :) , 2) , 3) , 4)) ...
             ./ (annlz(sum(popVec(yr_start : yr_end , ageArtInds) , 2)) ...
             ./ stepsPerYear) * fScale;
@@ -1531,7 +1536,7 @@ for y = 1
     % Plot model outputs
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
         ccAgeNegRel(: , y) , '-kp' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , 5 , y) , '-k+' , ...
-        1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
+        1 : size(ccArtAgeRel , 1) , ccArtAgeRel(: , y) , '-k^');
     hold on
     % Plot observed data
      plot(4 : age ,  ken_canreg(:, 2)  , '--' , 4 : age ,  ken_canreg(:, 3), '--' );
@@ -1549,7 +1554,7 @@ for y = 2
     % Plot model outputs
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
         ccAgeNegRel(: , y) , '-kp' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , 5 , y) , '-k+' , ...
-        1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
+        1 : size(ccArtAgeRel , 1) , ccArtAgeRel(: , y) , '-k^');
     hold on
     % Plot observed data
      plot(4 : age ,  ken_canreg(:, 2)  , '--' , 4 : age ,  ken_canreg(:, 4), '--', 4 : age ,  ken_canreg(:, 5), '--' );
@@ -1567,7 +1572,7 @@ cols2 = {'Age', 'General' , 'HIV-' , 'HIV+' , 'ART'}; % , 'Nairobi 2007-11' , 'E
 xlswrite(filename, cols1, sheet, 'V1')
 xlswrite(filename, cols2, sheet, 'V2')
 xlswrite(filename, ageGroup', sheet, 'V3')
-xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtRel], sheet, 'W3')
+xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtAgeRel], sheet, 'W3')
 % xlswrite(filename, [ken_canreg], sheet, 'F6')
 
 %% Cervical cancer incidence over time
@@ -1580,7 +1585,7 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 % Total population
 ageInds = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
     1 : intervens , 2 , 1 : age , 1 : risk));
-ccAgeRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
+ccAllRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
     1 : disease , 1 : age , :) , 2) , 3) , 4)) ...
     ./ (annlz(sum(popVec(1:end-1 , ageInds) , 2)) ...
     ./ stepsPerYear) * fScale;
@@ -1588,7 +1593,7 @@ ccAgeRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
 % HIV Negative
 ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
     1 : intervens , 2 , 1 : age , 1 : risk));
-ccAgeNegRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
+ccNegRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
     1 : 2 , 1 : age , :) , 2) , 3) , 4)) ...
     ./ (annlz(sum(popVec(1:end-1 , ageNegInds) , 2)) ...
     ./ stepsPerYear) * fScale;
@@ -1596,7 +1601,7 @@ ccAgeNegRel = annlz(sum(sum(sum(newCC(1:end-1 , ...
 % All HIV+ no ART
  ageAllPosInds = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
     1 : intervens , 2 , 1 : age , 1 : risk));
- ccAgePosRel = annlz(sum(sum(sum(newCC(1:end-1 ...
+ ccPosRel = annlz(sum(sum(sum(newCC(1:end-1 ...
     , 3 : 7 , 1 : age , :), 2) , 3) , 4)) ...
     ./ (annlz(sum(popVec(1:end-1 , ageAllPosInds) , 2)) ...
     ./ stepsPerYear) * fScale;
@@ -1641,21 +1646,23 @@ gbd_cc = [
 2017	22.72	18.55	31.90
 ];
 
+%crude (non age adjusted) rates
 globocan_EA = zeros(2, 2);
 globocan_EA = [2008 34.5
-    2012 42.7];
+    2012 25.8
+    2008 24.1];
 globocan_Ken = zeros(3, 2);
 globocan_Ken = [2008 23.4
-    2012 40.03
-    2018 32.5]
+    2012 22.4
+    2018 20.5]
 
 figure()
 % Plot model outputs
-plot(tVec(1 : stepsPerYear : end-1) , ccAgeRel)
+plot(tVec(1 : stepsPerYear : end-1) , ccAllRel)
 hold all
-plot(tVec(1 : stepsPerYear : end-1) , ccAgeNegRel)
+plot(tVec(1 : stepsPerYear : end-1) , ccNegRel)
 hold all
-plot(tVec(1 : stepsPerYear : end-1) , ccAgePosRel)
+plot(tVec(1 : stepsPerYear : end-1) , ccPosRel)
 hold all
 plot(tVec(1 : stepsPerYear : end-1) , ccArtRel)
 hold all
@@ -1666,7 +1673,7 @@ plot(globocan_EA(: ,1) , globocan_EA(: ,2), 'o', ...
     globocan_Ken(:, 1), globocan_Ken(:,2), 'o')
 hold all
 xlabel('Time'); ylabel('Incidence per 100,000');
-title('Cervical Cancer Incidence ');
+title('Crude Cervical Cancer Incidence ');
 xlim([1970 2020]);
 legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...
     'Location', 'NorthWest')
@@ -1684,7 +1691,136 @@ xlswrite(filename, [ccAgeRel', ccAgeNegRel', ccAgePosRel',...
 % xlswrite(filename, globocan_Ken, sheet, 'J86')
 
 
-%% CC incidence over time (age-standardized)
+%% population by age in 2012
+pop2012 = zeros(16, 1);
+    for a = 1 : age
+        popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk)); 
+        pop2012(a, 1) = sum(popVec(((2012 - startYear) * stepsPerYear +1) , popAge),2);            
+    end
+
+%% CC incidence over time (age-standardized, Segi pop)
+
+segi = [0.1212 0.1010 0.0909 0.0909 0.0808 0.0808 0.0606 ...
+    0.0606 0.0606 0.0606 0.0505 0.0404 0.0404 0.0303 0.0202 0.0101];
+ccAll_ASR = sum(ccAgeRel(:, 2) .* segi); 
+inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
+fac = 10 ^ 5;
+plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+
+figure()
+for i = 1 : length(inds)
+ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';          
+    for a = 1 : age
+        % General
+        allF = toInd(allcomb(1 : disease, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-negative women
+        hivNeg = toInd(allcomb(1 : 2, 1 : viral, [1 : 5 , 7], [1 : 5 , 7], 1, 1 : intervens, 2, a, 1 : risk));
+        % HIV-positive women not on ART
+        hivNoARTF = toInd(allcomb(3 : 7, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
+            1, 1 : intervens, 2, a, 1 : risk));
+        % Women on ART
+        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-positive women
+        hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
+       
+        % Calculate incidence
+            ccIncRef = ...
+                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear))* fac) .* segi(a);
+            if (i == 4) && (a < 3) && (max(annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4))) == 0.0)
+                ccIncRef = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+            end
+        ccIncRefVec = ccIncRefVec + ccIncRef;
+    end
+   
+    %ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age)));
+    plot(tVec(1 : stepsPerYear : end-1) , ccIncRefVec ,'DisplayName' , plotTits1{i});
+    hold all;    
+end
+globocan_EA_ASR = zeros(2, 2);
+globocan_EA_ASR = [2008 34.5
+    2012 42.7
+    2018 40.1];
+globocan_Ken_ASR = zeros(3, 2);
+globocan_Ken_ASR = [2008 23.4
+    2012 40.1
+    2018 33.8]
+
+    errorbar(gbd_cc(:, 1) , gbd_cc(:, 2), gbd_cc(:, 2) - gbd_cc(: , 3), ...
+    gbd_cc(:, 4)-gbd_cc(: , 2))
+    hold on
+    plot(globocan_EA_ASR(: ,1) , globocan_EA_ASR(: ,2), 'o', globocan_Ken_ASR(:, 1), globocan_Ken_ASR(:,2), 'o')
+    hold on;
+    legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'HIV all', ...
+        'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...
+    'Location', 'NorthWest');
+    title({'Age-standardized Cervical Cancer Incidence', '\it\fontsize{10}Segi World Population'});
+    xlabel('Year'); ylabel('Incidence per 100,000');
+    grid off;
+    xlim([1970 2020]);
+% ###### calculate age-specific incidence for each year then with segi %s 
+
+
+%% CC incidence over time (age-standardized, Segi pop)
+
+UN_worldPop_2015 = [0.0906 0.0869 0.0830 0.0812 0.0810 0.0831 0.0755 0.0689 ...
+    0.0674 0.0635 0.0562 0.0481 0.0420 0.0316 0.0230 0.0180];
+inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
+fac = 10 ^ 5;
+plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+
+figure()
+for i = 1 : length(inds)
+ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';          
+    for a = 1 : age
+        % General
+        allF = toInd(allcomb(1 : disease, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-negative women
+        hivNeg = toInd(allcomb(1 : 2, 1 : viral, [1 : 5 , 7], [1 : 5 , 7], 1, 1 : intervens, 2, a, 1 : risk));
+        % HIV-positive women not on ART
+        hivNoARTF = toInd(allcomb(3 : 7, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
+            1, 1 : intervens, 2, a, 1 : risk));
+        % Women on ART
+        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , 1 : intervens , 2 , a , 1 : risk));
+        % All HIV-positive women
+        hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+            1 , 1 : intervens , 2 , a , 1 : risk));
+        genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
+       
+        % Calculate incidence
+            ccIncRef = ...
+                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear))* fac) .* UN_worldPop_2015(a);
+            if (i == 4) && (a < 3) && (max(annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4))) == 0.0)
+                ccIncRef = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+            end
+        ccIncRefVec = ccIncRefVec + ccIncRef;
+    end
+   
+    %ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age)));
+    plot(tVec(1 : stepsPerYear : end-1) , ccIncRefVec ,'DisplayName' , plotTits1{i});
+    hold all;    
+end
+
+    errorbar(gbd_cc(:, 1) , gbd_cc(:, 2), gbd_cc(:, 2) - gbd_cc(: , 3), ...
+    gbd_cc(:, 4)-gbd_cc(: , 2))
+    hold on
+    plot(globocan_EA_ASR(: ,1) , globocan_EA_ASR(: ,2), 'o', globocan_Ken_ASR(:, 1), globocan_Ken_ASR(:,2), 'o')
+    hold on;
+    legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'HIV all', ...
+        'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...
+    'Location', 'NorthWest');
+    title({'Age-standardized Cervical Cancer Incidence'; '\it\fontsize{10}2015 World Population'});
+    xlabel('Year'); ylabel('Incidence per 100,000');
+    grid off;
+    xlim([1950 2020]);
+    
+%% CC incidence over time (age-standardized, WHO pop)
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
 fac = 10 ^ 5;
 plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
@@ -1693,6 +1829,12 @@ linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290,
 %         247167 240167 226750 201603 171975 150562 113118 82266 64484];
 worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 23477 9261 2155];
+UN_worldPop_2015 = [0.0906 0.0869 0.0830 0.0812 0.0810 0.0831 0.0755 0.0689 ...
+    0.0674 0.0635 0.0562 0.0481 0.0420 0.0316 0.0230 0.0180];
+
+segi = [0.1212 0.1010 0.0909 0.0909 0.0808 0.0808 0.0606 ...
+    0.0606 0.0606 0.0606 0.0505 0.0404 0.0404 0.0303 0.0202 0.0101]; %s 
+
 % sheet = ['CC_inc_standardized'];
 % cols1 = {toNowName, 'Age-standardized cervical cancer incidence'};
 % cols2 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all' }; %,...
@@ -1710,7 +1852,6 @@ for i = 1 : length(inds)
         else
             a = aInd;
         end
-       
         % General
         allF = toInd(allcomb(1 : disease, 1 : viral, [1 : 5, 7], [1 : 5, 7], ...
             1 , 1 : intervens , 2 , a , 1 : risk));
@@ -1745,7 +1886,7 @@ for i = 1 : length(inds)
         ccIncRefVec = ccIncRefVec + ccIncRef;
     end
    
-    ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
+    ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age)));
  
     plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
     hold all;
@@ -1754,10 +1895,19 @@ for i = 1 : length(inds)
     xlswrite(filename, ccInc', sheet, [cell(i) +'3'])
 
 end
+
+globocan_EA_ASR = zeros(2, 2);
+globocan_EA_ASR = [2008 34.5
+    2012 42.7];
+globocan_Ken_ASR = zeros(3, 2);
+globocan_Ken_ASR = [2008 23.4
+    2012 40.1
+    2018 32.5]
+
     errorbar(gbd_cc(:, 1) , gbd_cc(:, 2), gbd_cc(:, 2) - gbd_cc(: , 3), ...
     gbd_cc(:, 4)-gbd_cc(: , 2))
     hold on
-    plot(globocan_EA(: ,1) , globocan_EA(: ,2), 'o', globocan_Ken(:, 1), globocan_Ken(:,2), 'o')
+    plot(globocan_EA_ASR(: ,1) , globocan_EA_ASR(: ,2), 'o', globocan_Ken_ASR(:, 1), globocan_Ken_ASR(:,2), 'o')
     hold on;
     legend('General' , 'HIV-' , 'HIV+, no ART' , 'HIV+, ART', 'HIV all', ...
         'GBD Kenya 2018', 'Globocan E. Africa', 'Globocan Kenya',...

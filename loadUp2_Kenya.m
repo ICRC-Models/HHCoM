@@ -124,7 +124,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.37; 0.2];
+    fertDeclineProp = [0.75 ; 0.36; 0.2];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -572,20 +572,20 @@ end
 for a = 1 : length(ageTrends)
     mult = 1;
     if a >= 7
-        mult = 1.3 .* (1 - (1/a));
+        mult = 1.29 .* (1 - (1/a));
     end
     % Apply age trends to 9v HPV transitions
-    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; % ages 25-49
+    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; 
     kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2) * mult;
     kCin3_Cin2(a + 5 , 1) = kCin3_Cin2(1, 1) * ageTrends(a,3) * mult;
     kCC_Cin3(a + 5 , 1) = kCC_Cin3(1 , 1) * ageTrends(a,4) * mult;
-    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) * mult ; %include 20-24
+    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) * mult ; 
     kInf_Cin1(a + 5 , 1) = kInf_Cin1(1 , 1) * ageTrends(a,6) * mult;
     kCin1_Cin2(a + 5 , 1) = kCin1_Cin2(1 , 1) * ageTrends(a,7) * mult;
     kCin2_Cin3(a + 5 , 1) = kCin2_Cin3(1 , 1) * ageTrends(a,8) * mult;
     
     % Apply age trends to non-9v HPV transitions 
-    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1) * mult; % ages 25-49
+    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1) * mult;
     kCin2_Cin1(a + 5 , 2) = kCin2_Cin1(1 , 2) * ageTrends(a,2) * mult;
     kCin3_Cin2(a + 5 , 2) = kCin3_Cin2(1, 2) * ageTrends(a,3) * mult; 
     kCC_Cin3(a + 5, 2) = kCC_Cin3(1 , 2) * ageTrends(a,4) * mult;
