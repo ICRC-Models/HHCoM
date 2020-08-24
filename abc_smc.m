@@ -4,7 +4,7 @@
 
 function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
 t = tstep_abc;
-alpha = 0.4;
+alpha = (1/3);
 p_acc_min = 0.05;
 date = date_abc;
 

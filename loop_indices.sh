@@ -2,7 +2,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2V8
+DATE=22Apr20Ph2V9
 echo "${DATE}"
 export DATE
 
@@ -15,7 +15,7 @@ echo "${NSETS}"
 export NSETS
 
 echo "Running simulations, first try."
-SEQ28all=($(seq 1 28 ${NSETS}))      # set up for NSETS=10220
+SEQ28all=($(seq 1 28 ${NSETS}))      # set up for NSETS=7644
 LENGTH28=${#SEQ28all[@]}
 echo "${LENGTH28}"
 for i in $(seq 1 5 ${LENGTH28}); do
