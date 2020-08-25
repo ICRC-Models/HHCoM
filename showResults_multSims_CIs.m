@@ -54,7 +54,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'0_960'};    % 22Apr20Ph2V8
+fileInds = {'0_784'};    % 22Apr20Ph2V9
 % fileInds = {'1_1439' , '0_1611' , '0_4873' , '0_8201' , '1_5425' , ...
 %     '0_8745' , '0_7117' , '1_1474' , '0_5506' , '0_408' , '1_5948' , ...
 %     '2_1116' , '2_1631' , '2_6083' , '2_1512' , '2_4652' , '0_7729' , ...
@@ -173,7 +173,7 @@ hpv_nonVax = cc_vax;
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_22Apr20Ph2V8_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
+    pathModifier = ['toNow_22Apr20Ph2V9_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
@@ -590,6 +590,14 @@ for j = 1 : nRuns
             1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
             [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
         
+    cin2Inds_vax = toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
+        1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+    cin2Inds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 3 , 7] , 4 , ...
+        1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+    cin2Inds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
+            1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+            [1 : 3 , 7] , 4 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+        
     cin1Inds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
         1 , 1 : intervens , 2 , 1 : age , 1 : risk));
     cin1Inds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 2 , 7] , 3 , ...
@@ -616,6 +624,11 @@ for j = 1 : nRuns
             ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin3Inds_tot) , 2);
         cin3_nonVax(j , i) = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin3Inds_nonVax) , 2)...
             ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin3Inds_tot) , 2);
+        
+        cin2_vax(j , i) = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin2Inds_vax) , 2)...
+            ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin2Inds_tot) , 2);
+        cin2_nonVax(j , i) = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin2Inds_nonVax) , 2)...
+            ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin2Inds_tot) , 2);
 
         cin1_vax(j , i) = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin1Inds_vax) , 2)...
             ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin1Inds_tot) , 2);
@@ -1559,6 +1572,14 @@ subplot(2,3,3);
 plot(2012 , 62.81 , 'k*');
 hold on;
 plot(2012 , 37.19 , 'b*');
+hold on;
+plot(typeDistYearVec , mean((cin2_vax .* 100),1)' , 'k-' , ...
+    typeDistYearVec , min((cin2_vax .* 100),[],1)' , 'k--' , ...
+    typeDistYearVec , max((cin2_vax .* 100),[],1)' , 'k--' , 'LineWidth' , 1.5);
+hold on;
+plot(typeDistYearVec , mean((cin2_nonVax .* 100),1)' , 'b-' , ...
+    typeDistYearVec , min((cin2_nonVax .* 100),[],1)' , 'b--' , ...
+    typeDistYearVec , max((cin2_nonVax .* 100),[],1)' , 'b--' , 'LineWidth' , 1.5);
 ylim([0 100]);
 xlim([2010 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
