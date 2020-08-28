@@ -130,29 +130,29 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* fertDeclineProp(3,1);
 
-partnersMmult = [1.2 2.4 1.1];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
-    partnersM = zeros(age , risk);
+    %partnersM = zeros(age , risk);
     %partnersMmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-    %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) .* partnersMmult;
-    %partnersM(10:age , 3) = ones(7 , 1);
-    partnersM(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersM(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersM(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
-    partnersM(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
-    for a = 4 : age
-        partnersM(a , 1:2) = (partnersM(a , 3)/partnersM(a-1 , 3)) .* partnersM(a-1 , 1:2);
-    end
+    load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
+    partnersM(3 , 2: 3) = partnersM(3 , 2:3) + 1;
+    partnersM(4:16, 2:3) = zeros;
+    partnersM(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersM(4:6, 1);
+    partnersM(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersM(7:9, 1);
+    partnersM(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersM(10:age, 1);
+    partnersM(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersM(4:6, 1);
+    partnersM(7:10, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersM(7:10, 1);
+    partnersM(11:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersM(11:age, 1);
+%     partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
+%     partnersM(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
+%     for a = 4 : age
+%         partnersM(a , 1:2) = (partnersM(a , 3)/partnersM(a-1 , 3)) .* partnersM(a-1 , 1:2);
+%     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     
@@ -165,25 +165,26 @@ end
 % Female partners per year by age and risk group
 if calibBool && any(2 == pIdx)
     idx = find(2 == pIdx);
-    partnersF = zeros(age , risk);
+    %partnersF = zeros(age , risk);
     %partnersFmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-    %partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-    %partnersF(10:age , 3) = ones(7 , 1);
-    partnersF(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersF(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersF(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
-    partnersF(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
-    for a = 4 : age
-        partnersF(a , 1:2) = (partnersF(a , 3)/partnersF(a-1 , 3)) .* partnersF(a-1 , 1:2);
-    end
+    load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
+    partnersF(3, 2: 3) = partnersF(3 , 2:3) + 1;
+    partnersF(4:16, 2:3) = zeros;
+    partnersF(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersF(4:6, 1);
+    partnersF(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersF(7:9, 1);
+    partnersF(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersF(10:age, 1);
+    partnersF(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersF(4:6, 1);
+    partnersF(7:9, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersF(7:9, 1);
+    partnersF(10:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersF(10:age, 1);
+%     partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
+%     partnersF(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
+%     for a = 4 : age
+%         partnersF(a , 1:2) = (partnersF(a , 3)/partnersF(a-1 , 3)) .* partnersF(a-1 , 1:2);
+%     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
@@ -195,15 +196,17 @@ end
 % Male acts per partnership per year by age and risk group
 if calibBool && any(8 == pIdx)
     idx = find(8 == pIdx);
-    maleActs = zeros(age , risk);
-    maleActsmult = paramSet(paramsSub{idx}.inds(:));
+    %maleActs = zeros(age , risk);
+    load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
+    %maleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    maleActs(1:2 , 1:risk) = zeros(2 , risk);
-    %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* paramSet(paramsSub{idx}.inds(1)); 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* paramSet(paramsSub{idx}.inds(3));
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4));
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
@@ -215,15 +218,17 @@ end
 % Female acts per partnership per year by age and risk group
 if calibBool && any(9 == pIdx)
     idx = find(9 == pIdx);
-    femaleActs = zeros(age , risk);
-    femaleActsmult = paramSet(paramsSub{idx}.inds(:));
+%     femaleActs = zeros(age , risk);
+%     femaleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-    %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+    load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* paramSet(paramsSub{idx}.inds(1));
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).*paramSet(paramsSub{idx}.inds(3)) ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4)) ;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
@@ -1528,12 +1533,23 @@ dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2070 - 2020) * stepsPerYe
 dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
-d_partnersMmult = ones(2, 5);
-d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2004 - 1994) * stepsPerYear);
-d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
-d_partnersMmult(1, 3) = (0.5 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
+partnersMmult = ones(1, 3); %[1.2 2.4 1.1];
 
-d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
+if calibBool && any(38 == pIdx);
+    idx = find(38 == pIdx);
+    ptMult = paramSet(paramsSub{idx}.inds(:));
+else
+    ptMult = [1.2 2.4 1.1 1 1.4 1];
+end
+
+d_partnersMmult = ones(6, 60);
+d_partnersMmult(1, 1:30) = linspace(1, ptMult(1), 5 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
+d_partnersMmult(2, 1:30) = linspace(1, ptMult(2), 5 * stepsPerYear);  % multiplier for increasing pts in F aged 15-24
+d_partnersMmult(3, 1:30) = linspace(1, ptMult(3), 5 * stepsPerYear); % mulitplier for increasing pts in M and F aged 25 - 49
+d_partnersMmult(4, 1:60) = linspace(ptMult(1), ptMult(4), 10 * stepsPerYear); % multiplier for decreasing pts in M aged 15 - 24
+d_partnersMmult(5, 1:60) = linspace(ptMult(2), ptMult(5), 10 * stepsPerYear); % multiplier for decreasing pts in F aged 15 - 24
+d_partnersMmult(6, 1:60) = linspace(ptMult(3), ptMult(6), 10 * stepsPerYear); % mulitplier for decreasing pts in M and F aged 25 - 49
+%d_partnersMmult(5, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
 riskAdj = 0.005;
