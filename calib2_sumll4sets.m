@@ -39,7 +39,7 @@ end
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    [negSumLogL] = historicalSim_Kenya(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     negSumLogLSet(n,1) = negSumLogL;
 end
 
