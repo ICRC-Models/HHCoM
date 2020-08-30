@@ -130,7 +130,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* fertDeclineProp(3,1);
 
-partnersMmult = [1.0 1.0 1.0];
+%partnersMmult = [1.0 1.0 1.0];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -336,7 +336,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.00075]; %[0.001, 0.0004];
+    baseVagTrans = [0.0008]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -376,7 +376,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 1.75 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 1.99 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -595,7 +595,6 @@ for a = 1 : length(ageTrends)
     kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
 end
 
-
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
 
@@ -768,7 +767,7 @@ file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
 circProtect = xlsread(file , 'Protection' , 'B18');
 condProtect = xlsread(file , 'Protection' , 'B19');
 MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+artVScov = xlsread(file , 'Protection' , 'L33:N46');    % [years , females , males] 
 save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
@@ -777,7 +776,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; .4] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use
@@ -800,9 +799,9 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
+maxRateM = [artVScov(:,3) ./ 100 ; 0.70] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.85] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -1508,12 +1507,23 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
 %% partnersM multiplier 
 %d_partnersMmult = ones(2, 5);
-d_partnersMmultVec = nonLinspace(1, 1.5, ((1993 - 1990) .* stepsPerYear), 'log10');
-d_partnersMmult = [d_partnersMmultVec, flip(d_partnersMmultVec)];
+% d_partnersMmultVec = nonLinspace(1, 1.5, ((1993 - 1990) .* stepsPerYear), 'log10');
+% d_partnersMmult = [d_partnersMmultVec, flip(d_partnersMmultVec)];
 % d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2004 - 1994) * stepsPerYear);
 % d_partnersMmult(1, 3) = (1.0 - partnersMmult(3)) ./ ((2004 - 1994) * stepsPerYear);
 % 
 % d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
+
+ptMult = [1.2 1.4 1.1 1 1 1];
+
+d_partnersMmult = ones(6, 60);
+d_partnersMmult(1, 1:30) = linspace(1, ptMult(1), 5 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
+d_partnersMmult(2, 1:30) = linspace(1, ptMult(2), 5 * stepsPerYear);  % multiplier for increasing pts in F aged 15-24
+d_partnersMmult(3, 1:30) = linspace(1, ptMult(3), 5 * stepsPerYear); % mulitplier for increasing pts in M and F aged 25 - 49
+d_partnersMmult(4, 1:60) = linspace(ptMult(1), ptMult(4), 10 * stepsPerYear); % multiplier for decreasing pts in M aged 15 - 24
+d_partnersMmult(5, 1:60) = linspace(ptMult(2), ptMult(5), 10 * stepsPerYear); % multiplier for decreasing pts in F aged 15 - 24
+d_partnersMmult(6, 1:60) = linspace(ptMult(3), ptMult(6), 10 * stepsPerYear); % mulitplier for decreasing pts in M and F aged 25 - 49
+%d_partnersMmult(5, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
 riskAdj = 0.05;

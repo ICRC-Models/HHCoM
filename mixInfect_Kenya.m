@@ -116,13 +116,34 @@ end
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
 % partnersMmult = [1.2 2 1.1 ];
-if (year >= 1988) && (year < 1994)
-   yearInd = round((year - (1988 - (1/6))) * 6);
-   partnersMmult = d_partnersMmult(yearInd);
-end
+% if (year >= 1988) && (year < 1994)
+%    yearInd = round((year - (1988 - (1/6))) * 6);
+%    partnersMmult = d_partnersMmult(yearInd);
+% end
 
-partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
-partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
+if (year >= 1975) && (year < 1980)
+    yearInd = round((year - (1975 - (1/6))) * 6);
+    partnersMmult(1) = d_partnersMmult(1, yearInd);
+    partnersMmult(2) = d_partnersMmult(2, yearInd);
+    partnersMmult(3) = d_partnersMmult(3, yearInd);
+elseif (year >= 1980) && (year < 1990)
+    partnersMmult(1) = d_partnersMmult(1, 30);
+    partnersMmult(2) = d_partnersMmult(2, 30);
+    partnersMmult(3) = d_partnersMmult(3, 30);
+elseif (year >= 1990) && (year < 2000)
+    yearInd2 = round((year - (1990 - (1/6))) * 6);
+    partnersMmult(1) = d_partnersMmult(4, yearInd2);
+    partnersMmult(2) = d_partnersMmult(5, yearInd2);
+    partnersMmult(3) = d_partnersMmult(6, yearInd2);
+end
+% partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
+% partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
+
+partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
+partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
+partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
+partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
+
 
 % males
 c(1 , : , :) = partnersM;
@@ -477,8 +498,9 @@ for h = 1 : hpvVaxStates
                             
                             %set multiplier for HPV+ states, which include
                             %CINs but not CC 
-                            lambdaMult = 1;
-                            if ((h > 1) && (h < 6)) || ((s > 1) && (s < 6))
+                            lambdaMultF = 1;
+                            lambdaMultM = 1;
+                            if ((h > 1) && (h < 3)) || ((s > 1) && (s < 3))
                                     lambdaMultM = hiv_hpvMult;
                                     lambdaMultF = hiv_hpvMult;
                             end

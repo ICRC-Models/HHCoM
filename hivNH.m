@@ -38,7 +38,7 @@ artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(dis
 treat = zeros(disease , viral , gender , age ,risk);
 
 % CD4 <= 200, from 2004 to 2011
-if year >= 2003 && year < 2011
+if year >= 2003 && year < 2008
     % Calculate HIV-associated mortality on ART
     muART = 0.5 .* mueYear;
     % Calculate population-level ART coverage
@@ -57,15 +57,15 @@ if year >= 2003 && year < 2011
     elseif year >= 2007 && year < 2008
         ind = (round(artYr_vec{5} , 4) == round(year , 4));
         popCover = {artM_vec{5} , artF_vec{5}};
-    elseif year >= 2008 && year < 2009
-        ind = (round(artYr_vec{6} , 4) == round(year , 4));
-        popCover = {artM_vec{6} , artF_vec{6}};
-    elseif year >= 2009 && year < 2010
-        ind = (round(artYr_vec{7} , 4) == round(year , 4));
-        popCover = {artM_vec{7} , artF_vec{7}};
-    elseif year >= 2010 && year < 2011
-        ind = (round(artYr_vec{8} , 4) == round(year , 4));
-        popCover = {artM_vec{8} , artF_vec{8}};
+%     elseif year >= 2008 && year < 2009
+%         ind = (round(artYr_vec{6} , 4) == round(year , 4));
+%         popCover = {artM_vec{6} , artF_vec{6}};
+%     elseif year >= 2009 && year < 2010
+%         ind = (round(artYr_vec{7} , 4) == round(year , 4));
+%         popCover = {artM_vec{7} , artF_vec{7}};
+%     elseif year >= 2010 && year < 2011
+%         ind = (round(artYr_vec{8} , 4) == round(year , 4));
+%         popCover = {artM_vec{8} , artF_vec{8}};
     end
     ageVec = [1 : age];
     dRange = [7];
@@ -103,11 +103,20 @@ if year >= 2003 && year < 2011
 end
 
 % CD4 <= 350, from 2011 to 2015
-if year >= 2011 && year < 2015
+if year >= 2008 && year < 2015
     % Calculate HIV-associated mortality on ART
     muART = 0.4 .* mueYear; %0.5
     % Calculate population-level ART coverage
-   if year >= 2011 && year < 2012
+    if year >= 2008 && year < 2009
+        ind = (round(artYr_vec{6} , 4) == round(year , 4));
+        popCover = {artM_vec{6} , artF_vec{6}};
+    elseif year >= 2009 && year < 2010
+        ind = (round(artYr_vec{7} , 4) == round(year , 4));
+        popCover = {artM_vec{7} , artF_vec{7}};
+    elseif year >= 2010 && year < 2011
+        ind = (round(artYr_vec{8} , 4) == round(year , 4));
+        popCover = {artM_vec{8} , artF_vec{8}};
+    elseif year >= 2011 && year < 2012
         ind = (round(artYr_vec{9} , 4) == round(year , 4));
         popCover = {artM_vec{9} , artF_vec{9}};
     elseif year >= 2012 && year < 2014
