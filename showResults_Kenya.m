@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_1-99_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacq']
+toNowName = ['toNow_RR_1-99_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacq_ptMult']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 

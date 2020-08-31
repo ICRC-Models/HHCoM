@@ -130,7 +130,7 @@ fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* fertDeclineProp(3,1);
 
-%partnersMmult = [1.0 1.0 1.0];
+partnersMmult = [1.0 1.0 1.0];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
@@ -1514,7 +1514,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 % 
 % d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
-ptMult = [1.2 1.4 1.1 1 1 1];
+ptMult = [1.1 1.3 1 1 1 1];
 
 d_partnersMmult = ones(6, 60);
 d_partnersMmult(1, 1:30) = linspace(1, ptMult(1), 5 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
