@@ -54,7 +54,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'0_784'};    % 22Apr20Ph2V9
+fileInds = {'0_1430' , '0_216'};    % 22Apr20Ph2V9
 % fileInds = {'1_1439' , '0_1611' , '0_4873' , '0_8201' , '1_5425' , ...
 %     '0_8745' , '0_7117' , '1_1474' , '0_5506' , '0_408' , '1_5948' , ...
 %     '2_1116' , '2_1631' , '2_6083' , '2_1512' , '2_4652' , '0_7729' , ...
@@ -173,7 +173,7 @@ hpv_nonVax = cc_vax;
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_22Apr20Ph2V9_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
+    pathModifier = ['toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
