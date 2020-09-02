@@ -341,7 +341,9 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001]; %[0.0004];
+    baseVagTrans = [0.001]; %Thomson et al: For a 25-year-old woman not taking PrEP, 
+                            %the HIV acquisition probability per condomless sex act with an HIV-infected 
+                            %male partner with a viral load of 10 000 copies/mL was 0.0011 (95% CI 0.005–0.0019)
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 

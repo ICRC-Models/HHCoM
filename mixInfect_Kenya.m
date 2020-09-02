@@ -156,8 +156,8 @@ partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
 partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
 
 
-yearInd = round((year - (1988 - (1/6))) * 6);
-   partnersMmult = d_partnersMmult(yearInd);
+% yearInd = round((year - (1988 - (1/6))) * 6);
+%    partnersMmult = d_partnersMmult(yearInd);
 % males
 c(1 , : , :) = partnersM;
 % females
