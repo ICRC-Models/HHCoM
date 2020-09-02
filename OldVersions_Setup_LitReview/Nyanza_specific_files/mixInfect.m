@@ -4,7 +4,7 @@
 % Accepts contact parameters and a population matrix
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
-function [dPop , newInfs] = mixInfect_Kenya(t , pop , ...
+function [dPop , newInfs] = mixInfect(t , pop , ...
     stepsPerYear , year , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
     age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , partnersMmult, ...
@@ -115,49 +115,29 @@ end
 
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
-% partnersMmult = [1.2 2 1.1 ];
-if (year >= 1975) && (year < 1980)
-    yearInd = round((year - (1975 - (1/6))) * 6);
-    partnersMmult(1) = d_partnersMmult(1, yearInd);
-    partnersMmult(2) = d_partnersMmult(2, yearInd);
-    partnersMmult(3) = d_partnersMmult(3, yearInd);
-elseif (year >= 1980) && (year < 1990)
-    partnersMmult(1) = d_partnersMmult(1, 30);
-    partnersMmult(2) = d_partnersMmult(2, 30);
-    partnersMmult(3) = d_partnersMmult(3, 30);
-elseif (year >= 1990) && (year < 2000)
-    yearInd2 = round((year - (1990 - (1/6))) * 6);
-    partnersMmult(1) = d_partnersMmult(4, yearInd2);
-    partnersMmult(2) = d_partnersMmult(5, yearInd2);
-    partnersMmult(3) = d_partnersMmult(6, yearInd2);
+% partnersMmult = [2 4];
+if (year >= 1995) && (year < 2006)
+    dt = (year - 1995) * stepsPerYear;
+    partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1, 1) .* dt; %M, 15-19
+    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(1, 2) .* dt; %F, 15-29
+    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(1, 3) .* dt; %M, 20-49 & F, 30-49
+elseif (year >= 2006) && (year < 2008)
+    yearInd = round(year - 2005);
+    dt = (year - 2005) * stepsPerYear;
+    partnersMmult(1) = 1.2; %M, 15-19
+    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2, yearInd) .* dt; %F, 15-29
+    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3, yearInd) .* dt; %M, 20-49 & F, 30-49
+elseif year >= 2008
+    partnersMmult(1) = 1.1;
+    partnersMmult(2) = 2.2;
+    partnersMmult(3) = 1.0;
 end
-
-% if (year >= 1990) && (year < 2000)
-%     yearInd = round((year - (1990 - (1/6))) * 6);
-%     partnersMmult = d_partnersMmult(yearInd);
-%     dt = (year - 1990) * stepsPerYear;
-%     partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1, 1) .* dt;
-%     partnersMmult(2) = partnersMmult(2) + d_partnersMmult(1, 2) .* dt;
-%     partnersMmult(3) = partnersMmult(3) + d_partnersMmult(1, 3) .* dt;
-% elseif (year >= 2000) && (year < 2005)
-%     yearInd = round(year - 1999.5);
-%     dt = (year - 1999.5);
-%     partnersMmult(1) = 1.1;
-%     partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2, yearInd) .* dt;
-%     partnersMmult(3) = 0.65;
-% elseif year >= 2005
-%     partnersMmult(1) = 1.0;
-%     partnersMmult(2) = 1.4;
-%     partnersMmult(3) = 0.8;
-% end
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
 partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
+
 partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
 partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
 
-
-% yearInd = round((year - (1988 - (1/6))) * 6);
-%    partnersMmult = d_partnersMmult(yearInd);
 % males
 c(1 , : , :) = partnersM;
 % females
@@ -171,7 +151,6 @@ for g = 1 : gender
         end
     end
 end
-
 ageNum = sum(c .* popSum , 3); % numerator for age portion, sum by r -> dim [g x a]
 den = sum(ageNum , 2); % sum across a -> dim [g x 1]
 

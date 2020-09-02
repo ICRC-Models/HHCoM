@@ -1,12 +1,10 @@
 % Load and save parameters, calibration data, indices, and matrices
 function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
-    intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd , ...
-    annlz , ...
+    intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd, annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , partnersMmult, maleActs , ...
-    femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4, ...
-    mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , ...
-    yr , ...
+    femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4,...
+    mue , mue2 , mue3 , mue4 , epsA_vec , epsR_vec , yr , ...
     hivOn , betaHIV_mod , muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
@@ -19,14 +17,12 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear ,circNatStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
     circProtect , condProtect , MTCTRate , hyst , OMEGA , ...
-    ccInc2011_dObs , cc_dist_dObs , cin3_dist_dObs , ...
-    cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
-    hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , ...
-    hivPrevM_dObs , hivPrevF_dObs , popAgeDist_dObs , totPopSize_dObs , ...
-    hivCurr , ...
+    ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , cin1_dist_dObs , ...
+    hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
+    hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
+    hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
-    toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
-    hivInds , ...
+    toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
     ccReghpvVaxInds , ccDisthpvVaxInds , cin3hpvNonVaxIndsFrom , ...
     ccLochpvNonVaxIndsTo , ccLochpvNonVaxIndsFrom , ccReghpvNonVaxInds , ...
@@ -34,16 +30,14 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     cin1hpvNonVaxInds , cin2hpvNonVaxInds , cin3hpvNonVaxInds , normalhpvVaxInds , ...
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
     infhpvNonVaxInds , ageInd , riskInd , ...
-    hivNegNonVMMCinds , hivNegVMMCinds , ...
-    vlAdvancer , ...
-    d_partnersMmult, riskAdj, d_riskAdj, ...
+    hivNegNonVMMCinds , hivNegVMMCinds , vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
     hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    dFertPos3 , dFertNeg3  , dFertMat3,  ...
+    dFertPos3 , dFertNeg3  , dFertMat3, d_partnersMmult, riskAdj, d_riskAdj, ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2_Kenya(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
 
 tic
 
@@ -98,24 +92,22 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue2(1, :)= mue2(1 , :) .* 1.5 ;
 mue3 = zeros(age , gender);
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) .* 2 ; %set childhood mortality to be 1.5 times higher 
+mue3(1, :)= mue3(1 , :) .* 2 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(1, :)= mue4(1 , :) .* 2 ; %set childhood mortality to be 1.5 times higher 
-fertility = xlsread(file , 'Fertility' , 'D104:J119');
-
+mue4(1, :)= mue4(1 , :) .* 2 ;
+fertility = xlsread(file , 'Fertility' , 'D104:I119');
+%fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
     'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
-
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -132,41 +124,40 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.7 ; 0.5; 0.6];
+    fertDeclineProp = [0.7 ; 0.4; 0.6];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
 fertility4 = fertility3 .* fertDeclineProp(3,1);
 
-
-partnersMmult = [1.2 2.45 1.4];
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
     idx = find(1 == pIdx);
-    partnersM = zeros(age , risk);
+    %partnersM = zeros(age , risk);
     %partnersMmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    partnersM(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    %partnersM(3:10, 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    %partnersM(11:age , 1:risk) = ones(6,risk).*partnersM(10 , 1:risk);
-    %partnersM(3:age , 1:risk) = partnersM(3:age , 1:risk) ;
-    %partnersM(10:age , 3) = ones(7 , 1);
-    partnersM(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersM(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersM(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
-    partnersM(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
-    for a = 4 : age
-        partnersM(a , 1:2) = (partnersM(a , 3)/partnersM(a-1 , 3)) .* partnersM(a-1 , 1:2);
-    end
+    load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
+    partnersM(3 , 2: 3) = partnersM(3 , 2:3) + 1;
+    partnersM(4:16, 2:3) = zeros;
+    partnersM(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersM(4:6, 1);
+    partnersM(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersM(7:9, 1);
+    partnersM(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersM(10:age, 1);
+    partnersM(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersM(4:6, 1);
+    partnersM(7:10, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersM(7:10, 1);
+    partnersM(11:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersM(11:age, 1);
+%     partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
+%     partnersM(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersM(3 , 2);
+%     for a = 4 : age
+%         partnersM(a , 1:2) = (partnersM(a , 3)/partnersM(a-1 , 3)) .* partnersM(a-1 , 1:2);
+%     end
 else 
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     
     partnersM(3 , 2:3) = partnersM(3, 2:3) + 1;
-    partnersM(4 , 2:3) = partnersM(4, 2:3); 
+    partnersM(4 , 2:3) = partnersM(4, 2:3);
     partnersM(5:6 , 3) = partnersM(5:6 , 3) ;
     
 end
@@ -174,29 +165,30 @@ end
 % Female partners per year by age and risk group
 if calibBool && any(2 == pIdx)
     idx = find(2 == pIdx);
-    partnersF = zeros(age , risk);
+    %partnersF = zeros(age , risk);
     %partnersFmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    partnersF(1:2 , 1:risk) = ones(2 , risk) .* 0.00001;
-    %partnersF(3:10 , 1:risk) = [paramSet(rl).*paramSet(rm).*paramSet(rh) , paramSet(rm).*paramSet(rh) , paramSet(rh)];
-    %partnersF(11:age , 1:risk) = ones(6,risk).*partnersF(10 , 1:risk);
-    %partnersF(3:age , 1:risk) = partnersF(3:age , 1:risk) .* partnersFmult;
-    %partnersF(10:age , 3) = ones(7 , 1);
-    partnersF(3:6 , 3) = paramSet(paramsSub{idx}.inds(1:4));
-    partnersF(7:9 , 3) = ones(3,1).*paramSet(paramsSub{idx}.inds(5));
-    partnersF(10:age , 3) = ones(7,1).*paramSet(paramsSub{idx}.inds(6));
-    partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
-    partnersF(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
-    for a = 4 : age
-        partnersF(a , 1:2) = (partnersF(a , 3)/partnersF(a-1 , 3)) .* partnersF(a-1 , 1:2);
-    end
+    load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
+    partnersF(3, 2: 3) = partnersF(3 , 2:3) + 1;
+    partnersF(4:16, 2:3) = zeros;
+    partnersF(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersF(4:6, 1);
+    partnersF(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersF(7:9, 1);
+    partnersF(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersF(10:age, 1);
+    partnersF(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersF(4:6, 1);
+    partnersF(7:9, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersF(7:9, 1);
+    partnersF(10:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersF(10:age, 1);
+%     partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
+%     partnersF(3 , 1) = paramSet(paramsSub{idx}.inds(8))*partnersF(3 , 2);
+%     for a = 4 : age
+%         partnersF(a , 1:2) = (partnersF(a , 3)/partnersF(a-1 , 3)) .* partnersF(a-1 , 1:2);
+%     end
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3 , 2: 3) = partnersF(3 , 2:3) + 1;
-    partnersF(4 , 2: 3) = partnersF(4 , 2:3); 
+    partnersF(4 , 2: 3) = partnersF(4 , 2:3); % .* partnersMmult(2);
     partnersF(5:6 , 1: 3) = partnersF(5:6 , 1:3) ;
     partnersF(7:10 , 1: 3) = partnersF(7:10 , 1:3) ;
 end    
@@ -204,41 +196,45 @@ end
 % Male acts per partnership per year by age and risk group
 if calibBool && any(8 == pIdx)
     idx = find(8 == pIdx);
-    maleActs = zeros(age , risk);
-    maleActsmult = paramSet(paramsSub{idx}.inds(:));
+    %maleActs = zeros(age , risk);
+    load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
+    %maleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    maleActs(1:2 , 1:risk) = zeros(2 , risk);
-    %maleActs(3:age , 1:risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    maleActs(3:age , 1:risk) = maleActs(3:age , 1:risk) .* maleActsmult;
+    maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* paramSet(paramsSub{idx}.inds(1)); 
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* paramSet(paramsSub{idx}.inds(3));
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4));
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
-    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 1.5;
-    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6 ;
+    maleActs(5, 1:risk) = maleActs(5, 1:risk) .* 2.5 ;
+    maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* 0.6;
     maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* 1.5 ;
 end
 
 % Female acts per partnership per year by age and risk group
 if calibBool && any(9 == pIdx)
     idx = find(9 == pIdx);
-    femaleActs = zeros(age , risk);
-    femaleActsmult = paramSet(paramsSub{idx}.inds(:));
+%     femaleActs = zeros(age , risk);
+%     femaleActsmult = paramSet(paramsSub{idx}.inds(:));
     %rowL = paramsSub{idx}.length/3;
     %rl = paramsSub{idx}.inds(1:rowL);
     %rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
     %rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    femaleActs(1:2 , 1:risk) = zeros(2 , risk);
-    %femaleActs(3:age , 1: risk) = [paramSet(rl) , paramSet(rm).*paramSet(rl) , paramSet(rh).*paramSet(rm).*paramSet(rl)];
-    femaleActs(3:age , 1: risk) = femaleActs(3:age , 1: risk) .* femaleActsmult;
+    load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
+    femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* paramSet(paramsSub{idx}.inds(1));
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).*paramSet(paramsSub{idx}.inds(3)) ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4)) ;
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
-    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) * 1.8;
-    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk) .* 0.6 ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk) .* 1.5 ;
+    femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* 2.6 ;
+    femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).* 0.6 ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* 1.5 ;
 end
 
 % Convert 5-year age groups to 1-year age groups
@@ -253,10 +249,10 @@ if ~fivYrAgeGrpsOn
 
     % Replicate rates across single age groups for other variables
     vars5To1_nms = {'riskDistM' , 'riskDistF' , 'mue' , 'mue2' , 'mue3' , 'mue4' , ...
-        'fertility' , 'fertility2' , 'fertility3' , ...
+        'fertility' , 'fertility2' , 'fertility3' , 'fertility4' ,...
         'partnersM' , 'partnersF' , 'maleActs' , 'femaleActs'};
     vars5To1_vals = {riskDistM , riskDistF , mue , mue2 , mue3 , mue4 , ...
-        fertility , fertility2 , fertility3 , fertility4, ...
+        fertility , fertility2 , fertility3 , fertility4 ,...
         partnersM , partnersF , maleActs , femaleActs};    
     for j = 1 : length(vars5To1_vals)
         valsA1 = age5To1(vars5To1_vals{j});
@@ -319,7 +315,6 @@ hivOn = 1; % bool to turn HIV on or off although model calibrated for HIV on
 load([paramDir , 'hivNHParamsFrmExcel'] , 'muHIV' , 'kCD4male' , ...
     'kCD4female' , 'kVlmale' , 'kVlfemale');
 
-muHIV = muHIV .* 1.1;
 % Convert 5-year age groups to 1-year age groups
 if ~fivYrAgeGrpsOn
     % Replicate rates across single age groups for other variables
@@ -346,7 +341,9 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.001]; %[0.0004];
+    baseVagTrans = [0.001]; %Thomson et al: For a 25-year-old woman not taking PrEP, 
+                            %the HIV acquisition probability per condomless sex act with an HIV-infected 
+                            %male partner with a viral load of 10 000 copies/mL was 0.0011 (95% CI 0.005–0.0019)
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -423,7 +420,10 @@ end
 % Set transitions in first age group from pre-saved or calibrated values
 load([paramDir , 'hpvCinCCTransFrmExcel'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
-    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig' , 'ageTrends');
+    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig') % , 'ageTrends');
+
+file = [pwd , '/Config/HPV_parameters.xlsx'];
+ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
 
 kCin1_Inf = zeros(16,2);  %(:, 1) 9vHPV, (:, 2) non-9vHPV
 kCin2_Cin1 = zeros(16,2);
@@ -441,7 +441,7 @@ if calibBool && any(27 == pIdx)
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
 else
-    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 2.2 ;
+    kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * 2.2;
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * 3.2; % original multiplier = 1.6
 end
 
@@ -463,8 +463,8 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) .* 1.3;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * 3.3; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.3;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 3.3; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -474,8 +474,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * 2.1;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * 6.7;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2.1;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 6.7;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -485,7 +485,7 @@ if calibBool && any(31 == pIdx)
     rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * rNormal_InfMult(1);
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * rNormal_InfMult(2);
 else
-    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * 2.9; 
+    rNormal_Inf(1 : 5 , 1) = rNormal_Inf_orig(1 , 1) * 2.9;
     rNormal_Inf(1 : 5 , 2) = rNormal_Inf_orig(1 , 2) * 1.9;
 end
 
@@ -508,7 +508,7 @@ if calibBool && any(33 == pIdx)
     kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * kCin1_Cin2Mult(2);
 else
     kCin1_Cin2(1 : 5 , 1) = kCin1_Cin2_orig(1 , 1) * 1.25;
-    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * .35;
+    kCin1_Cin2(1 : 5 , 2) = kCin1_Cin2_orig(1 , 2) * 0.35;
 end
 
 % CIN3 to CIN2, ages 10-24
@@ -518,61 +518,89 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1);
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * .4;
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1)* 1 ;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.4;
 end
+% 
+% % Apply age trends to 9v HPV transitions
+% kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
+% kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
+% kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
+% kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
+% rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ; %include 20-24
+% kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
+% kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
+% kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
+% kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
+% kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
+% kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
+% kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4) * .8;
+% rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5) ;
+% kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
+% kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
+% kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
+% kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
+% kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
+% kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
+% kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4) * .9 ;
+% rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5) ;
+% kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
+% kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
+% kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
+% 
+% % Apply age trends to non-9v HPV transitions
+% kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
+% kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
+% kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
+% kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
+% rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
+% kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
+% kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
+% kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
+% kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
+% kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
+% kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
+% kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4) * .8 ;
+% rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
+% kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
+% kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
+% kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
+% kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
+% kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
+% kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
+% kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4) * .9 ;
+% rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5) ;
+% kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
+% kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
+% kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
-% Apply age trends to 9v HPV transitions
-kCin1_Inf(6 : 10 , 1) = kCin1_Inf(1 , 1) * ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 1) = kCin2_Cin1(1 , 1) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 1) = kCin3_Cin2(1, 1) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 1) = kCC_Cin3(1 , 1) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 1) = rNormal_Inf(1 , 1) * ageTrends(1,5) ;
-kInf_Cin1(6 : 10 , 1) = kInf_Cin1(1 , 1) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 1) = kCin1_Cin2(1 , 1) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 1) = kCin2_Cin3(1 , 1) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 1) = kCin1_Inf(1 , 1) * ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 1) = kCin2_Cin1(1 , 1) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 1) = kCin3_Cin2(1 , 1) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 1) = kCC_Cin3(1 , 1) * ageTrends(2,4) * .8;
-rNormal_Inf(11 : 14 , 1) = rNormal_Inf(1 , 1) * ageTrends(2,5) ;
-kInf_Cin1(11 : 14 , 1) = kInf_Cin1(1 , 1) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 1) = kCin1_Cin2(1 , 1) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 1) = kCin2_Cin3(1 , 1) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 1) = kCin1_Inf(1 , 1) * ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 1) = kCin2_Cin1(1 , 1) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 1) = kCin3_Cin2(1 , 1) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 1) = kCC_Cin3(1 , 1) * ageTrends(3,4) * .9 ;
-rNormal_Inf(15 : 16 , 1) = rNormal_Inf(1 , 1) * ageTrends(3,5) ;
-kInf_Cin1(15 : 16 , 1) = kInf_Cin1(1 , 1) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 1) = kCin1_Cin2(1 , 1) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 1) = kCin2_Cin3(1 , 1) * ageTrends(3,8);
-
-% Apply age trends to non-9v HPV transitions
-kCin1_Inf(6 : 10 , 2) = kCin1_Inf(1 , 2) * ageTrends(1,1); % ages 25-49
-kCin2_Cin1(6 : 10 , 2) = kCin2_Cin1(1 , 2) * ageTrends(1,2);
-kCin3_Cin2(6 : 10 , 2) = kCin3_Cin2(1, 2) * ageTrends(1,3);
-kCC_Cin3(6 : 10 , 2) = kCC_Cin3(1 , 2) * ageTrends(1,4);
-rNormal_Inf(6 : 10 , 2) = rNormal_Inf(1 , 2) * ageTrends(1,5) ;
-kInf_Cin1(6 : 10 , 2) = kInf_Cin1(1 , 2) * ageTrends(1,6);
-kCin1_Cin2(6 : 10 , 2) = kCin1_Cin2(1 , 2) * ageTrends(1,7);
-kCin2_Cin3(6 : 10 , 2) = kCin2_Cin3(1 , 2) * ageTrends(1,8);
-kCin1_Inf(11 : 14 , 2) = kCin1_Inf(1 , 2) * ageTrends(2,1); % ages 50-69
-kCin2_Cin1(11 : 14 , 2) = kCin2_Cin1(1 , 2) * ageTrends(2,2);
-kCin3_Cin2(11 : 14 , 2) = kCin3_Cin2(1 , 2) * ageTrends(2,3);
-kCC_Cin3(11 : 14 , 2) = kCC_Cin3(1 , 2) * ageTrends(2,4) * .8;
-rNormal_Inf(11 : 14 , 2) = rNormal_Inf(1 , 2) * ageTrends(2,5);
-kInf_Cin1(11 : 14 , 2) = kInf_Cin1(1 , 2) * ageTrends(2,6);
-kCin1_Cin2(11 : 14 , 2) = kCin1_Cin2(1 , 2) * ageTrends(2,7);
-kCin2_Cin3(11 : 14 , 2) = kCin2_Cin3(1 , 2) * ageTrends(2,8);
-kCin1_Inf(15 : 16 , 2) = kCin1_Inf(1 , 2) * ageTrends(3,1); % ages 70-79
-kCin2_Cin1(15 : 16 , 2) = kCin2_Cin1(1 , 2) * ageTrends(3,2);
-kCin3_Cin2(15 : 16 , 2) = kCin3_Cin2(1 , 2) * ageTrends(3,3);
-kCC_Cin3(15 : 16 , 2) = kCC_Cin3(1 , 2) * ageTrends(3,4)* .9 ;
-rNormal_Inf(15 : 16 , 2) = rNormal_Inf(1 , 2) * ageTrends(3,5) ;
-kInf_Cin1(15 : 16 , 2) = kInf_Cin1(1 , 2) * ageTrends(3,6);
-kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
-kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
+% HPV progression multipler 5-year age group
+%%
+for a = 1 : length(ageTrends)
+    mult = 1;
+    if a >= 7
+        mult = 1.29 .* (1 - (1/a));
+    end
+    % Apply age trends to 9v HPV transitions
+    kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; 
+    kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2) * mult;
+    kCin3_Cin2(a + 5 , 1) = kCin3_Cin2(1, 1) * ageTrends(a,3) * mult;
+    kCC_Cin3(a + 5 , 1) = kCC_Cin3(1 , 1) * ageTrends(a,4) * mult;
+    rNormal_Inf(a + 5, 1) = rNormal_Inf(1 , 1) * ageTrends(a,5) * mult ; 
+    kInf_Cin1(a + 5 , 1) = kInf_Cin1(1 , 1) * ageTrends(a,6) * mult;
+    kCin1_Cin2(a + 5 , 1) = kCin1_Cin2(1 , 1) * ageTrends(a,7) * mult;
+    kCin2_Cin3(a + 5 , 1) = kCin2_Cin3(1 , 1) * ageTrends(a,8) * mult;
+    
+    % Apply age trends to non-9v HPV transitions 
+    kCin1_Inf(a + 5 , 2) = kCin1_Inf(1 , 2) * ageTrends(a,1) * mult;
+    kCin2_Cin1(a + 5 , 2) = kCin2_Cin1(1 , 2) * ageTrends(a,2) * mult;
+    kCin3_Cin2(a + 5 , 2) = kCin3_Cin2(1, 2) * ageTrends(a,3) * mult; 
+    kCC_Cin3(a + 5, 2) = kCC_Cin3(1 , 2) * ageTrends(a,4) * mult;
+    rNormal_Inf(a + 5 , 2) = rNormal_Inf(1 , 2) * ageTrends(a,5) * mult ;
+    kInf_Cin1(a + 5 , 2) = kInf_Cin1(1 , 2) * ageTrends(a,6) * mult;
+    kCin1_Cin2(a + 5 , 2) = kCin1_Cin2(1 , 2) * ageTrends(a,7) * mult;
+    kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
+end
 
 % % if calibBool && any(25 == pIdx) % CJB note: old code
 % %     idx = find(25 == pIdx);
@@ -616,7 +644,7 @@ if calibBool && any(18 == pIdx)
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
-    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.20) , log10(0.405) , 4);
+    lambdaMultImm(5 : 8) = 1 - logspace(log10(0.33) , log10(0.405) , 4);
     lambdaMultImm(9 : 12) = 1 - logspace(log10(0.40) , log10(0.215) , 4);
     lambdaMultImm(13 : 16) = lambdaMultImm(12);
 end
@@ -679,7 +707,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.00780; %original value 0.005
+    perPartnerHpv_vax = 0.0078;
 end
 
 if calibBool && any(11 == pIdx)
@@ -777,8 +805,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = circProtect .* 0.5;
-circProtect = [[circProtect; 0.3] , [0; 0.2]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use
@@ -787,9 +814,9 @@ if calibBool && any(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
-        condUse = 0.05; % * 0.5;
+        condUse = 0.15; % * 0.5;
     else
-        condUse = 0.05; %changed from 20%
+        condUse = .05; %changed from 20%
     end
 end
 
@@ -802,8 +829,8 @@ artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females
+maxRateM = [artVScov(:,3) ./ 100 ; 0.55] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.65] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -821,16 +848,16 @@ end
 hivStartYear = 1980;
 circStartYear = 1980;
 circNatStartYear = 2008;
-vaxStartYear = 2020;
+vaxStartYear = 2014;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
-vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1960
-            0.2998 0.5047 0.3554 0.309825 0.2240865 0.192258; ... % 2003
-            0.3717 0.4683 0.3956 0.3592 0.4032 0.1939; ... %2008
-            0.7154 0.7274 0.5088 0.4378 0.4167 0.4064; ... %2014 
-            0.72 0.73 0.51 0.44 0.42 0.41];   % 2030 --> 80% [year x age group]
+vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
+            0.5 0.70 0.75 0.70 0.6 0.50; ... % 2003
+            0.60 0.70 0.75 0.70 0.60 0.60; ... %2008
+            0.70 0.75 0.80 0.75 0.70 0.60; ... %2014 
+            0.70 0.75 0.80 0.75 0.70 0.60];   % 2030 ideal: 90% [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
@@ -927,45 +954,58 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 %% Import and save calibration data
-% file = [pwd , '/Config/Calibration_targets.xlsx'];
+file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
+
+ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidence Rate 2012, by age
+ccInc2012_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H10:I22');
+cc_dist_dObs = zeros(2, 3);
+cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E2:E3'); % CC type distribution for 9v and non-9v HPV types
+cc_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H2:I3');
+
+cin3_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E8:E9'); % CIN3 type distribution for 9v and non-9v HPV types
+cin3_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H8:I9');
+
+cin1_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E6:E7'); % CIN1 type distribution for 9v and non-9v HPV types
+cin1_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H6:I7');
+
+hpv_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E4:E5'); % HPV type distribution for 9v and non-9v HPV types
+hpv_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H4:I5');
+
+cinPos2007_dObs(: , 1) = xlsread(file , 'Calibration' , 'E23:E25'); % CIN2/CIN3 Prevalence (HIV+) 2007, by age
+cinPos2007_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H23:I25');
+
+cin1_2010_dObs(: , 1) = xlsread(file , 'Calibration' , 'E29:E30'); % CIN1 Prevalence 2010, by HIV status
+cin1_2010_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H29:I30');
+
+cin2_2010_dObs(: , 1) = xlsread(file , 'Calibration' , 'E31:E32'); % CIN2+ Prevalence 2010, by HIV status
+cin2_2010_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H31:I32');
+
+hpv_hiv_dObs = zeros(4, 3);
+hpv_hiv_dObs(: , 1) = xlsread(file , 'Calibration' , 'E33:E36'); % HPV Prevalence in high risk HIV+ Women (high risk) 2006, by age
+hpv_hiv_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H33:I36');
+hpv_hivNeg_dObs(: , 1) = xlsread(file , 'Calibration' , 'E37:E40'); % HPV Prevalence in high risk HIV- Women (high risk) 2006, by age
+hpv_hivNeg_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H37:I40');
+
+hpv_all_dObs(: , 1) = xlsread(file , 'Calibration' , 'E41:E46'); % HPV Prevalence in all women, by age
+hpv_all_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H41:I46');
+hpv_hiv2009_dObs(: , 1) = xlsread(file , 'Calibration' , 'E47:E51'); % HPV Prevalence in HIV+ women, by age
+hpv_hiv2009_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H47:I51');
+
+hivPrevF_dObs = zeros(21, 1);
+hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'E52:E72'); % HIV Prevalence in Women 2003,2007,2009, by age
+hivPrevF_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H52:I72');
+% hivPrevF_dObs(: , 4:5) = xlsread(file , 'Calibration' , 'E102:F143'); % raw data %
+hivPrevM_dObs = zeros(24, 1);
+hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'E73:E96'); % HIV Prevalence in Men 2003,2007,2009, by age
+hivPrevM_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H73:I96');
+% hivPrevM_dObs(: , 4:5) = xlsread(file , 'Calibration' , 'E60:F101'); % raw data
+
+hivPrevAll_dObs(: , 1) = xlsread(file , 'Calibration' , 'E97:E106'); % HIV Prevalence in all 2003,2007,2009, by age
+hivPrevAll_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H97:I106');
 % 
-% ccInc2011_dObs(: , 1) = xlsread(file , 'Calibration' , 'D162 : D174'); % CC Incidence Rate 2011, by age
-% ccInc2011_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H162 : I174');
-% 
-% cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D183 : D184'); % CC type distribution for 9v and non-9v HPV types
-% cc_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H183 : I184');
-% 
-% cin3_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D189 : D190'); % CIN3 type distribution for 9v and non-9v HPV types
-% cin3_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H189 : I190');
-% 
-% cin1_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D187 : D188'); % CIN1 type distribution for 9v and non-9v HPV types
-% cin1_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H187 : I188');
-% 
-% hpv_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'D185 : D186'); % HPV type distribution for 9v and non-9v HPV types
-% hpv_dist_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H185 : I186');
-% 
-% cinPos2002_dObs(: , 1) = xlsread(file , 'Calibration' , 'D2 : D11'); % CIN2/CIN3 Prevalence (HIV+) 2002, by age
-% cinPos2002_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H2 : I11');
-% cinNeg2002_dObs(: , 1) = xlsread(file , 'Calibration' , 'D12 : D21'); % CIN2/CIN3 Prevalence (HIV-) 2002, by age
-% cinNeg2002_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H12 : I21');
-% 
-% hpv_hiv_dObs(: , 1) = xlsread(file , 'Calibration' , 'D144 : D152'); % HPV Prevalence in HIV+ Women (All) 2014, by age
-% hpv_hiv_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H144 : I152');
-% hpv_hivNeg_dObs(: , 1) = xlsread(file , 'Calibration' , 'D153 : D161'); % HPV Prevalence in HIV- Women (All) 2014, by age
-% hpv_hivNeg_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H153 : I161');
-% 
-% hpv_hivM2008_dObs(: , 1) = xlsread(file , 'Calibration' , 'D52 : D55'); % HPV Prevalence in HIV+ Men, by age
-% hpv_hivM2008_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H52 : I55');
-% hpv_hivMNeg2008_dObs(: , 1) = xlsread(file , 'Calibration' , 'D56 : D59'); % HPV Prevalence in HIV- Men, by age
-% hpv_hivMNeg2008_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H56 : I59');
-% 
-% hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'D60 : D101'); % HIV Prevalence in Men 2003,2005,2006,2007,2008,2009, by age
-% hivPrevM_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H60 : I101');
-% hivPrevM_dObs(: , 4 : 5) = xlsread(file , 'Calibration' , 'E60 : F101'); % raw data
-% hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'D102 : D143'); % HIV Prevalence in Women 2003,2005,2006,2007,2008,2009, by age
-% hivPrevF_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H102 : I143');
-% hivPrevF_dObs(: , 4 : 5) = xlsread(file , 'Calibration' , 'E102 : F143'); % raw data
-% 
+popAgeDist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E107:E170');  % Population age distribution in 1996, 2011, and 2019
+popAgeDist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H107:I170'); 
+
 % popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, and 2019
 %     xlsread(file , 'Calibration' , 'D223 : D238');
 %     xlsread(file , 'Calibration' , 'D255 : D270')];
@@ -973,18 +1013,18 @@ end
 %     xlsread(file , 'Calibration' , 'H223 : I238');
 %     xlsread(file , 'Calibration' , 'H255 : I270')];
 % 
-% totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D273'); % Total population size in 2001, 2011, and 2019
-% totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I273');
-% 
-% save(fullfile(paramDir , 'calibData'), 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
-%     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
-%     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
-%     'hivPrevM_dObs' , 'hivPrevF_dObs' , 'popAgeDist_dObs' , 'totPopSize_dObs')
+totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E171:E174'); % Total population size in 2001, 2011, and 2019
+totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H171:I174');
+% % 
+save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+    'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
+    'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
+    'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs')
 
-load([paramDir , 'calibData'], 'ccInc2011_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
-    'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
-    'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , ...
-    'hivPrevM_dObs' , 'hivPrevF_dObs' , 'popAgeDist_dObs' , 'totPopSize_dObs');
+load([paramDir , 'calibData'], 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+    'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
+    'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
+    'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs');
 
 
 
@@ -1302,11 +1342,6 @@ for a = 1 : age
         ones(length(hivPosArt),1).*negMaleBirth; ones(length(hivPosArt),1).*negFemaleBirth];
     yInds = [yInds; hivUninf; hivUninf; hivPosArt; hivPosArt];
     vals = [vals; ones((length(hivUninf)*2+length(hivPosArt)*2),1) .* ( 0.5*fertility(a,1) )];
-%     hivUninf = toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , ...
-%         1 : intervens , 2 , a , 1 : risk));
-%     xInds = [xInds; ones(length(hivUninf),1).*negMaleBirth; ones(length(hivUninf),1).*negFemaleBirth];
-%     yInds = [yInds; hivUninf; hivUninf];
-%     vals = [vals; ones((length(hivUninf)*2),1) .* ( 0.5*fertility(a,1) )];
 end
 fertMat = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
@@ -1356,11 +1391,6 @@ for a = 1 : age
         ones(length(hivPosArt),1).*negMaleBirth; ones(length(hivPosArt),1).*negFemaleBirth];
     yInds = [yInds; hivUninf; hivUninf; hivPosArt; hivPosArt];
     vals = [vals; ones((length(hivUninf)*2+length(hivPosArt)*2),1) .* ( 0.5*fertility2(a,1) )];
-%     hivUninf = toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , ...
-%         1 : intervens , 2 , a , 1 : risk));
-%     xInds = [xInds; ones(length(hivUninf),1).*negMaleBirth; ones(length(hivUninf),1).*negFemaleBirth];
-%     yInds = [yInds; hivUninf; hivUninf];
-%     vals = [vals; ones((length(hivUninf)*2),1) .* ( 0.5*fertility2(a,1) )];
 end
 fertMat2 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
@@ -1410,11 +1440,6 @@ for a = 1 : age
         ones(length(hivPosArt),1).*negMaleBirth; ones(length(hivPosArt),1).*negFemaleBirth];
     yInds = [yInds; hivUninf; hivUninf; hivPosArt; hivPosArt];
     vals = [vals; ones((length(hivUninf)*2+length(hivPosArt)*2),1) .* ( 0.5*fertility3(a,1) )];
-%     hivUninf = toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , ...
-%         1 : intervens , 2 , a , 1 : risk));
-%     xInds = [xInds; ones(length(hivUninf),1).*negMaleBirth; ones(length(hivUninf),1).*negFemaleBirth];
-%     yInds = [yInds; hivUninf; hivUninf];
-%     vals = [vals; ones((length(hivUninf)*2),1) .* ( 0.5*fertility3(a,1) )];
 end
 fertMat3 = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 
@@ -1426,7 +1451,7 @@ valsPos = [];
 xIndsNeg = [];
 yIndsNeg = [];
 valsNeg = [];
-for d = 3 :7 % hiv infected
+for d = 3 : 7 % hiv infected
     for v = 1 : viral % hiv infected
         for a = 1 : age
             hivInfected = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : 3 , 1 : intervens , 2 , a , 1 : risk));
@@ -1509,24 +1534,28 @@ dFertPos3 = (hivFertPosBirth4 - hivFertPosBirth3) ./ ((2070 - 2020) * stepsPerYe
 dFertNeg3 = (hivFertNegBirth4 - hivFertNegBirth3) ./ ((2070 - 2020) * stepsPerYear);
 dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 
-
 %% partnersM multiplier 
-d_partnersMmult = ones(3, 3);
+partnersMmult = ones(1, 3); %[1.2 2.4 1.1];
 
-d_partnersMmult(1, 1) = (1.0 - partnersMmult(1)) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(1, 2) = (1.0 - partnersMmult(2)) ./ ((2005 - 1995) * stepsPerYear);
-d_partnersMmult(1, 3) = (0.5 - partnersMmult(3)) ./ ((2005 - 1995) * stepsPerYear);
+if calibBool && any(38 == pIdx);
+    idx = find(38 == pIdx);
+    ptMult = paramSet(paramsSub{idx}.inds(:));
+else
+    ptMult = [1.2 2.4 1.1 1 1.4 1];
+end
 
-d_partnersMmult(2, 1:3) = -logspace(log10(0.2), log10(0.02), 3);
-d_partnersMmult(3, 1:3) = -logspace(log10(0.12), log10(0.028) , 3);
+d_partnersMmult = ones(6, 60);
+d_partnersMmult(1, 1:30) = linspace(1, ptMult(1), 5 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
+d_partnersMmult(2, 1:30) = linspace(1, ptMult(2), 5 * stepsPerYear);  % multiplier for increasing pts in F aged 15-24
+d_partnersMmult(3, 1:30) = linspace(1, ptMult(3), 5 * stepsPerYear); % mulitplier for increasing pts in M and F aged 25 - 49
+d_partnersMmult(4, 1:60) = linspace(ptMult(1), ptMult(4), 10 * stepsPerYear); % multiplier for decreasing pts in M aged 15 - 24
+d_partnersMmult(5, 1:60) = linspace(ptMult(2), ptMult(5), 10 * stepsPerYear); % multiplier for decreasing pts in F aged 15 - 24
+d_partnersMmult(6, 1:60) = linspace(ptMult(3), ptMult(6), 10 * stepsPerYear); % mulitplier for decreasing pts in M and F aged 25 - 49
+%d_partnersMmult(5, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
-
-
-%% risk distribution multiplier
-
-riskAdj = 0.1;
-d_riskAdj = (0.01 - riskAdj) ./ ((1996 - 1991) .* stepsPerYear);
-
+%% risk adjustment multiplier
+riskAdj = 0.005;
+d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);
 
 %% Background death rate before 1950
 % disp('Building death matrix')

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=Kenya_futureSim_mox                    # Job name
+#SBATCH --job-name=NyanFutureSim_mox                    # Job name
 #SBATCH --chdir=/gscratch/csde/guiliu/HHCoM         # Working directory
 #SBATCH --mail-type=ALL                            # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=guiliu@uw.edu
@@ -19,7 +19,7 @@ echo "Running MATLAB script futureSim for simulation predictions."
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/guiliu/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "futureSim_Kenya(0 , [] , [] , [] , [] , 0 , '19May20')"
+matlab -nodisplay -nosplash -r "futureSim(0 , [] , [] , [] , [] , 0 , '19May20')"
 
 rm -r /gscratch/csde/guiliu/$SLURM_JOB_ID
 
