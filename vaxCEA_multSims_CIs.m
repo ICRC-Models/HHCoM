@@ -64,12 +64,16 @@ fileInds = {'11_1' , '11_2' , '11_3' , '11_4' , '11_5' , '11_6' , ...
 nRuns = length(fileInds);
 
 % Initialize model output plots
+% Annual timespan
+annualTimespan = [startYear : lastYear-1];
 % Total population size
-popYearVec = [1980 : 10 : 2060];
-popSize = zeros(nRuns , length(popYearVec));
-% % Population age distribution
-% popYearVec = unique(popAgeDist_dObs(: ,1));
-% popProp = zeros(nRuns , length(popYearVec) , age);
+popSize = zeros(nRuns , length(annualTimespan));
+% Population age distribution
+popYearVec = [2019 2100];
+popPropF = zeros(nRuns , length(popYearVec) , age);
+
+
+
 % HIV prevalence
 hivYearVec = [1980 : 10 : 2060];
 % hivAgeM = zeros(nRuns , 7 , length(hivYearVec));
@@ -142,25 +146,21 @@ for j = 1 : nRuns
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
     %% Population size over time vs. Statistics South Africa data (calibration)
-    popYearVec = [1980 : 10 : 2060];
+    popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
+    popSize(j , :) = sum(noV.popVec(: , popTot),2);
+    
+    %% Female population size by 5-year age groups over time vs. Statistics South Africa data (internal validation)
     for t = 1 : length(popYearVec)
-        popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-        popSize(j , t) = sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
+        for a = 1 : age
+            popAgeF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+            popTotF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
+            popPropF(j , t , a) = sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popAgeF),2) ./ ...
+                sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTotF),2);
+        end
     end
-
-    %% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
-%     popYearVec = unique(popAgeDist_dObs(: ,1));
-%     for t = 1 : length(popYearVec)
-%         for a = 1 : age
-%             popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%                 1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
-%             popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%                 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-%             popProp(j , t , a) = sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popAge),2) ./ ...
-%                 sum(noV.popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
-%         end
-%     end
 
     %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
@@ -455,7 +455,6 @@ end
 %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
 %% Population size over time vs. Statistics South Africa data (calibration/validation)
-popYearVec = unique(totPopSize_dObs(: ,1));
 % Load calibration/validation data from Excel (years, values)
 file = [pwd , '/Config/Population_validation_targets.xlsx'];
 historicalPop0_69 = zeros(5,2);
@@ -474,117 +473,18 @@ errorbar(totPopSize_dObs(: , 1) , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold all;
 plot(futurePop0_69(:,1) , futurePop0_69(:,2) , 'o');
-%boxplot(popSize , 'Positions' , popYearVec , 'Labels' , popYearVec , 'Color' , 'k' , 'Whisker' , 5);
-plot([1980 : 10 : 2060]' , mean(popSize,1)' , 'k-' , ...
-    [1980 : 10 : 2060]' , min(popSize,[],1)' , 'k--' , ...
-    [1980 : 10 : 2060]' , max(popSize,[],1)' , 'k--' , 'LineWidth' , 1.5);
+plot(annualTimespan , mean(popSize,1)' , 'k-' , ...
+    annualTimespan , min(popSize,[],1)' , 'k--' , ...
+    annualTimespan , max(popSize,[],1)' , 'k--' , 'LineWidth' , 1.5);
 title('KZN Population Size Ages 0-79')
 xlabel('Year'); ylabel('Individuals')
 xlim([1980 2060]); ylim([0 (20*10^6)]);
-legend('(Statistics SA) Observed KZN, ages 0-79: mean, 2SD' , 'Model, ages 0-79: 25-sets mean' , 'Model, ages 0-79: 25-sets minimum' , 'Model, ages 0-79: 25-sets maximum');
+legend('(Statistics SA) Observed KZN, ages 0-79: mean, 2SD' , ...
+    '(UN World Population Prospects) Future SA, ages 0-69' , ...
+    'Model, ages 0-79: 25-sets mean' , 'Model, ages 0-79: 25-sets minimum' , 'Model, ages 0-79: 25-sets maximum');
 grid on;
 
-%% Population size by 5-year age groups over time vs. Statistics South Africa data (calibration)
-% % Load calibration data from Excel
-% file = [pwd , '/Config/Population_validation_targets.xlsx'];
-% years = xlsread(file , 'Demographics' , 'B91:F91');    % years
-% kzn_popByage_yrs(: , :) = xlsread(file , 'Demographics' , 'M92:Q107').*1000;    % males and females by age in 1996-2019
-% popProp_obs = zeros(5,age);
-% for y = 1 : length(years)
-%     yearCurr = years(y);
-%     for a = 1 : age
-%         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%             1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
-%         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%             1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1 : risk));
-%         popProp_obs(y,a) = sum(kzn_popByage_yrs(a , y)) / sumall(kzn_popByage_yrs(1 : end , y));
-%     end
-% end
-% 
-% popYearVec = unique(popAgeDist_dObs(: ,1));
-% 
-% % Calibration error bars
-% meanObs = [popAgeDist_dObs(1:16 , 2) , popAgeDist_dObs(17:32 , 2) , popAgeDist_dObs(33:48 , 2)]';
-% sdevObs = ([popAgeDist_dObs(1:16 , 3) , popAgeDist_dObs(17:32 , 3) , popAgeDist_dObs(33:48 , 3)]'.^(1/2)).*2;
-% 
-% figure;
-% subplot(1,3,1);
-% set(gca,'ColorOrderIndex',1)
-% calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , ...
-%     unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) ,];
-% errorbar(calibYrs , meanObs(: , 1:7) , sdevObs(: , 1:7) , ...
-%     's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
-% hold on;
-% % set(gca,'ColorOrderIndex',1)
-% % plot(years , popProp_obs(: , 1:7) , 'o');
-% % hold on;
-% for a = 1 : 7
-%     set(gca,'ColorOrderIndex',a)
-%     plot(popYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a)
-%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a)
-%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-% end
-% ylim([0.05 0.18]);
-% ylabel('Population proportion by age'); xlabel('Year');
-% legend('(Statistics SA) Observed KZN, ages 0-4: mean, 2SD' , 'ages 5-9: mean, 2SD' , 'ages 10-14: mean, 2SD' , 'ages 15-19: mean, 2SD' , 'ages 20-24: mean, 2SD' , 'ages 25-29: mean, 2SD' , 'ages 30-34: mean, 2SD' , ...
-%     'Model, ages 0-4: 25-sets mean' , 'ages 0-4: 25-sets minimum' , 'ages 0-4: 25-sets maximum' , '...' , 'Location' , 'north');
-% 
-% subplot(1,3,2);
-% set(gca,'ColorOrderIndex',1)
-% calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , ...
-%     unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) ,];
-% errorbar(calibYrs , meanObs(: , 8:14) , sdevObs(: , 8:14) , ...
-%     's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
-% hold on;
-% % set(gca,'ColorOrderIndex',1)
-% % plot(years , popProp_obs(: , 8:14) , 'o');
-% % hold on;
-% for a = 8 : 14
-%     set(gca,'ColorOrderIndex',a-7)
-%     plot(popYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a-7)
-%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a-7)
-%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-% end
-% ylim([0.0 0.13]);
-% ylabel('Population proportion by age'); xlabel('Year');
-% legend('(Statistics SA) Observed KZN, ages 35-39: mean, 2SD' , 'ages 40-44: mean, 2SD' , 'ages 45-49: mean, 2SD' , 'ages 50-54: mean, 2SD' , 'ages 55-59: mean, 2SD' , 'ages 60-64: mean, 2SD' , 'ages 65-69: mean, 2SD' , ...
-%     'Model, ages 35-39: 25-sets mean' , 'ages 35-39: 25-sets minimum' , 'ages 35-39: 25-sets maximum' , '...' , 'Location' , 'north');
-% 
-% 
-% subplot(1,3,3);
-% set(gca,'ColorOrderIndex',1)
-% calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1))];
-% errorbar(calibYrs , meanObs(: , 15:16) , sdevObs(: , 15:16) , ...
-%     's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
-% hold on;
-% % set(gca,'ColorOrderIndex',1)
-% % plot(years , popProp_obs(: , 15:16) , 'o');
-% % hold on;
-% for a = 15 : 16
-%     set(gca,'ColorOrderIndex',a-14)
-%     plot(popYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a-14)
-%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-%     set(gca,'ColorOrderIndex',a-14)
-%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-%     hold all;
-% end
-% ylim([0.0 0.04]);
-% ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
-% legend('(Statistics SA) Observed KZN, ages 70-74: mean, 2SD' , 'ages 75-79: mean, 2SD' , ...
-%     'Model, ages 70-74: 25-sets mean' , 'ages 70-74: 25-sets minimum' , 'ages 70-74: 25-sets maximum' , '...' , 'Location' , 'north');
+%% Female population size by 5-year age groups over time vs. Statistics South Africa data (internal validation)
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
