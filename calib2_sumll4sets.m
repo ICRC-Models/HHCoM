@@ -17,7 +17,7 @@ date = date_abc;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
@@ -31,8 +31,8 @@ pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);
 %% If on Phase 2 of calibration, uncomment the following to load resampled subset of parameters from best-fit sets of a previous phase.
 %  Note: also need to set paramSet = [ph1sampleSubset(:,subMatrixInds(n)) ; paramSetMatrix(:,subMatrixInds(n))];
 %  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
-pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
-ph1sampleSubset = load([paramDir,'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
+% pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
+% ph1sampleSubset = load([paramDir,'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct();
@@ -47,7 +47,7 @@ end
 %% Obtain model output for each set of sampled parameters
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
-    paramSet = [ph1sampleSubset(:,subMatrixInds(n)) ; paramSetMatrix(:,subMatrixInds(n))];
+    paramSet = [paramSetMatrix(:,subMatrixInds(n))];
     %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     negSumLogLSet(n,1) = negSumLogL;
