@@ -16,18 +16,18 @@ date = date_abc;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Load structure of all potentially calibrated parameters
 [paramsAll] = genParamStruct();
 
 %% Latin hypercube sampling of parameter space
+
 %nSets = 48; %100;    % number of parameter sets to sample
 %p = 84; 398;    % number of parameters
 
 pIdx = [1,2,5,6,7,8,9,10,35,38];    % indices in paramsAll cell array
-prtnrActMults = 1;
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -51,53 +51,7 @@ sampleNorm = sampleNorm';
 
 sample = lb + (sampleNorm .* (ub-lb));
 
-%% Apply parameter constraints
-
-% partnersM, partnersF (if calibrating actual values vs. multipliers)
-if (any(1 == pIdx) && ~prtnrActMults)
-    idx = find(1 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0)); % mr partners < hr partners, > lr partners
-    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:)); % lr partners < mr partners
-end
-if (any(2 == pIdx) && ~prtnrActMults) 
-    idx = find(2 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rh,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rh,:) - ((sample(rh,:)-lb(rm,:))./2.0));
-    sample(rl,:) = lb(rl,:) + sampleNorm(rl,:) .* (sample(rm,:) - lb(rl,:));
-end
-
-% maleActs, femaleActs (if calibrating actual values vs. multipliers)
-if (any(8 == pIdx) && ~prtnrActMults)
-    idx = find(8 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
-    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
-end
-if (any(9 == pIdx) && ~prtnrActMults)
-    idx = find(9 == pIdx);
-    rowL = paramsSub{idx}.length/3;
-    rl = paramsSub{idx}.inds(1:rowL);
-    rm = paramsSub{idx}.inds(rowL+1 : rowL*2);
-    rh = paramsSub{idx}.inds(rowL*2+1 : rowL*3);
-    sample(rm,:) = (sample(rl,:)-lb(rm,:))./2.0 + sampleNorm(rm,:) .* ...
-        (sample(rl,:) - ((sample(rl,:)-lb(rm,:))./2.0));
-    sample(rh,:) = lb(rh,:) + sampleNorm(rh,:) .* (sample(rm,:) - lb(rh,:));
-end
-
-%% Save parameter sets and negSumLogL values
+%% Save parameter sets and parameter index values
 file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , pIdx)
@@ -105,3 +59,23 @@ csvwrite([paramDir, file] , pIdx)
 file = ['paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
+
+%% If on Phase 2 of calibration, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
+%  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
+% pIdx_wPh1Resample = [1,2,5,6,9,35, pIdx(1,:)];
+% 
+% ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20_20_top50Sets.dat']);
+% ph1sample = datasample(ph1_top50Sets, nSets , 2); % resample
+% ph1sampleSubset = [ph1sample(1:21,:); ph1sample(26,:)]; % keep subset of resampled parameter set
+% 
+% file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '_wPh1Resample' , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% csvwrite([paramDir, file] , pIdx_wPh1Resample)
+% 
+% file = ['resampleSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% csvwrite([paramDir, file] , ph1sample)
+% 
+% file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% csvwrite([paramDir, file] , ph1sampleSubset)

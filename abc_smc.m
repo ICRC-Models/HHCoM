@@ -4,7 +4,7 @@
 
 function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
 t = tstep_abc;
-alpha = 0.6; %(5998/9996);
+alpha = 0.4;
 p_acc_min = 0.05;
 date = date_abc;
 
@@ -197,3 +197,34 @@ if p_acc > p_acc_min
     fileD = ['paramSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
     csvwrite([paramDir, fileD] , new_particles(2:end,:));
 end
+
+%% If on Phase 2 of calibration, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
+%  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
+% resampleSubsetSets = load([paramDir , 'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 random parameter sample
+% if t_curr == 0
+%     % Save initial set of resampled particles
+%     masterResampleSubsetMatrix = resampleSubsetSets;
+%     fileMresample = ['masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+%     csvwrite([paramDir, fileMresample] , masterResampleSubsetMatrix);
+% elseif t_curr > 0
+%     % Append resampled particles in iteration t-1 to particles in iteration t
+%     alphaResampleSubset_prev = load([paramDir , 'alphaResampleSubset_calib_' , date , '_' , num2str(t_prev) , '.dat']);
+%     masterResampleSubsetMatrix = [alphaResampleSubset_prev , resampleSubsetSets];
+%     fileMresample = ['masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+%     csvwrite([paramDir, fileMresample] , masterResampleSubsetMatrix);
+% end
+% alphaResampleSubset = masterResampleSubsetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
+% fileAlphaResample = ['alphaResampleSubset_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of top alpha-proportion of Ph1 resampled sets
+% csvwrite([paramDir, fileAlphaResample] , alphaResampleSubset);
+% 
+% ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20_20_top50Sets.dat']);
+% ph1sample = datasample(ph1_top50Sets, round(n_new_particles) , 2); % resample
+% ph1sampleSubset = [ph1sample(1:21,:); ph1sample(26,:)]; % keep subset of resampled parameter set
+% 
+% file = ['resampleSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% csvwrite([paramDir, file] , ph1sample)
+% 
+% file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% csvwrite([paramDir, file] , ph1sampleSubset)
