@@ -1,16 +1,16 @@
 #!/bin/bash
 
-#SBATCH --job-name=Nyan_historicalSim_mox   	            # Job name
-#SBATCH --chdir=/gscratch/csde/guiliu/HHCoM         # Working directory
-#SBATCH --mail-type=ALL           		    # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
+#SBATCH --job-name=histKen_mox                      # Job name
+#SBATCH --chdir=/gscratch/csde/guiliu/HPV-HIVacq_model/HHCoM    # Working directory
+#SBATCH --mail-type=ALL                                         # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=guiliu@uw.edu
-#SBATCH --export=all                                # Export environment variables to the batch job session
+#SBATCH --export=all                                            # Export environment variables to the batch job session
 
-#SBATCH --account=csde      	 		    # Allocation Definition
+#SBATCH --account=csde                                          # Allocation Definition
 #SBATCH --partition=csde
-#SBATCH --nodes=1   		 		    # Node resources
-#SBATCH --mem=185G   		 		    # Memory per node
-#SBATCH --time=04:00:00 	 		    # Wall clock time limit hrs:min:sec
+#SBATCH --nodes=1                                               # Node resources
+#SBATCH --mem=185G                                              # Memory per node
+#SBATCH --time=04:00:00                                         # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
 
@@ -24,3 +24,4 @@ matlab -nodisplay -nosplash -r "historicalSim(0 , [] , [] , [] , [] , 0 , '10Dec
 rm -r /gscratch/csde/guiliu/$SLURM_JOB_ID 
 
 date
+

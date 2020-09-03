@@ -115,29 +115,35 @@ end
 
 %% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
 % partnership/ contact matrices
-% partnersMmult = [2 4];
+% partnersMmult = [1.2 2 1.1 ];
+% if (year >= 1988) && (year < 1994)
+%    yearInd = round((year - (1988 - (1/6))) * 6);
+%    partnersMmult = d_partnersMmult(yearInd);
+% end
 
-if (year >= 1995) && (year < 2006)
-    dt = (year - 1995) * stepsPerYear;
-    partnersMmult(1) = partnersMmult(1) + d_partnersMmult(1, 1) .* dt; %M, 15-19
-    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(1, 2) .* dt; %F, 15-29
-    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(1, 3) .* dt; %M, 20-49 & F, 30-49
-elseif (year >= 2006) && (year < 2008)
-    yearInd = round(year - 2005);
-    dt = (year - 2005) * stepsPerYear;
-    partnersMmult(1) = 1.2; %M, 15-19
-    partnersMmult(2) = partnersMmult(2) + d_partnersMmult(2, yearInd) .* dt; %F, 15-29
-    partnersMmult(3) = partnersMmult(3) + d_partnersMmult(3, yearInd) .* dt; %M, 20-49 & F, 30-49
-elseif year >= 2008
-    partnersMmult(1) = 1.2;
-    partnersMmult(2) = 2.5;
-    partnersMmult(3) = 1.0;
+if (year >= 1975) && (year < 1978)
+    yearInd = round((year - (1975 - (1/6))) * 6);
+    partnersMmult(1) = d_partnersMmult(1, yearInd);
+    partnersMmult(2) = d_partnersMmult(2, yearInd);
+    partnersMmult(3) = d_partnersMmult(3, yearInd);
+elseif (year >= 1978) && (year < 1988)
+    partnersMmult(1) = d_partnersMmult(1, 18);
+    partnersMmult(2) = d_partnersMmult(2, 18);
+    partnersMmult(3) = d_partnersMmult(3, 18);
+elseif (year >= 1988) && (year < 1998)
+    yearInd2 = round((year - (1988 - (1/6))) * 6);
+    partnersMmult(1) = d_partnersMmult(4, yearInd2);
+    partnersMmult(2) = d_partnersMmult(5, yearInd2);
+    partnersMmult(3) = d_partnersMmult(6, yearInd2);
 end
+% partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
+% partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
+
 partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
 partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
-
 partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
 partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
+
 
 % males
 c(1 , : , :) = partnersM;
@@ -152,6 +158,7 @@ for g = 1 : gender
         end
     end
 end
+
 ageNum = sum(c .* popSum , 3); % numerator for age portion, sum by r -> dim [g x a]
 den = sum(ageNum , 2); % sum across a -> dim [g x 1]
 
@@ -257,8 +264,8 @@ cAdj(isinf(cAdj)) = 0;
 
 %% Protection against HIV and HPV due to condom usage and circumcision
 % find condom use according to the present year
-condStart = 1995;
-peakYear = 2000;
+condStart = 1994;
+peakYear = 1998;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year <= peakYear
@@ -355,6 +362,7 @@ for a = ageSexDebut : age
                     % non-vaccine-type HPV infection
                     mhpvNonVaxInf = hpvNonVaxInf(d , 1 , a , r , p , :); % update to infected
                     fhpvNonVaxInf = hpvNonVaxInf(d , 2 , a , r , p , :);
+
 
                     % Set lambda multipliers based on CD4 count
                     lambdaMultF = 1;
@@ -487,11 +495,21 @@ for h = 1 : hpvVaxStates
                             fSus = hivSus(d , h , s , x , 2 , a , r , :);
                             mTo = toHiv(h , s , x , 1 , a , r , :); % set disease state = 3 (acute infection)
                             fTo = toHiv(h , s , x , 2 , a , r , :);
+                            
+                            %set multiplier for HPV+ state, which does not
+                            %include CIN or CC
+                             
+                            lambdaMultF = 1;
+                            lambdaMultM = 1;
+                            if ((h == 2) && ((s < 3) || (s == 7))) || ((s == 2) && ((h < 3) || (h == 7)))
+                                    lambdaMultM = hiv_hpvMult;
+                                    lambdaMultF = hiv_hpvMult;
+                            end
 
                             % Calculate infections
-                            mInfected = min(lambda(1 , a , r)...
+                            mInfected = min(lambdaMultM .* lambda(1 , a , r)...
                                 .* psi_hiv(1,d) , 0.999) .* pop(mSus); % infected males
-                            fInfected = min(lambda(2 , a , r)...
+                            fInfected = min(lambdaMultF .* lambda(2 , a , r)...
                                 .* psi_hiv(2,d) , 0.999) .* pop(fSus); % infected females
 
                             % HIV incidence tracker

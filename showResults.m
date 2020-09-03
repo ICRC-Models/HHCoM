@@ -41,11 +41,11 @@ paramDir = [pwd , '\Params\'];
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3  , dFertMat3, d_partnersMmult, riskAdj, d_riskAdj, ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2_Kenya(1 , 0 , [] , [] , []);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_1-99_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacq_ptMult']
+toNowName = ['toNow_RR_1_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacqF_ptMult']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
