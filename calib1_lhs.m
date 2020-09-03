@@ -23,7 +23,11 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 [paramsAll] = genParamStruct();
 
 %% Latin hypercube sampling of parameter space
-pIdx = [1,2,5,6,7,8,9,10,11,35,38];    % indices in paramsAll cell array
+
+%nSets = 48; %100;    % number of parameter sets to sample
+%p = 84; 398;    % number of parameters
+
+pIdx = [1,2,5,6,7,8,9,10,35,38];    % indices in paramsAll cell array
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
