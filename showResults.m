@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_1_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacqF_ptMult']
+toNowName = ['toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -55,7 +55,6 @@ set(0 , 'defaultlinelinewidth' , 2)
 
 % excel output file 
 filename = [pwd, '\Calibration_comparison_national.xlsx']
-
 
 %% Population size over time vs. validation data
 totalPop0_79 = zeros(2, length(tVec));
@@ -282,7 +281,7 @@ hold on
 % errorbar(prevValYrs , prevVal , yNegError , yPosError , 'ms')
 xlabel('Year'); ylabel('Proportion of Population (%)'); title('HIV Prevalence (Ages 15-54)')
 legend('Model' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
-xlim([1980 2020])
+xlim([1990 2020])
 ylim([0, 20])
 %%
 sheet = ['HIV_prev'];
@@ -1238,7 +1237,6 @@ xlabel('Age Group'); ylabel('Prevalence (%)')
 title('Age specific CIN prevalence among all women in 2000')
 ylim([0 30])
 %% 
-
 sheet = ['CIN_by_age_2000'];
 cols1 = {toNowName, 'Age specific CIN prevalence among all women in 2000'};
 cols2 = {'Age', 'Model CIN 1', 'Model CIN 2/3'}; % , 'DeVuyst CIN 1', 'DeVuyst CIN 2/3'};
@@ -1275,7 +1273,6 @@ xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
 title('HPV');
 ylim([0 100]);
 xlim([2000 2015]);
-%legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
 
 % CIN1
 cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
@@ -1402,8 +1399,6 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 ccYrs = ((ccIncYears - startYear) * stepsPerYear : ...
     (ccIncYears + 1 - startYear) * stepsPerYear);
 
-%aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
-%for aInd = 1 : 16
 for a = 1 : age
     %a = aVec{aInd};
     for y = 1 : length(ccIncYears)
@@ -1488,7 +1483,6 @@ ken_canreg = xlsread(file , 'CC prevalence' , 'C46:G58'); % years
 
 for y = 1 
     ccIncYear = ccIncYears(y);
-    
     figure()
     % Plot model outputs
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
@@ -1505,8 +1499,7 @@ for y = 1
 end
 
 for y = 2 
-    ccIncYear = ccIncYears(y);
-    
+    ccIncYear = ccIncYears(y);  
     figure()
     % Plot model outputs
     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
@@ -1646,7 +1639,6 @@ xlswrite(filename, [ccAgeRel', ccAgeNegRel', ccAgePosRel',...
     ccArtRel'], sheet, 'S3')
 % xlswrite(filename, [gbd_cc], sheet, 'F68')
 % xlswrite(filename, globocan_Ken, sheet, 'J86')
-
 
 %% population by age in 2012
 pop2012 = zeros(16, 1);

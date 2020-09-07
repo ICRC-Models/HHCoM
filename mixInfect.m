@@ -501,8 +501,8 @@ for h = 1 : hpvVaxStates
                              
                             lambdaMultF = 1;
                             lambdaMultM = 1;
-                            if ((h == 2) && ((s < 3) || (s == 7))) || ((s == 2) && ((h < 3) || (h == 7)))
-                                    lambdaMultM = hiv_hpvMult;
+                            if ((h == 2) && ((s < 6) || (s == 7))) || ((s == 2) && ((h < 6) || (h == 7)))
+                                    lambdaMultM = 1;
                                     lambdaMultF = hiv_hpvMult;
                             end
 

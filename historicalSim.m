@@ -35,7 +35,7 @@ tic
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
-pathModifier = 'toNow_RR_1_HIVtrans-0008_HPVtrans-00095_onlyHPVincreaseHIVacqF_ptMult';
+pathModifier = 'toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]_increasedMue';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -467,7 +467,7 @@ for i = iStart : length(s) - 1
         hivSus , toHiv , hivCurr) , tspan , popIn);
     popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
-        disp('After mixInfect Kenya')
+        disp('After mixInfect')
         break
     end
     
@@ -515,7 +515,7 @@ for i = iStart : length(s) - 1
         vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
     popIn = pop(end , :);
     if any(pop(end , :) < 0)
-        disp('After bornAgeDieRisk Kenya')
+        disp('After bornAgeDieRisk')
         break
     end 
     

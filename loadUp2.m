@@ -92,14 +92,15 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue3 = zeros(age , gender) .* 2.5;
+mue2(1, :) = mue2(1, :) .* 1.5;
+mue3 = zeros(age , gender) ;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) .* 2.2 ;
+mue3(1, :)= mue3(1 , :) .* 1.5 ;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(1, :)= mue4(1 , :) ;
+mue4(1, :)= mue4(1 , :) .* 1.5;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 %fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'C279:E294');
@@ -336,7 +337,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.0008]; %[0.001, 0.0004];
+    baseVagTrans = [0.00095]; %[0.001, 0.0004];
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -376,7 +377,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 2.7 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 2 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -678,7 +679,7 @@ if calibBool && any(10 == pIdx)
     idx = find(10 == pIdx);
     perPartnerHpv_vax = paramSet(paramsSub{idx}.inds(:));
 else
-    perPartnerHpv_vax = 0.0095;
+    perPartnerHpv_vax = 0.01; %0.0095;
 end
 
 if calibBool && any(11 == pIdx)
@@ -774,9 +775,9 @@ save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
-circProtect = 0.7;
+
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; .25] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use
@@ -800,8 +801,8 @@ artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.70] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.85] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -819,7 +820,7 @@ end
 hivStartYear = 1978;
 circStartYear = 1980;
 circNatStartYear = 2008;
-vaxStartYear = 2014;
+vaxStartYear = 2019;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -1514,7 +1515,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 % 
 % d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
-ptMult = [1 1.2 1 1 1 1];
+ptMult = [1.1 1.2 1 1 1 1];
 
 d_partnersMmult = ones(6, 60);
 d_partnersMmult(1, 1:18) = linspace(1, ptMult(1), 3 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
