@@ -92,7 +92,7 @@ mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
 mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue2(1, :) = mue2(1, :) .* 1.5;
+mue2(1, :) = mue2(1, :) .* 2;
 mue3 = zeros(age , gender) ;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
@@ -572,9 +572,9 @@ end
 %%
 for a = 1 : length(ageTrends)
     mult = 1;
-    if a >= 7
-        mult = 1.29 .* (1 - (1/a));
-    end
+%     if a >= 7
+%         mult = 1.29 .* (1 - (1/a));
+%     end
     % Apply age trends to 9v HPV transitions
     kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; 
     kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2) * mult;
@@ -777,7 +777,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
     'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Protection from circumcision and condoms
-circProtect = [[circProtect; .25] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 % Condom use

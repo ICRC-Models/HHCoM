@@ -45,7 +45,7 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]']
+toNowName = ['toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]_increasedMue']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
@@ -99,10 +99,10 @@ totalPopVec = sum(totalPop0_79(1 : 2, :),1);
 %%
 sheet = ['pop'];
 cols1 = {toNowName};
-cols2 = {'Year', 'Model pop'}; %, 'UN pop'};
-xlswrite(filename, cols1, sheet, 'A1')
-xlswrite(filename, cols2, sheet, 'A2')
-xlswrite(filename, [totalPopVec(1 : stepsPerYear * 5 : end)'], sheet, 'B3')
+cols2 = {'Model pop'}; %, 'UN pop'};
+xlswrite(filename, cols1, sheet, 'C1')
+xlswrite(filename, cols2, sheet, 'C2')
+xlswrite(filename, [totalPopVec(1 : stepsPerYear * 5 : end)'], sheet, 'C3')
 % xlswrite(filename, [historicalPop0_79(:, 2)], sheet,'G8')
 % xlswrite(filename, [futurePop(:, 1)], sheet,'E23')
 % xlswrite(filename, [futurePop(:, 2)], sheet,'G23')
@@ -174,7 +174,7 @@ legend('0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79',...
     '0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs', ...
     'Location', 'NorthEastOutside');
 %%
-sheet = ['Pop_by_Age'];
+sheet = ['Pop_by_age'];
 cols1 = {toNowName};
 cols2 = {'Year','0-9', '10-19' , '20-29' , '30-39' , '40-49' , '50-59', '60-79'}; %,...
     %'0-9 obs', '10-19 obs' , '20-29 obs' , '30-39 obs' , '40-49 obs' , '50-59 obs', '60-79 obs'};
@@ -286,10 +286,10 @@ ylim([0, 20])
 %%
 sheet = ['HIV_prev'];
 cols1 = {toNowName};
-cols2 = {'Final'} %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
-xlswrite(filename, cols1, sheet, 'K1')
-xlswrite(filename, cols2, sheet, 'K2')
-xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'K3')
+cols2 = {'Prevalence'} %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(filename, cols1, sheet, 'J1')
+xlswrite(filename, cols2, sheet, 'J2')
+xlswrite(filename, [hivPrev(331:stepsPerYear:end) ], sheet, 'J3')
 % xlswrite(filename, [HIV_ANC_Kisumu'], sheet, 'C3')
 % xlswrite(filename, [HIV_Kenya_spectrum'], sheet, 'E3')
 
@@ -303,9 +303,9 @@ hivObsGender(:,2) = [4.6 5.4 4.6 4.4];
 
 % sheet = ['HIV_by_sex'];
 % cols1 = {toNowName};
-% cols2 = {'M, Final', 'F, Final'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-% xlswrite(filename, cols1, sheet, 'K1')
-% xlswrite(filename, cols2, sheet, 'K2')
+% cols2 = {'Male', 'Female'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
+% xlswrite(filename, cols1, sheet, 'H1')
+% xlswrite(filename, cols2, sheet, 'H2')
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -322,7 +322,7 @@ for g = 1 : 2
     hold on
     plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
-%     cell1 = ['K', 'L'];
+%     cell1 = ['H', 'I'];
 %     cell = ([cell1(g) +'3']);
 %     xlswrite(filename, [hivPrev_sex(331:stepsPerYear:end)], sheet, cell)
 end
@@ -342,13 +342,13 @@ legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS'
 hivSexAge = zeros(length(tVec), 7);
 ageGroup = ["15-19"; "20-24" ; "25-29"; "30-34"; "35-39" ; "40-44" ; "45-49"];
 yr = 1980 : 2020;
-sheet = ['HIV_sex_age'];
-cols1 = {toNowName,"Final" }
+sheet = ['HIV_by_age'];
+cols1 = {toNowName }
 %cols2 = ["HPVCalib_2.5xSexAct"]; %, 'F, 005% riskAdj'} %, 'Year', 'Males, DHS/KAIS', 'Females, DHS/KAIS',};
-xlswrite(filename, cols1, sheet, 'J11')
+xlswrite(filename, cols1, sheet, 'A11')
 %xlswrite(filename, cols2, sheet, 'A12')
 %xlswrite(filename, yr', sheet, 'P4')
-xlswrite(filename, ['Year', 'Sex', ageGroup' ], sheet, 'J12')
+xlswrite(filename, ['Year', 'Sex', ageGroup' ], sheet, 'A12')
 for g = 1  : 2
     for a = 4: 10
         %a = aVec{aInd};
@@ -361,8 +361,8 @@ for g = 1  : 2
 end
 
 sex_label = repmat(["M" "F"], 41, 1)
-    xlswrite(filename, [yr', sex_label(:, 1), squeeze(hivSexAge(331:stepsPerYear:end, 1, :))], sheet, "J13")
-    xlswrite(filename, [yr', sex_label(:, 2), squeeze(hivSexAge(331:stepsPerYear:end, 2, :))], sheet, "J54")
+    xlswrite(filename, [yr', sex_label(:, 1), squeeze(hivSexAge(331:stepsPerYear:end, 1, :))], sheet, "A13")
+    xlswrite(filename, [yr', sex_label(:, 2), squeeze(hivSexAge(331:stepsPerYear:end, 2, :))], sheet, "A54")
     
 
 %xlswrite(filename, [hivObsGender(:, 3), hivObsGender(:, 1:2)], sheet, 'E3')
@@ -918,17 +918,17 @@ ylim([0 100])
 %%
 sheet = ['HPV_by_age_2005'];
 cols1 = {toNowName};
-cols2 = {'HIV+, higherHIVmort 2020', 'HIV-, higherHIVmort 2020'} %, 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
-xlswrite(filename, cols1, sheet, 'V1')
-xlswrite(filename, cols2, sheet, 'V2')
+cols2 = {'HIV+', 'HIV-'} %, 'DeVuyst HIV+ 2009', 'Yamada HIV+', 'Yamada HIV-'};
+xlswrite(filename, cols1, sheet, 'E1')
+xlswrite(filename, cols2, sheet, 'E2')
 %xlswrite(filename, ageGroup(1:9)', sheet, 'A3')
-xlswrite(filename, [hpvHIV2005, hpvNeg2005], sheet, 'V3')
+xlswrite(filename, [hpvHIV2005, hpvNeg2005], sheet, 'E3')
 
 %% Age specific HPV prevalence data 
 ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-yr = 2000;
+yr = 2005;
 hpv2000 = zeros(9 , 1);
 hpvHIV2000 = hpv2000;
 hpvNeg2000 = hpv2000;
@@ -1154,15 +1154,15 @@ text(2.2, -3.25, 'Note: All observed data are from Nairobi')
 %annotation('textbox', [0, 0, 0.5, 0.1], 'string', 'All observed data are from Nairobi')
 
 %%
-sheet = ['CIN_by_HIV_2010'];
+sheet = ['CIN_by_HIV'];
 cols1 = {[toNowName], ['CIN Prevalence by HIV status in ', year]};
-cols2 = {'HIV+, higherHIVmort 2020', 'HIV-, higherHIVmort 2020'} %, 'HIV+ screening pop (Memiah)',...
+cols2 = {'HIV+', 'HIV-'} %, 'HIV+ screening pop (Memiah)',...
     %'HIV+ screening pop (DeVuyst)', ...
     %'HIV+ FSW (Sweet)', 'HIV- FSW (Sweet)', 'HIV+ FSW (Njagi)', 'HIV- FSW (Njagi)'};
-xlswrite(filename, cols1, sheet, 'X1')
-xlswrite(filename, cols2, sheet, 'X2')
+xlswrite(filename, cols1, sheet, 'H1')
+xlswrite(filename, cols2, sheet, 'H2')
 %xlswrite(filename, cinGroup', sheet, 'K3')
-xlswrite(filename, [cinHiv2010, cinHivNeg2010], sheet, 'X3')
+xlswrite(filename, [cinHiv2010, cinHivNeg2010], sheet, 'H3')
 % xlswrite(filename, [cinHiv2010, cinHivNeg2010, cinHiv_ccScreen',cinHiv_ccScreen2',...
 %     cinHIV_FSW', cinNeg_FSW', cinHIV_FSW2', cinNeg_FSW2'], sheet, 'B9')
  
@@ -1516,13 +1516,13 @@ for y = 2
 end
 
 %%
-sheet = ['CC_inc_by_age_2009'];
+sheet = ['CC_by_age'];
 cols1 = {toNowName, 'Cervical Cancer Incidence by age in 2009'};
 cols2 = {'Age', 'General' , 'HIV-' , 'HIV+' , 'ART'}; % , 'Nairobi 2007-11' , 'Eldoret 2008-11'};
-xlswrite(filename, cols1, sheet, 'V1')
-xlswrite(filename, cols2, sheet, 'V2')
-xlswrite(filename, ageGroup', sheet, 'V3')
-xlswrite(filename, [ccAgeRel, ccAgeNegRel, ccAgePosRel(:, 5), ccArtAgeRel], sheet, 'W3')
+xlswrite(filename, cols1, sheet, 'C1')
+xlswrite(filename, cols2, sheet, 'C2')
+xlswrite(filename, ageGroup(4:end)', sheet, 'C3')
+xlswrite(filename, [ccAgeRel(4:end, 2), ccAgeNegRel(4:end, 2), ccAgePosRel(4:end, 5, 2), ccArtAgeRel(4:end, 2)], sheet, 'D3')
 % xlswrite(filename, [ken_canreg], sheet, 'F6')
 
 %% Cervical cancer incidence over time
@@ -1656,6 +1656,11 @@ ccAll_ASR = sum(ccAgeRel(:, 2) .* segi);
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
 fac = 10 ^ 5;
 plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+sheet = ['CC_inc_ASR'];
+cols1 = {toNowName,};
+cols2 = {'Gen' , 'HIV-' , 'HIV+ ART-' , 'HIV+ ART+', 'All HIV'};
+xlswrite(filename, cols1, sheet, 'F1')
+xlswrite(filename, cols2, sheet, 'F2')
 
 figure()
 for i = 1 : length(inds)
@@ -1688,7 +1693,10 @@ ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
    
     %ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age)));
     plot(tVec(1 : stepsPerYear : end-1) , ccIncRefVec ,'DisplayName' , plotTits1{i});
-    hold all;    
+    hold all;   
+    cell1 = ['F' : 'J'];
+    cell = ([cell1(i) +'3']);
+    xlswrite(filename, [ccIncRefVec'], sheet, cell)
 end
 globocan_EA_ASR = zeros(2, 2);
 globocan_EA_ASR = [2008 34.5
@@ -1712,7 +1720,17 @@ globocan_Ken_ASR = [2008 23.4
     grid off;
     xlim([1970 2020]);
 % ###### calculate age-specific incidence for each year then with segi %s 
-
+%%
+sheet = ['CC_inc_ASR'];
+cols1 = {toNowName,};
+cols2 = {'Gen' , 'HIV-' , 'HIV+ ART-' , 'HIV+ ART+'}; %,...
+   % 'Year', 'GBD Kenya 2018', 'GBD LB', 'GBD UB', 'Year', 'Globocan Kenya'};
+xlswrite(filename, cols1, sheet, 'G1')
+xlswrite(filename, cols2, sheet, 'G2')
+xlswrite(filename, [ccAgeRel', ccAgeNegRel', ccAgePosRel',...
+    ccArtRel'], sheet, 'G3')
+% xlswrite(filename, [gbd_cc], sheet, 'F68')
+% xlswrite(filename, globocan_Ken, sheet, 'J86')
 
 %% CC incidence over time (age-standardized, WHO world pop)
 
