@@ -1,0 +1,9 @@
+param_name,param_val,ci_lb,ci_ub,year,currency,definition,source
+home_testing_pc,8.58,,,2012,usd,Home HTC,"Sharma et al, Nature 2015"
+hosp_200,125.5,,,2009,usd,"Pre-ART hospitalization costs, CD4<200",
+hosp_200_350,58,39,97,2009,usd,"Pre-ART hospitalization costs, CD4 200-350",
+hosp_350,39,23,76,2009,usd,"Pre-ART hospitalization costs, CD4 350+",
+hosp_art,45,23,80,2009,usd,"Post-ART hospitalization costs, CD4 350+ (assumes everyone on ART has CD4+ >350)",
+cb_art_y1,310.84,,,2018,usd,"Community-based ART, Year 1","DO ART , Table S13 - Volume-weighted mean"
+cb_art_y1,245.42,,,2018,usd,"Community-based ART, Subsequent Years","DO ART , Table S13 - Volume-weighted mean"
+standard_art,249.15,,,2018,usd,Standard of Care ART for Adults in SA,"Meyer-Rath, PLoS One, 2019"
