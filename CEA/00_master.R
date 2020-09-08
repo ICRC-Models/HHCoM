@@ -21,6 +21,16 @@ discounter <- function(x,discount_amt) {
   x*discount_amt
 }
 
+# DO ART parameters: amount enrolled in clinic versus community-based ART
+# (Maybe create an excel spreadsheet with parameters)
+
+males_enrolment_clinic <- 51/72
+males_enrolment_cbART <- 21/72
+females_enrolment_clinic <- 70/73
+females_enrolment_cbART <- 3/73
+
+
 # NEXT STEPS:
+# QALYs
 # Males/females
 # Vary Discount Rate 0-5%
