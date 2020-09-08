@@ -1,26 +1,28 @@
 ######################################################################
 
-# Calculate average annual costs at 2030, 2040, 2050, and 2060
+# Calculate average annual costs per year
 # Author: Mita Sahu
 # Date: September 8, 2020
 
 # NOTE: Must be connected to IHME VPN for currency conversion function 
 
+
+# !!!! NEED TO RESOLVE SCENARIO 3
+
 ######################################################################
 
-library(dplyr)
-library(pacman)
 source("00_master.R")
+library(pacman)
+
+
 source('H:/repos/fgh/FGH_2019/04_functions/currency_conversion.R')
 
+library(dplyr)
 
 # TO DO:
-# 1. Inflate any costs -- DONE
-# 2. Discount
-# 3. Double check if reasonable to assume everyone on ART is CD4>350
-# 4. Check ART costs
-# 5. Include startup cost cb_art ,
-# 6. Calculate QALYS!!
+# 1. Double check if reasonable to assume everyone on ART is CD4>350
+# 2. Resolve scenario 3
+# 3. Calculate QALYS!!
 
 #######################################################################
 
@@ -53,7 +55,7 @@ for (x in 1:3) {
   
   prev_ART<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_combined_aged15-79_onART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -69,7 +71,7 @@ for (x in 1:3) {
   
   prev_200 <- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_combined_aged15-79_CD4_below200_noART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -85,7 +87,7 @@ for (x in 1:3) {
   
   prev_200_350 <- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_combined_aged15-79_CD4_200-350_noART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -101,7 +103,7 @@ for (x in 1:3) {
   
   prev_350 <- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_combined_aged15-79_CD4_350plus_noART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -129,7 +131,7 @@ rm(prev_ART, prev_200, prev_200_350, prev_350)
 hosp_scen1 <- as.data.frame(
               prev_200_scen1[,-1] * costs["hosp_200"] +
               prev_200_350_scen1[,-1] * costs["hosp_200_350"] +
-              prev_350_scen1[,-1] * costs["hosp_200_350"] +
+              prev_350_scen1[,-1] * costs["hosp_350"] +
               prev_ART_scen1[,-1] * costs["hosp_art"] ) %>% 
       mutate(year=2020:2060) %>% 
       select(year,everything())
@@ -139,7 +141,7 @@ hosp_scen1 <- as.data.frame(
 hosp_scen2 <- as.data.frame(
   prev_200_scen2[,-1] * costs["hosp_200"] +
     prev_200_350_scen2[,-1] * costs["hosp_200_350"] +
-    prev_350_scen2[,-1] * costs["hosp_200_350"] +
+    prev_350_scen2[,-1] * costs["hosp_350"] +
     prev_ART_scen2[,-1] * costs["hosp_art"] ) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
@@ -149,7 +151,7 @@ hosp_scen2 <- as.data.frame(
 hosp_scen3 <- as.data.frame(
   prev_200_scen3[,-1] * costs["hosp_200"] +
     prev_200_350_scen3[,-1] * costs["hosp_200_350"] +
-    prev_350_scen3[,-1] * costs["hosp_200_350"] +
+    prev_350_scen3[,-1] * costs["hosp_350"] +
     prev_ART_scen3[,-1] * costs["hosp_art"] ) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
@@ -168,7 +170,7 @@ hosp_scen3 <- as.data.frame(
 
 test_scen1 <- as.data.frame(matrix(0, ncol = 28, nrow = 41)) %>% 
   setNames(paste0("s",-2:25)) %>%
-  rename(mean=1,
+  dplyr::rename(mean=1,
          min=2,
          max=3) %>% 
   mutate(year=2020:2060) %>% 
@@ -178,7 +180,7 @@ test_scen1 <- as.data.frame(matrix(0, ncol = 28, nrow = 41)) %>%
 
 test_scen2 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), ncol = 28, nrow = 40)) %>% 
   setNames(paste0("s",-2:25)) %>%
-  rename(mean=1,
+  dplyr::rename(mean=1,
          min=2,
          max=3) %>% 
   rbind(costs["home_testing_pc"]) %>% 
@@ -189,7 +191,7 @@ test_scen2 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), nco
 
 test_scen3 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), ncol = 28, nrow = 40)) %>% 
   setNames(paste0("s",-2:25)) %>%
-  rename(mean=1,
+  dplyr::rename(mean=1,
          min=2,
          max=3) %>% 
   rbind(costs["home_testing_pc"]) %>% 
@@ -212,7 +214,7 @@ for (x in 1:3) {
   
   prev_ART_males<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_males_aged15-79_onART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -226,7 +228,7 @@ for (x in 1:3) {
   
   prev_ART_females<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_females_aged15-79_onART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
+    dplyr::rename(year=1,
            mean=2,
            min=3,
            max=4) %>% 
@@ -238,87 +240,125 @@ for (x in 1:3) {
 
 rm(prev_ART_males,prev_ART_females)
 
+
+# Generate AVERAGE cb-ART costs for the first year and costs for subsequent years 
+
+cbART_costs_pc <- data.frame(year=2020:2060) %>% 
+  mutate(cb_ART_cost= 
+           (costs["cb_art_y1"] + (year-2020)*costs["cb_art_sub"] )/  # Numerator is 1st year costs, plus all subsequent years  
+           (year-2020+1))   # Denominator is total number of years
+                                   
+cbART_costs <- data.frame(matrix(cbART_costs_pc[,2],ncol = 28, nrow = 41)) %>% 
+  setNames(paste0("s",-2:25)) %>%
+  dplyr::rename(mean=1,
+                min=2,
+                max=3) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything())
+  
+rm(cbART_costs_pc)
+
+
 # Multiply based on percentages enrolled in clinic versus community-based ART (defined in master script)
 
+# Males
+
 mART_scen1 <- as.data.frame(
-    (Mprev_ART_scen1[,-1] * males_enrolment_clinic * costs["standard_art"]) +   # clinic ART costs
-    (Mprev_ART_scen1[,-1] * males_enrolment_cbART * costs["cb_art_sub"]))
-      
-    prev_200_350_scen1[,-1] * costs["hosp_200_350"] +
-    prev_350_scen1[,-1] * costs["hosp_200_350"] +
-    prev_ART_scen1[,-1] * costs["hosp_art"] ) %>% 
+  (Mprev_ART_scen1[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Mprev_ART_scen1[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+mART_scen2 <- as.data.frame(
+  (Mprev_ART_scen2[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Mprev_ART_scen2[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+# NEED TO RESOLVE SCENARIO 3
+
+mART_scen3 <- as.data.frame(
+  (Mprev_ART_scen3[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Mprev_ART_scen3[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+# Females
+
+fART_scen1 <- as.data.frame(
+  (Fprev_ART_scen1[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Fprev_ART_scen1[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+fART_scen2 <- as.data.frame(
+  (Fprev_ART_scen2[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Fprev_ART_scen2[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+# NEED TO RESOLVE SCENARIO 3
+
+fART_scen3 <- as.data.frame(
+  (Fprev_ART_scen3[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+  (Fprev_ART_scen3[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+# Combined
+
+ART_scen1 <- (mART_scen1 + fART_scen1) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
 
+ART_scen2 <- (mART_scen2 + fART_scen2) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything())
 
-#################################
-# Annual costs, 2030 - Scenario 1
-#################################
+# NEED TO RESOLVE SCENARIO 3
 
-ART_cost <- prev_ART %>% 
-  select(year, mean1) %>% 
-  mutate(ART_cost = mean1*art + mean1*hosp_art, # ART cost plus hospitalization cost
-         cum_ART_cost = cumsum(ART_cost))
+ART_scen3 <- (mART_scen3 + fART_scen3) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything())
 
-cost_200 <- prev_200 %>% 
-  select(year, mean1) %>% 
-  mutate(hosp200_cost = mean1*hosp_200,
-         cum_hosp200_cost = cumsum(hosp200_cost))
+# Remove excess
 
-cost_200_350 <- prev_200_350 %>% 
-  select(year, mean1) %>% 
-  mutate(hosp200_350_cost = mean1*hosp_200_350,
-         cum_hosp200_350_cost = cumsum(hosp200_350_cost))
-
-cost_350  <- prev_350 %>% 
-  select(year, mean1) %>% 
-  mutate(hosp350_cost = mean1*hosp_350,
-         cum_hosp350_cost = cumsum(hosp350_cost))
-
-total_cost1 <- ART_cost %>% 
-  left_join(cost_200, by="year") %>% 
-  left_join(cost_200_350, by="year") %>% 
-  left_join(cost_350, by="year") %>% 
-  mutate(total_cost1 = cum_ART_cost+cum_hosp200_cost+cum_hosp200_350_cost+cum_hosp350_cost) %>% 
-  select(year, total_cost1)
-
-# Scenario 2 cost per person  -- includes testing costs
-
-cost_testing <- data.frame("year"=2017:2060) %>% 
-  mutate(test_cost=ifelse(year%%5==0,testing_pc,0)) %>% 
-  mutate(cost_test_cum=cumsum(test_cost))
-
-ART_cost <- prev_ART %>% 
-  select(year, mean2) %>% 
-  mutate(ART_cost = mean2*art*(51/70) + mean2*cb_art*(19/70) + mean2*hosp_art, # ART cost plus hospitalization cost
-         cum_ART_cost = cumsum(ART_cost))
-
-cost_200 <- prev_200 %>% 
-  select(year, mean2) %>% 
-  mutate(hosp200_cost = mean2*hosp_200,
-         cum_hosp200_cost = cumsum(hosp200_cost))
-
-cost_200_350 <- prev_200_350 %>% 
-  select(year, mean2) %>% 
-  mutate(hosp200_350_cost = mean2*hosp_200_350,
-         cum_hosp200_350_cost = cumsum(hosp200_350_cost))
-
-cost_350  <- prev_350 %>% 
-  select(year, mean2) %>% 
-  mutate(hosp350_cost = mean2*hosp_350,
-         cum_hosp350_cost = cumsum(hosp350_cost))
-
-total_cost2 <- ART_cost %>% 
-  left_join(cost_200, by="year") %>% 
-  left_join(cost_200_350, by="year") %>% 
-  left_join(cost_350, by="year") %>% 
-  left_join(cost_testing, by="year") %>% 
-  mutate(cost_test_cum=ifelse(is.na(cost_test_cum),0,cost_test_cum)) %>%  #replace NA with zero
-  mutate(total_cost2 = cum_ART_cost+cum_hosp200_cost+cum_hosp200_350_cost+cum_hosp350_cost+cost_test_cum) %>% 
-  select(year, total_cost2)
+rm(mART_scen1,fART_scen1, mART_scen2, fART_scen2, mART_scen3, fART_scen3)
 
 
-cost_diff <- total_cost1 %>% 
-  left_join(total_cost2, by="year") %>% 
-  mutate(cost_diff_1_2=total_cost2-total_cost1)
+####################################################################################################
 
+# TOTAL COSTS
+
+# Sum the Hospitalization, Testing, and ART Costs
+# Then discount
+
+####################################################################################################
+
+
+# Scenario 1
+
+COST_scen1 <- (hosp_scen1[,-1] + test_scen1[,-1] + ART_scen1[,-1]) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything()) %>% 
+  # DISCOUNT
+  mutate(year_discount=0:40,   # set 2020 to Year 0
+         discount_amt=discount(discount_rate,year_discount)) %>% 
+  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
+  select(-year_discount,-discount_amt)
+
+write.csv(COST_scen1, paste0(cea_path,"costs/costs_scen1.csv"))
+
+# Scenario 2
+
+COST_scen2 <- (hosp_scen2[,-1] + test_scen2[,-1] + ART_scen2[,-1]) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything()) %>% 
+  # DISCOUNT
+  mutate(year_discount=0:40,   # set 2020 to Year 0
+         discount_amt=discount(discount_rate,year_discount)) %>% 
+  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
+  select(-year_discount,-discount_amt)
+
+write.csv(COST_scen2, paste0(cea_path,"costs/costs_scen2.csv"))
+
+# Scenario 3
+
+COST_scen3 <- (hosp_scen3[,-1] + test_scen3[,-1] + ART_scen3[,-1]) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,everything()) %>% 
+  # DISCOUNT
+  mutate(year_discount=0:40,   # set 2020 to Year 0
+         discount_amt=discount(discount_rate,year_discount)) %>% 
+  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
+  select(-year_discount,-discount_amt)
+
+write.csv(COST_scen3, paste0(cea_path,"costs/costs_scen3.csv"))
