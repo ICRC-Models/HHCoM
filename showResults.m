@@ -129,9 +129,9 @@ for y = 1 : length(years)
     for aInd = 1 : length(ageVec)
         a = ageVec{aInd};
         popAge = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1:2 , a , 1 : risk));
+            1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
         popTot = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1:2  , 1 : age , 1 : risk));
+            1 : endpoints , 1 : intervens , 1  , 1 : age , 1 : risk));
         popPropYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2) ...
             ./ sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popTot),2); 
         popNumYrs(y,aInd) = sum(popVec(((yearCurr - startYear) * stepsPerYear +1) , popAge),2);            
@@ -1656,11 +1656,11 @@ ccAll_ASR = sum(ccAgeRel(:, 2) .* segi);
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
 fac = 10 ^ 5;
 plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
-sheet = ['CC_inc_ASR'];
-cols1 = {toNowName,};
-cols2 = {'Gen' , 'HIV-' , 'HIV+ ART-' , 'HIV+ ART+', 'All HIV'};
-xlswrite(filename, cols1, sheet, 'F1')
-xlswrite(filename, cols2, sheet, 'F2')
+% sheet = ['CC_inc_ASR'];
+% cols1 = {toNowName,};
+% cols2 = {'Gen' , 'HIV-' , 'HIV+ ART-' , 'HIV+ ART+', 'All HIV'};
+% xlswrite(filename, cols1, sheet, 'F1')
+% xlswrite(filename, cols2, sheet, 'F2')
 
 figure()
 for i = 1 : length(inds)
@@ -1694,9 +1694,9 @@ ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
     %ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age)));
     plot(tVec(1 : stepsPerYear : end-1) , ccIncRefVec ,'DisplayName' , plotTits1{i});
     hold all;   
-    cell1 = ['F' : 'J'];
-    cell = ([cell1(i) +'3']);
-    xlswrite(filename, [ccIncRefVec'], sheet, cell)
+%     cell1 = ['F' : 'J'];
+%     cell = ([cell1(i) +'3']);
+%     xlswrite(filename, [ccIncRefVec'], sheet, cell)
 end
 globocan_EA_ASR = zeros(2, 2);
 globocan_EA_ASR = [2008 34.5

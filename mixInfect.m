@@ -265,7 +265,7 @@ cAdj(isinf(cAdj)) = 0;
 %% Protection against HIV and HPV due to condom usage and circumcision
 % find condom use according to the present year
 condStart = 1994;
-peakYear = 1998;
+peakYear = 2002;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year <= peakYear
