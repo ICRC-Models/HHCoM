@@ -697,6 +697,34 @@ writematrix([tVec(1 : stepsPerYear : end)' , mean(popSizeC_multSims , 2) , ...
 %% PLOT SCENARIOS COMPARED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 colorList = {'k' , 'b' , 'r'};
 
+%% Plot population size
+figure;
+
+% combined
+subplot(1 ,3 , 3);
+for i = 1 : 3
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
+        'PopulationSize_combined_aged15-79' , '.csv'];
+    popSizeC = xlsread(fname);
+    if i == 1
+        hold all;
+        plot(popSizeC(: , 1) , popSizeC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(popSizeC(: , 1) , popSizeC(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(popSizeC(: , 1) , popSizeC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    else
+        hold all;
+        plot(popSizeC((2019-startYear)+1 : end , 1) , popSizeC((2019-startYear)+1 : end , 2) , 'LineStyle' , '-' , 'Color' , colorList{i} , 'LineWidth' , 2);
+        plot(popSizeC((2019-startYear)+1 : end , 1) , popSizeC((2019-startYear)+1 : end , 3) , 'LineStyle' , '--' , 'Color' , colorList{i});
+        plot(popSizeC((2019-startYear)+1 : end , 1) , popSizeC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
+    end
+end
+xlabel('Year'); ylabel('Individuals'); title('Females + Males, aged 15-79');
+xlim([1980 2060]); ylim([0 14*(10^6)]);
+legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
+    'Scenario 3, mean' , 'min' , 'max');
+grid on;
+sgtitle('Population size');
+
 %% Plot HIV incidence
 figure;
 
