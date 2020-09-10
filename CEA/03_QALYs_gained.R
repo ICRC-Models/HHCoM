@@ -5,10 +5,14 @@
 # QALY Calculation: Years of Life * Utility Value
 # This script calculates average annual QALYs gained between interventions
 
+
 # TO DO:
 # Check if CD4+ and ART status of incident cases for model is available
 
 library(dplyr)
+
+##############################################################################
+
 
 # Set up utility weight parameters
 
@@ -19,15 +23,22 @@ wt_cd4_200 <- 0.7
 wt_art <- 0.94
 wt_dead <- 0
 
-# Current strategy:
+# Current strategy - calculate on an annual basis ; from the START of the year and don't include incident cases.
 #1. Number of prevalent cases * utility weight (by CD4+ count), per capita
-#2. Number of incident cases * utility weight (Assuming CD4+ >350 for all), per capita
-#3. Number of HIV negative cases * utility weight  [can be calculated as population minus inc minus prev minus deaths], per capita
-#4. Sum utilities
-#5. Discount
+#2. Number of HIV negative cases * utility weight  [can be calculated as population minus inc minus prev minus deaths], per capita
+#3. Sum utilities
+#4. Discount
 
 # Then Ask Paul Revill - because actually should be cumulative ! (or are births available?)
-# Also check if reasonable to assume all incident cases have CD4+ >350 
+
+
+##############################################################################
+
+# IMPORT POPULATION (males and females combined, age 15-79)
+
+##############################################################################
+
+
 
 
 ##############################################################################
@@ -100,33 +111,73 @@ for (x in 1:3) {
   
 }
 
-# Remove excess DFs
 
-rm(prev_ART, prev_200, prev_200_350, prev_350)
-
-
-
-# Mortality by year, for hypothetical population  (Mortality rates already given per 100k)
+# MULTIPLY BY UTILITY WEIGHTS
 
 for (x in 1:3) {
   
-  mortality <- read.csv(paste0(main_path,"Scenario",x,"/HIV_mortality_combined_aged15-79.csv"), header=F) %>% 
-    setNames(paste0("s",-3:25)) %>% 
-    rename(year=1,
-           mean=2,
-           min=3,
-           max=4) %>% 
-    filter(year>=2020) %>% 
-    select(-year)
+  hiv_pos <- (get(paste0("prev_ART_scen",x))[,-1] * wt_art +    
+              get(paste0("prev_200_scen",x))[,-1] * wt_cd4_200 +
+              get(paste0("prev_200_350_scen",x))[,-1] * wt_cd4_250_350 +
+              get(paste0("prev_350_scen",x))[,-1]  * wt_cd4_350 ) %>%  
+    # SHOULD MULTIPLY BY POPULATION
+    mutate(year=2020:2060) %>% 
+    select(year, everything()) 
   
-  assign(paste0("mortality",x),mortality)
+  assign(paste0("hiv_pos_scen",x),hiv_pos)
   
 }
 
-rm(mortality)
+##############################################################################
+
+# HIV-NEGATIVE (males and females combined), by CD4+ count and ART status
+
+##############################################################################
 
 
-# QALYs by year: Cumulative and discounted
+for (x in 1:3) {
+  
+  hiv_neg <- ((1- (get(paste0("prev_ART_scen",x))[,-1] +    # HIV-negative is 1 - HIV Prevalence
+                get(paste0("prev_200_scen",x))[,-1] +
+                get(paste0("prev_200_350_scen",x))[,-1] +
+                get(paste0("prev_350_scen",x))[,-1] )) 
+                      * wt_hiv_neg )  %>%   #multiply by utility weight (in this case = 1)
+    
+    # SHOULD MULTIPLY BY POPULATION
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+  
+  assign(paste0("hiv_neg_scen",x),hiv_neg)
+  
+}
+
+# Remove excess DFs
+
+rm(list=ls(pattern="prev"))
+rm(hiv_neg, hiv_pos)
+
+##############################################################################
+
+# Annual QALYs - sum HIV positive and HIV negative, then discount
+
+##############################################################################
 
 
+for (x in 1:3) {
+  
+  qaly <- ( get(paste0("hiv_neg_scen",x))[,-1] + get(paste0("hiv_pos_scen",x))[,-1] ) %>% 
+    mutate(year=2020:2060) %>% 
+    select(year, everything()) %>% 
+    
+    # DISCOUNT
+    mutate(year_discount=0:40,   # set 2020 to Year 0
+           discount_amt=discount(discount_rate,year_discount)) %>% 
+    mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
+    select(-year_discount,-discount_amt)
+  
+  assign(paste0("qaly_scen",x),qaly)
+  
+}
+
+rm(qaly)
 
