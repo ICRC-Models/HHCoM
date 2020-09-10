@@ -8,6 +8,7 @@
 
 
 # !!!! NEED TO RESOLVE SCENARIO 3
+# !!!! Need to add ART and hospitalization costs for incident cases
 
 ######################################################################
 
@@ -23,6 +24,7 @@ library(dplyr)
 # 1. Double check if reasonable to assume everyone on ART is CD4>350
 # 2. Resolve scenario 3
 # 3. Calculate QALYS!!
+# 4. Add costs of incident cases.
 
 #######################################################################
 

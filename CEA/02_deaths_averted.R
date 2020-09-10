@@ -3,7 +3,7 @@
 # September 7, 2020
 
 # NOTE that annual mortality is calculated per 100K persons
-# NOTE: just find and replace from Script 01 : mortality --> mortality, cases --> deahts
+# NOTE: just find and replace from Script 01 : mortality --> mortality, cases --> deaths
 
 source("00_master.R")
 library("dplyr")
