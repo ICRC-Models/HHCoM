@@ -6,9 +6,8 @@
 
 # NOTE: Must be connected to IHME VPN for currency conversion function 
 
-
 # !!!! NEED TO RESOLVE SCENARIO 3
-# !!!! Need to add ART and hospitalization costs for incident cases
+# Include costs of INCIDENT cases for 1/2 year
 
 ######################################################################
 
@@ -24,7 +23,7 @@ library(dplyr)
 # 1. Double check if reasonable to assume everyone on ART is CD4>350
 # 2. Resolve scenario 3
 # 3. Calculate QALYS!!
-# 4. Add costs of incident cases.
+# 4. Add costs of incident cases? Assume CD4+ 
 
 #######################################################################
 
