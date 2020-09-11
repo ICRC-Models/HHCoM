@@ -1,7 +1,7 @@
 
-LEGEND:
+COMPARTMENTAL MODEL STRUCTURE:
 _________________________________________________________________________
-pop(d , v , h , s , x , p , g , a , r)
+COMPARTMENTS:  pop(d , v , h , s , x , p , g , a , r)
 d - (disease) HIV disease state
 v - (viral) Viral load
 h - (hpvVaxStates) Vaccine-type HPV precancer state
@@ -76,9 +76,9 @@ For a:
 9- 8 (40-44)
 10- 9 (45-49)
 ...
-78- 77
-79- 78
-80- 79
+14- (65-69)
+15- (70-74)
+16- (75-79)
 
 For r:
 1 - Low risk
@@ -88,156 +88,59 @@ For r:
 
 
 
-***************below not updated************************
 
 NOTES: 
 ____________________________________________________________________
 
-hysterectomy --> not susceptible to infection
-
-How to retrive values for each compartment
-toInd(allcomb(d , v , h , s , p , g , a , r))
+How to retrieve values for each compartment
+toInd(allcomb(d , v , h , s , x , p , g , a , r))
 Each of the above variables can be a single number, e.g. "3", or a range of numbers, e.g. "2:5"
 
 
 
-SCRIPTS AND FUNCTIONS USED TO PREPARE AND RUN THE MODEL:
+SCRIPTS AND FUNCTIONS USED TO RUN THE MODEL:
 _________________________________________________________________________
 
 Run model:
-1) mainCalibrated.m 
-   - historical trends up to current year
-   - loads parameters/indices/matrices from the \Params directory
-     \Params\calibratedParams (most recent calibration & all parameters after Nick)
-     \Params\general (this and below loaded due to changes since Nick)
-     \Params\mixInfectIndices
-     \Params\hivIndices
-     \Params\hpvIndices
-     \Params\ageRiskInds  
-     \Params\ager
-     \Params\vlAdvancer
-     \Params\fertMat
-     \Params\hivFertMats
-     \Params\fertMat2
-     \Params\hivFertMats2
-     \Params\deathMat
-     \Params\circMat
-     \Params\circMat2
-   - saves outputs to the \HHCoM_Results directory
-     \HHCoM_Results\toNow
-   - uses the following functions
-     progressbar.m
-     ode4xtra.m    
-     hpvCCdet.m
-     hpvScreen.m 
-     mixInfect.m
-     hiv2a.m
-     calcDist.m
-     bornAgeDieRisk.m
-     hpvVaxSchool.m
+1) historicalSim.m 
+   - calculates historical trends up to current year
+   - saves outputs to the \HHCoM_Results directory:
+     \HHCoM_Results\toNow... .mat
+   - uses the following functions:
+     loadUp2.m (loads parameters)
+     ode4xtra.m (numerical solver)
+     hpvCCNH.m (HPV natural history)
+     hpvScreen.m (Cancer screening and treatment)
+     mixInfect.m (HPV and HIV transmission)
+     hivNH.m (HIV natural history)
+     calcDist.m (calculate distribution of persons initiating ART)
+     bornAgeDieRisk.m (demography)
+     vmmc.m (voluntary male medical circumcision)
+     hpvVaxSchool.m (HPV vaccination - school-based regimen)
+     likeFun.m (calculate summed log-likelihood)
+   - visualize results using:
      showResults.m
-     - loads parameters 
-       \Params\calibratedParams
-       \Params\calibData (probably not needed)
-       \Params\general
-       \HHCoM_Results\toNow
 
-2) simVaxCEA2.m 
-   - vaccination scenarios & cost analysis
-   - loads parameters from the \Params directory
-     \Params\calibratedParams (most recent calibration & all parameters after Nick)
-     \Params\general (this and below loaded due to changes since Nick)
-     \Params\mixInfectIndices
-     \Params\hivIndices
-     \Params\hpvIndices
-     \Params\ageRiskInds  
-     \Params\ager
-     \Params\vlAdvancer
-     \Params\fertMat
-     \Params\hivFertMats
-     \Params\fertMat2
-     \Params\hivFertMats2
-     \Params\deathMat
-     \Params\circMat
-     \Params\circMat2
-   - loads parameters from the \HHCoM_Results directory
-     \HHCoM_Results\toNow
-   - saves outputs to the \HHCoM_Results\Vaccine directory
-     \HHCoM_Results\Vaccine\vaxSimResult or \vaxWaneSimResult
-   - uses the following functions
-     allcomb.m
-     ode4xtra.m   
-     hpvCCdet.m 
-     hpvScreen.m 
-     mixInfect.m
-     hiv2a.m
-     calcDist.m
-     bornAgeDieRisk.m
-     hpvVaxLmtd.m
-     hpvVaxSchool.m
-     hpvVaxCU.m
-     parsave.m
+2) futureSim.m 
+   - calculates future predictions
+   - loads historical results from the \HHCoM_Results directory for initial conditions:
+     \HHCoM_Results\toNow... .mat
+   - saves outputs to the \HHCoM_Results\Vaccine... directory:
+     \HHCoM_Results\Vaccine...\vaxSimResult or \vaxWaneSimResult
+   - uses the following functions:
+     loadUp2.m (loads parameters)
+     ode4xtra.m (numerical solver)
+     hpvCCNH.m (HPV natural history)
+     hpvScreen.m (Cancer screening and treatment)
+     mixInfect.m (HPV and HIV transmission)
+     hivNH.m (HIV natural history)
+     calcDist.m (calculate distribution of persons initiating ART)
+     bornAgeDieRisk.m (demography)
+     vmmc.m (voluntary male medical circumcision)
+     hpvVaxLmtd.m (HPV vaccination - vaccine limited years)
+     hpvVaxSchool.m (HPV vaccination - school-based regimen)
+     hpvVaxCU.m (HPV vaccination - catch-up regimen)
+     parsave.m (save future results)
+   - visualize results using:
      vaxCEA.m
 
-Load and prepare parameters for the model (only need to run when input parameters or transition matrices are changed):
-1) loadUp.m*** 
-   - imports data from the following Excel spreadsheets in \Config directory 
-     (data imported into model is highlighted in yellow)
-     \Config\Population_data.xlsx (Demographics)
-     \Config\HIV_parameters.xlsx (Protection, Disease Data)
-     \Config\HPV_parameters.xlsx (HPV, Cervical Cancer, Screening and Treatment, CIN Transition
-     \Config\Weights_costs.xlsx (Costs)
-     \Config\Calibration_targets (Calibration)
-   - imports data from the following .mat file 
-     settings.mat
-   - saves parameters in the \Params directory as .mat files
-     \Params\popData
-     \Params\HIVParams
-     \Params\general
-     \Params\mixInfectParams
-     \Params\vlBeta
-     \Params\hpvData
-     \Params\cost_weights
-     \Params\calibData
-   - if uncommented, calculates indices using the following function
-     calcInds.m
-     - which saves parameters in the \Params directory as .mat files
-       mixInfectIndices.mat
-       hivIndices.mat
-       hpvIndices.mat
-       hpvTreatIndices.mat
-       ageRiskInds.mat
-       vaxInds.mat
-   ***parameters in calibratedParams.m don't necessarily match those loaded in by loadUp.m so for now better just to change manually in code
-     
-2) makeMat.m** 
-   - creates transition matrices using data from Excel spreadsheets             ????
-   **if data used in transition matrices changes, makeMat.m must be ran again
-
-3) prepCalibParams.m (out of date)
-   - combines a bunch of parameter matrices (some calibrated, some previously loaded) into one
-   - loads parameters from the \Params directory previously imported from Excel files  
-   - loads calibrated paramters from .dat file
-   - saves parameters in the \Params directory as .mat file
-     \Params\calibratedParams
-
-Calibrate model: (out of date)
-?) quickCalibrateModel.m
-   - uses the following functions
-     calibrator.m
-     - uses the following functions
-       hpvCCdet.m
-       mixInfect.m
-       hiv2a.m
-       bornAgeDieRisk.m
-       likeFun.m
-
-?) quickCalibrateModelHIV.m
-   - uses the following functions
-     calibratorHIV.m
-     - uses the following functions
-       hpvCCdet.m
-       mixInfect.m
-       hiv2a.m
-       bornAgeDieRisk.m
-       likeFun.m

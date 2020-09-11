@@ -30,7 +30,7 @@ parfor i = 1 : numPart
         kernel = 1;
         for p = 1 : numParam
             v = 2 .* var(alphaSets_prev(p,:) , alphaWeights_prev); % 2x weighted variance of previous accepted particles
-            kernel = kernel * (const * (1 / sqrt(v)) * exp(-0.5 * ((1/v)*(paramSetMatrix(p,i) - alphaSets_prev(p,j))) ^ 2));
+            kernel = kernel * (const * (1 / sqrt(v)) * exp(-0.5 * (1/v) * (paramSetMatrix(p,i) - alphaSets_prev(p,j))^2));
         end
         denominator_temp = denominator_temp + alphaWeights_prev(j) * kernel;
     end
