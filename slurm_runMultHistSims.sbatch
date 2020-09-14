@@ -15,7 +15,7 @@
 
 pwd; hostname; date #--qos=MaxJobs4
 
-echo "Running MATLAB script for historical/future sims in parallel with calibrated parameter sets"
+echo "Running MATLAB script for historical sims in parallel with calibrated parameter sets"
 echo "${SETIDX}" 
 export SETIDX
 echo "${TCURR}"
@@ -26,7 +26,7 @@ export DATE
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "calib2_runMultSims(${SETIDX} , ${TCURR} , '${DATE}')"
+matlab -nodisplay -nosplash -r "calib2_runMultHistSims(${SETIDX} , ${TCURR} , '${DATE}')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 
