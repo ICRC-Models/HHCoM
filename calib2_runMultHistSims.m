@@ -29,7 +29,8 @@ orderedLL = load([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) ,
 %% Get indices and parameter values of numBestFits*2  sets
 numBestFits = 25;
 numSets50 = size(orderedLL , 1)*((numBestFits*2)/5600);
-top50Inds = orderedLL(1:numSets50,1);
+specIndsList = [1,2,3,6,8,9,11,12,15,20,21,22,26,32,34,35,38,39,41,42,45,47]; 
+top50Inds = orderedLL(specIndsList,1); %orderedLL(1:numSets50,1);
 top50Params = masterSetMatrix(:,top50Inds);
 
 %% If on Phase 2 of calibration, uncomment the following to plot resampled Ph1 parameters + Ph2 parameters
@@ -51,9 +52,9 @@ end
 %% Obtain model output for each set of sampled parameters
 for m = paramSetIdx : nPrlSets : (numBestFits+paramSetIdx-1)
     subMatrixInds = [m : (m + nPrlSets - 1)];
-    for n = 1 : nPrlSets
+    parfor n = 1 : nPrlSets
         paramSet = top50Params(:,subMatrixInds(n));
-        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
+        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet ,specIndsList(m + n - 1) , tstep_abc , date_abc);
     end
 end
 
