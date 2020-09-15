@@ -123,11 +123,11 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.37 ; 0.75];
+    fertDeclineProp = [0.44 ; 0.76];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
-fertility4 = fertility3 .* 0.60;
+fertility4 = fertility3 .* 0.50;
 
 % Male partners per year by age and risk group
 if calibBool && any(1 == pIdx)
@@ -514,7 +514,7 @@ end
 kCin1_Inf(7 : 10 , 1) = kCin1_Inf(1 , 1) * linspace((1.05-1)*0.25+1.0 , 1.05 , 4); %ageTrends(1,1); % ages 30-49
 kCin2_Cin1(7 : 10 , 1) = kCin2_Cin1(1 , 1) * linspace((ageTrends(1,2)-1)*0.25+1.0 , ageTrends(1,2) , 4);
 kCin3_Cin2(7 : 10 , 1) = kCin3_Cin2(1, 1) * linspace((1.6-1)*0.25+1.0 , 1.6 , 4); %ageTrends(1,3);
-kCC_Cin3(7 : 10 , 1) = kCC_Cin3(1 , 1) * linspace((2.0-1.0)*0.25+1.0 , 2.0 , 4); %ageTrends(1,4);
+kCC_Cin3(7 : 10 , 1) = kCC_Cin3(1 , 1) * linspace((3.0-1.0)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
 rNormal_Inf(7 : 10 , 1) = rNormal_Inf(1 , 1) * linspace((1.0-1.0)*0.75+1.0 , 1.0 , 4); %ageTrends(1,5);
 kInf_Cin1(7 : 10 , 1) = kInf_Cin1(1 , 1) * linspace((1.0-ageTrends(1,6))*0.75+ageTrends(1,6) , ageTrends(1,6) , 4);
 kCin1_Cin2(7 : 10 , 1) = kCin1_Cin2(1 , 1) * linspace((1.0-ageTrends(1,7))*0.75+ageTrends(1,7) , ageTrends(1,7) , 4);
@@ -522,7 +522,7 @@ kCin2_Cin3(7 : 10 , 1) = kCin2_Cin3(1 , 1) * linspace((1.0-0.8)*0.75+0.8 , 0.8 ,
 kCin1_Inf(11 : 16 , 1) = kCin1_Inf(1 , 1) * linspace(1.05+((1.10-1.05)/6) , 1.10 , 6); %ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 16 , 1) = kCin2_Cin1(1 , 1) * linspace(ageTrends(1,2)+((ageTrends(2,2)-ageTrends(1,2))/6) , ageTrends(2,2) , 6);
 kCin3_Cin2(11 : 16 , 1) = kCin3_Cin2(1 , 1) * linspace(1.6+((2.0-1.6)/6) , 2.0 , 6); %ageTrends(2,3);
-kCC_Cin3(11 : 16 , 1) = kCC_Cin3(1 , 1) * linspace(2.0+((3.0-2.0)/6) , 3.0 , 6); %ageTrends(2,4);
+kCC_Cin3(11 : 16 , 1) = kCC_Cin3(1 , 1) * linspace(3.0+((7.0-3.0)/6) , 7.0 , 6); %ageTrends(2,4);
 rNormal_Inf(11 : 16 , 1) = rNormal_Inf(1 , 1) * linspace((1.0-ageTrends(2,5))*(5/6)+ageTrends(2,5) , ageTrends(2,5) , 6);
 kInf_Cin1(11 : 16 , 1) = kInf_Cin1(1 , 1) * linspace((ageTrends(1,6)-ageTrends(2,6))*(5/6)+ageTrends(2,6) , ageTrends(2,6) , 6);
 kCin1_Cin2(11 : 16 , 1) = kCin1_Cin2(1 , 1) * linspace((ageTrends(1,7)-ageTrends(2,7))*(5/6)+ageTrends(2,7) , ageTrends(2,7) , 6);
@@ -540,7 +540,7 @@ kCin2_Cin3(11 : 16 , 1) = kCin2_Cin3(1 , 1) * linspace((0.8-0.6)*(5/6)+0.6 , 0.6
 kCin1_Inf(7 : 10 , 2) = kCin1_Inf(1 , 2) * linspace((1.05-1)*0.25+1.0 , 1.05 , 4); %ageTrends(1,1); % ages 30-49
 kCin2_Cin1(7 : 10 , 2) = kCin2_Cin1(1 , 2) * linspace((ageTrends(1,2)-1)*0.25+1.0 , ageTrends(1,2) , 4);
 kCin3_Cin2(7 : 10 , 2) = kCin3_Cin2(1, 2) * linspace((1.6-1)*0.25+1.0 , 1.6 , 4); %ageTrends(1,3);
-kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((2.0-1)*0.25+1.0 , 2.0 , 4); %ageTrends(1,4);
+kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((3.0-1)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
 rNormal_Inf(7 : 10 , 2) = rNormal_Inf(1 , 2) * linspace((1.0-1.0)*0.75+1.0 , 1.0 , 4); %ageTrends(1,5);
 kInf_Cin1(7 : 10 , 2) = kInf_Cin1(1 , 2) * linspace((1.0-ageTrends(1,6))*0.75+ageTrends(1,6) , ageTrends(1,6) , 4);
 kCin1_Cin2(7 : 10 , 2) = kCin1_Cin2(1 , 2) * linspace((1.0-ageTrends(1,7))*0.75+ageTrends(1,7) , ageTrends(1,7) , 4);
@@ -548,7 +548,7 @@ kCin2_Cin3(7 : 10 , 2) = kCin2_Cin3(1 , 2) * linspace((1.0-0.8)*0.75+0.8 , 0.8 ,
 kCin1_Inf(11 : 16 , 2) = kCin1_Inf(1 , 2) * linspace(1.05+((1.10-1.05)/6) , 1.10 , 6); %ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 16 , 2) = kCin2_Cin1(1 , 2) * linspace(ageTrends(1,2)+((ageTrends(2,2)-ageTrends(1,2))/6) , ageTrends(2,2) , 6);
 kCin3_Cin2(11 : 16 , 2) = kCin3_Cin2(1 , 2) * linspace(1.6+((2.0-1.6)/6) , 2.0 , 6); %ageTrends(2,3);
-kCC_Cin3(11 : 16 , 2) = kCC_Cin3(1 , 2) * linspace(2.0+((3.0-2.0)/6) , 3.0 , 6); %ageTrends(2,4);
+kCC_Cin3(11 : 16 , 2) = kCC_Cin3(1 , 2) * linspace(3.0+((7.0-3.0)/6) , 7.0 , 6); %ageTrends(2,4);
 rNormal_Inf(11 : 16 , 2) = rNormal_Inf(1 , 2) * linspace((1.0-ageTrends(2,5))*(5/6)+ageTrends(2,5) , ageTrends(2,5) , 6);
 kInf_Cin1(11 : 16 , 2) = kInf_Cin1(1 , 2) * linspace((ageTrends(1,6)-ageTrends(2,6))*(5/6)+ageTrends(2,6) , ageTrends(2,6) , 6);
 kCin1_Cin2(11 : 16 , 2) = kCin1_Cin2(1 , 2) * linspace((ageTrends(1,7)-ageTrends(2,7))*(5/6)+ageTrends(2,7) , ageTrends(2,7) , 6);
@@ -911,7 +911,7 @@ end
 % WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
 whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
 whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-whob.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
+whob.screenAgeMults = [(1.0) , (1.0)];  % / max(1 , fivYrAgeGrpsOn*5))
 whob.testSens = hpvSensWHO;
 whob.colpoRetain = 1.0;
 whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
