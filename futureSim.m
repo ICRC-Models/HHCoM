@@ -15,12 +15,12 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-%historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec04-08_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
+%historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-%pathModifier = [date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec04-08_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+%pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_WHO-SCES012_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -37,8 +37,8 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
 screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
-whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
-whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
+whoScreenAges = [8]; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
+whoScreenAgeMults = [1.0]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
 
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
@@ -73,8 +73,8 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 1;    % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 : 10];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)-1).*0.50 , 0.50*0.20];   % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age, *adjustment factor if fraction of 5-year cohort
+vaxAgeCU = [4 : 5];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [ones(1,length(vaxAgeCU)-1).*0.50];   % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age, *adjustment factor if fraction of 5-year cohort
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
