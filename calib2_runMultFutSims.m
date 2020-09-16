@@ -29,7 +29,7 @@ orderedLL = load([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) ,
 %% Get indices and parameter values of numBestFits*2 sets
 numBestFits = 25;
 numSets50 = size(orderedLL , 1)*((numBestFits*2)/5600);
-specIndsList = [1,2,3,6,8,9,11,12,15,20,21,22,26,32,34,35,38,39,41,42,45,47]; 
+specIndsList = [1,2,3,6,8,9,11,12,13,15,20,21,22,26,27,32,34,35,38,39,40,41,42,45,47]; 
 top50Inds = orderedLL(specIndsList,1); %orderedLL(1:numSets50,1);
 top50Params = masterSetMatrix(:,top50Inds);
 
