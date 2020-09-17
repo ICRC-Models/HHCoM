@@ -48,7 +48,7 @@ calibBool = 0;
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1925;
+startYear = 1960;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -93,17 +93,17 @@ mue2 = zeros(age , gender);
 mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
 mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
 mue2(1, :) = mue2(1, :) .* 2;
-mue2(7:16, :) = mue2(7:16, :) .* .95;
+mue2(7:16, :) = mue2(7:16, :) .* .92;
 mue3 = zeros(age , gender) ;
 mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
 mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
 mue3(1, :)= mue3(1 , :) .* 2 ;
-mue3(7:16, :) = mue3(7:16, :) .* .95;
+mue3(7:16, :) = mue3(7:16, :) .* .92;
 mue4 = zeros(age , gender);
 mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
 mue4(1, :)= mue4(1 , :) .* 1.5;
-mue4(7:16, :) = mue4(7:16, :) .* .95;
+mue4(7:16, :) = mue4(7:16, :) .* .92;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
 %fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'C279:E294');
@@ -276,7 +276,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.3 ; 0.3 ; 0.3];
+    epsA = [0.2; 0.5; 0.5 ; 0.3];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -284,15 +284,16 @@ if calibBool && any(7 == pIdx);
     %epsR = paramSet(paramsSub{idx}.inds(:));
     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsR = [0.3 ; 0.3 ; 0.3];
+    epsR = [0.2; 0.3 ; 0.3 ; 0.3];
 end
-yr = [1985; 1990; 2000];
-epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
-epsR_vec = cell(size(yr , 1) - 1, 1);
+%%
+yr = [1975; 1980; 1990; 2000];
+% epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
+% epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
     period = [yr(i) , yr(i + 1)];
-    epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
-        yr(i) : timeStep : yr(i + 1));
+   epsA_vec{i} = interp1(period , epsA(i : i + 1 , 1) , ...
+       yr(i) : timeStep : yr(i + 1));
     epsR_vec{i} = interp1(period , epsR(i : i + 1 , 1) , ...
         yr(i) : timeStep : yr(i + 1));
 end
