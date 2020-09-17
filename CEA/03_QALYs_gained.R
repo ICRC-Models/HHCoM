@@ -9,7 +9,6 @@
 # TO DO:
 # Check if CD4+ and ART status of incident cases for model is available
 
-library(dplyr)
 
 ##############################################################################
 
@@ -182,7 +181,8 @@ for (x in 1:3) {
     
     # DISCOUNT
     mutate(year_discount=0:40,   # set 2020 to Year 0
-           discount_amt=discount(discount_rate,year_discount)) %>% 
+           discount_amt=discount(discount_rate=discount_rate,
+                                 year_discount=year_discount)) %>% 
     transmute_at(vars(c(mean,min,max,4:28)),~discounter(.,discount_amt)) %>% 
     
     mutate(year=2020:2060) %>% 
@@ -209,11 +209,82 @@ for (x in 1:3) {
     
     # DISCOUNT
     mutate(year_discount=0:40,   # set 2020 to Year 0
-           discount_amt=discount(discount_rate,year_discount)) %>% 
+           discount_amt=discount(discount_rate=discount_rate,
+                                 year_discount=year_discount)) %>% 
     mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
     select(-year_discount,-discount_amt)
   
-  assign(paste0("qaly_scen",x),qaly)
+  assign(paste0("qaly_cum_scen",x),qaly)
   
 }
+
+
+
+###################################################################################################################
+
+# Annual raw qalys gained
+
+qaly_gained_raw_scen2 <- (qaly_scen2[,-1] - qaly_scen1[,-1] )  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+qaly_gained_raw_scen3 <- (qaly_scen3[,-1] - qaly_scen1[,-1] )  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+# Annual percent qalys gained
+
+qaly_gained_pct_scen2 <- (((qaly_scen2[,-1] - qaly_scen1[,-1] )/qaly_scen2[,-1] )*100)  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+qaly_gained_pct_scen3 <- (((qaly_scen3[,-1] - qaly_scen1[,-1] )/qaly_scen3[,-1] )*100)  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+# Cumulative raw qalys gained
+
+qaly_cum_gained_raw_scen2 <- ( qaly_cum_scen2[,-1] - qaly_cum_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+qaly_cum_gained_raw_scen3 <- ( qaly_cum_scen3[,-1] - qaly_cum_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+# Cumulative percent qalys gained
+
+qaly_cum_gained_pct_scen2 <- (((qaly_cum_scen2[,-1] - qaly_cum_scen1[,-1] )/qaly_cum_scen2[,-1] )*100)  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+qaly_cum_gained_pct_scen3 <- (((qaly_cum_scen3[,-1] - qaly_cum_scen1[,-1] )/qaly_cum_scen3[,-1] )*100)  %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+###################################################################################################################
+
+# Export CSVs
+
+csv_list <- list("qaly_scen1",
+                 "qaly_scen2",
+                 "qaly_scen3",
+                 "qaly_cum_scen1",
+                 "qaly_cum_scen2",
+                 "qaly_cum_scen3",
+                 "qaly_gained_raw_scen2",
+                 "qaly_gained_raw_scen3",
+                 "qaly_gained_pct_scen2",
+                 "qaly_gained_pct_scen3",
+                 "qaly_cum_gained_raw_scen2",
+                 "qaly_cum_gained_raw_scen3",
+                 "qaly_cum_gained_pct_scen2",
+                 "qaly_cum_gained_pct_scen3")
+
+
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/qalys/",x,".csv")))
+
+# Remove excess DFs
+
+rm(list=ls())
 

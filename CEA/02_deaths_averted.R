@@ -66,11 +66,12 @@ for (x in 1:3) {
 
 for (x in 1:3) {
   
-  deaths <- ((get(paste0("mortality",x))[,-1]*get(paste0("pop_scen",x))[,-1])/100000)  %>% # Get deaths given mortality rate per 100   
+  deaths <- ((get(paste0("mortality",x))[,-1]*get(paste0("pop_scen",x))[,-1])/100000)  %>% # Get deaths given mortality rate per 100k  
     
     # DISCOUNT
     mutate(year_discount=0:40,   # set 2020 to Year 0
-           discount_amt=discount(discount_rate,year_discount)) %>% 
+           discount_amt=discount(discount_rate=discount_rate,
+                                 year_discount=year_discount)) %>% 
     transmute_at(vars(c(mean,min,max,4:28)),~discounter(.,discount_amt)) %>% 
     
     mutate(year=2020:2060) %>% 

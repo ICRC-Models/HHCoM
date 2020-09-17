@@ -8,6 +8,7 @@
 
 # !!!! NEED TO RESOLVE SCENARIO 3
 # Include costs of INCIDENT cases for 1/2 year
+# Double check total costs... extremely expensive
 
 ######################################################################
 
@@ -172,8 +173,8 @@ hosp_scen3 <- as.data.frame(
 test_scen1 <- as.data.frame(matrix(0, ncol = 28, nrow = 41)) %>% 
   setNames(paste0("s",-2:25)) %>%
   dplyr::rename(mean=1,
-         min=2,
-         max=3) %>% 
+                min=2,
+                max=3) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
 
@@ -182,8 +183,8 @@ test_scen1 <- as.data.frame(matrix(0, ncol = 28, nrow = 41)) %>%
 test_scen2 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), ncol = 28, nrow = 40)) %>% 
   setNames(paste0("s",-2:25)) %>%
   dplyr::rename(mean=1,
-         min=2,
-         max=3) %>% 
+                min=2,
+                max=3) %>% 
   rbind(costs["home_testing_pc"]) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
@@ -193,8 +194,8 @@ test_scen2 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), nco
 test_scen3 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), ncol = 28, nrow = 40)) %>% 
   setNames(paste0("s",-2:25)) %>%
   dplyr::rename(mean=1,
-         min=2,
-         max=3) %>% 
+                min=2,
+                max=3) %>% 
   rbind(costs["home_testing_pc"]) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
@@ -242,24 +243,17 @@ for (x in 1:3) {
 rm(prev_ART_males,prev_ART_females)
 
 
-# Generate AVERAGE cb-ART costs for the first year and costs for subsequent years 
-
-cbART_costs_pc <- data.frame(year=2020:2060) %>% 
-  mutate(cb_ART_cost= 
-           (costs["cb_art_y1"] + (year-2020)*costs["cb_art_sub"] )/  # Numerator is 1st year costs, plus all subsequent years  
-           (year-2020+1))   # Denominator is total number of years
+# Generate cb-ART costs for the first year and subsequent years 
                                    
-cbART_costs <- data.frame(matrix(cbART_costs_pc[,2],ncol = 28, nrow = 41)) %>% 
+cbART_costs <- data.frame(matrix(costs["cb_art_y1"],ncol = 28, nrow = 1)) %>% 
+  rbind(data.frame(matrix(costs["cb_art_sub"],ncol = 28, nrow = 40))) %>% 
   setNames(paste0("s",-2:25)) %>%
   dplyr::rename(mean=1,
                 min=2,
-                max=3) %>% 
+                max=3) %>%
   mutate(year=2020:2060) %>% 
   select(year,everything())
   
-rm(cbART_costs_pc)
-
-
 # Multiply based on percentages enrolled in clinic versus community-based ART (defined in master script)
 
 # Males
@@ -272,12 +266,6 @@ mART_scen2 <- as.data.frame(
   (Mprev_ART_scen2[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
   (Mprev_ART_scen2[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
 
-# NEED TO RESOLVE SCENARIO 3
-
-mART_scen3 <- as.data.frame(
-  (Mprev_ART_scen3[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Mprev_ART_scen3[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
-
 # Females
 
 fART_scen1 <- as.data.frame(
@@ -287,12 +275,6 @@ fART_scen1 <- as.data.frame(
 fART_scen2 <- as.data.frame(
   (Fprev_ART_scen2[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
   (Fprev_ART_scen2[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
-
-# NEED TO RESOLVE SCENARIO 3
-
-fART_scen3 <- as.data.frame(
-  (Fprev_ART_scen3[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Fprev_ART_scen3[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
 
 # Combined
 
@@ -304,15 +286,47 @@ ART_scen2 <- (mART_scen2 + fART_scen2) %>%
   mutate(year=2020:2060) %>% 
   select(year,everything())
 
-# NEED TO RESOLVE SCENARIO 3
+# NEED TO RESOLVE SCENARIO 3 - CURRENTLY INCLUDED AS DUMMY
+
+mART_scen3 <- as.data.frame(
+  (Mprev_ART_scen3[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+    (Mprev_ART_scen3[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+
+fART_scen3 <- as.data.frame(
+  (Fprev_ART_scen3[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
+    (Fprev_ART_scen3[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
 
 ART_scen3 <- (mART_scen3 + fART_scen3) %>% 
   mutate(year=2020:2060) %>% 
   select(year,everything())
 
+
 # Remove excess
 
 rm(mART_scen1,fART_scen1, mART_scen2, fART_scen2, mART_scen3, fART_scen3)
+
+
+
+##############################################################################
+
+# IMPORT POPULATION (males and females combined, age 15-79)
+
+##############################################################################
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_combined_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("pop_scen",x),pop)
+  
+}
+rm(pop)
 
 
 ####################################################################################################
@@ -324,42 +338,278 @@ rm(mART_scen1,fART_scen1, mART_scen2, fART_scen2, mART_scen3, fART_scen3)
 
 ####################################################################################################
 
+# 1. Annual per capita (discounted)
+# 2. Annual total (discounted)
+# 3. Cumulative per capita (discounted)
+# 4. Cumulative total (discounted)
 
-# Scenario 1
+# 5. Incremental costs (annual per capita)
+# 6. Incremental costs  (annual total)
+# 7. Incremental costs  (cumulative per capita)
+# 8. Incremental costs  (cumulative total)
 
-COST_scen1 <- (hosp_scen1[,-1] + test_scen1[,-1] + ART_scen1[,-1]) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything()) %>% 
+# 1. ANNUAL PER CAPITA (discounted)
+
+for (x in 1:3) {
+
+cost <- (get(paste0("hosp_scen",x))[,-1] + 
+           get(paste0("test_scen",x))[,-1]+
+           get(paste0("ART_scen",x))[,-1]) %>% 
+  
   # DISCOUNT
   mutate(year_discount=0:40,   # set 2020 to Year 0
-         discount_amt=discount(discount_rate,year_discount)) %>% 
-  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
-  select(-year_discount,-discount_amt)
-
-write.csv(COST_scen1, paste0(cea_path,"costs/costs_scen1.csv"))
-
-# Scenario 2
-
-COST_scen2 <- (hosp_scen2[,-1] + test_scen2[,-1] + ART_scen2[,-1]) %>% 
+         discount_amt=discount(year_discount=year_discount,
+                               discount_rate=discount_rate)) %>% 
+  mutate_at(1:28,~discounter(.,discount_amt)) %>% 
+  select(-year_discount,-discount_amt) %>% 
+  
   mutate(year=2020:2060) %>% 
-  select(year,everything()) %>% 
-  # DISCOUNT
-  mutate(year_discount=0:40,   # set 2020 to Year 0
-         discount_amt=discount(discount_rate,year_discount)) %>% 
-  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
-  select(-year_discount,-discount_amt)
+  select(year,everything()) 
+  
+assign(paste0("cost_annual_pc_scen",x),cost)
 
-write.csv(COST_scen2, paste0(cea_path,"costs/costs_scen2.csv"))
+}
 
-# Scenario 3
+# 2. ANNUAL TOTAL (discounted)
 
-COST_scen3 <- (hosp_scen3[,-1] + test_scen3[,-1] + ART_scen3[,-1]) %>% 
+for (x in 1:3) {
+  
+  cost <- (get(paste0("cost_annual_pc_scen",x))[,-1]*get(paste0("pop_scen",x))[,-1]) %>% 
+    mutate(mean=rowMeans(.[,4:28]),
+               min=apply(.[,4:28],1,FUN=min),
+               max=apply(.[,4:28],1,FUN=max)) %>% 
+    mutate(year=2020:2060) %>% 
+    select(year,mean,min,max,everything()) 
+  
+  assign(paste0("cost_annual_total_scen",x),cost)
+  
+}
+
+
+# 3. CUMULATIVE, per capita (discounted)
+
+for (x in 1:3) {
+  
+  cost <- (get(paste0("hosp_scen",x))[,-1] + 
+             get(paste0("test_scen",x))[,-1]+
+             get(paste0("ART_scen",x))[,-1]) %>% 
+    
+    # DISCOUNT
+    mutate(year_discount=0:40,   # set 2020 to Year 0
+           discount_amt=discount(year_discount=year_discount,
+                                 discount_rate=discount_rate)) %>% 
+    mutate_at(1:28,~discounter(.,discount_amt)) %>% 
+    select(-year_discount,-discount_amt) %>% 
+    transmute_at(1:28, ~cumsum(.)) %>% 
+    
+    mutate(year=2020:2060) %>% 
+    select(year,everything()) 
+  
+  assign(paste0("cost_cum_pc_scen",x),cost)
+  
+}
+
+
+# 4. CUMULATIVE, total (discounted)
+
+for (x in 1:3) {
+  
+  cost <- (get(paste0("cost_cum_pc_scen",x))[,-1]*get(paste0("pop_scen",x))[,-1]) %>% 
+    mutate(mean=rowMeans(.[,4:28]),
+           min=apply(.[,4:28],1,FUN=min),
+           max=apply(.[,4:28],1,FUN=max)) %>% 
+    mutate(year=2020:2060) %>% 
+    select(year,mean,min,max,everything()) 
+  
+  assign(paste0("cost_cum_total_scen",x),cost)
+  
+}
+
+# 5. Incremental costs (annual per capita)
+
+inc_costs_annual_pc_scen2 <- ( cost_annual_pc_scen2[,-1] - cost_annual_pc_scen1[,-1] ) %>% 
   mutate(year=2020:2060) %>% 
-  select(year,everything()) %>% 
-  # DISCOUNT
-  mutate(year_discount=0:40,   # set 2020 to Year 0
-         discount_amt=discount(discount_rate,year_discount)) %>% 
-  mutate_at(vars(c(mean,min,max,5:29)),~discounter(.,discount_amt)) %>% 
-  select(-year_discount,-discount_amt)
+  select(year, everything()) 
 
-write.csv(COST_scen3, paste0(cea_path,"costs/costs_scen3.csv"))
+inc_costs_annual_pc_scen3 <- ( cost_annual_pc_scen3[,-1] - cost_annual_pc_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+# 6. Incremental costs  (annual total)
+
+inc_costs_annual_total_scen2 <- ( cost_annual_total_scen2[,-1] - cost_annual_total_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+inc_costs_annual_total_scen3 <- ( cost_annual_total_scen3[,-1] - cost_annual_total_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+# 7. Incremental costs  (cumulative per capita)
+
+inc_costs_cum_pc_scen2 <- ( cost_cum_pc_scen2[,-1] - cost_cum_pc_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+inc_costs_cum_pc_scen3 <- ( cost_cum_pc_scen3[,-1] - cost_cum_pc_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+
+# 8. Incremental costs  (cumulative total)
+
+inc_costs_cum_total_scen2 <- ( cost_cum_total_scen2[,-1] - cost_cum_total_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+inc_costs_cum_total_scen3 <- ( cost_cum_total_scen3[,-1] - cost_cum_total_scen1[,-1] ) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year, everything()) 
+
+##############################################################################################
+
+# Export CSVs
+
+csv_list <- list("cost_annual_pc_scen1",
+                 "cost_annual_pc_scen2",
+                 "cost_annual_pc_scen3",
+                 "cost_annual_total_scen1",
+                 "cost_annual_total_scen2",
+                 "cost_annual_total_scen3",
+                 "cost_cum_pc_scen1",
+                 "cost_cum_pc_scen2",
+                 "cost_cum_pc_scen3",
+                 "cost_cum_total_scen1",
+                 "cost_cum_total_scen2",
+                 "cost_cum_total_scen3",
+                 "inc_costs_annual_pc_scen2",
+                 "inc_costs_annual_pc_scen3",
+                 "inc_costs_annual_total_scen2",
+                 "inc_costs_annual_total_scen3",
+                 "inc_costs_cum_pc_scen2",
+                 "inc_costs_cum_pc_scen3",
+                 "inc_costs_cum_total_scen2",
+                 "inc_costs_cum_total_scen3"
+           )
+
+
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"costs/",x,".csv")))
+
+# Remove excess DFs
+
+rm(list=ls())
+
+##############################################################################################
+
+# PLOTS
+
+cea_path <- "C:/Users/msahu/Documents/Other_Research/DO_ART/Code/HHCoM/CEA/"
+
+# Annual costs (per capita, full population)
+
+costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen1.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual costs per capita (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  ylim(0,125)
+
+costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual costs per capita (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  ylim(0,125)
+
+# Incremental costs (per capita)
+
+costs <- read.csv(paste0(cea_path,"costs/inc_costs_annual_pc_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual incremental costs per capita (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
+
+costs <- read.csv(paste0(cea_path,"costs/inc_costs_cum_pc_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Cumulative costs per capita (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18))  +
+  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
+
+# Incremental costs (total)
+
+costs <- read.csv(paste0(cea_path,"costs/inc_costs_annual_total_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual incremental costs (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey") +
+  scale_y_continuous(labels = function(x) format(x, scientific = F)) 
+
+costs <- read.csv(paste0(cea_path,"costs/inc_costs_cum_pc_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Cumulative costs per capita (2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18))  +
+  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
