@@ -53,15 +53,16 @@ paramDir = [pwd , '\Params\'];
 % ***SET ME***: save names of potential scenarios to analyze as variables
 baseDirName = 'Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_';
 dirName_reductBaseline = [baseDirName , 'WHO-SCES012_6_1'];
+dirName_reductBaseline2 = ['Vaccine22Apr20Ph2V11_whoBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_' , 'WHO-SCE0b_6_1'];
 dirName_P1_SCE34 = [baseDirName , 'WHO-SCES34_6_1'];
 dirName_P1_SCE56 = [baseDirName , 'WHO-SCES56_6_1'];
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline}; % , dirName_reductBaseline , dirName_reductBaseline , ...
-%     dirName_P1_SCE34 , dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P1_SCE56};
-fileVec = {'sim0' , 'sim1' , 'sim2' , 'sim1' , 'sim2' , 'sim1' , 'sim2'};
+simVec = {dirName_reductBaseline , dirName_reductBaseline2 , dirName_reductBaseline , dirName_reductBaseline , ...
+    dirName_P1_SCE34 , dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P1_SCE56};
+fileVec = {'sim0' , 'sim0' , 'sim1' , 'sim2' , 'sim1' , 'sim2' , 'sim1' , 'sim2'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'P1_SCE0'}; % , 'P1_SCE1' , 'P1_SCE2' , 'P1_SCE3' , 'P1_SCE4' , 'P1_SCE5' , 'P1_SCE6'};
+fileTits = {'P1-SCE0' , 'P1-SCE0b' , 'P1-SCE1' , 'P1-SCE2' , 'P1-SCE3' , 'P1-SCE4' , 'P1-SCE5' , 'P1-SCE6'};
 
 nResults = length(simVec);
 
@@ -85,7 +86,7 @@ for j = 1 : nResults
     
     diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};    
     
-    for dInd = 1 : length(diseaseLabels);
+    for dInd = 1 : 1 %length(diseaseLabels);
         % Load results
         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
             'ICC_' , diseaseLabels{dInd} , '_' , fileVec{j} , '.csv'];
@@ -118,7 +119,7 @@ for j = 1 : nResults
         end
         hold all;
         plot(ccIncHivAgeTime(1 , 2:end) , ccInc , '-')
-        axis([1980 2120 0 175])
+        axis([1980 2120 0 60])
         grid on;
         xlabel('Year'); ylabel('AS ICC per 100K'); 
         %legend('General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt');
@@ -132,7 +133,7 @@ if j == nResults
     plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*4.0 , 'r:')
     hold all;
     plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*10.0 , 'r--')
-    legend('General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt' , ...
+    legend(fileTits{:} , ... %'General' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt' , ...    %
         'Elimination: <4/100K' , 'Benchmark: <10/100K');
 end
 
