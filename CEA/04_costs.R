@@ -6,25 +6,14 @@
 
 # NOTE: Must be connected to IHME VPN for currency conversion function 
 
-# !!!! NEED TO RESOLVE SCENARIO 3
-# Include costs of INCIDENT cases for 1/2 year
-# Double check total costs... extremely expensive
-
 ######################################################################
 
 source("00_master.R")
 library(pacman)
 
-
 source('H:/repos/fgh/FGH_2019/04_functions/currency_conversion.R')
 
 library(dplyr)
-
-# TO DO:
-# 1. Double check if reasonable to assume everyone on ART is CD4>350
-# 2. Resolve scenario 3
-# 3. Calculate QALYS!!
-# 4. Add costs of incident cases? Assume CD4+ 
 
 #######################################################################
 
@@ -45,9 +34,64 @@ cost_inflated <- currency_conversion(data = cost_params,
 costs <- cost_inflated[["param_val"]]
 names(costs) <- cost_inflated[["param_name"]]
 
+
 ########################################################################
 
-# IMPORT PREVALENCE (males and females combined)
+# IMPORT POPULATION
+
+########################################################################
+
+# Full population
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_combined_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("pop_scen",x),pop)
+  
+}
+
+# Male population  
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_males_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("Mpop_scen",x),pop)
+  
+}
+
+# Female population  
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_females_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("Fpop_scen",x),pop)
+  
+}
+
+########################################################################
+
+# IMPORT PREVALENCE
 
 ########################################################################
 
@@ -115,48 +159,141 @@ for (x in 1:3) {
   
 }
 
+# Prevalence on ART, males
+
+for (x in 1:3) {
+  
+  prev_ART_males<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_males_aged15-79_onART.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("Mprev_ART_scen",x),prev_ART_males)
+  
+}
+
+# Prevalence on ART, females
+
+for (x in 1:3) {
+  
+  prev_ART_females<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_females_aged15-79_onART.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    filter(year>=2020)
+  
+  assign(paste0("Fprev_ART_scen",x),prev_ART_females)
+  
+}
+
+########################################################################
+
+# IMPORT INCIDENCE and calculate NEW CASES PER TOTAL POPULATION
+
+# Incidence rates are given per 100 HIV-negative persons
+# We need new cases per total population, gender-specific
+
+# Multiply incidence per HIV-susceptible * proportion HIV-negative
+
+########################################################################
+
+# Incidence rates per capita among HIV-susceptibles
+
+sex <- c("males","females")
+
+for (i in sex) {
+
+  for (x in 1:3) {
+  
+  incidence <- as.data.frame(read.csv(paste0(main_path,"Scenario",x,"/HIV_incidence_",i,"_aged15-79.csv"), header=F)[,-1] / 100 ) %>% 
+    setNames(paste0("s",-2:25)) %>% 
+    mutate(year=1925:2060) %>%
+    filter(year>=2020) %>%
+    select(year, everything()) %>%
+    rename(mean=2,
+           min=3,
+           max=4)  
+  
+  assign(paste0("incidence_",i,x),incidence)
+  }
+}
+
+# Calculate proportion HIV-negative as 1- Prevalence, by sex
+
+for (i in sex) {
+  
+  for (x in 1:3) {
+    
+    hiv_neg <- as.data.frame(1-read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_",i,"_aged15-79_all_HIV.csv"), header=F)[,-1]) %>% 
+      setNames(paste0("s",-2:25)) %>% 
+      mutate(year=1925:2060) %>%
+      filter(year>=2020) %>%
+      select(year, everything()) %>%
+      rename(mean=2,
+             min=3,
+             max=4)  
+    
+    assign(paste0("hiv_neg_",i,x),hiv_neg)
+  }
+}
+
+# Calculate new cases per total population of M/F by multiplying incidence rates among HIV-negative by proportion HIV-negative
+
+
+for (i in sex) {
+  
+  for (x in 1:3) {
+    
+    new_cases <- as.data.frame(get(paste0("hiv_neg_",i,x))[,-1] * get(paste0("incidence_",i,x))[,-1]) %>% 
+      mutate(year=2020:2060) %>%
+      select(year, everything()) 
+    
+    assign(paste0("cases_",i,x),new_cases)
+  }
+}
+
+
+############################################################################################
+
 # Remove excess DFs
 
-rm(prev_ART, prev_200, prev_200_350, prev_350)
+rm(prev_ART, prev_200, prev_200_350, prev_350, prev_ART_males, prev_ART_females, incidence, hiv_neg)
 
 
-##################################################################################
+############################################################################################
 
 # HOSPITALIZATION COSTS
 
 # Multiply HIV prevalence by average annual cost of hospitalization, by CD4+ count
 
-##################################################################################
+############################################################################################
 
-# Scenario 1
+# All 3 Scenarios follow same formula:
 
-hosp_scen1 <- as.data.frame(
-              prev_200_scen1[,-1] * costs["hosp_200"] +
-              prev_200_350_scen1[,-1] * costs["hosp_200_350"] +
-              prev_350_scen1[,-1] * costs["hosp_350"] +
-              prev_ART_scen1[,-1] * costs["hosp_art"] ) %>% 
+for (x in 1:3) {
+
+hosp <- as.data.frame(
+              (get(paste0("prev_200_scen",x))[,-1]) * costs["hosp_200"] +
+              (get(paste0("prev_200_350_scen",x))[,-1]) * costs["hosp_200_350"] +
+              (get(paste0("prev_350_scen",x))[,-1]) * costs["hosp_350"] +
+              (get(paste0("prev_ART_scen",x))[,-1]) * costs["hosp_art"] ) %>% 
+  # Recreate mean, max, min values
+      mutate(mean=rowMeans(.[,4:28]),
+         min=apply(.[,4:28],1,FUN=min),
+         max=apply(.[,4:28],1,FUN=max)) %>% 
       mutate(year=2020:2060) %>% 
-      select(year,everything())
+      select(year,mean,min,max,everything())
 
-# Scenario 2
+assign(paste0("hosp_scen",x),hosp)
 
-hosp_scen2 <- as.data.frame(
-  prev_200_scen2[,-1] * costs["hosp_200"] +
-    prev_200_350_scen2[,-1] * costs["hosp_200_350"] +
-    prev_350_scen2[,-1] * costs["hosp_350"] +
-    prev_ART_scen2[,-1] * costs["hosp_art"] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything())
+}
 
-# Scenario 3
-
-hosp_scen3 <- as.data.frame(
-  prev_200_scen3[,-1] * costs["hosp_200"] +
-    prev_200_350_scen3[,-1] * costs["hosp_200_350"] +
-    prev_350_scen3[,-1] * costs["hosp_350"] +
-    prev_ART_scen3[,-1] * costs["hosp_art"] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything())
+rm(hosp)
 
 
 ####################################################################################################
@@ -205,43 +342,31 @@ test_scen3 <- as.data.frame(matrix(rep(c(costs["home_testing_pc"],0,0,0,0)), nco
 
 # ART COSTS
 
+# Costs for prevalent cases + costs for incident cases (for 1/2 year)
+
 # Multiply prevalence of people on ART by the ART costs, using scalar for percentage on community 
 # versus clinic-based ART (disaggregated for males and females)
 
+# Incident cases are assumed to be enrolled using the model assumption for % cases starting ART
+# Costs are for 1/2 year (disaggregated by M/F)
+
 ####################################################################################################
 
-# Import prevalence of people on ART, for males and females
+# Set up DO ART parameters: enrollment assumptions
 
-for (x in 1:3) {
-  
-  prev_ART_males<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_males_aged15-79_onART.csv"), header=F) %>% 
-    setNames(paste0("s",-3:25)) %>% 
-    dplyr::rename(year=1,
-           mean=2,
-           min=3,
-           max=4) %>% 
-    filter(year>=2020)
-  
-  assign(paste0("Mprev_ART_scen",x),prev_ART_males)
-  
-}
+females_ART_scen1 <- .6223
+females_ART_scen2 <- .657
+females_ART_scen3 <- .857
 
-for (x in 1:3) {
-  
-  prev_ART_females<- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_females_aged15-79_onART.csv"), header=F) %>% 
-    setNames(paste0("s",-3:25)) %>% 
-    dplyr::rename(year=1,
-           mean=2,
-           min=3,
-           max=4) %>% 
-    filter(year>=2020)
-  
-  assign(paste0("Fprev_ART_scen",x),prev_ART_females)
-  
-}
+males_ART_scen1 <- .3978
+males_ART_scen2 <- .655
+males_ART_scen3 <- .857
 
-rm(prev_ART_males,prev_ART_females)
+males_enrolment_clinic <- 51/72
+males_enrolment_cbART <- 21/72
 
+females_enrolment_clinic <- 70/73
+females_enrolment_cbART <- 3/73
 
 # Generate cb-ART costs for the first year and subsequent years 
                                    
@@ -253,80 +378,111 @@ cbART_costs <- data.frame(matrix(costs["cb_art_y1"],ncol = 28, nrow = 1)) %>%
                 max=3) %>%
   mutate(year=2020:2060) %>% 
   select(year,everything())
-  
-# Multiply based on percentages enrolled in clinic versus community-based ART (defined in master script)
 
-# Males
+######################################
+# SCENARIO 1 : Standard of care ONLY #
+######################################
 
-mART_scen1 <- as.data.frame(
-  (Mprev_ART_scen1[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Mprev_ART_scen1[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+# MALES
+
+mART_scen1 <- as.data.frame(   
+  # Prevalent cases * standard of care costs   
+  (Mprev_ART_scen1[,-1] * costs["standard_art"]) + 
+  # Incident cases * % initiating ART * 1/2 year * standard of care costs
+  (cases_males1[,-1] * males_ART_scen1 * costs["standard_art"] * 0.5 ))  
+
+# FEMALES
+
+fART_scen1 <- as.data.frame(   
+  # Prevalent cases * standard of care costs 
+  (Fprev_ART_scen1[,-1] * costs["standard_art"]) + 
+  # Incident cases * % initiating ART * 1/2 year * standard of care costs
+  (cases_females1[,-1] * females_ART_scen1 * costs["standard_art"] * 0.5 ))  
+
+##########################################
+# SCENARIO 2 : Standard of care + cb-ART #
+##########################################
+
+# MALES 
 
 mART_scen2 <- as.data.frame(
-  (Mprev_ART_scen2[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Mprev_ART_scen2[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+  # Prevalent cases * enrollment scalar * ART costs 
+  (Mprev_ART_scen2[,-1] * males_enrolment_clinic * costs["standard_art"]) + # Standard of care cost
+  (Mprev_ART_scen2[,-1] * males_enrolment_cbART * cbART_costs[,-1]) +   # Community-based ART cost
+  # Incident cases * % initiating ART * enrollment scalar * 1/2 year * ART costs
+  (cases_males2[,-1] * males_ART_scen2 * males_enrolment_clinic * costs["standard_art"] * 0.5 ) + # Standard of care cost
+  (cases_males2[,-1] * males_ART_scen2 * males_enrolment_cbART * cbART_costs[,-1] * 0.5 )) # Community-based ART cost
 
-# Females
-
-fART_scen1 <- as.data.frame(
-  (Fprev_ART_scen1[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Fprev_ART_scen1[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+# FEMALES
 
 fART_scen2 <- as.data.frame(
-  (Fprev_ART_scen2[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-  (Fprev_ART_scen2[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+  # Prevalent cases * enrollment scalar * ART costs 
+  (Fprev_ART_scen2[,-1] * females_enrolment_clinic * costs["standard_art"]) + # Standard of care cost
+  (Fprev_ART_scen2[,-1] * females_enrolment_cbART * cbART_costs[,-1]) +   # Community-based ART cost
+  # Incident cases * % initiating ART * enrollment scalar * 1/2 year * ART costs
+  (cases_females2[,-1] * females_ART_scen2 * females_enrolment_clinic * costs["standard_art"] * 0.5 ) + # Standard of care cost
+  (cases_females2[,-1] * females_ART_scen2 * females_enrolment_cbART * cbART_costs[,-1] * 0.5 )) # Community-based ART cost
 
-# Combined
+######################################################
+# SCENARIO 3 (base case) : Standard of care + cb-ART #
+######################################################
 
-ART_scen1 <- (mART_scen1 + fART_scen1) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything())
-
-ART_scen2 <- (mART_scen2 + fART_scen2) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything())
-
-# NEED TO RESOLVE SCENARIO 3 - CURRENTLY INCLUDED AS DUMMY
+# MALES 
 
 mART_scen3 <- as.data.frame(
-  (Mprev_ART_scen3[,-1] * males_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-    (Mprev_ART_scen3[,-1] * males_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+  # Prevalent cases * enrollment scalar * ART costs 
+  (Mprev_ART_scen3[,-1] * males_enrolment_clinic * costs["standard_art"]) + # Standard of care cost
+  (Mprev_ART_scen3[,-1] * males_enrolment_cbART * cbART_costs[,-1]) +   # Community-based ART cost
+  # Incident cases * % initiating ART * enrollment scalar * 1/2 year * ART costs
+  (cases_males3[,-1] * males_ART_scen3 * males_enrolment_clinic * costs["standard_art"] * 0.5 ) + # Standard of care cost
+  (cases_males3[,-1] * males_ART_scen3 * males_enrolment_cbART * cbART_costs[,-1] * 0.5 )) # Community-based ART cost
+
+# FEMALES
 
 fART_scen3 <- as.data.frame(
-  (Fprev_ART_scen3[,-1] * females_enrolment_clinic * costs["standard_art"]) + #Standard of care cost
-    (Fprev_ART_scen3[,-1] * females_enrolment_cbART * cbART_costs[,-1]))   # Community-based ART cost
+  # Prevalent cases * enrollment scalar * ART costs 
+  (Fprev_ART_scen3[,-1] * females_enrolment_clinic * costs["standard_art"]) + # Standard of care cost
+  (Fprev_ART_scen3[,-1] * females_enrolment_cbART * cbART_costs[,-1]) +   # Community-based ART cost
+  # Incident cases * % initiating ART * enrollment scalar * 1/2 year * ART costs
+  (cases_females3[,-1] * females_ART_scen3 * females_enrolment_clinic * costs["standard_art"] * 0.5 ) + # Standard of care cost
+  (cases_females3[,-1] * females_ART_scen3 * females_enrolment_cbART * cbART_costs[,-1] * 0.5 )) # Community-based ART cost
 
-ART_scen3 <- (mART_scen3 + fART_scen3) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year,everything())
-
-
-# Remove excess
-
-rm(mART_scen1,fART_scen1, mART_scen2, fART_scen2, mART_scen3, fART_scen3)
-
-
-
-##############################################################################
-
-# IMPORT POPULATION (males and females combined, age 15-79)
-
-##############################################################################
+############################  
+# COMBINED MALE AND FEMALE #
+############################
+  
+# Generate weight - proportion male
 
 for (x in 1:3) {
   
-  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_combined_aged15-79.csv"), header=F) %>% 
-    setNames(paste0("s",-3:25)) %>% 
-    dplyr::rename(year=1,
-                  mean=2,
-                  min=3,
-                  max=4) %>% 
-    filter(year>=2020)
+  M_wt <- ( (get(paste0("Mpop_scen",x))[,-1]) / (get(paste0("pop_scen",x))[,-1]))%>% 
+    mutate(year=2020:2060) %>% 
+    select(year,everything())
   
-  assign(paste0("pop_scen",x),pop)
+  assign(paste0("Mwt_scen",x),pop)
   
 }
-rm(pop)
+
+# Combine male and female, by applying weight for males and females
+
+for (x in 1:3) {
+
+ART <- (( get(paste0("mART_scen",x)) * (M_wt[,-1]) )  +       # Male cost * male wt
+       (  get(paste0("fART_scen",x)) * ((1-M_wt)[,-1]) )) %>% # Female cost * (1- male wt)
+  # Recreate mean. min, max
+  mutate(mean=rowMeans(.[,4:28]),
+         min=apply(.[,4:28],1,FUN=min),
+         max=apply(.[,4:28],1,FUN=max)) %>% 
+  mutate(year=2020:2060) %>% 
+  select(year,mean,min,max,everything())
+
+assign(paste0("ART_scen",x),ART)
+
+}
+
+# Remove excess
+
+rm(pop, ART, M_wt, mART_scen1,fART_scen1, mART_scen2, fART_scen2, mART_scen3, fART_scen3, Mwt_scen1, Mwt_scen2, Mwt_scen3)
 
 
 ####################################################################################################
@@ -347,6 +503,7 @@ rm(pop)
 # 6. Incremental costs  (annual total)
 # 7. Incremental costs  (cumulative per capita)
 # 8. Incremental costs  (cumulative total)
+
 
 # 1. ANNUAL PER CAPITA (discounted)
 
@@ -470,7 +627,16 @@ inc_costs_cum_total_scen3 <- ( cost_cum_total_scen3[,-1] - cost_cum_total_scen1[
 
 # Export CSVs
 
-csv_list <- list("cost_annual_pc_scen1",
+csv_list <- list("hosp_scen1",
+                 "hosp_scen2",
+                 "hosp_scen3",
+                 "ART_scen1",
+                 "ART_scen2",
+                 "ART_scen3",
+                 "test_scen1",
+                 "test_scen2",
+                 "test_scen3",
+                 "cost_annual_pc_scen1",
                  "cost_annual_pc_scen2",
                  "cost_annual_pc_scen3",
                  "cost_annual_total_scen1",
@@ -505,6 +671,62 @@ rm(list=ls())
 
 cea_path <- "C:/Users/msahu/Documents/Other_Research/DO_ART/Code/HHCoM/CEA/"
 
+# Stacked bar chart of breakdown of costs - Scenario 1
+
+art_costs <- read.csv(paste0(cea_path,"costs/ART_scen1.csv")) %>% 
+  select(year,mean) %>% 
+  rename(ART=mean)
+
+hosp_costs <- read.csv(paste0(cea_path,"costs/hosp_scen1.csv")) %>% 
+  select(year,mean) %>% 
+  rename(Hospital=mean)
+
+test_costs <- read.csv(paste0(cea_path,"costs/test_scen1.csv")) %>% 
+  select(year,mean) %>% 
+  rename(Testing=mean)
+
+scen1_costs <- art_costs %>% 
+  left_join(hosp_costs, by="year") %>% 
+  left_join(test_costs, by="year") %>% 
+  reshape2::melt(id.var="year", measure.vars=c("ART","Hospital","Testing"), value.name = "Cost") %>% 
+  rename(Year=year,
+         `Cost Category`=variable)
+
+ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost, x=Year)) + 
+  geom_bar(position="stack", stat="identity") +
+  ylab("Cost per capita (2020 USD)") +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) 
+  
+
+# Stacked bar chart of breakdown of costs - Scenario 2
+
+art_costs <- read.csv(paste0(cea_path,"costs/ART_scen2.csv")) %>% 
+  select(year,mean) %>% 
+  rename(ART=mean)
+
+hosp_costs <- read.csv(paste0(cea_path,"costs/hosp_scen2.csv")) %>% 
+  select(year,mean) %>% 
+  rename(Hospital=mean)
+
+test_costs <- read.csv(paste0(cea_path,"costs/test_scen2.csv")) %>% 
+  select(year,mean) %>% 
+  rename(Testing=mean)
+
+scen2_costs <- art_costs %>% 
+  left_join(hosp_costs, by="year") %>% 
+  left_join(test_costs, by="year") %>% 
+  reshape2::melt(id.var="year", measure.vars=c("ART","Hospital","Testing"), value.name = "Cost") %>% 
+  rename(Year=year,
+         `Cost Category`=variable)
+
+ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost, x=Year)) + 
+  geom_bar(position="stack", stat="identity") +
+  ylab("Cost per capita (2020 USD)") +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) 
+
+
 # Annual costs (per capita, full population)
 
 costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen1.csv")) %>% 
@@ -522,7 +744,7 @@ ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
   theme_cowplot() +
   theme(axis.title=element_text(size=18),
         axis.text=element_text(size=18)) +
-  ylim(0,125)
+  ylim(0,100)
 
 costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen2.csv")) %>% 
   select(-X) %>% 
@@ -539,7 +761,45 @@ ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
   theme_cowplot() +
   theme(axis.title=element_text(size=18),
         axis.text=element_text(size=18)) +
-  ylim(0,125)
+  ylim(0,100)
+
+
+# Annual costs (total)
+
+costs <- read.csv(paste0(cea_path,"costs/cost_annual_total_scen1.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual costs per capita (in millions of 2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  ylim(0,500)
+
+costs <- read.csv(paste0(cea_path,"costs/cost_annual_total_scen2.csv")) %>% 
+  select(-X) %>% 
+  # reshape long
+  melt(id="year",value.name="costs") %>% 
+  rename(set_name=variable) %>% 
+  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
+
+ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
+  geom_line(aes(color=set_name,size=size)) +
+  scale_size_manual(values=c(1.5,.1)) +
+  xlab("Year") +
+  ylab("Annual costs per capita (in millions of 2020 USD)") +
+  theme_cowplot() +
+  theme(axis.title=element_text(size=18),
+        axis.text=element_text(size=18)) +
+  ylim(0,500)
+
 
 # Incremental costs (per capita)
 
@@ -571,7 +831,7 @@ ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
   geom_line(aes(color=set_name,size=size)) +
   scale_size_manual(values=c(1.5,.1)) +
   xlab("Year") +
-  ylab("Cumulative costs per capita (2020 USD)") +
+  ylab("Incremental cumulative costs per capita (2020 USD)") +
   theme_cowplot() +
   theme(axis.title=element_text(size=18),
         axis.text=element_text(size=18))  +
@@ -586,11 +846,11 @@ costs <- read.csv(paste0(cea_path,"costs/inc_costs_annual_total_scen2.csv")) %>%
   rename(set_name=variable) %>% 
   mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
 
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
+ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
   geom_line(aes(color=set_name,size=size)) +
   scale_size_manual(values=c(1.5,.1)) +
   xlab("Year") +
-  ylab("Annual incremental costs (2020 USD)") +
+  ylab("Annual incremental costs (millions of 2020 USD)") +
   theme_cowplot() +
   theme(axis.title=element_text(size=18),
         axis.text=element_text(size=18)) +

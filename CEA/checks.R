@@ -86,3 +86,65 @@ print(all.equal(mortality_check$min,mortality_check$min2))
 print(all.equal(mortality_check$max,mortality_check$max2))
 
 rm(mortality_check)
+
+
+##############################################################################
+
+#Male and female population numbers add up - TRUE
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_combined_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    select(-year,-min,-max)
+  
+  assign(paste0("pop_scen",x),pop)
+  
+}
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_females_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    select(-year,-min,-max)
+  
+  assign(paste0("Fpop_scen",x),pop)
+  
+}
+
+for (x in 1:3) {
+  
+  pop <- read.csv(paste0(main_path,"Scenario",x,"/PopulationSize_males_aged15-79.csv"), header=F) %>% 
+    setNames(paste0("s",-3:25)) %>% 
+    dplyr::rename(year=1,
+                  mean=2,
+                  min=3,
+                  max=4) %>% 
+    select(-year,-min,-max)
+  
+  assign(paste0("Mpop_scen",x),pop)
+  
+}
+
+
+for (x in 1:3) {
+  
+  pop <- get(paste0("Mpop_scen",x))+get(paste0("Fpop_scen",x))
+  
+  assign(paste0("Cpop_scen",x),pop)
+  
+}
+
+for (x in 1:3) {
+  
+  print(all.equal(get(paste0("Cpop_scen",x)),get(paste0("pop_scen",x))))
+  
+}
