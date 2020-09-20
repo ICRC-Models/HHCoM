@@ -35,7 +35,7 @@ tic
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
-pathModifier = 'toNow_10Sept_hivPopIn_epsA2533_1960start';
+pathModifier = 'toNow_10Sept_epsA7533';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -385,8 +385,8 @@ for i = iStart : length(s) - 1
         % % toHivNonHpv = sort(toInd(allcomb(4 , 2 , 1 , 1 , 1 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
         % % fromNonHivHpv = sort(toInd(allcomb(1 , 1 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk))); 
         % % toHivHpv = sort(toInd(allcomb(4 , 2 , 2 : hpvVaxStates , 2 : hpvNonVaxStates , 1 : 3 , 1 , 1:gender , (15/max(1,fivYrAgeGrpsOn*5)+1) : (30/max(1,fivYrAgeGrpsOn*5)) , 1:risk)));
-        fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1:risk))); 
-        toHivAll = sort(toInd(allcomb(4 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1:risk)));
+        fromNonHivAll = sort(toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1 : age , 1:risk))); 
+        toHivAll = sort(toInd(allcomb(4 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 : gender , 1:age , 1:risk)));
         
         % Distribute HIV infections 
         % % (HPV-)        
@@ -395,8 +395,8 @@ for i = iStart : length(s) - 1
         % % (HPV+)
         % % popIn(fromNonHivHpv) = (1 - 0.001) .* popIn_init(fromNonHivHpv);    % reduce non-HIV infected
         % % popIn(toHivHpv) = (0.001) .* popIn_init(fromNonHivHpv);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
-        popIn(fromNonHivAll) = (1 - 0.0025) .* popIn_init(fromNonHivAll);    % reduce non-HIV infected
-        popIn(toHivAll) = (0.0025) .* popIn_init(fromNonHivAll);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
+        popIn(fromNonHivAll) = (1 - 0.003) .* popIn_init(fromNonHivAll);    % reduce non-HIV infected
+        popIn(toHivAll) = (0.003) .* popIn_init(fromNonHivAll);    % increase HIV infected ( male/female, age groups 4-6) (% prevalence)
         
     end
 

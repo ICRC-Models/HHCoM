@@ -33,7 +33,13 @@ baseYr = yr(baseYrInd);
 if year <= dataYr1 % assortativity in 1st year
     epsA = epsA_vec{1}(1);
     epsR = epsR_vec{1}(1);
-elseif (year < dataYrLast) && (year > dataYr1) % assortativity between 1st and last year
+elseif (year < yr(2)) && (year > dataYr1) % assortativity between 1st and last year
+    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+elseif (year < yr(3)) && (year >= yr(2)) % assortativity between 1st and last year
+    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+elseif (year < dataYrLast) && (year >= yr(3)) % assortativity between 1st and last year
     epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
     epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
 elseif year >= dataYrLast % assortativity in last year and after

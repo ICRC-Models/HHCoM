@@ -48,7 +48,7 @@ calibBool = 0;
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1960;
+startYear = 1925;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -276,7 +276,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.2; 0.5; 0.5 ; 0.3];
+    epsA = [0.7; 0.5; 0.5 ; 0.3];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -284,10 +284,11 @@ if calibBool && any(7 == pIdx);
     %epsR = paramSet(paramsSub{idx}.inds(:));
     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsR = [0.2; 0.3 ; 0.3 ; 0.3];
+    epsR = [0.7; 0.5 ; 0.3 ; 0.3];
 end
 %%
 yr = [1975; 1980; 1990; 2000];
+%%
 % epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 % epsR_vec = cell(size(yr , 1) - 1, 1);
 for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps within period
