@@ -101,7 +101,6 @@ mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
 mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
 mue4(1, :)= mue4(1 , :) .* 2 ;
 fertility = xlsread(file , 'Fertility' , 'D104:I119');
-%fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
 partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
@@ -958,7 +957,7 @@ file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
 
 ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidence Rate 2012, by age
 ccInc2012_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H10:I22');
-cc_dist_dObs = zeros(2, 3);
+
 cc_dist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E2:E3'); % CC type distribution for 9v and non-9v HPV types
 cc_dist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H2:I3');
 
@@ -980,7 +979,6 @@ cin1_2010_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H29:I30');
 cin2_2010_dObs(: , 1) = xlsread(file , 'Calibration' , 'E31:E32'); % CIN2+ Prevalence 2010, by HIV status
 cin2_2010_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H31:I32');
 
-hpv_hiv_dObs = zeros(4, 3);
 hpv_hiv_dObs(: , 1) = xlsread(file , 'Calibration' , 'E33:E36'); % HPV Prevalence in high risk HIV+ Women (high risk) 2006, by age
 hpv_hiv_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H33:I36');
 hpv_hivNeg_dObs(: , 1) = xlsread(file , 'Calibration' , 'E37:E40'); % HPV Prevalence in high risk HIV- Women (high risk) 2006, by age
@@ -991,31 +989,19 @@ hpv_all_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H41:I46');
 hpv_hiv2009_dObs(: , 1) = xlsread(file , 'Calibration' , 'E47:E51'); % HPV Prevalence in HIV+ women, by age
 hpv_hiv2009_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H47:I51');
 
-hivPrevF_dObs = zeros(21, 1);
-hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'E52:E72'); % HIV Prevalence in Women 2003,2007,2009, by age
+hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'E52:E72'); % HIV Prevalence in Women 2003, 2007, and 2009, by age
 hivPrevF_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H52:I72');
-% hivPrevF_dObs(: , 4:5) = xlsread(file , 'Calibration' , 'E102:F143'); % raw data %
-hivPrevM_dObs = zeros(24, 1);
-hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'E73:E96'); % HIV Prevalence in Men 2003,2007,2009, by age
+hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'E73:E96'); % HIV Prevalence in Men 2003, 2007, and 2009, by age
 hivPrevM_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H73:I96');
-% hivPrevM_dObs(: , 4:5) = xlsread(file , 'Calibration' , 'E60:F101'); % raw data
-
-hivPrevAll_dObs(: , 1) = xlsread(file , 'Calibration' , 'E97:E106'); % HIV Prevalence in all 2003,2007,2009, by age
+hivPrevAll_dObs(: , 1) = xlsread(file , 'Calibration' , 'E97:E106'); % HIV Prevalence in all in 2012, by age
 hivPrevAll_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H97:I106');
-% 
-popAgeDist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E107:E170');  % Population age distribution in 1996, 2011, and 2019
+ 
+popAgeDist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E107:E170');  % Population age distribution in 1979, 1989, 1990, and 2009
 popAgeDist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H107:I170'); 
 
-% popAgeDist_dObs(: , 1) = [xlsread(file , 'Calibration' , 'D191 : D206'); ... % Population age distribution in 1996, 2011, and 2019
-%     xlsread(file , 'Calibration' , 'D223 : D238');
-%     xlsread(file , 'Calibration' , 'D255 : D270')];
-% popAgeDist_dObs(: , 2 : 3) = [xlsread(file , 'Calibration' , 'H191 : I206'); ...
-%     xlsread(file , 'Calibration' , 'H223 : I238');
-%     xlsread(file , 'Calibration' , 'H255 : I270')];
-% 
-totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E171:E174'); % Total population size in 2001, 2011, and 2019
-totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H171:I174');
-% % 
+totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E171:E174'); % Total population size in 1979, 1989, 1990, and 2009
+totPopSize_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H171:I174');
+ 
 save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
