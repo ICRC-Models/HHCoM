@@ -422,7 +422,7 @@ kInf_Cin1 = zeros(16,2);
 kCin1_Cin2 = zeros(16,2);
 kCin2_Cin3 = zeros(16,2);
 
-% HPV to CIN1, ages 10-24
+% HPV to CIN1, ages 10-29
 if calibBool && any(27 == pIdx)
     idx = find(27 == pIdx);
     kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
@@ -433,7 +433,7 @@ else
     kCin1_Inf(1 : 6 , 2) = kCin1_Inf_orig(1 , 2) * 2.0;
 end
 
-% CIN1 to CIN2, ages 10-24
+% CIN1 to CIN2, ages 10-29
 if calibBool && any(28 == pIdx)
     idx = find(28 == pIdx);
     kCin2_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
@@ -444,7 +444,7 @@ else
     kCin2_Cin1(1 : 6 , 2) = kCin2_Cin1_orig(1 , 2) * 2.0;
 end
 
-% CIN2 to CIN3, ages 10-24
+% CIN2 to CIN3, ages 10-29
 if calibBool && any(29 == pIdx)
     idx = find(29 == pIdx);
     kCin3_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
@@ -455,7 +455,7 @@ else
     kCin3_Cin2(1 : 6 , 2) = kCin3_Cin2_orig(1 , 2) * 2.0;
 end
 
-% CIN3 to unlocalized cancer, ages 10-24
+% CIN3 to unlocalized cancer, ages 10-29
 if calibBool && any(30 == pIdx)
     idx = find(30 == pIdx);
     kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
@@ -466,7 +466,7 @@ else
     kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * 5.0;
 end
 
-% HPV to Well (or natural immunity), ages 10-24
+% HPV to Well (or natural immunity), ages 10-29
 if calibBool && any(31 == pIdx)
     idx = find(31 == pIdx);
     rNormal_InfMult = paramSet(paramsSub{idx}.inds(:));
@@ -477,7 +477,7 @@ else
     rNormal_Inf(1 : 6 , 2) = rNormal_Inf_orig(1 , 2) * 1.41;
 end
 
-% CIN1 to HPV, ages 10-24
+% CIN1 to HPV, ages 10-29
 if calibBool && any(32 == pIdx)
     idx = find(32 == pIdx);
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
@@ -488,7 +488,7 @@ else
     kInf_Cin1(1 : 6 , 2) = kInf_Cin1_orig(1 , 2) * 0.97;
 end
 
-% CIN2 to CIN1, ages 10-24
+% CIN2 to CIN1, ages 10-29
 if calibBool && any(33 == pIdx)
     idx = find(33 == pIdx);
     kCin1_Cin2Mult = paramSet(paramsSub{idx}.inds(:));
@@ -499,7 +499,7 @@ else
     kCin1_Cin2(1 : 6 , 2) = kCin1_Cin2_orig(1 , 2) * 0.2;
 end
 
-% CIN3 to CIN2, ages 10-24
+% CIN3 to CIN2, ages 10-29
 if calibBool && any(34 == pIdx)
     idx = find(34 == pIdx);
     kCin2_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
@@ -540,7 +540,7 @@ kCin2_Cin3(11 : 16 , 1) = kCin2_Cin3(1 , 1) * linspace((0.8-0.6)*(5/6)+0.6 , 0.6
 kCin1_Inf(7 : 10 , 2) = kCin1_Inf(1 , 2) * linspace((1.05-1)*0.25+1.0 , 1.05 , 4); %ageTrends(1,1); % ages 30-49
 kCin2_Cin1(7 : 10 , 2) = kCin2_Cin1(1 , 2) * linspace((ageTrends(1,2)-1)*0.25+1.0 , ageTrends(1,2) , 4);
 kCin3_Cin2(7 : 10 , 2) = kCin3_Cin2(1, 2) * linspace((1.6-1)*0.25+1.0 , 1.6 , 4); %ageTrends(1,3);
-kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((3.0-1)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
+kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((3.0-1.0)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
 rNormal_Inf(7 : 10 , 2) = rNormal_Inf(1 , 2) * linspace((1.0-1.0)*0.75+1.0 , 1.0 , 4); %ageTrends(1,5);
 kInf_Cin1(7 : 10 , 2) = kInf_Cin1(1 , 2) * linspace((1.0-ageTrends(1,6))*0.75+ageTrends(1,6) , ageTrends(1,6) , 4);
 kCin1_Cin2(7 : 10 , 2) = kCin1_Cin2(1 , 2) * linspace((1.0-ageTrends(1,7))*0.75+ageTrends(1,7) , ageTrends(1,7) , 4);
