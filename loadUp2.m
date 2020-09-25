@@ -1295,7 +1295,7 @@ end
 vlAdvancer = sparse(xInds , yInds , vals , numel(pop) , numel(pop));
 % disp('Finished building viral load progression matrix')
 
-%% Fertility prior to 1990
+%% Fertility prior to 2000
 
 % birth indices
 negMaleBirth = toInd(allcomb(1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1));
