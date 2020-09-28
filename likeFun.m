@@ -268,10 +268,10 @@ hpvInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , 
         [1 , 7] , 2 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
     
 for i = 1 : length(typeDistYearVec) 
-    hpv_vax = sum(popVec(((typeDisYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_vax) , 2)...
-        ./ sum(popVec(((typeDisYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
-    hpv_nonVax = sum(popVec(((typeDisYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_nonVax) , 2)...
-        ./ sum(popVec(((typeDisYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
+    hpv_vax = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_vax) , 2)...
+        ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
+    hpv_nonVax = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_nonVax) , 2)...
+        ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , hpvInds_tot) , 2);
 
     mObs = [mObs; hpv_vax; hpv_nonVax];
     dMean = [dMean ; hpv_dist_dObs(: , 2)];
@@ -296,7 +296,7 @@ mObs = [mObs ; ccInc2012];
 dMean = [dMean ; ccInc2012_dObs(: , 2)];
 dVar =  [dVar ; ccInc2012_dObs(: , 3)];
 
-%% Population age distribution
+%% Population age distribution:
 popYearVec = unique(popAgeDist_dObs(: ,1));
 popProp = zeros(age, length(popYearVec));
 
