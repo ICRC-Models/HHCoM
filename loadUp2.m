@@ -459,8 +459,8 @@ end
 if calibBool && any(30 == pIdx)
     idx = find(30 == pIdx);
     kCC_Cin3Mult = paramSet(paramsSub{idx}.inds(:));
-    kCC_Cin3(1 : 6 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
-    kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
+    kCC_Cin3(1 : 6 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1) * 2.0;
+    kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2) * 2.0;
 else
     kCC_Cin3(1 : 6 , 1) = kCC_Cin3_orig(1 , 1) * 1.0;
     kCC_Cin3(1 : 6 , 2) = kCC_Cin3_orig(1 , 2) * 5.0;
@@ -514,7 +514,7 @@ end
 kCin1_Inf(7 : 10 , 1) = kCin1_Inf(1 , 1) * linspace((1.05-1)*0.25+1.0 , 1.05 , 4); %ageTrends(1,1); % ages 30-49
 kCin2_Cin1(7 : 10 , 1) = kCin2_Cin1(1 , 1) * linspace((ageTrends(1,2)-1)*0.25+1.0 , ageTrends(1,2) , 4);
 kCin3_Cin2(7 : 10 , 1) = kCin3_Cin2(1, 1) * linspace((1.6-1)*0.25+1.0 , 1.6 , 4); %ageTrends(1,3);
-kCC_Cin3(7 : 10 , 1) = kCC_Cin3(1 , 1) * linspace((3.0-1.0)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
+kCC_Cin3(7 : 10 , 1) = kCC_Cin3(1 , 1) * linspace((2.5-1.0)*0.25+1.0 , 2.5 , 4); %ageTrends(1,4);
 rNormal_Inf(7 : 10 , 1) = rNormal_Inf(1 , 1) * linspace((1.0-1.0)*0.75+1.0 , 1.0 , 4); %ageTrends(1,5);
 kInf_Cin1(7 : 10 , 1) = kInf_Cin1(1 , 1) * linspace((1.0-ageTrends(1,6))*0.75+ageTrends(1,6) , ageTrends(1,6) , 4);
 kCin1_Cin2(7 : 10 , 1) = kCin1_Cin2(1 , 1) * linspace((1.0-ageTrends(1,7))*0.75+ageTrends(1,7) , ageTrends(1,7) , 4);
@@ -522,7 +522,7 @@ kCin2_Cin3(7 : 10 , 1) = kCin2_Cin3(1 , 1) * linspace((1.0-0.8)*0.75+0.8 , 0.8 ,
 kCin1_Inf(11 : 16 , 1) = kCin1_Inf(1 , 1) * linspace(1.05+((1.10-1.05)/6) , 1.10 , 6); %ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 16 , 1) = kCin2_Cin1(1 , 1) * linspace(ageTrends(1,2)+((ageTrends(2,2)-ageTrends(1,2))/6) , ageTrends(2,2) , 6);
 kCin3_Cin2(11 : 16 , 1) = kCin3_Cin2(1 , 1) * linspace(1.6+((2.0-1.6)/6) , 2.0 , 6); %ageTrends(2,3);
-kCC_Cin3(11 : 16 , 1) = kCC_Cin3(1 , 1) * linspace(3.0+((7.0-3.0)/6) , 7.0 , 6); %ageTrends(2,4);
+kCC_Cin3(11 : 16 , 1) = kCC_Cin3(1 , 1) * linspace(2.5+((9.0-2.5)/6) , 9.0 , 6); %ageTrends(2,4);
 rNormal_Inf(11 : 16 , 1) = rNormal_Inf(1 , 1) * linspace((1.0-ageTrends(2,5))*(5/6)+ageTrends(2,5) , ageTrends(2,5) , 6);
 kInf_Cin1(11 : 16 , 1) = kInf_Cin1(1 , 1) * linspace((ageTrends(1,6)-ageTrends(2,6))*(5/6)+ageTrends(2,6) , ageTrends(2,6) , 6);
 kCin1_Cin2(11 : 16 , 1) = kCin1_Cin2(1 , 1) * linspace((ageTrends(1,7)-ageTrends(2,7))*(5/6)+ageTrends(2,7) , ageTrends(2,7) , 6);
@@ -540,7 +540,7 @@ kCin2_Cin3(11 : 16 , 1) = kCin2_Cin3(1 , 1) * linspace((0.8-0.6)*(5/6)+0.6 , 0.6
 kCin1_Inf(7 : 10 , 2) = kCin1_Inf(1 , 2) * linspace((1.05-1)*0.25+1.0 , 1.05 , 4); %ageTrends(1,1); % ages 30-49
 kCin2_Cin1(7 : 10 , 2) = kCin2_Cin1(1 , 2) * linspace((ageTrends(1,2)-1)*0.25+1.0 , ageTrends(1,2) , 4);
 kCin3_Cin2(7 : 10 , 2) = kCin3_Cin2(1, 2) * linspace((1.6-1)*0.25+1.0 , 1.6 , 4); %ageTrends(1,3);
-kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((3.0-1.0)*0.25+1.0 , 3.0 , 4); %ageTrends(1,4);
+kCC_Cin3(7 : 10 , 2) = kCC_Cin3(1 , 2) * linspace((2.5-1.0)*0.25+1.0 , 2.5 , 4); %ageTrends(1,4);
 rNormal_Inf(7 : 10 , 2) = rNormal_Inf(1 , 2) * linspace((1.0-1.0)*0.75+1.0 , 1.0 , 4); %ageTrends(1,5);
 kInf_Cin1(7 : 10 , 2) = kInf_Cin1(1 , 2) * linspace((1.0-ageTrends(1,6))*0.75+ageTrends(1,6) , ageTrends(1,6) , 4);
 kCin1_Cin2(7 : 10 , 2) = kCin1_Cin2(1 , 2) * linspace((1.0-ageTrends(1,7))*0.75+ageTrends(1,7) , ageTrends(1,7) , 4);
@@ -548,7 +548,7 @@ kCin2_Cin3(7 : 10 , 2) = kCin2_Cin3(1 , 2) * linspace((1.0-0.8)*0.75+0.8 , 0.8 ,
 kCin1_Inf(11 : 16 , 2) = kCin1_Inf(1 , 2) * linspace(1.05+((1.10-1.05)/6) , 1.10 , 6); %ageTrends(2,1); % ages 50-69
 kCin2_Cin1(11 : 16 , 2) = kCin2_Cin1(1 , 2) * linspace(ageTrends(1,2)+((ageTrends(2,2)-ageTrends(1,2))/6) , ageTrends(2,2) , 6);
 kCin3_Cin2(11 : 16 , 2) = kCin3_Cin2(1 , 2) * linspace(1.6+((2.0-1.6)/6) , 2.0 , 6); %ageTrends(2,3);
-kCC_Cin3(11 : 16 , 2) = kCC_Cin3(1 , 2) * linspace(3.0+((7.0-3.0)/6) , 7.0 , 6); %ageTrends(2,4);
+kCC_Cin3(11 : 16 , 2) = kCC_Cin3(1 , 2) * linspace(2.5+((9.0-2.5)/6) , 9.0 , 6); %ageTrends(2,4);
 rNormal_Inf(11 : 16 , 2) = rNormal_Inf(1 , 2) * linspace((1.0-ageTrends(2,5))*(5/6)+ageTrends(2,5) , ageTrends(2,5) , 6);
 kInf_Cin1(11 : 16 , 2) = kInf_Cin1(1 , 2) * linspace((ageTrends(1,6)-ageTrends(2,6))*(5/6)+ageTrends(2,6) , ageTrends(2,6) , 6);
 kCin1_Cin2(11 : 16 , 2) = kCin1_Cin2(1 , 2) * linspace((ageTrends(1,7)-ageTrends(2,7))*(5/6)+ageTrends(2,7) , ageTrends(2,7) , 6);
