@@ -15,5 +15,5 @@ export NSETS
 echo "Running specified simulation."
 SETIDX=1
 export SETIDX
-sbatch -p ckpt -A csde-ckpt slurm_runMultHistSims.sbatch
+sbatch -p csde -A csde slurm_runMultHistSims.sbatch
 
