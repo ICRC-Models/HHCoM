@@ -781,7 +781,9 @@ circStartYear = 1960; % Year VMMC begins in ages 15-19
 circNatStartYear = 2010; % Year SA National VMMC program begins, older men circumcised
 vaxStartYear = 2014;
 
-% Protection from circumcision and condoms
+% Protection from HIV or HPV acquisition provided by circumcision and condoms
+% Note: circProtect applies only to individuals placed in the HIV-negative, circumcised compartment
+%       condProtect applies to all individuals of that gender
 circProtect = [[circProtect; 0.0] , [0.30; 0.0]];    % HIV protection , HPV protection
 condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
 
