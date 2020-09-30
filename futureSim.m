@@ -8,20 +8,20 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 % profile clear;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+%pc = parcluster('local');    % create a local cluster object
+%pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+%parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
     'popLast' , 'artDistList' , 'artDist'); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_WHO-SCES012_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_WHO-SCES012_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -37,9 +37,9 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
 hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
-screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
+screenAlgorithmNeg = 4; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
 whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
-whoScreenAgeMults = [1.0 , 1.0]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
+whoScreenAgeMults = [1.0 , 1.0]; %[1.0 , 1.0 , 1.0 , 1.0 , 1.0]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
 
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
@@ -322,8 +322,7 @@ end
 
 %% Simulation
 %profile on
-
-parfor n = 1 : nTests
+n = 1; %parfor n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -337,10 +336,8 @@ parfor n = 1 : nTests
         vaxRemain = vaxLimitPerYr;
         vaxCoverL = vaxCoverLmat(n);
     end
-    
     % Initial population
     popIn = historicalIn.popLast; % initial population to "seed" model
-    
     % Initialize time vector
     yearsF = lastYear - currYear;
     s = 1 : timeStep : yearsF + 1;
@@ -349,7 +346,7 @@ parfor n = 1 : nTests
     % Initialize other vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = zeros(size(popVec));
+    deaths = zeros(length(s) - 1 , 1); %zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -362,20 +359,18 @@ parfor n = 1 : nTests
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+    % newTreatImm = newScreen;
+    % newTreatHpv = newScreen;
+    % newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
     vaxdCU = vaxdLmtd;
-    
     % ART
     import java.util.LinkedList
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
-    
     %% Main body of simulation
     for i = 2 : length(s) - 1
         year = currYear + s(i) - 1;
@@ -406,10 +401,7 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -546,7 +538,7 @@ parfor n = 1 : nTests
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
-    popLast = popVec(end , :);
+    popLast = sparse(popVec(end , :));
     popVec = sparse(popVec); % compress population vectors
 
     filename = ['vaxSimResult' , num2str(simNum)];
@@ -558,9 +550,8 @@ parfor n = 1 : nTests
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 
-        newTreatImm , newTreatHpv , newTreatHyst , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
-end
+%end
 disp('Done')
 
 %profile viewer

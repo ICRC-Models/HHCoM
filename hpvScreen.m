@@ -1,5 +1,5 @@
 % HPV screening and treatment
-function[dPop , ccScreen , ccTreatImm , ccTreatHpv , ccTreatHyst] = hpvScreen(pop , ...
+function[dPop , ccScreen] = hpvScreen(pop , ...
     disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -10,9 +10,9 @@ function[dPop , ccScreen , ccTreatImm , ccTreatHpv , ccTreatHyst] = hpvScreen(po
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-ccTreatImm = ccScreen;
-ccTreatHpv = ccScreen;
-ccTreatHyst = ccScreen;
+%ccTreatImm = ccScreen;
+%ccTreatHpv = ccScreen;
+%ccTreatHyst = ccScreen;
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs)
@@ -112,14 +112,14 @@ for i = 1 : length(screenAlgs)
                                     end    
                                         
                                     ccScreen(d , v , h , s , x , aS , r , 1) = sumall(noVaxScreend);
-                                    ccTreatImm(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatImmMult .* noVaxScreend);
-                                    ccTreatHpv(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatHpvMult .* noVaxScreend);
-                                    ccTreatHyst(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatHystMult .* noVaxScreend);
+                                    %ccTreatImm(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatImmMult .* noVaxScreend);
+                                    %ccTreatHpv(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatHpvMult .* noVaxScreend);
+                                    %ccTreatHyst(d , v , h , s , x , aS , r , 1) = sumall(toScreenTreatHystMult .* noVaxScreend);
 
                                     ccScreen(d , v , h , s , x , aS , r , 2) = sumall(vaxScreend);
-                                    ccTreatImm(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatImmMult .* vaxScreend);
-                                    ccTreatHpv(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatHpvMult .* vaxScreend);
-                                    ccTreatHyst(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatHystMult .* vaxScreend);
+                                    %ccTreatImm(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatImmMult .* vaxScreend);
+                                    %ccTreatHpv(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatHpvMult .* vaxScreend);
+                                    %ccTreatHyst(d , v , h , s , x , aS , r , 2) = sumall(toScreenTreatHystMult .* vaxScreend);
                                 end
                             end
                         end
