@@ -51,22 +51,32 @@ paramDir = [pwd , '\Params\'];
 
 %% LOAD SAVED RESULTS
 % ***SET ME***: save names of potential scenarios to analyze as variables
-baseDirName = 'Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_';
+baseDirName = 'Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_';
 dirName_reductBaseline = [baseDirName , 'WHO-SCES012_6_1'];
-dirName_reductBaseline2 = ['Vaccine22Apr20Ph2V11_whoBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_' , 'WHO-SCE0b_6_1'];
+dirName_reductBaseline2 = ['Vaccine22Apr20Ph2V11_whoS0bBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , 'WHO-SCE0b_6_1'];
 dirName_P1_SCE34 = [baseDirName , 'WHO-SCES34_6_1'];
 dirName_P1_SCE56 = [baseDirName , 'WHO-SCES56_6_1'];
+dirName_P2_SCE7a7 = [baseDirName , 'WHO-SCES7a7_6_1'];
+dirName_P2_SCE7b = [baseDirName , 'WHO-SCES7b_6_1'];
+dirName_P2_SCE8 = [baseDirName , 'WHO-SCES8_6_1'];
+dirName_P2_SCE9 = [baseDirName , 'WHO-SCES9_6_1'];
+dirName_P2_SCE10 = [baseDirName , 'WHO-SCES10_6_1'];
+dirName_P2_SCE11 = [baseDirName , 'WHO-SCES11_6_1'];
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
-simVec = {dirName_reductBaseline , dirName_reductBaseline2 , dirName_reductBaseline , dirName_reductBaseline , ...
-    dirName_P1_SCE34 , dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P1_SCE56};
-fileVec = {'sim0' , 'sim0' , 'sim1' , 'sim2' , 'sim1' , 'sim2' , 'sim1' , 'sim2'};
+simVec = {dirName_reductBaseline , ... %dirName_reductBaseline , dirName_reductBaseline , ...
+    ...%dirName_P1_SCE34 , dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P1_SCE56}; % , ...
+     dirName_P2_SCE7a7 , dirName_P2_SCE7a7 , dirName_P2_SCE7b , dirName_P2_SCE8 , ...
+     dirName_P2_SCE9 , dirName_P2_SCE10 , dirName_P2_SCE11};
+fileVec = {'sim0' , ... %'sim1' , 'sim2' , 'sim1' , 'sim2' , 'sim1' , 'sim2'}; % , ...
+    'sim1' , 'sim2' , 'sim1' , 'sim2' , 'sim2' , 'sim2' , 'sim2'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'P1-SCE0' , 'P1-SCE0b' , 'P1-SCE1' , 'P1-SCE2' , 'P1-SCE3' , 'P1-SCE4' , 'P1-SCE5' , 'P1-SCE6'};
+fileTits = {'P1-SCE0' , ... %'P1-SCE1' , 'P1-SCE2' , 'P1-SCE3' , 'P1-SCE4' , 'P1-SCE5' , 'P1-SCE6'};
+    'P2-SCE7a' , 'P2-SCE7' , 'P2-SCE7b' , ...
+    'P2-SCE8' , 'P2-SCE9' , 'P2-SCE10' , 'P2-SCE11'};
 
 nResults = length(simVec);
 
-%% SAVE CC INCIDENCE AND MORTALITY; NEW CC CASES; HIV PREVALENCE
 for j = 1 : nResults 
     %% CC INCIDENCE - age standardized
     % Note: the age-standardization process shifts the incidence rate of the
@@ -119,11 +129,78 @@ for j = 1 : nResults
         end
         hold all;
         plot(ccIncHivAgeTime(1 , 2:end) , ccInc , '-')
-        axis([1980 2120 0 60])
+        axis([1980 2120 0 80])
         grid on;
         xlabel('Year'); ylabel('AS ICC per 100K'); 
         %legend('General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt');
     end
+    
+    %% HPV INCIDENCE - age standardized
+%     % Note: the age-standardization process shifts the incidence rate of the
+%     % last modelled age group to the next age group in the following year.
+%     % However, HPV incidence is NaN prior to HIV introduction in the
+%     % HIV-positive no ART group, and NaN prior to ART introduction in the
+%     % HIV-positive ART group. Since we have four age groups past the 16 we
+%     % model, a NaN value is present for four years past the introduction of
+%     % HIV/ART, leading to a NaN value for summed incidence during these 
+%     % years. We therefore lack data in this four-year interval in the
+%     % saved/plotted results.
+%
+%     % Note: a limitation of these plots is that vax and nonVax HPV
+%     % incidence is currently double-counted in coinfected individuals
+%     
+%     fac = 100;
+%     worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+%         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+%         23477 9261 2155];
+%     
+%     riskLabels = {'lr' , 'mr' , 'hr'};
+%     riskPlotLines = {'-' , '--' , ':'};
+%     diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};    
+%     for r = 1 : risk
+%         set(gca,'ColorOrderIndex',1)
+%         for dInd = 1 : length(diseaseLabels);
+%             % Load results
+%             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%                 'HPVinc_' , diseaseLabels{dInd} , '_' , riskLabels{r} , '_' , fileVec{j} , '.csv'];
+%             hpvIncHivAgeTime = xlsread(fname);
+% 
+%             hpvIncRefTot = zeros(1 , size(hpvIncHivAgeTime,2)-1);       
+%             for aInd = 1:age+4
+%                 a = aInd;
+%                 if aInd >= age
+%                     a = age;
+%                 end
+% 
+%                 if aInd <= age    
+%                     hpvIncRef = hpvIncHivAgeTime(a+1 , 2:end) .* worldStandard_WP2015(aInd);
+%                     if (a < 3)
+%                         hpvIncRef = zeros(1 , size(hpvIncHivAgeTime,2)-1);
+%                     end
+%                 elseif aInd > age
+%                     hpvIncRef = hpvIncHivAgeTime(a+1 , 2:end);
+%                     hpvIncRef = [(ones(1,aInd-a).*hpvIncRef(1,1)) , hpvIncRef(1,1:end-(aInd-a))];
+%                     hpvIncRef = hpvIncRef .* worldStandard_WP2015(aInd);
+%                 end
+%                 hpvIncRefTot = hpvIncRefTot + hpvIncRef;
+%             end
+%             hpvInc = hpvIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
+% 
+%             % Plot baseline incidence
+%             if (j == 1) && (dInd == 1) && (r == 1)
+%                 figure;
+%             end
+%             hold all;
+%             plot(hpvIncHivAgeTime(1 , 2:end) , hpvInc , riskPlotLines{r});
+%             hold all;
+%             axis([1980 2120 0 30])
+%             grid on;
+%             xlabel('Year'); ylabel('AS HPV incidence per 100'); 
+%             legend('General, lr' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt' , ...
+%                 'General, mr' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt' , ...
+%                 'General, hr' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt');
+%         end
+%     end
 
 end
 
@@ -133,7 +210,7 @@ if j == nResults
     plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*4.0 , 'r:')
     hold all;
     plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*10.0 , 'r--')
-    legend(fileTits{:} , ... %'General' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt' , ...    %
-        'Elimination: <4/100K' , 'Benchmark: <10/100K');
+    legend(fileTits{:} , ... %'General' , 'HIV-neg' , 'HIV-posAll' , 'HIV-posNoArt' , 'HIV-posArt' , ...
+       'Elimination: <4/100K' , 'Benchmark: <10/100K'); %
+        %'P1-SCE0 (10sims) - adjusted KZN' , 'P1-SCE1 (10sims) - adjusted KZN' , 'P1-SCE2 (10sims) - adjusted KZN' , ...
 end
-
