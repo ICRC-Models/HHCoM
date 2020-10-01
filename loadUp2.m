@@ -80,8 +80,11 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 %% Save demographic and behavioral parameters
 
 % Import from Excel initial population size, male risk distribution, 
+% Uncomment if attempting to re-generatethe .m file -- will likely fail if
+% multithreading
 
 %background mortality, fertility, partnerships, and acts per partnership
+%{
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
 popInit = xlsread(file , 'Population' , 'B169:C184'); 
 popInit = popInit .* 1000; 
@@ -106,7 +109,9 @@ partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
-    'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
+%}
+
+%%    'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -384,9 +389,9 @@ end
 
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
-% 
-% ageTrends = xlsread(file , 'CIN transitions by type' , 'C38 : J40');
-% 
+% % 
+% ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
+% % 
 % kCin1_Inf_orig = zeros(1,2);
 % kCin2_Cin1_orig = zeros(1,2);
 % kCin3_Cin2_orig = zeros(1,2);
@@ -394,35 +399,36 @@ end
 % rNormal_Inf_orig = zeros(1,2);
 % kInf_Cin1_orig = zeros(1,2);
 % kCin1_Cin2_orig = zeros(1,2);
-% kCin2_Cin3_orig = zeros(1,2);
-% % 9v HPV types
-% kCin1_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'C25'); % HPV to CIN1, ages 10-24
-% kCin2_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'D25'); % CIN1 to CIN2
-% kCin3_Cin2_orig(1, 1) = xlsread(file , 'CIN transitions by type', 'E25'); % CIN2 to CIN3
-% kCC_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'F25'); % CIN3 to unlocalized
-% rNormal_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'G25'); % HPV to Well (natural immunity)
-% kInf_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'H25'); % CIN1 to HPV
-% kCin1_Cin2_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'I25'); % CIN2 to CIN1
-% kCin2_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'J25'); % CIN3 to CIN2
-% % Non-9v HPV types
-% kCin1_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'M25');  % HPV to CIN1, ages 10-24
-% kCin2_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'N25'); % CIN1 to CIN2
-% kCin3_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'O25'); %CIN2 to CIN3
-% kCC_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'P25'); % CIN3 to unlocalized
-% rNormal_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'Q25'); % HPV to Well (natural immunity)
-% kInf_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'R25'); % CIN1 to HPV
-% kCin1_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'S25'); % CIN2 to CIN1
-% kCin2_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'T25'); % CIN3 to CIN2
+%  kCin2_Cin3_orig = zeros(1,2);
+%  % 9v HPV types
+%  kCin1_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'C25'); % HPV to CIN1, ages 10-24
+%  kCin2_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'D25'); % CIN1 to CIN2
+%  kCin3_Cin2_orig(1, 1) = xlsread(file , 'CIN transitions by type', 'E25'); % CIN2 to CIN3
+%  kCC_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'F25'); % CIN3 to unlocalized
+%  rNormal_Inf_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'G25'); % HPV to Well (natural immunity)
+%  kInf_Cin1_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'H25'); % CIN1 to HPV
+%  kCin1_Cin2_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'I25'); % CIN2 to CIN1
+%  kCin2_Cin3_orig(1 , 1) = xlsread(file , 'CIN transitions by type' , 'J25'); % CIN3 to CIN2
+%  % Non-9v HPV types
+%  kCin1_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'M25');  % HPV to CIN1, ages 10-24
+%  kCin2_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'N25'); % CIN1 to CIN2
+%  kCin3_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'O25'); %CIN2 to CIN3
+%  kCC_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'P25'); % CIN3 to unlocalized
+%  rNormal_Inf_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'Q25'); % HPV to Well (natural immunity)
+%  kInf_Cin1_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'R25'); % CIN1 to HPV
+%  kCin1_Cin2_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'S25'); % CIN2 to CIN1
+%  kCin2_Cin3_orig(1 , 2) = xlsread(file , 'CIN transitions by type' , 'T25'); % CIN3 to CIN2
+% 
+%  save(fullfile(paramDir ,'hpvCinCCTransFrmExcel'), 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
+%     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
+%     'kCin1_Cin2_orig' , 'kCin2_Cin3_orig', 'ageTrends');
 
 %% Set HPV/CIN/CC transitions by age group based on pre-saved or calibrated values
 
 % Set transitions in first age group from pre-saved or calibrated values
 load([paramDir , 'hpvCinCCTransFrmExcel'] , 'kCin1_Inf_orig' , 'kCin2_Cin1_orig' , ...
     'kCin3_Cin2_orig' , 'kCC_Cin3_orig' , 'rNormal_Inf_orig' , 'kInf_Cin1_orig' , ...
-    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig') % , 'ageTrends');
-
-file = [pwd , '/Config/HPV_parameters.xlsx'];
-ageTrends = xlsread(file , 'CIN transitions by type' , 'C45:J55');
+    'kCin1_Cin2_orig' , 'kCin2_Cin3_orig', 'ageTrends');
 
 kCin1_Inf = zeros(16,2);  %(:, 1) 9vHPV, (:, 2) non-9vHPV
 kCin2_Cin1 = zeros(16,2);
@@ -435,7 +441,7 @@ kCin2_Cin3 = zeros(16,2);
 
 % HPV to CIN1, ages 10-24
 if calibBool && any(27 == pIdx)
-    idx = find(27 == pIdx);
+    idx = 27 == pIdx;
     kCin1_InfMult = paramSet(paramsSub{idx}.inds(:));
     kCin1_Inf(1 : 5 , 1) = kCin1_Inf_orig(1 , 1) * kCin1_InfMult(1);
     kCin1_Inf(1 : 5 , 2) = kCin1_Inf_orig(1 , 2) * kCin1_InfMult(2);
@@ -791,13 +797,15 @@ end
 %% Save intervention parameters
 
 %Import from Excel HIV intervention parameters
-file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-circProtect = xlsread(file , 'Protection' , 'B18');
-condProtect = xlsread(file , 'Protection' , 'B19');
-MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
+%Uncomment if trying to re-generate .m file from excel. Will likely fail if
+%multithreading
+%%file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+%%circProtect = xlsread(file , 'Protection' , 'B18');
+%%condProtect = xlsread(file , 'Protection' , 'B19');
+%%MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+%%artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+%%save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
+%%    'condProtect' , 'MTCTRate' , 'artVScov');
 
 % Load pre-saved HIV intervention parameters
 load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
@@ -953,6 +961,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 %% Import and save calibration data
+%{
 file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
 
 ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidence Rate 2012, by age
@@ -1006,7 +1015,7 @@ save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
     'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs')
-
+%}
 load([paramDir , 'calibData'], 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
