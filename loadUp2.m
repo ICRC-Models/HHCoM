@@ -1523,8 +1523,8 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 %% partnersM multiplier 
 partnersMmult = ones(1, 3); %[1.2 2.4 1.1];
 
-if calibBool && any(38 == pIdx);
-    idx = find(38 == pIdx);
+if calibBool && any(40 == pIdx);
+    idx = find(40 == pIdx);
     ptMult = paramSet(paramsSub{idx}.inds(:));
 else
     ptMult = [1.2 2.4 1.1 1 1.4 1];
