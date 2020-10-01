@@ -39,16 +39,22 @@ elseif (year < yr(2)) && (year > dataYr1) % assortativity between 1st and last y
 elseif (year < yr(3)) && (year >= yr(2)) % assortativity between 1st and last year
     epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
     epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-elseif (year < dataYrLast) && (year >= yr(3)) % assortativity between 1st and last year
+elseif (year < yr(4)) && (year >= yr(3)) % assortativity between 1st and last year
+    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+ elseif (year < yr(5)) && (year >= yr(4)) % assortativity between 1st and last year
+    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
+elseif (year < dataYrLast) && (year >= yr(5)) % assortativity between 1st and last year
     epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
     epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
 elseif year >= dataYrLast % assortativity in last year and after
-    lastIndA = size(epsA_vec , 1);
-    lastIndR = size(epsR_vec , 1);
+    lastIndA = size(epsA_vec , 2);
+    lastIndR = size(epsR_vec , 2);
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
-
+%%
 if fivYrAgeGrpsOn
     %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
     deltaR = eye(3 , 3);
@@ -132,12 +138,12 @@ if (year >= 1975) && (year < 1978)
     partnersMmult(1) = d_partnersMmult(1, yearInd);
     partnersMmult(2) = d_partnersMmult(2, yearInd);
     partnersMmult(3) = d_partnersMmult(3, yearInd);
-elseif (year >= 1978) && (year < 1988)
+elseif (year >= 1978) && (year < 1985)
     partnersMmult(1) = d_partnersMmult(1, 18);
     partnersMmult(2) = d_partnersMmult(2, 18);
     partnersMmult(3) = d_partnersMmult(3, 18);
-elseif (year >= 1988) && (year < 1998)
-    yearInd2 = round((year - (1988 - (1/6))) * 6);
+elseif (year >= 1985) && (year < 1995)
+    yearInd2 = round((year - (1985 - (1/6))) * 6);
     partnersMmult(1) = d_partnersMmult(4, yearInd2);
     partnersMmult(2) = d_partnersMmult(5, yearInd2);
     partnersMmult(3) = d_partnersMmult(6, yearInd2);

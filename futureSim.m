@@ -7,17 +7,17 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 % profile clear;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]_increasedMue2']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]']); % ***SET ME***: name for historical run input file 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '19Sept20_80CUVaxCov'; % ***SET ME***: name for simulation output file
+pathModifier = '19Sept20_50CUVaxCov'; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -37,12 +37,26 @@ whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; %[26 , 29 , 32 , 35 , 38 , 41 ,
 whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 
 % VACCINATION
+% Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
+%   If you want no vaccination in your baseline scenario, set baseline vaccine coverage to zero. The school-based vaccine coverage of each scenario is applied to all
+%   ages listed in that section. Therefore, if you assume baseline vaccination, your list of ages in the school-based vaccination algorithm should
+%   include the age of baseline vaccination, and school-based vaccine coverage should be at least baseline vaccine coverage.
+%   If turned on, catch-up vaccine coverage is applied on top of all school-based vaccination scenarios, but not in the baseline vaccination only scenario.
+%   Distinct from the functionality of the school-based vaccination algorithm, catch-up vaccination coverage is defined by age group. Catch-up vaccination
+%   age groups should be exclusive of the school-based vaccination age groups.
+%   If limited-vaccine years is turned on, this contraint is applied at the beginning of all the school-based vaccination scenarios, but not in the baseline
+%   vaccination only scenario. After the designated number of vaccine limited years has passed, the model will use the school based vaccination parameters
+%   and catch-up vaccination parameters if turned on.
+% Example:
+%   Scenario 1: limited vaccine years --> school-based regimen for ages 9-14 at 86% coverage + catch-up coverage
+%   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage
+%   Scenario 3: baseline regimen for age 9 at 86% coverage
 vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [3];
-vaxCoverB = 0.8; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+vaxCoverB = 0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
@@ -54,7 +68,7 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
 vaxAgeCU = [4 : 5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.80]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.50]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years

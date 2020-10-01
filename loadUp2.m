@@ -128,7 +128,7 @@ if calibBool && any(36 == pIdx);
     idx = find(36 == pIdx);
     fertDeclineProp = paramSet(paramsSub{idx}.inds(:));
 else
-    fertDeclineProp = [0.75 ; 0.36; 0.2];
+    fertDeclineProp = [0.75 ; 0.36; 0.05];
 end
 fertility2 = fertility .* fertDeclineProp(1,1);
 fertility3 = fertility2 .* fertDeclineProp(2,1);
@@ -276,7 +276,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.7; 0.5; 0.5 ; 0.3];
+    epsA = [0.5; 0.4; 0.3; 0.1; 0.1; 0.1];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -284,10 +284,10 @@ if calibBool && any(7 == pIdx);
     %epsR = paramSet(paramsSub{idx}.inds(:));
     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsR = [0.7; 0.5 ; 0.3 ; 0.3];
+    epsR = [0.2; 0.4; 0.4; 0.3; 0.3; 0.3];
 end
 %%
-yr = [1975; 1980; 1990; 2000];
+yr = [1975; 1980; 1985; 1988; 1995; 2000];
 %%
 % epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 % epsR_vec = cell(size(yr , 1) - 1, 1);
@@ -354,6 +354,7 @@ betaHIV_F2M_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*
 betaHIV_M2F_red = bsxfun(@times , [9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0; 9.0*0.5 1.0*0.5 2.5*0.5 7.0*0.5 0.7 0.0] , vagTransM);
 betaHIV = zeros(gender , age , risk , viral);
 betaHIV_red = zeros(gender , age , risk , viral);
+
 for a = 1 : age % calculate per-partnership probability of HIV transmission
     % force of infection: females to infect HIV-negative males, 
     % affected by betaHIV_F2M, probability of transmission from female (receptive) to male(insertive) based on female's disease state), and number of male acts
@@ -382,7 +383,7 @@ for v = 1 : viral
     end
 end
 
-hiv_hpvMult = 2 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+hiv_hpvMult = 1.9 ; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '/Config/HPV_parameters.xlsx'];
 % 
@@ -526,9 +527,9 @@ end
 %%
 for a = 1 : length(ageTrends)
     mult = 1;
-%     if a >= 7
-%         mult = 1.2 .* (1 - (1/a));
-%     end
+    if a >= 7
+        mult = 1.2 .* (1 - (1/a));
+    end
     % Apply age trends to 9v HPV transitions
     kCin1_Inf(a + 5 , 1) = kCin1_Inf(1 , 1) * ageTrends(a,1) * mult; 
     kCin2_Cin1(a + 5 , 1) = kCin2_Cin1(1 , 1) * ageTrends(a,2) * mult;
@@ -549,6 +550,25 @@ for a = 1 : length(ageTrends)
     kCin1_Cin2(a + 5 , 2) = kCin1_Cin2(1 , 2) * ageTrends(a,7) * mult;
     kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
 end
+
+%% %% Save intervention parameters
+
+%Import from Excel HIV intervention parameters
+file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+circProtect = xlsread(file , 'Protection' , 'B18');
+condProtect = xlsread(file , 'Protection' , 'B19');
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+
+% Load pre-saved HIV intervention parameters
+load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+
+% Protection from circumcision and condoms
+circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
@@ -646,10 +666,10 @@ end
 % Decrease HPV transmission rate in women with cervical cancer as a proxy for decreased sexual activity
 vagTrans_vax = ones(risk , 1) .* perPartnerHpv_vax; % [risk x 1]
 vagTrans_nonV = ones(risk , 1) .* perPartnerHpv_nonV; % [risk x 1]
-betaHPV_vax = bsxfun(@times , [1.0 0.5 0.1; 1.0 0.5 0.1; 1.0 0.5 0.1] , vagTrans_vax);
-betaHPV_nonV = bsxfun(@times , [1.0 0.5 0.1; 1.0 0.5 0.1; 1.0 0.5 0.1] , vagTrans_nonV);
-beta_hpvVax = zeros(gender , age , risk , 3); % age x risk x [normal transmission , reduced transmission (CC-regional / CC-distant) , reduced transmission (late-stage HIV)]
-beta_hpvNonVax = zeros(gender , age , risk , 3);
+betaHPV_vax = bsxfun(@times , [1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2); 1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2); 1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2)] , vagTrans_vax);
+betaHPV_nonV = bsxfun(@times, [1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2); 1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2); 1.0 0.5 0.1 1.0 * 1 - circProtect(2, 2)] , vagTrans_nonV);
+beta_hpvVax = zeros(gender , age , risk , 4); % age x risk x [normal transmission, reduced transmission (CC-regional / CC-distant) , reduced transmission (late-stage HIV), reduced transmission circumcised]
+beta_hpvNonVax = zeros(gender , age , risk , 4);
 for a = 1 : age % calculate per-partnership probability of HPV transmission
     % VACCINE-TYPE HPV
     % force of infection: females to infect HPV-negative males 
@@ -715,32 +735,14 @@ else
     artHpvMult = 1.0;
 end
 
-%% Save intervention parameters
-
-%Import from Excel HIV intervention parameters
-file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-circProtect = xlsread(file , 'Protection' , 'B18');
-condProtect = xlsread(file , 'Protection' , 'B19');
-MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
-
-% Load pre-saved HIV intervention parameters
-load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
-
-% Protection from circumcision and condoms
-circProtect = [[circProtect; 0] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
-condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
-
+%%
 % Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
 else
     if fivYrAgeGrpsOn
-        condUse = 0.25;
+        condUse = 0.10;
     else
         condUse = .05; %changed from 20%
     end
@@ -774,7 +776,7 @@ end
 hivStartYear = 1978;
 circStartYear = 1980;
 circNatStartYear = 2008;
-vaxStartYear = 2019;
+vaxStartYear = 2021;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -804,19 +806,20 @@ screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
-cytoSens = [0.0 , 0.57 , 0.57]; % pap smear
+cytoSens = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-pos persons  (based on Chung et al)
+cytoSens2 = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-neg persons
 hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16]; %[0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16];
+baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.361; % 0.721
-baseline.cinTreatEff = [0.905 , 0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
+baseline.colpoRetain = 0.333; % assummed
+baseline.cinTreatEff = [0.97 , 0.97 , 0.67 , 0.67 , 0.66 , 0.66 , 0.66 , 0.71]; % cryo efficacy in HIV+ based on Greene et al 2020 and in HIV- based on Kuhn et al2010
 baseline.cinTreatRetain = 0.25; % 0.51
 baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP including treatment failure
 baseline.cinTreatHpvPersistHivNeg = baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1)); % 0.185; proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
@@ -832,8 +835,8 @@ end
 cisnet.screenCover = [0.0; 0.1; 0.30; 0.30; 0.30; 0.30; 0.30];
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
-cisnet.testSens = cytoSens;
-cisnet.colpoRetain = 0.361; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
+cisnet.testSens = cytoSens2;
+cisnet.colpoRetain = 0.333; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
 cisnet.cinTreatRetain = 0.25;
 cisnet.cinTreatHpvPersist = 0.28; % HPV persistence with cryotherapy including treatment failure
@@ -1469,7 +1472,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2070 - 2020) * stepsPerYear);
 % 
 % d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
-ptMult = [1.1 1.2 1 1 1 1];
+ptMult = [1 1.2 1 1 1 1];
 
 d_partnersMmult = ones(6, 60);
 d_partnersMmult(1, 1:18) = linspace(1, ptMult(1), 3 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
@@ -1481,7 +1484,7 @@ d_partnersMmult(6, 1:60) = linspace(ptMult(3), ptMult(6), 10 * stepsPerYear); % 
 %d_partnersMmult(5, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
 %% risk adjustment multiplier
-riskAdj = 0.05;
+riskAdj = 0;
 d_riskAdj_vec = nonLinspace(0, riskAdj, ((1994 - 1990) .* stepsPerYear), 'exp10');
 d_riskAdj = [d_riskAdj_vec, flip(d_riskAdj_vec)];
 %d_riskAdj = (0 - riskAdj) ./ ((1994 - 1990) .* stepsPerYear);

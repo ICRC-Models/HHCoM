@@ -46,9 +46,9 @@ function vaxCEA(pathModifier)
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
 % Load results
-pathModifier = '3Jun20_80VaxCov_muART';
+pathModifier = '19Sept20_50CUVaxCov';
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']), 1 );
-curr = load([pwd , '\HHCoM_Results\toNow_30May20_N_increaseClearHIV_increasekCC_5_muART']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_RR_2_HIVtrans-00095_HPVtrans-001_onlyHPVincreaseHIVacqF_ptMult[1]']); % Population up to current year
 
 clear cell;
 vaxResult = cell(nSims , 1);
@@ -79,6 +79,8 @@ noVaxInd = nSims;
 noV = vaxResult{noVaxInd};
 tVec = noV.tVec;
 tVecYr = tVec(1 : stepsPerYear : end);
+
+excelfile = [pwd, '\Calibration_comparison_future.xlsx'];
 
 %%
 % Plot settings
@@ -119,7 +121,7 @@ plot(futurePop0_79(:,1) , futurePop0_79(:,2) , 'o');
 %     plot(tVec , sum(noV.popVec(: , genArray{i}) , 2))
 %     hold all;
 % end
-title('Nyanza Population Size Ages 0-79')
+title('Kenya Population Size Ages 0-79')
 xlabel('Year'); ylabel('Individuals')
 xlim([1950 2070]);
 legend('Model prediction' , 'UN historical estimates' , 'UN projections', 'Location', 'NorthWest')
@@ -168,6 +170,11 @@ title('All-cause mortality')
 %%
 %% HIV prevalance
 figure()
+hivObsGender = zeros(4,3)
+hivObsGender(:,3) = [2003 2007 2009 2012]; 
+hivObsGender(:,1) = [8.7 8.4 8.0 6.9]; 
+hivObsGender(:,2) = [4.6 5.4 4.6 4.4]; 
+
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : 10 , 1 : risk));
@@ -178,22 +185,29 @@ for g = 1 : 2
         1 : endpoints , 1 : intervens , g , 4 : 10 , 1 : risk)); 
     hivPop = sum(vaxResult{1}.popVec(: , hivInds) , 2);
     allPop = sum(vaxResult{1}.popVec(: , allInds) , 2);
-    plot(tVec , 100 * (hivPop + artPop) ./ allPop)
+    hivPrev_sex = 100 * (hivPop + artPop) ./ allPop;
+    plot(tVec , hivPrev_sex)
+    hold on
+    plot(hivObsGender(:, 3), hivObsGender(:, g), 'o')
     hold on
 end
+
 xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence by sex')
+legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS', ...
+    'Location', 'NorthEast')
 xlim([1980 2070])
 
 figure()
-% Compared to ANC data
-HIV_ANC_Kisumu(1 , :) = [1990 1991 1992 1993 1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2008 2010 2011 ] ;
-HIV_ANC_Kisumu(2 , :) = [18 18 19 19 29 24 26 32 27 25 33 29 26 26 11.2 15.1 18.5 16.9 18.5 15.5];
-% 
-% Compared to National AIDS Control Council (Kenya)
-HIV_Kenya_spectrum(1, :) = [1983 1987 1990 1994 1999 2003 2007 2011 2015 2019];
-HIV_Kenya_spectrum(2, :) = [0.002 0.0209 0.1233 0.2431 0.2302 0.171 0.1372 0.1419 0.1456 0.1252 ] .* 100;
+% Compared to DHS/Kais data
+file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
+HIV_Ken_spectrum = xlsread(file , ['HIV ' 'prevalence'] , 'B184:E212');
+DHS_KAIS = [2003 6.7 5.8 7.6;
+    2007 7.1 6.6 7.9;
+    2009 6.4 5.4 7.3;
+    2012 5.6 4.9 6.3];
+
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk));
 artPop = sum(vaxResult{1}.popVec(: , artInds) , 2);
@@ -203,14 +217,25 @@ allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonV
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk)); 
 hivPop = sum(vaxResult{1}.popVec(: , hivInds) , 2);
 allPop = sum(vaxResult{1}.popVec(: , allInds) , 2);
-plot(tVec , 100 * (hivPop + artPop) ./ allPop, ...
-    HIV_ANC_Kisumu(1 , :) , HIV_ANC_Kisumu(2 , :) , '*', ...
-    HIV_Kenya_spectrum(1, :), HIV_Kenya_spectrum(2, :), 'o')
+hivPrev = 100 * (hivPop + artPop) ./ allPop;
+plot(tVec , hivPrev, ...
+    HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
+    DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')
 
 xlabel('Year')
 ylabel('Prevalence')
 title('HIV Prevalence All')
+legend('Model' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
 xlim([1980 2070])
+   
+%%
+sheet = ['HIV_prev'];
+cols1 = {pathModifier}
+cols2 = {'Year' , 'Prevalence_50CU'} %, 'ANC data (Kisumu)', 'Year', 'Spectrum data (Nyanza)'};
+xlswrite(excelfile, cols1, sheet, 'J1')
+xlswrite(excelfile, cols2, sheet, 'J2')
+xlswrite(excelfile, [tVec(331: stepsPerYear :end)', hivPrev(331:stepsPerYear:end) ], sheet, 'J3')
+%xlswrite(excelfile, [hivPrev(331:stepsPerYear:end) ], sheet, 'L3')
 
 %% CC incidence and incidence reduction (not age-standardized)
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8};
@@ -219,23 +244,16 @@ files = {'CC_General_Hpv_VaxCover' , ...
      'CC_HivNeg_Hpv_VaxCover' , 'CC_HivNoART_Hpv_VaxCover' ,...
      'CC_ART_HPV_VaxCover' , 'CC_HivAll_HPV_VaxCover'};
 plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
-plotTits2 = {'50% CU coverage: Total population' , '90% coverage'  , ...
-    '50% CU coverage: HIV-Negative' , '90% coverage' , ...
-    '50% CU coverage: HIV-Positive no ART' , '90% coverage' , ...
-    '50% CU coverage: HIV-Positive ART' , '90% coverage' , ...
-    '50% CU coverage: HIV-Positive all' , '90% coverage'};
-linStyle = {'-' , '--'};
+plotTits2 = {'80% coverage: Total female population' , '90% coverage'  , ...
+    '80% coverage: HIV-Negative' , '90% coverage' , ...
+    '80% coverage: HIV-Positive no ART' , '90% coverage' , ...
+    '80% coverage: HIV-Positive ART' , '90% coverage' , ...
+    '80% coverage: HIV-Positive all' , '90% coverage'};
+linStyle = {'-.', ':', '--' , '-'};
 linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
 
 figure();
-for i = 1 : length(inds)
-    % % plotTits = {plotTits2{(i*2-1):(i*2)}};
-    
-    for n = 1 : nSims
-        vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
-    end
-        
-    % General
+ % General
     allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
         1 , 1 : intervens , 2 , 1 : age , 1 : risk));
     % All HIV-negative women
@@ -251,61 +269,53 @@ for i = 1 : length(inds)
     hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
         1 , 1 : intervens , 2 , 1 : age , 1 : risk));
     genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
-
-    % Calculate incidence
+   
     for n = 1 : nSims
-        ccIncRef = ...
-            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , 1 : age , :),2),3),4)) ./ ...
-            (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear))* fac);
-        vaxResult{n}.ccIncRef = ccIncRef;
+        ccIncAll = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{1} , 3 : age , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{1}) , 2) ./ stepsPerYear))* fac);
+        vaxResult{n}.ccIncAll = ccIncAll;
+        ccIncHivNeg = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{2} , 3 : age , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{2}) , 2) ./ stepsPerYear))* fac);
+        vaxResult{n}.ccIncHivNeg = ccIncHivNeg;
+        ccIncHivPos = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{5} , 3 : age , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{5}) , 2) ./ stepsPerYear))* fac);
+        vaxResult{n}.ccIncHivPos = ccIncHivPos;
+        ccIncART = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{4} , 3 : age , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{4}) , 2) ./ stepsPerYear))* fac);
+        vaxResult{n}.ccIncART = ccIncART;
+        ccIncNoART = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{3} , 3 : age , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{3}) , 2) ./ stepsPerYear))* fac);
+        vaxResult{n}.ccIncNoART = ccIncNoART;
     end
-
-    for n = 1 : nSims
-        vaxResult{n}.ccInc = vaxResult{n}.ccIncRef;
+    for n = 2
+    plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncAll , linStyle{n}, ...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivNeg ,linStyle{n},...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivPos ,linStyle{n},...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncART,linStyle{n} ,...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncNoART,linStyle{n} );
+    hold all;
     end
-    
-    hold all;
-    plot(tVec(1 : stepsPerYear : end)' , vaxResult{noVaxInd}.ccInc' , '-')
-    hold all;
-    plot(tVec(1 : stepsPerYear : end)' , vaxResult{1}.ccInc' , '--') 
-%     plot(tVec(1 : stepsPerYear : end) , vaxResult{2}.ccInc , ...
-%         tVec(1 : stepsPerYear : end) , vaxResult{1}.ccInc ) % ...
-         %[plotTits1{i} , 'Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
-         % ': Efficacy: ' , num2str(round(noV.vaxEff * 100)) '% ,', ...
-         hold all;
-    legend(plotTits1{i});
-    hold all;
+    legend('General' , 'HIV-' , 'All HIV+' , 'HIV+, ART', 'HIV+, no ART', 'Location', 'NorthWest')
     grid on;
-    xlim([1980 2070]);
-    ylim([0 250]);
-    xticks([1980 : 10 : 2070]);
-    hold all;
- 
-%     figure()
-%     for n = 1 : length(vaxResult)-1
-% % %         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
-% % %             [plotTits1{i} , ': Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-% % %             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%']);
-%          
-%         % Reduction
-%         vaxResult{n}.ccRed = (vaxResult{n}.ccInc - vaxResult{noVaxInd}.ccInc) ./ vaxResult{noVaxInd}.ccInc * 100;
-%         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , 'LineStyle' , linStyle{n} , 'Color' , linColor{i} , 'DisplayName' , plotTits1{i})
-% %             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-% %             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-%         grid on
-%         legend('-DynamicLegend')
-%         xlim([2020 2070]);
-%         %ylim([-100 0]);
-%         xticks([2020 : 10 : 2070]);
-%         hold all;
-%     end
-% %     title(' Cervical Cancer Incidence')
-% %     xlabel('Year'); ylabel('Incidence per 100,000')
-% %     hold all;
-% 
-     title('Cervical cancer rates, by HIV status')
-     xlabel('Year'); ylabel('Percent change')
-end         
+    xlim([1970 2070]);
+    ylim([0 200]);
+    xticks([1970 : 10 : 2070]);
+  
+    %%
+sheet = ['CC_inc_crude']
+cols1 = {pathModifier, 'Cervical Cancer Incidence'};
+cols2 = {'All_noVax' , 'HIVneg_noVax' , 'HIVpos_noVax', 'ART_noVax', 'noART_noVax'} % , 'HIV+ ART+, baseline'}; %,...
+xlswrite(excelfile, cols1, sheet, 'G1')
+xlswrite(excelfile, cols2, sheet, 'G2')
+%xlswrite(excelfile, tVecYr(46: end)', sheet, 'A3')
+xlswrite(excelfile, [vaxResult{2}.ccIncAll(46:end)', vaxResult{2}.ccIncHivNeg(46:end)',...
+       vaxResult{2}.ccIncHivPos(46:end)', vaxResult{2}.ccIncART(46:end)', vaxResult{2}.ccIncNoART(46:end)'], sheet, 'G3')    
+
 
 %% CC incidence and incidence reduction (age-standardized)
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8};
@@ -314,45 +324,17 @@ files = {'CC_General_Hpv_VaxCover' , ...
      'CC_HivNeg_Hpv_VaxCover' , 'CC_HivNoART_Hpv_VaxCover' ,...
      'CC_ART_HPV_VaxCover' , 'CC_HivAll_HPV_VaxCover'};
 plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
-plotTits2 = {'80% coverage: Total female population' , '90% coverage'  , ...
-    '80% coverage: HIV-Negative' , '90% coverage' , ...
-    '80% coverage: HIV-Positive no ART' , '90% coverage' , ...
-    '80% coverage: HIV-Positive ART' , '90% coverage' , ...
-    '80% coverage: HIV-Positive all' , '90% coverage'};
 linStyle = {'-' , '--'};
 linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
-% worldStandard_WP2015 = [325428 (311262/5.0) 295693 287187 291738 299655 272348 ...
-%         247167 240167 226750 201603 171975 150562 113118 82266 64484];
+segi = [0.1212 0.1010 0.0909 0.0909 0.0808 0.0808 0.0606 ...
+    0.0606 0.0606 0.0606 0.0505 0.0404 0.0404 0.0303 0.0202 0.0101];
 worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
         23477 9261 2155];
 
 figure();
-
-for i = 1 : length(inds)
-    % % plotTits = {plotTits2{(i*2-1):(i*2)}};
-    
-    for n = 1 : nSims
-        vaxResult{n}.ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
-    end
-     
-    % % % General, all ages
-    % % allFAge = [toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : 4 , ...
-    % %     1 : intervens , 2 , 3 : age , 1 : risk)); ...
-    % %     toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 9 : 10 , ...
-    % %     1 : intervens , 2 , 3 : age , 1 : risk))];
-    % % allhivNegFAge = [toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvVaxStates , 1 : 4 , 1 : intervens , ...
-    % %     2 , 3 : age , 1 : risk)); ...
-    % %     toInd(allcomb([1,7:9] , 1 : viral , 1 : hpvVaxStates , 9 : 10 , 1 : intervens , ...
-    % %     2 , 3 : age , 1 : risk))];
-    
-    for aInd = 1 : age + 4
-        if aInd >= age
-            a = age;
-        else
-            a = aInd;
-        end
-        
+for n = 1 : nSims
+    for a = 3 : age 
         % General
         allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
             1 , 1 : intervens , 2 , a , 1 : risk));
@@ -370,32 +352,58 @@ for i = 1 : length(inds)
             1 , 1 : intervens , 2 , a , 1 : risk));
         genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
         
-        % Calculate incidence
-        for n = 1 : nSims
-            if aInd <= age
-                ccIncRef = ...
-                    (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4)) ./ ...
-                    (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
-                    .* (worldStandard_WP2015(a));
-                    %.* (annlz(sum(noV.popVec(: , genArray{3}) , 2) ./ stepsPerYear));
-                if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4))) == 0.0)
-                    ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
-                end
-            elseif aInd > age
-                ccIncRef = ...
-                    (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4)) ./ ...
-                    (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear)) * fac);
-                ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
-                ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
-            end
-            vaxResult{n}.ccIncRef = vaxResult{n}.ccIncRef + ccIncRef;
-            % % vaxResult{n}.ccIncRef = ccIncRef;
-        end
+        % Calculate incidence   
+% %             if aInd <= age
+%                 ccIncRef = ...
+%                     (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4)) ./ ...
+%                     (annlz(sum(vaxResult{n}.popVec(: , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
+%                     .* (segi(a));
+%                     %.* (annlz(sum(noV.popVec(: , genArray{3}) , 2) ./ stepsPerYear));
+%                 if (i == 4) && (a < 3) && (max(annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{i} , a , :),2),3),4))) == 0.0)
+%                     ccIncRef = zeros(length(tVec(1 : stepsPerYear : end)),1)';
+%                 end
+% 
+%             vaxResult{n}.ccIncRef = vaxResult{n}.ccIncRef + ccIncRef;
+            
+        ccIncAll = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{1} , a , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{1}) , 2) ./ stepsPerYear))* fac) .* (segi(a));
+        vaxResult{n}.ccIncAll = vaxResult{n}.ccIncAll + ccIncAll;
+        ccIncHivNeg = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{2} , a , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{2}) , 2) ./ stepsPerYear))* fac) .* (segi(a));
+        vaxResult{n}.ccIncHivNeg = vaxResult{n}.ccIncHivNeg + ccIncHivNeg;
+        ccIncHivPos = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{5} , a , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{5}) , 2) ./ stepsPerYear))* fac) .* (segi(a));
+        vaxResult{n}.ccIncHivPos = vaxResult{n}.ccIncHivPos + ccIncHivPos;
+        ccIncART = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{4} , a , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{4}) , 2) ./ stepsPerYear))* fac) .* (segi(a));
+        vaxResult{n}.ccIncART =  vaxResult{n}.ccIncART + ccIncART;
+        ccIncNoART = ...
+            (annlz(sum(sum(sum(vaxResult{n}.newCC(: , inds{3} , a , :),2),3),4)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(: , genArray{3}) , 2) ./ stepsPerYear))* fac) .* (segi(a));
+        vaxResult{n}.ccIncNoART =  vaxResult{n}.ccIncNoART + ccIncNoART;
+   end
+end
+    
+    for n = 2
+        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncAll , linStyle{n}, ...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivNeg ,linStyle{n},...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivPos ,linStyle{n},...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncART,linStyle{n} ,...
+        tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncNoART,linStyle{n} );
+    hold all;
     end
-    for n = 1 : nSims
-        vaxResult{n}.ccInc = vaxResult{n}.ccIncRef ./ (sum(worldStandard_WP2015(1:age+4)));
-    end
-        
+
+ plot(tVec(1 : stepsPerYear : end-1) ,yline(6), '--');
+    %hold on;
+    legend('General' , 'HIV-' , 'All HIV+' , 'HIV+, ART', 'HIV+, no ART', 'Elimination', 'Location', 'NorthWest')
+    grid on;
+    xlim([1980 2070]);
+    ylim([0 50]);
+    xticks([1980 : 10 : 2070]);
 %     plot(tVec(1 : stepsPerYear : end) , vaxResult{noVaxInd}.ccInc ,'DisplayName' , ...
 %          [plotTits1{i} , ': Efficacy: ' , num2str(round(noV.vaxEff * 100)) '% ,', ...
 %          'Coverage: ' , num2str(round(noV.vaxRate * 100)) , '%']);
@@ -405,46 +413,55 @@ for i = 1 : length(inds)
 %     ylim([0 150]);
 %     xticks([1980 : 20 : 2120]);
 %     hold all;
-
-    for n = 2 : length(vaxResult) - 1
-%         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
-%             [plotTits1{i} , ': Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
-%             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%']);
-        
-        % Reduction
-        vaxResult{n}.ccRed = (vaxResult{n}.ccInc - vaxResult{noVaxInd}.ccInc) ./ vaxResult{noVaxInd}.ccInc * 100;
-        plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , ...
-            'LineStyle' , linStyle{1} , 'Color' , linColor{i} , 'DisplayName' , plotTits1{i})
-%             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,' , ...
-%             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
-        grid on
-        legend('-DynamicLegend')
-        xlim([2020 2120]);
-        %ylim([-100 0]);
-        xticks([2020 : 20 : 2120]);
-        hold all
-%               
-%         % Save reduction results
-% %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
-% %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
-% %         sname = [plotTits1{i} , '_IncRed'];
-% %         if exist(fname , 'file') == 2
-% %             M = xlsread(fname);
-% %             M = catpad(2 , [tVec(1 : stepsPerYear : end)' , noV.ccInc' , vaxResult{n}.ccInc' , vaxResult{n}.ccRed'] , M);
-% %             xlswrite(fname , M , sname)
-% %         else
-% %             xlswrite(fname , [tVec(1 : stepsPerYear : end)' , noV.ccInc' , vaxResult{n}.ccInc' , vaxResult{n}.ccRed'] , sname)
-% %         end
+% 
+%     for n = 1 : length(vaxResult) - 1
+% %         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccInc , 'DisplayName' , ...
+% %             [plotTits1{i} , ': Efficacy: ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,', ...
+% %             'Coverage: ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%']);
 %         
-     end
-% %     title(' Cervical Cancer Incidence')
+%         % Reduction
+%         vaxResult{n}.ccRed = (vaxResult{n}.ccInc - vaxResult{noVaxInd}.ccInc) ./ vaxResult{noVaxInd}.ccInc * 100;
+%         plot(tVec(1 : stepsPerYear : end) , vaxResult{n}.ccRed , ...
+%             'LineStyle' , linStyle{1} , 'Color' , linColor{i} , 'DisplayName' , plotTits1{i})
+% %             ': Efficacy ' , num2str(round(vaxResult{n}.vaxEff * 100)) '% ,' , ...
+% %             'Coverage ' , num2str(round(vaxResult{n}.vaxRate * 100)) , '%'])
+%         grid on
+%         legend('-DynamicLegend')
+%         xlim([2020 2120]);
+%         %ylim([-100 0]);
+%         xticks([2020 : 20 : 2120]);
+%         hold all
+% %               
+% %         % Save reduction results
+% % %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+% % %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
+% % %         sname = [plotTits1{i} , '_IncRed'];
+% % %         if exist(fname , 'file') == 2
+% % %             M = xlsread(fname);
+% % %             M = catpad(2 , [tVec(1 : stepsPerYear : end)' , noV.ccInc' , vaxResult{n}.ccInc' , vaxResult{n}.ccRed'] , M);
+% % %             xlswrite(fname , M , sname)
+% % %         else
+% % %             xlswrite(fname , [tVec(1 : stepsPerYear : end)' , noV.ccInc' , vaxResult{n}.ccInc' , vaxResult{n}.ccRed'] , sname)
+% % %         end
+% %         
+%      end
+% % %     title(' Cervical Cancer Incidence')
 % %     xlabel('Year'); ylabel('Incidence per 100,000')
 % %     hold all;
 % 
 %     title('Figure 1: Percent reduction in cervical cancer cases, by HIV status')
 %     xlabel('Year'); ylabel('Percent change')
-end        
+%end        
 
+%%
+sheet = ['CC_ASR']
+cols1 = {pathModifier, 'Cervical Cancer Incidence'};
+cols2 = {'All_noVax' , 'HIVneg_noVax' , 'HIVpos_noVax', 'ART_noVax', 'noART_noVax'} % , 'HIV+ ART+, baseline'}; %,...
+xlswrite(excelfile, cols1, sheet, 'G1')
+xlswrite(excelfile, cols2, sheet, 'G2')
+%xlswrite(excelfile, tVecYr(46: end)', sheet, 'A3')
+xlswrite(excelfile, [vaxResult{2}.ccIncAll(46:end)', vaxResult{2}.ccIncHivNeg(46:end)',...
+       vaxResult{2}.ccIncHivPos(46:end)', vaxResult{2}.ccIncART(46:end)', vaxResult{2}.ccIncNoART(46:end)'], sheet, 'G3')    
 
 
 %% Proportion HIV-negative males circumcised by broad age groups over time
