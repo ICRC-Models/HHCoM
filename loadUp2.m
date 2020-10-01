@@ -9,7 +9,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
@@ -573,8 +573,8 @@ end
 % kCin1_Cin2(15 : 16 , 2) = kCin1_Cin2(1 , 2) * ageTrends(3,7);
 % kCin2_Cin3(15 : 16 , 2) = kCin2_Cin3(1 , 2) * ageTrends(3,8);
 
-% HPV progression multipler 5-year age group
-%%
+
+%% HPV progression multipler 5-year age group
 for a = 1 : length(ageTrends)
     mult = 1;
     if a >= 7
@@ -661,7 +661,7 @@ if ~fivYrAgeGrpsOn
     end
 end
 
-% HPV clearance multiplier for HIV-positive persons 
+% HPV immunity clearance multiplier for HIV-positive persons 
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
@@ -682,10 +682,9 @@ end
 % CIN2 to CIN3 progression multiplier for HIV-positive women
 if calibBool && any(15 == pIdx)
     idx = find(15 == pIdx);
-    c3c2Mults = zeros(4 , 1);
-    c3c2Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c3c2Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c3c2Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+    c3c2multiplier = paramSet(paramsSub{idx}.inds(:));
+    c3c2Mults = [1.0; 2.0; 2.7; 3.5];
+    c3c2Mults(2 : end) = c3c2Mults(2 : end).*c3c2multiplier;
 else
     c3c2Mults = [1.0; 1.1; 1.2; 1.3]; %original values [1.0; 1.8; 2.6; 5.5]
 end
@@ -693,12 +692,29 @@ end
 % CIN1 to CIN2 progression multiplier for HIV-positive women
 if calibBool && any(16 == pIdx)
     idx = find(16 == pIdx);
-    c2c1Mults = zeros(4 , 1);
-    c2c1Mults(4,1) = paramSet(paramsSub{idx}.inds(3));
-    c2c1Mults(3,1) = c3c2Mults(4,1)*paramSet(paramsSub{idx}.inds(2));
-    c2c1Mults(2,1) = c3c2Mults(3,1)*paramSet(paramsSub{idx}.inds(1));
+    c2c1multiplier = paramSet(paramsSub{idx}.inds(:));
+    c2c1Mults = [1.0; 1.9; 2.4; 2.7];
+    c2c1Mults(2 : end) = c2c1Mults(2 : end).*c2c1multiplier;
 else
     c2c1Mults = [1.0; 1.4; 1.8; 2.2]; % orginal values [1.00; 1.75; 2.30; 2.66];
+end
+
+% CIN3 to CIN2 regression multiplier for HIV-positive women
+if calibBool && any(38 == pIdx)
+    idx = find(38 == pIdx);
+    c2c3multiplier = paramSet(paramsSub{idx}.inds(:));
+    c2c3Mults = [0.60; 0.55; 0.45; 0.30].*c2c3multiplier;
+else
+    c2c3Mults = [0.60; 0.55; 0.45; 0.30];
+end
+
+% CIN2 to CIN1 regression multiplier for HIV-positive women
+if calibBool && any(39 == pIdx)
+    idx = find(39 == pIdx);
+    c1c2multiplier = paramSet(paramsSub{idx}.inds(:));
+    c1c2Mults = [0.60; 0.55; 0.45; 0.30].*c1c2multiplier;
+else
+    c1c2Mults = [0.60; 0.55; 0.45; 0.30];
 end
 
 % HPV tranmission rates
