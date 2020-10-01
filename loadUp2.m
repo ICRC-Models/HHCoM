@@ -643,9 +643,8 @@ load([paramDir , 'hpvNHParamsFrmExcel'] , 'muCC' );
 % Natural immunity multiplier
 if calibBool && any(18 == pIdx)
     idx = find(18 == pIdx);
-    lambdaMultImm = zeros(age , 1);
     lambdaMultImmmult = paramSet(paramsSub{idx}.inds(:));
-    lambdaMultImm = lambdaMultImm .* lambdaMultImmmult;
+    lambdaMultImm = ones(age , 1) .* lambdaMultImmmult;   
 else
     lambdaMultImm = zeros(16 , 1);
     lambdaMultImm(1 : 4) = 1 - 0.01;
