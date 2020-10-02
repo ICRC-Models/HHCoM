@@ -945,7 +945,7 @@ end
 % CISNET screening algorithm
 cisnet.screenCover = [0.0; 0.1; 0.30; 0.30; 0.30; 0.30; 0.30];
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
-cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
+cisnet.screenAgeMults = [1.0]; %[1.0 / max(1 , fivYrAgeGrpsOn*5)];
 cisnet.testSens = cytoSens;
 cisnet.colpoRetain = 0.361; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
@@ -979,7 +979,7 @@ end
 % WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
 whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
 whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-whob.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
+whob.screenAgeMults = [1.0 , 1.0]; %[(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 whob.testSens = hpvSensWHO;
 whob.colpoRetain = 1.0;
 whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0]; % 100% treatment efficacy
