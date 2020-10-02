@@ -113,9 +113,7 @@ else
                            ones(1,9).*(1/9)];
 end
 
-%% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
-% partnership/ contact matrices
-% partnersMmult = [1.2 2 1.1 ];
+%% partnersMmult = [1.2 2 1.1 ];
 if (year >= 1975) && (year < 1980)
     yearInd = round((year - (1975 - (1/6))) * 6);
     partnersMmult(1) = d_partnersMmult(1, yearInd);
@@ -155,9 +153,11 @@ partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
 partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
 partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
 
-
 % yearInd = round((year - (1988 - (1/6))) * 6);
 %    partnersMmult = d_partnersMmult(yearInd);
+
+%% Calculate mixing matrix rho (pattern of sexual contact by gender, age, risk)
+% partnership/ contact matrices
 % males
 c(1 , : , :) = partnersM;
 % females
