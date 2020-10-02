@@ -62,7 +62,7 @@ pIdx_wPh1Resample = [pIdx(1,1:8) , 15,16,18,27,28,29,30,31,32,33,34 , pIdx(1,9) 
 
 ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20Ph2V11_6_top50Sets.dat']);
 ph1sample = datasample(ph1_top50Sets, nSets , 2); % resample
-ph1sampleSubset = [ph1sample(2:15,:)]; % keep subset of resampled parameter set
+ph1sampleSubset = [ph1sample(2:23,:)]; % keep subset of resampled parameter set
 
 file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '_wPh1Resample' , '.dat'];
 paramDir = [pwd , '/Params/'];
