@@ -83,33 +83,31 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 % Uncomment if attempting to re-generatethe .mat file -- will likely fail if
 % multithreading
 % background mortality, fertility, partnerships, and acts per partnership
-%{
-file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
-popInit = xlsread(file , 'Population' , 'B169:C184'); 
-popInit = popInit .* 1000; 
-riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88');
-mue = zeros(age , gender);
-mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
-mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
-mue2 = zeros(age , gender);
-mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
-mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-mue3 = zeros(age , gender);
-mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
-mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-mue3(1, :)= mue3(1 , :) .* 2 ;
-mue4 = zeros(age , gender);
-mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
-mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-mue4(1, :)= mue4(1 , :) .* 2 ;
-fertility = xlsread(file , 'Fertility' , 'D104:I119');
-partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
-partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
-maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
-femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
-save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
-    'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
-%}
+% file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
+% popInit = xlsread(file , 'Population' , 'B169:C184'); 
+% popInit = popInit .* 1000; 
+% riskDistM = xlsread(file , 'Sexual behavior' , 'F73:H88');
+% mue = zeros(age , gender);
+% mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
+% mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
+% mue2 = zeros(age , gender);
+% mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
+% mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
+% mue3 = zeros(age , gender);
+% mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
+% mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
+% mue3(1, :)= mue3(1 , :) .* 2 ;
+% mue4 = zeros(age , gender);
+% mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % 2020
+% mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
+% mue4(1, :)= mue4(1 , :) .* 2 ;
+% fertility = xlsread(file , 'Fertility' , 'D104:I119');
+% partnersM = xlsread(file , 'Sexual behavior' , 'O73:Q88');
+% partnersF = xlsread(file , 'Sexual behavior' , 'L73:N88');
+% maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
+% femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
+% save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , ...
+%     'mue' , 'mue2' , 'mue3' , 'mue4' , 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -300,10 +298,10 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
 end
 
 % partnersM multiplier 
-partnersMmult = ones(1, 3); %[1.2 2.4 1.1];
+partnersMmult = ones(1, 6); %[1.2 2.4 1.1];
 if calibBool && any(40 == pIdx);
     idx = find(40 == pIdx);
-    ptMult = paramSet(paramsSub{idx}.inds(:));
+    ptMult = paramSet(paramsSub{idx}.inds(:))';
 else
     ptMult = [1.2 2.4 1.1 1 1.4 1];
 end
