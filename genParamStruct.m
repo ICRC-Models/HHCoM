@@ -1,7 +1,7 @@
 % Save all potentially calibrated parameters into structure
 function [paramsAll] = genParamStruct()
 
-numParams = 38;
+numParams = 40;
 paramsAll = cell(numParams,1);
 % partnersM, [age x risk], (hr range by age, mr % of hr, lr % of mr)
 paramsAll{1}.name = 'partnersM'; paramsAll{1}.length = 6; ... %1 %24;
@@ -31,17 +31,17 @@ paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 6; ... %1 %24;
 % %     paramsAll{4}.lb = [ones(paramsAll{4}.length*(1/3),1).*0.5; ones(paramsAll{4}.length*(2/3),1).*0.001]; ...
 % %     paramsAll{4}.ub = ones(paramsAll{4}.length,1);
 
-% condUse, [1 x 1], (0.11 to 0.85)
+% condUse, [1 x 1]
 paramsAll{5}.name = 'condUse'; paramsAll{5}.length = 1; ...
     paramsAll{5}.lb = 0.10; ...
     paramsAll{5}.ub = 0.25;
 
-% epsA, [1 x 1], (0.2 to 0.8)
+% epsA, [1 x 1]
 paramsAll{6}.name = 'epsA'; paramsAll{6}.length = 1; ... %3
     paramsAll{6}.lb = ones(paramsAll{6}.length,1).*0.1; ...
     paramsAll{6}.ub = ones(paramsAll{6}.length,1).*0.6;
 
-% epsR, [1 x 1], (0.1 to 1)
+% epsR, [1 x 1]
 paramsAll{7}.name = 'epsR'; paramsAll{7}.length = 1; ... %3
     paramsAll{7}.lb = ones(paramsAll{7}.length,1).*0.1; ...
     paramsAll{7}.ub = ones(paramsAll{7}.length,1);
@@ -60,12 +60,12 @@ paramsAll{9}.name = 'femaleActs'; paramsAll{9}.length = 5; ... %42; ...
     paramsAll{9}.ub = [10; 5; 1.5; 2; 3]; %[ones(paramsAll{9}.length*(1/3),1).*90.0; ones(paramsAll{9}.length*(1/3),1).*0.99; ...
                     % ones(paramsAll{9}.length*(1/3),1).*0.99]; %15;
 
-% perPartnerHpv_vax, [1 x 1], (0.001 to 1.0)
+% perPartnerHpv_vax, [1 x 1]
 paramsAll{10}.name = 'perPartnerHpv_vax'; paramsAll{10}.length = 1; ...
     paramsAll{10}.lb = 0.005; ...
     paramsAll{10}.ub = 0.85;
 
-% perPartnerHpv_nonV, [1 x 1], (0.001 to 1.0)
+% perPartnerHpv_nonV, [1 x 1]
 paramsAll{11}.name = 'perPartnerHpv_nonV'; paramsAll{11}.length = 1; ...
     paramsAll{11}.lb = 0.005; ...
     paramsAll{11}.ub = 1.0;
@@ -75,27 +75,27 @@ paramsAll{11}.name = 'perPartnerHpv_nonV'; paramsAll{11}.length = 1; ...
 % %     paramsAll{12}.lb = ones(paramsAll{12}.length,1).*0.25; ...
 % %     paramsAll{12}.ub = ones(paramsAll{12}.length,1).*4.0;
 
-% hpv_hivClear, [dec CD4], (0.25x to 4x)
+% hpv_hivClear, [dec CD4]
 paramsAll{14}.name = 'hpv_hivClear'; paramsAll{14}.length = 4; ...
     paramsAll{14}.lb = [0.5 ; 0.01; 0.01; 0.01]; ... %ones(paramsAll{15}.length,1).*0.25;
     paramsAll{14}.ub = [1.0; 0.99; 0.99; 0.99]; %ones(paramsAll{15}.length,1).*4.0;
 
-% c3c2Mults, [dec CD4], (0.25x to 4x)
-paramsAll{15}.name = 'c3c2Mults'; paramsAll{15}.length = 3; ... %4;
-    paramsAll{15}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{16}.length,1).*0.25;
-    paramsAll{15}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{16}.length,1).*4.0;
+% c3c2Mults, [dec CD4]
+paramsAll{15}.name = 'c3c2Mults'; paramsAll{15}.length = 1; ...
+    paramsAll{15}.lb = 0.5; ...
+    paramsAll{15}.ub = 1.0;
 
-% c2c1Mults, [dec CD4], (0.25x to 4x)
-paramsAll{16}.name = 'c2c1Mults'; paramsAll{16}.length = 3; ... %4
-    paramsAll{16}.lb = [0.01; 0.01; 2.0]; ... %ones(paramsAll{17}.length,1).*0.25;
-    paramsAll{16}.ub = [0.99; 0.99; 10.0]; %ones(paramsAll{17}.length,1).*4.0;
+% c2c1Mults, [dec CD4]
+paramsAll{16}.name = 'c2c1Mults'; paramsAll{16}.length = 1; ...
+    paramsAll{16}.lb = 0.8; ... 
+    paramsAll{16}.ub = 1.5;
 
-% lambdaMultImm, [age x 1], (0.001 to 1)
-paramsAll{18}.name = 'lambdaMultImm'; paramsAll{18}.length = 1; ... %16;
+% lambdaMultImm, [age x 1]
+paramsAll{18}.name = 'lambdaMultImm'; paramsAll{18}.length = 1; ...
     paramsAll{18}.lb = ones(paramsAll{18}.length,1).*0.5; ...
-    paramsAll{18}.ub = ones(paramsAll{18}.length,1).*(1.0/0.99);
+    paramsAll{18}.ub = ones(paramsAll{18}.length,1).*1.0;
 
-% artHpvMult, [1 x 1], (1 to 2.32)
+% artHpvMult, [1 x 1]
 paramsAll{21}.name = 'artHpvMult'; paramsAll{21}.length = 1; ...
     paramsAll{21}.lb = ones(paramsAll{21}.length,1).*1.0; ...
     paramsAll{21}.ub = ones(paramsAll{21}.length,1).*2.32;
@@ -165,6 +165,17 @@ paramsAll{37}.name = 'maleHpvClearMult'; paramsAll{37}.length = 1; ...
     paramsAll{37}.lb = [1.0]; ...
     paramsAll{37}.ub = [2.0];
 
-paramsAll{38}.name = 'ptMult'; paramsAll{38}.length = 6; ...
-    paramsAll{38}.lb = [0.6; 0.8; 0.5; 0.5; 0.7; 0.5]; ...
-    paramsAll{38}.ub = [2.5; 5; 2.2; 2; 2.8; 2];
+% c2c3Mults, [dec CD4]
+paramsAll{38}.name = 'c2c3Mults'; paramsAll{38}.length = 1; ...
+    paramsAll{38}.lb = 1.2; ...
+    paramsAll{38}.ub = 1.66;
+
+% c1c2Mults, [dec CD4]
+paramsAll{39}.name = 'c1c2Mults'; paramsAll{39}.length = 1; ...
+    paramsAll{39}.lb = 0.75; ...
+    paramsAll{39}.ub = 1.4;
+
+% ptMult
+paramsAll{40}.name = 'ptMult'; paramsAll{40}.length = 6; ...
+    paramsAll{40}.lb = [0.6; 0.8; 0.5; 0.5; 0.7; 0.5]; ...
+    paramsAll{40}.ub = [2.5; 5; 2.2; 2; 2.8; 2];

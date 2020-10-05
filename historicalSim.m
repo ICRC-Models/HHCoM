@@ -1,8 +1,9 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
-%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
+function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)    % input variables when using a calibration parameter set
+%Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
+% Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
 % Note: Make sure you are calculating NEGATIVE summed log-likelihood. 
@@ -24,7 +25,6 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 %     startIdx = startIdx + paramsSub{s}.length;
 % end
 
-
 %%
 %close all; clear all; clc;
 tic
@@ -33,11 +33,11 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-%pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = 'toNow_24Aug20_K_HPVprogAge';
+pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+%pathModifier = 'toNow_24Aug20_K_HPVprogAge';
 
 % AGE GROUPS
-fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
+fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -45,11 +45,17 @@ hivPosScreen = 1; % ***SET ME***: 0 applies same screening algorithm (screenAlgo
 screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
 
 % VACCINATION
+% Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
+%   Otherwise, set it to 0.86 (the historical coverage level for 9 year-olds) times an adjustment for the bivalent vaccine. We are 
+%   adjusting coverage rather than efficacy because we don't track vaccination by vaccine type and age cohorts can have mixed vaccine
+%   types, particularly if catch-up vaccination is applied in future years.
+
+% Common parameters
 vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
-vaxRate = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+vaxRate = 0.0; %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types))
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -63,7 +69,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , muCC , kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
@@ -247,7 +253,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 % disp(' ')
 
 % If starting from beginning
-if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
+if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     
     % Initial Population 
     MpopStruc = riskDist(: , : , 1);
@@ -294,7 +300,7 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     popVec(1 , :) = popIn;
     deaths = popVec; 
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-    hivDeaths = zeros(length(s) - 1 , gender , age);
+    hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -315,10 +321,10 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     import java.util.LinkedList
     artDistList = LinkedList();
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
-    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
-elseif isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
+elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
     chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
     
@@ -354,7 +360,7 @@ elseif isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     import java.util.LinkedList
     artDistList = chckPntIn.artDistList;
     artDist = chckPntIn.artDist;
-    %artTreatTracker = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 end
 
 %% Main body of simulation
@@ -366,7 +372,7 @@ disp(' ')
 % progressbar('Simulation Progress')
 
 for i = iStart : length(s) - 1
-    year = startYear + s(i) - 1
+    year = startYear + s(i) - 1;
     tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
     popIn = popVec(i - 1 , :);
 %   currStep = round(s(i) * stepsPerYear);
@@ -407,7 +413,7 @@ for i = iStart : length(s) - 1
         % Cervical cancer-associated mortality by stage and HIV status/CD4 count
         [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
-            hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
+            hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , ...
             normalhpvVaxInds , immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , ...
             immunehpvNonVaxInds , infhpvNonVaxInds , cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ...
             ccLochpvVaxIndsFrom , ccReghpvVaxInds , ccDisthpvVaxInds , ...
@@ -453,7 +459,7 @@ for i = iStart : length(s) - 1
     % HPV infection by type
     % HIV infection and protection provided by condoms, circumcision, and ART
     [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
-        newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , : , : , : , :)] = ...
+        newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax(i , : , : , : , : , :) , newHiv(i , : , : , : , : , : , :)] = ...
         ode4xtra(@(t , pop) mixInfect(t , pop , ...
         stepsPerYear , year , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
         age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
@@ -476,14 +482,15 @@ for i = iStart : length(s) - 1
     % ART initiation, dicontinuation, and scale-up by CD4 count
     % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
-        [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+        [~ , pop , hivDeaths(i , : , : , :) , artTreat] =...
             ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
             kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
             ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
         popIn = pop(end , :);
-        %artTreatTracker(i , : , : , : , : , : , : , :  ,:) = artTreat;
-        artDistList.add(sum(sum(sum(artTreat , 3) , 4) , 5));
+        %artTreat = artTreatTracker(i , : , : , : , : , :);
+        artTreat = reshape(artTreat , [numel(artTreat) , 1]);
+        artDistList.add(artTreat); %sum(sum(sum(artTreat , 3) , 4) , 5)
         if artDistList.size() >= stepsPerYear * 2
             artDistList.remove(); % remove CD4 and VL distribution info for people initiating ART more than 2 years ago
         end
@@ -503,11 +510,11 @@ for i = iStart : length(s) - 1
     [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
         bornAgeDieRisk(t , pop , year , ...
         gender , age , fivYrAgeGrpsOn , fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
-    hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
-    fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
-    dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
-    dFertPos3 , dFertNeg3  , dFertMat3,  ...
-    deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+        hivFertPosBirth2 , hivFertNegBirth2 , fertMat3 , hivFertPosBirth3 , hivFertNegBirth3 , ...
+        fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
+        dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
+        dFertPos3 , dFertNeg3  , dFertMat3,  ...
+        deathMat , deathMat2 , deathMat3 , deathMat4 , ...
         dDeathMat , dDeathMat2 , dDeathMat3, ...
         MTCTRate , ageInd , riskAdj, d_riskAdj, riskInd , riskDist ,......
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
@@ -550,7 +557,7 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
     
-    if rem(year , 25) == 0.0
+    if rem(year , 50) == 0.0
         savdir = [pwd , '/HHCoM_Results/'];
         save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
@@ -561,7 +568,7 @@ for i = iStart : length(s) - 1
     end
 
 end
-popLast = popVec(end-1 , :);
+popLast = spase(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
@@ -587,10 +594,6 @@ if calibBool
         cin1_dist_dObs , hpv_dist_dObs , ccInc2012_dObs ,popAgeDist_dObs , totPopSize_dObs , ...
         toInd , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , ...
         age , gender , risk , startYear , stepsPerYear , annlz)
-
-    if negSumLogL < -190000.00
-        delete([savdir , pathModifier , '.mat']);
-    end
     
     if isnan(negSumLogL)
         negSumLogL = -10000000.00;

@@ -1,30 +1,36 @@
-TCURR=0    # t_curr
+TCURR=0    # calibration iteration
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2V11
+DATE=01Oct20    # date
 echo "${DATE}"
 export DATE
 
+# Notes on workflow: comment out sections for previous steps when you move on to the next step
+# using    : <<'END'    at the beginning of the section and    END    at the end of the section
+
+# STEP ONE - calculate and save nsets in a file
+# Notes: slurm_sizeMatrix.sbatch must successfully run and create matrixSize_calib_[date]_[t_curr].dat 
+# before you can successfully run slurm_batch.sbatch
 echo "Running MATLAB script to get matrix size."
 sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 sleep 180
+
+# STEP TWO - run simulations with potential parameters sets in parallel
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
 echo "${NSETS}" 
 export NSETS
-
 echo "Running simulations, first try."
-SEQ28all=($(seq 1 28 ${NSETS}))      # set up for NSETS=5600
+SEQ28all=($(seq 1 28 ${NSETS}))    # set up for NSETS=5600
 LENGTH28=${#SEQ28all[@]}
 echo "${LENGTH28}"
 for i in $(seq 1 5 ${LENGTH28}); do
-    for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once 
+    for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit batches of 4 jobs (28 simulations per job) to not overwhelm scheduler
         SETIDX=${SEQ28all[$j]}
             export SETIDX
-            sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch #--qos=MaxJobs4
+            sbatch -p ckpt -A csde-ckpt slurm_batch.sbatch
     done
-    
     sleep 10
     if [ $i -ge 73 ] && [ $i -lt 77 ]; then
         echo "${i}"
@@ -40,20 +46,24 @@ for i in $(seq 1 5 ${LENGTH28}); do
     fi
 done
 
+# STEP THREE - check for failed simulations
 : <<'END'
 echo "Running MATLAB script to identify failed simulations."
 sbatch -p ckpt -A csde-ckpt slurm_idMissing.sbatch
 #sleep 300
-#FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
-#RERUN=$(<$FILE)
-#echo "$RERUN"
-#: <<'END'
+END
+
+# STEP FOUR - rerun failed simulations
+: <<'END'
+FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
+RERUN=$(<$FILE)
+echo "$RERUN"
 echo "Re-running failed simulations."
 #while [ ! -z "$RERUN" ]; do
     MISSING=($RERUN)
     INT=0
     for i in $(seq 1 5 ${LENGTH28}); do
-	for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit 4 simulations for each target node at once
+	for j in $(seq $((${i}-1)) 1 $((${i}+3))); do    # submit batches of 4 jobs (28 simulations per job) to not overwhelm scheduler
              SETIDX=${SEQ28all[$j]}
              if [[ " ${MISSING[@]} " =~ " ${SETIDX} " ]]; then
                  export SETIDX
@@ -67,8 +77,9 @@ echo "Re-running failed simulations."
 	fi
     done
     #if [ $INT -gt 0 ] && [ $INT -lt 5 ]; then
-    #    sleep 10800    # give submitted simulations time to finish 
+    #    sleep 10800    # give submitted simulations time to finish
     #fi
+
 
     #echo "Running MATLAB script to identify failed simulations, again."
     #sbatch -p csde -A csde slurm_idMissing.sbatch
@@ -79,11 +90,9 @@ echo "Re-running failed simulations."
 #done
 END
 
-#echo "Running MATLAB abc_smc script to get next set of particles."
-#sbatch -p ckpt -A csde-ckpt slurm_abc.sbatch
-#sleep 21600
- 
-#echo "Running MATLAB idParamRanges script to get ranges of parameters in best-fitting sets."
-#sbatch -p csde -A csde slurm_idParamRanges.sbatch
-
-
+# STEP FIVE - finish ABC-SMC algorithm to get parameter sets for next batch of simulations
+: <<'END'
+echo "Running MATLAB abc_smc script to get next set of particles."
+sbatch -p ckpt -A csde-ckpt slurm_abc.sbatch
+sleep 21600
+END

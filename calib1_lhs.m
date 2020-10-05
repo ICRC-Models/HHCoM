@@ -23,7 +23,7 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 [paramsAll] = genParamStruct();
 
 %% Latin hypercube sampling of parameter space
-pIdx = [1,2,5,6,7,8,9,10,35,38];    % indices in paramsAll cell array
+pIdx = [1,2,5,6,7,8,9,10,35,40];    % indices in paramsAll cell array
 
 paramsSub = cell(length(pIdx),1);
 p = 0;
@@ -56,22 +56,22 @@ file = ['paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , sample)
 
-%% If on Phase 2 of calibration, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
-%  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
-% pIdx_wPh1Resample = [1,2,5,6,9,35, pIdx(1,:)];
-% 
-% ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20_20_top50Sets.dat']);
-% ph1sample = datasample(ph1_top50Sets, nSets , 2); % resample
-% ph1sampleSubset = [ph1sample(1:21,:); ph1sample(26,:)]; % keep subset of resampled parameter set
-% 
-% file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '_wPh1Resample' , '.dat'];
-% paramDir = [pwd , '/Params/'];
-% csvwrite([paramDir, file] , pIdx_wPh1Resample)
-% 
-% file = ['resampleSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
-% paramDir = [pwd , '/Params/'];
-% csvwrite([paramDir, file] , ph1sample)
-% 
-% file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
-% paramDir = [pwd , '/Params/'];
-% csvwrite([paramDir, file] , ph1sampleSubset)
+%% If using parameters from a previous calibration or phase, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
+% Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
+pIdx_wPh1Resample = [pIdx(1,1:8) , 15,16,18,27,28,29,30,31,32,33,34 , pIdx(1,9) , 37,38,39 , pIdx(1,10)];
+
+ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20Ph2V11_6_top50Sets.dat']);
+ph1sample = datasample(ph1_top50Sets, nSets , 2); % resample
+ph1sampleSubset = [ph1sample(2:23,:)]; % keep subset of resampled parameter set
+
+file = ['pIdx_calib_' , date , '_' , num2str(t_curr) , '_wPh1Resample' , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , pIdx_wPh1Resample)
+
+file = ['resampleSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , ph1sample)
+
+file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , ph1sampleSubset)
