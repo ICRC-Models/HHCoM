@@ -205,7 +205,8 @@ if calibBool && any(8 == pIdx)
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* paramSet(paramsSub{idx}.inds(1)); 
     maleActs(5, 1:risk) = maleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
     maleActs(6:7, 1:risk) = maleActs(6:7, 1:risk) .* paramSet(paramsSub{idx}.inds(3));
-    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4));
+    maleActs(8:9, 1:risk) = maleActs(8:9, 1:risk) .* paramSet(paramsSub{idx}.inds(4));
+    maleActs(10:16, 1:risk) = maleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(5));
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'maleActs');
     maleActs(3:4, 1:risk) = maleActs(3:4, 1:risk) .* 5; 
@@ -227,7 +228,8 @@ if calibBool && any(9 == pIdx)
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* paramSet(paramsSub{idx}.inds(1));
     femaleActs(5, 1:risk) = femaleActs(5, 1:risk) .* paramSet(paramsSub{idx}.inds(2)) ;
     femaleActs(6:7, 1:risk) = femaleActs(6:7, 1:risk).*paramSet(paramsSub{idx}.inds(3)) ;
-    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(4)) ;
+    femaleActs(8:9, 1:risk) = femaleActs(8:9, 1:risk).*paramSet(paramsSub{idx}.inds(4)) ;
+    femaleActs(10:16, 1:risk) = femaleActs(10:16, 1:risk).* paramSet(paramsSub{idx}.inds(5));
 else
     load([paramDir , 'demoParamsFrmExcel'] , 'femaleActs');
     femaleActs(3 : 4, 1:risk) = femaleActs(3 : 4, 1:risk) .* 6;
@@ -805,7 +807,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
 
 % Protection from circumcision and condoms
 circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
-condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
+condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
 if calibBool && any(5 == pIdx);
