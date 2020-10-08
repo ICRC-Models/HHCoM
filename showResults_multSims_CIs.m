@@ -107,7 +107,7 @@ fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
 %     '12_3895' , '22_487' , '8_2705' , '22_3250' , '15_2550' , '14_563' , ...
 %     '4_1887' , '10_688' , '18_3391' , '14_2659' , '19_2814' , '18_903' , ...
 %     '22_2697' , '4_1676' , '4_2471' , '15_2517' , '16_1709' , '12_2481' , '16_3992'};
-% {'2_846' , '14_947' , '16_3127' , '12_689' , ...  % 22Apr20Ph1, top 50 sets
+% fileInds = {'2_846' , '14_947' , '16_3127' , '12_689' , ...  % 22Apr20Ph1, top 50 sets
 %     '10_2727' , '17_3986' , '16_2194' , '15_3850' , '9_334' , '0_6657' , ...
 %     '16_2364' , '4_711' , '19_1017' , '4_2361' , '15_2155' , '17_594' , ...
 %     '19_1779' , '11_1541' , '12_3055' , '6_746' , '20_944' , '13_3012' , ...
@@ -211,10 +211,10 @@ hpv_nonVax = cc_vax;
 resultsDir = [pwd , '\HHCoM_Results\'];
 baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_';
 
-loopSegments = {1 , round(nRuns/2) , nRuns};
+loopSegments = {0 , round(nRuns/2) , nRuns};  %{0 , 10 , 20 , 30 , 40 , 50};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
-    parfor j = loopSegments{k} : loopSegments{k+1}
+    parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
         pathModifier = [baseFileName , fileInds{j}];
         histResult = load([resultsDir , pathModifier]);
@@ -951,8 +951,8 @@ end
 %% HIV prevalence by gender over time vs. AHRI (validation) and (Vandormael, 2019) AHRI data (validation)
 hivYearVec = [unique(hivPrevM_dObs(: ,1)) ; [2010 : 2016]'];
 
-hivData(: , : , 1) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
-hivData(: , : , 2) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
+hivData(: , 1 , 1) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
+hivData(: , 1 , 2) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
 
 hivRaw(:,:,1) = hivPrevM_dObs(: , 4:5);
 hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
@@ -971,7 +971,7 @@ figure;
 gen = {'Male' , 'Female'};
 for g = 1 : gender
     subplot(1,2,g)
-    plot(unique(hivPrevM_dObs(: ,1)) , hivData(:,:,g) , 'bo');
+    plot(unique(hivPrevM_dObs(: ,1)) , hivData(:,1,g) , 'bo');
     hold on;
     plot(hivYearVecAlt , hivDataAlt(:,:,g) , 'co');
     hold on;
