@@ -852,7 +852,7 @@ vaxStartYear = 2014;
 % Protection from HIV or HPV acquisition provided by circumcision and condoms
 % Note: circProtect applies only to individuals placed in the HIV-negative, circumcised compartment
 %       condProtect applies to all individuals of that gender
-circProtect = [[circProtect; 0.3] , [0; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
+circProtect = [[circProtect; 0.0] , [0.30; 0]];  % HIV protection (changed from 30% to 45%) , HPV protection;  
 condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
 
 % Condom use
