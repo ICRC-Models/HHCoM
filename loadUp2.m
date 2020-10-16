@@ -852,9 +852,9 @@ screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
-cytoSens = [0.0 , 0.57 , 0.57]; % pap smear
-hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
-hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
+cytoSens = [0.0 , 0.57 , 0.57]; % pap smear (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
+hpvSens = [0.0 , 0.881 , 0.881]; % careHPV (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
+hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
 
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
