@@ -80,6 +80,7 @@ monthlyTimespan = [startYear : (1/6) : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
 midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
+screenAnnualTimespan = [(2020+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
 % Total population size
 popSize = zeros(nRuns , length(monthlyTimespan));
 popSizeAgeF = zeros(nRuns , 5 , age , length(monthlyTimespan));
@@ -175,18 +176,21 @@ cin1_nonVax = cc_vax;
 hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 % HPV vaccination and screening
-newScreenTime = zeros(nRuns , length(annualTimespan));
+newScreenTime = zeros(nRuns , length(screenAnnualTimespan));
+screenCovTime = newScreenTime;
+screenTotAnnual = zeros(nRuns , 5 , length(screenAnnualTimespan));
 vaxCoverage = zeros(nRuns , length(monthlyTimespan));
 vaxCoverageAge = zeros(nRuns , age , length(monthlyTimespan));
+vaxTotAge = zeros(nRuns , age , 5 , length(monthlyTimespan));
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 n = vaxResultInd;
 baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_WHO-SCES' , sceNum , '_'];
-loopSegments = {1 , round(nRuns/2) , nRuns};
+loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
-    parfor j = loopSegments{k} : loopSegments{k+1}
+    parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
         nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
@@ -208,7 +212,7 @@ for k = 1 : loopSegmentsLength-1
         vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
-        %vaxResult{n}.newScreen = [curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)];
+        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , : , : , :)];
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
@@ -531,7 +535,7 @@ for k = 1 : loopSegmentsLength-1
         for dInd = 1 : diseaseVecLength_ccInc;
             d = diseaseVec_ccInc{dInd};
             for rInd = 1 : risk
-                r = rInd
+                r = rInd;
                 for a = 1 : age
                     allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
                         1 : endpoints , 1 : intervens , 2 , a , r));
@@ -808,23 +812,38 @@ for k = 1 : loopSegmentsLength-1
         %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
         
         %% Screening "coverage"
-%         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%             1 : endpoints , 1 : intervens , 2 , 7 : age , 1 : risk));
-%         % Calculate incidence
-%         newScreenTime(j , :) = ...
-%             annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , : , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9)) ./ ...
-%             (annlz(sum(vaxResult{n}.popVec(: , allF) , 2) ./ stepsPerYear) * 0.1);
+        allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , 7 : age , 1 : risk));
+        % Calculate incidence
+        newScreenTime(j , :) = ...
+            annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , : , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9)) ./ ...
+            (annlz(sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2) ./ stepsPerYear) * 0.1);
+        
+        %% Screening coverage ages 35-39
+        allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , 8 , 1 : risk));
+        screenF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , [3 , 4] , 2 , 8 , 1 : risk));
+        
+        screenCovTime(j , :) = ...
+            sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , screenF) , 2) ./ ...
+            sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2);
+        
+        %% Total number of women screened annually by age and disease status
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9))
+        end
         
         %% Vaccine coverage overall
         % Overall
         vaxInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , [2 , 4] , 2 , 4 : 15 , 1 : risk));
+            1 : endpoints , [2 , 4] , 2 , 3 : 16 , 1 : risk));
         popInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 2 , 4 : 15 , 1 : risk));
+            1 : endpoints , 1 : intervens , 2 , 3 : 16 , 1 : risk));
         vaxCoverage(j , :) = sum(vaxResult{n}.popVec(: , vaxInds) , 2) ./ sum(vaxResult{n}.popVec(: , popInds) , 2);
         
         %% Vaccine coverage by age
-        % By age
         for a = 1 : age
             vaxInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
                 1 : endpoints , [2 , 4] , 2 , a , 1 : risk));
@@ -832,7 +851,18 @@ for k = 1 : loopSegmentsLength-1
                 1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
             vaxCoverageAge(j , a , :) = sum(vaxResult{n}.popVec(: , vaxInds) , 2) ./ sum(vaxResult{n}.popVec(: , popInds) , 2);
         end
-
+        
+        %% Total number of women vaccinated by age and disease status
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                vaxInds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                    1 : endpoints , [2 , 4] , 2 , a , 1 : risk));
+                vaxTotAge(j , a , dInd , :) = sum(vaxResult{n}.popVec(: , vaxInds) , 2);
+            end
+        end
+        
+        
     end
 end
 
@@ -2019,30 +2049,49 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
 
 %% Screening "coverage"
-% figure;   
-% plot(annualTimespan , mean(newScreenTime,1) , 'k-' , ...
-%     annualTimespan , min(newScreenTime,[],1) , 'k--' , ...
-%     annualTimespan , max(newScreenTime,[],1) , 'k--' , 'LineWidth' , 1.5);
-% xlabel('Time'); ylabel('Screening coverage');
-% xlim([1990 2100]); ylim([0 0.3]); grid on;
-% title(['Screening coverage']);
-% legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-%     'Location' , 'northwest');
+figure;   
+plot(screenAnnualTimespan , mean(newScreenTime,1) , 'k-' , ...
+    screenAnnualTimespan , min(newScreenTime,[],1) , 'k--' , ...
+    screenAnnualTimespan , max(newScreenTime,[],1) , 'k--' , 'LineWidth' , 1.5);
+xlabel('Time'); ylabel('Screening coverage');
+xlim([2020 2100]); ylim([0 0.3]); grid on;
+title(['Screening coverage']);
+legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+    'Location' , 'northwest');
+
+%% Screening coverage ages 35-39
+figure;   
+plot(screenAnnualTimespan , mean(screenCovTime,1) , 'k-' , ...
+    screenAnnualTimespan , min(screenCovTime,[],1) , 'k--' , ...
+    screenAnnualTimespan , max(screenCovTime,[],1) , 'k--' , 'LineWidth' , 1.5);
+xlabel('Time'); ylabel('Screening coverage');
+xlim([2020 2100]); ylim([0 0.3]); grid on;
+title(['Screening coverage ages 35-39']);
+legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+    'Location' , 'northwest');
+
+%% Total number of women screened annually by age and disease status
+diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'ScreenTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+    writematrix([[0 ; 35 ; 35 ; 35] , ...
+        [screenAnnualTimespan ;
+        [squeeze(median(squeeze(screenTotAnnual(: , dInd , :)) , 1)) ; ...
+        squeeze(min(squeeze(screenTotAnnual(: , dInd , :)) , [] , 1)) ; ...
+        squeeze(max(squeeze(screenTotAnnual(: , dInd , :)) , [] , 1))]]] , fname)
+end
 
 %% Vaccine coverage overall
 figure;   
-plot(monthlyTimespan , mean(vaxCoverage,1) , 'k-' , ...
-    monthlyTimespan , min(vaxCoverage,[],1) , 'k--' , ...
-   monthlyTimespan , max(vaxCoverage,[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(midAnnualTimespan , mean(vaxCoverage(: , (3 : stepsPerYear : end)),1) , 'k-' , ...
+    midAnnualTimespan , min(vaxCoverage(: , (3 : stepsPerYear : end)),[],1) , 'k--' , ...
+    midAnnualTimespan , max(vaxCoverage(: , (3 : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
 xlabel('Time'); ylabel('Vaccine coverage');
 xlim([2020 2100]); ylim([0 1]); grid on;
 title(['Vaccine coverage']);
 legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
     'Location' , 'northwest');
-
-
-vaxCoverage = zeros(nRuns , length(monthlyTimespan));
-vaxCoverageAge = zeros(nRuns , age , length(monthlyTimespan));
 
 %% Vaccine coverage by age
 ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
@@ -2051,29 +2100,37 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
 
 figure;    
 for a = 1 : age
-    plot(1 : age , mean(squeeze(vaxCoverageAge(: , a , :)),1)' , '-' , ...
-        1 : age , min(squeeze(vaxCoverageAge(: , a , :)),[],1)' , '--' , ...
-        1 : age , max(squeeze(vaxCoverageAge(: , a , :)),[],1)' , '--' , 'LineWidth' , 1.5);
+    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (3 : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
 end
-xlabel('Age Group'); ylabel('Vaccine coverage');
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+xlabel('Year'); ylabel('Vaccine coverage');
 xlim([2020 2100]); ylim([0 1]); grid on;
 title(['Vaccine coverage by age']);
-legend('Model, 0-4: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 5-9: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 10-14: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 15-19: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 20-24: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 25-29: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 30-34: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 35-39: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 40-44: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 45-49: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 50-54: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 55-59: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 60-64: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 65-69: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 70-74: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, 75-59: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
+legend('Model, 0-4: 25-sets mean' , ...
+    'Model, 5-9: 25-sets mean' , ...
+    'Model, 10-14: 25-sets mean' , ...
+    'Model, 15-19: 25-sets mean' , ...
+    'Model, 20-24: 25-sets mean' , ...
+    'Model, 25-29: 25-sets mean' , ...
+    'Model, 30-34: 25-sets mean' , ...
+    'Model, 35-39: 25-sets mean' , ...
+    'Model, 40-44: 25-sets mean' , ...
+    'Model, 45-49: 25-sets mean' , ...
+    'Model, 50-54: 25-sets mean' , ...
+    'Model, 55-59: 25-sets mean' , ...
+    'Model, 60-64: 25-sets mean' , ...
+    'Model, 65-69: 25-sets mean' , ...
+    'Model, 70-74: 25-sets mean' , ...
+    'Model, 75-59: 25-sets mean');
 
+%% Vaccine coverage by age and disease status
+diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'VaxTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+    writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
+        [midAnnualTimespan ;
+        [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , 1)) ; ...
+        squeeze(min(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1)) ; ...
+        squeeze(max(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1))]]] , fname)
+end  
