@@ -81,6 +81,8 @@ monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
 midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
 screenAnnualTimespan = [(2020+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
+screenMonthlyTimespan = [2020 : (1/6) : lastYear];
+screenMonthlyTimespan = screenMonthlyTimespan(1 : end-1);
 % Total population size
 popSize = zeros(nRuns , length(monthlyTimespan));
 popSizeAgeF = zeros(nRuns , 5 , age , length(monthlyTimespan));
@@ -177,7 +179,7 @@ hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 % HPV vaccination and screening
 newScreenTime = zeros(nRuns , length(screenAnnualTimespan));
-screenCovTime = newScreenTime;
+screenCovTime = zeros(nRuns , length(screenMonthlyTimespan));
 screenTotAnnual = zeros(nRuns , 5 , length(screenAnnualTimespan));
 vaxCoverage = zeros(nRuns , length(monthlyTimespan));
 vaxCoverageAge = zeros(nRuns , age , length(monthlyTimespan));
@@ -247,7 +249,7 @@ for k = 1 : loopSegmentsLength-1
         end
         
         %% Female total population size by 5-year age groups over time
-        for dInd = 1 : diseaseVecLength_ccInc;
+        for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 popAgeF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -832,7 +834,7 @@ for k = 1 : loopSegmentsLength-1
         %% Total number of women screened annually by age and disease status
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
-            screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9))
+            screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9));
         end
         
         %% Vaccine coverage overall
@@ -1715,7 +1717,7 @@ for dInd = 1 : length(diseaseLabels);
 
         if aInd <= age    
             ccIncRef = ccIncHivAgeTime_med(a , :) .* worldStandard_WP2015(aInd);
-            if (dInd == 5) && (a < 3)
+            if (a < 3)
                 ccIncRef = zeros(1 , size(ccIncHivAgeTime_med,2));
             end
         elseif aInd > age
@@ -2061,9 +2063,9 @@ legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximu
 
 %% Screening coverage ages 35-39
 figure;   
-plot(screenAnnualTimespan , mean(screenCovTime,1) , 'k-' , ...
-    screenAnnualTimespan , min(screenCovTime,[],1) , 'k--' , ...
-    screenAnnualTimespan , max(screenCovTime,[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(screenMonthlyTimespan , mean(screenCovTime,1) , 'k-' , ...
+    screenMonthlyTimespan , min(screenCovTime,[],1) , 'k--' , ...
+    screenMonthlyTimespan , max(screenCovTime,[],1) , 'k--' , 'LineWidth' , 1.5);
 xlabel('Time'); ylabel('Screening coverage');
 xlim([2020 2100]); ylim([0 0.3]); grid on;
 title(['Screening coverage ages 35-39']);
