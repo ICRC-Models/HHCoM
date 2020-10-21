@@ -52,14 +52,14 @@ function vaxCEA(pathModifier)
 
 % Load results
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-curr = load([pwd , '\HHCoM_Results\toNow_19May20_baseVax_baseScreen_handCalibModel']); % Population up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_11_1']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
 if waning
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
 end
-parfor n = 1 : nSims
+for n = 2 %parfor n = 1 : nSims
     % load results from vaccine run into cell array
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
     % concatenate vectors/matrices of population up to current year to population
@@ -77,7 +77,7 @@ parfor n = 1 : nSims
     vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
     %vaxResult{n}.ccTreated = [curr.ccTreated(1 : end) , vaxResult{n}.ccTreated(2 : end)];
 end
-noVaxInd = nSims;
+noVaxInd = 2; %nSims
 noV = vaxResult{noVaxInd};
 tVec = noV.tVec;
 tVecYr = tVec(1 : stepsPerYear : end);
@@ -431,7 +431,7 @@ circPropYr_obs = vmmcYr;
 circProp_obs = vmmcRate' .* 100;
 circProp_obs = [0.0 0.0 0.0 0.0 0.0 0.0 0.0; circProp_obs];
 
-ageVec = {1 , 4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
+ageVec = {1 , 4 , 5 , [6:10] , [11:age] , [4 : age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 circProp = zeros(length(vaxResult{noVaxInd}.tVec) , length(ageVec));
 
 figure()
@@ -445,17 +445,19 @@ for aInd = 1 : length(ageVec)
     hivNegPop = sum(vaxResult{noVaxInd}.popVec(: , hivNegInds) , 2);
     circProp(: , aInd) = 100 * circPop ./ hivNegPop;
 end
-plot(tVec , circProp);
+hold on;
+plot(tVec , circProp(: , length(ageVec)));
 set(gca,'ColorOrderIndex',1)
 hold on;
-plot(circPropYr_obs , circProp_obs , 'o');
+%plot(circPropYr_obs , circProp_obs , 'o');
 xlabel('Year')
-ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
-title('Circumcision Indicator')
-xlim([1960 2120]);
+ylabel('Proportion Circumcised by Broad Age Groups (%)')
+title('VMMC Coverage among HIV-Negative Males, aged 15-79')
+xlim([1960 2060]); ylim([0 100]);
 grid on;
-legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
-    '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');
+legend('Baseline' , 'Sensitivity analysis')
+% legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , '0-79' , ...
+%     '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
