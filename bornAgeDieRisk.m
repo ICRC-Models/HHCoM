@@ -128,6 +128,10 @@ for g = 1 : gender
         riskFrac2 = 0;
         riskFrac3 = 0;
         
+        if a == 4
+            aged1519 = agedOut;
+        end
+        
         % find fraction of every compartment that must be moved to maintain risk group distribution
         if riskDiff(3) > 0 % if risk 3 deficient
             % start with moving from risk 2 to risk 3
@@ -217,6 +221,7 @@ dPop = dPop + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = abs(deaths);
+extraOut{2} = aged1519;
 
 dPop = sparse(dPop);
 

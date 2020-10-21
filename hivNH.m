@@ -12,7 +12,7 @@
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
 
-function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
+function[dPop , extraOuts] = hivNH(t , pop , propHivDiagWCamp , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
     kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year)
@@ -83,9 +83,9 @@ if year >= 2003 && year < 2011
         end
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
-        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
-        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
-        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+        minCoverLim = popCover{g}(ind) * minLim * propHivDiagWCamp(1 , g); % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim * propHivDiagWCamp(1 , g); % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind) * propHivDiagWCamp(1 , g); % desired population-level ART coverage
 
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
@@ -129,9 +129,9 @@ if year >= 2011 && year < 2015
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
-        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
-        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
-        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+        minCoverLim = popCover{g}(ind) * minLim * propHivDiagWCamp(1 , g); % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim * propHivDiagWCamp(1 , g); % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind) * propHivDiagWCamp(1 , g); % desired population-level ART coverage
 
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
@@ -175,9 +175,9 @@ if year >= 2015 && year < 2016
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
-        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
-        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
-        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+        minCoverLim = popCover{g}(ind) * minLim * propHivDiagWCamp(1 , g); % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim * propHivDiagWCamp(1 , g); % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind) * propHivDiagWCamp(1 , g); % desired population-level ART coverage
 
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
@@ -222,13 +222,13 @@ if year >= 2016
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
         if year < (2020-1)
-            minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
-            maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
-            popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+            minCoverLim = popCover{g}(ind) * minLim * propHivDiagWCamp(1 , g); % minimum ART coverage by age
+            maxCoverLim = popCover{g}(ind) * maxLim * propHivDiagWCamp(1 , g); % maximum ART coverage by age
+            popCoverInd = popCover{g}(ind) * propHivDiagWCamp(1 , g); % desired population-level ART coverage
         elseif year >= (2020-1)
-            minCoverLim = popCover{g}(end) * minLim;
-            maxCoverLim = popCover{g}(end) * maxLim;
-            popCoverInd = popCover{g}(end);
+            minCoverLim = popCover{g}(end) * minLim * propHivDiagWCamp(1 , g);
+            maxCoverLim = popCover{g}(end) * maxLim * propHivDiagWCamp(1 , g);
+            popCoverInd = popCover{g}(end) * propHivDiagWCamp(1 , g);
         end     
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...

@@ -85,6 +85,13 @@ vaxAgeL = 5;    % age group to vaccinate
 vaxCoverL = 0.5;    % vaccine coverage
 vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
+% HIV TESTING CAMPAIGN
+propHivDiag = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males, females)
+propDiagOneYear = (1 - 0.41);
+hivTestCampYrs = [2020 : 5 : lastYear-1];
+hivTestCampCov = 0.75;
+propHivDiagWCamp = [0.78 , 0.889];
+
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
@@ -348,8 +355,11 @@ for n = nTests
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
     deaths = zeros(size(popVec));
+    aged1519 = zeros(length(s) - 1 , 1);
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
+    nHivDiag = zeros(length(s) - 1 , 1);
+    nHivUndiag = zeros(length(s) - 1 , 1);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -373,6 +383,7 @@ for n = nTests
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    nTested = zeros(length(s) - 1 , gender);
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
@@ -380,10 +391,30 @@ for n = nTests
         tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
         popIn = popVec(i - 1 , :);
         
+        % HIV testing initial conditions
+        if i == 2
+            for g = 1 : gender
+                nHivPos = sumall(popIn(hivInds(3 : 8 , 1 , g , 1 : age , 1 : risk , :)));
+                nHivDiag(i , g) = nHivPos * propHivDiag(1 , g);        
+                nHivUndiag(i , g) = nHivPos * (1 - propHivDiag(1 , g));
+            end
+        end
+        
+        % HIV testing, calculated rather than tracked in compartments
+        if any(year == hivTestCampYrs) || (year == currYear + (1/stepsPerYear))
+            [nTested(i , :) , propHivDiagWCamp(i , :) , nHivDiag(i , :) , nHivUndiag(i , :)] ...
+                = hivTest(popIn , hivTestCampCov , propHivDiagWCamp , nHivPos , ...
+                nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk)
+            year
+            propHivDiagWCamp
+        else
+            propHivDiagWCamp = [0.78 , 0.889];
+        end
+        
         if hpvOn
             % Progression/regression from initial HPV infection to
             % precancer stages and cervical cancer. Differential CC
-            % detection by CC stage and HIV status/CD4 count.
+            % death by CC stage and HIV status/CD4 count.
             [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
                 = ode4xtra(@(t , pop) ...
                 hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
@@ -446,7 +477,7 @@ for n = nTests
         % excess HIV mortality
         if hivOn
             [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
-                ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
+                ode4xtra(@(t , pop) hivNH(t , pop , propHivDiagWCamp , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
@@ -467,7 +498,7 @@ for n = nTests
         end
         
         % Birth, aging, risk redistribution module
-        [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
+        [~ , pop , deaths(i , :) , aged1519(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , ...
             gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
             hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , ...
@@ -499,6 +530,14 @@ for n = nTests
             end
         end
         
+        % Estimate changes to proportion PLWHIV diagnosed/undiagnosed according to
+        % population dynamics
+        [nHivDiag(i , :) , nHivUndiag(i , :)] = hivTestPopStats(popIn , ...
+            nHivDiag(i , :) , nHivUndiag(i , :) , deaths(i , :) , ...
+            hivDeaths(i , : , : , :) , ccDeath(i , : , : , :) , ...
+            aged1519(i , :) , hivInds , gar , disease , viral , gender , ...
+            age , risk , hpvTypeGroups);
+         
         if (year >= vaxStartYear)
             % If within first vaxLimitYrs-many vaccine-limited years
             if vaxLimit && ((year - currYear) <= vaxLimitYrs)
@@ -540,7 +579,7 @@ for n = nTests
                 end
             end
         end
- 
+       
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
@@ -552,11 +591,12 @@ for n = nTests
         filename = ['vaxWaneSimResult' , num2str(simNum)];
     end
     
-    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
+    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv , ...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
+        hivDiag , hivUndiag , nTested , propHivDiagWCamp , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
