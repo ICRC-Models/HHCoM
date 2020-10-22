@@ -34,9 +34,9 @@ for a = 4 : 13 % 15-19 -> 60-64
         ./ (sum(popVec((2002 - startYear) * stepsPerYear +1 , ageNegInds)));
 end
 
-mObs = [mObs ; cinPos2002; cinNeg2002];
-dMean = [dMean ; cinPos2002_dObs(: , 2) ; cinNeg2002_dObs(: , 2)];
-dVar = [dVar ; cinPos2002_dObs(: , 3) ; cinNeg2002_dObs(: , 3)];
+%mObs = [mObs ; cinPos2002; cinNeg2002];
+%dMean = [dMean ; cinPos2002_dObs(: , 2) ; cinNeg2002_dObs(: , 2)];
+%dVar = [dVar ; cinPos2002_dObs(: , 3) ; cinNeg2002_dObs(: , 3)];
 
 %% HR HPV Prevalence in HIV+ men
 hpv_hivM2008 = zeros(4 , 1);
@@ -127,9 +127,9 @@ for i = 1 : length(typeDistYearVec)
     cc_nonVax = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , ccInds_nonVax) , 2)...
         ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , ccInds_tot) , 2);
 
-    mObs = [mObs; cc_vax; cc_nonVax];
-    dMean = [dMean ; cc_dist_dObs(: , 2)];
-    dVar =  [dVar ; cc_dist_dObs(: , 3)];
+    %mObs = [mObs; cc_vax; cc_nonVax];
+    %dMean = [dMean ; cc_dist_dObs(: , 2)];
+    %dVar =  [dVar ; cc_dist_dObs(: , 3)];
 end
 
 %% CIN3 type distribution
@@ -148,9 +148,9 @@ for i = 1 : length(typeDistYearVec)
     cin3_nonVax = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin3Inds_nonVax) , 2)...
         ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin3Inds_tot) , 2);
 
-    mObs = [mObs; cin3_vax; cin3_nonVax];
-    dMean = [dMean ; cin3_dist_dObs(: , 2)];
-    dVar =  [dVar ; cin3_dist_dObs(: , 3)];
+    %mObs = [mObs; cin3_vax; cin3_nonVax];
+    %dMean = [dMean ; cin3_dist_dObs(: , 2)];
+    %dVar =  [dVar ; cin3_dist_dObs(: , 3)];
 end
 
 %% CIN1 type distribution
@@ -169,9 +169,9 @@ for i = 1 : length(typeDistYearVec)
     cin1_nonVax = sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin1Inds_nonVax) , 2)...
         ./ sum(popVec(((typeDistYearVec(i) - startYear) * stepsPerYear +1) , cin1Inds_tot) , 2);
 
-    mObs = [mObs; cin1_vax; cin1_nonVax];
-    dMean = [dMean ; cin1_dist_dObs(: , 2)];
-    dVar =  [dVar ; cin1_dist_dObs(: , 3)];
+    %mObs = [mObs; cin1_vax; cin1_nonVax];
+    %dMean = [dMean ; cin1_dist_dObs(: , 2)];
+    %dVar =  [dVar ; cin1_dist_dObs(: , 3)];
 end
 
 %% HPV type distribution
@@ -249,9 +249,9 @@ for a = 4 : age
         (annlz(sum(popVec(incTimeSpan , allF) , 2) ./ stepsPerYear)) * fac);
 end
 
-mObs = [mObs ; ccInc2012];
-dMean = [dMean ; ccInc2012_dObs(: , 2)];
-dVar =  [dVar ; ccInc2012_dObs(: , 3)];
+%mObs = [mObs ; ccInc2012];
+%dMean = [dMean ; ccInc2012_dObs(: , 2)];
+%dVar =  [dVar ; ccInc2012_dObs(: , 3)];
 
 %% HIV prevalence
 hivYearVec = unique(hivPrevM_dObs(: ,1));
@@ -281,9 +281,9 @@ for t = 1 : length(hivYearVec)
     end
 end
 
-% mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
-% dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
-% dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
+mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
+dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
+dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
 %% Population age distribution
 popYearVec = unique(popAgeDist_dObs(: ,1));
@@ -300,9 +300,9 @@ for t = 1 : length(popYearVec)
     end
 end
 
-% mObs = [mObs ; popProp(:)];
-% dMean = [dMean ; popAgeDist_dObs(: , 2)];
-% dVar =  [dVar ;  popAgeDist_dObs(: , 3)];
+mObs = [mObs ; popProp(:)];
+dMean = [dMean ; popAgeDist_dObs(: , 2)];
+dVar =  [dVar ;  popAgeDist_dObs(: , 3)];
 
 %% Total population size
 popYearVec = unique(totPopSize_dObs(: ,1));
@@ -314,9 +314,9 @@ for t = 1 : length(popYearVec)
     popSize(t) = sum(popVec(((popYearVec(t) - startYear) * stepsPerYear +1) , popTot),2);
 end
 
-% mObs = [mObs ; popSize(:)];
-% dMean = [dMean ; totPopSize_dObs(: , 2)];
-% dVar =  [dVar ;  totPopSize_dObs(: , 3)];
+mObs = [mObs ; popSize(:)];
+dMean = [dMean ; totPopSize_dObs(: , 2)];
+dVar =  [dVar ;  totPopSize_dObs(: , 3)];
 
 %% Likelihood function
 logL = -(0.5*log(2*pi)) - (0.5.*log(dVar)) - ((0.5.*(1./dVar)).*(mObs-dMean).^2);

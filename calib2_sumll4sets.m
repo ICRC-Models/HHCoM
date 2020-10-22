@@ -31,8 +31,8 @@ pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);
 %% If on Phase 2 of calibration, uncomment the following to load resampled subset of parameters from best-fit sets of a previous phase.
 %  Note: also need to set paramSet = [ph1sampleSubset(:,subMatrixInds(n)) ; paramSetMatrix(:,subMatrixInds(n))];
 %  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
-pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
-ph1sampleSubset = load([paramDir,'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
+%pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
+%ph1sampleSubset = load([paramDir,'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct();
@@ -47,7 +47,7 @@ end
 %% Obtain model output for each set of sampled parameters
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
-    paramSet = [ph1sampleSubset(:,subMatrixInds(n)) ; paramSetMatrix(:,subMatrixInds(n))];
+    paramSet = [paramSetMatrix(:,subMatrixInds(n))];
     %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     negSumLogLSet(n,1) = negSumLogL;
@@ -68,7 +68,7 @@ dlmwrite([paramDir, file] , formatOutput , 'delimiter' , ',' , 'roffset' , 1 , '
 for j = 1 : nPrlSets
     pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(t_curr) , '_' , num2str(paramSetIdx + j - 1)];
     savdir = [pwd , '/HHCoM_Results/'];
-    if negSumLogLSet(j,1) < -3000 %-200000.00
+    if negSumLogLSet(j,1) < -200000.00
         delete([savdir , pathModifier , '.mat']);
     end
 end
