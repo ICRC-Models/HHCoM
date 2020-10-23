@@ -21,6 +21,7 @@ function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , 
 dPop = zeros(size(pop));
 artTreat = zeros(disease , viral , gender , age , risk); %zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 hivDeaths = zeros(disease , gender , age);
+transCD4 = zeros(disease , gender , age);
 
 %% Calculate background mortality rate for calculating HIV-associated mortality on ART
 if (year < 2003)
@@ -287,6 +288,8 @@ for g = 1 : gender
                         + muHIV(a , d - 1) ... % disease-related mortality
                         + treat(d , v , g , a , r))... % going on ART
                         .* pop(cd4Curr);
+                    
+                    transCD4(d , g , a) = transCD4(d , g , a) + kCD4(a , d - 3 , g) * pop(cd4Prev);
 
                     % HIV-positive going on ART (d = 8)
                     dPop(hivPositiveArt) = dPop(hivPositiveArt)...
@@ -325,6 +328,7 @@ dPop = dPop + vlAdvanced;
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOuts{1} = hivDeaths;
 extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
+extraOuts{3} = transCD4;
 
 dPop = sparse(dPop);
 
