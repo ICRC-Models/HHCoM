@@ -17,7 +17,6 @@ pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
-%%
 nPrlSets = 5; %numCPUperNode;
 
 %% Load all particles
@@ -67,3 +66,4 @@ end
 %file = ['negSumLogL_runSims_' , date , '_' , num2str(t_curr) , '.dat'];
 %paramDir = [pwd , '/Params/'];
 %csvwrite([paramDir, file] , negSumLogLSetAll)
+
