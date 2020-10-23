@@ -63,7 +63,8 @@ nRuns = length(fileInds);
 hivIncF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivIncM_multSims = hivIncF_multSims;
 hivIncC_multSims = hivIncF_multSims;
-hivPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 6);
+hivIncAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3);
+hivPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 5);
 hivPrevM_multSims = hivPrevF_multSims;
 hivPrevC_multSims = hivPrevF_multSims;
 artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
@@ -72,9 +73,12 @@ artPrevC_multSims = artPrevF_multSims;
 cd4DistF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 3);
 cd4DistM_multSims = cd4DistF_multSims;
 cd4DistC_multSims = cd4DistF_multSims;
+cd4DistAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 4);
+cd4TransAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 2);
 hivMortF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivMortM_multSims = hivMortF_multSims;
 hivMortC_multSims = hivMortF_multSims;
+hivMortAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 5);
 popSizeF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 popSizeM_multSims = popSizeF_multSims;
 popSizeC_multSims = popSizeF_multSims;
@@ -84,11 +88,11 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 %% Loop through nRuns
 for j = 1 : nRuns
     % Load results
-    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_DoART';
+    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_DoART';
     baseFileName = [baseFileNameShort , '_S1_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -102,6 +106,7 @@ for j = 1 : nRuns
         % matrices for years past current year
         vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
+        vaxResult{n}.transCD4 = [curr.transCD4(1 : end , : , : , :); vaxResult{n}.transCD4(2 : end , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
         vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
@@ -211,6 +216,18 @@ for j = 1 : nRuns
     xlim([1980 2060]); ylim([0 10]);
     legend('Model: ages 15-79'); %'(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 
     grid on;
+    
+    %% HIV INCIDENCE BY AGE
+    
+    % Calculate combined HIV incidence
+    for a = 4 : age
+        hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 : 2 , a , 1 : risk));
+        hivSus = annlz(sum(noV.popVec(: , hivSusInds) , 2)) ./ stepsPerYear;
+        hivIncC = annlz(sum(sum(sum(sum(sum(sum(noV.newHiv(: , : , : , : , 1 : 2 , a , ...
+            1 : risk), 2), 3), 4), 5), 6), 7)) ./ hivSus * 100;
+        hivIncAgeC_multSims(: , j , a-3) = hivIncC(1 : end)';
+    end
     
     %% HIV PREVALENCE
     cInds = {3 : 8 , 3 : 5 , 6 , 7 , 8};
@@ -437,6 +454,28 @@ for j = 1 : nRuns
         grid on;
     end
     
+    %% CD4 DISTRIBUTION AT ART INITIATION BY AGE
+    cInds = {3 : 7 , 3 : 5 , 6 , 7};
+    
+    % Calculate combined numbers initiating ART
+    for c = 1 : length(cInds)
+        for a = 4 : age 
+            init_subC = sum(sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6);
+            cd4DistAgeC_multSims(: , j , a-3 , c) = init_subC(1 : stepsPerYear : end)';
+        end
+    end
+    
+    %% CD4 TRANSITIONS BY AGE
+    cInds = {6 , 7};
+    
+    % Calculate combined
+    for c = 1 : length(cInds)
+        for a = 4 : age 
+            init_subC = sum(sum(sum(noV.transCD4(: , cInds{c} , 1 : 2 , a), 2), 3), 4);
+            cd4TransAgeC_multSims(: , j , a-3 , c) = init_subC(1 : stepsPerYear : end)';
+        end
+    end
+    
     %% HIV-ASSOCIATED MORTALITY
     
     % Calculate female HIV-associated mortality
@@ -501,6 +540,21 @@ for j = 1 : nRuns
     xlim([1980 2060]); ylim([0 5000]);
     legend('Model: ages 15-79');
     grid on;
+    
+    %% HIV-ASSOCIATED MORTALITY BY AGE
+    cInds = {3 : 8 , 3 : 5 , 6 , 7 , 8};
+    cTits = {'all HIV' , 'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onART'};
+    
+    % Calculate combined HIV-associated mortality
+    for c = 1 : length(cInds)
+        for a = 4 : age
+            popIndsC = toInd(allcomb(cInds{c} , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                1 : intervens , 1 : 2 , a , 1 : risk));
+            popTotC = annlz(sum(noV.popVec(: , popIndsC) , 2)) ./ stepsPerYear;
+            hivMortC = annlz(sum(sum(sum(noV.hivDeaths(: , cInds{c} , 1 : 2 , a), 2), 3), 4)) ./ popTotC * 100000;
+            hivMortAgeC_multSims(: , j , a-3 , c) = hivMortC(1 : end)';
+        end
+    end
     
     %% TOTAL POPULATION SIZE
     
@@ -586,6 +640,25 @@ writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncC_multSims , 2) , ...
     min(hivIncC_multSims , [] , 2) , max(hivIncC_multSims , [] , 2) , ...
     hivIncC_multSims] , fname)
 
+%% Save HIV incidence by age
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+
+% combined
+for a = 4 : age
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+    'HIV_incidence_combined_' , ageTits{a-3} , '.csv'];
+%     fullMatrix = [0 ; tVec(1 : stepsPerYear : end)'];
+%     fullMatrix = [[[ageTits{a-3} , ': mean'] , 'min' , 'max' , '1' , '2' , '3' , '4' , '5' ,'6' , ...
+%         '7' , '8' , '9' , '10' , '11' , '12' , '13' , '14' , '15' , '16' , '17' , ...
+%         '18' , '19' , '20' , '21' , '22' , '23' , '24' , '25'] ; [fullMatrix , mean(squeeze(hivIncAgeC_multSims(: , : , a-3)) , 2) , ...
+%     min(squeeze(hivIncAgeC_multSims(: , : , a-3)) , [] , 2) , max(squeeze(hivIncAgeC_multSims(: , : , a-3)) , [] , 2) , ...
+%     hivIncAgeC_multSims(: , : , a-3)]]
+    writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivIncAgeC_multSims(: , : , a-3)) , 2) , ...
+        min(squeeze(hivIncAgeC_multSims(: , : , a-3)) , [] , 2) , max(squeeze(hivIncAgeC_multSims(: , : , a-3)) , [] , 2) , ...
+        squeeze(hivIncAgeC_multSims(: , : , a-3))] , fname)  
+end
+
 %% Save HIV prevalence
 cInds = {3 : 8 , 3 : 5 , 6 , 7 , 8};
 cTits = {'all_HIV' , 'CD4_350plus_noART' , 'CD4_200-350_noART' , 'CD4_below200_noART' , 'onART'};
@@ -654,6 +727,40 @@ for c = 1 : length(cInds)
         cd4DistC_multSims(: , : , c)] , fname)
 end
 
+%% Save CD4 at ART initiation by age
+cInds = {3 : 7 , 3 : 5 , 6 , 7};
+cTits = {'Any_CD4' , 'CD4_350plus' , 'CD4_200-350' , 'CD4_below200'};
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+
+for c = 1 : length(cInds)
+    for a = 4 : age 
+        % combined 
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+            'ART_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            cd4DistAgeC_multSims(: , : , a-3 , c)] , fname)
+    end
+end
+
+%% Save CD4 transitions by age
+cInds = {6 , 7};
+cTits = {'CD4_200-350' , 'CD4_below200'};
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+
+for c = 1 : length(cInds)
+    for a = 4 : age 
+        % combined 
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+            'CD4_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            cd4TransAgeC_multSims(: , : , a-3 , c)] , fname)
+    end
+end
+
 %% Save HIV mortality
 % female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
@@ -673,6 +780,23 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
 writematrix([tVec(1 : stepsPerYear : end)' , mean(hivMortC_multSims , 2) , ...
     min(hivMortC_multSims , [] , 2) , max(hivMortC_multSims , [] , 2) , ...
     hivMortC_multSims] , fname)
+
+%% Save HIV mortality by age
+cInds = {3 : 8 , 3 : 5 , 6 , 7 , 8};
+cTits = {'all_HIV' , 'CD4_350plus_noART' , 'CD4_200-350_noART' , 'CD4_below200_noART' , 'onART'};
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+    
+% combined
+for c = 1 : length(cInds)
+    for a = 4 : age
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+            'HIV_mortality_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            squeeze(hivMortAgeC_multSims(: , : , a-3 , c))] , fname)
+    end
+end
 
 %% Save population size
 % female
