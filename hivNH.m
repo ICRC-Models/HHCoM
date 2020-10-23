@@ -289,7 +289,7 @@ for g = 1 : gender
                         + treat(d , v , g , a , r))... % going on ART
                         .* pop(cd4Curr);
                     
-                    transCD4(d , g , a) = transCD4(d , g , a) + kCD4(a , d - 3 , g) * pop(cd4Prev);
+                    transCD4(d , g , a) = transCD4(d , g , a) + sumall(kCD4(a , d - 3 , g) .* pop(cd4Prev));
 
                     % HIV-positive going on ART (d = 8)
                     dPop(hivPositiveArt) = dPop(hivPositiveArt)...
