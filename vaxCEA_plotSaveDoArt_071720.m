@@ -217,15 +217,13 @@ for j = 1 : nRuns
     legend('Model: ages 15-79'); %'(Vandormael, 2019) Observed KZN, ages 15-49: 95% CI' , 
     grid on;
     
-    %% HIV INCIDENCE BY AGE
+    %% HIV INCIDENCE CASES BY AGE
     
     % Calculate combined HIV incidence
     for a = 4 : age
         hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
             1 : intervens , 1 : 2 , a , 1 : risk));
-        hivSus = annlz(sum(noV.popVec(: , hivSusInds) , 2)) ./ stepsPerYear;
-        hivIncC = annlz(sum(sum(sum(sum(sum(sum(noV.newHiv(: , : , : , : , 1 : 2 , a , ...
-            1 : risk), 2), 3), 4), 5), 6), 7)) ./ hivSus * 100;
+        hivIncC = annlz(sum(sum(sum(sum(sum(sum(noV.newHiv(: , : , : , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6), 7));
         hivIncAgeC_multSims(: , j , a-3) = hivIncC(1 : end)';
     end
     
@@ -460,8 +458,8 @@ for j = 1 : nRuns
     % Calculate combined numbers initiating ART
     for c = 1 : length(cInds)
         for a = 4 : age 
-            init_subC = sum(sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6);
-            cd4DistAgeC_multSims(: , j , a-3 , c) = init_subC(1 : stepsPerYear : end)';
+            init_subC = annlz(sum(sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6));
+            cd4DistAgeC_multSims(: , j , a-3 , c) = init_subC(1 : end)';
         end
     end
     
@@ -471,8 +469,8 @@ for j = 1 : nRuns
     % Calculate combined
     for c = 1 : length(cInds)
         for a = 4 : age 
-            init_subC = sum(sum(sum(noV.transCD4(: , cInds{c} , 1 : 2 , a), 2), 3), 4);
-            cd4TransAgeC_multSims(: , j , a-3 , c) = init_subC(1 : stepsPerYear : end)';
+            init_subC = annlz(sum(sum(sum(noV.transCD4(: , cInds{c} , 1 : 2 , a), 2), 3), 4));
+            cd4TransAgeC_multSims(: , j , a-3 , c) = init_subC(1 : end)';
         end
     end
     
@@ -550,8 +548,7 @@ for j = 1 : nRuns
         for a = 4 : age
             popIndsC = toInd(allcomb(cInds{c} , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
                 1 : intervens , 1 : 2 , a , 1 : risk));
-            popTotC = annlz(sum(noV.popVec(: , popIndsC) , 2)) ./ stepsPerYear;
-            hivMortC = annlz(sum(sum(sum(noV.hivDeaths(: , cInds{c} , 1 : 2 , a), 2), 3), 4)) ./ popTotC * 100000;
+            hivMortC = annlz(sum(sum(sum(noV.hivDeaths(: , cInds{c} , 1 : 2 , a), 2), 3), 4));
             hivMortAgeC_multSims(: , j , a-3 , c) = hivMortC(1 : end)';
         end
     end
@@ -647,7 +644,7 @@ ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' ,
 % combined
 for a = 4 : age
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-    'HIV_incidence_combined_' , ageTits{a-3} , '.csv'];
+    'Raw_HIV_incidence_combined_' , ageTits{a-3} , '.csv'];
 %     fullMatrix = [0 ; tVec(1 : stepsPerYear : end)'];
 %     fullMatrix = [[[ageTits{a-3} , ': mean'] , 'min' , 'max' , '1' , '2' , '3' , '4' , '5' ,'6' , ...
 %         '7' , '8' , '9' , '10' , '11' , '12' , '13' , '14' , '15' , '16' , '17' , ...
@@ -737,7 +734,7 @@ for c = 1 : length(cInds)
     for a = 4 : age 
         % combined 
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-            'ART_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+            'Raw_ART_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
         writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , 2) , ...
             min(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
             cd4DistAgeC_multSims(: , : , a-3 , c)] , fname)
@@ -754,7 +751,7 @@ for c = 1 : length(cInds)
     for a = 4 : age 
         % combined 
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-            'CD4_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+            'Raw_CD4_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
         writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , 2) , ...
             min(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4TransAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
             cd4TransAgeC_multSims(: , : , a-3 , c)] , fname)
@@ -791,7 +788,7 @@ ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' ,
 for c = 1 : length(cInds)
     for a = 4 : age
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-            'HIV_mortality_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+            'Raw_HIV_mortality_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
         writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , 2) , ...
             min(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
             squeeze(hivMortAgeC_multSims(: , : , a-3 , c))] , fname)
@@ -826,8 +823,8 @@ colorList = {'k' , 'b' , 'g' , 'r'};
 figure;
 
 % combined
-subplot(1 ,3 , 3);
-for i = 1 : 4
+%subplot(1 ,3 , 3);
+for i = 1 : 2 %4
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
         'PopulationSize_combined_aged15-79' , '.csv'];
     popSizeC = xlsread(fname);
@@ -843,12 +840,13 @@ for i = 1 : 4
         plot(popSizeC((2019-startYear)+1 : end , 1) , popSizeC((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{i});
     end
 end
-xlabel('Year'); ylabel('Individuals'); title('Females + Males, aged 15-79');
+xlabel('Year'); ylabel('Individuals'); title('Population Size: Females + Males, aged 15-79');
 xlim([1980 2060]); ylim([0 14*(10^6)]);
 legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2, mean' , 'min' , 'max' , ...
-    'Scenario 3, mean' , 'min' , 'max' , 'Scenario 4, mean' , 'min' , 'max');
+    'Scenario 3, mean' , 'min' , 'max' , 'Scenario 4, mean' , 'min' , 'max' , ...
+    'Location' , 'Northwest');
 grid on;
-sgtitle('Population size');
+%sgtitle('Population size');
 
 %% Plot HIV incidence
 figure;
