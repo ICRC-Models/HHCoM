@@ -242,7 +242,7 @@ csv_list <- list("cases_scen1",
                  "cases_cum_averted_pct_scen3")
 
 
-lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/cases/",x,".csv")))
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/cases/",x,".csv"), row.names = F))
 
 # Remove excess DFs
 

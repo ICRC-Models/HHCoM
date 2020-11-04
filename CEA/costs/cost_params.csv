@@ -1,9 +1,9 @@
-param_name,param_val,ci_lb,ci_ub,year,currency,definition,source
-home_testing_pc,8.58,,,2012,usd,Home HTC,"Sharma et al, Nature 2015"
-hosp_200,125.5,,,2009,usd,"Pre-ART hospitalization costs, CD4<200",
-hosp_200_350,58,39,97,2009,usd,"Pre-ART hospitalization costs, CD4 200-350",
-hosp_350,39,23,76,2009,usd,"Pre-ART hospitalization costs, CD4 350+",
-hosp_art,45,23,80,2009,usd,"Post-ART hospitalization costs, CD4 350+ (assumes everyone on ART has CD4+ >350)",
-cb_art_y1,310.84,,,2018,usd,"Community-based ART, Year 1","DO ART , Table S13 - Volume-weighted mean"
-cb_art_sub,245.42,,,2018,usd,"Community-based ART, Subsequent Years","DO ART , Table S13 - Volume-weighted mean"
-standard_art,249.15,,,2018,usd,Standard of Care ART for Adults in SA,"Meyer-Rath, PLoS One, 2019"
+param_name,param_val,lb,ub,year,lb_year,ub_year,currency,definition,param_source,lb_source,ub_source
+home_testing_pc,8.58,2,$20.50 ,2012,2020,2014,usd,Home HTC,"Sharma et al, Nature 2015",Shapiro et al self-testing,SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
+hosp_200,125.5,71.5,222.5,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4<200","Meyer Rath, 2013, Table 2A",,
+hosp_200_350,58,39,97,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 200-350","Meyer Rath, 2013, Table 2A",,
+hosp_350,39,23,76,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 350+","Meyer Rath, 2013, Table 2A",,
+hosp_art,45,23,80,2009,2009,2009,usd,"Post-ART hospitalization costs, CD4 350+ (assumes everyone on ART has CD4+ >350)","Meyer Rath, 2013, Table 2A",,
+cb_art_y1,310.84,,,2018,,,usd,"Community-based ART, Year 1","DO ART , Table S13 - Volume-weighted mean",,
+cb_art_sub,245.42,,,2018,,,usd,"Community-based ART, Subsequent Years","DO ART , Table S13 - Volume-weighted mean",,
+standard_art,249.15,,,2018,,,usd,Standard of Care ART for Adults in SA,"Meyer-Rath, PLoS One, 2019",,

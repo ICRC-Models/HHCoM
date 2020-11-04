@@ -6,8 +6,8 @@
 # This script calculates average annual QALYs gained between interventions
 
 
-# TO DO:
-# Check if CD4+ and ART status of incident cases for model is available
+# Note that health benefits for INCIDENT cases are not included. - ie. 
+# assumption is that health benefits show up the next year.
 
 
 ##############################################################################
@@ -200,17 +200,7 @@ rm(qaly)
 
 for (x in 1:3) {
   
-  qaly <- ( ( get(paste0("hiv_neg_scen",x))[,-1] + get(paste0("hiv_pos_scen",x))[,-1] )
-            
-            # MULTIPLY BY POPULATION
-            * get(paste0("pop_scen",x))[,-1] )  %>% 
-    
-    # DISCOUNT
-    mutate(year_discount=0:40,   # set 2020 to Year 0
-           discount_amt=discount(year_discount=year_discount,
-                                 discount_rate=discount_rate)) %>% 
-    mutate_at(1:28,~discounter(.,discount_amt)) %>% 
-    select(-year_discount,-discount_amt) %>% 
+  qaly <- get(paste0("qaly_scen",x))[,-1] %>% 
     transmute_at(1:28, ~cumsum(.)) %>% 
     
     mutate(year=2020:2060) %>% 
@@ -283,7 +273,7 @@ csv_list <- list("qaly_scen1",
                  "qaly_cum_gained_pct_scen3")
 
 
-lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/qalys/",x,".csv")))
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/qaly/",x,".csv"), row.names = F))
 
 # Remove excess DFs
 
@@ -297,8 +287,7 @@ rm(list=ls())
 
 # Annual qalys (total)
 
-qalys <- read.csv(paste0(cea_path,"effects/qalys/qaly_scen1.csv")) %>% 
-  select(-X) %>% 
+qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_scen1.csv")) %>% 
   # reshape long
   reshape2::melt(id="year",value.name="qalys") %>% 
   rename(set_name=variable) %>% 
@@ -314,8 +303,7 @@ ggplot(data=qalys, aes(x=year, y=qalys/10000,group=set_name)) +
         axis.text=element_text(size=18)) +
   ylim(0,800)
 
-qalys <- read.csv(paste0(cea_path,"effects/qalys/qaly_scen2.csv")) %>% 
-  select(-X) %>% 
+qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_scen2.csv")) %>% 
   # reshape long
   reshape2::melt(id="year",value.name="qalys") %>% 
   rename(set_name=variable) %>% 
@@ -333,8 +321,7 @@ ggplot(data=qalys, aes(x=year, y=qalys/10000,group=set_name)) +
 
 # Cumulative qalys (total)
 
-qalys <- read.csv(paste0(cea_path,"effects/qalys/qaly_cum_scen1.csv")) %>% 
-  select(-X) %>% 
+qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_cum_scen1.csv")) %>% 
   # reshape long
   reshape2::melt(id="year",value.name="qalys") %>% 
   rename(set_name=variable) %>% 
@@ -350,8 +337,7 @@ ggplot(data=qalys, aes(x=year, y=qalys/100000,group=set_name)) +
         axis.text=element_text(size=18)) +
   ylim(0,2500)
 
-qalys <- read.csv(paste0(cea_path,"effects/qalys/qaly_cum_scen2.csv")) %>% 
-  select(-X) %>% 
+qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_cum_scen2.csv")) %>% 
   # reshape long
   reshape2::melt(id="year",value.name="qalys") %>% 
   rename(set_name=variable) %>% 
