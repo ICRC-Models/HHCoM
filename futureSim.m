@@ -358,8 +358,8 @@ for n = nTests
     aged1519 = zeros(length(s) - 1 , 1);
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
-    nHivDiag = zeros(length(s) - 1 , 1);
-    nHivUndiag = zeros(length(s) - 1 , 1);
+    nHivDiagVec = zeros(length(s) - 1 , 1);
+    nHivUndiagVec = zeros(length(s) - 1 , 1);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -391,18 +391,21 @@ for n = nTests
         tspan = [s(i) , s(i + 1)]; % evaluate diff eqs over one time interval
         popIn = popVec(i - 1 , :);
         
+        nHivDiag = nHivDiagVec(i-1 , :);
+        nHivUndiag = nHivUndiagVec(i-1 , :);
+        
         % HIV testing initial conditions
         if i == 2
             for g = 1 : gender
                 nHivPos = sumall(popIn(hivInds(3 : 8 , 1 , g , 1 : age , 1 : risk , :)));
-                nHivDiag(i , g) = nHivPos * propHivDiag(1 , g);        
-                nHivUndiag(i , g) = nHivPos * (1 - propHivDiag(1 , g));
+                nHivDiag(1 , g) = nHivPos * propHivDiag(1 , g);        
+                nHivUndiag(1 , g) = nHivPos * (1 - propHivDiag(1 , g));
             end
         end
         
         % HIV testing, calculated rather than tracked in compartments
         if any(year == hivTestCampYrs) || (year == currYear + (1/stepsPerYear))
-            [nTested(i , :) , propHivDiagWCamp(i , :) , nHivDiag(i , :) , nHivUndiag(i , :)] ...
+            [nTested(i , :) , propHivDiagWCamp(i , :) , nHivDiag , nHivUndiag] ...
                 = hivTest(popIn , hivTestCampCov , propHivDiagWCamp , nHivPos , ...
                 nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk)
             year
@@ -532,8 +535,8 @@ for n = nTests
         
         % Estimate changes to proportion PLWHIV diagnosed/undiagnosed according to
         % population dynamics
-        [nHivDiag(i , :) , nHivUndiag(i , :)] = hivTestPopStats(popIn , ...
-            nHivDiag(i , :) , nHivUndiag(i , :) , deaths(i , :) , ...
+        [nHivDiag , nHivUndiag] = hivTestPopStats(popIn , ...
+            nHivDiag , nHivUndiag , deaths(i , :) , ...
             hivDeaths(i , : , : , :) , ccDeath(i , : , : , :) , ...
             aged1519(i , :) , hivInds , gar , disease , viral , gender , ...
             age , risk , hpvTypeGroups);
@@ -582,6 +585,10 @@ for n = nTests
        
         % add results to population vector
         popVec(i , :) = pop(end , :);
+        
+        nHivDiagVec(i , :) = nHivDiag;
+        nHivUndiagVec(i , :) = nHivUndiag;
+        
     end
     popLast = popVec(end , :);
     popVec = sparse(popVec); % compress population vectors
