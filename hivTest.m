@@ -17,9 +17,9 @@ nTested = zeros(1 , gender);
 for g = 1 : gender
     nHivNeg = sumall(pop(hivInds(1 : 2 , 1 : viral , g , 1 : age , 1 : risk , :)));
     
-    nHivTestCampTargetPop = nHivNeg + nHivUndiag;
+    nHivTestCampTargetPop = nHivNeg + nHivUndiag(1 , g);
     nTested(1 , g) = hivTestCampCov * nHivTestCampTargetPop;
-    nHivDiag = nHivDiag + hivTestCampCov * nHivUndiag;
-    nHivUndiag = nHivUndiag - hivTestCampCov * nHivUndiag;
-    propHivDiagWCamp(1 , g) = nHivDiag / nHivPos;
+    nHivDiag(1 , g) = nHivDiag(1 , g) + hivTestCampCov * nHivUndiag(1 , g);
+    nHivUndiag(1 , g) = nHivUndiag(1 , g) - hivTestCampCov * nHivUndiag(1 , g);
+    propHivDiagWCamp(1 , g) = nHivDiag(1 , g) / nHivPos;
 end
