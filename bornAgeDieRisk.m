@@ -15,14 +15,14 @@
 % to aging.
 
 function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
-        gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
+        viral , gender , age , risk , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
         hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , ...
         hivFertPosBirth3 , hivFertNegBirth3 , hivFertPosBirth4 , hivFertNegBirth4 , ...
         dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
         dFertPos3 , dFertNeg3 , dFertMat3 , ...
         deathMat , deathMat2 , deathMat3 , deathMat4 , ...
         dDeathMat , dDeathMat2 , dDeathMat3 , ...
-        MTCTRate , ageInd , riskInd , riskDist , ...
+        MTCTRate , hivInds , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 
@@ -95,8 +95,10 @@ end
 deaths = deathMat * pop;
 
 %% Aging and risk proportion redistribution
-% Initialize dPop
+% Initialize dPop and output vectors
 dPop = zeros(size(pop));
+aged1519 = zeros(1 , gender);
+aged7579 = zeros(1 , gender);
 
 % prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
@@ -127,11 +129,7 @@ for g = 1 : gender
         riskFrac1 = 0;
         riskFrac2 = 0;
         riskFrac3 = 0;
-        
-        if a == 4
-            aged1519 = agedOut;
-        end
-        
+               
         % find fraction of every compartment that must be moved to maintain risk group distribution
         if riskDiff(3) > 0 % if risk 3 deficient
             % start with moving from risk 2 to risk 3
@@ -195,6 +193,10 @@ for g = 1 : gender
         dPop(r1) = dPop(r1) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r1);
         dPop(r2) = dPop(r2) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r2);
         dPop(r3) = dPop(r3) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3);
+        
+        if a == 4
+            aged1519(1 , g) = sumall(dPop(hivInds(3 : 8 , 1 : viral , g , 4 , 1 : risk , :)));
+        end
 
         % Remove screened status as people age out of screened age groups
         if (year >= hpvScreenStartYear)
@@ -214,6 +216,8 @@ for g = 1 : gender
     dPop(r1To) = dPop(r1To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r1To);
     dPop(r2To) = dPop(r2To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r2To);
     dPop(r3To) = dPop(r3To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3To);
+    
+    aged7579(1 , g) = sumall((1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(hivInds(3 : 8 , 1 : viral , g , age , 1 : risk , :)));
 end
 
 % Account for births, deaths, and aging
@@ -222,6 +226,7 @@ dPop = dPop + births + hivBirths + deaths;
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = abs(deaths);
 extraOut{2} = aged1519;
+extraOut{3} = aged7579;
 
 dPop = sparse(dPop);
 

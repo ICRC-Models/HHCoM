@@ -7,7 +7,7 @@
 %
 
 function [nTested , propHivDiagWCamp , nHivDiag , nHivUndiag] = hivTest(pop , ...
-    hivTestCampCov , propHivDiagWCamp , nHivPos , nHivUndiag , nHivDiag , ...
+    hivTestCampCov , nHivPos , nHivNeg , nHivUndiag , nHivDiag , ...
     hivInds , viral , gender , age , risk)
 
 %% Initialize output vectors
@@ -15,11 +15,10 @@ nTested = zeros(1 , gender);
 
 %% Calculate diagnosed and undiagnosed HIV
 for g = 1 : gender
-    nHivNeg = sumall(pop(hivInds(1 : 2 , 1 : viral , g , 1 : age , 1 : risk , :)));
-    
-    nHivTestCampTargetPop = nHivNeg + nHivUndiag(1 , g);
+
+    nHivTestCampTargetPop = nHivNeg(1 , g) + nHivUndiag(1 , g);
     nTested(1 , g) = hivTestCampCov * nHivTestCampTargetPop;
     nHivDiag(1 , g) = nHivDiag(1 , g) + hivTestCampCov * nHivUndiag(1 , g);
     nHivUndiag(1 , g) = nHivUndiag(1 , g) - hivTestCampCov * nHivUndiag(1 , g);
-    propHivDiagWCamp(1 , g) = nHivDiag(1 , g) / nHivPos;
+    propHivDiagWCamp(1 , g) = nHivDiag(1 , g) / nHivPos(1 , g);
 end

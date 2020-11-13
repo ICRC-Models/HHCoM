@@ -16,11 +16,11 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_diagHiv_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -86,11 +86,10 @@ vaxCoverL = 0.5;    % vaccine coverage
 vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
 % HIV TESTING CAMPAIGN
-propHivDiag = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males, females)
+propHivDiagBaseline = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males, females)
 propDiagOneYear = (1 - 0.41);
 hivTestCampYrs = [2020 : 5 : lastYear-1];
 hivTestCampCov = 0.75;
-propHivDiagWCamp = [0.78 , 0.889];
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
@@ -355,11 +354,8 @@ for n = nTests
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
     deaths = zeros(size(popVec));
-    aged1519 = zeros(length(s) - 1 , 1);
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
-    nHivDiagVec = zeros(length(s) - 1 , 1);
-    nHivUndiagVec = zeros(length(s) - 1 , 1);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -383,7 +379,14 @@ for n = nTests
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    
+    % Additional HIV testing campaigns
+    nHivDiagVec = zeros(length(s) - 1 , gender);
+    nHivUndiagVec = zeros(length(s) - 1 , gender);
     nTested = zeros(length(s) - 1 , gender);
+    propHivDiag = zeros(length(s) - 1 , gender);
+    aged1519 = zeros(length(s) - 1 , gender);
+    aged7579 = zeros(length(s) - 1 , gender);
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
@@ -395,23 +398,25 @@ for n = nTests
         nHivUndiag = nHivUndiagVec(i-1 , :);
         
         % HIV testing initial conditions
-        if i == 2
-            for g = 1 : gender
-                nHivPos = sumall(popIn(hivInds(3 : 8 , 1 , g , 1 : age , 1 : risk , :)));
-                nHivDiag(1 , g) = nHivPos * propHivDiag(1 , g);        
-                nHivUndiag(1 , g) = nHivPos * (1 - propHivDiag(1 , g));
+        for g = 1 : gender
+            nHivPos(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivNeg(1 , g) = sumall(popIn(hivInds(1 : 2 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            if i == 2
+                nHivDiag(1 , g) = nHivPos(1 , g) * propHivDiagBaseline(1 , g);        
+                nHivUndiag(1 , g) = nHivPos(1 , g) * (1 - propHivDiagBaseline(1 , g));
+                propHivDiag(i , g) = propHivDiagBaseline(1 , g);
             end
         end
         
         % HIV testing, calculated rather than tracked in compartments
         if any(year == hivTestCampYrs) || (year == currYear + (1/stepsPerYear))
-            [nTested(i , :) , propHivDiagWCamp(i , :) , nHivDiag , nHivUndiag] ...
-                = hivTest(popIn , hivTestCampCov , propHivDiagWCamp , nHivPos , ...
-                nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk)
+            [nTested(i , :) , propHivDiag(i , :) , nHivDiag , nHivUndiag] ...
+                = hivTest(popIn , hivTestCampCov , nHivPos , nHivNeg , ...
+                nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk);
             year
-            propHivDiagWCamp
+            propHivDiag(i , :)
         else
-            propHivDiagWCamp = [0.78 , 0.889];
+            propHivDiag(i , :) = propHivDiagBaseline;
         end
         
         if hpvOn
@@ -436,7 +441,7 @@ for n = nTests
                 disp('After hpv')
                 break
             end
-            
+                   
             if (year >= hpvScreenStartYear)
                 [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
                     newTreatImm(i , : , : , : , : , : , : , : , :) , ...
@@ -480,7 +485,7 @@ for n = nTests
         % excess HIV mortality
         if hivOn
             [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
-                ode4xtra(@(t , pop) hivNH(t , pop , propHivDiagWCamp , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
+                ode4xtra(@(t , pop) hivNH(t , pop , propHivDiag(i , :) , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
@@ -501,16 +506,16 @@ for n = nTests
         end
         
         % Birth, aging, risk redistribution module
-        [~ , pop , deaths(i , :) , aged1519(i , :)] = ode4xtra(@(t , pop) ...
-            bornAgeDieRisk(t , pop , year , ...
-            gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
+        [~ , pop , deaths(i , :) , aged1519(i , :) , aged7579(i , :)] = ode4xtra(@(t , pop) ...
+            bornAgeDieRisk(t , pop , year , viral , ...
+            gender , age , risk , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
             hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , ...
             hivFertPosBirth3 , hivFertNegBirth3 , hivFertPosBirth4 , hivFertNegBirth4 , ...
             dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ... 
             dFertPos3 , dFertNeg3 , dFertMat3 , ...
             deathMat , deathMat2 , deathMat3 , deathMat4 , ...
             dDeathMat , dDeathMat2 , dDeathMat3 , ...
-            MTCTRate , ageInd , riskInd , riskDist , ...
+            MTCTRate , hivInds , ageInd , riskInd , riskDist , ...
             stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
             vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
         popIn = pop(end , :);
@@ -536,9 +541,10 @@ for n = nTests
         % Estimate changes to proportion PLWHIV diagnosed/undiagnosed according to
         % population dynamics
         [nHivDiag , nHivUndiag] = hivTestPopStats(popIn , propDiagOneYear , ...
-            nHivDiag , nHivUndiag , newHiv(i , : , : , : , : , : , :) , deaths(i , :) , ...
+            nHivDiag , nHivUndiag , ...
+            newHiv(i , : , : , : , : , : , :) , deaths(i , :) , ...
             hivDeaths(i , : , : , :) , ccDeath(i , : , : , :) , ...
-            aged1519(i , :) , hivInds , gar , disease , viral , ...
+            aged1519(i , :) , aged7579(i , :) , hivInds , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , ...
             gender , age , risk , hpvTypeGroups);
          
@@ -604,7 +610,7 @@ for n = nTests
         hivDeaths , deaths , ccDeath , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
-        hivDiag , hivUndiag , nTested , propHivDiagWCamp , ...
+        nHivDiagVec , nHivUndiagVec , nTested , propHivDiag , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
