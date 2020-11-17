@@ -36,10 +36,14 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
-hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
-screenAlgorithmNeg = 4; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
-whoScreenAges = [8 , 10]; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
-whoScreenAgeMults = [1.0 , 1.0]; %[1.0 , 1.0 , 1.0 , 1.0 , 1.0]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET ME***: vector of equal length to whoScreenAges, fraction representing number of cohorts in each age range being screened
+%hivPosScreen = 0; % ***SET ME***: 0 applies same screening algorithm (screenAlgorithm) for all HIV states; 1 applies screenAlgorithm to HIV+ and screenAlgorithmNeg to HIV-
+%screenAlgorithmNeg = 4; % ***SET ME***: If hivPosScreen=1, screening algorithm to use for HIV- persons (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb) 
+
+%              2000; 2003; 2016; currYear; 2023; 2030; 2045
+sceScreenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
+sceScreenAges = {[8 , 10]}; %[6 , 7 , 8 , 9 , 10]; % ***SET ME***: ages that get screened when using the WHOa algorithm
+sceScreenHivGrps = {[1 : 2] , [3 : 8]};
+
 
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
@@ -136,8 +140,11 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 %% Screening
 
 % WHO screening algorithm - version a
-who.screenAge = whoScreenAges;
-who.screenAgeMults = whoScreenAgeMults;
+who.screenAge = sceScreenAges;
+% Vector of equal length to sceScreenAges, fraction representing number of 
+% cohorts in each age range being screened. Previously used [0.40 , 0.40 , 0.20 , 0.40 , 0.40]
+% for WHO HIV-positive-specific scenario
+who.screenAgeMults = ones(1 , length(sceScreenAges));    
 
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
