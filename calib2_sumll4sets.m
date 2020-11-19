@@ -69,10 +69,10 @@ file = ['negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
 paramDir = [pwd , '/Params/'];
 dlmwrite([paramDir, file] , formatOutput , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append' , 'precision' , 9)
 
-%%for j = 1 : nPrlSets
-%%    pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(t_curr) , '_' , num2str(paramSetIdx + j - 1)];
-%%    savdir = [pwd , '/HHCoM_Results/'];
-%%    if negSumLogLSet(j,1) < -1000 %-200000.00
-%%        delete([savdir , pathModifier , '.mat']);
-%%    end
-%%end
+for j = 1 : nPrlSets
+    pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(t_curr) , '_' , num2str(paramSetIdx + j - 1)];
+    savdir = [pwd , '/HHCoM_Results/'];
+    if negSumLogLSet(j,1) < -100000000000000000000
+        delete([savdir , pathModifier , '.mat']);
+    end
+end

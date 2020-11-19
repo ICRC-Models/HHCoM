@@ -2,7 +2,7 @@ TCURR=0    # calibration iteration
 echo "${TCURR}"
 export TCURR
 
-DATE=01Oct20    # date
+DATE=26Oct20    # date
 echo "${DATE}"
 export DATE
 
@@ -12,15 +12,19 @@ export DATE
 # STEP ONE - calculate and save nsets in a file
 # Notes: slurm_sizeMatrix.sbatch must successfully run and create matrixSize_calib_[date]_[t_curr].dat 
 # before you can successfully run slurm_batch.sbatch
+: <<'END'
 echo "Running MATLAB script to get matrix size."
 sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 sleep 180
+END
+
 
 # STEP TWO - run simulations with potential parameters sets in parallel
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
 NSETS=$(<${FILE})
 echo "${NSETS}" 
 export NSETS
+: <<'END'
 echo "Running simulations, first try."
 SEQ28all=($(seq 1 28 ${NSETS}))    # set up for NSETS=5600
 LENGTH28=${#SEQ28all[@]}
@@ -45,16 +49,16 @@ for i in $(seq 1 5 ${LENGTH28}); do
         sleep 5400
     fi
 done
-
-# STEP THREE - check for failed simulations
-: <<'END'
-echo "Running MATLAB script to identify failed simulations."
-sbatch -p ckpt -A csde-ckpt slurm_idMissing.sbatch
-#sleep 300
 END
+# STEP THREE - check for failed simulations
+
+echo "Running MATLAB script to identify failed simulations."
+sbatch -p csde -A csde slurm_idMissing.sbatch
+sleep 300
+
 
 # STEP FOUR - rerun failed simulations
-: <<'END'
+
 FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
 RERUN=$(<$FILE)
 echo "$RERUN"
@@ -88,7 +92,7 @@ echo "Re-running failed simulations."
     #RERUN=$(<$FILE)
     #echo "$RERUN"
 #done
-END
+
 
 # STEP FIVE - finish ABC-SMC algorithm to get parameter sets for next batch of simulations
 : <<'END'
