@@ -82,6 +82,7 @@ hivMortF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivMortM_multSims = hivMortF_multSims;
 hivMortC_multSims = hivMortF_multSims;
 hivMortAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 5);
+allCauseMortAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 5);
 hivMortAllAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivMortAllAgeF_multSims = hivMortAllAgeC_multSims;
 hivMortAllAgeM_multSims = hivMortAllAgeC_multSims;
@@ -115,6 +116,8 @@ for j = 1 : nRuns
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.transCD4 = [curr.transCD4(1 : end , : , : , :); vaxResult{n}.transCD4(2 : end , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
+        vaxResult{n}.deaths = [curr.deaths(1 : end , :); vaxResult{n}.deaths(2 : end , :)];
+        vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :); vaxResult{n}.ccDeath(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
         vaxResult{n}.menCirc = [curr.menCirc(1 : end  , :); vaxResult{n}.menCirc(2 : end , :)];
         vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
@@ -573,6 +576,21 @@ for j = 1 : nRuns
         end
     end
     
+    %% ALL-CAUSE MORTALITY BY AGE
+    cInds = {1 : 2 , 3 : 8 , 3 : 5 , 6 , 7 , 8};
+    cTits = {'HIV neg' , 'all HIV' , 'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onART'};
+    
+    % Calculate combined HIV-associated mortality
+    for c = 1 : length(cInds)
+        for a = 4 : age
+            disInds = toInd(allcomb(cInds{c} , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                1 : intervens , 1 : gender , a , 1 : risk));
+            allCauseMortC = annlz(sum(noV.deaths(: , disInds) , 2)) + annlz(sum(sum(sum(noV.ccDeath(: , cInds{c} , a , 1 : hpvTypeGroups), 2), 3), 4)) + ...
+                annlz(sum(sum(sum(noV.hivDeaths(: , cInds{c} , 1 : 2 , a), 2), 3), 4));
+            allCauseMortAgeC_multSims(: , j , a-3 , c) = allCauseMortC(1 : end)';
+        end
+    end
+    
     %% HIV-ASSOCIATED DEATHS ACROSS ALL AGES
     % Calculate female HIV-associated mortality 
     hivMortF = annlz(sum(sum(sum(noV.hivDeaths(: , 3 : 8 , 2 , 4 : age), 2), 3), 4));
@@ -851,6 +869,23 @@ for c = 1 : length(cInds)
         writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , 2) , ...
             min(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(hivMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
             squeeze(hivMortAgeC_multSims(: , : , a-3 , c))] , fname)
+    end
+end
+
+%% All-cause mortality by age
+cInds = {1 : 2 , 3 : 8 , 3 : 5 , 6 , 7 , 8};
+cTits = {'HIV_neg' , 'all_HIV' , 'CD4_350plus_noART' , 'CD4_200-350_noART' , 'CD4_below200_noART' , 'onART'};
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+
+% combined
+for c = 1 : length(cInds)
+    for a = 4 : age
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+            'Raw_allCause_mortality_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(allCauseMortAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(allCauseMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(allCauseMortAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            squeeze(allCauseMortAgeC_multSims(: , : , a-3 , c))] , fname)
     end
 end
 
