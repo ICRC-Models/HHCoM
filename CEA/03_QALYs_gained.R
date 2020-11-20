@@ -131,8 +131,7 @@ for (x in 1:3) {
               get(paste0("prev_200_scen",x))[,-1] * wt_cd4_200 +
               get(paste0("prev_200_350_scen",x))[,-1] * wt_cd4_250_350 +
               get(paste0("prev_350_scen",x))[,-1] * wt_cd4_350  ) %>% 
-    mutate(year=2020:2060) %>% 
-    select(year, everything()) 
+    addYearCol(., horizon_year = horizon_year) 
   
   assign(paste0("hiv_pos_scen",x),hiv_pos)
   
@@ -153,8 +152,7 @@ for (x in 1:3) {
                 get(paste0("prev_200_350_scen",x))[,-1] +
                 get(paste0("prev_350_scen",x))[,-1] )) 
                       * wt_hiv_neg )  %>%   #multiply by utility weight (in this case = 1)
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+    addYearCol(., horizon_year = horizon_year)
   
   assign(paste0("hiv_neg_scen",x),hiv_neg)
   
@@ -180,14 +178,10 @@ for (x in 1:3) {
     * get(paste0("pop_scen",x))[,-1] ) %>% 
     
     # DISCOUNT
-    mutate(year_discount=0:40,   # set 2020 to Year 0
-           discount_amt=discount(year_discount=year_discount,
-                                 discount_rate=discount_rate)) %>% 
-    mutate_at(1:28,~discounter(.,discount_amt)) %>% 
-    select(-year_discount,-discount_amt) %>% 
+    discount(., discount_rate = discount_rate) %>%  
     
-    mutate(year=2020:2060) %>% 
-    select(year,everything()) 
+    addYearCol(., horizon_year = horizon_year) %>% 
+    recalcFuns(.) # recalculate mean, min, max
   
   assign(paste0("qaly_scen",x),qaly)
   
@@ -202,9 +196,7 @@ for (x in 1:3) {
   
   qaly <- get(paste0("qaly_scen",x))[,-1] %>% 
     transmute_at(1:28, ~cumsum(.)) %>% 
-    
-    mutate(year=2020:2060) %>% 
-    select(year,everything()) 
+    addYearCol(., horizon_year = horizon_year) 
   
   assign(paste0("qaly_cum_scen",x),qaly)
   
@@ -216,42 +208,42 @@ for (x in 1:3) {
 # Annual raw qalys gained
 
 qaly_gained_raw_scen2 <- (qaly_scen2[,-1] - qaly_scen1[,-1] )  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max 
 
 qaly_gained_raw_scen3 <- (qaly_scen3[,-1] - qaly_scen1[,-1] )  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 # Annual percent qalys gained
 
 qaly_gained_pct_scen2 <- (((qaly_scen2[,-1] - qaly_scen1[,-1] )/qaly_scen2[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 qaly_gained_pct_scen3 <- (((qaly_scen3[,-1] - qaly_scen1[,-1] )/qaly_scen3[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max 
 
 # Cumulative raw qalys gained
 
 qaly_cum_gained_raw_scen2 <- ( qaly_cum_scen2[,-1] - qaly_cum_scen1[,-1] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 qaly_cum_gained_raw_scen3 <- ( qaly_cum_scen3[,-1] - qaly_cum_scen1[,-1] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 # Cumulative percent qalys gained
 
 qaly_cum_gained_pct_scen2 <- (((qaly_cum_scen2[,-1] - qaly_cum_scen1[,-1] )/qaly_cum_scen2[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 qaly_cum_gained_pct_scen3 <- (((qaly_cum_scen3[,-1] - qaly_cum_scen1[,-1] )/qaly_cum_scen3[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 ###################################################################################################################
 
@@ -275,81 +267,8 @@ csv_list <- list("qaly_scen1",
 
 lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/qaly/",x,".csv"), row.names = F))
 
-# Remove excess DFs
+# Remove excess DFs, source for next script
 
-rm(list=ls())
-
-#############################################################################################
-
-# PLOTS
-
-
-
-# Annual qalys (total)
-
-qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_scen1.csv")) %>% 
-  # reshape long
-  reshape2::melt(id="year",value.name="qalys") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=qalys, aes(x=year, y=qalys/10000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual QALYs for KZN / 10000") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,800)
-
-qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_scen2.csv")) %>% 
-  # reshape long
-  reshape2::melt(id="year",value.name="qalys") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=qalys, aes(x=year, y=qalys/10000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual QALYs for KZN / 10000") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,800)
-
-# Cumulative qalys (total)
-
-qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_cum_scen1.csv")) %>% 
-  # reshape long
-  reshape2::melt(id="year",value.name="qalys") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=qalys, aes(x=year, y=qalys/100000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Cumulative QALYs for KZN / 100k") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,2500)
-
-qalys <- read.csv(paste0(cea_path,"effects/qaly/qaly_cum_scen2.csv")) %>% 
-  # reshape long
-  reshape2::melt(id="year",value.name="qalys") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=qalys, aes(x=year, y=qalys/100000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Cumulative QALYs for KZN / 100k") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,2500)
+rm(list=ls()[! ls() %in% c("main_path","cea_path","helper_path")])
+source(paste0(helper_path, "helper.R"))
 

@@ -8,13 +8,6 @@
 
 ##############################################################################
 
-# Setup
-
-source("00_master.R")
-library("dplyr")
-
-##############################################################################
-
 # IMPORT POPULATION (males and females combined, age 15-79)
 
 ##############################################################################
@@ -115,9 +108,9 @@ for (x in 1:3) {
   
   prev_350 <- read.csv(paste0(main_path,"Scenario",x,"/HIV_prevalence_combined_aged15-79_CD4_350plus_noART.csv"), header=F) %>% 
     setNames(paste0("s",-3:25)) %>% 
-    dplyr::rename(year=1,
-                  mean=2,
-                  min=3,
+    dplyr::rename(year=1, 
+                  mean=2, 
+                  min=3, 
                   max=4) %>% 
     filter(year>=2020)
   
@@ -142,8 +135,7 @@ for (x in 1:3) {
                      get(paste0("prev_200_350_scen",x))[,-1] +
                      get(paste0("prev_350_scen",x))[,-1] )) 
                 *(get(paste0("pop_scen",x))[,-1]) ) %>%   # multiply by population
-    mutate(year=2020:2060) %>% 
-    select(year, everything()) 
+    addYearCol(., horizon_year = horizon_year)  
   
   assign(paste0("hiv_neg_scen",x),hiv_neg)
   
@@ -153,16 +145,12 @@ for (x in 1:3) {
 
 for (x in 1:3) {
   
-  cases <- ((get(paste0("incidence",x))[,-1]*get(paste0("hiv_neg_scen",x))[,-1])/100)  %>% # Get cases given incidence rate per 100   
+    cases <- ((get(paste0("incidence",x))[,-1]*get(paste0("hiv_neg_scen",x))[,-1])/100) %>% # Get cases given incidence rate per 100 
     
     # DISCOUNT
-    mutate(year_discount=0:40,   # set 2020 to Year 0
-               discount_amt=discount(discount_rate=discount_rate,
-                                     year_discount=year_discount)) %>% 
-    transmute_at(vars(c(mean,min,max,4:28)),~discounter(.,discount_amt)) %>% 
-     
-    mutate(year=2020:2060) %>% 
-    select(year, everything()) 
+    discount(., discount_rate = discount_rate) %>%  
+    addYearCol(., horizon_year = horizon_year) %>% 
+    recalcFuns(.) # recalculate mean, min, max
      
   assign(paste0("cases_scen",x),cases)
   
@@ -173,8 +161,7 @@ for (x in 1:3) {
 for (x in 1:3) {
   
   cases_cum <- cumsum(get(paste0("cases_scen",x))[,-1])  %>% 
-    mutate(year=2020:2060) %>% 
-    select(year, everything()) 
+    addYearCol(., horizon_year = horizon_year) 
   
   assign(paste0("cases_cum_scen",x),cases_cum)
   
@@ -185,42 +172,42 @@ for (x in 1:3) {
 # Annual raw cases averted 
 
 cases_averted_raw_scen2 <- (cases_scen1[,-1] - cases_scen2[,-1] )  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 cases_averted_raw_scen3 <- (cases_scen1[,-1] - cases_scen3[,-1] )  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max 
 
 # Annual percent cases averted
 
 cases_averted_pct_scen2 <- (((cases_scen1[,-1] - cases_scen2[,-1] )/cases_scen1[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 cases_averted_pct_scen3 <- (((cases_scen1[,-1] - cases_scen3[,-1] )/cases_scen1[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 # Cumulative raw cases averted 
 
 cases_cum_averted_raw_scen2 <- ( cases_cum_scen1[,-1] - cases_cum_scen2[,-1] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 cases_cum_averted_raw_scen3 <- ( cases_cum_scen1[,-1] - cases_cum_scen3[,-1] ) %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 # Cumulative percent cases averted
 
 cases_cum_averted_pct_scen2 <- (((cases_cum_scen1[,-1] - cases_cum_scen2[,-1] )/cases_cum_scen1[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 cases_cum_averted_pct_scen3 <- (((cases_cum_scen1[,-1] - cases_cum_scen3[,-1] )/cases_cum_scen1[,-1] )*100)  %>% 
-  mutate(year=2020:2060) %>% 
-  select(year, everything()) 
+  addYearCol(., horizon_year = horizon_year) %>% 
+  recalcFuns(.) # recalculate mean, min, max
 
 ###################################################################################################################
 
@@ -241,9 +228,9 @@ csv_list <- list("cases_scen1",
                  "cases_cum_averted_pct_scen2",
                  "cases_cum_averted_pct_scen3")
 
-
 lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/cases/",x,".csv"), row.names = F))
 
-# Remove excess DFs
+# Remove excess DFs, source for next script
 
-rm(list=ls())
+rm(list=ls()[! ls() %in% c("main_path","cea_path","helper_path")])
+source(paste0(helper_path, "helper.R"))
