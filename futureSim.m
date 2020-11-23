@@ -20,7 +20,7 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScr
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_diagHiv_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_diagHiv-noArtLim-075_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -383,7 +383,8 @@ for n = nTests
     % Additional HIV testing campaigns
     nHivDiagVec = zeros(length(s) - 1 , gender);
     nHivUndiagVec = zeros(length(s) - 1 , gender);
-    nTested = zeros(length(s) - 1 , gender);
+    nTestedNeg = zeros(length(s) - 1 , gender);
+    nTestedUndiag = zeros(length(s) - 1 , gender);
     propHivDiag = zeros(length(s) - 1 , gender);
     aged1519 = zeros(length(s) - 1 , gender);
     aged7579 = zeros(length(s) - 1 , gender);
@@ -407,16 +408,19 @@ for n = nTests
                 propHivDiag(i , g) = propHivDiagBaseline(1 , g);
             end
         end
+        (nHivDiag + nHivUndiag) - nHivPos
         
         % HIV testing, calculated rather than tracked in compartments
         if any(year == hivTestCampYrs) || (year == currYear + (1/stepsPerYear))
-            [nTested(i , :) , propHivDiag(i , :) , nHivDiag , nHivUndiag] ...
+            [nTestedNeg(i , :) , nTestedUndiag(i , :) , propHivDiag(i , :) , nHivDiag , nHivUndiag] ...
                 = hivTest(popIn , hivTestCampCov , nHivPos , nHivNeg , ...
                 nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk);
             year
-            propHivDiag(i , :)
+            propHivDiag(i , :);
+            %%%num2str(propHivDiag(i , :))
         else
-            propHivDiag(i , :) = propHivDiagBaseline;
+            propHivDiag(i , :) = nHivDiag(1 , :) ./ (nHivDiag(1 , :) + nHivUndiag(1 , :));
+            %%%num2str(propHivDiag(i , :))
         end
         
         if hpvOn
@@ -547,7 +551,7 @@ for n = nTests
             aged1519(i , :) , aged7579(i , :) , hivInds , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , ...
             gender , age , risk , hpvTypeGroups);
-         
+        
         if (year >= vaxStartYear)
             % If within first vaxLimitYrs-many vaccine-limited years
             if vaxLimit && ((year - currYear) <= vaxLimitYrs)
@@ -610,7 +614,7 @@ for n = nTests
         hivDeaths , deaths , ccDeath , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
-        nHivDiagVec , nHivUndiagVec , nTested , propHivDiag , ...
+        nHivDiagVec , nHivUndiagVec , nTestedNeg , nTestedUndiag , propHivDiag , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end
 disp('Done')
