@@ -6,7 +6,7 @@
 % Returns:
 %
 
-function [nTested , propHivDiagWCamp , nHivDiag , nHivUndiag] = hivTest(pop , ...
+function [nTestedNeg , nTestedUndiag , propHivDiagWCamp , nHivDiag , nHivUndiag] = hivTest(pop , ...
     hivTestCampCov , nHivPos , nHivNeg , nHivUndiag , nHivDiag , ...
     hivInds , viral , gender , age , risk)
 
@@ -15,10 +15,10 @@ nTested = zeros(1 , gender);
 
 %% Calculate diagnosed and undiagnosed HIV
 for g = 1 : gender
-
-    nHivTestCampTargetPop = nHivNeg(1 , g) + nHivUndiag(1 , g);
-    nTested(1 , g) = hivTestCampCov * nHivTestCampTargetPop;
+    nTestedUndiag(1 , g) = hivTestCampCov * nHivUndiag(1 , g);
+    nTestedNeg(1 , g) = hivTestCampCov * nHivNeg(1 , g);
     nHivDiag(1 , g) = nHivDiag(1 , g) + hivTestCampCov * nHivUndiag(1 , g);
     nHivUndiag(1 , g) = nHivUndiag(1 , g) - hivTestCampCov * nHivUndiag(1 , g);
-    propHivDiagWCamp(1 , g) = nHivDiag(1 , g) / nHivPos(1 , g);
+    propHivDiagWCamp(1 , g) = nHivDiag(1 , g) / (nHivDiag(1 , g) + nHivUndiag(1 , g));
 end
+ 
