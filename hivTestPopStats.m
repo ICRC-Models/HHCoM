@@ -16,7 +16,7 @@ function [nHivDiag , nHivUndiag] = hivTestPopStats(pop , propDiagOneYear , ...
 for g = 1 : gender
     % Account for new HIV cases
     nHivDiag(1 , g) = nHivDiag(1 , g) + propDiagOneYear * sumall(newHiv(1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , g , 4 : age , 1 : risk));
-    nHivUndiag(1 , g) = nHivUndiag(1 , g) + propDiagOneYear * sumall(newHiv(1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , g , 4 : age , 1 : risk));
+    nHivUndiag(1 , g) = nHivUndiag(1 , g) + (1 - propDiagOneYear) * sumall(newHiv(1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , g , 4 : age , 1 : risk));
     
     % Account for HIV and cervical cancer deaths; persons aging into 15-79 population
     hivDiagProp = nHivDiag(1 , g) / (nHivDiag(1 , g) + nHivUndiag(1 , g));
