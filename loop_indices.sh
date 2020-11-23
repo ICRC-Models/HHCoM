@@ -1,4 +1,4 @@
-TCURR=21    # t_curr
+TCURR=23    # t_curr
 echo "${TCURR}"
 export TCURR
 
@@ -6,7 +6,7 @@ DATE=22Apr20
 echo "${DATE}"
 export DATE
 
-echo "Running MATLAB script to get matrix size."
+#echo "Running MATLAB script to get matrix size."
 #sbatch -p csde -A csde slurm_sizeMatrix.sbatch
 #sleep 180
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
@@ -33,9 +33,9 @@ echo "${LENGTH28}"
 #done
 
 #: <<'END'
-#echo "Running MATLAB script to identify failed simulations."
-#sbatch -p csde -A csde slurm_idMissing.sbatch
-#sleep 300
+echo "Running MATLAB script to identify failed simulations."
+sbatch -p csde -A csde slurm_idMissing.sbatch
+sleep 300
 FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
 RERUN=$(<$FILE)
 echo "$RERUN"
