@@ -90,6 +90,8 @@ popSizeF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 popSizeM_multSims = popSizeF_multSims;
 popSizeC_multSims = popSizeF_multSims;
 vmmcM_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+nTestedHivNegC_multSims = zeros(length([currYear : lastYear]) , nRuns);
+nTestedHivUndiagC_multSims = nTestedHivNegC_multSims;
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 
@@ -100,7 +102,7 @@ for j = 1 : nRuns
     baseFileName = [baseFileNameShort , '_S' , num2str(fileInd) , '_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_diagHiv-noArtLim-090_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -120,6 +122,8 @@ for j = 1 : nRuns
         vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :); vaxResult{n}.ccDeath(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
         vaxResult{n}.menCirc = [curr.menCirc(1 : end  , :); vaxResult{n}.menCirc(2 : end , :)];
+        vaxResult{n}.nTestedNeg = vaxResult{n}.nTestedNeg (1 : end , :);
+        vaxResult{n}.nTestedUndiag = vaxResult{n}.nTestedUndiag (1 : end , :);
         vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
     end
     noVaxInd = nSims;
@@ -604,6 +608,10 @@ for j = 1 : nRuns
     hivMortC = annlz(sum(sum(sum(noV.hivDeaths(: , 3 : 8 , 1 : 2 , 4 : age), 2), 3), 4));
     hivMortAllAgeC_multSims(: , j) = hivMortC(1 : end)';
     
+    %% NUMBER ADDITIONAL TESTED DURING HOME TESTING CAMPAIGNS
+    nTestedHivNegC_multSims(: , j) = annlz(sum(noV.nTestedNeg(: , 1 : gender) , 2));
+    nTestedHivUndiagC_multSims(: , j) = annlz(sum(noV.nTestedUndiag(: , 1 : gender) , 2));
+    
     %% TOTAL POPULATION SIZE
     
     % Calculate female population size
@@ -907,6 +915,19 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
 writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivMortAllAgeC_multSims(: , :)) , 2) , ...
     min(squeeze(hivMortAllAgeC_multSims(: , :)) , [] , 2) , max(squeeze(hivMortAllAgeC_multSims(: , :)) , [] , 2) , ...
     squeeze(hivMortAllAgeC_multSims(: , :))] , fname)
+
+%% Save additional number tested with home testing campaigns
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+    'Raw_HTC_combined_hivNeg.csv'];
+writematrix([[currYear : endYear]' , mean(squeeze(nTestedHivNegC_multSims(: , :)) , 2) , ...
+    min(squeeze(nTestedHivNegC_multSims(: , :)) , [] , 2) , max(squeeze(nTestedHivNegC_multSims(: , :)) , [] , 2) , ...
+    squeeze(nTestedHivNegC_multSims(: , :))] , fname)
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+    'Raw_HTC_combined_hivUndiag.csv'];
+writematrix([[currYear : endYear]' , mean(squeeze(nTestedHivUndiagC_multSims(: , :)) , 2) , ...
+    min(squeeze(nTestedHivUndiagC_multSims(: , :)) , [] , 2) , max(squeeze(nTestedHivUndiagC_multSims(: , :)) , [] , 2) , ...
+    squeeze(nTestedHivUndiagC_multSims(: , :))] , fname)
 
 %% Save population size
 % female
