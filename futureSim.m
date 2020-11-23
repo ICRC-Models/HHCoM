@@ -21,6 +21,7 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScr
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_diagHiv-noArtLim-075_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -355,6 +356,7 @@ for n = nTests
     popVec(1 , :) = popIn;
     deaths = zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    transCD4 = zeros(length(s) - 1 , disease , gender , age);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
@@ -488,7 +490,7 @@ for n = nTests
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
         if hivOn
-            [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
+            [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :) , transCD4(i , : , : , :)] =...
                 ode4xtra(@(t , pop) hivNH(t , pop , propHivDiag(i , :) , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
@@ -609,7 +611,7 @@ for n = nTests
         filename = ['vaxWaneSimResult' , num2str(simNum)];
     end
     
-    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv , ...
+    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv , transCD4 , ...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , artTreatTracker , ... 

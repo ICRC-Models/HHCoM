@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec042-076_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
@@ -205,7 +205,7 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 % disp(' ')
 
 % If starting from beginning
-if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
+if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     
     % Initial Population 
     MpopStruc = riskDist(: , : , 1);
@@ -253,6 +253,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     deaths = popVec; 
     aged1519 = zeros(length(s) - 1 , 1);
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    transCD4 = zeros(length(s) - 1 , disease , gender , age);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
@@ -277,7 +278,7 @@ if ~ isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
 
 % If continuing from checkpoint
-elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
+elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
     chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
     
@@ -293,6 +294,7 @@ elseif isfile(['H:/HHCoM/' , 'HHCoM_Results/' , pathModifier , '.mat'])
     deaths = chckPntIn.deaths; 
     aged1519 = chckPntIn.aged1519;
     newHiv = chckPntIn.newHiv;
+    transCD4 = chckPntIn.transCD4;
     hivDeaths = chckPntIn.hivDeaths;
     newHpvVax = chckPntIn.newHpvVax;
     newImmHpvVax = chckPntIn.newImmHpvVax;
@@ -435,7 +437,7 @@ for i = iStart : length(s) - 1
     % ART initiation, dicontinuation, and scale-up by CD4 count
     % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
-        [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :)] =...
+        [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :) , transCD4(i , : , : , :)] =...
             ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
             kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
@@ -526,7 +528,8 @@ popVec = sparse(popVec); % compress population vectors
 
 %% Save results
 savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , ...
+    'newHiv' , 'transCD4' , ...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'aged1519' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
     'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
