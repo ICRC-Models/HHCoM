@@ -104,6 +104,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Screening
 screenAlgs = baseline;
+screenAlgs.genTypBool = 0;
 screenAlgs.screenHivGrps = {[1:disease]};
 screenAlgs.screenAge = {8};
 screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])

@@ -144,21 +144,27 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 if (screenAlgorithm == 1)
     % Baseline screening algorithm
     screenAlgs = baseline;
+    screenAlgs.genTypBool = 0;
 elseif (screenAlgorithm == 2)
     % WHO screening algorithm
     screenAlgs = who;
+    screenAlgs.genTypBool = 0;
 elseif (screenAlgorithm == 3)
     % Screening paper cytology algorithm
     screenAlgs = spCyto;
+    screenAlgs.genTypBool = 0;
 elseif (screenAlgorithm == 4)
     % Screening paper HPV DNA -and-treat algorithm
     screenAlgs = spHpvDna;
+    screenAlgs.genTypBool = 0;
 elseif (screenAlgorithm == 5)
     % Screening paper HPV DNA+genotyping -and-treat algorithm
     screenAlgs = spGentyp;
+    screenAlgs.genTypBool = 1;
 elseif (screenAlgorithm == 6)
     % Screening paper AVE -and-treat algorithm
     screenAlgs = spAve;
+    screenAlgs.genTypBool = 0;
 end
 screenAlgs.screenHivGrps = sceScreenHivGrps;
 screenAlgs.screenAge = sceScreenAges;
