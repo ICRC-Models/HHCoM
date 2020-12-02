@@ -1100,6 +1100,7 @@ sgtitle('HIV Incidence');
 %% Plot percent reduction in HIV incidence and mortality over time
 fig = figure;
 set(fig,'defaultAxesColorOrder',[[0 0 0]; [0.5 0.5 0.5]]);
+set(fig,'DefaultAxesFontSize' , 18);
 
 % female
 subplot(1 , 3 , 1);
@@ -1109,7 +1110,7 @@ H(2).CData = [0.8500, 0.3250, 0.0980];
 box on;
 set(gca,'XColor','none')
 xlim([0.5 1.5]); ylim([0 100]);
-ylabel('Viral suppression (%)');
+ylabel('Percent of Women Living with HIV who are Virally Suppressed');
 legend('Clinic ART' , 'Clinic ART + Community-based ART');
 title('Impact of Community-based ART on Viral Suppression');
 
@@ -1121,6 +1122,7 @@ hivIncFbase = xlsread(fname);
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(1) , '_11_1' , '\' , ...
     'HIV_mortality_females_aged15-79' , '.csv'];
 hivMortFbase = xlsread(fname);
+timeInd = (currYear-startYear)+1;
 for iInd = 2 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1133,9 +1135,15 @@ for iInd = 2 : length(iIndList)
     disp('Incidence reduction female (2025, 2060):')
     percReduct_CI((2025-1925)+1 , :)
     percReduct_CI(end , :)
-    plot(hivIncF(: , 1) , percReduct_CI(: , 1) , 'LineStyle' , '-' , 'Color' , 'k' , 'LineWidth' , 2);
-    plot(hivIncF(: , 1) , percReduct_CI(: , 2) , 'LineStyle' , '--' , 'Color' , 'k');
-    plot(hivIncF(: , 1) , percReduct_CI(: , 3) , 'LineStyle' , '--' , 'Color' , 'k');
+    plot(hivIncF(timeInd:end , 1) , percReduct_CI(timeInd:end , 1) , 'LineStyle' , '-' , 'Color' , 'k' , 'LineWidth' , 2);
+    x2 = [hivIncF(timeInd:end , 1)' , fliplr(hivIncF(timeInd:end , 1)')];
+    inBetween = [percReduct_CI(timeInd:end , 2)' , fliplr(percReduct_CI(timeInd:end , 3)')];
+    h = fill(x2 , inBetween , 'k');
+    h.FaceColor = 'k';
+    h.EdgeColor = 'k';
+    h.FaceAlpha = 0.3;
+    h.LineStyle = '-';
+    h.LineWidth = 0.5;
     ylabel('HIV incidence reduction (%)'); ylim([-55 0]); box on;
     
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1149,18 +1157,26 @@ for iInd = 2 : length(iIndList)
     percReduct_CI((2025-1925)+1 , :)
     percReduct_CI(end , :)
     plot(hivMortF(: , 1) , percReduct_CI(: , 1) , 'LineStyle' , '-' , 'Color' , [0.5 0.5 0.5] , 'LineWidth' , 2);
-    plot(hivMortF(: , 1) , percReduct_CI(: , 2) , 'LineStyle' , '--' , 'Color' , [0.5 0.5 0.5]);
-    plot(hivMortF(: , 1) , percReduct_CI(: , 3) , 'LineStyle' , '--' , 'Color' , [0.5 0.5 0.5]);
-    ylabel('HIV mortality reduction (%)'); ylim([-55 0]); 
+    x2 = [hivMortF(timeInd:end , 1)' , fliplr(hivMortF(timeInd:end , 1)')];
+    inBetween = [percReduct_CI(timeInd:end , 2)' , fliplr(percReduct_CI(timeInd:end , 3)')];
+    h = fill(x2 , inBetween , 'k');
+    h.FaceColor = [0.5 0.5 0.5];
+    h.EdgeColor = [0.5 0.5 0.5];
+    h.FaceAlpha = 0.2;
+    h.LineStyle = '-';
+    h.LineWidth = 0.5;
+    ylabel('HIV mortality reduction (%)'); ylim([-55 0]);
 end
 ax.YAxis(1).Color = [0 0 0];
 ax.YAxis(2).Color = [0.5 0.5 0.5];
-xlabel('Year');  title('Percent Reduction in HIV Outcomes');
+xlabel('Year');  title('Percent Reduction in HIV Outcomes among Women');
+legend('Mean HIV incidence reduction' , 'Range' , 'Mean HIV mortality reduction' , 'Range' , 'Location' , 'NorthEast');
 xlim([2020 2060]); grid on;
-sgtitle('FEMALES');
+%sgtitle('FEMALES');
 
 fig = figure;
 set(fig,'defaultAxesColorOrder',[[0 0 0]; [0.5 0.5 0.5]]);
+set(fig,'DefaultAxesFontSize' , 18);
 
 % male
 subplot(1 , 3 , 1);
@@ -1169,7 +1185,7 @@ H(1).CData = [0, 0.4470, 0.7410];
 H(2).CData = [0.8500, 0.3250, 0.0980];
 set(gca,'XColor','none')
 xlim([0.5 1.5]); ylim([0 100]); box on;
-ylabel('Viral suppression (%)');
+ylabel('Percent of Men Living with HIV who are Virally Suppressed');
 legend('Clinic ART' , 'Clinic ART + Community-based ART');
 title('Impact of Community-based ART on Viral Suppression');
 
@@ -1181,6 +1197,7 @@ hivIncMbase = xlsread(fname);
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(1) , '_11_1' , '\' , ...
     'HIV_mortality_males_aged15-79' , '.csv'];
 hivMortMbase = xlsread(fname);
+timeInd = (currYear-startYear)+1;
 for iInd = 2 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1194,8 +1211,14 @@ for iInd = 2 : length(iIndList)
     percReduct_CI((2025-1925)+1 , :)
     percReduct_CI(end , :)
     plot(hivIncM(: , 1) , percReduct_CI(: , 1) , 'LineStyle' , '-' , 'Color' , 'k' , 'LineWidth' , 2);
-    plot(hivIncM(: , 1) , percReduct_CI(: , 2) , 'LineStyle' , '--' , 'Color' , 'k');
-    plot(hivIncM(: , 1) , percReduct_CI(: , 3) , 'LineStyle' , '--' , 'Color' , 'k');
+    x2 = [hivIncM(timeInd:end , 1)' , fliplr(hivIncM(timeInd:end , 1)')];
+    inBetween = [percReduct_CI(timeInd:end , 2)' , fliplr(percReduct_CI(timeInd:end , 3)')];
+    h = fill(x2 , inBetween , 'k');
+    h.FaceColor = 'k';
+    h.EdgeColor = 'k';
+    h.FaceAlpha = 0.3;
+    h.LineStyle = '-';
+    h.LineWidth = 0.5;
     ylabel('HIV incidence reduction (%)'); ylim([-55 0]); box on;
     
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1209,13 +1232,20 @@ for iInd = 2 : length(iIndList)
     percReduct_CI((2025-1925)+1 , :)
     percReduct_CI(end , :)
     plot(hivMortM(: , 1) , percReduct_CI(: , 1) , 'LineStyle' , '-' , 'Color' , [0.5 0.5 0.5] , 'LineWidth' , 2);
-    plot(hivMortM(: , 1) , percReduct_CI(: , 2) , 'LineStyle' , '--' , 'Color' , [0.5 0.5 0.5]);
-    plot(hivMortM(: , 1) , percReduct_CI(: , 3) , 'LineStyle' , '--' , 'Color' , [0.5 0.5 0.5]);
+    x2 = [hivMortM(timeInd:end , 1)' , fliplr(hivMortM(timeInd:end , 1)')];
+    inBetween = [percReduct_CI(timeInd:end , 2)' , fliplr(percReduct_CI(timeInd:end , 3)')];
+    h = fill(x2 , inBetween , 'k');
+    h.FaceColor = [0.5 0.5 0.5];
+    h.EdgeColor = [0.5 0.5 0.5];
+    h.FaceAlpha = 0.2;
+    h.LineStyle = '-';
+    h.LineWidth = 0.5;
     ylabel('HIV mortality reduction (%)'); ylim([-55 0]); 
 end
-xlabel('Year');  title('Percent Reduction in HIV Outcomes');
+xlabel('Year');  title('Percent Reduction in HIV Outcomes among Men');
+legend('Mean HIV incidence reduction' , 'Range' , 'Mean HIV mortality reduction' , 'Range' , 'Location' , 'NorthEast');
 xlim([2020 2060]); grid on;
-sgtitle('MALES');
+%sgtitle('MALES');
 
 %% Plot gender difference in HIV incidence over time
 fig = figure;
