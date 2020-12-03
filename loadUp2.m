@@ -940,12 +940,6 @@ baseline.colpoRetain = 0.72; % proportion who return for colposcopy; assume 100%
 baseline.treatRetain = [0.0 , cryoRetain , cryoRetain , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 baseline.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,6)]; % cryotherapy/LEEP effectiveness by HIV status
 baseline.cinTreatHpvPersistHivNeg = [persLeepHivNeg.*ones(1,4)]; % proportion of effectively treated HIV-negative women who have persistent HPV after LEEP (infected , CIN1 , CIN2 , CIN3)
-baseline.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    baseline.screenCover_vec{i} = interp1(period , baseline.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % WHO screening algorithm
 who.testSens = hpvSensWHO;
@@ -953,12 +947,6 @@ who.colpoRetain = 1.0; % no triage with colposcopy
 who.treatRetain = [0.0 , 0.90 , 0.90 , 0.90]; % proportion who return/comply with treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0]; % 100% treatment efficacy
 who.cinTreatHpvPersistHivNeg = [persLeepHivNeg.*ones(1,4)]; % proportion of effectively treated HIV-negative women who have persistent HPV after treatment (infected , CIN1 , CIN2 , CIN3)
-who.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    who.screenCover_vec{i} = interp1(period , who.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % Screening paper - cytology algorithm
 spCyto.testSens = cytoSensSP;
@@ -966,12 +954,6 @@ spCyto.colpoRetain = 0.72; % proportion who return for colposcopy; assume 100% s
 spCyto.treatRetain = [0.0 , cryoRetain , cryoRetain , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 spCyto.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
 spCyto.cinTreatHpvPersistHivNeg = [persAblat , persLeepCryo]; % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy/LEEP (infected , CIN1 , CIN2 , CIN3)
-spCyto.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    spCyto.screenCover_vec{i} = interp1(period , spCyto.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % Screening paper - HPV DNA -and-treat algorithm
 spHpvDna.testSens = hpvSensSP;
@@ -979,12 +961,6 @@ spHpvDna.colpoRetain = 1.0; % no triage with colposcopy
 spHpvDna.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 spHpvDna.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
 spHpvDna.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
-spHpvDna.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    spHpvDna.screenCover_vec{i} = interp1(period , spHpvDna.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % Screening paper - HPV DNA + genotyping -and-treat algorithm
 spGentyp.testSens = hpvGentypSensSP;
@@ -992,12 +968,6 @@ spGentyp.colpoRetain = 1.0; % no triage with colposcopy
 spGentyp.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 spGentyp.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
 spGentyp.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
-spGentyp.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    spGentyp.screenCover_vec{i} = interp1(period , spGentyp.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 % Screening paper - AVE -and-treat algorithm
 spAve.testSens = viaSensSP;
@@ -1005,12 +975,6 @@ spAve.colpoRetain = 1.0; % no triage with colposcopy
 spAve.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 spAve.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
 spAve.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
-spAve.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    spAve.screenCover_vec{i} = interp1(period , spAve.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
 
 
 %% Import and save calibration data
