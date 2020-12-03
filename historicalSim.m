@@ -33,12 +33,17 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_noBaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
+
+% SCREENING
+% Instructions: Choose either the original baseline screening algorithm or the screening paper cytology algorithm
+%   Screening coverage, HIV groups, and ages are set automatically below 
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 3 for spCyto)
 
 % VACCINATION
 % Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
@@ -103,7 +108,13 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
-screenAlgs = baseline;
+if (screenAlgorithm == 1)
+    % Baseline screening algorithm
+    screenAlgs = baseline;
+elseif (screenAlgorithm == 3)
+    % Screening paper cytology algorithm
+    screenAlgs = spCyto;
+end
 screenAlgs.genTypBool = 0;
 screenAlgs.screenHivGrps = {[1:disease]};
 screenAlgs.screenAge = {8};
