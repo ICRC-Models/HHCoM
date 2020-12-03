@@ -59,7 +59,8 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                     % if you're infected with either HPV type
                                     elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==2))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,2)) + (screenAlgs.testSens(d,2) * (1 - screenAlgs.colpoRetain)) + ...
-                                            (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1))));
+                                            (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1)))) + ...
+                                            (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1)) * screenAlgs.cinTreatHpvPersistHivNeg(1));
                                         toScreenTreatImmMult = screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.treatRetain(1) * ...
                                             (1.0-screenAlgs.cinTreatHpvPersistHivNeg(1));
                                         toScreenTreatHpvMult = 0.0;
