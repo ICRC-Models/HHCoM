@@ -46,7 +46,6 @@ sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.70; 0.90]; % Coverage over 
 sceScreenHivGrps = {[1 : 2] , [3 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
 sceScreenAges = {[8 , 10] , [6 , 7 , 8 , 9 , 10]}; % ***SET ME***: screening ages that correspond to HIV state groupings
 
-
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
 %   If you want no vaccination in your baseline scenario, set baseline vaccine coverage to zero. The school-based vaccine coverage of each scenario is applied to all 
