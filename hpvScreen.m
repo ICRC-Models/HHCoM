@@ -51,7 +51,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
 
                                     % Apply selected screening algorithm(s)
                                     % if you're susceptible/immune to both HPV types or have had a hysterectomy
-                                    if ( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) ) || (x==4)
+                                    if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypeBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
                                         toScreenMult = 1.0;
                                         toScreenTreatImmMult = 0.0;
                                         toScreenTreatHpvMult = 0.0;
@@ -96,7 +96,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (screenAlgs.cinTreatHpvPersistHivNeg(4)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
                                     % if you have cervical cancer
-                                    elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==6))]
+                                    elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==6) && (x<=3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.ccTreatRetain(4))));
                                         toScreenTreatImmMult = 0.0;
