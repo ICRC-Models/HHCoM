@@ -117,7 +117,7 @@ end
 
 % Create screening indices
 numScreenAge = length(screenAlgs.screenAge);
-agesComb = screenAlgs.screenAge;
+agesComb = screenAlgs.screenAge{1};
 screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
 screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
