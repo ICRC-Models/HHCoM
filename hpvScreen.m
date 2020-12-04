@@ -18,7 +18,7 @@ ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 
 for i = 1 : length(screenAlgs.screenHivGrps)
     prevAL = 0;
     if i > 1
-        for j = 1 : i
+        for j = 1 : i-1
             prevAL = prevAL + length(screenAlgs.screenAge{i-1});
         end
     end
