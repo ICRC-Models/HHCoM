@@ -36,7 +36,7 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
 %   For example, if you want persons across all HIV states to follow the same screening pattern,
-%   use sceScreenHivGrps={[1:disease]} sceScreenAges={[8 , 10]} for 2x screening regardless of HIV status. 
+%   use sceScreenHivGrps={[1:8]} sceScreenAges={[8 , 10]} for 2x screening regardless of HIV status. 
 %   If you want screening pattern to %   differ by HIV status, use sceScreenHivGrps={[1 : 2] , [3 : 8]} 
 %   to designate different patterns for HIV-negative and HIV-positive women and 
 %   sceScreenAges={[8 , 10] , [6 , 7 , 8 , 9 , 10]} for 2x screening among HIV-negative women and screening 
