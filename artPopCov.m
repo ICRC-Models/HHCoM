@@ -18,18 +18,18 @@ fracART = sum(fracARTAge_adj(1 , ageSexDebut+1:end) .* ...
 fracExcMinAges = ageARTSubTots(excMinAges) ./ sum(ageARTSubTots(excMinAges)); % population ART proportion by age, for ages > MIN coverage
 toRedisMinAges = sum(ageARTSubTots(minAges)); % summed HIV-positives on ART of ages < MIN to redistribute
 % Discontinue persons to match population coverage
-if fracART > popCoverInd
-    cover = (fracART - popCoverInd) ./ (fracART); % discontinuation fraction needed to meet population-level coverage
-    totToRedis = fracExcMinAges .* sumall(toRedisMinAges .* max(cover , 0)); % calculate discontinuation #s, distributing persons that would have been from ages < MIN
-    fracToRedis = totToRedis ./ ageARTSubTots(excMinAges); % calculate discontinuation proportions
-    formatToRedis = ones(1 , length(excMinAges) , 1);
-    formatToRedis(:) = (max(cover , 0) + fracToRedis'); % set up matrix values by age
-    % Discontinuation matrix by gender, age, risk, accounting for min/max adjustment
-    % adjustment factor = ((ARTpop-#disc)/ARTpop) = (1 - #disc/ARTpop) = (1 - artOut)
-    artOut(g , excMinAges , :) = artOut(g , excMinAges , :) + ...
-        bsxfun(@times , ones(1 , length(excMinAges) , risk) , formatToRedis) .* ...
-        (1 - artOut(g , excMinAges , :));
-end
+% if fracART > popCoverInd
+%     cover = (fracART - popCoverInd) ./ (fracART); % discontinuation fraction needed to meet population-level coverage
+%     totToRedis = fracExcMinAges .* sumall(toRedisMinAges .* max(cover , 0)); % calculate discontinuation #s, distributing persons that would have been from ages < MIN
+%     fracToRedis = totToRedis ./ ageARTSubTots(excMinAges); % calculate discontinuation proportions
+%     formatToRedis = ones(1 , length(excMinAges) , 1);
+%     formatToRedis(:) = (max(cover , 0) + fracToRedis'); % set up matrix values by age
+%     % Discontinuation matrix by gender, age, risk, accounting for min/max adjustment
+%     % adjustment factor = ((ARTpop-#disc)/ARTpop) = (1 - #disc/ARTpop) = (1 - artOut)
+%     artOut(g , excMinAges , :) = artOut(g , excMinAges , :) + ...
+%         bsxfun(@times , ones(1 , length(excMinAges) , risk) , formatToRedis) .* ...
+%         (1 - artOut(g , excMinAges , :));
+% end
 
 fracExcMaxAges = ageHIVeligSubTots(excMaxAges) ./ sum(ageHIVeligSubTots(excMaxAges)); % population HIV proportion by age, for ages < MAX coverage
 toRedisMaxAges = ageHIVeligSubTots(maxAges); % HIV-positives of ages > MAX coverage to redistribute

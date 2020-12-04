@@ -222,16 +222,14 @@ if year >= 2016
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
-        fracARTAll = sumall(ageARTSubTots) ./ (sumall(ageARTSubTots) + sumall(ageHIVallSubTots));
-        
         if year < (2020-1)
-            minCoverLim = fracARTAll * minLim; % minimum ART coverage by age
-            maxCoverLim = fracARTAll * maxLim; % maximum ART coverage by age
-            popCoverInd = fracARTAll; % desired population-level ART coverage
+            minCoverLim = popCover{g}(ind) * minLim * propHivDiag(1 , g); % minimum ART coverage by age
+            maxCoverLim = popCover{g}(ind) * maxLim * propHivDiag(1 , g); % maximum ART coverage by age
+            popCoverInd = popCover{g}(ind) * propHivDiag(1 , g); % desired population-level ART coverage
         elseif year >= (2020-1)
-            minCoverLim = fracARTAll * minLim;
-            maxCoverLim = fracARTAll * maxLim;
-            popCoverInd = fracARTAll;
+            minCoverLim = popCover{g}(end) * minLim * propHivDiag(1 , g);
+            maxCoverLim = popCover{g}(end) * maxLim * propHivDiag(1 , g);
+            popCoverInd = popCover{g}(end) * propHivDiag(1 , g);
         end     
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
@@ -245,20 +243,6 @@ if year >= 2016
             ageHIVallSubTots , ageHIVeligSubTots , ageARTSubTots , maxAges , minAges , ...
             fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
             agePopSubTots , dRange);
-        
-        if year < (2020-1)
-            popCoverInd = popCover{g}(ind) * propHivDiag(1 , g); % desired population-level ART coverage
-        elseif year >= (2020-1)
-            popCoverInd = popCover{g}(end) * propHivDiag(1 , g);
-        end     
-                
-        % Initiate persons to match population coverage
-        if fracARTAll < popCoverInd
-            cover = ((popCoverInd - fracARTAll) ./ (1 - fracARTAll)) .* ... % initiation fraction needed to meet population-level coverage
-                (sumall(ageHIVallSubTots) ./ sumall(ageHIVeligSubTots)); % adjust coverage b/c only initiating persons with eligible CD4 = ((cover*HIVtot)/HIVelig)
-            treat(dRange , 1 : 5 , g , [ageSexDebut+1 : age] , :) = treat(dRange , 1 : 5 , g , [ageSexDebut+1 : age] , :) + ...
-                ones(length(dRange) , 5 , 1 , length([ageSexDebut+1 : age]) , risk) .* cover; 
-        end
     end  
 end
 
