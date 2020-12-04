@@ -98,7 +98,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                     % if you have cervical cancer
                                     elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
-                                            (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.ccTreatRetain(4))));
+                                            (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(4))));
                                         toScreenTreatImmMult = 0.0;
                                         toScreenTreatHpvMult = 0.0;
                                         toScreenTreatHystMult = screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(4);
