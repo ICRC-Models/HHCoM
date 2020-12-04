@@ -323,9 +323,9 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % newCin3 = chckPntIn.newCin3;
     ccDeath = chckPntIn.ccDeath;
     newScreen = chckPntIn.newScreen;
-    newTreatImm = chckPntIn.newTreatImm;
-    newTreatHpv = chckPntIn.newTreatHpv;
-    newTreatHyst = chckPntIn.newTreatHyst;
+    % newTreatImm = chckPntIn.newTreatImm;
+    % newTreatHpv = chckPntIn.newTreatHpv;
+    % newTreatHyst = chckPntIn.newTreatHyst;
     menCirc = chckPntIn.menCirc;
     vaxdSchool = chckPntIn.vaxdSchool;
     
