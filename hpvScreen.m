@@ -51,13 +51,13 @@ for i = 1 : length(screenAlgs.screenHivGrps)
 
                                     % Apply selected screening algorithm(s)
                                     % if you're susceptible/immune to both HPV types or have had a hysterectomy
-                                    if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypeBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
+                                    if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
                                         toScreenMult = 1.0;
                                         toScreenTreatImmMult = 0.0;
                                         toScreenTreatHpvMult = 0.0;
                                         toScreenTreatHystMult = 0.0;
                                     % if you're infected with either HPV type
-                                    elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==2))]
+                                    elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==2))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,2)) + (screenAlgs.testSens(d,2) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1)))) + ...
                                             (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1)) * screenAlgs.cinTreatHpvPersistHivNeg(1));
@@ -66,7 +66,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                         toScreenTreatHpvMult = 0.0;
                                         toScreenTreatHystMult = 0.0;
                                     % if you have CIN1 of either HPV type
-                                    elseif [( ((h==3) && ((s<=3) || (s==7))) || (((h<=3) || (h==7)) && (s==3)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==3))]
+                                    elseif [( ((h==3) && ((s<=3) || (s==7))) || (((h<=3) || (h==7)) && (s==3)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,2)) + (screenAlgs.testSens(d,2) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(1))) + ...
                                             (screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.treatRetain(1) * (1-screenAlgs.cinTreatEff(d))));
@@ -76,7 +76,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (screenAlgs.cinTreatHpvPersistHivNeg(2)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;    
                                     % if you have CIN2 of either HPV type
-                                    elseif [( ((h==4) && ((s<=4) || (s==7))) || (((h<=4) || (h==7)) && (s==4)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==4))]
+                                    elseif [( ((h==4) && ((s<=4) || (s==7))) || (((h<=4) || (h==7)) && (s==4)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==4))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,3)) + (screenAlgs.testSens(d,3) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(2))) + ...
                                             (screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.treatRetain(2) * (1-screenAlgs.cinTreatEff(d))));
@@ -86,7 +86,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (screenAlgs.cinTreatHpvPersistHivNeg(3)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
                                     % if you have CIN3 of either HPV type
-                                    elseif [( ((h==5) && ((s<=5) || (s==7))) || (((h<=5) || (h==7)) && (s==5)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==5))]
+                                    elseif [( ((h==5) && ((s<=5) || (s==7))) || (((h<=5) || (h==7)) && (s==5)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==5))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(3))) + ...
                                             (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(3) * (1-screenAlgs.cinTreatEff(d))));
@@ -96,7 +96,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (screenAlgs.cinTreatHpvPersistHivNeg(4)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
                                     % if you have cervical cancer
-                                    elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypeBool && (h==6) && (x<=3))]
+                                    elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
                                             (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.ccTreatRetain(4))));
                                         toScreenTreatImmMult = 0.0;
