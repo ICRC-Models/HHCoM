@@ -271,7 +271,7 @@ for g = 1 : gender
 
                 hivDeaths(3 , g , a) = hivDeaths(3 , g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
                 artTreat(3 , v , g , a , r) = treat(3 , v , g , a , r) .* sumall(pop(acuteInf)); % keep track of distribution of people going on ART
-                artDiscont(3 , v , g , a , r) = artOut(g , a , r) * (artDist(3 , v , g , a , r) / sumall(artDist(: , : , g , a , r))) .* pop(hivPositiveArt);
+                artDiscont(3 , v , g , a , r) = artOut(g , a , r) * (artDist(3 , v , g , a , r) / sumall(artDist(: , : , g , a , r))) .* sumall(pop(hivPositiveArt));
 
                 % CD4 progression for HIV-positives advanced to decreased CD4 count
                 for d = 4 : 7
@@ -297,7 +297,7 @@ for g = 1 : gender
 
                     hivDeaths(d , g , a) = hivDeaths(d , g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
                     artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART  
-                    artDiscont(d , v , g , a , r) = artOut(g , a , r) * (artDist(d , v , g , a , r) / sumall(artDist(: , : , g , a , r))) .* pop(hivPositiveArt);
+                    artDiscont(d , v , g , a , r) = artOut(g , a , r) * (artDist(d , v , g , a , r) / sumall(artDist(: , : , g , a , r))) .* sumall(pop(hivPositiveArt));
                 end
             end
 
