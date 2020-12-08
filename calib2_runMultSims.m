@@ -56,7 +56,7 @@ end
     parfor n = 1 : nPrlSets
         paramSet = top25Params(:,subMatrixInds(n));
         futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-        %[negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
+        %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
         %negSumLogLSet(n,1) = negSumLogL;
     end
     %negSumLogLSetAll(m : (m + nPrlSets - 1) , 1) = negSumLogLSet;
