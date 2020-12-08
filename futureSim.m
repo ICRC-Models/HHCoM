@@ -426,6 +426,10 @@ for n = nTests
             %%%num2str(propHivDiag(i , :))
         end
         
+        for g = 1 : gender
+            nHivPos1(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+        end
+        
         if hpvOn
             % Progression/regression from initial HPV infection to
             % precancer stages and cervical cancer. Differential CC
@@ -469,6 +473,13 @@ for n = nTests
             end
         end
         
+        disp('ccDeath')
+        for g = 1 : gender
+            nHivPos2(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPos2(1,g)-nHivPos1(1,g)
+            sumall(ccDeath(i , 3 : 8 , 4 : age , 1 : hpvTypeGroups))
+        end
+        
         % HIV and HPV mixing and infection module. Protective effects of condom
         % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
         [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
@@ -486,6 +497,14 @@ for n = nTests
         if any(pop(end , :) < 0)
             disp('After mixInfect')
             break
+        end
+        
+        disp('newHiv')
+        for g = 1 : gender
+            nHivPos3(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPosArt3(1 , g) = sumall(popIn(hivInds(8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPos3(1,g)-nHivPos2(1,g)
+            sumall(newHiv(i , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , g , 4 : age , 1 : risk))
         end
         
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
@@ -513,6 +532,16 @@ for n = nTests
             end
         end
         
+        disp('hivDeaths')
+        for g = 1 : gender
+            nHivPos4(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPosArt4(1 , g) = sumall(popIn(hivInds(8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPos4(1,g)-nHivPos3(1,g)
+            sumall(hivDeaths(i , 1 : disease , g , 4 : age))
+            %nHivPosArt4(1,g)-nHivPosArt3(1,g)
+            %sumall(hivDeaths(i , 8 , g , 4 : age))
+        end
+        
         % Birth, aging, risk redistribution module
         [~ , pop , deaths(i , :) , aged1519(i , :) , aged7579(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , viral , ...
@@ -530,6 +559,13 @@ for n = nTests
         if any(pop(end , :) < 0)
             disp('After bornAgeDieRisk')
             break
+        end
+        
+        disp('demographics')
+        for g = 1 : gender
+            nHivPos5(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            nHivPos5(1,g)-nHivPos4(1,g)
+            aged1519(i , g) - aged7579(i , g) - sumall(deaths(i , hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)))
         end
         
         % VOLUNTARY MALE MEDICAL CIRCUMCISION
