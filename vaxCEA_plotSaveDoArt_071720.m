@@ -77,6 +77,7 @@ cd4DistF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 3);
 cd4DistM_multSims = cd4DistF_multSims;
 cd4DistC_multSims = cd4DistF_multSims;
 cd4DistAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 4);
+cd4DiscontAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 4);
 cd4TransAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 2);
 hivMortF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivMortM_multSims = hivMortF_multSims;
@@ -121,6 +122,7 @@ for j = 1 : nRuns
         vaxResult{n}.deaths = [curr.deaths(1 : end , :); vaxResult{n}.deaths(2 : end , :)];
         vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :); vaxResult{n}.ccDeath(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
+        vaxResult{n}.artDiscont = [curr.artDiscont(1 : end , : , : , : , : , :); vaxResult{n}.artDiscont(2 : end , : , : , : , : , :)];
         vaxResult{n}.menCirc = [curr.menCirc(1 : end  , :); vaxResult{n}.menCirc(2 : end , :)];
         vaxResult{n}.nTestedNeg = vaxResult{n}.nTestedNeg (1 : end , :);
         vaxResult{n}.nTestedUndiag = vaxResult{n}.nTestedUndiag (1 : end , :);
@@ -481,7 +483,7 @@ for j = 1 : nRuns
         grid on;
     end
     
-    %% CD4 DISTRIBUTION AT ART INITIATION BY AGE
+    %% ART INITIATION BY CD4 AND AGE
     cInds = {3 : 7 , 3 : 5 , 6 , 7};
     
     % Calculate combined numbers initiating ART
@@ -489,6 +491,17 @@ for j = 1 : nRuns
         for a = 4 : age 
             init_subC = annlz(sum(sum(sum(sum(sum(noV.artTreatTracker(: , cInds{c} , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6));
             cd4DistAgeC_multSims(: , j , a-3 , c) = init_subC(1 : end)';
+        end
+    end
+    
+    %% ART DISCONTINUATION BY CD4 AND AGE
+    cInds = {3 : 7 , 3 : 5 , 6 , 7};
+    
+    % Calculate combined numbers discontinuing ART
+    for c = 1 : length(cInds)
+        for a = 4 : age 
+            discont_subC = annlz(sum(sum(sum(sum(sum(noV.artDiscont(: , cInds{c} , : , 1 : 2 , a , 1 : risk), 2), 3), 4), 5), 6));
+            cd4DiscontAgeC_multSims(: , j , a-3 , c) = discont_subC(1 : end)';
         end
     end
     
@@ -809,7 +822,7 @@ for c = 1 : length(cInds)
         cd4DistC_multSims(: , : , c)] , fname)
 end
 
-%% Save CD4 at ART initiation by age
+%% Save ART initiation by CD4 and age
 cInds = {3 : 7 , 3 : 5 , 6 , 7};
 cTits = {'Any_CD4' , 'CD4_350plus' , 'CD4_200-350' , 'CD4_below200'};
 ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
@@ -819,10 +832,10 @@ for c = 1 : length(cInds)
     for a = 4 : age 
         % combined 
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
-            'Raw_ART_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
-        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , 2) , ...
-            min(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
-            cd4DistAgeC_multSims(: , : , a-3 , c)] , fname)
+            'Raw_ART_discont_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4DiscontAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(cd4DiscontAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4DiscontAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            cd4DiscontAgeC_multSims(: , : , a-3 , c)] , fname)
     end
 end
 
