@@ -520,635 +520,635 @@ legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
-%% HPV Prevalence by age in 2002 vs. McDonald 2014 data
-ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
-    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-hpv2002 = zeros(9 , 1);
-hpvHIV2002 = hpv2002;
-hpvNeg2002 = hpv2002;
-
-aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
-%for aInd = 1 : 13
-for a = 4 : 12
-    %a = aVec{aInd};
-    hpvInds = unique([toInd(allcomb(1 : disease , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    hpv2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    
-    % HIV+
-    hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
-        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    hpvHIV2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    
-    % HIV-
-    hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
-        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    hpvNeg2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
-        ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-end
-
-% McDonald 2014 (not sure where these bounds came from)
-hpvHivObs(: , 1) = hpv_hiv_dObs(: , 2); % mean
-hpvHivObs(: , 2) = [0.63 0.54 0.54 0.47 0.42 0.34 0.32 0.35 0.16]'; % lb
-hpvHivObs(: , 3) = [0.87 0.67 0.66 0.62 0.51 0.50 0.55 0.72 0.53]'; % ub
-hpvNegObs(: , 1) = hpv_hivNeg_dObs(: , 2); % mean
-hpvNegObs(: , 2) = [0.53 0.34 0.21 0.17 0.18 0.16 0.11 0.14 0.12]'; % lb
-hpvNegObs(: , 3) = [0.67 0.41 0.27 0.23 0.21 0.20 0.15 0.19 0.18]'; % ub
-hpvHivObs = hpvHivObs * 100;
-hpvNegObs = hpvNegObs * 100;
-
-% Calibration error bars
-mean = hpv_hiv_dObs(: , 2) .* 100;
-sdev = (hpv_hiv_dObs(: , 3).^(1/2)) .* 100;
-meanNeg = hpv_hivNeg_dObs(: , 2) .* 100;
-sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)) .* 100;
-
-figure()
-% plot(1 : length(hpv2002) , hpv2002 , 'o-')
+% %% HPV Prevalence by age in 2002 vs. McDonald 2014 data
+% ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
+%     '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% hpv2002 = zeros(9 , 1);
+% hpvHIV2002 = hpv2002;
+% hpvNeg2002 = hpv2002;
+% 
+% aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+% %for aInd = 1 : 13
+% for a = 4 : 12
+%     %a = aVec{aInd};
+%     hpvInds = unique([toInd(allcomb(1 : disease , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+%     ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+%     hpv2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
+%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
+%     
+%     % HIV+
+%     hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
+%         [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+%     ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+%     hpvHIV2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
+%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
+%     
+%     % HIV-
+%     hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
+%         [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+%     ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+%     hpvNeg2002(a - 3 , 1) = sum(popVec((2002 - startYear) * stepsPerYear , hpvInds))...
+%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
+% end
+% 
+% % McDonald 2014 (not sure where these bounds came from)
+% hpvHivObs(: , 1) = hpv_hiv_dObs(: , 2); % mean
+% hpvHivObs(: , 2) = [0.63 0.54 0.54 0.47 0.42 0.34 0.32 0.35 0.16]'; % lb
+% hpvHivObs(: , 3) = [0.87 0.67 0.66 0.62 0.51 0.50 0.55 0.72 0.53]'; % ub
+% hpvNegObs(: , 1) = hpv_hivNeg_dObs(: , 2); % mean
+% hpvNegObs(: , 2) = [0.53 0.34 0.21 0.17 0.18 0.16 0.11 0.14 0.12]'; % lb
+% hpvNegObs(: , 3) = [0.67 0.41 0.27 0.23 0.21 0.20 0.15 0.19 0.18]'; % ub
+% hpvHivObs = hpvHivObs * 100;
+% hpvNegObs = hpvNegObs * 100;
+% 
+% % Calibration error bars
+% mean = hpv_hiv_dObs(: , 2) .* 100;
+% sdev = (hpv_hiv_dObs(: , 3).^(1/2)) .* 100;
+% meanNeg = hpv_hivNeg_dObs(: , 2) .* 100;
+% sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)) .* 100;
+% 
+% figure()
+% % plot(1 : length(hpv2002) , hpv2002 , 'o-')
+% % hold all;
+% plot(1 : length(hpvHIV2002) , hpvHIV2002 , 'o-');
 % hold all;
-plot(1 : length(hpvHIV2002) , hpvHIV2002 , 'o-');
-hold all;
-plot(1 : length(hpvNeg2002) , hpvNeg2002 , 'o-')
-hold all;
-set(gca , 'xtickLabel' , ageGroup);
-
-% general
-% yPosError = abs(hrHpvObs(: , 3) - hrHpvObs(: , 1));
-% yNegError = abs(hrHpvObs(: , 2) - hrHpvObs(: , 1));
-% errorbar(1 : length(hrHpvObs) , hrHpvObs(: , 1) , yNegError , yPosError , 'rs')
-% HIV+
-yPosError = abs(hpvHivObs(: , 3) - hpvHivObs(: , 1));
-yNegError = abs(hpvHivObs(: , 2) - hpvHivObs(: , 1));
-errorbar(1 : length(hpvHivObs) , hpvHivObs(: , 1) , yNegError , yPosError , 'bs')
-hold all;
-errorbar(1 : length(mean) , mean , sdev , 'ks')
-%HIV-
-yPosError = abs(hpvNegObs(: , 3) - hpvNegObs(: , 1));
-yNegError = abs(hpvNegObs(: , 2) - hpvNegObs(: , 1));
-errorbar(1 : length(hpvNegObs) , hpvNegObs(: , 1) , yNegError , yPosError , 'rs')
-hold all;
-errorbar(1 : length(mean) , meanNeg , sdevNeg , 'ks')
-
-set(gca , 'xtick' , 1 : length(hpvNegObs) , 'xtickLabel' , ageGroup);
-legend('HIV-Positive (year 2002)' , 'HIV-Negative (year 2002)' , ...
-    'Observed HIV-Positive (McDonald, 2014): 2SD' , 'Observed HIV-Positive: Calibration SD' , ...
-    'Observed HIV-Negative (McDonald, 2014): 2SD' , 'Observed HIV-Negative: Calibration SD')
-xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
-%title('Age Specific hrHPV Prevalence in 2002')
-
-%% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
-yearPrev = 2008;
-ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
-ageVec = {[4:5],[6:7],[8:9],[10:13]};
-hpv_hivM2008 = zeros(length(ageVec) , 2);
-
-
-for aV = 1 : length(ageVec)
-    a = ageVec{aV};
-    hpvHivPosInd = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 , [1 : 2 , 7] , ...
-        1 , 1 : intervens , 1 , a  , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
-        [1 : 2 , 7] , 2 , 1 , 1 : intervens , 1 , a , 1 : risk))]);
-    popHivInd = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , ...
-        1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
-    hpv_hivM2008(aV , 1) = (sum(popVec((yearPrev - startYear) * stepsPerYear +1 , hpvHivPosInd)) ...
-        ./ sum(popVec((yearPrev - startYear) * stepsPerYear +1 , popHivInd))) * 100;
-    
-    hpvHivNegInd = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 , [1 : 2 , 7] , 1 , ...
-        1 : intervens , 1 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
-        [1 : 2 , 7] , 2 , 1 , 1 : intervens , 1 , a , 1 : risk))]);
-    popNegInd = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , ...
-        1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
-    hpv_hivM2008(aV , 2) = (sum(popVec((yearPrev - startYear) * stepsPerYear +1 , hpvHivNegInd)) ...
-        ./ sum(popVec((yearPrev - startYear) * stepsPerYear +1 , popNegInd))) * 100;
-    
-end
-
-% Calibration error bars
-mean = hpv_hivM2008_dObs(: , 2) .* 100;
-sdev = (hpv_hivM2008_dObs(: , 3).^(1/2)) .* 100;
-meanNeg = hpv_hivMNeg2008_dObs(: , 2) .* 100;
-sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)) .* 100;
-
-figure()
-subplot(2,1,1)
-plot([1 : length(ageVec)] , hpv_hivM2008(: , 1)' , 'b-');
-hold all;
-plot([1 : length(ageVec)] , hpv_hivM2008_dObs(: , 2)' .* 100 , 'bo');
-hold all;
-errorbar(1 : length(mean) , mean , sdev , 'ks')
-set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup);
-legend('HIV-Positive Males (year 2008)' , 'Observed HIV-Positive Males: Mbulawa 2008' , ...
-    'Observed HIV-Positive Males: Calibration SD');
-xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
-
-subplot(2,1,2)
-plot([1 : length(ageVec)] , hpv_hivM2008(: , 2)' , 'r-')
-hold all;
-plot([1 : length(ageVec)] , hpv_hivMNeg2008_dObs(: , 2)' .* 100 , 'ro');
-hold all;
-errorbar(1 : length(mean) , meanNeg , sdevNeg , 'ks')
-set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup);
-legend('HIV-Negative Males (year 2008)' , 'Observed HIV-Negative Males: Mbulawa 2008' , ...
-    'Observed HIV-Negative Males: Calibration SD');
-xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
-
-%% ********************************** CIN FIGURES *********************************************************************************************
-
-%% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002 vs. McDonald 2014 data
-cinPos2002 = zeros(10 , 1);
-cinNeg2002 = cinPos2002;
-ageGroup = {'17-19' , '20-24' , '25-29' ,...
-    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
-    '60-64' , '65-69' , '70-74' , '75-79'};
-%aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
-for a = 4 : 13  %note, age group 4 is 17-19 in the data
-    %a = aVec{aInd};
-    % HIV-positive (on and not on ART)
-    cinInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
-        [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    cinPos2002(a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinInds)))...
-        ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
-    % HIV-negative
-    cinNegInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
-        [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
-    ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
-    cinNeg2002(a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinNegInds)))...
-        ./ (sum(popVec((2002 - startYear) * stepsPerYear , ageNegInds))) * 100;
-end
-
-% McDonald 2014, HIV-positive (not sure where these bounds came from)
-cinPosAct(: , 1) = cinPos2002_dObs(: , 2); % mean
-cinPosAct(: , 2) = [0.03 0.02 0.09 0.10 0.05 0.02 0.02 0.00 0.00 0.00]'; % lb
-cinPosAct(: , 3) = [0.22 0.08 0.17 0.21 0.11 0.09 0.14 0.17 0.22 0.22]'; % ub
-cinPosAct = cinPosAct .* 100; % convert to %
-yPosError = abs(cinPosAct(: , 3) - cinPosAct(: , 1));
-yNegError = abs(cinPosAct(: , 2) - cinPosAct(: , 1));
-
-% Calibration error bars
-mean = cinPos2002_dObs(: , 2) .* 100;
-sdev = (cinPos2002_dObs(: , 3).^(1/2)) .* 100;
-
-figure();
-subplot(2 , 1 , 1);
-plot(1 : length(cinPos2002) , cinPos2002 ,'o-')
-hold on;
-errorbar(1 : length(cinPosAct) , cinPosAct(: , 1) , yNegError , yPosError , 'rs')
-hold on;
-errorbar(1 : length(mean) , mean , sdev , 'ks')
-legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('Prevalence (%)')
-title('Age Specific CIN 2/3 Prevalence Among HIV+ in 2002')
-ylim([0 25])
-
-% McDonald 2014, HIV-negative (not sure where these bounds came from)
-cinNegAct(: , 1) = cinNeg2002_dObs(: , 2); % mean
-cinNegAct(: , 2) = [0.00 0.02 0.01 0.02 0.02 0.02 0.02 0.01 0.00 0.00]'; % lb
-cinNegAct(: , 3) = [0.03 0.04 0.03 0.05 0.04 0.04 0.04 0.03 0.03 0.03]'; % ub
-cinNegAct = cinNegAct .* 100; % convert to %
-yPosError = abs(cinNegAct(: , 3) - cinNegAct(: , 1));
-yNegError = abs(cinNegAct(: , 2) - cinNegAct(: , 1));
-
-% Calibration error bars
-mean = cinNeg2002_dObs(: , 2) .* 100;
-sdev = (cinNeg2002_dObs(: , 3).^(1/2)) .* 100;
-
-subplot(2 , 1 , 2)
-plot(1 : length(cinNeg2002) , cinNeg2002 , 'o-')
-hold on;
-errorbar(1 : length(cinNegAct) , cinNegAct(: , 1) , yNegError , yPosError , 'rs')
-hold on;
-errorbar(1 : length(mean) , mean , sdev , 'ks')
-legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('Prevalence (%)')
-title('Age Specific CIN 2/3 Prevalence Among HIV- in 2002')
-ylim([0 25])
-
-%% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
-
-%% Cervical cancer incidence in 2012 by age vs. NCR KZN data and other sources
-%ccIncYears = [2017 , 2003 , 1994 , 2012];
-ccIncYears = [2012];
-ccAgeRel = zeros(age , length(ccIncYears));
-ccAgeNegRel = ccAgeRel;
-ccAgePosRel = zeros(age , 5 , length(ccIncYears));
-ccArtRel = ccAgeRel;
-ccNegPosArt = zeros(age , 3 , length(ccIncYears));
-fScale = 10^5;
-ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
-    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
-    '60-64' , '65-69' , '70-74' , '75-79'};
-annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
-ccYrs = ((ccIncYears - startYear) * stepsPerYear : ...
-    (ccIncYears + 1 - startYear) * stepsPerYear);
-
-%aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
-%for aInd = 1 : 16
-for a = 1 : age
-    %a = aVec{aInd};
-    for y = 1 : length(ccIncYears)
-        % Year
-        yr_start = (ccIncYears(y) - 1 - startYear)  .* stepsPerYear;
-        yr_end = (ccIncYears(y) - startYear) .* stepsPerYear - 1;
-        
-        % Total population
-        ageInds = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , a , 1 : risk));
-        ccAgeRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
-            1 : disease , a , :) , 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ...
-            ./ stepsPerYear) * fScale;
-
-        % HIV Negative
-        ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , a , 1 : risk));
-        ccAgeNegRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end...
-            , 1 : 2 , a , :) , 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , ageNegInds) , 2)) ...
-            ./ stepsPerYear) * fScale;
-        
-        % Acute and CD4 > 500
-        agePosInds = toInd(allcomb(3 : 4 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , a , 1 : risk));
-        ccAgePosRel(a , 1 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
-            , 3 : 4 , a , :), 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , agePosInds) , 2)) ...
-            ./ stepsPerYear) * fScale;
-        
-        % HIV Positive CD4 500-350 -> CD4 < 200
-        for d = 5 : 7
-            agePosInds = toInd(allcomb(d , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-                1 : intervens , 2 , a , 1 : risk));
-            ccAgePosRel(a , d - 3 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end...
-                , d , a , :), 2) , 3) , 4)) ...
-                ./ (annlz(sum(popVec(yr_start : yr_end , agePosInds) , 2)) ...
-                ./ stepsPerYear) * fScale;
-        end
-
-        % All HIV+ no ART
-         ageAllPosInds = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , a , 1 : risk));
-         ccAgePosRel(a , 5 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
-            , 3 : 7 , a , :), 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , ageAllPosInds) , 2)) ...
-            ./ stepsPerYear) * fScale;
-        
-        % On ART
-        ageArtInds = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
-            1 : intervens , 2 , a , 1 : risk));
-        ccArtRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
-            , 8 , a , :) , 2) , 3) , 4)) ...
-            ./ (annlz(sum(popVec(yr_start : yr_end , ageArtInds) , 2)) ...
-            ./ stepsPerYear) * fScale;
-
-        % Proportion of cervical cancers by HIV/ART status and age
-        % Total by age
-        ageTotal = annlz(sum(popVec(yr_start : yr_end , ageInds), 2 )) ./ stepsPerYear;
-
-        % HIV-
-        ccNegPosArt(a , 1 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
-            1 , a , :), 2) , 3) , 4)) ...
-            ./ ageTotal) .* fScale;
-        % HIV+
-        ccNegPosArt(a , 2 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
-            3 : 7 , a , :) , 2) , 3) , 4)) ...
-            ./ ageTotal) .* fScale;
-        % ART
-        ccNegPosArt(a , 3 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
-            8 , a , :), 2) , 3) , 4)) ...
-            ./ ageTotal) .* fScale;
-    end
-end
-
-globocan = [0.00
-2.646467154
-8.848389036
-45.1937379
-53.40682334
-63.4
-68.3
-70.7
-73
-77.4
-82.7
-88.6
-95.2];
-
-combined_ub = [0.00
-2.65
-8.85
-45.19
-53.41
-67.05
-80.83
-78.97
-128.87
-105.27
-118.70
-111.81
-95.20];
-
-combined_lb = [0.00
-0.00
-0.41
-9.97
-12.61
-25.00
-45.69
-36.31
-50.55
-57.08
-62.69
-42.43
-52.01];
-
-% Calibration error bars
-mean = ccInc2012_dObs(: , 2);
-sdev = (ccInc2012_dObs(: , 3).^(1/2));
-
-for y = 1 : length(ccIncYears)
-    ccIncYear = ccIncYears(y);
-    
-    figure()
-    % Plot model outputs
-    plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
-        ccAgeNegRel(: , y) , '-kp' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , 5 , y) , '-k+' , ...
-        1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
-    hold on
-    % Plot observed data
-    plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2012_dObs(: , 2) , 'r-');
-    hold on; 
-    errorbar(4 : age , mean , sdev , 'rs')
-    xlabel('Age Group'); ylabel('Incidence per 100,000');
-    set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
-    ylim([0 350]);
-    title(['Cervical Cancer Incidence in ' num2str(ccIncYear)]);
-    legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Combined SA: upper bound' , 'Combined SA: lower bound' , ...
-        'Globocan SA (2012)' , 'Calibration SD')
-    % legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
-    %     'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
-    %     'Location' , 'NorthEastOutside')
-
+% plot(1 : length(hpvNeg2002) , hpvNeg2002 , 'o-')
+% hold all;
+% set(gca , 'xtickLabel' , ageGroup);
+% 
+% % general
+% % yPosError = abs(hrHpvObs(: , 3) - hrHpvObs(: , 1));
+% % yNegError = abs(hrHpvObs(: , 2) - hrHpvObs(: , 1));
+% % errorbar(1 : length(hrHpvObs) , hrHpvObs(: , 1) , yNegError , yPosError , 'rs')
+% % HIV+
+% yPosError = abs(hpvHivObs(: , 3) - hpvHivObs(: , 1));
+% yNegError = abs(hpvHivObs(: , 2) - hpvHivObs(: , 1));
+% errorbar(1 : length(hpvHivObs) , hpvHivObs(: , 1) , yNegError , yPosError , 'bs')
+% hold all;
+% errorbar(1 : length(mean) , mean , sdev , 'ks')
+% %HIV-
+% yPosError = abs(hpvNegObs(: , 3) - hpvNegObs(: , 1));
+% yNegError = abs(hpvNegObs(: , 2) - hpvNegObs(: , 1));
+% errorbar(1 : length(hpvNegObs) , hpvNegObs(: , 1) , yNegError , yPosError , 'rs')
+% hold all;
+% errorbar(1 : length(mean) , meanNeg , sdevNeg , 'ks')
+% 
+% set(gca , 'xtick' , 1 : length(hpvNegObs) , 'xtickLabel' , ageGroup);
+% legend('HIV-Positive (year 2002)' , 'HIV-Negative (year 2002)' , ...
+%     'Observed HIV-Positive (McDonald, 2014): 2SD' , 'Observed HIV-Positive: Calibration SD' , ...
+%     'Observed HIV-Negative (McDonald, 2014): 2SD' , 'Observed HIV-Negative: Calibration SD')
+% xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
+% %title('Age Specific hrHPV Prevalence in 2002')
+% 
+% %% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data
+% yearPrev = 2008;
+% ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
+% ageVec = {[4:5],[6:7],[8:9],[10:13]};
+% hpv_hivM2008 = zeros(length(ageVec) , 2);
+% 
+% 
+% for aV = 1 : length(ageVec)
+%     a = ageVec{aV};
+%     hpvHivPosInd = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 , [1 : 2 , 7] , ...
+%         1 , 1 : intervens , 1 , a  , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
+%         [1 : 2 , 7] , 2 , 1 , 1 : intervens , 1 , a , 1 : risk))]);
+%     popHivInd = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , ...
+%         1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+%     hpv_hivM2008(aV , 1) = (sum(popVec((yearPrev - startYear) * stepsPerYear +1 , hpvHivPosInd)) ...
+%         ./ sum(popVec((yearPrev - startYear) * stepsPerYear +1 , popHivInd))) * 100;
+%     
+%     hpvHivNegInd = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 , [1 : 2 , 7] , 1 , ...
+%         1 : intervens , 1 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
+%         [1 : 2 , 7] , 2 , 1 , 1 : intervens , 1 , a , 1 : risk))]);
+%     popNegInd = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , ...
+%         1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+%     hpv_hivM2008(aV , 2) = (sum(popVec((yearPrev - startYear) * stepsPerYear +1 , hpvHivNegInd)) ...
+%         ./ sum(popVec((yearPrev - startYear) * stepsPerYear +1 , popNegInd))) * 100;
+%     
+% end
+% 
+% % Calibration error bars
+% mean = hpv_hivM2008_dObs(: , 2) .* 100;
+% sdev = (hpv_hivM2008_dObs(: , 3).^(1/2)) .* 100;
+% meanNeg = hpv_hivMNeg2008_dObs(: , 2) .* 100;
+% sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)) .* 100;
+% 
+% figure()
+% subplot(2,1,1)
+% plot([1 : length(ageVec)] , hpv_hivM2008(: , 1)' , 'b-');
+% hold all;
+% plot([1 : length(ageVec)] , hpv_hivM2008_dObs(: , 2)' .* 100 , 'bo');
+% hold all;
+% errorbar(1 : length(mean) , mean , sdev , 'ks')
+% set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup);
+% legend('HIV-Positive Males (year 2008)' , 'Observed HIV-Positive Males: Mbulawa 2008' , ...
+%     'Observed HIV-Positive Males: Calibration SD');
+% xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
+% 
+% subplot(2,1,2)
+% plot([1 : length(ageVec)] , hpv_hivM2008(: , 2)' , 'r-')
+% hold all;
+% plot([1 : length(ageVec)] , hpv_hivMNeg2008_dObs(: , 2)' .* 100 , 'ro');
+% hold all;
+% errorbar(1 : length(mean) , meanNeg , sdevNeg , 'ks')
+% set(gca , 'xtick' , [1 : length(ageVec)] , 'xtickLabel' , ageGroup);
+% legend('HIV-Negative Males (year 2008)' , 'Observed HIV-Negative Males: Mbulawa 2008' , ...
+%     'Observed HIV-Negative Males: Calibration SD');
+% xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
+% 
+% %% ********************************** CIN FIGURES *********************************************************************************************
+% 
+% %% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002 vs. McDonald 2014 data
+% cinPos2002 = zeros(10 , 1);
+% cinNeg2002 = cinPos2002;
+% ageGroup = {'17-19' , '20-24' , '25-29' ,...
+%     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+%     '60-64' , '65-69' , '70-74' , '75-79'};
+% %aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+% for a = 4 : 13  %note, age group 4 is 17-19 in the data
+%     %a = aVec{aInd};
+%     % HIV-positive (on and not on ART)
+%     cinInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
+%         [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+%     ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+%     cinPos2002(a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinInds)))...
+%         ./ sum(popVec((2002 - startYear) * stepsPerYear , ageInds)) * 100;
+%     % HIV-negative
+%     cinNegInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
+%         [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+%     ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%         1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+%     cinNeg2002(a - 3) = (sum(popVec((2002 - startYear) * stepsPerYear , cinNegInds)))...
+%         ./ (sum(popVec((2002 - startYear) * stepsPerYear , ageNegInds))) * 100;
+% end
+% 
+% % McDonald 2014, HIV-positive (not sure where these bounds came from)
+% cinPosAct(: , 1) = cinPos2002_dObs(: , 2); % mean
+% cinPosAct(: , 2) = [0.03 0.02 0.09 0.10 0.05 0.02 0.02 0.00 0.00 0.00]'; % lb
+% cinPosAct(: , 3) = [0.22 0.08 0.17 0.21 0.11 0.09 0.14 0.17 0.22 0.22]'; % ub
+% cinPosAct = cinPosAct .* 100; % convert to %
+% yPosError = abs(cinPosAct(: , 3) - cinPosAct(: , 1));
+% yNegError = abs(cinPosAct(: , 2) - cinPosAct(: , 1));
+% 
+% % Calibration error bars
+% mean = cinPos2002_dObs(: , 2) .* 100;
+% sdev = (cinPos2002_dObs(: , 3).^(1/2)) .* 100;
+% 
+% figure();
+% subplot(2 , 1 , 1);
+% plot(1 : length(cinPos2002) , cinPos2002 ,'o-')
+% hold on;
+% errorbar(1 : length(cinPosAct) , cinPosAct(: , 1) , yNegError , yPosError , 'rs')
+% hold on;
+% errorbar(1 : length(mean) , mean , sdev , 'ks')
+% legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
+% set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+% xlabel('Age Group'); ylabel('Prevalence (%)')
+% title('Age Specific CIN 2/3 Prevalence Among HIV+ in 2002')
+% ylim([0 25])
+% 
+% % McDonald 2014, HIV-negative (not sure where these bounds came from)
+% cinNegAct(: , 1) = cinNeg2002_dObs(: , 2); % mean
+% cinNegAct(: , 2) = [0.00 0.02 0.01 0.02 0.02 0.02 0.02 0.01 0.00 0.00]'; % lb
+% cinNegAct(: , 3) = [0.03 0.04 0.03 0.05 0.04 0.04 0.04 0.03 0.03 0.03]'; % ub
+% cinNegAct = cinNegAct .* 100; % convert to %
+% yPosError = abs(cinNegAct(: , 3) - cinNegAct(: , 1));
+% yNegError = abs(cinNegAct(: , 2) - cinNegAct(: , 1));
+% 
+% % Calibration error bars
+% mean = cinNeg2002_dObs(: , 2) .* 100;
+% sdev = (cinNeg2002_dObs(: , 3).^(1/2)) .* 100;
+% 
+% subplot(2 , 1 , 2)
+% plot(1 : length(cinNeg2002) , cinNeg2002 , 'o-')
+% hold on;
+% errorbar(1 : length(cinNegAct) , cinNegAct(: , 1) , yNegError , yPosError , 'rs')
+% hold on;
+% errorbar(1 : length(mean) , mean , sdev , 'ks')
+% legend('HR HPV CIN 2/3' , 'Observed (McDonald, 2014), 2SD' , 'Calibration SD')
+% set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+% xlabel('Age Group'); ylabel('Prevalence (%)')
+% title('Age Specific CIN 2/3 Prevalence Among HIV- in 2002')
+% ylim([0 25])
+% 
+% %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
+% 
+% %% Cervical cancer incidence in 2012 by age vs. NCR KZN data and other sources
+% %ccIncYears = [2017 , 2003 , 1994 , 2012];
+% ccIncYears = [2012];
+% ccAgeRel = zeros(age , length(ccIncYears));
+% ccAgeNegRel = ccAgeRel;
+% ccAgePosRel = zeros(age , 5 , length(ccIncYears));
+% ccArtRel = ccAgeRel;
+% ccNegPosArt = zeros(age , 3 , length(ccIncYears));
+% fScale = 10^5;
+% ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+%     '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
+%     '60-64' , '65-69' , '70-74' , '75-79'};
+% annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
+% ccYrs = ((ccIncYears - startYear) * stepsPerYear : ...
+%     (ccIncYears + 1 - startYear) * stepsPerYear);
+% 
+% %aVec = {1:5,6:10,11:15,16:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+% %for aInd = 1 : 16
+% for a = 1 : age
+%     %a = aVec{aInd};
+%     for y = 1 : length(ccIncYears)
+%         % Year
+%         yr_start = (ccIncYears(y) - 1 - startYear)  .* stepsPerYear;
+%         yr_end = (ccIncYears(y) - startYear) .* stepsPerYear - 1;
+%         
+%         % Total population
+%         ageInds = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%             1 : intervens , 2 , a , 1 : risk));
+%         ccAgeRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             1 : disease , a , :) , 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageInds) , 2)) ...
+%             ./ stepsPerYear) * fScale;
+% 
+%         % HIV Negative
+%         ageNegInds = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%             1 : intervens , 2 , a , 1 : risk));
+%         ccAgeNegRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end...
+%             , 1 : 2 , a , :) , 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageNegInds) , 2)) ...
+%             ./ stepsPerYear) * fScale;
+%         
+%         % Acute and CD4 > 500
+%         agePosInds = toInd(allcomb(3 : 4 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%             1 : intervens , 2 , a , 1 : risk));
+%         ccAgePosRel(a , 1 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
+%             , 3 : 4 , a , :), 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , agePosInds) , 2)) ...
+%             ./ stepsPerYear) * fScale;
+%         
+%         % HIV Positive CD4 500-350 -> CD4 < 200
+%         for d = 5 : 7
+%             agePosInds = toInd(allcomb(d , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%                 1 : intervens , 2 , a , 1 : risk));
+%             ccAgePosRel(a , d - 3 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end...
+%                 , d , a , :), 2) , 3) , 4)) ...
+%                 ./ (annlz(sum(popVec(yr_start : yr_end , agePosInds) , 2)) ...
+%                 ./ stepsPerYear) * fScale;
+%         end
+% 
+%         % All HIV+ no ART
+%          ageAllPosInds = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%             1 : intervens , 2 , a , 1 : risk));
+%          ccAgePosRel(a , 5 , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
+%             , 3 : 7 , a , :), 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageAllPosInds) , 2)) ...
+%             ./ stepsPerYear) * fScale;
+%         
+%         % On ART
+%         ageArtInds = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , 1 , ...
+%             1 : intervens , 2 , a , 1 : risk));
+%         ccArtRel(a , y) = annlz(sum(sum(sum(newCC(yr_start : yr_end ...
+%             , 8 , a , :) , 2) , 3) , 4)) ...
+%             ./ (annlz(sum(popVec(yr_start : yr_end , ageArtInds) , 2)) ...
+%             ./ stepsPerYear) * fScale;
+% 
+%         % Proportion of cervical cancers by HIV/ART status and age
+%         % Total by age
+%         ageTotal = annlz(sum(popVec(yr_start : yr_end , ageInds), 2 )) ./ stepsPerYear;
+% 
+%         % HIV-
+%         ccNegPosArt(a , 1 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             1 , a , :), 2) , 3) , 4)) ...
+%             ./ ageTotal) .* fScale;
+%         % HIV+
+%         ccNegPosArt(a , 2 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             3 : 7 , a , :) , 2) , 3) , 4)) ...
+%             ./ ageTotal) .* fScale;
+%         % ART
+%         ccNegPosArt(a , 3 , y) = (annlz(sum(sum(sum(newCC(yr_start : yr_end , ...
+%             8 , a , :), 2) , 3) , 4)) ...
+%             ./ ageTotal) .* fScale;
+%     end
+% end
+% 
+% globocan = [0.00
+% 2.646467154
+% 8.848389036
+% 45.1937379
+% 53.40682334
+% 63.4
+% 68.3
+% 70.7
+% 73
+% 77.4
+% 82.7
+% 88.6
+% 95.2];
+% 
+% combined_ub = [0.00
+% 2.65
+% 8.85
+% 45.19
+% 53.41
+% 67.05
+% 80.83
+% 78.97
+% 128.87
+% 105.27
+% 118.70
+% 111.81
+% 95.20];
+% 
+% combined_lb = [0.00
+% 0.00
+% 0.41
+% 9.97
+% 12.61
+% 25.00
+% 45.69
+% 36.31
+% 50.55
+% 57.08
+% 62.69
+% 42.43
+% 52.01];
+% 
+% % Calibration error bars
+% mean = ccInc2012_dObs(: , 2);
+% sdev = (ccInc2012_dObs(: , 3).^(1/2));
+% 
+% for y = 1 : length(ccIncYears)
+%     ccIncYear = ccIncYears(y);
+%     
 %     figure()
-%     bar(1 : length(ccNegPosArt(: , : , y)) , ccNegPosArt(: , : , y), 'stacked')
-%     xlabel('Age Group'); ylabel('Incidence per 100,000')
+%     % Plot model outputs
+%     plot(1 : size(ccAgeRel , 1) , ccAgeRel(: , y) , '-ko' , 1 : size(ccAgeNegRel(: , y) , 1) , ...
+%         ccAgeNegRel(: , y) , '-kp' , 1 : size(ccAgePosRel , 1) , ccAgePosRel(: , 5 , y) , '-k+' , ...
+%         1 : size(ccArtRel , 1) , ccArtRel(: , y) , '-k^');
+%     hold on
+%     % Plot observed data
+%     plot(4 : age , combined_ub , 'r--' , 4 : age , combined_lb , 'r--' , 4 : age , ccInc2012_dObs(: , 2) , 'r-');
+%     hold on; 
+%     errorbar(4 : age , mean , sdev , 'rs')
+%     xlabel('Age Group'); ylabel('Incidence per 100,000');
 %     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
-%     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
-%     legend('HIV-' , 'HIV+' , 'ART')
-end
-
-%% CC incidence by HIV status over time (age-standardized)
-inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
-fac = 10 ^ 5;
-plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
-linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
-% worldStandard_WP2015 = [325428 (311262/5.0) 295693 287187 291738 299655 272348 ...
-%         247167 240167 226750 201603 171975 150562 113118 82266 64484];
-worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
-        247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
-        23477 9261 2155];
-
-figure();
-
-for i = 1 : length(inds)
-    
-    ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
-           
-    for aInd = 1 : age + 4
-        if aInd >= age
-            a = age;
-        else
-            a = aInd;
-        end
-        
-        % General
-        allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
-        % All HIV-negative women
-        hivNeg = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
-        % HIV-positive women not on ART
-        hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
-        % Women on ART
-        artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
-        % All HIV-positive women
-        hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 2 , a , 1 : risk));
-        genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
-        
-        % Calculate incidence
-        if aInd <= age
-            ccIncRef = ...
-                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
-                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
-                .* (worldStandard_WP2015(a));
-            if (i == 4) && (a < 3) && (max(annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4))) == 0.0)
-                ccIncRef = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
-            end
-        elseif aInd > age
-            ccIncRef = ...
-                (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
-                (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear)) * fac);
-            ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
-            ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
-        end
-        ccIncRefVec = ccIncRefVec + ccIncRef;
-
-    end
-    
-    ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
- 
-    plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
-    xlabel('Year'); ylabel('Cervical cancer incidence per 100K- age-standardized');
-    legend('-DynamicLegend');
-    grid on;
-    xlim([1925 2020]);
-    ylim([0 150]);
-    hold all;
-end 
-
-%% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
-
-%% HPV type distribution by state over time (coinfections grouped as 9v-type HPV)
-% HPV infected
-hpvInds_vax = toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-hpvInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 , 7] , 2 , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-hpvInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , ...
-        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 , 7] , 2 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
-hpv_vax = sum(popVec(: , hpvInds_vax) , 2)...
-    ./ sum(popVec(: , hpvInds_tot) , 2) * 100;
-hpv_nonVax = sum(popVec(: , hpvInds_nonVax) , 2)...
-    ./ sum(popVec(: , hpvInds_tot) , 2) * 100;
-
-% Calibration error bars
-mean = hpv_dist_dObs(: , 2) .* 100;
-sdev = (hpv_dist_dObs(: , 3).^(1/2)) .* 100;
-
-figure;
-subplot(2,3,1)
-plot(tVec , hpv_vax , 'k')
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 46.82 , 'ko')
-hold all;
-plot(tVec , hpv_nonVax , 'b');
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 53.18 , 'bo');
-hold all; 
-errorbar([2011, 2011] , mean , sdev , 'ks')
-xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
-title('HPV');
-ylim([0 100]);
-xlim([2000 2015]);
-%legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
-
-% CIN1
-cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 2 , 7] , 3 , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
-        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 : 2 , 7] , 3 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
-cin_vax = sum(popVec(: , cinInds_vax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-
-% Calibration error bars
-mean = cin1_dist_dObs(: , 2) .* 100;
-sdev = (cin1_dist_dObs(: , 3).^(1/2)) .* 100;
-
-subplot(2,3,2)
-plot(tVec , cin_vax , 'k')
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 51.92 , 'ko')
-hold all;
-plot(tVec , cin_nonVax ,'b');
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 48.08 , 'bo')
-hold all;
-errorbar([2011, 2011] , mean , sdev , 'ks')
-ylim([0 100]);
-xlim([2000 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
-title('CIN1')
-%legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Obsersved 2011: non-9v');
-
-% CIN2
-cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 3 , 7] , 4 , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
-        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 : 3 , 7] , 4 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
-cin_vax = sum(popVec(: , cinInds_vax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-
-subplot(2,3,3)
-plot(tVec , cin_vax , 'k')
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 62.81 , 'ko')
-hold all;
-plot(tVec , cin_nonVax ,'b');
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 37.19 , 'bo')
-ylim([0 100]);
-xlim([2000 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
-title('CIN2')
-%legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
-
-% CIN3
-cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 4 , 7] , 5 , ...
-    1 , 1 : intervens , 2 , 1 : age , 1 : risk));
-cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
-        1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
-cin_vax = sum(popVec(: , cinInds_vax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
-    ./ sum(popVec(: , cinInds_tot) , 2) * 100;
-
-% Calibration error bars
-mean = cin3_dist_dObs(: , 2) .* 100;
-sdev = (cin3_dist_dObs(: , 3).^(1/2)) .* 100;
-
-subplot(2,3,4)
-plot(tVec , cin_vax , 'k')
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 73.71 , 'ko')
-hold all;
-plot(tVec , cin_nonVax ,'b');
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 26.29 , 'bo')
-hold all;
-errorbar([2011, 2011] , mean , sdev , 'ks')
-ylim([0 100]);
-xlim([2000 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
-title('CIN3')
-%legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
-
-% CC
-ccInds_vax = toInd(allcomb(1 : disease , 1 : viral , 6 , [1 : 6 , 7] , ...
-    1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
-ccInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , 6 , ...
-    1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
-ccInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 6 , [1 : 6 , 7] , ...
-        1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
-        [1 : 5 , 7] , 6 , 1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
-cc_vax = sum(popVec(: , ccInds_vax) , 2)...
-    ./ sum(popVec(: , ccInds_tot) , 2) * 100;
-cc_nonVax = sum(popVec(: , ccInds_nonVax) , 2)...
-    ./ sum(popVec(: , ccInds_tot) , 2) * 100;
-
-% Calibration error bars
-mean = cc_dist_dObs(: , 2) .* 100;
-sdev = (cc_dist_dObs(: , 3).^(1/2)) .* 100;
-
-subplot(2,3,5)
-plot(tVec , cc_vax , 'k')
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 85.78 , 'ko')
-hold all;
-plot(tVec , cc_nonVax ,'b');
-hold all;
-plot(tVec((2011 - startYear) * stepsPerYear) , 14.22 , 'bo')
-hold all;
-errorbar([2011, 2011] , mean , sdev , 'ks')
-ylim([0 100]);
-xlim([2000 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
-title('Cervical Cancer')
-legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
+%     ylim([0 350]);
+%     title(['Cervical Cancer Incidence in ' num2str(ccIncYear)]);
+%     legend('General' , 'HIV-' , 'HIV+' , 'ART' , 'Combined SA: upper bound' , 'Combined SA: lower bound' , ...
+%         'Globocan SA (2012)' , 'Calibration SD')
+%     % legend('General' , 'HIV-' , ' Acute and CD4 > 500' , 'CD4 500-350' , 'CD4 350-200' , ...
+%     %     'CD4 < 200' , 'ART' , 'Globocan' , 'Upper Bound' , 'Lower Bound' , ...
+%     %     'Location' , 'NorthEastOutside')
+% 
+% %     figure()
+% %     bar(1 : length(ccNegPosArt(: , : , y)) , ccNegPosArt(: , : , y), 'stacked')
+% %     xlabel('Age Group'); ylabel('Incidence per 100,000')
+% %     set(gca , 'xtick' , 1 : length(ccAgeRel) , 'xtickLabel' , ageGroup);
+% %     title(['Cervical Cancer Incidence Distribution in ' , num2str(ccIncYear)])
+% %     legend('HIV-' , 'HIV+' , 'ART')
+% end
+% 
+% %% CC incidence by HIV status over time (age-standardized)
+% inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8}; % HIV state inds
+% fac = 10 ^ 5;
+% plotTits1 = {'General' , 'HIV-negative' , 'HIV-positive no ART' , 'HIV-positive ART' , 'HIV all'};
+% linColor = {'k' , '[0.8500, 0.3250, 0.0980]' , '[0, 0.4470, 0.7410]' , '[0.9290, 0.6940, 0.1250]' , 'g'};
+% % worldStandard_WP2015 = [325428 (311262/5.0) 295693 287187 291738 299655 272348 ...
+% %         247167 240167 226750 201603 171975 150562 113118 82266 64484];
+% worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+%         247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+%         23477 9261 2155];
+% 
+% figure();
+% 
+% for i = 1 : length(inds)
+%     
+%     ccIncRefVec = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+%            
+%     for aInd = 1 : age + 4
+%         if aInd >= age
+%             a = age;
+%         else
+%             a = aInd;
+%         end
+%         
+%         % General
+%         allF = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+%             1 , 1 : intervens , 2 , a , 1 : risk));
+%         % All HIV-negative women
+%         hivNeg = toInd(allcomb(1 : 2 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+%             1 , 1 : intervens , 2 , a , 1 : risk));
+%         % HIV-positive women not on ART
+%         hivNoARTF = toInd(allcomb(3 : 7 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+%             1 , 1 : intervens , 2 , a , 1 : risk));
+%         % Women on ART
+%         artF = toInd(allcomb(8 , 6 , [1 : 5 , 7] , [1 : 5 , 7] , ...
+%             1 , 1 : intervens , 2 , a , 1 : risk));
+%         % All HIV-positive women
+%         hivAllF = toInd(allcomb(3 : 8 , 1 : viral , [1 : 5 , 7] , [1 : 5 , 7] , ...
+%             1 , 1 : intervens , 2 , a , 1 : risk));
+%         genArray = {allF , hivNeg , hivNoARTF , artF , hivAllF};
+%         
+%         % Calculate incidence
+%         if aInd <= age
+%             ccIncRef = ...
+%                 (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+%                 (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear))* fac) ...
+%                 .* (worldStandard_WP2015(a));
+%             if (i == 4) && (a < 3) && (max(annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4))) == 0.0)
+%                 ccIncRef = zeros(length(tVec(1 : stepsPerYear : end-1)),1)';
+%             end
+%         elseif aInd > age
+%             ccIncRef = ...
+%                 (annlz(sum(sum(newCC(1:end-1 , inds{i} , a , :),2),4)) ./ ...
+%                 (annlz(sum(popVec(1:end-1 , genArray{i}) , 2) ./ stepsPerYear)) * fac);
+%             ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
+%             ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+%         end
+%         ccIncRefVec = ccIncRefVec + ccIncRef;
+% 
+%     end
+%     
+%     ccInc = ccIncRefVec ./ (sum(worldStandard_WP2015(1:age+4)));
+%  
+%     plot(tVec(1 : stepsPerYear : end-1) , ccInc ,'DisplayName' , plotTits1{i});
+%     xlabel('Year'); ylabel('Cervical cancer incidence per 100K- age-standardized');
+%     legend('-DynamicLegend');
+%     grid on;
+%     xlim([1925 2020]);
+%     ylim([0 150]);
+%     hold all;
+% end 
+% 
+% %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
+% 
+% %% HPV type distribution by state over time (coinfections grouped as 9v-type HPV)
+% % HPV infected
+% hpvInds_vax = toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% hpvInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 , 7] , 2 , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% hpvInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 2 , [1 : 2 , 7] , ...
+%         1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 , 7] , 2 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+% hpv_vax = sum(popVec(: , hpvInds_vax) , 2)...
+%     ./ sum(popVec(: , hpvInds_tot) , 2) * 100;
+% hpv_nonVax = sum(popVec(: , hpvInds_nonVax) , 2)...
+%     ./ sum(popVec(: , hpvInds_tot) , 2) * 100;
+% 
+% % Calibration error bars
+% mean = hpv_dist_dObs(: , 2) .* 100;
+% sdev = (hpv_dist_dObs(: , 3).^(1/2)) .* 100;
+% 
+% figure;
+% subplot(2,3,1)
+% plot(tVec , hpv_vax , 'k')
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 46.82 , 'ko')
+% hold all;
+% plot(tVec , hpv_nonVax , 'b');
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 53.18 , 'bo');
+% hold all; 
+% errorbar([2011, 2011] , mean , sdev , 'ks')
+% xlabel('Year'); ylabel('Prevalence Proportion by Type (%)');
+% title('HPV');
+% ylim([0 100]);
+% xlim([2000 2015]);
+% %legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
+% 
+% % CIN1
+% cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 2 , 7] , 3 , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 3 , [1 : 3 , 7] , ...
+%         1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 : 2 , 7] , 3 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+% cin_vax = sum(popVec(: , cinInds_vax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% 
+% % Calibration error bars
+% mean = cin1_dist_dObs(: , 2) .* 100;
+% sdev = (cin1_dist_dObs(: , 3).^(1/2)) .* 100;
+% 
+% subplot(2,3,2)
+% plot(tVec , cin_vax , 'k')
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 51.92 , 'ko')
+% hold all;
+% plot(tVec , cin_nonVax ,'b');
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 48.08 , 'bo')
+% hold all;
+% errorbar([2011, 2011] , mean , sdev , 'ks')
+% ylim([0 100]);
+% xlim([2000 2015]);
+% xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
+% title('CIN1')
+% %legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Obsersved 2011: non-9v');
+% 
+% % CIN2
+% cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 3 , 7] , 4 , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 4 , [1 : 4 , 7] , ...
+%         1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 : 3 , 7] , 4 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+% cin_vax = sum(popVec(: , cinInds_vax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% 
+% subplot(2,3,3)
+% plot(tVec , cin_vax , 'k')
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 62.81 , 'ko')
+% hold all;
+% plot(tVec , cin_nonVax ,'b');
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 37.19 , 'bo')
+% ylim([0 100]);
+% xlim([2000 2015]);
+% xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
+% title('CIN2')
+% %legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
+% 
+% % CIN3
+% cinInds_vax = toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 4 , 7] , 5 , ...
+%     1 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% cinInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 5 , [1 : 5 , 7] , ...
+%         1 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+% cin_vax = sum(popVec(: , cinInds_vax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% cin_nonVax = sum(popVec(: , cinInds_nonVax) , 2)...
+%     ./ sum(popVec(: , cinInds_tot) , 2) * 100;
+% 
+% % Calibration error bars
+% mean = cin3_dist_dObs(: , 2) .* 100;
+% sdev = (cin3_dist_dObs(: , 3).^(1/2)) .* 100;
+% 
+% subplot(2,3,4)
+% plot(tVec , cin_vax , 'k')
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 73.71 , 'ko')
+% hold all;
+% plot(tVec , cin_nonVax ,'b');
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 26.29 , 'bo')
+% hold all;
+% errorbar([2011, 2011] , mean , sdev , 'ks')
+% ylim([0 100]);
+% xlim([2000 2015]);
+% xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
+% title('CIN3')
+% %legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
+% 
+% % CC
+% ccInds_vax = toInd(allcomb(1 : disease , 1 : viral , 6 , [1 : 6 , 7] , ...
+%     1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% ccInds_nonVax = toInd(allcomb(1 : disease , 1 : viral , [1 : 5 , 7] , 6 , ...
+%     1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk));
+% ccInds_tot = unique([toInd(allcomb(1 : disease , 1 : viral , 6 , [1 : 6 , 7] , ...
+%         1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+%         [1 : 5 , 7] , 6 , 1 : 3 , 1 : intervens , 2 , 1 : age , 1 : risk))]);
+% cc_vax = sum(popVec(: , ccInds_vax) , 2)...
+%     ./ sum(popVec(: , ccInds_tot) , 2) * 100;
+% cc_nonVax = sum(popVec(: , ccInds_nonVax) , 2)...
+%     ./ sum(popVec(: , ccInds_tot) , 2) * 100;
+% 
+% % Calibration error bars
+% mean = cc_dist_dObs(: , 2) .* 100;
+% sdev = (cc_dist_dObs(: , 3).^(1/2)) .* 100;
+% 
+% subplot(2,3,5)
+% plot(tVec , cc_vax , 'k')
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 85.78 , 'ko')
+% hold all;
+% plot(tVec , cc_nonVax ,'b');
+% hold all;
+% plot(tVec((2011 - startYear) * stepsPerYear) , 14.22 , 'bo')
+% hold all;
+% errorbar([2011, 2011] , mean , sdev , 'ks')
+% ylim([0 100]);
+% xlim([2000 2015]);
+% xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
+% title('Cervical Cancer')
+% legend('9v-type HPV' , 'Observed 2011: 9v' , 'Non-9v-type HPV' , 'Observed 2011: non-9v');
 
 
 

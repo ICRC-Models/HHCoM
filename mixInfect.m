@@ -392,10 +392,10 @@ for a = ageSexDebut : age
     end
 end
 
-newInfs{1} = newHpvVax;
-newInfs{2} = newImmHpvVax;
-newInfs{3} = newHpvNonVax;
-newInfs{4} = newImmHpvNonVax;
+% newInfs{1} = newHpvVax;
+% newInfs{2} = newImmHpvVax;
+% newInfs{3} = newHpvNonVax;
+% newInfs{4} = newImmHpvNonVax;
 
 %% HIV Infection
 % HIV average betas
@@ -476,7 +476,7 @@ for h = 1 : hpvVaxStates
 end
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
-newInfs{5} = newHiv;
+newInfs{1} = newHiv;
 
 dPop = sparse(dPop);
 

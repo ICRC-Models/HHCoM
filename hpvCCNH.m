@@ -240,7 +240,7 @@ for d = 1 : disease
 end
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
-extraOut{1} = ccInc;
-extraOut{2} = ccDeath;
+extraOut{1} = ccDeath;
+%extraOut{2} = ccInc;
 
 dPop = sparse(dPop);

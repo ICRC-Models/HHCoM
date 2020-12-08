@@ -16,12 +16,11 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_diagHiv090-1204_DoART_S2_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
-
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_diagHiv090-1204_DoART_S2_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -358,23 +357,23 @@ for n = nTests
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     transCD4 = zeros(length(s) - 1 , disease , gender , age);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
-    newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
-    newImmHpvVax = newHpvVax;
-    newHpvNonVax = newHpvVax;
-    newImmHpvNonVax = newHpvVax;
-    newCC = zeros(length(s) - 1 , disease , age , hpvTypeGroups); % track by HPV type causal to CC
+    % newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
+    % newImmHpvVax = newHpvVax;
+    % newHpvNonVax = newHpvVax;
+    % newImmHpvNonVax = newHpvVax;
+    % newCC = zeros(length(s) - 1 , disease , age , hpvTypeGroups); % track by HPV type causal to CC
     % newCin1 = newCC;
     % newCin2 = newCC;
     % newCin3 = newCC;
-    ccDeath = newCC;
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+    ccDeath = zeros(length(s) - 1 , disease , age , hpvTypeGroups);
+    % newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
+    % newTreatImm = newScreen;
+    % newTreatHpv = newScreen;
+    % newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
-    vaxdLmtd = zeros(length(s) - 1 , 1);
-    vaxdSchool = vaxdLmtd;
-    vaxdCU = vaxdLmtd;
+    % vaxdLmtd = zeros(length(s) - 1 , 1);
+    % vaxdSchool = vaxdLmtd;
+    % vaxdCU = vaxdLmtd;
     
     % ART
     import java.util.LinkedList
@@ -434,7 +433,7 @@ for n = nTests
             % Progression/regression from initial HPV infection to
             % precancer stages and cervical cancer. Differential CC
             % death by CC stage and HIV status/CD4 count.
-            [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
+            [~ , pop , ccDeath(i , : , : , :)] ...
                 = ode4xtra(@(t , pop) ...
                 hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
                 normalhpvVaxInds , immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , ...
@@ -454,10 +453,7 @@ for n = nTests
             end
                    
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+                [dPop] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -482,8 +478,7 @@ for n = nTests
         
         % HIV and HPV mixing and infection module. Protective effects of condom
         % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
-        [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
-            newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , : , : , : , :)] = ...
+        [~ , pop , newHiv(i , : , : , : , : , : , :)] = ...
             ode4xtra(@(t , pop) mixInfect(t , pop , ...
             stepsPerYear , year , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
             age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
@@ -596,7 +591,7 @@ for n = nTests
             % If within first vaxLimitYrs-many vaccine-limited years
             if vaxLimit && ((year - currYear) <= vaxLimitYrs)
                 % HPV vaccination module- vaccine limited years
-                [dPop , vaxdLmtd(i , :) , vaxRemain] = hpvVaxLmtd(popIn , year , vaxLimitPerYr , ...
+                [dPop , vaxRemain] = hpvVaxLmtd(popIn , year , vaxLimitPerYr , ...
                     disease , viral , risk , hpvVaxStates , hpvNonVaxStates , endpoints , ...
                     intervens , vaxCoverL , vaxRemain , vaxGL , toInd);
                 pop(end , :) = pop(end , :) + dPop;
@@ -609,7 +604,7 @@ for n = nTests
             % If vaccines are not limited
             else
                 % HPV vaccination module- school-based vaccination regimen
-                [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
+                [dPop] = hpvVaxSchool(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
                     vaxRate , toInd);
                 pop(end , :) = pop(end , :) + dPop;
@@ -622,7 +617,7 @@ for n = nTests
                 % If present, apply catch-up vaccination regimen
                 if vaxCU
                     % HPV vaccination module- catch-up vaccination regimen
-                    [dPop , vaxdCU(i , :)] = hpvVaxCU(popIn , viral , risk , ...
+                    [dPop] = hpvVaxCU(popIn , viral , risk , ...
                         hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxAgeCU , ...
                         vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd);
                     pop(end , :) = pop(end , :) + dPop;
@@ -650,9 +645,8 @@ for n = nTests
     end
     
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv , transCD4 , ...
-        newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ...
+        menCirc , ...
         artDist , artDistList , artTreatTracker , artDiscont , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
         nHivDiagVec , nHivUndiagVec , nTestedNeg , nTestedUndiag , propHivDiag , ...
