@@ -1,5 +1,5 @@
 % HPV Natural History
-% Simulates progression through HPV states.
+% Simulates progression through HPV states and vaccine waning.
 % Accepts a population matrix as input and returns dPop, a vector of
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.
@@ -13,8 +13,8 @@ function[dPop , extraOut] = hpvCCNH(t , pop , ...
     cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
     cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
-    rImmune , fImm , kRL , kDR , maleHpvClearMult , disease , age , hpvVaxStates , ...
-    hpvNonVaxStates , hpvTypeGroups)
+    rImmune , fImm , kRL , kDR , maleHpvClearMult , rVaxWane , disease , ...
+    age , hpvVaxStates , hpvNonVaxStates , hpvTypeGroups)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -238,6 +238,12 @@ for d = 1 : disease
         end
     end   
 end
+
+%% Vaccine waning
+dPop(fromVaxNoScrn) = dPop(fromVaxNoScrn) - rVaxWane .* pop(fromVaxNoScrn);
+dPop(fromVaxScrn) = dPop(fromVaxScrn) - rVaxWane .* pop(fromVaxScrn);
+dPop(toNonVaxNoScrn) = dPop(toNonVaxNoScrn) + rVaxWane .* pop(fromVaxNoScrn);
+dPop(toNonVaxScrn) = dPop(toNonVaxScrn) + rVaxWane .* pop(fromVaxScrn);                        
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = ccInc;
