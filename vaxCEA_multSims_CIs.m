@@ -212,9 +212,6 @@ for k = 1 : loopSegmentsLength-1
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
-        if waning
-            resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
-        end
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
@@ -1266,16 +1263,16 @@ for g = 1 : gender
         yr = hivPrevYrVec(yrInd);
         
         % Calibration error bars
-        hivM(: , 1) = hivPrevM_dObs(((yrInd-1)*7+1):(yrInd*7) , 2) .* 100; % mean
-        hivM(: , 2) = (hivPrevM_dObs(((yrInd-1)*7+1):(yrInd*7) , 3).^(1/2)).*2 .* 100; % calibration SD
-        hivF(: , 1) = hivPrevF_dObs(((yrInd-1)*7+1):(yrInd*7) , 2) .* 100; % mean
-        hivF(: , 2) = (hivPrevF_dObs(((yrInd-1)*7+1):(yrInd*7) , 3).^(1/2)).*2 .* 100; % calibration SD
+        hivM2(: , 1) = hivPrevM_dObs(((yrInd-1)*7+1):(yrInd*7) , 2) .* 100; % mean
+        hivM2(: , 2) = (hivPrevM_dObs(((yrInd-1)*7+1):(yrInd*7) , 3).^(1/2)).*2 .* 100; % calibration SD
+        hivF2(: , 1) = hivPrevF_dObs(((yrInd-1)*7+1):(yrInd*7) , 2) .* 100; % mean
+        hivF2(: , 2) = (hivPrevF_dObs(((yrInd-1)*7+1):(yrInd*7) , 3).^(1/2)).*2 .* 100; % calibration SD
         
         subplot(2 , 3 , yrInd);
-        hivPrevs = hivM;
+        hivPrevs = hivM2;
         hivModel = hivAgeM;
         if g == 2
-            hivPrevs = hivF;
+            hivPrevs = hivF2;
             hivModel = hivAgeF;
         end
         hold all;            
