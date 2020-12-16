@@ -345,7 +345,7 @@ parfor n = 1 : nTests
     % Initialize other vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = zeros(size(popVec));
+    deaths = zeros(length(s) - 1 , 1); %zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -358,9 +358,9 @@ parfor n = 1 : nTests
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+    % newTreatImm = newScreen;
+    % newTreatHpv = newScreen;
+    % newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
@@ -402,10 +402,7 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
