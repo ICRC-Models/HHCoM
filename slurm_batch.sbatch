@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=batch_${SETIDX}                   # Job name
+#SBATCH --job-name=batch                             # Job name
 #SBATCH --chdir=/gscratch/csde/guiliu/HHCoM          # Working directory
 #SBATCH --mail-type=FAIL           		             # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=guiliu@uw.edu
