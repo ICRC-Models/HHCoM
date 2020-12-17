@@ -142,7 +142,7 @@ elseif (year >= 1978) && (year < 1985)
     partnersMmult(1) = d_partnersMmult(1, 18);
     partnersMmult(2) = d_partnersMmult(2, 18);
     partnersMmult(3) = d_partnersMmult(3, 18);
-elseif (year >= 1985) && (year < 1995)
+elseif (year >= 1985) && (year < 1990)
     yearInd2 = round((year - (1985 - (1/6))) * 6);
     partnersMmult(1) = d_partnersMmult(4, yearInd2);
     partnersMmult(2) = d_partnersMmult(5, yearInd2);
@@ -151,11 +151,10 @@ end
 % partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
 % partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
 
-partnersM(4:5, 1:3) = partnersM(4:5, 1:3) .* partnersMmult(1);
-partnersF(4:5, 1:3) = partnersF(4:5, 1:3) .* partnersMmult(2);
-partnersM(6:10, 1:3) = partnersM(6:10, 1:3) .* partnersMmult(3);
-partnersF(6:10, 1:3) = partnersF(6:10, 1:3) .* partnersMmult(3);
-
+partnersM(4:6, 1:3) = partnersM(4:6, 1:3) .* partnersMmult(1);
+partnersF(4:6, 1:3) = partnersF(4:6, 1:3) .* partnersMmult(1);
+partnersM(7:10, 1:3) = partnersM(7:10, 1:3) .* partnersMmult(2);
+partnersF(7:10, 1:3) = partnersF(7:10, 1:3) .* partnersMmult(3);
 
 % males
 c(1 , : , :) = partnersM;
@@ -277,26 +276,37 @@ cAdj(isinf(cAdj)) = 0;
 %% Protection against HIV and HPV due to condom usage and circumcision
 % find condom use according to the present year
 condStart = 1994;
-peakYear = 2002;
+peakYear = 1999;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
-condUse = condUseVec(1); % year <= peakYear
+condUseVec = zeros(risk, length(yrVec)-1);
+for r = 1 : risk
+condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
+end
+condUse = condUseVec(1: risk, 1); % year <= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
-    condUse = condUseVec(yrInd);
+    condUse = condUseVec(1:risk, yrInd);
 elseif year >= peakYear
-    condUse = condUseVec(end);
+    condUse = condUseVec(1:risk, end);
 end
-
+%%
 % calculate psi vectors for protective factors
 % HIV
-cond_hiv = 1-(condProtect(:,1) .* condUse); % condom usage and condom protection rates
-psi_hiv = ones(gender,disease) .* cond_hiv; % condom use only for all disease states
-psi_hiv(:,2) = (1 - circProtect(:,1)) .* cond_hiv; % condom use + circumcision protection for d=2
+cond_hiv = 1-(condProtect(:,1) .* condUse');
+psi_hiv = zeros(gender, disease, risk); 
+% condom usage and condom protection rates
+for r = 1 : risk
+psi_hiv(:, :, r) = ones(gender,disease) .* cond_hiv(:, r); % condom use only for all disease states
+psi_hiv(:,2, r) = (1 - circProtect(:,1)) .* cond_hiv(:, r);
+end
+% condom use + circumcision protection for d=2
 %HPV
-cond_hpv = 1-(condProtect(:,2) * condUse); % condom usage and condom protection rates
-psi_hpv = ones(gender,disease) .* cond_hpv;
-psi_hpv(:,2) = (1 - circProtect(:,2)) .* cond_hpv;
+cond_hpv = 1-(condProtect(:,2) * condUse'); % condom usage and condom protection rates
+psi_hpv = zeros(gender, disease, risk);
+for r = 1 : risk
+psi_hpv(:, :, r) = ones(gender,disease) .* cond_hpv(:, r);
+psi_hpv(:,2, r) = (1 - circProtect(:,2)) .* cond_hpv(:, r);
+end
 
 %% HPV Infection
 % calculate per-partnership probability of HPV transmission
@@ -307,21 +317,23 @@ for g = 1 : gender
         for r = 1 : risk
             for v = 1 : viral
                 for x = 1 : 3
-                    vax = vaxInds(v , x , g , a , r , :);
+                    for d = 1 : disease
+                    vax = vaxInds(d, v , x , g , a , r , :);
                     vaxSum = sumall(pop(vax));
                     if vaxSum ~= 0.0
                         p_vaxHPV = max(vaxSum / popSum(g , a , r) , 0); % proportion of sexually active with vax-type HPV. Max handles divide by 0 error.
                         % adjust beta for HPV transmission to account for proportion of population that is carrying HPV. 
                         % Transmission probability throughout population is dependent on the "concentration" of HPV carriers in the population.
-                        beta(: , : , g , a , r , 1) = beta(: , : , g , a , r , 1) - log(1 - beta_hpvVax_mod(: , : , v , x , g)) * p_vaxHPV;
+                        beta(: , : , g , a , r , 1) = beta(: , : , g , a , r , 1) - log(1 - beta_hpvVax_mod(:, : , d , v , x , g)) * p_vaxHPV;
                     end
-                    nonV = nonVInds(v , x , g , a , r , :);
+                    nonV = nonVInds(d, v , x , g , a , r , :);
                     nonVSum = sumall(pop(nonV));
                     if nonVSum ~= 0.0
                         p_nonVHPV = max(nonVSum / popSum(g , a , r) , 0); % proportion of sexually active with non-vax-type HPV
                         % adjust beta for HPV transmission to account for proportion of population that is carrying HPV. 
                         % Transmission probability throughout population is dependent on the "concentration" of HPV carriers in the population.
-                        beta(: , : , g , a , r , 2) = beta(: , : , g , a , r , 2) - log(1 - beta_hpvNonVax_mod(: , : , v , x , g)) * p_nonVHPV;
+                        beta(: , : , g , a , r , 2) = beta(: , : , g , a , r , 2) - log(1 - beta_hpvNonVax_mod(:, : , d , v , x , g)) * p_nonVHPV;
+                    end
                     end
                 end
             end
@@ -395,19 +407,19 @@ for a = ageSexDebut : age
 
                     % Calculate infections
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV (infection rate capped at 0.99) 
-                    mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d) * lambda(1 , a , r , 1)...
+                    mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d,r) * lambda(1 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
-                    fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                    fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(fhpvVaxSus);
-                    fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                    fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
 
                     % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV (infection rate capped at 0.99) 
-                    mInfectedNonVax = min(lambdaMultM * psi_hpv(1,d) * lambda(1 , a , r , 2)...
+                    mInfectedNonVax = min(lambdaMultM * psi_hpv(1,d,r) * lambda(1 , a , r , 2)...
                         , 0.999) .* pop(mhpvNonVaxSus);
-                    fInfectedNonVax = min(lambdaMultF * psi_hpv(2,d) * lambda(2 , a , r , 2)...
+                    fInfectedNonVax = min(lambdaMultF * psi_hpv(2,d,r) * lambda(2 , a , r , 2)...
                         , 0.999) .* pop(fhpvNonVaxSus);
-                    fInfectedNonVaxImm = min(lambdaMultF * lambdaMultImm(a) * psi_hpv(2,d) * lambda(2 , a , r , 2)...
+                    fInfectedNonVaxImm = min(lambdaMultF * lambdaMultImm(a) * psi_hpv(2,d,r) * lambda(2 , a , r , 2)...
                         , 0.999) .* pop(fhpvNonVaxImm);
               
 
@@ -520,9 +532,9 @@ for h = 1 : hpvVaxStates
 
                             % Calculate infections
                             mInfected = min(lambdaMultM .* lambda(1 , a , r)...
-                                .* psi_hiv(1,d) , 0.999) .* pop(mSus); % infected males
+                                .* psi_hiv(1,d,r) , 0.999) .* pop(mSus); % infected males
                             fInfected = min(lambdaMultF .* lambda(2 , a , r)...
-                                .* psi_hiv(2,d) , 0.999) .* pop(fSus); % infected females
+                                .* psi_hiv(2,d,r) , 0.999) .* pop(fSus); % infected females
 
                             % HIV incidence tracker
                             newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);

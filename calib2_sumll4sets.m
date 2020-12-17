@@ -15,16 +15,16 @@ date = date_abc;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
-paramSetMatrix = load([paramDir,'paramSets_calib_' , date , '_' , num2str(t_curr) , '.dat']);
-nPrlSets = 28; %numCPUperNode; %16;
+paramSetMatrix = load([paramDir,'stochasticParamsets.dat']);
+nPrlSets = 5; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
-pIdx = load([paramDir,'pIdx_calib_' , date , '_0.dat']);
+pIdx = [10, 35, 38];
 
 [paramsAll] = genParamStruct();
 paramsSub = cell(length(pIdx),1);
@@ -36,21 +36,22 @@ for s = 1 : length(pIdx)
 end
 
 %% Obtain model output for each set of sampled parameters
-negSumLogLSet = zeros(nPrlSets,1);
+%
+%negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-    negSumLogLSet(n,1) = negSumLogL;
+    [ ] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    %negSumLogLSet(n,1) = negSumLogL;
 end
 
 %% Save parameter sets and negSumLogL values
-formatOutput = zeros(nPrlSets+(nPrlSets/4) , 1);
-paramSetIdxBY4 = [paramSetIdx : 4 : (paramSetIdx + nPrlSets - 1)];
-nPrlSetsBY4 = [1 : 4 : (nPrlSets - 1)];
-for i = 1 : (nPrlSets/4)
-    formatOutput(nPrlSetsBY4(i) + (i-1) : nPrlSetsBY4(i) + 4 + (i-1) , 1) = [paramSetIdxBY4(i) ; negSumLogLSet(((i-1)*4+1 : i*4) , 1)];
-end
-
-file = ['negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
-paramDir = [pwd , '/Params/'];
-dlmwrite([paramDir, file] , formatOutput , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append' , 'precision' , 9)
+% formatOutput = zeros(nPrlSets+(nPrlSets/4) , 1);
+% paramSetIdxBY4 = [paramSetIdx : 4 : (paramSetIdx + nPrlSets - 1)];
+% nPrlSetsBY4 = [1 : 4 : (nPrlSets - 1)];
+% for i = 1 : (nPrlSets/4)
+%     formatOutput(nPrlSetsBY4(i) + (i-1) : nPrlSetsBY4(i) + 4 + (i-1) , 1) = [paramSetIdxBY4(i) ; negSumLogLSet(((i-1)*4+1 : i*4) , 1)];
+% end
+% 
+% file = ['negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+% paramDir = [pwd , '/Params/'];
+% dlmwrite([paramDir, file] , formatOutput , 'delimiter' , ',' , 'roffset' , 1 , 'coffset' , 0 , '-append' , 'precision' , 9)
