@@ -14,15 +14,15 @@ t_curr = tstep_abc;
 date = date_abc;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
-parpool(pc , numCPUperNode)    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
+% parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 paramSetMatrix = load([paramDir,'stochasticParamsets.dat']);
-nPrlSets = 5; %numCPUperNode; %16;
+nPrlSets = 1; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = [10, 35, 38];
 
@@ -38,9 +38,9 @@ end
 %% Obtain model output for each set of sampled parameters
 %
 %negSumLogLSet = zeros(nPrlSets,1);
-parfor n = 1 : nPrlSets
+for n = 1 : nPrlSets
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    [ ] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     %negSumLogLSet(n,1) = negSumLogL;
 end
 

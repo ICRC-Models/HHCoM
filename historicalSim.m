@@ -1,7 +1,7 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-function [%] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
+function [] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 

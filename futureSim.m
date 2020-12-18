@@ -14,7 +14,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , '/HHCoM_Results/toNow_10Oct_HIVbeta00099_condUsebyRisk_95-00_fertFuture']); % ***SET ME***: name for historical run input file 
+historicalIn = load([pwd , ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '19Oct20_50CUVaxCov_fert'; % ***SET ME***: name for simulation output file
