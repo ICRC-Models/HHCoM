@@ -1,4 +1,4 @@
-TCURR=23    # t_curr
+TCURR=24    # t_curr
 echo "${TCURR}"
 export TCURR
 
@@ -33,9 +33,9 @@ echo "${LENGTH28}"
 #done
 
 #: <<'END'
-echo "Running MATLAB script to identify failed simulations."
-sbatch -p csde -A csde slurm_idMissing.sbatch
-sleep 300
+#echo "Running MATLAB script to identify failed simulations."
+#sbatch -p csde -A csde slurm_idMissing.sbatch
+#sleep 300
 FILE=./Params/missingSets_calib_${DATE}_${TCURR}.dat
 RERUN=$(<$FILE)
 echo "$RERUN"
