@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
 %pathModifier = 'toNow_10Oct_HIVbeta00099_condUsebyRisk_94-99_fertFuture';
 
