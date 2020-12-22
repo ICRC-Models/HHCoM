@@ -80,6 +80,7 @@ nRuns = length(fileInds);
 monthlyTimespan = [startYear : (1/6) : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
+futAnnualTimespan = [2019 : lastYear-1];
 midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
 screenAnnualTimespan = [(2020+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
 screenMonthlyTimespan = [2020 : (1/6) : lastYear];
@@ -91,7 +92,7 @@ popSizeAgeF = zeros(nRuns , 5 , age , length(monthlyTimespan));
 popYearVec = [2018 2100];
 popYearVecLength = length(popYearVec);
 popPropF = zeros(nRuns , length(popYearVec) , age);
-popYearVec2 = [2019 2120];
+popYearVec2 = [2019 2100];
 popYearVecLength2 = length(popYearVec2);
 ageVec_cPopDist = {3 , [4:5] , [6:7] , [8:9] , [10:11] , [12:13] , [14:15]};
 ageVecLength_cPopDist = length(ageVec_cPopDist);
@@ -163,6 +164,7 @@ ccIncTimePos = ccIncTime;
 ccIncTimeArt = ccIncTime;
 ccIncTimePosAll = ccIncTime;
 ccIncHivAgeTime = zeros(nRuns , 5 , age , length(annualTimespan));
+ccCumHivAgeTime = zeros(nRuns , 5 , age , length(futAnnualTimespan));
 diseaseVec_ccInc = {[1 : disease] , [1 : 2] , [3 : 8] , [3 : 7] , 8};
 diseaseVecLength_ccInc = length(diseaseVec_ccInc);
 % Prevalence ratios
@@ -739,7 +741,7 @@ for k = 1 : loopSegmentsLength-1
             (annlz(sum(sum(sum(vaxResult{n}.newCC(: , 3 : 8 , 1 : age , :),2),3),4)) ./ ...
             (annlz(sum(vaxResult{n}.popVec(: , allFposAll) , 2) ./ stepsPerYear)) * fac);
         
-        %% Cervical cancer by HIV status and age over time
+        %% Cervical cancer incidence by HIV status and age over time
         fac = 10 ^ 5;
         for dInd = 1 : diseaseVecLength_ccInc;
             d = diseaseVec_ccInc{dInd};
@@ -750,6 +752,16 @@ for k = 1 : loopSegmentsLength-1
                 ccIncHivAgeTime(j , dInd , a , :) = ...
                     (annlz(sum(sum(vaxResult{n}.newCC(: , d , a , :),2),4)) ./ ...
                     (annlz(sum(vaxResult{n}.popVec(: , allF) , 2) ./ stepsPerYear)) * fac);
+            end
+        end
+        
+        %% Cumulative cervical cancer cases by HIV status and age over time
+        for dInd = 1 : diseaseVecLength_ccInc;
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                % Calculate incidence
+                ccCumHivAgeTime(j , dInd , a , :) = ...
+                    cumsum(squeeze(annlz(sum(sum(vaxResult{n}.newCC(((2019 - startYear) * stepsPerYear +1):end , d , a , :),2),4))),2);
             end
         end
 
@@ -1030,8 +1042,8 @@ set(gca , 'xtickLabel' , ageGroup);
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 xlabel('Age Group'); ylabel('Population Proportion (%)');
 ylim([0 50]); grid on;
-legend('Model, 2120: 25-sets median' , ...
-    'Model, 2120: 25-sets range' , 'Location' , 'northeast');
+legend('Model, 2100: 25-sets median' , ...
+    'Model, 2100: 25-sets range' , 'Location' , 'northeast');
 sgtitle('Age Distribution');
 
 %% Female total population size by 5-year age groups over time
@@ -1291,9 +1303,9 @@ for g = 1 : gender
         set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
         xlabel('Age Group'); ylabel('HIV Prevalence (%)'); title(num2str(yr));
         if g == 1 
-            ylim([0 80]);
+            ylim([0 100]);
         elseif g == 2
-            ylim([0 80]);
+            ylim([0 100]);
         end
         grid on;
         legend('(AHRI data request) Observed KZN: mean, 2SD' , ...
@@ -2001,6 +2013,18 @@ for dInd = 1 : length(diseaseLabels);
     writematrix([annualTimespan ; ccInc] , fname)
 end
 
+%% Cumulative cervical cancer cases by HIV status and age over time
+diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+for dInd = 1 : length(diseaseLabels);
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'CumCC_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+    writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
+        [futAnnualTimespan ;
+        [squeeze(median(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , 1)) ; ...
+        squeeze(min(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , [] , 1)) ; ...
+        squeeze(max(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , [] , 1))]]] , fname)
+end
+
 %% Cervical cancer prevalence ratios in 2005 and 2018
 ccRatioHivStatusF = squeeze(cc_prev_ratios(: , 2 , :) ./ cc_prev_ratios(: , 1 , :));
 ccRatioArtStatusF = squeeze(cc_prev_ratios(: , 4 , :) ./ cc_prev_ratios(: , 3 , :));
@@ -2490,4 +2514,4 @@ for dInd = 1 : length(diseaseLabels)
         [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , 1)) ; ...
         squeeze(min(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1)) ; ...
         squeeze(max(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1))]]] , fname)
-end  
+end 
