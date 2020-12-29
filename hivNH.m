@@ -57,15 +57,15 @@ if year >= 2003 && year < 2008
     elseif year >= 2007 && year < 2008
         ind = (round(artYr_vec{5} , 4) == round(year , 4));
         popCover = {artM_vec{5} , artF_vec{5}};
-%     elseif year >= 2008 && year < 2009
-%         ind = (round(artYr_vec{6} , 4) == round(year , 4));
-%         popCover = {artM_vec{6} , artF_vec{6}};
-%     elseif year >= 2009 && year < 2010
-%         ind = (round(artYr_vec{7} , 4) == round(year , 4));
-%         popCover = {artM_vec{7} , artF_vec{7}};
-%     elseif year >= 2010 && year < 2011
-%         ind = (round(artYr_vec{8} , 4) == round(year , 4));
-%         popCover = {artM_vec{8} , artF_vec{8}};
+    elseif year >= 2008 && year < 2009
+        ind = (round(artYr_vec{6} , 4) == round(year , 4));
+        popCover = {artM_vec{6} , artF_vec{6}};
+    elseif year >= 2009 && year < 2010
+        ind = (round(artYr_vec{7} , 4) == round(year , 4));
+        popCover = {artM_vec{7} , artF_vec{7}};
+    elseif year >= 2010 && year < 2011
+        ind = (round(artYr_vec{8} , 4) == round(year , 4));
+        popCover = {artM_vec{8} , artF_vec{8}};
     end
     ageVec = [1 : age];
     dRange = [7];
@@ -103,20 +103,20 @@ if year >= 2003 && year < 2008
 end
 
 % CD4 <= 350, from 2011 to 2015
-if year >= 2008 && year < 2015
+if year >= 2011 && year < 2015
     % Calculate HIV-associated mortality on ART
     muART = 0.6 .* mueYear; %0.5
     % Calculate population-level ART coverage
-    if year >= 2008 && year < 2009
-        ind = (round(artYr_vec{6} , 4) == round(year , 4));
-        popCover = {artM_vec{6} , artF_vec{6}};
-    elseif year >= 2009 && year < 2010
-        ind = (round(artYr_vec{7} , 4) == round(year , 4));
-        popCover = {artM_vec{7} , artF_vec{7}};
-    elseif year >= 2010 && year < 2011
-        ind = (round(artYr_vec{8} , 4) == round(year , 4));
-        popCover = {artM_vec{8} , artF_vec{8}};
-    elseif year >= 2011 && year < 2012
+%     if year >= 2008 && year < 2009
+%         ind = (round(artYr_vec{6} , 4) == round(year , 4));
+%         popCover = {artM_vec{6} , artF_vec{6}};
+%     elseif year >= 2009 && year < 2010
+%         ind = (round(artYr_vec{7} , 4) == round(year , 4));
+%         popCover = {artM_vec{7} , artF_vec{7}};
+%     elseif year >= 2010 && year < 2011
+%         ind = (round(artYr_vec{8} , 4) == round(year , 4));
+%         popCover = {artM_vec{8} , artF_vec{8}};
+    if year >= 2011 && year < 2012
         ind = (round(artYr_vec{9} , 4) == round(year , 4));
         popCover = {artM_vec{9} , artF_vec{9}};
     elseif year >= 2012 && year < 2014
@@ -286,7 +286,7 @@ for g = 1 : gender
                 acuteInf = hivInds(3 , v , g , a , r , :);
                 dPop(acuteInf) = dPop(acuteInf) ...
                     - (muHIV(a , 2) + kCD4(a , 1 , g) + treat(3 , v , g , a , r)) ... % out: disease related mortality, CD4 progression, ART coverage.
-                    .* pop(acuteInf) + artOut(g , a , r) * artDist(3 , v , g , a , r) ... % Distributed dropouts from ART
+                    .* pop(acuteInf) + artOut(g , a , r) * max(0.0, (artDist(3 , v , g , a , r)/ sumall(artDist(:, :, g, a, r)))) ... % Distributed dropouts from ART
                     .* pop(hivPositiveArt);
 
                 % HIV-positive going on ART (d = 8)
@@ -307,7 +307,7 @@ for g = 1 : gender
                     end
                     dPop(cd4Curr) = ...
                         kCD4(a , d - 3 , g) * pop(cd4Prev) ... % CD4 progression from previous disease state
-                        + artOut(g , a , r) * artDist(d , v , g , a , r) ... % Distributed dropouts from ART
+                        + artOut(g , a , r) * max(0.0, (artDist(d , v , g , a , r)/ sumall(artDist(:, :, g, a, r))))  ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state
                         + muHIV(a , d - 1) ... % disease-related mortality

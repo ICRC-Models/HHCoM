@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=batch                             # Job name
-#SBATCH --chdir=/gscratch/csde/guiliu/HHCoM          # Working directory
-#SBATCH --mail-type=FAIL           		             # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
+#SBATCH --chdir=/gscratch/csde/guiliu/HPV-HIVacq_model/HHCoM          # Working directory
+#SBATCH --mail-type=ALL           		             # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=guiliu@uw.edu
 #SBATCH --export=all                    	         # Export environment variables to the batch job session
 
