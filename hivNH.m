@@ -38,7 +38,7 @@ artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(dis
 treat = zeros(disease , viral , gender , age ,risk);
 
 % CD4 <= 200, from 2004 to 2011
-if year >= 2003 && year < 2008
+if year >= 2003 && year < 2011
     % Calculate HIV-associated mortality on ART
     muART = 0.75 .* mueYear;
     % Calculate population-level ART coverage

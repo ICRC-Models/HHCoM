@@ -14,10 +14,10 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '19Oct20_50CUVaxCov_fert'; % ***SET ME***: name for simulation output file
+pathModifier = ['14Dec20_50CUVaxCov_', num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -310,7 +310,8 @@ end
 %% Simulation
 %profile on
 
-parfor n = 1 : nTests
+%parfor n = 1 : nTests
+n = 1 
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -336,7 +337,7 @@ parfor n = 1 : nTests
     % Initialize other vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = zeros(size(popVec));
+    deaths = zeros(length(s) - 1 , 1); %zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -349,9 +350,9 @@ parfor n = 1 : nTests
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+%     newTreatImm = newScreen;
+%     newTreatHpv = newScreen;
+%     newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
@@ -393,10 +394,7 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , : , : , :)]  ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -532,7 +530,7 @@ parfor n = 1 : nTests
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
-    popLast = popVec(end , :);
+    popLast = sparse(popVec(end , :));
     popVec = sparse(popVec); % compress population vectors
     
     filename = ['vaxSimResult' , num2str(simNum)];
@@ -543,10 +541,9 @@ parfor n = 1 : nTests
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker , 
-        newTreatImm , newTreatHpv , newTreatHyst , ...
+        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
-end
+%end
 disp('Done')
 
 %profile viewer

@@ -35,7 +35,7 @@ tic
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 
-%pathModifier = 'toNow_10Oct_HIVbeta00099_condUsebyRisk_94-99_fertFuture';
+% pathModifier = 'toNow_determMod_final';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -293,7 +293,7 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     % Initialize result vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = popVec; 
+    deaths = zeros(length(s) - 1 , 1); %popVec; 
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -306,9 +306,9 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+%     newTreatImm = newScreen;
+%     newTreatHpv = newScreen;
+%     newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdSchool = zeros(length(s) - 1 , 1);
     
@@ -345,9 +345,9 @@ elseif isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     % newCin3 = chckPntIn.newCin3;
     ccDeath = chckPntIn.ccDeath;
     newScreen = chckPntIn.newScreen;
-    newTreatImm = chckPntIn.newTreatImm;
-    newTreatHpv = chckPntIn.newTreatHpv;
-    newTreatHyst = chckPntIn.newTreatHyst;
+%     newTreatImm = chckPntIn.newTreatImm;
+%     newTreatHpv = chckPntIn.newTreatHpv;
+%     newTreatHyst = chckPntIn.newTreatHyst;
     menCirc = chckPntIn.menCirc;
     vaxdSchool = chckPntIn.vaxdSchool;
     
@@ -440,10 +440,7 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+            [dPop , newScreen(i , : , : , : , : , : , : , : , :)]  ...
                 = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                 screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -567,13 +564,13 @@ for i = iStart : length(s) - 1
         save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
             'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-            'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+            'newScreen' , ... % 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
             'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
             'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 
 end
-popLast = popVec(end-1 , :);
+popLast = sparse(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
@@ -582,7 +579,7 @@ savdir = [pwd , '/HHCoM_Results/'];
 save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-    'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
+    'newScreen' , ... %'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
     'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
