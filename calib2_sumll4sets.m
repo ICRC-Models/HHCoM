@@ -22,7 +22,7 @@ parpool(pc , numCPUperNode)    % start the pool with max number workers
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 paramSetMatrix = load([paramDir,'stochasticParamsets.dat']);
-nPrlSets = 25; %numCPUperNode; %16;
+nPrlSets = 100; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = [10, 35, 38];
 
@@ -38,13 +38,13 @@ end
 %% Obtain model output for each set of sampled parameters
 %
 %negSumLogLSet = zeros(nPrlSets,1);
-%parfor n = 1 : nPrlSets
-n = 1
+parfor n = 1 : nPrlSets
+
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-    historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     %negSumLogLSet(n,1) = negSumLogL;
-%end
+end
 
 %% Save parameter sets and negSumLogL values
 % formatOutput = zeros(nPrlSets+(nPrlSets/4) , 1);

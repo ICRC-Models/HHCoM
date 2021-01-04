@@ -45,7 +45,9 @@ paramDir = [pwd , '\Params\'];
 
 % Load results
 resultsDir = [pwd , '\HHCoM_Results\'];
-toNowName = ['toNow_10Oct_HIVbeta00099_condUsebyRisk_95-00_fertFuture']
+% toNowName = ['toNow_10Oct_HIVbeta00099_condUsebyRisk_94-99_fertFuture']
+% %Final version 
+toNowName = ['toNow_14DEC20_stochMod_1']
 load([resultsDir ,toNowName]) %change from pathModifier to file name
 annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)); 
 
