@@ -99,11 +99,11 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 %% Loop through nRuns
 for j = 1 : nRuns
     % Load results
-    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4_DoART';
+    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_DoART';
     baseFileName = [baseFileNameShort , '_S' , num2str(fileInd) , '_'];
     pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
     nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4_diagHiv-noArtLim-090_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_diagHiv090_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -823,6 +823,23 @@ for c = 1 : length(cInds)
 end
 
 %% Save ART initiation by CD4 and age
+cInds = {3 : 7 , 3 : 5 , 6 , 7};
+cTits = {'Any_CD4' , 'CD4_350plus' , 'CD4_200-350' , 'CD4_below200'};
+ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
+    '50-54' , '55-59' , '60-64' , '65-69' , '70-74' , '75-79'};
+
+for c = 1 : length(cInds)
+    for a = 4 : age 
+        % combined 
+        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
+            'Raw_ART_incidence_combined_' , ageTits{a-3} , '_' , cTits{c} , '.csv'];
+        writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , 2) , ...
+            min(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , max(squeeze(cd4DistAgeC_multSims(: , : , a-3 , c)) , [] , 2) , ...
+            cd4DistAgeC_multSims(: , : , a-3 , c)] , fname)
+    end
+end
+
+%% Save ART discontinuation by CD4 and age
 cInds = {3 : 7 , 3 : 5 , 6 , 7};
 cTits = {'Any_CD4' , 'CD4_350plus' , 'CD4_200-350' , 'CD4_below200'};
 ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
