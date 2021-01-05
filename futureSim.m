@@ -14,7 +14,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_14DEC20_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['14Dec20_stochMod_noVax']; % ***SET ME***: name for simulation output file
