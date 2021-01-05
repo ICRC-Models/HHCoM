@@ -20,7 +20,7 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScr
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_diagHiv090-1204_DoART_S2_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_diagHiv090-4Jan20_DoART_S2_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -410,14 +410,15 @@ for n = nTests
                 propHivDiag(i , g) = propHivDiagBaseline(1 , g);
             end
         end
-        (nHivDiag + nHivUndiag) - nHivPos
+        %disp('TRACKED HIV VS. COMPARTMENT HIV AT START OF ITERATION')
+        %(nHivDiag + nHivUndiag) - nHivPos
         
         % HIV testing, calculated rather than tracked in compartments
         if any(year == hivTestCampYrs) || (year == currYear + (1/stepsPerYear))
             [nTestedNeg(i , :) , nTestedUndiag(i , :) , propHivDiag(i , :) , nHivDiag , nHivUndiag] ...
                 = hivTest(popIn , hivTestCampCov , nHivPos , nHivNeg , ...
                 nHivUndiag , nHivDiag , hivInds , viral , gender , age , risk);
-            year
+            %year
             propHivDiag(i , :);
             %%%num2str(propHivDiag(i , :))
         else
@@ -451,6 +452,13 @@ for n = nTests
                 disp('After hpv')
                 break
             end
+            
+            %disp('CC DEATH')
+            for g = 1 : gender
+                nHivPos2(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
+            end
+            %disp('Compartments vs. outputted change')
+            %(nHivPos1(1,2)-nHivPos2(1,2)) - sumall(ccDeath(i , 3 : 8 , 4 : age , 1 : hpvTypeGroups))
                    
             if (year >= hpvScreenStartYear)
                 [dPop] ...
@@ -467,13 +475,6 @@ for n = nTests
                     break
                 end
             end
-        end
-        
-        disp('ccDeath')
-        for g = 1 : gender
-            nHivPos2(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
-            nHivPos2(1,g)-nHivPos1(1,g)
-            sumall(ccDeath(i , 3 : 8 , 4 : age , 1 : hpvTypeGroups))
         end
         
         % HIV and HPV mixing and infection module. Protective effects of condom
@@ -494,13 +495,16 @@ for n = nTests
             break
         end
         
-        disp('newHiv')
+        %disp('NEW HIV')
         for g = 1 : gender
             nHivPos3(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
             nHivPosArt3(1 , g) = sumall(popIn(hivInds(8 , 1 : viral , g , 4 : age , 1 : risk , :)));
-            nHivPos3(1,g)-nHivPos2(1,g)
-            sumall(newHiv(i , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , g , 4 : age , 1 : risk))
         end
+        for a = 4 : age
+            nHivPosArtAgeF(1 , a) = sumall(popIn(hivInds(8 , 1 : viral , 2 , a , 1 : risk , :)));
+        end
+        %disp('Compartments vs. outputed change')
+        %[nHivPos3(1,:)-nHivPos2(1,:)] - [sumall(newHiv(i , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 , 4 : age , 1 : risk)) , sumall(newHiv(i , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 2 , 4 : age , 1 : risk))]
         
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
@@ -527,15 +531,29 @@ for n = nTests
             end
         end
         
-        disp('hivDeaths')
         for g = 1 : gender
             nHivPos4(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
             nHivPosArt4(1 , g) = sumall(popIn(hivInds(8 , 1 : viral , g , 4 : age , 1 : risk , :)));
-            nHivPos4(1,g)-nHivPos3(1,g)
-            sumall(hivDeaths(i , 1 : disease , g , 4 : age))
-            %nHivPosArt4(1,g)-nHivPosArt3(1,g)
-            %sumall(hivDeaths(i , 8 , g , 4 : age))
         end
+        %disp('All HIV: compartments vs. outputed change')
+        %[nHivPos3(1,:)-nHivPos4(1,:)] - [sumall(hivDeaths(i , 1 : disease , 1 , 4 : age)) , sumall(hivDeaths(i , 1 : disease , 2 , 4 : age))]
+        
+        artChangeOut = [nHivPosArt4(1,:)-nHivPosArt3(1,:)] - [(sumall(artTreatTracker(i , 3 : disease , 1 : viral , 1 , 4 : age , 1 : risk))- sumall(artDiscont(i , 3 : disease , 1 : viral , 1 , 4 : age , 1 : risk)) - sumall(hivDeaths(i , 8 , 1 , 4 : age))) , ...
+            (sumall(artTreatTracker(i , 3 : disease , 1 : viral , 2 , 4 : age , 1 : risk))- sumall(artDiscont(i , 3 : disease , 1 : viral , 2 , 4 : age , 1 : risk)) - sumall(hivDeaths(i , 8 , 2 , 4 : age)))];
+        if abs(sumall(artChangeOut)) > 10
+            disp('HIV DEATHS')
+            disp('ART: compartments vs. outputted change')
+            artChangeOut
+            for a = 4 : age
+                (sumall(popIn(hivInds(8 , 1 : viral , 2 , a , 1 : risk , :)))-nHivPosArtAgeF(1,a)) ...
+                    - (sumall(artTreatTracker(i , 3 : disease , 1 : viral , 2 , a , 1 : risk)) - ...
+                    sumall(artDiscont(i , 3 : disease , 1 : viral , 2 , a , 1 : risk)) - sumall(hivDeaths(i , 8 , 2 , a)))
+            end
+        end
+        %disp('Female ART outputted change breakdown: ART init, ART discont, ART deaths')
+        %sumall(artTreatTracker(i , 3 : disease , 1 : viral , 2 , 4 : age , 1 : risk))
+        %sumall(artDiscont(i , 3 : disease , 1 : viral , 2 , 4 : age , 1 : risk))
+        %sumall(hivDeaths(i , 8 , 2 , 4 : age))
         
         % Birth, aging, risk redistribution module
         [~ , pop , deaths(i , :) , aged1519(i , :) , aged7579(i , :)] = ode4xtra(@(t , pop) ...
@@ -556,12 +574,12 @@ for n = nTests
             break
         end
         
-        disp('demographics')
+        %disp('DEMOGRAPHICS')
         for g = 1 : gender
             nHivPos5(1 , g) = sumall(popIn(hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)));
-            nHivPos5(1,g)-nHivPos4(1,g)
-            aged1519(i , g) - aged7579(i , g) - sumall(deaths(i , hivInds(3 : 8 , 1 : viral , g , 4 : age , 1 : risk , :)))
         end
+        %disp('Compartments vs. outputted change')
+        %[nHivPos5(1,:)-nHivPos4(1,:)] - [(aged1519(i , 1) - aged7579(i , 1) - sumall(deaths(i , hivInds(3 : 8 , 1 : viral , 1 , 4 : age , 1 : risk , :)))) , (aged1519(i , 2) - aged7579(i , 2) - sumall(deaths(i , hivInds(3 : 8 , 1 : viral , 2 , 4 : age , 1 : risk , :))))]
         
         % VOLUNTARY MALE MEDICAL CIRCUMCISION
         % Scale-up of VMMC by age
