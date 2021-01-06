@@ -202,7 +202,7 @@ vaxTotAge = zeros(nRuns , age , 5 , length(monthlyTimespan));
 resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_WHO-SCES' , sceNum , '_'];
+baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_WHO-SCES' , sceNum , '_'];
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
@@ -210,7 +210,7 @@ for k = 1 : loopSegmentsLength-1
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
         nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];

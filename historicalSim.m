@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
