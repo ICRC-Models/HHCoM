@@ -16,11 +16,11 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_discontFxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_discontFxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
