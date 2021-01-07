@@ -625,9 +625,7 @@ for k = 1 : loopSegmentsLength-1
             cGroup = cIndsAllMort{cInd};
             for aInd = 1 : agesEligVecLength
                 a = agesEligVec{aInd};
-                disInds = toInd(allcomb(cGroup , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
-                    1 : intervens , 1 : gender , a , 1 : risk));
-                allCauseMortC = annlz(sum(vaxResult{n}.deaths(: , disInds) , 2)) + annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , cGroup , a , 1 : hpvTypeGroups), 2), 3), 4)) + ...
+                allCauseMortC = annlz(sum(sum(sum(vaxResult{n}.deaths(: , cGroup , 1 : 2 , a) ,2) ,3) ,4)) + annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , cGroup , a , 1 : hpvTypeGroups), 2), 3), 4)) + ...
                     annlz(sum(sum(sum(vaxResult{n}.hivDeaths(: , cGroup , 1 : 2 , a), 2), 3), 4));
                 allCauseMortAgeC_multSims(: , j , aInd , cInd) = allCauseMortC(1 : end)';
             end

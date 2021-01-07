@@ -14,7 +14,7 @@
 % derivatives that describes the change in the population's subgroups due
 % to aging.
 
-function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
+function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , disease , ...
         gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
         hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , ...
         hivFertPosBirth3 , hivFertNegBirth3 , hivFertPosBirth4 , hivFertNegBirth4 , ...
@@ -95,8 +95,9 @@ end
 deaths = deathMat * pop;
 
 %% Aging and risk proportion redistribution
-% Initialize dPop
+% Initialize dPop and output vectors
 dPop = zeros(size(pop));
+deathsOut = zeros(disease , gender , age);
 
 % prospective population after accounting for births, and deaths
 prosPop = pop + births + hivBirths + deaths;
@@ -216,7 +217,14 @@ end
 dPop = dPop + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
-extraOut{1} = abs(deaths);
+for g = 1 : gender
+    for a = 1 : age
+        for d = 1 : disease
+            deathsOut(d , g , a) = sum(abs(deaths(: , deathInds(d , g , a , :))) , 2);
+        end
+    end
+end
+extraOut{1} = deathsOut;
 
 dPop = sparse(dPop);
 

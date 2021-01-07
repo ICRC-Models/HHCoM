@@ -1214,6 +1214,17 @@ for g = 1 : gender
     end
 end
 
+%% bornAgeDieRisk.m indices
+deathInds = zeros(disease , gender , age , viral * hpvVaxStates * hpvNonVaxStates * endpoints * intervens * risk);
+for d = 1 : disease
+    for g = 1 : gender
+        for a = 1 : age
+            deathInds(d , g , a , :) = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , ...
+                1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , g , a , 1 : risk));
+        end
+    end
+end
+
 %% vmmc.m indices
 hivNegNonVMMCinds = zeros(age , hpvVaxStates * hpvNonVaxStates * intervens  * risk);
 hivNegVMMCinds = hivNegNonVMMCinds;
