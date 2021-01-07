@@ -543,7 +543,7 @@ for n = nTests
         % add results to population vector
         popVec(i , :) = pop(end , :);
     end
-    popLast = popVec(end , :);
+    popLast = sparse(popVec(end , :));
     popVec = sparse(popVec); % compress population vectors
     
     filename = ['vaxSimResult' , num2str(simNum)];

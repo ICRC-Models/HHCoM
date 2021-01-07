@@ -518,7 +518,7 @@ for i = iStart : length(s) - 1
     end
 
 end
-popLast = popVec(end-1 , :);
+popLast = sparse(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
