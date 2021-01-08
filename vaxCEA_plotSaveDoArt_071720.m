@@ -2,7 +2,7 @@ function vaxCEA_plotSaveDoArt_071720(fileInd)
 
 %% SET RUN-TIME VARIABLES
 lastYear = 2061;
-baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_discontFxd_DoART';    % **** SET ME ****
+baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_discontFxd_diagHiv075_DoART';    % **** SET ME ****
 baseFileName = [baseFileNameShort , '_S' , num2str(fileInd) , '_'];
 n = 2; % use 2nd, or vaxResult scenario with baseline HPV vaccination (does not affect this analysis)
 baseHistFileNameShort = 'toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_discontFxd_DoART_S1_';    % **** SET ME ****
@@ -137,25 +137,6 @@ for k = 1 : loopSegmentsLength-1
         if waning
             resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
         end
-
-<<<<<<< HEAD
-%% Loop through nRuns
-for j = 1 : nRuns
-    % Load results
-    baseFileNameShort = '22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_DoART';
-    baseFileName = [baseFileNameShort , '_S' , num2str(fileInd) , '_'];
-    pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
-    nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-    curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_diagHiv090_DoART_S1_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
-    
-    vaxResult = cell(nSims , 1);
-    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
-    if waning
-        resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
-    end
-    for n = nSims
-=======
->>>>>>> 7b8f3580a36de265bee88f3d81ff8e65bce29ac0
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
@@ -652,89 +633,6 @@ for j = 1 : nRuns
                 allCauseMortAgeC_multSims(: , j , aInd , cInd) = allCauseMortC(1 : end)';
             end
         end
-<<<<<<< HEAD
-    end
-    
-    %% HIV-ASSOCIATED DEATHS ACROSS ALL AGES
-    % Calculate female HIV-associated mortality 
-    hivMortF = annlz(sum(sum(sum(noV.hivDeaths(: , 3 : 8 , 2 , 4 : age), 2), 3), 4));
-    hivMortAllAgeF_multSims(: , j) = hivMortF(1 : end)';
-    
-    % Calculate male HIV-associated mortality 
-    hivMortM = annlz(sum(sum(sum(noV.hivDeaths(: , 3 : 8 , 1 , 4 : age), 2), 3), 4));
-    hivMortAllAgeM_multSims(: , j) = hivMortM(1 : end)';
-    
-    % Calculate combined HIV-associated mortality 
-    hivMortC = annlz(sum(sum(sum(noV.hivDeaths(: , 3 : 8 , 1 : 2 , 4 : age), 2), 3), 4));
-    hivMortAllAgeC_multSims(: , j) = hivMortC(1 : end)';
-    
-    %% NUMBER ADDITIONAL TESTED DURING HOME TESTING CAMPAIGNS
-    nTestedHivNegC_multSims(: , j) = annlz(sum(noV.nTestedNeg(: , 1 : gender) , 2));
-    nTestedHivUndiagC_multSims(: , j) = annlz(sum(noV.nTestedUndiag(: , 1 : gender) , 2));
-    
-    %% TOTAL POPULATION SIZE
-    
-    % Calculate female population size
-    popTotF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk));
-    popSizeF = sum(noV.popVec(: , popTotF) , 2);
-    popSizeF_multSims(: , j) = popSizeF(1 : stepsPerYear : end);
-
-    % Plot female population size
-%     if (j == 1)
-%         fig11 = figure;
-%         %insert observed data
-%     else
-%         figure(fig11);
-%     end
-%     hold all;
-%     plot(tVec(1 : stepsPerYear : end)' , popSizeF(1 : stepsPerYear : end) , 'b-')
-%     xlabel('Year'); ylabel('Individuals'); title('Female population size, ages 15-79');
-%     xlim([1980 2060])
-%     legend('Model: ages 15-79');
-%     grid on;
-
-    % Calculate male population size
-    popTotM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 1 , 4 : age , 1 : risk));
-    popSizeM = sum(noV.popVec(: , popTotM) , 2);
-    popSizeM_multSims(: , j) = popSizeM(1 : stepsPerYear : end);
-
-    % Plot female population size
-%     if (j == 1)
-%         fig12 = figure;
-%         %insert observed data
-%     else
-%         figure(fig12);
-%     end
-%     hold all;
-%     plot(tVec(1 : stepsPerYear : end)' , popSizeM(1 : stepsPerYear : end) , 'b-')
-%     xlabel('Year'); ylabel('Individuals'); title('Male population size, ages 15-79');
-%     xlim([1980 2060])
-%     legend('Model: ages 15-79');
-%     grid on;
-    
-    % Calculate combined population size
-    popTotC = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-        1 : endpoints , 1 : intervens , 1 : 2 , 4 : age , 1 : risk));
-    popSizeC = sum(noV.popVec(: , popTotC) , 2);
-    popSizeC_multSims(: , j) = popSizeC(1 : stepsPerYear : end);
-
-    % Plot combined population size
-%     if (j == 1)
-%         fig18 = figure;
-%         %insert observed data
-%     else
-%         figure(fig18);
-%     end
-%     hold all;
-%     plot(tVec(1 : stepsPerYear : end)' , popSizeC(1 : stepsPerYear : end) , 'b-')
-%     xlabel('Year'); ylabel('Individuals'); title('Combined population size, ages 15-79');
-%     xlim([1980 2060])
-%     legend('Model: ages 15-79');
-%     grid on;
-=======
->>>>>>> 7b8f3580a36de265bee88f3d81ff8e65bce29ac0
 
         %% HIV-ASSOCIATED DEATHS ACROSS ALL AGES
         % Calculate female HIV-associated mortality 
@@ -748,7 +646,12 @@ for j = 1 : nRuns
         % Calculate combined HIV-associated mortality 
         hivMortC = annlz(sum(sum(sum(vaxResult{n}.hivDeaths(: , 3 : 8 , 1 : 2 , 4 : age), 2), 3), 4));
         hivMortAllAgeC_multSims(: , j) = hivMortC(1 : end)';
-
+        
+        %% NUMBER ADDITIONAL TESTED DURING HOME TESTING CAMPAIGNS
+        
+        nTestedHivNegC_multSims(: , j) = annlz(sum(noV.nTestedNeg(: , 1 : gender) , 2));
+        nTestedHivUndiagC_multSims(: , j) = annlz(sum(noV.nTestedUndiag(: , 1 : gender) , 2));
+    
         %% TOTAL POPULATION SIZE
 
         % Calculate female population size
