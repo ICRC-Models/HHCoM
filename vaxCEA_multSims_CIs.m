@@ -1,4 +1,5 @@
-function [] = vaxCEA_multSims_CIs(vaxResultInd , sceNum)
+function [] = vaxCEA_multSims_CIs(vaxResultInd , sceNum , fileNameNums)
+% example: vaxCEA_multSims_CIs(1 , '34' , {'3' , '4' , '0'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -201,6 +202,7 @@ vaxTotAge = zeros(nRuns , age , 5 , length(monthlyTimespan));
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
+fileKeyNums = fileNameNums;
 n = vaxResultInd;
 baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_WHO-SCES' , sceNum , '_'];
 loopSegments = {0 , round(nRuns/2) , nRuns};
@@ -1053,9 +1055,26 @@ for dInd = 1 : length(diseaseLabels)
         'WmnYrs_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
-        [squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (3 : stepsPerYear : end))) , 1)) ; ...
-        squeeze(min(squeeze(popSizeAgeF(: , dInd , : , (3 : stepsPerYear : end))) , [] , 1)) ; ...
-        squeeze(max(squeeze(popSizeAgeF(: , dInd , : , (3 : stepsPerYear : end))) , [] , 1))]]] , fname)   
+        [squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , 1)) ; ...
+        squeeze(min(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , [] , 1)) ; ...
+        squeeze(max(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , [] , 1))]]] , fname)   
+end
+
+%% Write female total population size by 5-year age groups over time (2019-2120) into existing template
+diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
+firstYrInd = ((2019 - startYear) * stepsPerYear +4);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+
+diseaseLabels = {'All - Pop (N)' , 'HIV- (N)' , 'HIV+ (N)' , 'HIV+ no ART (N)' , 'HIV+ ART (N)'};
+firstYrInd = ((2019 - startYear) * stepsPerYear +4);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_CumulativeImpact_CC-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 
 %% Risk distribution of HIV-negative women with CIN over time
@@ -1968,6 +1987,15 @@ for dInd = 1 : length(diseaseLabels);
         squeeze(max(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , [] , 1))]]] , fname)
 end
 
+%% Write cervical cancer incidence rates by 5-year age groups over time (2019-2120) into existing template
+diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+firstYrInd = ((2019 - startYear) +1);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
+end
+
 %% CC incidence - age standardized
 % Note: the age-standardization process shifts the incidence rate of the
 % last modelled age group to the next age group in the following year.
@@ -2013,6 +2041,52 @@ for dInd = 1 : length(diseaseLabels);
     writematrix([annualTimespan ; ccInc] , fname)
 end
 
+%% Write cervical cancer age-standardized incidence rates over time (2019-2120) into existing template
+% Note: the age-standardization process shifts the incidence rate of the
+% last modelled age group to the next age group in the following year.
+% However, CC incidence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed incidence during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+fac = 10 ^ 5;
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+
+diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+firstYrInd = ((2019 - startYear) +1);
+for dInd = 1 : length(diseaseLabels);
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    ccIncHivAgeTime_med = squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 1));
+
+    ccIncRefTot = zeros(1 , size(ccIncHivAgeTime_med,2));       
+    for aInd = 1:age+4
+        a = aInd;
+        if aInd >= age
+            a = age;
+        end
+
+        if aInd <= age    
+            ccIncRef = ccIncHivAgeTime_med(a , :) .* worldStandard_WP2015(aInd);
+            if (a < 3)
+                ccIncRef = zeros(1 , size(ccIncHivAgeTime_med,2));
+            end
+        elseif aInd > age
+            ccIncRef = ccIncHivAgeTime_med(a , :);
+            ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
+            ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+        end
+        ccIncRefTot = ccIncRefTot + ccIncRef;
+    end
+    ccInc = ccIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
+
+    writematrix(ccInc(firstYrInd:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
+end
+
 %% Cumulative cervical cancer cases by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels);
@@ -2023,6 +2097,14 @@ for dInd = 1 : length(diseaseLabels);
         [squeeze(median(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , 1)) ; ...
         squeeze(min(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , [] , 1)) ; ...
         squeeze(max(squeeze(ccCumHivAgeTime(: , dInd , : , :)) , [] , 1))]]] , fname)
+end
+
+%% Write cumulative cervical cancer cases by 5-year age groups over time (2019-2120) into existing template
+diseaseLabels = {'Pop(All) CCC' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_CumulativeImpact_CC-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(ccCumHivAgeTime(: , dInd , 3:age , :)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
 
 %% Cervical cancer prevalence ratios in 2005 and 2018
@@ -2465,9 +2547,9 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 
 %% Vaccine coverage overall
 figure;   
-plot(midAnnualTimespan , mean(vaxCoverage(: , (3 : stepsPerYear : end)),1) , 'k-' , ...
-    midAnnualTimespan , min(vaxCoverage(: , (3 : stepsPerYear : end)),[],1) , 'k--' , ...
-    midAnnualTimespan , max(vaxCoverage(: , (3 : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(midAnnualTimespan , mean(vaxCoverage(: , (4 : stepsPerYear : end)),1) , 'k-' , ...
+    midAnnualTimespan , min(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , ...
+    midAnnualTimespan , max(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
 xlabel('Time'); ylabel('Vaccine coverage');
 xlim([2020 2100]); ylim([0 1]); grid on;
 title(['Vaccine coverage']);
@@ -2481,7 +2563,7 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
 
 figure;    
 for a = 1 : age
-    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (3 : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
+    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (4 : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
 end
 xlabel('Year'); ylabel('Vaccine coverage');
@@ -2511,7 +2593,7 @@ for dInd = 1 : length(diseaseLabels)
         'VaxTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
-        [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , 1)) ; ...
-        squeeze(min(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1)) ; ...
-        squeeze(max(squeeze(vaxTotAge(: , : , dInd , (3 : stepsPerYear : end))) , [] , 1))]]] , fname)
+        [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , 1)) ; ...
+        squeeze(min(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1)) ; ...
+        squeeze(max(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1))]]] , fname)
 end 
