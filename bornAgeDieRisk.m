@@ -220,7 +220,7 @@ dPop = dPop + births + hivBirths + deaths;
 for g = 1 : gender
     for a = 1 : age
         for d = 1 : disease
-            deathsOut(d , g , a) = sum(abs(deaths(: , deathInds(d , g , a , :))) , 2);
+            deathsOut(d , g , a) = sum(abs(deaths(deathInds(d , g , a , :))));
         end
     end
 end
