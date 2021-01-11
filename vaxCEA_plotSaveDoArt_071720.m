@@ -120,7 +120,7 @@ popSizeM_multSims = popSizeF_multSims;
 popSizeC_multSims = popSizeF_multSims;
 % VMMC
 vmmcM_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
-nTestedHivNegC_multSims = zeros(length([currYear : lastYear]) , nRuns);
+nTestedHivNegC_multSims = zeros(length([currYear : lastYear-1]) , nRuns);
 nTestedHivUndiagC_multSims = nTestedHivNegC_multSims;
 
 %% LOOP THROUGH NRUNS
@@ -649,8 +649,8 @@ for k = 1 : loopSegmentsLength-1
         
         %% NUMBER ADDITIONAL TESTED DURING HOME TESTING CAMPAIGNS
         
-        nTestedHivNegC_multSims(: , j) = annlz(sum(noV.nTestedNeg(: , 1 : gender) , 2));
-        nTestedHivUndiagC_multSims(: , j) = annlz(sum(noV.nTestedUndiag(: , 1 : gender) , 2));
+        nTestedHivNegC_multSims(: , j) = annlz(sum(vaxResult{n}.nTestedNeg(: , 1 : gender) , 2));
+        nTestedHivUndiagC_multSims(: , j) = annlz(sum(vaxResult{n}.nTestedUndiag(: , 1 : gender) , 2));
     
         %% TOTAL POPULATION SIZE
 
@@ -977,13 +977,13 @@ writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(hivMortAllAgeC_multSim
 %% Save additional number tested with home testing campaigns
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
     'Raw_HTC_combined_hivNeg.csv'];
-writematrix([[currYear : endYear]' , mean(squeeze(nTestedHivNegC_multSims(: , :)) , 2) , ...
+writematrix([[currYear : lastYear-1]' , mean(squeeze(nTestedHivNegC_multSims(: , :)) , 2) , ...
     min(squeeze(nTestedHivNegC_multSims(: , :)) , [] , 2) , max(squeeze(nTestedHivNegC_multSims(: , :)) , [] , 2) , ...
     squeeze(nTestedHivNegC_multSims(: , :))] , fname)
 
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , '11_1' , '\' , ...
     'Raw_HTC_combined_hivUndiag.csv'];
-writematrix([[currYear : endYear]' , mean(squeeze(nTestedHivUndiagC_multSims(: , :)) , 2) , ...
+writematrix([[currYear : lastYear-1]' , mean(squeeze(nTestedHivUndiagC_multSims(: , :)) , 2) , ...
     min(squeeze(nTestedHivUndiagC_multSims(: , :)) , [] , 2) , max(squeeze(nTestedHivUndiagC_multSims(: , :)) , [] , 2) , ...
     squeeze(nTestedHivUndiagC_multSims(: , :))] , fname)
 
@@ -1045,7 +1045,7 @@ figure('DefaultAxesFontSize' , 14);
 
 % female
 subplot(1 , 2 , 1);
-iIndList = {1 , 2 , 3};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1087,7 +1087,7 @@ grid on;
 
 % male
 subplot(1 , 2 , 2);
-iIndList = {1 , 2 , 3};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1628,7 +1628,7 @@ figure;
 
 % female
 subplot(1 , 3 , 1);
-iIndList = {1 , 4 , 2};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1654,7 +1654,7 @@ grid on;
 
 % male
 subplot(1 , 3 , 2);
-iIndList = {1 , 4 , 2};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1680,7 +1680,7 @@ grid on;
 
 % combined
 subplot(1 , 3 , 3);
-iIndList = {1 , 4 , 2};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1805,7 +1805,7 @@ figure('DefaultAxesFontSize' , 18);;
 
 % female
 subplot(1 , 2 , 1);
-iIndList = {1 , 2 , 3};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
@@ -1847,7 +1847,7 @@ grid on;
 
 % male
 subplot(1 , 2 , 2);
-iIndList = {1 , 2 , 3};
+iIndList = {2};
 for iInd = 1 : length(iIndList)
     i = iIndList{iInd};
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_S' , num2str(i) , '_11_1' , '\' , ...
