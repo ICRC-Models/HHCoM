@@ -37,7 +37,7 @@ top50Params = masterSetMatrix(:,top50Inds);
 pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
 masterResampleSubsetMatrix = load([paramDir , 'masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 resampled parameters
 masterCombinedPhaseMatrix = [masterResampleSubsetMatrix ; masterSetMatrix];
-top25Params = masterCombinedPhaseMatrix(:,top50Inds);
+top50Params = masterCombinedPhaseMatrix(:,top50Inds);
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct();
@@ -51,12 +51,11 @@ end
 
 %% Obtain model output for each set of sampled parameters
 %for m = 1 : nPrlSets : numBestFits
-    subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
-    %subMatrixInds = [m : (m + nPrlSets - 1)];
-    parfor n = 1 : nPrlSets
-        paramSet = top50Params(:,subMatrixInds(n));
-        futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-        %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-    end
+subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)]; %subMatrixInds = [m : (m + nPrlSets - 1)];
+parfor n = 1 : nPrlSets
+    paramSet = top50Params(:,subMatrixInds(n));
+    futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+end
 %end
 
