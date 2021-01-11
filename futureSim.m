@@ -553,7 +553,7 @@ for n = nTests
         menCirc , ...
         artDist , artDistList , artTreatTracker , artDiscont , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
-%end
+end
 disp('Done')
 
 %profile viewer
