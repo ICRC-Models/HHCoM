@@ -17,6 +17,7 @@ pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
+%%
 nPrlSets = 25; %numCPUperNode;
 
 %% Load all particles
@@ -25,17 +26,18 @@ masterSetMatrix = load([paramDir , 'masterSets_calib_' , date , '_' , num2str(t_
 pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
 orderedLL = load([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent ordered log-likelihoods
 
-%% Get indices and parameter values of top 25 sets (*(25/10220))
+%% Get indices and parameter values of numBestFits*2 sets
 numBestFits = 25;
-numSets25 = size(orderedLL , 1)*(numBestFits/10220);
-top25Inds = orderedLL(1:numSets25,1);
-top25Params = masterSetMatrix(:,top25Inds);
+numSets50 = size(orderedLL , 1)*((numBestFits*2)/5600);
+specIndsList = [1,2,3,6,8,9,11,12,13,15,20,21,22,26,27,32,34,35,38,39,40,41,42,45,47];
+top50Inds = orderedLL(specIndsList,1); %orderedLL(1:numSets50,1);
+top50Params = masterSetMatrix(:,top50Inds);
 
 %% If on Phase 2 of calibration, uncomment the following to plot resampled Ph1 parameters + Ph2 parameters
 pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
 masterResampleSubsetMatrix = load([paramDir , 'masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 resampled parameters
 masterCombinedPhaseMatrix = [masterResampleSubsetMatrix ; masterSetMatrix];
-top25Params = masterCombinedPhaseMatrix(:,top25Inds);
+top25Params = masterCombinedPhaseMatrix(:,top50Inds);
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct();
@@ -48,13 +50,13 @@ for s = 1 : length(pIdx)
 end
 
 %% Obtain model output for each set of sampled parameters
-for m = 1 : nPrlSets : numBestFits
-    %subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
-    subMatrixInds = [m : (m + nPrlSets - 1)];
+%for m = 1 : nPrlSets : numBestFits
+    subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
+    %subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
-        paramSet = top25Params(:,subMatrixInds(n));
+        paramSet = top50Params(:,subMatrixInds(n));
         futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
         %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     end
-end
+%end
 
