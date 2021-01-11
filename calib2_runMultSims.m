@@ -54,8 +54,8 @@ end
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)]; %subMatrixInds = [m : (m + nPrlSets - 1)];
 parfor n = 1 : nPrlSets
     paramSet = top50Params(:,subMatrixInds(n));
-    futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-    %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    futureSim(1 , pIdx , paramsSub , paramSet , specIndsList(paramSetIdx + n - 1) , tstep_abc , date_abc);
+    %historicalSim(1 , pIdx , paramsSub , paramSet , specIndsList(paramSetIdx + n - 1) , tstep_abc , date_abc);
 end
 %end
 
