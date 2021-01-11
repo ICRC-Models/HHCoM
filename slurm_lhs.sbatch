@@ -12,7 +12,7 @@
 #SBATCH --mem=120G   		 		    # Memory per node
 #SBATCH --time=00:30:00 	 		    # Wall clock time limit hrs:min:sec
 
-NSETS=10220    # nSets
+NSETS=5600    # nSets
 echo "${NSETS}" 
 export NSETS
 
@@ -20,7 +20,7 @@ TCURR=0    # t_curr
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2V4
+DATE=22Apr20Ph2V11
 echo "${DATE}"
 export DATE
 

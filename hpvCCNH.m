@@ -1,20 +1,22 @@
 % HPV Natural History
-% Simulates progression through HPV states.
+% Simulates progression through HPV states and vaccine waning.
 % Accepts a population matrix as input and returns dPop, a vector of
 % derivatives that describes the change in the population's subgroups due
 % to HPV progression.
 function[dPop , extraOut] = hpvCCNH(t , pop , ...
-    hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , muCC , ...
+    hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , ...
     normalhpvVaxInds , immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , ...
     immunehpvNonVaxInds , infhpvNonVaxInds , cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ...
     ccLochpvVaxIndsFrom , ccReghpvVaxInds , ccDisthpvVaxInds , ...
     cin3hpvNonVaxIndsFrom , ccLochpvNonVaxIndsTo , ccLochpvNonVaxIndsFrom , ...
     ccReghpvNonVaxInds , ccDisthpvNonVaxInds , cin1hpvVaxInds , ...
     cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
-    cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+    cin2hpvNonVaxInds , cin3hpvNonVaxInds , fromVaxNoScrnInds , ...
+    fromVaxScrnInds , toNonVaxNoScrnInds , toNonVaxScrnInds , ...
+    kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
     kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
-    rImmune , fImm , kRL , kDR , maleHpvClearMult , disease , age , hpvVaxStates , ...
-    hpvNonVaxStates , hpvTypeGroups)
+    rImmune , fImm , kRL , kDR , maleHpvClearMult , rVaxWane , disease , ...
+    age , hpvVaxStates , hpvNonVaxStates , hpvTypeGroups)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -42,9 +44,9 @@ for d = 1 : disease
         rHiv = rImmuneHiv(d - 3); % Multiplier for immunity clearance for HIV+
         c3c2Mult = c3c2Mults(d - 3); % CIN2 -> CIN3 progression multiplier
         c2c1Mult = c2c1Mults(d - 3); % CIN1 -> CIN2 progression multiplier
-        c1c2Mult = hpv_hivClear(d - 3); % CIN2 -> CIN1 regression multiplier
+        c1c2Mult = c1c2Mults(d - 3); % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1.0; %hpv_hivClear(d - 3); % Regression multiplier, compounds c1c2Mult (removing this by setting to 1.0)
-        c2c3Mult = hpv_hivClear(d - 3); % CIN3 -> CIN2 regression multiplier
+        c2c3Mult = c2c3Mults(d - 3); % CIN3 -> CIN2 regression multiplier
         deathCC = muCC(d - 3 , :); % HIV-positive CC-associated mortality     
     % Multipliers for HIV-positives on ART equivalent to those for CD4>500; ...
     % set CC-associated mortality equivalent to CD4>500
@@ -53,9 +55,9 @@ for d = 1 : disease
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
         c3c2Mult = c3c2Mults(1); % CIN2 -> CIN3 progression multiplier
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 progression multiplier
-        c1c2Mult = hpv_hivClear(1); % CIN2 -> CIN1 regression multiplier
+        c1c2Mult = c1c2Mults(1); % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1.0; %hpv_hivClear(1); % Regression multiplier, compounds c1c2Mult (removing this by setting to 1.0)
-        c2c3Mult = hpv_hivClear(1); % CIN3 -> CIN2 regression multiplier
+        c2c3Mult = c2c3Mults(1); % CIN3 -> CIN2 regression multiplier
         deathCC = muCC(5 , :); % HIV-positive on ART CC-associated mortality
     end
     
@@ -238,6 +240,12 @@ for d = 1 : disease
         end
     end   
 end
+
+%% Vaccine waning
+dPop(fromVaxNoScrnInds) = dPop(fromVaxNoScrnInds) - rVaxWane .* pop(fromVaxNoScrnInds);
+dPop(fromVaxScrnInds) = dPop(fromVaxScrnInds) - rVaxWane .* pop(fromVaxScrnInds);
+dPop(toNonVaxNoScrnInds) = dPop(toNonVaxNoScrnInds) + rVaxWane .* pop(fromVaxNoScrnInds);
+dPop(toNonVaxScrnInds) = dPop(toNonVaxScrnInds) + rVaxWane .* pop(fromVaxScrnInds);                        
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOut{1} = ccDeath;
