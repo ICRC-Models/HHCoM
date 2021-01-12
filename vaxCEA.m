@@ -58,9 +58,6 @@ curr = load([pwd , '\HHCoM_Results\toNow_22Apr20Ph2V2_baseVax057_baseScreen_base
 
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
-if waning
-    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
-end
 for n = 2 %parfor n = 1 : nSims
     % load results from vaccine run into cell array
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);

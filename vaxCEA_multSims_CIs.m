@@ -123,9 +123,6 @@ for j = 1 : nRuns
     
     vaxResult = cell(nSims , 1);
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
-    if waning
-        resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
-    end
     for n = nSims
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(3), '.mat']);
