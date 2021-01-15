@@ -227,7 +227,7 @@ for k = 1 : loopSegmentsLength-1
         vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
-        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , : , : , :)]; %curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)]; 
+        vaxResult{n}.newScreen = [curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)];%[vaxResult{n}.newScreen(1 : end , : , : , : , : , : , : , : , :)];
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
@@ -879,7 +879,7 @@ for k = 1 : loopSegmentsLength-1
         
         %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
         
-%         %% Screening "coverage"
+        %% Screening "coverage"
 %         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
 %             1 : endpoints , 1 : intervens , 2 , 7 : age , 1 : risk));
 %         % Calculate incidence
@@ -887,7 +887,7 @@ for k = 1 : loopSegmentsLength-1
 %             annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , : , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9)) ./ ...
 %             (annlz(sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2) ./ stepsPerYear) * 0.1);
 %         
-        %% Screening coverage ages 35-39
+%         %% Screening coverage ages 35-39
 %         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
 %             1 : endpoints , 1 : intervens , 2 , 8 , 1 : risk));
 %         screenF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -896,8 +896,8 @@ for k = 1 : loopSegmentsLength-1
 %         screenCovTime(j , :) = ...
 %             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , screenF) , 2) ./ ...
 %             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2);
-        
-        %% Total number of women screened annually by age and disease status
+%         
+%         %% Total number of women screened annually by age and disease status
 %         for dInd = 1 : diseaseVecLength_ccInc
 %             d = diseaseVec_ccInc{dInd};
 %             screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9));
@@ -2511,7 +2511,7 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 
 %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
 
-%% Screening "coverage"
+% %% Screening "coverage"
 % figure;   
 % plot(screenAnnualTimespan , mean(newScreenTime,1) , 'k-' , ...
 %     screenAnnualTimespan , min(newScreenTime,[],1) , 'k--' , ...
@@ -2521,8 +2521,8 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 % title(['Screening coverage']);
 % legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
 %     'Location' , 'northwest');
-
-%% Screening coverage ages 35-39
+% 
+% %% Screening coverage ages 35-39
 % figure;   
 % plot(screenMonthlyTimespan , mean(screenCovTime,1) , 'k-' , ...
 %     screenMonthlyTimespan , min(screenCovTime,[],1) , 'k--' , ...
@@ -2532,8 +2532,8 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 % title(['Screening coverage ages 35-39']);
 % legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
 %     'Location' , 'northwest');
-
-%% Total number of women screened annually by age and disease status
+% 
+% %% Total number of women screened annually by age and disease status
 % diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 % for dInd = 1 : length(diseaseLabels)
 %     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
@@ -2543,6 +2543,15 @@ legend('Model- 9v, 2000: 25-sets mean' , 'Model- 9v, 2000: 25-sets minimum' , 'M
 %         [squeeze(median(squeeze(screenTotAnnual(: , dInd , :)) , 1)) ; ...
 %         squeeze(min(squeeze(screenTotAnnual(: , dInd , :)) , [] , 1)) ; ...
 %         squeeze(max(squeeze(screenTotAnnual(: , dInd , :)) , [] , 1))]]] , fname)
+% end
+% 
+%% Total number of women screened annually by age and disease status (2020-2120) into existing template
+% diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N)' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N) W'};
+% firstYrInd = ((2020 - startYear) +1);
+% for dInd = 1 : length(diseaseLabels)
+%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+%     writematrix(squeeze(median(squeeze(screenTotAnnual(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
 % end
 
 %% Vaccine coverage overall
@@ -2586,7 +2595,7 @@ legend('Model, 0-4: 25-sets mean' , ...
     'Model, 70-74: 25-sets mean' , ...
     'Model, 75-59: 25-sets mean');
 
-%% Vaccine coverage by age and disease status
+%% Total vaccinated by age and disease status
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
@@ -2597,3 +2606,12 @@ for dInd = 1 : length(diseaseLabels)
         squeeze(min(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1)) ; ...
         squeeze(max(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1))]]] , fname)
 end 
+
+%% Total vaccinated by age and disease status (2020-2120) into existing template
+% diseaseLabels = {'Vaccinated (All) (N)' , 'Vaccinated (HIV-) (N)' , 'Vaccinated (HIV+) (N)' , 'Vaccinated (HIV+ not on ART)(N)' , 'Vaccinated (HIV+ on ART) (N)'};
+% firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+% for dInd = 1 : length(diseaseLabels)
+%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+%     writematrix(squeeze(median(squeeze(vaxTotAge(: , : , dInd , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')
+% end
