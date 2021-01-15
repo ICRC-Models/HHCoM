@@ -126,6 +126,9 @@ hivMortAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 
 cIndsAllMort = {1 : 2 , 3 : 8 , 3 : 5 , 6 , 7 , 8};
 cIndsAllMortLength = length(cIndsAllMort);
 allCauseMortAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 5);
+popSizeGAD_disInds = {1 : 2 , 3 : 5 , 6 , 7 , 8};
+popSizeGAD_disIndsLength = length(popSizeGAD_disInds);
+allCauseDeathGAD_multSims = zeros(length([startYear : lastYear-1]) , nRuns , popSizeGAD_disIndsLength , gender , agesEligVecLength);
 hivMortAllAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivMortAllAgeF_multSims = hivMortAllAgeC_multSims;
 hivMortAllAgeM_multSims = hivMortAllAgeC_multSims;
@@ -133,6 +136,7 @@ hivMortAllAgeM_multSims = hivMortAllAgeC_multSims;
 popSizeF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 popSizeM_multSims = popSizeF_multSims;
 popSizeC_multSims = popSizeF_multSims;
+popSizeGAD_multSims = zeros(length([startYear : lastYear-1]) , nRuns , popSizeGAD_disIndsLength , gender , agesEligVecLength);
 % VMMC
 vmmcM_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 nTestedHivNegC_multSims = zeros(length([currYear : lastYear-1]) , nRuns);
@@ -622,8 +626,6 @@ for k = 1 : loopSegmentsLength-1
 %         grid on;
 
         %% HIV-ASSOCIATED MORTALITY BY AGE
-        cTits = {'all HIV' , 'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onART'};
-
         % Calculate combined HIV-associated mortality
         for cInd = 1 : cIndsHivMortLength
             cGroup = cIndsHivMort{cInd};
@@ -634,9 +636,7 @@ for k = 1 : loopSegmentsLength-1
             end
         end
 
-        %% ALL-CAUSE MORTALITY BY AGE
-        cTits = {'HIV neg' , 'all HIV' , 'CD4 350plus noART' , 'CD4 200-350 noART' , 'CD4 below200 noART' , 'onART'};
-
+        %% ALL-CAUSE DEATHS BY AGE
         % Calculate combined HIV-associated mortality
         for cInd = 1 : cIndsAllMortLength
             cGroup = cIndsAllMort{cInd};
@@ -645,6 +645,21 @@ for k = 1 : loopSegmentsLength-1
                 allCauseMortC = annlz(sum(sum(sum(vaxResult{n}.deaths(: , cGroup , 1 : 2 , a) ,2) ,3) ,4)) + annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , cGroup , a , 1 : hpvTypeGroups), 2), 3), 4)) + ...
                     annlz(sum(sum(sum(vaxResult{n}.hivDeaths(: , cGroup , 1 : 2 , a), 2), 3), 4));
                 allCauseMortAgeC_multSims(: , j , aInd , cInd) = allCauseMortC(1 : end)';
+            end
+        end
+        
+        %% ALL-CAUSE DEATHS BY GENDER, AGE, HIV/ART STATUS   
+        for gInd = 1 : 2
+            g = gInd;
+            for aInd = 1 : agesEligVecLength
+                a = agesEligVec{aInd};
+                for dInd = 1 : popSizeGAD_disIndsLength
+                    d = popSizeGAD_disInds{dInd};
+                    allCauseDeathGAD = annlz(sum(sum(sum(vaxResult{n}.deaths(: , d , g , a) ,2) ,3) ,4)) + ...
+                        (g-1).*annlz(sum(sum(sum(vaxResult{n}.ccDeath(: , d , a , 1 : hpvTypeGroups), 2), 3), 4)) + ...
+                        annlz(sum(sum(sum(vaxResult{n}.hivDeaths(: , d , g , a), 2), 3), 4));
+                    allCauseDeathGAD_multSims(: , j , dInd , gInd , aInd) = allCauseDeathGAD';
+                end
             end
         end
 
@@ -733,6 +748,20 @@ for k = 1 : loopSegmentsLength-1
 %         xlim([1980 2060])
 %         legend('Model: ages 15-79');
 %         grid on;
+
+        %% TOTAL POPULATION SIZE BY GENDER, AGE, HIV/ART STATUS   
+        for gInd = 1 : 2
+            g = gInd;
+            for aInd = 1 : agesEligVecLength
+                a = agesEligVec{aInd};
+                for dInd = 1 : popSizeGAD_disIndsLength
+                    d = popSizeGAD_disInds{dInd};
+                    popSizeGADinds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                        1 : endpoints , 1 : intervens , g , a , 1 : risk));
+                    popSizeGAD_multSims(: , j , dInd , gInd , aInd) = sum(vaxResult{n}.popVec((1 : stepsPerYear:end) , popSizeGADinds) , 2);
+                end
+            end
+        end
 
     end
 end
@@ -1026,6 +1055,34 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
 writematrix([tVec(1 : stepsPerYear : end)' , mean(popSizeC_multSims , 2) , ...
     min(popSizeC_multSims , [] , 2) , max(popSizeC_multSims , [] , 2) , ...
     popSizeC_multSims] , fname)
+
+%% Save population size and deaths by gender, age, and HIV/ART status to existing template
+ageLabelVec = {17 , 22 , 27 , 32 , 37 , 42 , 47 , 52 , 57 , 62 , 67 , 72 , 77};
+hivStatusVec = {0 , 1 , 1 , 1 , 1};
+cd4CountVec = {0 , 3 , 2 , 1 , 0};
+artStatusVec = {0 , 0 , 0 , 0 , 1};
+firstYrInd = ((2020 - startYear)*stepsPerYear +1);
+t20on = tVec(firstYrInd:stepsPerYear:end)';
+t20onLen = length(t20on);
+firstYrAnlInd = ((2020 - startYear) +1);
+outputVec = [];
+
+for gInd = 1 : gender
+    for aInd = 1 : agesEligVecLength
+        for dInd = 1 : popSizeGAD_disIndsLength
+           outputVec = [outputVec; ...
+               [t20on , ones(t20onLen,1).*(gInd-1) , ...
+               ones(t20onLen,1).*ageLabelVec{aInd} , ones(t20onLen,1).*hivStatusVec{dInd} , ...
+               ones(t20onLen,1).*cd4CountVec{dInd} , ones(t20onLen,1).*artStatusVec{dInd} , ...
+               mean(squeeze(popSizeGAD_multSims((firstYrAnlInd:end) , : , dInd , gInd , aInd)),2) , ...
+               mean(squeeze(allCauseDeathGAD_multSims((firstYrAnlInd:end) , : , dInd , gInd , aInd)),2)]];
+        end
+    end
+end
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+'do_art_daly_template_4allen_S' , num2str(fileInd) , '.xlsx'];
+writematrix(outputVec , fname , 'Range' , 'A2')
 
 
 %% PLOT SCENARIOS COMPARED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1980,4 +2037,3 @@ legend('Scenario 1, mean' , 'min' , 'max' , 'Scenario 2a, mean' , 'min' , 'max' 
     'Location' , 'Northwest');
 grid on;
 %sgtitle('Population size');
-
