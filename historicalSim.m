@@ -34,8 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-
-% pathModifier = 'toNow_determMod_final';
+% pathModifier = 'toNow_determMod_final_artDiscontFix';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
@@ -295,7 +294,7 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     popVec(1 , :) = popIn;
     deaths = zeros(length(s) - 1 , 1); %popVec; 
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-    hivDeaths = zeros(length(s) - 1 , gender , age);
+    hivDeaths = zeros(length(s) - 1 , disease, gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -485,7 +484,7 @@ for i = iStart : length(s) - 1
     % ART initiation, dicontinuation, and scale-up by CD4 count
     % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
-        [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+        [~ , pop , hivDeaths(i , :, : , :) , artTreat] =...
             ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
             kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...

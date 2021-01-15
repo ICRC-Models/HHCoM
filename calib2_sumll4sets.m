@@ -41,8 +41,8 @@ end
 parfor n = 1 : nPrlSets
 
     paramSet = paramSetMatrix(:,subMatrixInds(n));
-    futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-    %historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+    historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     %negSumLogLSet(n,1) = negSumLogL;
 end
 

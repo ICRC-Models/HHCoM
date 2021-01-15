@@ -15,9 +15,10 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD POPULATION
 historicalIn = load([pwd , ['/HHCoM_Results/toNow_14DEC20_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+% historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['14Dec20_stochMod_noVax']; % ***SET ME***: name for simulation output file
+pathModifier = ['14Dec20_stochMod_CU80']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -55,20 +56,20 @@ vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = [2];
-vaxCoverB = 0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+vaxAgeB = [3];
+vaxCoverB = 0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
-vaxAge = [2];
-vaxCover = [0];
+vaxAge = [3];
+vaxCover = [0.86*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
 vaxAgeCU = [4 : 5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)).*0]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.8]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -339,7 +340,7 @@ n = 1
     popVec(1 , :) = popIn;
     deaths = zeros(length(s) - 1 , 1); %zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-    hivDeaths = zeros(length(s) - 1 , gender , age);
+    hivDeaths = zeros(length(s) - 1 , disease, gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
     newImmHpvVax = newHpvVax;
     newHpvNonVax = newHpvVax;
@@ -433,7 +434,7 @@ n = 1
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
         if hivOn
-            [~ , pop , hivDeaths(i , : , :) , artTreat] =...
+            [~ , pop , hivDeaths(i , :, : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...

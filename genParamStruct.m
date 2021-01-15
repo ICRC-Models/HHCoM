@@ -166,7 +166,7 @@ paramsAll{37}.name = 'maleHpvClearMult'; paramsAll{37}.length = 1; ...
     paramsAll{37}.ub = [2.0];
 
 % hiv_hpvMult [1x1]
-paramsAll{38}.name = 'partnersF'; paramsAll{38}.length = 1; ... %1 %24;
+paramsAll{38}.name = 'hiv_hpvMult'; paramsAll{38}.length = 1; ... %1 %24;
     paramsAll{38}.lb = [1.5];  
     paramsAll{38}.ub = [2.6];  
 

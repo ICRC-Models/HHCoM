@@ -46,9 +46,9 @@ function vaxCEA(pathModifier)
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
 % Load results
-pathModifier = '19Oct20_50CUVaxCov_fert';
+pathModifier = '14Dec20_stochMod_noVax';
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']), 1 );
-curr = load([pwd , '\HHCoM_Results\toNow_10Oct_HIVbeta00099_condUsebyRisk_95-00_fertFuture']); % Historical output up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_14DEC20_stochMod_2']); % Historical output up to current year
 
 clear cell;
 vaxResult = cell(nSims , 1);
@@ -58,7 +58,7 @@ if waning
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+    vaxResult{n} = load([resultFileName , num2str(n), '.mat']); 
     % concatenate vectors/matrices of population up to current year to population
     % matrices for years past current year
     vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
@@ -69,7 +69,7 @@ parfor n = 1 : nSims
     vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)];
     vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : ,:)];
     vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
-    vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , :); vaxResult{n}.hivDeaths(2 : end , : , :)];
+    vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , :, : , :); vaxResult{n}.hivDeaths(2 : end , :, : , :)];
     %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , : , : , : , :)];
     vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
     vaxResult{n}.deaths = [curr.deaths(1 : end, :) ;  vaxResult{n}.deaths(2 : end, :)];
@@ -100,7 +100,8 @@ art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
 
 genArray = {hivNeg , hivNoART , art};   
 
-totalPop0_79 = sum(noV.popVec(:,genArray{1}),2) + sum(noV.popVec(:,genArray{2}),2) + sum(noV.popVec(:,genArray{3}),2);
+for n = 1 : 5
+totalPop0_79 = sum(vaxResult{n}.popVec(:,genArray{1}),2) + sum(vaxResult{n}.popVec(:,genArray{2}),2) + sum(vaxResult{n}.popVec(:,genArray{3}),2);
 
 file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
 historicalPop0_79 = zeros(15,2);
@@ -128,7 +129,7 @@ ylim([0 (2.5 * 10^8)])
 legend('Model prediction' , 'UN historical estimates' , 'UN projections', 'Location', 'NorthWest')
 %legend('Total Population' , 'HIV-Negative' , 'HIV-Positive no ART' , 'HIV-Positive ART');
 hold off
-
+end
 %% Population size by age vs. validation data
 
 % % Load calibration data from Excel
@@ -216,7 +217,7 @@ for a = 1 : age
         popHiv = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 2  , a , 1 : risk));
         %hivDeathInds = toInd(allcomb(1, a));
-        hivDeathsF(:, a) = annAvg(sum(noV.hivDeaths(1:end, 2, a), 3)) ;
+        hivDeathsF(:, a) = annAvg(sum(noV.hivDeaths(1:end, :, 2, a), 3)) ;
         bkgdDeathsF(:, a) = annlz(sum(noV.deaths(1:end, popAge), 2));  
         popTotAgeF(:, a) = annlz(sum(noV.popVec(1:end , popAge), 2)) ./ stepsPerYear;
         popHivAgeF(:, a) = annlz(sum(noV.popVec(1:end , popHiv), 2)) ./ stepsPerYear;
@@ -244,16 +245,18 @@ hivObsGender(:,3) = [2003 2007 2009 2012];
 hivObsGender(:,1) = [8.7 8.4 8.0 6.9]; 
 hivObsGender(:,2) = [4.6 5.4 4.6 4.4]; 
 
+n = 2;
+
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
         1 : endpoints , 1 : intervens , g , 4 : 10 , 1 : risk));
-    artPop = sum(vaxResult{2}.popVec(: , artInds) , 2);
+    artPop = sum(vaxResult{n}.popVec(: , artInds) , 2);
     hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
         1 : endpoints , 1 : intervens , g , 4 : 10 , 1 : risk));
     allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
         1 : endpoints , 1 : intervens , g , 4 : 10 , 1 : risk)); 
-    hivPop = sum(vaxResult{2}.popVec(: , hivInds) , 2);
-    allPop = sum(vaxResult{2}.popVec(: , allInds) , 2);
+    hivPop = sum(vaxResult{n}.popVec(: , hivInds) , 2);
+    allPop = sum(vaxResult{n}.popVec(: , allInds) , 2);
     hivPrev_sex = 100 * (hivPop + artPop) ./ allPop;
     plot(tVec , hivPrev_sex)
     hold on
@@ -271,7 +274,7 @@ end
 
 xlabel('Year')
 ylabel('Prevalence')
-title('HIV Prevalence by sex')
+title(['HIV Prevalence by sex',' iteration ', num2str(n)])
 legend('Males, model' , 'Males, DHS/KAIS', 'Females, model', 'Females, DHS/KAIS', ...
     'Location', 'NorthEast')
 xlim([1980 2070])
@@ -287,13 +290,13 @@ DHS_KAIS = [2003 6.7 5.8 7.6;
 
 artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk));
-artPop = sum(vaxResult{2}.popVec(: , artInds) , 2);
+artPop = sum(vaxResult{n}.popVec(: , artInds) , 2);
 hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk));
 allInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
     1 : endpoints , 1 : intervens , 1 : gender , 4 : 10 , 1 : risk)); 
-hivPop = sum(vaxResult{2}.popVec(: , hivInds) , 2);
-allPop = sum(vaxResult{2}.popVec(: , allInds) , 2);
+hivPop = sum(vaxResult{n}.popVec(: , hivInds) , 2);
+allPop = sum(vaxResult{n}.popVec(: , allInds) , 2);
 hivPrev = 100 * (hivPop + artPop) ./ allPop;
 plot(tVec , hivPrev, ...
     HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
@@ -301,7 +304,7 @@ plot(tVec , hivPrev, ...
 
 xlabel('Year')
 ylabel('Prevalence')
-title('HIV Prevalence All')
+title(['HIV Prevalence All', ' iteration ', num2str(n)])
 legend('Model' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
 xlim([1980 2070])
    
@@ -1237,7 +1240,7 @@ end
 %         % Calculate mortality
 %         for n = nSims %1 : nSims
 %             hivMortRef = ...
-%                 (annlz(sum(vaxResult{n}.hivDeaths(end-5:end , 2 , a),3)) ./ ... % end-5:end
+%                 (annlz(sum(vaxResult{n}.hivDeaths(end-5:end ,:,  2 , a),3)) ./ ... % end-5:end
 %                 (annlz(sum(vaxResult{n}.popVec(end-5:end , allF) , 2) ./ stepsPerYear)) * fac); %553:553+5  , 661:661+5
 %             
 %             aMatrix(1,aInd) = hivMortRef;
@@ -1315,7 +1318,7 @@ end
 %         
 %         % Calculate mortality
 %         hivMortRef = ...
-%             (annlz(sum(noV.hivDeaths(end-5:end , 2 , a),3)) ./ ... % end-5:end
+%             (annlz(sum(noV.hivDeaths(end-5:end , :, 2 , a),3)) ./ ... % end-5:end
 %             (annlz(sum(noV.popVec(end-5:end , allF) , 2) ./ stepsPerYear)) * fac); %553:553+5  , 661:661+5
 % 
 %         aMatrix(1,a) = hivMortRef;

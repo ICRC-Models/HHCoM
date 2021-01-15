@@ -20,7 +20,7 @@ function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 artTreat = zeros(disease , viral , gender , age , risk); %zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-hivDeaths = zeros(gender , age , 1);
+hivDeaths = zeros(disease, gender , age);
 
 %% Calculate background mortality rate for calculating HIV-associated mortality on ART
 if (year < 2003)
@@ -107,15 +107,6 @@ if year >= 2011 && year < 2015
     % Calculate HIV-associated mortality on ART
     muART = 0.6 .* mueYear; %0.5
     % Calculate population-level ART coverage
-%     if year >= 2008 && year < 2009
-%         ind = (round(artYr_vec{6} , 4) == round(year , 4));
-%         popCover = {artM_vec{6} , artF_vec{6}};
-%     elseif year >= 2009 && year < 2010
-%         ind = (round(artYr_vec{7} , 4) == round(year , 4));
-%         popCover = {artM_vec{7} , artF_vec{7}};
-%     elseif year >= 2010 && year < 2011
-%         ind = (round(artYr_vec{8} , 4) == round(year , 4));
-%         popCover = {artM_vec{8} , artF_vec{8}};
     if year >= 2011 && year < 2012
         ind = (round(artYr_vec{9} , 4) == round(year , 4));
         popCover = {artM_vec{9} , artF_vec{9}};
@@ -284,9 +275,18 @@ for g = 1 : gender
             % CD4 progression for HIV-positives with acute infection
             for v = 1 : 5
                 acuteInf = hivInds(3 , v , g , a , r , :);
+                
+                artDiscontDist = (artDist(3 , v , g , a , r) / sumall(artDist(: , : , g , a , r)));
+                aInd = a;
+                while isnan(artDiscontDist) && (aInd > 1)
+                    aInd = aInd - 1;
+                    artDiscontDist = (artDist(3 , v , g , aInd , r) / sumall(artDist(: , : , g , aInd , r)));
+                end
+                artDiscontDist = max(0.0 , artDiscontDist);
+                
                 dPop(acuteInf) = dPop(acuteInf) ...
                     - (muHIV(a , 2) + kCD4(a , 1 , g) + treat(3 , v , g , a , r)) ... % out: disease related mortality, CD4 progression, ART coverage.
-                    .* pop(acuteInf) + artOut(g , a , r) * max(0.0, (artDist(3 , v , g , a , r)/ sumall(artDist(:, :, g, a, r)))) ... % Distributed dropouts from ART
+                    .* pop(acuteInf) + artOut(g , a , r) * artDiscontDist ... % Distributed dropouts from ART
                     .* pop(hivPositiveArt);
 
                 % HIV-positive going on ART (d = 8)
@@ -294,9 +294,9 @@ for g = 1 : gender
                     + treat(3 , v , g , a , r)... % rate of going on ART
                     .* pop(acuteInf); % going on ART   
 
-                hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
+                hivDeaths(3, g , a) = hivDeaths(3, g , a) + sumall(muHIV(a , 2) .* pop(acuteInf));
                 artTreat(3 , v , g , a , r) = treat(3 , v , g , a , r) .* sumall(pop(acuteInf)); % keep track of distribution of people going on ART
-
+                
                 % CD4 progression for HIV-positives advanced to decreased CD4 count
                 for d = 4 : 7
                     cd4Curr = hivInds(d , v , g , a , r , :);
@@ -305,9 +305,18 @@ for g = 1 : gender
                     if d ~= 7
                         kCD4_next = kCD4(a , d - 2 , g); %  progression to next disease state
                     end
+                    
+                    artDiscontDist = (artDist(d , v , g , a , r) / sumall(artDist(: , : , g , a , r)));
+                    aInd = a;
+                    while isnan(artDiscontDist) && (aInd > 1)
+                        aInd = aInd - 1;
+                        artDiscontDist = (artDist(d , v , g , aInd , r) / sumall(artDist(: , : , g , aInd , r)));
+                    end
+                    artDiscontDist = max(0.0 , artDiscontDist);
+
                     dPop(cd4Curr) = ...
                         kCD4(a , d - 3 , g) * pop(cd4Prev) ... % CD4 progression from previous disease state
-                        + artOut(g , a , r) * max(0.0, (artDist(d , v , g , a , r)/ sumall(artDist(:, :, g, a, r))))  ... % Distributed dropouts from ART
+                        + artOut(g , a , r) * artDiscontDist  ... % Distributed dropouts from ART
                         .* pop(hivPositiveArt)...
                         - (kCD4_next ... % progression to next disease state
                         + muHIV(a , d - 1) ... % disease-related mortality
@@ -319,8 +328,8 @@ for g = 1 : gender
                         + treat(d , v , g , a , r)... % rate of going on ART
                         .* pop(cd4Curr); % going on ART
 
-                    hivDeaths(g , a) = hivDeaths(g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
-                    artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART                    
+                    hivDeaths(d, g , a) = hivDeaths(d, g , a) + sumall(muHIV(a , d - 1) .* pop(cd4Curr));
+                    artTreat(d , v , g , a , r) = treat(d , v , g , a , r) .* sumall(pop(cd4Curr)); % keep track of distribution of people going on ART 
                 end
             end
 
@@ -328,6 +337,7 @@ for g = 1 : gender
             % Dropout from ART (d = 8)
             dPop(hivPositiveArt) = dPop(hivPositiveArt)...
                 - (artOut(g , a , r) + muART(a , g)) .* pop(hivPositiveArt); % artOut to d = 3:7 as determined by distribution matrix
+            hivDeaths(8 , g , a) = hivDeaths(8 , g , a) + sumall(muART(a , g) .* pop(hivPositiveArt));
         end
     end
 end
@@ -349,7 +359,7 @@ dPop = dPop + vlAdvanced;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOuts{1} = hivDeaths;
-extraOuts{2} = reshape(artTreat , [numel(artTreat) , 1]); % artTreat
+extraOuts{2} =  reshape(artTreat , [numel(artTreat) , 1]); %artTreat;
 
 dPop = sparse(dPop);
 
