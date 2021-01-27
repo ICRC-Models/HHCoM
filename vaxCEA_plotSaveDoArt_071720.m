@@ -1757,18 +1757,18 @@ set(fig,'defaultAxesColorOrder',[[0 0 0]; [0.5 0.5 0.5]]);
 set(fig,'DefaultAxesFontSize' , 18);
 
 % female
-subplot(1 , 3 , 1);
-H = bar([1] , [62.23 65.70-62.23] , 'stacked', 'FaceColor' ,'flat');
-H(1).CData = [0, 0.4470, 0.7410]; 
-H(2).CData = [0.8500, 0.3250, 0.0980];
-box on;
-set(gca,'XColor','none')
-xlim([0.5 1.5]); ylim([0 100]);
-ylabel('Percent of Women Living with HIV who are Virally Suppressed');
-legend('Clinic ART' , 'Clinic ART + Community-based ART');
-title('Impact of Community-based ART on Viral Suppression');
+% subplot(1 , 3 , 1);
+% H = bar([1] , [62.23 65.70-62.23] , 'stacked', 'FaceColor' ,'flat');
+% H(1).CData = [0, 0.4470, 0.7410]; 
+% H(2).CData = [0.8500, 0.3250, 0.0980];
+% box on;
+% set(gca,'XColor','none')
+% xlim([0.5 1.5]); ylim([0 100]);
+% ylabel('Percent of Women Living with HIV who are Virally Suppressed');
+% legend('Clinic ART' , 'Clinic ART + Community-based ART');
+% title('Impact of Community-based ART on Viral Suppression');
 
-subplot(1 , 3 , [2,3]);
+subplot(2 , 2 , [1,2]);
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_DoART' , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
     'HIV_incidence_females_aged15-79' , '.csv'];
 hivIncFbase = xlsread(fname);
@@ -1782,7 +1782,7 @@ for iInd = 2
         'HIV_incidence_females_aged15-79' , '.csv'];
     hivIncF = xlsread(fname);
     hold all;
-    yyaxis left
+    %yyaxis left
     percReduct = ((hivIncF(: , 5:29) - hivIncFbase(: , 5:29)) ./ hivIncFbase(: , 5:29)) .* 100;
     percReduct_CI = [mean(percReduct , 2) , min(percReduct , [] , 2) , max(percReduct , [] , 2)];
     disp('Incidence reduction female (2025, 2060):')
@@ -1797,13 +1797,14 @@ for iInd = 2
     h.FaceAlpha = 0.3;
     h.LineStyle = '-';
     h.LineWidth = 0.5;
-    ylabel('HIV incidence reduction (%)'); ylim([-55 0]); box on;
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    ylabel('Percent reduction'); ylim([-55 0]); box on;
     
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_diagHiv075_DoART' , '_S' , num2str(i) , '_' , fileInds{1} , '\' , ...
         'HIV_mortality_females_aged15-79' , '.csv'];
     hivMortF = xlsread(fname);
     hold all;
-    yyaxis right
+    %yyaxis right
     percReduct = ((hivMortF(: , 5:29) - hivMortFbase(: , 5:29)) ./ hivMortFbase(: , 5:29)) .* 100;
     percReduct_CI = [mean(percReduct , 2) , min(percReduct , [] , 2) , max(percReduct , [] , 2)];
     disp('Mortality reduction female (2025, 2060):')
@@ -1818,31 +1819,33 @@ for iInd = 2
     h.FaceAlpha = 0.2;
     h.LineStyle = '-';
     h.LineWidth = 0.5;
-    ylabel('HIV mortality reduction (%)'); ylim([-55 0]);
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    ylim([-60 0]); %ylabel('Percent reduction'); 
 end
 ax.YAxis(1).Color = [0 0 0];
 ax.YAxis(2).Color = [0.5 0.5 0.5];
-xlabel('Year');  title('Percent Reduction in HIV Outcomes among Women');
-legend('Mean HIV incidence reduction' , 'Range' , 'Mean HIV mortality reduction' , 'Range' , 'Location' , 'NorthEast');
+title('Women'); %xlabel('Year');  
+hlegend1 = legend('Incidence, mean [uncertainty range]' , 'Mortality, mean [uncertainty range]' , 'Location' , 'NorthEast'); % , 'Orientation' , 'horizontal');
+%hlegend1.NumColumns=2;
 xlim([2020 2060]); grid on;
 %sgtitle('FEMALES');
 
-fig = figure;
-set(fig,'defaultAxesColorOrder',[[0 0 0]; [0.5 0.5 0.5]]);
-set(fig,'DefaultAxesFontSize' , 18);
+% fig = figure;
+% set(fig,'defaultAxesColorOrder',[[0 0 0]; [0.5 0.5 0.5]]);
+% set(fig,'DefaultAxesFontSize' , 18);
 
 % male
-subplot(1 , 3 , 1);
-H = bar([1] , [39.78 65.50-39.78] , 'stacked' , 'FaceColor' ,'flat');
-H(1).CData = [0, 0.4470, 0.7410]; 
-H(2).CData = [0.8500, 0.3250, 0.0980];
-set(gca,'XColor','none')
-xlim([0.5 1.5]); ylim([0 100]); box on;
-ylabel('Percent of Men Living with HIV who are Virally Suppressed');
-legend('Clinic ART' , 'Clinic ART + Community-based ART');
-title('Impact of Community-based ART on Viral Suppression');
+% subplot(1 , 3 , 1);
+% H = bar([1] , [39.78 65.50-39.78] , 'stacked' , 'FaceColor' ,'flat');
+% H(1).CData = [0, 0.4470, 0.7410]; 
+% H(2).CData = [0.8500, 0.3250, 0.0980];
+% set(gca,'XColor','none')
+% xlim([0.5 1.5]); ylim([0 100]); box on;
+% ylabel('Percent of Men Living with HIV who are Virally Suppressed');
+% legend('Clinic ART' , 'Clinic ART + Community-based ART');
+% title('Impact of Community-based ART on Viral Suppression');
 
-subplot(1 , 3 , [2,3]);
+subplot(2 , 2 , [3,4]);
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_DoART' , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
     'HIV_incidence_males_aged15-79' , '.csv'];
 hivIncMbase = xlsread(fname);
@@ -1856,7 +1859,7 @@ for iInd = 2
         'HIV_incidence_males_aged15-79' , '.csv'];
     hivIncM = xlsread(fname);
     hold all;
-    yyaxis left
+    %yyaxis left
     percReduct = ((hivIncM(: , 5:29) - hivIncMbase(: , 5:29)) ./ hivIncMbase(: , 5:29)) .* 100;
     percReduct_CI = [mean(percReduct , 2) , min(percReduct , [] , 2) , max(percReduct , [] , 2)];
     disp('Incidence reduction male (2025, 2060):')
@@ -1871,13 +1874,14 @@ for iInd = 2
     h.FaceAlpha = 0.3;
     h.LineStyle = '-';
     h.LineWidth = 0.5;
-    ylabel('HIV incidence reduction (%)'); ylim([-55 0]); box on;
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    ylabel('Percent reduction'); ylim([-55 0]); box on;
     
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , '_diagHiv075_DoART' , '_S' , num2str(i) , '_' , fileInds{1} , '\' , ...
         'HIV_mortality_males_aged15-79' , '.csv'];
     hivMortM = xlsread(fname);
     hold all;
-    yyaxis right
+    %yyaxis right
     percReduct = ((hivMortM(: , 5:29) - hivMortMbase(: , 5:29)) ./ hivMortMbase(: , 5:29)) .* 100;
     percReduct_CI = [mean(percReduct , 2) , min(percReduct , [] , 2) , max(percReduct , [] , 2)];
     disp('Mortality reduction male (2025, 2060):')
@@ -1892,10 +1896,12 @@ for iInd = 2
     h.FaceAlpha = 0.2;
     h.LineStyle = '-';
     h.LineWidth = 0.5;
-    ylabel('HIV mortality reduction (%)'); ylim([-55 0]); 
+    h.Annotation.LegendInformation.IconDisplayStyle = 'off';
+    ylim([-60 0]); %ylabel('HIV mortality reduction (%)'); 
 end
-xlabel('Year');  title('Percent Reduction in HIV Outcomes among Men');
-legend('Mean HIV incidence reduction' , 'Range' , 'Mean HIV mortality reduction' , 'Range' , 'Location' , 'NorthEast');
+xlabel('Year');  title('Men');
+hlegend2 = legend('Incidence, mean [uncertainty range]' , 'Mortality, mean [uncertainty range]' , 'Location' , 'NorthEast'); % , 'Orientation' , 'horizontal');
+%hlegend2.NumColumns=2;
 xlim([2020 2060]); grid on;
 %sgtitle('MALES');
 
@@ -1946,7 +1952,8 @@ for iInd = 1 : length(iIndListGenDiff)
     hold all;
     genderGap = (hivIncF(: , 5:29) ./ hivIncM(: , 5:29));
     genderGap_CI = [mean(genderGap , 2) , min(genderGap , [] , 2) , max(genderGap , [] , 2)];
-    disp(['Gender gap (2025, 2060) for S' , num2str(i) , ':'])
+    disp(['Gender gap (2020 , 2025, 2060) for S' , num2str(i) , ':'])
+    genderGap_CI((2020-1925)+1 , :)
     genderGap_CI((2025-1925)+1 , :)
     genderGap_CI(end , :)
     plot(hivIncF(: , 1) , genderGap_CI(: , 1) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
