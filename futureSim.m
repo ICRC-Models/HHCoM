@@ -345,7 +345,7 @@ n = 1; %parfor n = 1 : nTests
     % newCin2 = newCC;
     % newCin3 = newCC;
     ccDeath = newCC;
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
+    newScreen = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , 2);
     % newTreatImm = newScreen;
     % newTreatHpv = newScreen;
     % newTreatHyst = newScreen;
@@ -390,7 +390,7 @@ n = 1; %parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...

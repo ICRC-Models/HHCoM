@@ -3709,13 +3709,13 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %     for v = 1 : 2
 %         for i = 1 : (length(vaxResult{1}.tVec) - length(curr.tVec))
 %         %HIV-
-%         rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v ));
+%         rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v ));
 % 
 %         %HIV+
-%         rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : 5 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v));
+%         rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v));
 % 
 %         %ART
-%         rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v));
+%         rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v));
 %         end
 % 
 %         subplot(1,3,1)

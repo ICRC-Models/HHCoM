@@ -221,7 +221,7 @@ for k = 1 : loopSegmentsLength-1
         vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
-        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , : , : , :)]; %curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)]; 
+        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , :)]; %curr.newScreen(1 : end , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , :)]; 
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
@@ -855,7 +855,7 @@ for k = 1 : loopSegmentsLength-1
 %             1 : endpoints , 1 : intervens , 2 , 7 : age , 1 : risk));
 %         % Calculate incidence
 %         newScreenTime(j , :) = ...
-%             annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , : , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9)) ./ ...
+%             annlz(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , : , : , : , : , : , :),2),3),4),5),6),7)) ./ ...
 %             (annlz(sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2) ./ stepsPerYear) * 0.1);
 %         
         %% Screening coverage ages 35-39
@@ -871,7 +871,7 @@ for k = 1 : loopSegmentsLength-1
         %% Total number of women screened annually by age and disease status
 %         for dInd = 1 : diseaseVecLength_ccInc
 %             d = diseaseVec_ccInc{dInd};
-%             screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , : , : , :),2),3),4),5),6),7),8),9));
+%             screenTotAnnual(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , :),2),3),4),5),6),7));
 %         end
         
         %% Vaccine coverage overall
