@@ -1156,7 +1156,7 @@ for iInd = 1 : length(iIndList)
         %plot(hivIncF((2019-startYear)+1 : end , 1) , hivIncF((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
     end
 end
-xlabel('Year'); ylabel('HIV incidence per 100'); title('Females');
+xlabel('Year'); ylabel('HIV incidence per 100'); title('Women');
 xlim([2020 2060]); ylim([0 4]);
 legend('Scenario 1, mean' , 'range' , ...
     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
@@ -1197,7 +1197,7 @@ for iInd = 1 : length(iIndList)
         %plot(hivIncM((2019-startYear)+1 : end , 1) , hivIncM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
     end
 end
-xlabel('Year'); title('Males'); %ylabel('HIV incidence per 100'); 
+xlabel('Year'); title('Men'); %ylabel('HIV incidence per 100'); 
 xlim([2020 2060]); ylim([0 4]);
 legend('Scenario 1, mean' , 'range' , ...
     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
@@ -1268,7 +1268,7 @@ for iInd = 1 : length(iIndList)
         %plot(hivMortF((2019-startYear)+1 : end , 1) , hivMortF((2019-startYear)+1 : end , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{iInd});
     end
 end
-xlabel('Year'); ylabel('HIV-associated mortality per 100K'); title('Females');
+xlabel('Year'); ylabel('HIV-associated mortality per 100K'); title('Women');
 xlim([2020 2060]); ylim([0 2000]);
 legend('Scenario 1, mean' , 'range' , ...
     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
@@ -1309,7 +1309,7 @@ for iInd = 1 : length(iIndList)
         %plot(hivMortM((2019-startYear)+1 : end , 1) , hivMortM((2019-startYear)+1 : end , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
     end
 end
-xlabel('Year'); title('Males'); %ylabel('Mortality per 100K'); 
+xlabel('Year'); title('Men'); %ylabel('Mortality per 100K'); 
 xlim([2020 2060]); ylim([0 2000]);
 legend('Scenario 1, mean' , 'range' , ...
     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
