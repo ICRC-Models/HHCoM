@@ -115,6 +115,10 @@ hivDeathsF = hivDeathsM;
 artCovM = zeros(nRuns , length(monthlyTimespan));
 artCovF = artCovM;
 artCovAge = zeros(nRuns , age , length(monthlyTimespan));
+% VMMC coverage
+ageVecCirc = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
+ageVecCirc_length = length(ageVecCirc);
+circProp = zeros(nRuns , ageVecCirc_length , length(monthlyTimespan));
 % Female HPV prevalence
 hpvYearVec_orig = [2002 2018];
 hpvYearVec2018_orig = [2018];
@@ -387,6 +391,18 @@ for k = 1 : loopSegmentsLength-1
                 1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
             hivPop = sum(vaxResult{n}.popVec(: , hivInds) , 2);
             artCovAge(j , a , :) = artPop ./ hivPop;
+        end
+        
+        %% Proportion HIV-negative males circumcised by broad age groups over time
+        for aInd = 1 : ageVecCirc_length
+            aGroup = ageVecCirc{aInd};
+            circInds = toInd(allcomb(2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : endpoints , 1 : intervens , 1 , aGroup , 1 : risk));
+            circPop = sum(vaxResult{n}.popVec(: , circInds) , 2);
+            hivNegInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+                1 : endpoints , 1 : intervens , 1 , aGroup , 1 : risk));
+            hivNegPop = sum(vaxResult{n}.popVec(: , hivNegInds) , 2);
+            circProp(j , aInd , :) = 100 .* (circPop ./ hivNegPop);
         end
     
         
@@ -1008,17 +1024,21 @@ legend('(Statistics SA) Observed KZN, 2019' , 'Model, 2018: 25-sets mean' , ...
 % Load calibration data from Excel
 file = [pwd , '/Config/Population_validation_targets.xlsx'];
 kzn_popByageC_yrs(: , 1) = xlsread(file , 'Demographics' , 'Q92:Q107').*1000;    % females by age in 2019
-popPropBroadC_obs = zeros(ageVecLength_cPopDist , 1);
+popPropBroadC_obs = zeros(ageVecLength_cPopDist , 2);
 for aV = 1 : ageVecLength_cPopDist
     a = ageVec_cPopDist{aV};
-    popPropBroadC_obs(aV , 1) = (sum(kzn_popByageC_yrs(a , 1)) / sumall(kzn_popByageC_yrs(3 : 15 , 1))) * 100;
+    prev = (sum(kzn_popByageC_yrs(a , 1)) / sumall(kzn_popByageC_yrs(3 : 15 , 1)));
+    popPropBroadC_obs(aV , 1) = prev * 100;
+    var = (prev*(1-prev)) / sumall(kzn_popByageC_yrs(3 : 15 , 1));
+    popPropBroadC_obs(aV , 2) = ((var)^(1/2)) * 2 * 100;
 end
 
 ageGroup = {'10-14' , '15 - 24' , '25 - 34' , '35 - 44' , '45 - 54' , '55 - 64' ,...
     '65 - 74'};
 figure('DefaultAxesFontSize' , 18);
 subplot(2 , 1 , 1)
-plot(1 : ageVecLength_cPopDist , popPropBroadC_obs , 'ro')
+errorbar(1 : ageVecLength_cPopDist , popPropBroadC_obs(: , 1) , popPropBroadC_obs(: , 2) , ...
+    'rs' , 'LineWidth' , 1.5);
 hold all;
 plot(1 : ageVecLength_cPopDist , median(squeeze(popPropBroadC(: , 1 , :)),1) , 'k-' , 'LineWidth' , 1.5);
 hold all;
@@ -1031,7 +1051,7 @@ set(gca , 'xtickLabel' , ageGroup);
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 ylabel('Population Proportion (%)');
 ylim([0 50]); grid on;
-legend('(Statistics SA) Observed KZN, 2019' , 'Model, 2019: 25-sets median' , ...
+legend('(Statistics SA) Observed KZN, 2019: mean, 2SD' , 'Model, 2019: 25-sets median' , ...
     'Model, 2019: 25-sets range' , 'Location' , 'northeast');
 
 subplot(2 , 1 , 2)
@@ -1211,13 +1231,16 @@ for g = 1 : gender
 end
 
 %% HIV prevalence by gender over time vs. AHRI (calibration)
-hivData(: , : , 1) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
-hivData(: , : , 2) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 1);
+hivData(: , : , 1) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 2);
+hivData(: , : , 2) = zeros(length(unique(hivPrevM_dObs(: ,1))) , 2);
 hivRaw(:,:,1) = hivPrevM_dObs(: , 4:5);
 hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
 for i = 1 : length(unique(hivPrevM_dObs(: ,1)))
     for g = 1 : gender
-        hivData(i,1,g) = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g))) .* 100;
+        prev = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g)));
+        hivData(i,1,g) = prev * 100;
+        var = (prev*(1-prev)) / sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g));
+        hivData(i,2,g) = (var ^ (1/2)) * 2 * 100;
     end
 end
 
@@ -1227,7 +1250,8 @@ genFlipInd = {2 , 1};
 for gInd = 1 : gender
     g = genFlipInd{gInd};
     subplot(1,2,g)
-    plot(unique(hivPrevM_dObs(: ,1)) , hivData(:,:,g) , 'ro');
+    errorbar(unique(hivPrevM_dObs(: ,1)) , hivData(:,1,g) , hivData(:,2,g) , ...
+        'rs' , 'LineWidth' , 1.5);
     hold on;
     plot(monthlyTimespan , median(squeeze(hivPrev(: , g , :)),1)' , 'k-' , 'LineWidth' , 1.5);
     x2 = [monthlyTimespan , fliplr(monthlyTimespan)];
@@ -1236,13 +1260,13 @@ for gInd = 1 : gender
     h.FaceAlpha = 0.3;
     h.LineStyle = '--';
     xlabel('Year'); ylabel('HIV Prevalence (%)'); title(gen{g});
-    xlim([1990 2020]); ylim([0 50]);
+    xlim([1990 2020]); ylim([0 100]);
     if g == 1 
-        legend('(AHRI data request) Observed KZN, ages 15-49' , ...
+        legend('(AHRI data request) Observed KZN, ages 15-49: mean, 2SD' , ...
             'Model, ages 15-49: 25-sets median' , 'Model, ages 15-49: 25-sets range' , ...
             'Location' , 'SouthEast');
     elseif g == 2
-        legend('(AHRI data request) Observed KZN, ages 15-49' , ...
+        legend('(AHRI data request) Observed KZN, ages 15-49: mean, 2SD' , ...
             'Model, ages 15-49: 25-sets median' , 'Model, ages 15-49: 25-sets range' , ...
             'Location' , 'SouthEast');
     end
@@ -1407,6 +1431,47 @@ xlabel('Age'); ylabel('Proportion PLWHIV on ART + VS');
 title('Proportion on ART + VS by age');
 ylim([0 1]); grid on;
 legend('Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+
+%% Proportion HIV-negative males circumcised by broad age groups over time
+circPropYr_obs = vmmcYr;
+circProp_obs = vmmcRate' .* 100;
+
+figure('DefaultAxesFontSize' , 18);
+plot(circPropYr_obs , circProp_obs , 'o');
+hold on;
+set(gca,'ColorOrderIndex',1)
+p = plot(monthlyTimespan , squeeze(median(circProp,1)) , '-' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan , fliplr(monthlyTimespan)];
+inBetween = [squeeze(max(squeeze(circProp),[],1)) , fliplr(squeeze(min(squeeze(circProp),[],1)))];
+colorVecP = get(p,'Color');
+h1 = fill(x2 , inBetween(1,:) , colorVecP{1});
+h1.FaceAlpha = 0.3;
+h1.LineStyle = '--';
+h2 = fill(x2 , inBetween(2,:) , colorVecP{2});
+h2.FaceAlpha = 0.3;
+h2.LineStyle = '--';
+h3 = fill(x2 , inBetween(3,:) , colorVecP{3});
+h3.FaceAlpha = 0.3;
+h3.LineStyle = '--';
+h4 = fill(x2 , inBetween(4,:) , colorVecP{4});
+h4.FaceAlpha = 0.3;
+h4.LineStyle = '--';
+xlim([1990 2020]); ylim([0 100]);
+xlabel('Year'); ylabel('HIV-Negative Males Circumcised(%)')
+grid on;
+legend('Observed KZN, ages 15-19' , ...
+    'Observed KZN, ages 20-24' , 'Observed KZN, ages 25-49' , ...
+    'Observed KZN, ages 50+' , ...
+    'Model, ages 15-19: 25-sets median' , ...
+    'Model, ages 20-24: 25-sets median' , ...
+    'Model, ages 25-49: 25-sets median'  , ...
+    'Model, ages 50+: 25-sets median' , ...
+    'Model: 25-sets range' , ...
+    'Model: 25-sets range' , ...
+    'Model: 25-sets range' , ...
+    'Model: 25-sets range');
+
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
