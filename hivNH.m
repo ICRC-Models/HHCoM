@@ -230,7 +230,7 @@ if year >= 2016
             minCoverLim = popCover{g}(end) * minLim;
             maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);
-        end     
+        end
 
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...

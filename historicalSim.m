@@ -33,12 +33,17 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
+
+% SCREENING
+% Instructions: Choose either the original baseline screening algorithm or the screening paper cytology algorithm
+%   Screening coverage, HIV groups, and ages are set automatically below 
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 3 for spCyto)
 
 % VACCINATION
 % Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
@@ -52,7 +57,7 @@ rVaxWane = 0.0; % rate of waning vaccine immunity
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.0; %0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
+vaxRate = 0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -75,8 +80,9 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -104,13 +110,27 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
-screenAlgorithm = 1;
-screenAlgs{1} = baseline;
+if (screenAlgorithm == 1)
+    % Baseline screening algorithm
+    screenAlgs = baseline;
+elseif (screenAlgorithm == 3)
+    % Screening paper cytology algorithm
+    screenAlgs = spCyto;
+end
+screenAlgs.genTypBool = 0;
+screenAlgs.screenHivGrps = {[1:disease]};
+screenAlgs.screenAge = {8};
+screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
+screenAlgs.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+    period = [screenYrs(i) , screenYrs(i + 1)];
+    screenAlgs.screenCover_vec{i} = interp1(period , screenAlgs.screenCover(i : i + 1 , 1) , ...
+        screenYrs(i) : timeStep : screenYrs(i + 1));
+end
 
 % Create screening indices
-numScreenAge = length(screenAlgs{1}.screenAge);
-agesComb = screenAlgs{1}.screenAge;
-ageMultsComb = screenAlgs{1}.screenAgeMults;
+numScreenAge = length(screenAlgs.screenAge);
+agesComb = screenAlgs.screenAge{1};
 screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
 screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
@@ -246,7 +266,7 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % newCin2 = newCC;
     % newCin3 = newCC;
     ccDeath = newCC;
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
+    newScreen = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , 2);
     % newTreatImm = newScreen;
     % newTreatHpv = newScreen;
     % newTreatHyst = newScreen;
@@ -375,13 +395,13 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
+            [dPop , newScreen(i , : , : , : , : , : , :)] ...
                 = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                 screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
                 vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
                 noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
-                vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , ageMultsComb);
+                vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)

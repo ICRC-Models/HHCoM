@@ -6,7 +6,7 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function calib2_runMultSims(paramSetIdx , tstep_abc , date_abc)
+function calib2_runMultHistSims(paramSetIdx , tstep_abc , date_abc)
 
 t_curr = tstep_abc;
 date = date_abc;
