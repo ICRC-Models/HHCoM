@@ -21,7 +21,7 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_2v57BaseVax_spCyto
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
-pathModifier = [date , '_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_SA-S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_SA-S0_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -41,10 +41,10 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 %   to designate different patterns for HIV-negative and HIV-positive women and 
 %   sceScreenAges={[8 , 10] , [6 , 7 , 8 , 9 , 10]} for 2x screening among HIV-negative women and screening 
 %   every 3 years among HIV-positive women.
-screenAlgorithm = 4; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve)
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve)
 sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear;     2023; 2030; 2045])
-sceScreenHivGrps = {[1 : 2] , [3 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
-sceScreenAges = {[8 , 10] , [6 , 7 , 8 , 9 , 10]}; % ***SET ME***: screening ages that correspond to HIV state groupings
+sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
+sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
 
 % VACCINATION
 % Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
@@ -73,7 +73,7 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-vaxCover = [0.90];    % vaccine coverages
+vaxCover = [0.57];    % vaccine coverages
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
