@@ -3,7 +3,7 @@ function vaxCEA_plotSaveDoArt_071720(fileInd)
 %% SET RUN-TIME VARIABLES
 lastYear = 2061;
 baseFileNameShort = '22Apr20Ph2V11_baseVax057_baseScreen_baseVMMC_fertDec042-076-052_2020ARTfxd_trackCD4-Discont_discontFxd';    % **** SET ME ****
-baseFileName = [baseFileNameShort , '_DoART_S' , num2str(fileInd) , '_']; %'_diagHiv075_DoART_S' , 
+baseFileName = [baseFileNameShort , '_DoART_S' , num2str(fileInd) , '_']; %'_diagHiv075_DoART_S' ,
 %  Note: if not saving outputs for a simulation with explicit HIV diagnosis,
 %  need to comment out sections below referencing the following variables:
 %  nTestedHivNegC_multSims , nTestedNeg
@@ -1147,7 +1147,24 @@ for gInd = 1 : gender
                ones(t20onLen,1).*ageLabelVec{aInd} , ones(t20onLen,1).*hivStatusVec{dInd} , ...
                ones(t20onLen,1).*cd4CountVec{dInd} , ones(t20onLen,1).*artStatusVec{dInd} , ...
                mean(squeeze(popSizeGAD_multSims((firstYrAnlInd:end) , : , dInd , gInd , aInd)),2) , ...
-               mean(squeeze(allCauseDeathGAD_multSims((firstYrAnlInd:end) , : , dInd , gInd , aInd)),2)]];
+               mean(squeeze(allCauseDeathGAD_multSims((firstYrAnlInd:end) , : , dInd , gInd , aInd)),2) , ...
+               zeros(t20onLen,1)]];
+        end
+    end
+end
+
+for n = 1 : nRuns
+    for gInd = 1 : gender
+        for aInd = 1 : agesEligVecLength
+            for dInd = 1 : popSizeGAD_disIndsLength
+               outputVec = [outputVec; ...
+                   [t20on , ones(t20onLen,1).*(gInd-1) , ...
+                   ones(t20onLen,1).*ageLabelVec{aInd} , ones(t20onLen,1).*hivStatusVec{dInd} , ...
+                   ones(t20onLen,1).*cd4CountVec{dInd} , ones(t20onLen,1).*artStatusVec{dInd} , ...
+                   squeeze(popSizeGAD_multSims((firstYrAnlInd:end) , n , dInd , gInd , aInd)) , ...
+                   squeeze(allCauseDeathGAD_multSims((firstYrAnlInd:end) , n , dInd , gInd , aInd)) , ...
+                   (ones(t20onLen,1).*n)]];
+            end
         end
     end
 end
