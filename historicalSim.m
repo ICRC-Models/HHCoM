@@ -363,7 +363,7 @@ for i = iStart : length(s) - 1
         
     end
 
-    if hpvOn
+    if hpvOn % (Note: model not set up for HPV to be off; would need to add hpvOn bool logic to seeding of initial HPV infections)
         % HPV NATURAL HISTORY
         % Progression and clearance of HPV
         % Progression and regression of precancerous lesions
