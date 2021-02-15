@@ -106,6 +106,8 @@ hpv_hivMNeg = hpv_hivM;
 hpv_hivMtot = hpv_hivM;
 ageVec_mHPV = {[4:5],[6:7],[8:9],[10:13]};
 ageVecLength_mHPV = length(ageVec_mHPV);
+% Combined HPV prevalence
+hpv_hivMW = zeros(nRuns , 5 , age , length(monthlyTimespan));
 % CIN2/3 prevalence
 cinPosAge = zeros(nRuns , 2 , age);
 cinNegAge = cinPosAge;
@@ -121,6 +123,7 @@ ccIncTimeArt = ccIncTime;
 ccIncTimePosAll = ccIncTime;
 ccIncHivAgeTime = zeros(nRuns , 5 , age , length(annualTimespan));
 ccCumHivTime = zeros(nRuns , 5 , length(futAnnualTimespan));
+ccAnlHivTime = ccCumHivTime;
 diseaseVec_ccInc = {[1 : disease] , [1 : 2] , [3 : 8] , [3 : 7] , 8};
 diseaseVecLength_ccInc = length(diseaseVec_ccInc);
 % HPV/CIN/CC type distribution
@@ -342,6 +345,20 @@ for k = 1 : loopSegmentsLength-1
             end
         end
         
+        %% HPV prevalence by HIV status over time
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                hpvInds = unique([toInd(allcomb(d , 1 : viral , 2 : 6 , 1 : hpvNonVaxStates , ...
+                    1 : 3 , 1 : intervens , 1 : gender , a , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                    1 : hpvVaxStates , 2 : 5 , 1 : 3 , 1 : intervens , 1 : gender , a , 1 : risk))]);
+                ageInds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                    1 : endpoints , 1 : intervens , 1 : gender , a , 1 : risk));
+                hpv_hivMW(j , dInd , a , :) = sum(vaxResult{n}.popVec(: , hpvInds))...
+                    ./ sum(vaxResult{n}.popVec(: , ageInds));
+            end
+        end
+        
         
         %% ********************************** CIN FIGURES *********************************************************************************************
     
@@ -457,6 +474,14 @@ for k = 1 : loopSegmentsLength-1
                 % Calculate incidence
                 ccCumHivTime(j , dInd , :) = ...
                     cumsum(squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((2020 - startYear) * stepsPerYear +1):end , d , : , :),2),3),4))),2);
+        end
+        
+        %% Annual cervical cancer cases by HIV status over time
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+                % Calculate incidence
+                ccAnlHivTime(j , dInd , :) = ...
+                    squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((2020 - startYear) * stepsPerYear +1):end , d , : , :),2),3),4)));
         end
         
        
@@ -1200,6 +1225,8 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
 firstYrRange = (lastYear-1) - currYear;
+firstYrRange2 = (lastYear-1) - 1982;
+outputVec = [];
 for dInd = 1 : length(diseaseLabels)
     ccIncHivAgeTime_dis = squeeze(ccIncHivAgeTime(: , dInd , : , :));
 
@@ -1231,7 +1258,13 @@ for dInd = 1 : length(diseaseLabels)
         squeeze(max(squeeze(ccInc(: , : , (end-firstYrRange):end)) , [] , 1))' , ...
         squeeze(ccInc(: , : , (end-firstYrRange):end))'] , ...
         fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B3') 
+    
+    outputVec = [outputVec; ...
+        [squeeze(median(squeeze(ccInc(: , : , (end-firstYrRange2):end)) , 1))']];
 end
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'ART_comparative_modeling_outcome_templates_020221.xlsx'];  
+writematrix(outputVec , fname , 'Sheet' , ['S' , fileKeyNums{n}] , 'Range' , 'F4') 
 
 %% Write cumulative cervical cancer cases by by HIV status over time (2020-2120) into existing template
 diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
