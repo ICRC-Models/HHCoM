@@ -2066,9 +2066,12 @@ for iInd = 2
         'Raw_HIV_incidence_combined_ages15-79' , '.csv'];
     hivIncC = xlsread(fname);
     casesAverted = sum(hivIncCbase(: , 5:29) , 1) - sum(hivIncC(: , 5:29) , 1);
+    casesAvertedPer = (sum(hivIncCbase(96:end , 5:29) , 1) - sum(hivIncC(96:end , 5:29) , 1)) ./ sum(hivIncCbase(96:end , 5:29) , 1) .* 100; 
     casesAverted_CI = [mean(casesAverted , 2) , min(casesAverted , [] , 2) , max(casesAverted , [] , 2)];
+    casesAvertedPer_CI = [mean(casesAvertedPer , 2) , min(casesAvertedPer , [] , 2) , max(casesAvertedPer , [] , 2)];
     disp('Cases averted by 2060:')
     num2str(casesAverted_CI(end , :))
+    num2str(casesAvertedPer_CI(end,:))
     casesAverted = sum(hivIncCbase(1:((2025-1925)+1) , 5:29) , 1) - sum(hivIncC(1:((2025-1925)+1) , 5:29) , 1);
     casesAverted_CI = [mean(casesAverted , 2) , min(casesAverted , [] , 2) , max(casesAverted , [] , 2)];
     disp('Cases averted by 2025:')
@@ -2078,9 +2081,12 @@ for iInd = 2
         'Raw_HIV_mortality_combined_ages15-79' , '.csv'];
     hivMortC = xlsread(fname);
     deathsAverted = sum(hivMortCbase(: , 5:29) , 1) - sum(hivMortC(: , 5:29) , 1);
+    deathsAvertedPer = (sum(hivMortCbase(96:end , 5:29) , 1) - sum(hivMortC(96:end , 5:29) , 1)) ./ sum(hivMortCbase(96:end , 5:29) , 1) .* 100;
     deathsAverted_CI = [mean(deathsAverted , 2) , min(deathsAverted , [] , 2) , max(deathsAverted , [] , 2)];
+    deathsAvertedPer_CI = [mean(deathsAvertedPer , 2) , min(deathsAvertedPer , [] , 2) , max(deathsAvertedPer , [] , 2)];
     disp('Deaths averted by 2060:')
     num2str(deathsAverted_CI(end , :))
+    num2str(deathsAvertedPer_CI(end,:))
     deathsAverted = sum(hivMortCbase(1:((2025-1925)+1) , 5:29) , 1) - sum(hivMortC(1:((2025-1925)+1) , 5:29) , 1);
     deathsAverted_CI = [mean(deathsAverted , 2) , min(deathsAverted , [] , 2) , max(deathsAverted , [] , 2)];
     disp('Deaths averted by 2025:')
