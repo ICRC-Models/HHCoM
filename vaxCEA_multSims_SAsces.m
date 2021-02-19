@@ -80,20 +80,16 @@ styleVec = {'-.' , ':' , '-' , '-' , '--' , '-' , '--' , '-' , '--'};
 %     'S6 (HPV genotyping at baseline levels): median' , 'range' , ...
 %     'S7 (AVE-and-treat at current levels): median' , 'range' , ...
 %     'S8 (AVE-and-treat with scale-up): median' , 'range'};
-fileTits = {'S0 (Baseline vaccination): median', ...
-    'S1 (Vaccine scale-up): median' , ...
-    'S2 (Repeat screening by HIV status): median' , ...
-    'S3 (HPV-and-treat at baseline levels): median' , ... 
-    'S4 (HPV-and-treat with scale-up): median' , ...
-    'S5 (HPV genotyping at baseline levels): median' , ...
-    'S6 (HPV genotyping at baseline levels): median' , ...
-    'S7 (AVE-and-treat at current levels): median' , ...
-    'S8 (AVE-and-treat with scale-up): median'};
-fileTits2 = {'Cytology' , 'HPV DNA test + treat' , 'HPV DNA test w/ genotyping + treat' , ...
-    'AVE + treat' , '57% 9v vaccine; 48% screening at age 35' , ...
+fileTits = {'Cytology', ...
+    'HPV DNA' , ... 
+    'HPV DNA + genotyping' , ...
+    'AVE'};
+fileTits2 = {'Three-visit cytology + colposcopy + treat' , 'One-visit HPV DNA test + treat' , 'One-visit HPV DNA test w/ genotyping + treat' , ...
+    'One-visit AVE + treat' , '57% 9v vaccine; 48% screening at age 35' , ...
     '90% 9v vaccine; 48% screening at age 35' , ...
     '90% 9v vaccine; 48% repeat screening by HIV status' , ...
     '90% 9v vaccine; scaled-up repeat screening by HIV status'};
+fileTits3 = {'CIN1' , 'HPV+ (no CIN)' , 'HPV-susceptible' , 'HIV-negative' , 'HIV-positive, untreated' , 'HIV-positive on ART'};
 nResults = length(simVec);
 
 % Plot settings
@@ -102,7 +98,8 @@ set(0 , 'defaultlinelinewidth' , 1.5)
 
 %% Cumulative cervical cancer cases over time
 diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'}; 
-figure;
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
 
 for j = 1 : nResults  
     for dInd = 1 : 1 %length(diseaseLabels);
@@ -138,7 +135,8 @@ title('Cumulative cervical cancer cases');
 
 %% Cervical cancer cases averted over time
 diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};   
-figure;
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
 % Load baseline results
 fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
     'SA_screening_S0.xlsx'];
@@ -181,7 +179,8 @@ title('Cervical cancer cases averted');
 
 %% Age-standardized cervical cancer incidence over time
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'}; 
-figure;
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
 for j = 1 : nResults  
     for dInd = 1 : 1 %length(diseaseLabels);
         % Load results
@@ -207,11 +206,13 @@ f(5) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{1});
 f(6) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{2});
 f(7) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{3}); 
 f(8) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{5});
+f(9) = plot(NaN,NaN,'k--');
+f(10) = plot(NaN,NaN,'k:');
 
 hold all;
-plot (ccIncHivTime(: , 1) , ones(size(ccIncHivTime,1),1).*4.0 , 'k')
+plot (ccIncHivTime(: , 1) , ones(size(ccIncHivTime,1),1).*4.0 , 'k--')
 hold all;
-plot (ccIncHivTime(: , 1) , ones(size(ccIncHivTime,1),1).*10.0 , 'k')
+plot (ccIncHivTime(: , 1) , ones(size(ccIncHivTime,1),1).*10.0 , 'k:')
 legend(f , fileTits2{:} , 'Elimination: <4/100K' , 'Benchmark: <10/100K' , 'Location' , 'northeast');
 xlim([2020 2120])
 grid on;
@@ -220,7 +221,8 @@ title('Age-standardized cervical cancer incidence');
 
 %% Percent reduction in age-standardized cervical cancer incidence over time
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
-figure;
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
 % Load baseline results
 fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
     'SA_screening_S0.xlsx'];
@@ -254,11 +256,188 @@ f(5) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{1});
 f(6) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{2});
 f(7) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{3}); 
 f(8) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{5});
+f(9) = plot(NaN,NaN,'k--');
 
 hold all;
-plot ([2020:2120]' , ones(size(ccIncHivTime,1),1).*85.0 , 'k')
+plot ([2020:2120]' , ones(size(ccIncHivTime,1),1).*85.0 , 'k--')
 legend(f , fileTits2{:} , 'Elimination: >85% reduction' , 'Location' , 'southeast');
 xlim([2020 2120]); ylim([0 100]);
 grid on;
 xlabel('Year'); ylabel('Percent reduction in AS-ICC'); 
 title('Percent reduction in age-standardized cervical cancer incidence');
+
+% %% Number of women (over)screened in states <CIN2 over time
+% diseaseLabels = {'Tot (OS)' , 'HIV- (OS)' , 'HIV+ (OS)' , 'HIV+ no ART (OS)' , 'HIV+ ART (OS)'}; 
+% diseaseSheetInds = {2 , 4 , 5};
+% sceInds = [3 , 4 , 6 , 8];
+% fig = figure;
+% set(fig,'DefaultAxesFontSize' , 18)
+% 
+% ovrScrnVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds));
+% for jInd = 1 : length(sceInds)
+%     j = sceInds(jInd);
+%     for dInd = 1 : length(diseaseSheetInds)
+%         d = diseaseSheetInds{dInd};
+%         % Load results
+%         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%             'SA_screening_S' , fileVec{j} , '.xlsx'];
+%         scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103');
+%         scrnHpvHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C104:C204') + readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C205:C305');
+%         scrnCin1HivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C306:C406') + readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C407:C507');
+%         ovrScrnVec(jInd , 3 , dInd) = scrnSusHivTime(end,1);
+%         ovrScrnVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
+%         ovrScrnVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
+%     end
+% end
+% f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
+% f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
+% f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
+% f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all; 
+% f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
+% f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
+% 
+% b = bar([1:4],reshape(permute(ovrScrnVec,[1,3,2]),[4,9]) , 'stacked');
+% set(b(1:3),'FaceColor','r');
+% set(b(4:6),'FaceColor','b');
+% set(b(7:9),'FaceColor',[0 0.5 0]);
+% set(b([1,4,7]),'FaceAlpha',1.0);
+% set(b([2,5,8]),'FaceAlpha',0.6);
+% set(b([3,6,9]),'FaceAlpha',0.2);
+% grid on;
+% xlabel('Scenario'); ylabel('Number of women'); 
+% set(gca,'xticklabel',fileTits);
+% set(gca,'xtick', 1 : 1 : 4); xlim([0,5]);
+% title('Number of women screened in states <CIN2');
+% legend(f , fileTits3{:} , 'Location' , 'northwest');
+% 
+% 
+% %% Number of women false positive screen results
+% diseaseLabels = {'Tot (OS)' , 'HIV- (OS)' , 'HIV+ (OS)' , 'HIV+ no ART (OS)' , 'HIV+ ART (OS)'};
+% diseaseSheetInds = {2 , 4 , 5};
+% diseaseScrnInds = {1 , 3 , 8};
+% sceScrnPos = {spCyto.testSens , spCyto.testSens , spCyto.testSens , ...
+%     spHpvDna.testSens , spHpvDna.testSens , ...
+%     spGentyp.testSens , spGentyp.testSens , ...
+%     spAve.testSens , spAve.testSens};
+% sceInds = [3 , 4 , 6 , 8];
+% fig = figure;
+% set(fig,'DefaultAxesFontSize' , 18);
+% 
+% falsePosVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds));
+% for jInd = 1 : length(sceInds)
+%     j = sceInds(jInd);
+%     if (j == 6 || j == 7)
+%         for dInd = 1 : length(diseaseSheetInds)
+%             d = diseaseSheetInds{dInd};
+%             % Load results
+%             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%                 'SA_screening_S' , fileVec{j} , '.xlsx'];
+%             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1);
+%             scrnHpvHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C104:C204') .* sceScrnPos{j}(diseaseScrnInds{dInd},2);
+%             scrnCin1HivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C306:C406') .* sceScrnPos{j}(diseaseScrnInds{dInd},2);
+%             falsePosVec(jInd , 3 , dInd) = scrnSusHivTime(end,1);
+%             falsePosVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
+%             falsePosVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
+%         end
+%     else
+%         for dInd = 1 : length(diseaseSheetInds)
+%             d = diseaseSheetInds{dInd};
+%             % Load results
+%             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%                 'SA_screening_S' , fileVec{j} , '.xlsx'];
+%             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1);
+%             scrnHpvHivTime = (readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C104:C204') + readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C205:C305')) .* sceScrnPos{j}(diseaseScrnInds{dInd},2);
+%             scrnCin1HivTime = (readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C306:C406') + readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C407:C507')) .* sceScrnPos{j}(diseaseScrnInds{dInd},2);
+%             falsePosVec(jInd , 3 , dInd) = scrnSusHivTime(end,1);
+%             falsePosVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
+%             falsePosVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
+%         end
+%     end
+% end
+% f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
+% f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
+% f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
+% f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all; 
+% f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
+% f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
+% 
+% b = bar([1:4],reshape(permute(falsePosVec,[1,3,2]),[4,9]) , 'stacked');
+% set(b(1:3),'FaceColor','r');
+% set(b(4:6),'FaceColor','b');
+% set(b(7:9),'FaceColor',[0 0.5 0]);
+% set(b([1,4,7]),'FaceAlpha',1.0);
+% set(b([2,5,8]),'FaceAlpha',0.6);
+% set(b([3,6,9]),'FaceAlpha',0.2);
+% grid on;
+% xlabel('Scenario'); ylabel('Number of women'); 
+% set(gca,'xticklabel',fileTits);
+% set(gca,'xtick', 1 : 1 : 4); xlim([0,5]);
+% title('Number of women false-positive screen');
+% legend(f , fileTits3{:} , 'Location' , 'northwest');
+% 
+% %% Number of women overtreated
+% diseaseLabels = {'Tot (OS)' , 'HIV- (OS)' , 'HIV+ (OS)' , 'HIV+ no ART (OS)' , 'HIV+ ART (OS)'};
+% diseaseSheetInds = {2 , 4 , 5};
+% diseaseScrnInds = {1 , 3 , 8};
+% sceScrnPos = {spCyto.testSens , spCyto.testSens , spCyto.testSens , ...
+%     spHpvDna.testSens , spHpvDna.testSens , ...
+%     spGentyp.testSens , spGentyp.testSens , ...
+%     spAve.testSens , spAve.testSens};
+% sceTreat = {0 , 0 , 0 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95};
+% sceInds = [3 , 4 , 6 , 8];
+% fig = figure;
+% set(fig,'DefaultAxesFontSize' , 18);
+% 
+% overTreatVec = zeros(length(sceInds) , length(diseaseSheetInds));
+% for jInd = 1 : length(sceInds)
+%     j = sceInds(jInd);
+%     if (j == 6 || j == 7)
+%         for dInd = 1 : length(diseaseSheetInds)
+%             d = diseaseSheetInds{dInd};
+%             % Load results
+%             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%                 'SA_screening_S' , fileVec{j} , '.xlsx'];
+%             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1) .* sceTreat{j};
+%             scrnHpvHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C104:C204') .* sceScrnPos{j}(diseaseScrnInds{dInd},2) .* sceTreat{j};
+%             scrnCin1HivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C306:C406') .* sceScrnPos{j}(diseaseScrnInds{dInd},2) .* sceTreat{j};
+%             overTreatVec(jInd , 3 , dInd) = scrnSusHivTime(end,1);
+%             overTreatVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
+%             overTreatVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
+%         end
+%     else
+%         for dInd = 1 : length(diseaseSheetInds)
+%             d = diseaseSheetInds{dInd};
+%             % Load results
+%             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%                 'SA_screening_S' , fileVec{j} , '.xlsx'];
+%             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1) .* sceTreat{j};
+%             scrnHpvHivTime = (readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C104:C204') + ...
+%                 readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C205:C305')) .* sceScrnPos{j}(diseaseScrnInds{dInd},2) .* sceTreat{j};
+%             scrnCin1HivTime = (readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C306:C406') + ...
+%                 readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C407:C507')) .* sceScrnPos{j}(diseaseScrnInds{dInd},2) .* sceTreat{j};
+%             overTreatVec(jInd , 3 , dInd) = scrnSusHivTime(end,1);
+%             overTreatVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
+%             overTreatVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
+%         end
+%     end
+% end
+% f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
+% f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
+% f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
+% f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all; 
+% f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
+% f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
+% 
+% b = bar([1:4],reshape(permute(overTreatVec,[1,3,2]),[4,9]) , 'stacked');
+% set(b(1:3),'FaceColor','r');
+% set(b(4:6),'FaceColor','b');
+% set(b(7:9),'FaceColor',[0 0.5 0]);
+% set(b([1,4,7]),'FaceAlpha',1.0);
+% set(b([2,5,8]),'FaceAlpha',0.6);
+% set(b([3,6,9]),'FaceAlpha',0.2);
+% grid on;
+% xlabel('Scenario'); ylabel('Number of women'); 
+% set(gca,'xticklabel',fileTits);
+% set(gca,'xtick', 1 : 1 : 4); xlim([0,5]);
+% title('Number of women overtreated');
+% legend(f , fileTits3{:} , 'Location' , 'northwest');
