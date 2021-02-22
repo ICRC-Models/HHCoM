@@ -41,7 +41,7 @@ lastYear = 2121; % ***SET ME***: end year of simulation run
 %   to designate different patterns for HIV-negative and HIV-positive women and 
 %   sceScreenAges={[8 , 10] , [6 , 7 , 8 , 9 , 10]} for 2x screening among HIV-negative women and screening 
 %   every 3 years among HIV-positive women.
-screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve)
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve , 7 for spHpvAve)
 sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear;     2023; 2030; 2045])
 sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
 sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
@@ -111,7 +111,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , who , spCyto , spHpvDna , spGentyp , spAve , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
     circProtect , condProtect , MTCTRate , hyst , ...
     OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
@@ -164,6 +164,10 @@ elseif (screenAlgorithm == 5)
 elseif (screenAlgorithm == 6)
     % Screening paper AVE -and-treat algorithm
     screenAlgs = spAve;
+    screenAlgs.genTypBool = 0;
+elseif (screenAlgorithm == 7)
+    % Screening paper HPV DNA + AVE triage -and-treat algorithm
+    screenAlgs = spHpvAve;
     screenAlgs.genTypBool = 0;
 end
 screenAlgs.screenHivGrps = sceScreenHivGrps;
