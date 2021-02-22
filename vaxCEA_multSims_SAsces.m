@@ -177,12 +177,97 @@ grid on;
 xlabel('Year'); ylabel('Cervical cancer cases averted'); 
 title('Cervical cancer cases averted');
 
+%% Percent cervical cancer cases averted over time
+diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};   
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
+% Load baseline results
+fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
+    'SA_screening_S0.xlsx'];
+ccCumHivTime_baseline = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
+for j = 1 : nResults 
+        % Load results
+        fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+            'SA_screening_S' , fileVec{j} , '.xlsx'];
+        ccCumHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
+
+        reductCases = (ccCumHivTime_baseline - ccCumHivTime) ./ ccCumHivTime_baseline .* 100;
+        medReduct = median(reductCases , 2);
+        minReduct = min(reductCases , [] , 2);
+        maxReduct = max(reductCases , [] , 2);
+        
+        hold all;
+        p = plot([2020:2120]' , medReduct , 'Color' , colorVec{j} , 'LineStyle' , styleVec{j});
+%         hold all;
+%         x2 = [[2020:2120] , fliplr([2020:2120])];
+%         inBetween = [maxReduct' , fliplr(minReduct')];
+%         colorP = get(p,'Color');
+%         h = fill(x2 , inBetween , colorP);
+%         h.FaceAlpha = 0.3;
+%         h.LineStyle = '--';
+end
+f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
+f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
+f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
+f(4) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{8});
+f(5) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{1});
+f(6) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{2});
+f(7) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{3}); 
+f(8) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{5});
+
+legend(f , fileTits2{:} , 'Location' , 'northwest');
+xlim([2020 2120]); ylim([0 100]);
+grid on;
+xlabel('Year'); ylabel('Percent reduction'); 
+title('Percent reduction in cervical cancer cases');
+
+%% Percent cervical cancer cases averted over time - cytology; 90% 9v vaccine; 48% repeat screening by HIV status baseline
+% diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};   
+% fig = figure;
+% set(fig,'DefaultAxesFontSize' , 18);
+% % Load baseline results
+% fname = [pwd , '\HHCoM_Results\' , simVec{3} , '\' , ...
+%     'SA_screening_S2.xlsx'];
+% ccCumHivTime_baseline = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
+% for j = 3 : nResults 
+%         % Load results
+%         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%             'SA_screening_S' , fileVec{j} , '.xlsx'];
+%         ccCumHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
+% 
+%         reductCases = (ccCumHivTime_baseline - ccCumHivTime) ./ ccCumHivTime_baseline .* 100;
+%         medReduct = median(reductCases , 2);
+%         minReduct = min(reductCases , [] , 2);
+%         maxReduct = max(reductCases , [] , 2);
+%         
+%         hold all;
+%         p = plot([2020:2120]' , medReduct , 'Color' , colorVec{j} , 'LineStyle' , styleVec{j});
+% %         hold all;
+% %         x2 = [[2020:2120] , fliplr([2020:2120])];
+% %         inBetween = [maxReduct' , fliplr(minReduct')];
+% %         colorP = get(p,'Color');
+% %         h = fill(x2 , inBetween , colorP);
+% %         h.FaceAlpha = 0.3;
+% %         h.LineStyle = '--';
+% end
+% f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
+% f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
+% f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{8});
+% f(4) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{4}); 
+% f(5) = plot(NaN,NaN,'Color' , colorVec{1},'LineStyle' , styleVec{5});
+% 
+% legend(f , fileTits2{[2,3,4,7,8]} , 'Location' , 'northwest');
+% xlim([2020 2120]); ylim([0 100]);
+% grid on;
+% xlabel('Year'); ylabel('Percent reduction'); 
+% title('Percent reduction in cervical cancer cases');
+
 %% Age-standardized cervical cancer incidence over time
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'}; 
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
 for j = 1 : nResults  
-    for dInd = 1 : 1 %length(diseaseLabels);
+    for dInd = 1 : 1 %length(diseaseLabels)
         % Load results
         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
             'SA_screening_S' , fileVec{j} , '.xlsx'];
@@ -216,37 +301,42 @@ plot (ccIncHivTime(: , 1) , ones(size(ccIncHivTime,1),1).*10.0 , 'k:')
 legend(f , fileTits2{:} , 'Elimination: <4/100K' , 'Benchmark: <10/100K' , 'Location' , 'northeast');
 xlim([2020 2120])
 grid on;
-xlabel('Year'); ylabel('Cumulative cervical cancer cases'); 
+xlabel('Year'); ylabel('AS-ICC (per 100K)'); 
 title('Age-standardized cervical cancer incidence');
 
 %% Percent reduction in age-standardized cervical cancer incidence over time
-diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+diseaseLabels = {'HIV- (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'}; %{'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+widthVec = {7 3 1};
+incRedSceVec = {4 , 6 , 8};
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
-% Load baseline results
-fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
-    'SA_screening_S0.xlsx'];
-ccIncHivTime_baseline = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
-for j = 1 : nResults 
-    % Load results
-    fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
-        'SA_screening_S' , fileVec{j} , '.xlsx'];
-    ccIncHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , 'E3:AC103');
+for jInd = 1 : length(incRedSceVec) 
+    j = incRedSceVec{jInd};
+    for dInd =  1 : length(diseaseLabels)
+        % Load baseline results
+        fname = [pwd , '\HHCoM_Results\' , simVec{3} , '\' , ...
+            'SA_screening_S2.xlsx'];
+        ccIncHivTime_baseline = readmatrix(fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'E3:AC103');
+        % Load results
+        fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+            'SA_screening_S' , fileVec{j} , '.xlsx'];
+        ccIncHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'E3:AC103');
 
-    perReductInc = ((ccIncHivTime_baseline - ccIncHivTime) ./ ccIncHivTime_baseline) .* 100;
-    medReduct = median(perReductInc , 2);
-    minReduct = min(perReductInc , [] , 2);
-    maxReduct = max(perReductInc , [] , 2);
+        perReductInc = ((ccIncHivTime_baseline - ccIncHivTime) ./ ccIncHivTime_baseline) .* 100;
+        medReduct = median(perReductInc , 2);
+        minReduct = min(perReductInc , [] , 2);
+        maxReduct = max(perReductInc , [] , 2);
 
-    hold all;
-    p = plot([2020:2120]' , medReduct , 'Color' , colorVec{j} , 'LineStyle' , styleVec{j});
-%     hold all;
-%     x2 = [[2020:2120] , fliplr([2020:2120])];
-%     inBetween = [maxReduct' , fliplr(minReduct')];
-%     colorP = get(p,'Color');
-%     h = fill(x2 , inBetween , colorP);
-%     h.FaceAlpha = 0.3;
-%     h.LineStyle = '--';
+        hold all;
+        p = plot([2020:2120]' , medReduct , 'Color' , colorVec{j} , 'LineStyle' , styleVec{j} , 'LineWidth' , widthVec{dInd});
+    %     hold all;
+    %     x2 = [[2020:2120] , fliplr([2020:2120])];
+    %     inBetween = [maxReduct' , fliplr(minReduct')];
+    %     colorP = get(p,'Color');
+    %     h = fill(x2 , inBetween , colorP);
+    %     h.FaceAlpha = 0.3;
+    %     h.LineStyle = '--';
+    end
 end
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
@@ -261,12 +351,12 @@ f(9) = plot(NaN,NaN,'k--');
 hold all;
 plot ([2020:2120]' , ones(size(ccIncHivTime,1),1).*85.0 , 'k--')
 legend(f , fileTits2{:} , 'Elimination: >85% reduction' , 'Location' , 'southeast');
-xlim([2020 2120]); ylim([0 100]);
+xlim([2020 2120]); ylim([-20 100]);
 grid on;
 xlabel('Year'); ylabel('Percent reduction in AS-ICC'); 
 title('Percent reduction in age-standardized cervical cancer incidence');
 
-% %% Number of women (over)screened in states <CIN2 over time
+%% Number of women (over)screened in states <CIN2 over time
 % diseaseLabels = {'Tot (OS)' , 'HIV- (OS)' , 'HIV+ (OS)' , 'HIV+ no ART (OS)' , 'HIV+ ART (OS)'}; 
 % diseaseSheetInds = {2 , 4 , 5};
 % sceInds = [3 , 4 , 6 , 8];
