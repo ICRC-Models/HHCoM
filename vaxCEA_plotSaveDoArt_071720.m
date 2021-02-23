@@ -107,7 +107,11 @@ hivPrevM1559_multSims = hivPrevF1559_multSims;
 artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 artPrevM_multSims = artPrevF_multSims;
 artPrevC_multSims = artPrevF_multSims;
-% CD4 DISTRIBUTION/TRANSITIONS
+% POPULATION CD4 DISTRIBUTION
+cd4DistVec = {7 , [3 : 6] , 8}; % CD4<200, CD4>=200, on ART
+cd4DistVecLength = length(cd4DistVec);
+cd4PropMF1559 = zeros(length(tVecYr) , nRuns , cd4DistVecLength , gender);
+% ART INIT CD4 DISTRIBUTION/TRANSITIONS
 cIndsCD4Dist = {3 : 5 , 6 , 7};
 cIndsCD4DistLength = length(cIndsCD4Dist);
 cd4DistF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 3);
@@ -293,6 +297,20 @@ for k = 1 : loopSegmentsLength-1
         hivIncM = annlz(sum(sum(sum(sum(sum(vaxResult{n}.newHiv(: , : , : , : , 1 , 4 : 12 , ...
             1 : risk), 2), 3), 4), 6), 7)) ./ hivSus * 100;
         hivIncM1559_multSims(: , j) = hivIncM(1 : end)';
+        
+        %% CD4 DISTRIBUTION BY GENDER, AGES 15-59 FOR HIV-TB MODEL        
+        for gInd = 1 : gender
+            gGroup = gInd;
+            for cInd = 1 : cd4DistVecLength
+                c = cd4DistVec{cInd};
+                cd4Inds = toInd(allcomb(c , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                    1 : intervens , gGroup , 4 : 12 , 1 : risk));
+                hivInds = toInd(allcomb(3 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                    1 : intervens , gGroup , 4 : 12 , 1 : risk));
+                cd4PropMF1559(: , j , cInd , gInd) = sum(vaxResult{n}.popVec([1 : stepsPerYear : end] , cd4Inds) , 2) ./ ...
+                    sum(vaxResult{n}.popVec([1 : stepsPerYear : end] , hivInds) , 2);
+            end
+        end
 
         %% HIV INCIDENCE CASES BY AGE
         % Calculate combined HIV incidence
@@ -830,8 +848,8 @@ writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncC_multSims , 2) , ...
     min(hivIncC_multSims , [] , 2) , max(hivIncC_multSims , [] , 2) , ...
     hivIncC_multSims] , fname)
 
- %% Save HIV incidence by gender, ages 15-59, for HIV-TB model
- % female
+%% Save HIV incidence by gender, ages 15-59, for HIV-TB model
+% female
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
     'HIV_incidence_females_aged15-59_forHivTB' , '.csv'];
 writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncF1559_multSims , 2) , ...
@@ -842,7 +860,24 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
     'HIV_incidence_males_aged15-59_forHivTB' , '.csv'];
 writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncM1559_multSims , 2) , ...
     min(hivIncM1559_multSims , [] , 2) , max(hivIncM1559_multSims , [] , 2) , ...
-    hivIncM1559_multSims] , fname)     
+    hivIncM1559_multSims] , fname)  
+
+%% Save CD4 distribution by gender, ages 15-59 for HIV-TB model
+outputVec = [];
+for g = 1 : gender
+    for cInd = 1 : cd4DistVecLength
+       outputVec = [outputVec; ...
+           [tVecYr' , ones(length(tVecYr),1).*g , ...
+           ones(length(tVecYr),1).*cInd , ...
+           mean(squeeze(cd4PropMF1559(: , : , cInd , g)) , 2) , ...
+           min(squeeze(cd4PropMF1559(: , : , cInd , g)) , [] , 2) , ...
+           max(squeeze(cd4PropMF1559(: , : , cInd , g)) , [] , 2) , ...
+           squeeze(cd4PropMF1559(: , : , cInd , g))]];
+    end
+end
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'CD4distribution_MF_aged15-59_forHivTB' , '.csv'];
+writematrix(outputVec , fname) 
 
 %% Save HIV incidence by age
 ageTits = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , ...
