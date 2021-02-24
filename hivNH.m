@@ -364,7 +364,7 @@ dPop = dPop + vlAdvanced;
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 extraOuts{1} = hivDeaths;
 extraOuts{2} = artTreat; %reshape(artTreat , [numel(artTreat) , 1]);
-extraOuts{3} = artDiscont;
+%extraOuts{3} = artDiscont;
 
 dPop = sparse(dPop);
 
