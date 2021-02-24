@@ -14,7 +14,7 @@ t_next = t+1;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
@@ -219,7 +219,7 @@ csvwrite([paramDir, fileAlphaResample] , alphaResampleSubset);
 
 ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20Ph2V11_6_top50Sets.dat']);
 ph1sample = datasample(ph1_top50Sets, round(n_new_particles) , 2); % resample
-ph1sampleSubset = [ph1sample(2:15,:)]; % keep subset of resampled parameter set
+ph1sampleSubset = [ph1sample(2:23,:)]; % keep subset of resampled parameter set
 
 file = ['resampleSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
 paramDir = [pwd , '/Params/'];

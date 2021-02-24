@@ -60,7 +60,7 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];    % age groups to vaccinate
-vaxCoverB = 0.0; %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types) before 2020)
+vaxCoverB = 0.0; %0.57; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented) before 2020); last dose, first dose pilot
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
@@ -345,7 +345,7 @@ parfor n = 1 : nTests
     % Initialize other vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = zeros(size(popVec));
+    deaths = zeros(length(s) - 1 , 1); %zeros(size(popVec));
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -358,9 +358,9 @@ parfor n = 1 : nTests
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+    % newTreatImm = newScreen;
+    % newTreatHpv = newScreen;
+    % newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
@@ -370,7 +370,8 @@ parfor n = 1 : nTests
     import java.util.LinkedList
     artDistList = historicalIn.artDistList;
     artDist = historicalIn.artDist;
-    % artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    artDiscont = zeros(length(s) - 1 , disease , viral , gender , age , risk);
     
     %% Main body of simulation
     for i = 2 : length(s) - 1
@@ -402,10 +403,7 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                    newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+                [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -444,14 +442,15 @@ parfor n = 1 : nTests
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
         if hivOn
-            [~ , pop , hivDeaths(i , : , : , :) , artTreat] =...
+            [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :) , ...
+                artDiscont(i , : , : , : , : , :)] =...
                 ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
                 popIn = pop(end , :);    
             %artTreatTracker(i , : , : , : , : , :) = artTreat;
-            %artTreat = artTreatTracker(i , : , : , : , : , :);
+            artTreat = artTreatTracker(i , : , : , : , : , :);
             artTreat = reshape(artTreat , [numel(artTreat) , 1]);
             artDistList.add(artTreat); %sum(sum(sum(artTreat , 3) , 4) , 5)
             if artDistList.size() >= stepsPerYear * 2
@@ -554,7 +553,8 @@ parfor n = 1 : nTests
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker , 
+        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , ...
+        artDist , artDistList , artTreatTracker , artDiscont , ... 
         newTreatImm , newTreatHpv , newTreatHyst , ...
         currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier);
 end

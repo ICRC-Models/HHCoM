@@ -227,7 +227,7 @@ end
 dPop = dPop + births + hivBirths + deaths;
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
-extraOut{1} = abs(deaths);
+extraOut{1} = abs(sumall(deaths)); %abs(deaths);
 
 dPop = sparse(dPop);
 

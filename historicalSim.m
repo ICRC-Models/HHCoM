@@ -55,7 +55,7 @@ vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compar
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
-vaxRate = 0.0; %0.86*(2/7);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (2/7 oncogenic types))
+vaxRate = 0.0; %0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -298,7 +298,7 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % Initialize result vectors
     popVec = spalloc(length(s) - 1 , prod(dim) , 10 ^ 8);
     popVec(1 , :) = popIn;
-    deaths = popVec; 
+    deaths = zeros(length(s) - 1 , 1); %popVec;
     newHiv = zeros(length(s) - 1 , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
     hivDeaths = zeros(length(s) - 1 , disease , gender , age);
     newHpvVax = zeros(length(s) - 1 , gender , disease , age , risk , intervens);
@@ -311,9 +311,9 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % newCin3 = newCC;
     ccDeath = newCC;
     newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
-    newTreatImm = newScreen;
-    newTreatHpv = newScreen;
-    newTreatHyst = newScreen;
+    % newTreatImm = newScreen;
+    % newTreatHpv = newScreen;
+    % newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdSchool = zeros(length(s) - 1 , 1);
     
@@ -322,7 +322,8 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     artDistList = LinkedList();
     artDist = zeros(disease , viral , gender , age , risk); % initial distribution of inidividuals on ART = 0
     %artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
-
+    %artDiscont = zeros(length(s) - 1 , disease , viral , gender , age , risk);
+    
 % If continuing from checkpoint
 elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
@@ -350,9 +351,9 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % newCin3 = chckPntIn.newCin3;
     ccDeath = chckPntIn.ccDeath;
     newScreen = chckPntIn.newScreen;
-    newTreatImm = chckPntIn.newTreatImm;
-    newTreatHpv = chckPntIn.newTreatHpv;
-    newTreatHyst = chckPntIn.newTreatHyst;
+    % newTreatImm = chckPntIn.newTreatImm;
+    % newTreatHpv = chckPntIn.newTreatHpv;
+    % newTreatHyst = chckPntIn.newTreatHyst;
     menCirc = chckPntIn.menCirc;
     vaxdSchool = chckPntIn.vaxdSchool;
     
@@ -360,7 +361,8 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     import java.util.LinkedList
     artDistList = chckPntIn.artDistList;
     artDist = chckPntIn.artDist;
-    %artTreatTracker = zeros(length(s) - 1 , disease , viral , gender , age , risk); %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %artTreatTracker = chckPntIn.artTreatTracker; %zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+    %artDiscont = chckPntIn.artDiscont;
 end
 
 %% Main body of simulation
@@ -434,10 +436,7 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , : , : , : , : , :) , ...
-                newTreatImm(i , : , : , : , : , : , : , : , :) , ...
-                newTreatHpv(i , : , : , : , : , : , : , : , :) , ...
-                newTreatHyst(i , : , : , : , : , : , : , : , :)] ...
+            [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
                 = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                 screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -482,7 +481,7 @@ for i = iStart : length(s) - 1
     % ART initiation, dicontinuation, and scale-up by CD4 count
     % HIV-associated mortality
     if (hivOn && (year >= hivStartYear))
-        [~ , pop , hivDeaths(i , : , : , :) , artTreat] =...
+        [~ , pop , hivDeaths(i , : , : , :),artTreat] =...
             ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
             kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
@@ -562,8 +561,8 @@ for i = iStart : length(s) - 1
         save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
             'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
             'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-            'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-            'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+            'newScreen' , ...
+            'newCC' , 'artDist' , 'artDistList' ,  ...
             'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 
@@ -577,8 +576,8 @@ savdir = [pwd , '/HHCoM_Results/'];
 save(fullfile(savdir , pathModifier) , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-    'newScreen' , 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
-    'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
+    'newScreen' , ...
+    'newCC' , 'artDist' , 'artDistList' ,  ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')
