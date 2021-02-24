@@ -48,7 +48,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {''};    % 22Apr20Ph2V11
+fileInds = {'224','256','271','388','394','476','592','682','854','1008','1300'};    % 22Apr20Ph2V11
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -91,11 +91,16 @@ cin1_vax = cc_vax;
 cin1_nonVax = cc_vax;
 hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
+hiv_prev = zeros(nRuns,length([startYear:timeStep:currYear]));
+hpv2005 = zeros(nRuns,9,1);
+hpvHIV2005 = hpv2005;
+hpvNeg2005 = hpv2005;
+
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_24Aug20_K_HPVprogAge' , fileInds{j}];
+    pathModifier = ['toNow_26Oct20_noBaseVax_baseScreen_hpvHIVcalib_1_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
@@ -164,6 +169,26 @@ for j = 1 : nRuns
         end
     end
     
+    
+    
+    %%Total HIV Prevalence
+    % Total HIV positive
+
+    hivInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 11, 1 : risk));
+
+    hivPop = sum(popVec(: , hivInds) , 2);
+
+    artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
+    1 : endpoints , 1 : intervens , 1 : 2 , 4 : 11 , 1 : risk));
+
+    art = sum(popVec(: , artInds) , 2);
+
+    popTot = popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+    1 : intervens , 1 : 2 , 4 : 11 , 1 : risk)));
+
+    hiv_prev(j,:) = ((hivPop + art) ./ sum(popTot , 2) * 100)';
+    
     %% ********************************** HPV FIGURES **********************************************************************************************
     %% HPV Prevalence in high risk women
     yr = 2006;
@@ -172,18 +197,18 @@ for j = 1 : nRuns
         a = ageVec{aV};
         %HIV-positive
         hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 1 , a , 3)); toInd(allcomb(3 : 8 , 1 : viral , ...
-            [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 1 , a , 3))]);
+            1 , 1 : intervens , 2 , a , 3)); toInd(allcomb(3 : 8 , 1 : viral , ...
+            [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 3))]);
         ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 , a , 3));
+            1 : endpoints , 1 : intervens , 2 , a , 3));
         hpv_hiv(j , aV) = sum(popVec((yr - startYear) * stepsPerYear +1 , hpvInds))...
             ./ sum(popVec((yr - startYear) * stepsPerYear+1 , ageInds));
         %HIV-negative
         hpvInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
-            1 , 1 : intervens , 1 , a , 3)); toInd(allcomb(1 : 2 , 1 : viral , ...
-            [1 : 5 , 7] , 2 : 5, 1 , 1 : intervens , 1 , a , 3))]);
+            1 , 1 : intervens , 2 , a , 3)); toInd(allcomb(1 : 2 , 1 : viral , ...
+            [1 : 5 , 7] , 2 : 5, 1 , 1 : intervens , 2 , a , 3))]);
         ageInds = toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-            1 : endpoints , 1 : intervens , 1 , a , 3));
+            1 : endpoints , 1 : intervens , 2 , a , 3));
         hpv_hivNeg(j , aV) = sum(popVec((yr - startYear) * stepsPerYear +1 , hpvInds))...
             ./ sum(popVec((yr - startYear) * stepsPerYear+1 , ageInds));
     end
@@ -213,6 +238,58 @@ for j = 1 : nRuns
         hpv_hiv2009(j , aV) = sum(popVec((yr - startYear) * stepsPerYear +1 , hpvInds))...
             ./ sum(popVec((yr - startYear) * stepsPerYear +1 , ageInds));
     end
+    
+    %%% HPV Prevalence by age in 2005 vs. Yamada data
+    ageGroup = {'17 - 19' , '20 -24' , '25 - 29' ,...
+    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+    yr = 2005;
+    year = {yr};
+    aVec = {18:20,21:25,26:30,31:35,36:40,41:45,46:50,51:55,56:60,61:65,66:70,71:75,76:80};
+    for a = 4 : 12
+
+    %a = aVec{aInd};
+
+        hpvInds = unique([toInd(allcomb(1 : disease , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+
+        ageInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+    
+        hpv2005(j,a - 3 , 1) = sum(popVec((yr - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
+
+
+        % HIV+
+
+        hpvInds = unique([toInd(allcomb(3 : 8 , 1 : viral , 2 :5  , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(3 : 8 , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+
+        ageInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+
+        hpvHIV2005(j,a - 3 , 1) = sum(popVec((yr - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
+
+    
+
+    % HIV-
+
+        hpvInds = unique([toInd(allcomb(1 : 2 , 1  , 2  : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(1 : 2 , 1 , ...
+        [1 : 5 , 7] , 2 : 5, 1 , 1 : intervens , 2 , a , 1 : risk))]);
+
+        ageInds = toInd(allcomb(1 : 2 , 1  , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+
+        hpvNeg2005(j,a - 3 , 1) = sum(popVec((yr - startYear) * stepsPerYear , hpvInds))...
+        ./ sum(popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
+
+    end
+    
+    
 
     %% ********************************** CIN FIGURES *********************************************************************************************
     %% CIN2/3 prevalence among HIV+ women aged 20-50 in 2007
@@ -498,6 +575,7 @@ ageGroup = {'15 - 19' , '20 - 24' , '25 - 29' ,...
 ageEndVec = {11-3 , 10-3 , 13-3};
 genVecLabels = {'Male' , 'Female' , 'Male+Female Combined'};
 genVec = {1 , 2 , 1:2};
+yrColorVec = {'k' , 'b' , 'r'};
 
 figure;
 for gInd = 1 : length(genVec)
@@ -515,42 +593,63 @@ for gInd = 1 : length(genVec)
 
     subplot(3 , 1 , gInd);
     for i = 1 : size(hivModel , 3)
-        hold all;       
+        hold all;      
         errorbar(1 : ageEndVec{gInd} , hivPrevs(((i-1)*ageEndVec{gInd})+1 : ageEndVec{gInd}*i , 1) , ...
             hivPrevs(((i-1)*ageEndVec{gInd})+1 : ageEndVec{gInd}*i , 2) , ...
-            'rs' , 'LineWidth' , 1.5);
+            's' , 'LineWidth' , 1.5 , 'Color' , yrColorVec{i});
         hold all;
-        set(gca,'ColorOrderIndex',i)
-        plot(1 : ageEndVec{gInd} , mean((squeeze(hivModel(: , : , i)) .* 100),1)' , '-' , 'LineWidth' , 1.5);
-        set(gca,'ColorOrderIndex',i)
-        plot(1 : ageEndVec{gInd} , min((squeeze(hivModel(: , : , i)) .* 100),[],1)' , '--' , 'LineWidth' , 1.5);
-        set(gca,'ColorOrderIndex',i)
-        plot(1 : ageEndVec{gInd} , max((squeeze(hivModel(: , : , i)) .* 100),[],1)' , '--' , 'LineWidth' , 1.5);
+        plot(1 : ageEndVec{gInd} , mean((squeeze(hivModel(: , : , i)) .* 100),1)' , '-' , 'LineWidth' , 1.5 , 'Color' , yrColorVec{i});
+        hold all;
+        plot(1 : ageEndVec{gInd} , min((squeeze(hivModel(: , : , i)) .* 100),[],1)' , '--' , 'LineWidth' , 1.5 , 'Color' , yrColorVec{i});
+        hold all;
+        plot(1 : ageEndVec{gInd} , max((squeeze(hivModel(: , : , i)) .* 100),[],1)' , '--' , 'LineWidth' , 1.5 , 'Color' , yrColorVec{i});
         set(gca , 'xtickLabel' , ageGroup); set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
     end
-    xlabel('Age Group'); ylabel('HIV Prevalence (%)'); title(genVecLabels{gInd});
-    ylim([0 100]);
-    grid on;
-    if (gInd == 1) || (gInd == 2)
-        legend('(DHS/KAIS) Observed Kenya, 2003: mean, 2SD' , ...
-            '(DHS/KAIS) Observed Kenya, 2007: mean, 2SD' , ...
-            '(DHS/KAIS) Observed Kenya, 2008: mean, 2SD' , ...
-            ['Model, 2003: ' , num2str(nRuns) , '-sets mean'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
-            ['Model, 2007: ' , num2str(nRuns) , '-sets mean'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
-            ['Model, 2009: ' , num2str(nRuns) , '-sets mean'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets maximum']);
-    elseif gInd == 3
+   xlabel('Age Group'); ylabel('HIV Prevalence (%)'); title(genVecLabels{gInd});
+   ylim([0 50])
+   grid on;
+if (gInd == 1) || (gInd == 2)
+      legend('(DHS/KAIS) Observed Kenya, 2003: mean, 2SD' , ...
+      ['Model, 2003: ' , num2str(nRuns) , '-sets mean'] , ...
+      ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
+      ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
+       '(DHS/KAIS) Observed Kenya, 2007: mean, 2SD' , ...
+      ['Model, 2007: ' , num2str(nRuns) , '-sets mean'] , ...
+      ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
+      ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
+       '(DHS/KAIS) Observed Kenya, 2008: mean, 2SD' , ...
+       ['Model, 2009: ' , num2str(nRuns) , '-sets mean'] , ...
+       ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
+       ['Model: ' , num2str(nRuns) , '-sets maximum']);
+elseif gInd == 3
         legend('(DHS/KAIS) Observed Kenya: mean, 2SD' , ...
-            ['Model, 2012: ' , num2str(nRuns) , '-sets mean'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
-            ['Model: ' , num2str(nRuns) , '-sets maximum']);
-    end
+        ['Model, 2012: ' , num2str(nRuns) , '-sets mean'] , ...
+        ['Model: ' , num2str(nRuns) , '-sets minimum'] , ...
+        ['Model: ' , num2str(nRuns) , '-sets maximum']);
 end
+end
+
+
+%%HIV Prevalence
+% Compared to observed HIV data
+
+file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
+HIV_Ken_spectrum = xlsread(file , ['HIV ' 'prevalence'] , 'B184:E213');
+DHS_KAIS = [2003 6.7 5.8 7.6;
+    2007 7.1 6.6 7.9;
+    2009 6.4 5.4 7.3;
+    2012 5.6 4.9 6.3];
+
+figure()
+
+plot(tVec , mean(hiv_prev) , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
+DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')
+hold on 
+xlabel('Year'); ylabel('Proportion of Population (%)'); 
+title({'HIV Prevalence (Ages 15-54)'})
+legend('Model Mean' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
+xlim([1980 2020])
+ylim([0, 15])
 
 
 %% ********************************** HPV FIGURES **********************************************************************************************
@@ -650,6 +749,64 @@ legend('(DeVuyst, 2012; BJC) Observed Kenya: mean, 2SD' , ...
     ['Model: ' , num2str(nRuns) , '-sets maximum']);
 title('hrHPV Prevalence in 2009 - Females, HIV+');
 grid on;
+
+
+%Yamada,2009: HIV+ family planning/gyn health center, any HPV prevalence, but >50% types tested for
+
+% were HR: 16,18,31,33,35,39,45,51,52,56,58,59,67,68,82,(6,11,13,44),(26, 30, 53, 66,70)
+
+hpvHivObs(: , 1) = [1
+0.58
+0.56
+0.43
+0.46
+0.43
+NaN
+NaN
+NaN];
+
+%Yamada 2009 : HIV- family planning/gyn health center
+
+hpvHivObs(: , 2) = [0.44
+0.25
+0.12
+0.15
+0.10
+0.10
+NaN
+NaN
+NaN];
+
+hpvHivObs = hpvHivObs * 100;
+
+% hpvNegObs = hpvNegObs * 100;
+
+figure()
+
+% plot(1 : length(hpv2002) , hpv2002 , 'o-')
+
+% hold all;
+
+plot(1 : size(hpvHIV2005,2) , mean(hpvHIV2005,'omitnan') , 'o-');
+hold all;
+plot(1 : size(hpvNeg2005,2) , mean(hpvNeg2005) , 'o-')
+hold all;
+set(gca , 'xtickLabel' , ageGroup); 
+
+plot(1 : length(hpvHivObs) , hpvHivObs(: ,1) , '+--')
+plot(1 : length(hpvHivObs) , hpvHivObs(: ,2) , '+--')
+
+set(gca , 'xtick' , 1 : length(hpvHivObs) , 'xtickLabel' , ageGroup);
+
+legend('Model HIV-pos' , 'Model HIV-neg' ,...
+'Obs HIV-pos: Yamada (Nairobi, clinic)','Obs HIV-neg: Yamada (Nairobi, clinic)')
+
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
+
+title(['Kenya HPV prevalence in women in', year ])
+
+ylim([0 100])
+
 
 
 %% ********************************** CIN FIGURES *********************************************************************************************
@@ -767,11 +924,11 @@ xlabel('Age Group'); ylabel('Cervical cancer incidence per 100K');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 ylim([0 450]);
 title(['Cervical Cancer Incidence in 2012']);
-legend('Combined SA: upper bound' , 'Combined SA: lower bound' , ...
-    '(Globocan, 2012) Observed SA: mean, 2SD' , 'Model, general: ' , num2str(nRuns) , '-sets mean' , 'Model: ' , num2str(nRuns) , '-sets minimum' , 'Model: ' , num2str(nRuns) , '-sets maximum' , ...
-    'Model, HIV-negative: ' , num2str(nRuns) , '-sets mean' , 'Model: ' , num2str(nRuns) , '-sets minimum' , 'Model: ' , num2str(nRuns) , '-sets maximum' , ...
-    'Model, WLWHIV untreated: ' , num2str(nRuns) , '-sets mean' , 'Model: ' , num2str(nRuns) , '-sets minimum' , 'Model: ' , num2str(nRuns) , '-sets maximum' , ...
-    'Model, WLWHIV on ART: ' , num2str(nRuns) , '-sets mean' , 'Model: ' , num2str(nRuns) , '-sets minimum' , 'Model: ' , num2str(nRuns) , '-sets maximum' , ...
+legend('(Globocan, 2012) Observed SA: mean, 2SD' , ...
+    ['Model, general: ' , num2str(nRuns) , '-sets mean'] , ['Model: ' , num2str(nRuns) , '-sets minimum'] , ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['Model, HIV-negative: ' , num2str(nRuns) , '-sets mean'] , ['Model: ' , num2str(nRuns) , '-sets minimum'] , ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['Model, WLWHIV untreated: ' , num2str(nRuns) , '-sets mean'] , ['Model: ' , num2str(nRuns) , '-sets minimum'] , ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['Model, WLWHIV on ART: ' , num2str(nRuns) , '-sets mean'] , ['Model: ' , num2str(nRuns) , '-sets minimum'] , ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
     'Location' , 'Northwest');
 grid on;
 
