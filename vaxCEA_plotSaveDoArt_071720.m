@@ -1623,7 +1623,7 @@ xlim([2020 2060]); ylim([0.0 0.5]);
 grid on;
 % sgtitle('HIV Prevalence');
 
-%% Plot HIV cases
+%% Plot cumulative HIV cases
 figure('DefaultAxesFontSize' , 18);
 
 % female
@@ -1634,7 +1634,7 @@ for iInd = 1 : length(iIndList)
         'Raw_HIV_incidence_females_ages15-79' , '.csv'];
     hivIncF = xlsread(fname);
     hivIncF = hivIncF((2020-startYear)+1 : end , :);
-    hivIncF(: , 2:end) = cumsum(hivIncF(: , 2:end));
+    hivIncF(: , 2:end) = cumsum(hivIncF(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivIncF(: , 1) , hivIncF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1648,8 +1648,8 @@ for iInd = 1 : length(iIndList)
     %plot(hivIncF(: , 1) , hivIncF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
     %plot(hivIncF(: , 1) , hivIncF(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
 end
-ylabel('Cumulative new HIV cases'); title('Women'); %xlabel('Year'); 
-xlim([2020 2060]); ylim([0 4*10^6]);
+ylabel('Cumulative new HIV cases (in millions)'); title('Women'); %xlabel('Year'); 
+xlim([2020 2060]); ylim([0 4]);
 % legend('Clinic ART, mean' , 'range' , ...
 %     'HTC + Community ART, mean' , 'range'); % , 'Scenario 3, mean' , 'range');
 grid on;
@@ -1662,7 +1662,7 @@ for iInd = 1 : length(iIndList)
         'Raw_HIV_incidence_males_ages15-79' , '.csv'];
     hivIncM = xlsread(fname);
     hivIncM = hivIncM((2020-startYear)+1 : end , :);
-    hivIncM(: , 2:end) = cumsum(hivIncM(: , 2:end));
+    hivIncM(: , 2:end) = cumsum(hivIncM(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivIncM(: , 1) , hivIncM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1677,7 +1677,7 @@ for iInd = 1 : length(iIndList)
     %plot(hivIncM(: , 1) , hivIncM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
 end
 title('Men'); %ylabel('HIV incidence per 100'); xlabel('Year'); 
-xlim([2020 2060]); ylim([0 4*10^6]);
+xlim([2020 2060]); ylim([0 4]);
 % legend('Clinic ART, mean' , 'range' , ...
 %     'HTC + Community ART, mean' , 'range'); % , 'Scenario 3, mean' , 'range');
 grid on;
@@ -1690,7 +1690,7 @@ for iInd = 1 : length(iIndList)
         'Raw_HIV_incidence_combined_ages15-79' , '.csv'];
     hivIncC = xlsread(fname);
     hivIncC = hivIncC((2020-startYear)+1 : end , :);
-    hivIncC(: , 2:end) = cumsum(hivIncC(: , 2:end));
+    hivIncC(: , 2:end) = cumsum(hivIncC(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivIncC(: , 1) , hivIncC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1705,12 +1705,12 @@ for iInd = 1 : length(iIndList)
     %plot(hivIncC(: , 1) , hivIncC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
 end
 title('Total Population'); %ylabel('HIV incidence per 100'); xlabel('Year'); 
-xlim([2020 2060]); ylim([0 4*10^6]);
+xlim([2020 2060]); ylim([0 4]);
 legend('Clinic ART, mean' , 'range' , ...
     'HTC + Community ART, mean' , 'range'); % , 'Scenario 3, mean' , 'range');
 grid on;
 
-%% Plot HIV mortality
+%% Plot cumulative HIV deaths
 figure('DefaultAxesFontSize' , 18);
 
 % female
@@ -1721,7 +1721,7 @@ for iInd = 1 : length(iIndList)
         'Raw_HIV_mortality_females_ages15-79' , '.csv'];
     hivMortF = xlsread(fname);
     hivMortF = hivMortF((2020-startYear)+1 : end , :);
-    hivMortF(: , 2:end) = cumsum(hivMortF(: , 2:end));
+    hivMortF(: , 2:end) = cumsum(hivMortF(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivMortF(: , 1) , hivMortF(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1735,8 +1735,8 @@ for iInd = 1 : length(iIndList)
     %plot(hivMortF(: , 1) , hivMortF(: , 3) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
     %plot(hivMortF(: , 1) , hivMortF(: , 4) , 'LineStyle' ,  '--' , 'Color' , colorList{iInd});
 end
-ylabel('Cumulative new HIV deaths'); xlabel('Year'); %title('Women'); 
-xlim([2020 2060]); ylim([0 4*10^6]);
+ylabel('Cumulative new HIV deaths (in millions)'); xlabel('Year'); %title('Women'); 
+xlim([2020 2060]); ylim([0 4]);
 % legend('Scenario 1, mean' , 'range' , ...
 %     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
 grid on;
@@ -1749,7 +1749,7 @@ for iInd = 1 : length(iIndList)
         'raw_HIV_mortality_males_ages15-79' , '.csv'];
     hivMortM = xlsread(fname);
     hivMortM = hivMortM((2020-startYear)+1 : end , :);
-    hivMortM(: , 2:end) = cumsum(hivMortM(: , 2:end));
+    hivMortM(: , 2:end) = cumsum(hivMortM(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivMortM(: , 1) , hivMortM(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1764,7 +1764,7 @@ for iInd = 1 : length(iIndList)
     %plot(hivMortM(: , 1) , hivMortM(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
 end
 xlabel('Year'); %title('Men'); ylabel('Mortality per 100K');  
-xlim([2020 2060]); ylim([0 4*10^6]);
+xlim([2020 2060]); ylim([0 4]);
 % legend('Scenario 1, mean' , 'range' , ...
 %     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
 grid on;
@@ -1777,7 +1777,7 @@ for iInd = 1 : length(iIndList)
         'Raw_HIV_mortality_combined_ages15-79' , '.csv'];
     hivMortC = xlsread(fname);
     hivMortC = hivMortC((2020-startYear)+1 : end , :);
-    hivMortC(: , 2:end) = cumsum(hivMortC(: , 2:end));
+    hivMortC(: , 2:end) = cumsum(hivMortC(: , 2:end)) ./ 1000000;
     hold all;
     plot(hivMortC(: , 1) , hivMortC(: , 2) , 'LineStyle' , '-' , 'Color' , colorList{iInd} , 'LineWidth' , 2);
     hold all;
@@ -1792,7 +1792,7 @@ for iInd = 1 : length(iIndList)
     %plot(hivMortC(: , 1) , hivMortC(: , 4) , 'LineStyle' , '--' , 'Color' , colorList{iInd});
 end
 xlabel('Year'); %ylabel('Mortality per 100K'); title('Total Population');
-xlim([2020 2060]); ylim([0 4*10^6]);
+xlim([2020 2060]); ylim([0 4]);
 % legend('Scenario 1, mean' , 'range' , ...
 %     'Scenario 2, mean' , 'range' , 'Scenario 3, mean' , 'range');
 grid on;
