@@ -152,6 +152,7 @@ hpvIncTimePos = hpvIncTime;
 hpvIncTimeArt = hpvIncTime;
 hpvIncTimePosAll = hpvIncTime;
 hpvIncHivRiskAgeTime = zeros(nRuns , 5 , age , length(annualTimespan));
+hpv9vIncHivRiskAgeTime = hpvIncHivRiskAgeTime;
 % CIN2/3 prevalence
 cinPosAge = zeros(nRuns , 2 , age);
 cinNegAge = cinPosAge;
@@ -604,6 +605,21 @@ for k = 1 : loopSegmentsLength-1
                     annlz(sum(sum(sum(sum(sum(vaxResult{n}.newImmHpvVax(: , 2 , d , a , : , :),2),3),4),5),6)) + ...
                     annlz(sum(sum(sum(sum(sum(vaxResult{n}.newHpvNonVax(: , 2 , d , a , : , :),2),3),4),5),6)) + ...
                     annlz(sum(sum(sum(sum(sum(vaxResult{n}.newImmHpvNonVax(: , 2 , d , a , : , :),2),3),4),5),6))) ./ ...
+                    (annlz(sum(vaxResult{n}.popVec(: , allF) , 2) ./ stepsPerYear)) * fac);
+            end
+        end
+        
+        %% 9v-HPV incidence by HIV status and age over time
+        fac = 100;
+        for dInd = 1 : diseaseVecLength_ccInc;
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                    1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+                % Calculate incidence
+                hpv9vIncHivRiskAgeTime(j , dInd , a , :) = ...
+                    ((annlz(sum(sum(sum(sum(sum(vaxResult{n}.newHpvVax(: , 2 , d , a , : , :),2),3),4),5),6)) + ...
+                    annlz(sum(sum(sum(sum(sum(vaxResult{n}.newImmHpvVax(: , 2 , d , a , : , :),2),3),4),5),6))) ./ ...
                     (annlz(sum(vaxResult{n}.popVec(: , allF) , 2) ./ stepsPerYear)) * fac);
             end
         end
@@ -1757,6 +1773,18 @@ for dInd = 1 : length(diseaseLabels);
         [squeeze(median(squeeze(hpvIncHivRiskAgeTime(: , dInd , : , :)) , 1)) ; ...
         squeeze(min(squeeze(hpvIncHivRiskAgeTime(: , dInd , : , :)) , [] , 1)) ; ...
         squeeze(max(squeeze(hpvIncHivRiskAgeTime(: , dInd , : , :)) , [] , 1))]]] , fname)
+end
+
+%% HPV incidence by HIV status and age over time
+diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+for dInd = 1 : length(diseaseLabels);
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'HPV-9vInc_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+    writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
+        [annualTimespan ;
+        [squeeze(median(squeeze(hpv9vIncHivRiskAgeTime(: , dInd , : , :)) , 1)) ; ...
+        squeeze(min(squeeze(hpv9vIncHivRiskAgeTime(: , dInd , : , :)) , [] , 1)) ; ...
+        squeeze(max(squeeze(hpv9vIncHivRiskAgeTime(: , dInd , : , :)) , [] , 1))]]] , fname)
 end
 
 
