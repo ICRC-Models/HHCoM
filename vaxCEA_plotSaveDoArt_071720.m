@@ -108,7 +108,7 @@ artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 artPrevM_multSims = artPrevF_multSims;
 artPrevC_multSims = artPrevF_multSims;
 % POPULATION CD4 DISTRIBUTION
-cd4DistVec = {7 , [3 : 6] , 8}; % CD4<200, CD4>=200, on ART
+cd4DistVec = {7 , 6 , [3 : 5] , 8}; % CD4<200, CD4>=200, on ART
 cd4DistVecLength = length(cd4DistVec);
 cd4PropMF1559 = zeros(length(tVecYr) , nRuns , cd4DistVecLength , gender);
 % ART INIT CD4 DISTRIBUTION/TRANSITIONS
@@ -876,7 +876,7 @@ for g = 1 : gender
     end
 end
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
-    'CD4distribution_MF_aged15-59_forHivTB' , '.csv'];
+    'CD4distribution_MF_aged15-59_forHivTB_revised' , '.csv'];
 writematrix(outputVec , fname) 
 
 %% Save HIV incidence by age
