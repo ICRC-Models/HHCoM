@@ -3,6 +3,7 @@ function idParamPosteriors(tstep_abc , date_abc)
 t_curr = tstep_abc;
 date = date_abc;
 
+%% IF ON PHASE 2
 %% Load all particles
 paramDir = [pwd , '/Params/'];
 masterSetMatrix = load([paramDir , 'masterSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
@@ -52,3 +53,35 @@ paramSet = top50Params(:,1:25);
 for i = 1 : size(top50Params,1)
     disp([titles{i} , ': ' , num2str(mean(top50Params(i,:) , 2)) , ' [' , num2str(min(top50Params(i,:) , [] , 2)) , ', ' , num2str(max(top50Params(i,:) , [] , 2)) , ']'])
 end
+
+%% IF ON PHASE 1
+% %% Load all particles
+% paramDir = [pwd , '/Params/'];
+% top50Params = load([paramDir , 'alphaParamSets_calib_' , date , '_' , num2str(t_curr) , '_top50Sets.dat']); % load most recent parameter sample
+% top50Params = top50Params([1:21,26],:);
+% pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
+% 
+% %% Set up paramsSub for indexing into paramSet matrix
+% [paramsAll] = genParamStruct();
+% paramsSub = cell(length(pIdx),1);
+% startIdx = 1;
+% for s = 1 : length(pIdx)
+%     paramsSub{s}.length = paramsAll{pIdx(s)}.length;
+%     paramsSub{s}.inds = (startIdx : (startIdx + paramsSub{s}.length - 1));
+%     startIdx = startIdx + paramsSub{s}.length;
+% end
+% 
+% %% Print posteriors (mean [lb,ub])
+% titles = {'partnersM:15-19,hr' , 'partnersM:20-24,hr' , ...    % 22Apr20 calibration Phase 1
+%           'partnersM:25-29,hr' , 'partnersM:30-44,hr' , 'partnersM:45-79,hr' , ...
+%           'partnersM:10-14,mr' , 'partnersM:10-14,lr' , ...
+%           'partnersF:15-19,hr' , 'partnersF:20-24,hr' , ...
+%           'partnersF:25-29,hr' , 'partnersF:30-44,hr' , 'partnersF:45-79,hr' , ...
+%           'partnersF:10-14,mr' , 'partnersF:10-14,lr' , ...
+%           'condUse' , 'epsA' , ...
+%           'femaleActs:15-19,lr' , 'femaleActs:20-24,lr' , 'femaleActs:25-29,lr' , ...
+%           'femaleActs:30-44,lr' , 'femaleActs:45-79,lr' , ...
+%           'HIV transmission'};
+% for i = 1 : size(top50Params,1)
+%     disp([titles{i} , ': ' , num2str(mean(top50Params(i,:) , 2)) , ' [' , num2str(min(top50Params(i,:) , [] , 2)) , ', ' , num2str(max(top50Params(i,:) , [] , 2)) , ']'])
+% end
