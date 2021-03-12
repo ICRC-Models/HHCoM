@@ -745,8 +745,9 @@ for k = 1 : loopSegmentsLength-1
 %         
 %         %% PROPORTION TESTED DURING HOME TESTING CAMPAIGNS
 %         
-%         for g = 1 : gender
-%             propHivDiag_multSims(: , g , j) = vaxResult{n}.propHivDiag(: , g);
+%         for gInd = 1 : 2
+%             g = gInd;
+%             propHivDiag_multSims(: , gInd , j) = vaxResult{n}.propHivDiag(: , g);
 %         end
         
         %% TOTAL POPULATION SIZE
@@ -1214,33 +1215,35 @@ writematrix(outputVec , fname , 'Range' , 'A2')
 %% Plot proportion tested during home testing campaigns
 figure('DefaultAxesFontSize' , 18);
 
-subplot(1 , 2 , 1);
-plot([currYear : timeStep : lastYear-timeStep] , mean(squeeze(propHivDiag_multSims(: , 2 , :)) , 2)' , 'LineStyle' , '-' , 'Color' , colorList{2} , 'LineWidth' , 2);
+%subplot(1 , 2 , 1);
+plot([currYear+timeStep : timeStep : lastYear-timeStep] , mean(squeeze(propHivDiag_multSims(2:end , 2 , :).*100) , 2)' , 'LineStyle' , '-' , 'Color' , [0.5,0.5,0.5] , 'LineWidth' , 2);
 hold all;
-x2 = [[currYear : timeStep : lastYear-timeStep] , fliplr([currYear : timeStep : lastYear-timeStep])];
-inBetween = [max(squeeze(propHivDiag_multSims(: , 2 , :)) , [] , 2)' , fliplr(min(squeeze(propHivDiag_multSims(: , 2 , :)) , [] , 2)')];
-h = fill(x2 , inBetween , 'k');
-h.FaceColor = colorList{2};
-h.EdgeColor = colorList{2};
+x2 = [[currYear+timeStep : timeStep : lastYear-timeStep] , fliplr([currYear+timeStep : timeStep : lastYear-timeStep])];
+inBetween = [max(squeeze(propHivDiag_multSims(2:end , 2 , :).*100) , [] , 2)' , fliplr(min(squeeze(propHivDiag_multSims(2:end , 2 , :).*100) , [] , 2)')];
+h = fill(x2 , inBetween , [0.5,0.5,0.5]);
+h.FaceColor = [0.5,0.5,0.5];
+h.EdgeColor = [0.5,0.5,0.5];
 h.FaceAlpha = 0.3;
 h.LineStyle = '--';
-xlabel('Year'); ylabel('Proportion WLWHIV diagnosed - S2'); title('Females');
-xlim([2020 2060]); ylim([0 1]);
+xlabel('Year'); %ylabel('Proportion WLWHIV diagnosed - S2'); title('Women');
+xlim([2020 2060]); ylim([0 100]);
 grid on;
 
-subplot(1 , 2 , 2);
-plot([currYear : timeStep : lastYear-timeStep] , mean(squeeze(propHivDiag_multSims(: , 1 , :)) , 2)' , 'LineStyle' , '-' , 'Color' , colorList{2} , 'LineWidth' , 2);
+%subplot(1 , 2 , 2);
 hold all;
-x2 = [[currYear : timeStep : lastYear-timeStep] , fliplr([currYear : timeStep : lastYear-timeStep])];
-inBetween = [max(squeeze(propHivDiag_multSims(: , 1 , :)) , [] , 2)' , fliplr(min(squeeze(propHivDiag_multSims(: , 1 , :)) , [] , 2)')];
+plot([currYear+timeStep : timeStep : lastYear-timeStep] , mean(squeeze(propHivDiag_multSims(2:end , 1 , :).*100) , 2)' , 'LineStyle' , '-' , 'Color' , 'k' , 'LineWidth' , 2);
+hold all;
+x2 = [[currYear+timeStep : timeStep : lastYear-timeStep] , fliplr([currYear+timeStep : timeStep : lastYear-timeStep])];
+inBetween = [max(squeeze(propHivDiag_multSims(2:end , 1 , :).*100) , [] , 2)' , fliplr(min(squeeze(propHivDiag_multSims(2:end , 1 , :).*100) , [] , 2)')];
 h = fill(x2 , inBetween , 'k');
-h.FaceColor = colorList{2};
-h.EdgeColor = colorList{2};
+h.FaceColor = 'k';
+h.EdgeColor = 'k';
 h.FaceAlpha = 0.3;
 h.LineStyle = '--';
-xlabel('Year'); ylabel('Proportion MLWHIV diagnosed - S2'); title('Males');
-xlim([2020 2060]); ylim([0 1]);
+xlabel('Year'); ylabel('PLWHIV diagnosed (%)'); %title('Men');
+xlim([2020 2060]); ylim([0 100]);
 grid on;
+legend('Modeled KZN, women: mean' , 'range' , 'Modeled KZN, men: mean' , 'range' , 'Location' , 'southeast');
 
 %% Plot HIV incidence
 figure('DefaultAxesFontSize' , 18);
