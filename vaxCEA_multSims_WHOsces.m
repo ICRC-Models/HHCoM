@@ -53,7 +53,7 @@ paramDir = [pwd , '\Params\'];
 
 %% LOAD SAVED RESULTS
 % ***SET ME***: save names of potential scenarios to analyze as variables
-baseDirName = 'Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_';
+baseDirName = 'Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_';
 dirName_reductBaseline = [baseDirName , 'WHO-SCES012_6_1'];
 dirName_reductBaseline2 = ['Vaccine22Apr20Ph2V11_whoS0bBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , 'WHO-SCES012_6_1'];
 dirName_reductBaseline3 = ['Vaccine22Apr20Ph2V11_whoS0cBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , 'WHO-SCES012_6_1'];
@@ -73,14 +73,13 @@ simVec = {dirName_reductBaseline , dirName_reductBaseline2 , ...
     dirName_reductBaseline , dirName_reductBaseline , ...
     dirName_P2_SCE7a7 , dirName_P2_SCE7b , dirName_P2_SCE7a7 , ...
     dirName_P2_SCE8};
-fileVec = {'sim0' , 'sim0' , 'sim0' , 'sim0' , 'sim1' , 'sim2' , 'sim1' , 'sim1' , 'sim2' , 'sim2'}; 
+fileVec = {'sim0' , 'sim0' , 'sim0' , 'sim0' , 'sim1' , 'sim2' , 'sim1' , 'sim1' , 'sim2' , 'sim2'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
 fileTits = {'S0 (no vax, baseline screen)' , 'S0b (60% 2v, baseline screen)' , ...
     'S0c (80% 2v, baseline screen)' , 'S0d (no vax, no screen)' , ...
     'P1-S1 (80% 9v, baseline screen)' , 'P1-S2 (90% 9v, baseline screen)' , ...
     'P2-S7a (80% 9v, 50% CU, baseline screen)' , 'P2-S7b (80% 9v, 80% CU, baseline screen)' , ...
     'P2-S7 (90% 9v, 50% CU, baseline screen)' , 'P2-S8 (90% 9v, 90% CU, baseline screen)'};
-
 % % ***SET ME***: choose which scenarios you want to save data in Excel for
 % simVec = {dirName_reductBaseline , dirName_reductBaseline4 , ...
 %     dirName_reductBaseline , dirName_reductBaseline , ...
@@ -132,7 +131,6 @@ for j = 1 : nResults
             if aInd >= age
                 a = age;
             end
-            
             if aInd <= age    
                 ccIncRef = ccIncHivAgeTime(a+1 , 2:end) .* worldStandard_WP2015(aInd);
                 if (dInd == 5) && (a < 3)
@@ -146,14 +144,65 @@ for j = 1 : nResults
             ccIncRefTot = ccIncRefTot + ccIncRef;
         end
         ccInc = ccIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
+        
+        ccIncRefTot_lb = zeros(1 , size(ccIncHivAgeTime,2)-1);       
+        for aInd = 1:age+4
+            a = aInd;
+            if aInd >= age
+                a = age;
+            end
+            if aInd <= age    
+                ccIncRef = ccIncHivAgeTime(a+1+age , 2:end) .* worldStandard_WP2015(aInd);
+                if (dInd == 5) && (a < 3)
+                    ccIncRef = zeros(1 , size(ccIncHivAgeTime,2)-1);
+                end
+            elseif aInd > age
+                ccIncRef = ccIncHivAgeTime(a+1+age , 2:end);
+                ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
+                ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+            end
+            ccIncRefTot_lb = ccIncRefTot_lb + ccIncRef;
+        end
+        ccInc_lb = ccIncRefTot_lb ./ (sum(worldStandard_WP2015(1:age+4)));
+        
+        ccIncRefTot_ub = zeros(1 , size(ccIncHivAgeTime,2)-1);       
+        for aInd = 1:age+4
+            a = aInd;
+            if aInd >= age
+                a = age;
+            end
+            if aInd <= age    
+                ccIncRef = ccIncHivAgeTime(a+1+age*2 , 2:end) .* worldStandard_WP2015(aInd);
+                if (dInd == 5) && (a < 3)
+                    ccIncRef = zeros(1 , size(ccIncHivAgeTime,2)-1);
+                end
+            elseif aInd > age
+                ccIncRef = ccIncHivAgeTime(a+1+age*2 , 2:end);
+                ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
+                ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+            end
+            ccIncRefTot_ub = ccIncRefTot_ub + ccIncRef;
+        end
+        ccInc_ub = ccIncRefTot_ub ./ (sum(worldStandard_WP2015(1:age+4)));
           
         % Plot baseline incidence
         if (j == 1) && (dInd == 1)
-            figure;
+            fig = figure;
+            set(fig,'DefaultAxesFontSize' , 18);
         end
         hold all;
-        plot(ccIncHivAgeTime(1 , 2:end) , ccInc , '-')
-        axis([1980 2120 0 80])
+        firstYrInd = (currYear-startYear)+2;
+        firstYrInd2 = (currYear-startYear)+1;
+        p = plot(ccIncHivAgeTime(1 , firstYrInd:end) , ccInc(1 , firstYrInd2:end) , '-');
+        hold all;
+        x2 = [ccIncHivAgeTime(1 , firstYrInd:end) , fliplr(ccIncHivAgeTime(1 , firstYrInd:end))];
+        inBetween = [ccInc_ub(1 , firstYrInd2:end) , fliplr(ccInc_lb(1 , firstYrInd2:end))];
+        colorP = get(p,'Color');
+        h = fill(x2 , inBetween , colorP);
+        h.FaceAlpha = 0.3;
+        h.LineStyle = '--';
+        set(h,'EdgeColor', colorP);
+        axis([2020 2120 0 150])
         grid on;
         xlabel('Year'); ylabel('AS ICC per 100K'); 
         %legend('General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt');
