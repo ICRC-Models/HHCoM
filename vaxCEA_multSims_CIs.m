@@ -1,4 +1,4 @@
-% function [] = vaxCEA_multSims_CI()
+% function [] = vaxCEA_multSims_CIs()
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -1274,5 +1274,4 @@ end
 %     'Model- 9v: 25-sets mean' , 'Model- 9v: 25-sets minimum' , 'Model- 9v: 25-sets maximum' , ...
 %     'Model- non-9v: 25-sets mean' , 'Model- non-9v: 25-sets minimum' , 'Model- non-9v: 25-sets maximum');
 % grid on;
-
 
