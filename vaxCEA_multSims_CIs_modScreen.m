@@ -56,7 +56,7 @@ paramDir = [pwd , '\Params\'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2121;
+lastYear = 2121;  % ***SET ME***: last year of simulation (use 2022 for SA screening analysis)
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
@@ -70,7 +70,7 @@ nRuns = length(fileInds);
 monthlyTimespan = [startYear : (1/6) : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
-futAnnualTimespan = [2020 : lastYear-1];
+futAnnualTimespan = [currYear : lastYear-1];
 midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
 % Total population size
 popSize = zeros(nRuns , length(monthlyTimespan));
@@ -155,13 +155,13 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_CISNET-S' , sceNum , '_'];
+baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_CISNET-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
     parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
-        pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
+        pathModifier = [baseFileName , fileInds{j}];
         nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
         curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_obsHist_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
@@ -514,7 +514,7 @@ for k = 1 : loopSegmentsLength-1
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
                 ccCumHivTime(j , dInd , :) = ...
-                    cumsum(squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((2020 - startYear) * stepsPerYear +1):end , d , : , :),2),3),4))),2);
+                    cumsum(squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((currYear - startYear) * stepsPerYear +1):end , d , : , :),2),3),4))),2);
         end
         
         %% Annual cervical cancer cases by HIV status over time
