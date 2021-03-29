@@ -1,4 +1,5 @@
-#!/binn/bash
+#!/bin/bash
+
 #SBATCH --job-name=batch                             # Job name
 #SBATCH --chdir=/gscratch/csde/carajb/HHCoM          # Working directory
 #SBATCH --mail-type=FAIL           		     # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
