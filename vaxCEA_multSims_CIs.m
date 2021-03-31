@@ -133,6 +133,8 @@ diseaseVecLength_fHpv = length(diseaseVec_fHpv);
 ageVec_fHPV = {3 , [4:5] , [6:7] , [8:9] , [10:11] , [12:13] , [14:15] , 16 };
 ageVecLength_fHPV = length(ageVec_fHPV);
 hpv_hivTot2020 = zeros(nRuns , diseaseVecLength_fHpv , ageVecLength_fHPV);
+hpvHivAgeF = zeros(nRuns , 5 , age , length(monthlyTimespan));
+hpv9VHivAgeF = hpvHivAgeF;
 % Male HPV prevalence
 hpvYearVecMale = [2008 2018];
 hpvYearVecMaleLength = length(hpvYearVecMale);
@@ -161,6 +163,7 @@ cinGenTime = zeros(nRuns , length(monthlyTimespan));
 cinPosTime = cinGenTime;
 cinNegTime = cinGenTime;
 cin_hivTot2020 = zeros(nRuns , diseaseVecLength_fHpv , ageVecLength_fHPV);
+cin23HivAge = zeros(nRuns , 5 , age , length(monthlyTimespan));
 % CC incidence
 ccYearVec = [2005 2012 2018];
 ccYearVecLength = length(ccYearVec);
@@ -518,9 +521,30 @@ for k = 1 : loopSegmentsLength-1
                 ./ sum(vaxResult{n}.popVec(: , popInds) , 2);
         end
         
+        %% Female hrHPV prevalence by 5-year age groups over time
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                hpvInds = unique([toInd(allcomb(d , 1 : viral , 2 : 6 , 1 : hpvNonVaxStates , ...
+                1 : 3 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                1 : hpvVaxStates , 2 : 6 , 1 : 3 , 1 : intervens , 2 , a , 1 : risk))]);
+                hpvHivAgeF(j , dInd , a , :) = sum(vaxResult{n}.popVec(: , hpvInds),2);
+            end
+        end
+        
+        %% Female VT-hrHPV prevalence by 5-year age groups over time
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                hpvInds = toInd(allcomb(d , 1 : viral , 2 : 6 , 1 : hpvNonVaxStates , ...
+                1 : 3 , 1 : intervens , 2 , a , 1 : risk));
+                hpv9VHivAgeF(j , dInd , a , :) = sum(vaxResult{n}.popVec(: , hpvInds),2);
+            end
+        end
+        
         %% HPV prevalence ratios in 2005, 2018, 2019
         for i = 1 : hpvPrevYearVecLength
-            yr = hpvPrevYearVec(i); 
+            yr = hpvPrevYearVec(i);
             for g = 1 : gender
                 for dInd = 1 : diseaseVecLength_hpv
                     d = diseaseVec_hpv{dInd};
@@ -611,7 +635,7 @@ for k = 1 : loopSegmentsLength-1
         
         %% 9v-HPV incidence by HIV status and age over time
         fac = 100;
-        for dInd = 1 : diseaseVecLength_ccInc;
+        for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -698,6 +722,17 @@ for k = 1 : loopSegmentsLength-1
                     ./ (sum(vaxResult{n}.popVec((2019 - startYear) * stepsPerYear +1 , ageInds)));
             end
         end
+        
+        %% CIN2/3 prevalence by 5-year age groups over time
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            for a = 1 : age
+                cinInds = unique([toInd(allcomb(d , 1 : viral , 4 : 5 , [1 : 5 , 7] , ...
+                    1 , 1 : intervens , 2 , a , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                    [1 : 5 , 7] , 4 : 5 , 1 , 1 : intervens , 2 , a , 1 : risk))]);
+                cin23HivAge(j , dInd , a , :) = sum(vaxResult{n}.popVec(: , cinInds),2);
+            end
+        end
                
         %% CIN2/3 prevalence ratios in 2005, 2018, 2019
         for i = 1 : hpvPrevYearVecLength
@@ -776,7 +811,7 @@ for k = 1 : loopSegmentsLength-1
         
         %% Cervical cancer incidence by HIV status and age over time
         fac = 10 ^ 5;
-        for dInd = 1 : diseaseVecLength_ccInc;
+        for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -789,7 +824,7 @@ for k = 1 : loopSegmentsLength-1
         end
         
         %% Cumulative cervical cancer cases by HIV status and age over time
-        for dInd = 1 : diseaseVecLength_ccInc;
+        for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 % Calculate incidence
@@ -1103,6 +1138,34 @@ for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+
+diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
+firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(prctile(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 5 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(prctile(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 95 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 
 diseaseLabels = {'All - Pop (N)' , 'HIV- (N)' , 'HIV+ (N)' , 'HIV+ no ART (N)' , 'HIV+ ART (N)'};
@@ -1651,6 +1714,112 @@ legend('Model, ages 15-64: 25-sets mean' , 'Model, ages 15-64: 25-sets minimum' 
     'Model, ages 15-64: 25-sets maximum');
 sgtitle('Female hrHPV Prevalence (includes CIN) by HIV status');
 
+%% Female hrHPV prevalence by 5-year age groups over time               
+diseaseLabels = {'Pop(All) (hrHPV)' , 'HIV-  (hrHPV)' , 'HIV+   (hrHPV)' , 'HIV+ no ART  (hrHPV)' , 'HIV+ ART  (hrHPV)'};
+firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(hpvHivAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+
+%% Write age-standardized hrHPV cases by HIV status over time
+% Note: the age-standardization process shifts the prevalence of the
+% last modelled age group to the next age group in the following year.
+% However, prevalence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed HPV infected during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+
+diseaseLabels = {'Pop(All) (hrHPV)' , 'HIV-  (hrHPV)' , 'HIV+   (hrHPV)' , 'HIV+ no ART  (hrHPV)' , 'HIV+ ART  (hrHPV)'};
+firstYrRange2 = (lastYear-1) - 2020;
+for dInd = 1 : length(diseaseLabels)
+    hpvHivAgeF_dis = squeeze(hpvHivAgeF(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+
+    numHpvTot = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));       
+    for aInd = 1:age+4
+        a = aInd;
+        if aInd >= age
+            a = age;
+        end
+
+        if aInd <= age    
+            numHpv =hpvHivAgeF_dis(: , a , :) .* worldStandard_WP2015(aInd);
+            if (a < 3)
+                numHpv = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));
+            end
+        elseif aInd > age
+            numHpv = hpvHivAgeF_dis(: , a , :);
+            numHpv = cat(3 , (ones(size(numHpv,1),1,aInd-a).*numHpv(:,1,1)) , numHpv(: , 1 ,1:end-(aInd-a)));
+            numHpv = numHpv .* worldStandard_WP2015(aInd);
+        end
+        numHpvTot = numHpvTot + numHpv;
+    end
+    hpvCumTot = numHpvTot;
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(hpvCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
+end
+   
+%% Female VT-hrHPV prevalence by 5-year age groups over time
+diseaseLabels = {'Pop(All) (vtHPV)' , 'HIV-  (vtHPV)' , 'HIV+   (vtHPV)' , 'HIV+ no ART  (vtHPV)' , 'HIV+ ART  (vtHPV)'};
+firstYrInd = ((2020 - startYear) * stepsPerYear +4);   
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(hpv9VHivAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+
+%% Write age-standardized VT-hrHPV cases by HIV status over time
+% Note: the age-standardization process shifts the prevalence of the
+% last modelled age group to the next age group in the following year.
+% However, prevalence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed HPV infected during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+
+diseaseLabels = {'Pop(All) (vtHPV)' , 'HIV-  (vtHPV)' , 'HIV+   (vtHPV)' , 'HIV+ no ART  (vtHPV)' , 'HIV+ ART  (vtHPV)'};
+firstYrRange2 = (lastYear-1) - 2020;
+for dInd = 1 : length(diseaseLabels)
+    hpvHivAgeF_dis = squeeze(hpv9VHivAgeF(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+
+    numHpvTot = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));       
+    for aInd = 1:age+4
+        a = aInd;
+        if aInd >= age
+            a = age;
+        end
+
+        if aInd <= age    
+            numHpv =hpvHivAgeF_dis(: , a , :) .* worldStandard_WP2015(aInd);
+            if (a < 3)
+                numHpv = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));
+            end
+        elseif aInd > age
+            numHpv = hpvHivAgeF_dis(: , a , :);
+            numHpv = cat(3 , (ones(size(numHpv,1),1,aInd-a).*numHpv(:,1,1)) , numHpv(: , 1 ,1:end-(aInd-a)));
+            numHpv = numHpv .* worldStandard_WP2015(aInd);
+        end
+        numHpvTot = numHpvTot + numHpv;
+    end
+    hpvCumTot = numHpvTot;
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(hpvCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
+end
+
 %% HPV Prevalence over time by sex    
 figure;
 gen = {'Males aged 15-64' , 'Females aged 15-64 (includes CIN)'};
@@ -1907,6 +2076,59 @@ for dInd = 1 : length(diseaseLabels)
         squeeze(min(squeeze(cin_hivTot2020(: , dInd , :)) , [] , 1))' ; ...
         squeeze(max(squeeze(cin_hivTot2020(: , dInd , :)) , [] , 1))']]] , fname)
 end
+
+%% Female hrHPV prevalence by 5-year age groups over time               
+diseaseLabels = {'Pop(All) (CIN2+)' , 'HIV- (CIN2+)' , 'HIV+  (CIN2+)' , 'HIV+ no ART  (CIN2+)' , 'HIV+ ART  (CIN2+)'};
+firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(cin23HivAge(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
+end
+
+%% Write age-standardized CIN2/3 cases by HIV status over time
+% Note: the age-standardization process shifts the prevalence of the
+% last modelled age group to the next age group in the following year.
+% However, prevalence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed HPV infected during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+
+diseaseLabels = {'Pop(All) (CIN2+)' , 'HIV- (CIN2+)' , 'HIV+  (CIN2+)' , 'HIV+ no ART  (CIN2+)' , 'HIV+ ART  (CIN2+)'};
+firstYrRange2 = (lastYear-1) - 2020;
+for dInd = 1 : length(diseaseLabels)
+    cin23HivAge_dis = squeeze(cin23HivAge(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+
+    numCinTot = zeros(size(cin23HivAge_dis,1) , 1 , size(cin23HivAge_dis,3));       
+    for aInd = 1:age+4
+        a = aInd;
+        if aInd >= age
+            a = age;
+        end
+
+        if aInd <= age    
+            numCin =cin23HivAge_dis(: , a , :) .* worldStandard_WP2015(aInd);
+            if (a < 3)
+                numCin = zeros(size(cin23HivAge_dis,1) , 1 , size(cin23HivAge_dis,3));
+            end
+        elseif aInd > age
+            numCin = cin23HivAge_dis(: , a , :);
+            numCin = cat(3 , (ones(size(numCin,1),1,aInd-a).*numCin(:,1,1)) , numCin(: , 1 ,1:end-(aInd-a)));
+            numCin = numCin .* worldStandard_WP2015(aInd);
+        end
+        numCinTot = numCinTot + numCin;
+    end
+    cinCumTot = numCinTot;
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(median(squeeze(cinCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
+end
     
 %% CIN2/3 prevalence ratios in 2005 and 2018
 % cinRatioHivStatusF = squeeze(cin_prev_ratios(: , 2 , :) ./ cin_prev_ratios(: , 1 , :));
@@ -2097,6 +2319,19 @@ for dInd = 1 : length(diseaseLabels)
     writematrix(squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
 
+diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+firstYrInd = ((2020 - startYear) +1);
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 5 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
+end
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 95 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
+end
+
 if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_hpvHIVcalib')
     diseaseLabels = {'Pop(All) (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
     firstYrInd = ((1990 - startYear) +1);
@@ -2124,7 +2359,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
     23477 9261 2155];
 
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
-for dInd = 1 : length(diseaseLabels);
+for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'ICC-medAS_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     ccIncHivAgeTime_med = squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 1));
@@ -2172,11 +2407,16 @@ diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (IC
 diseaseLabels2 = {'Pop(All) (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
 firstYrInd = ((2019 - startYear) +1);
 firstYrInd2 = ((1990 - startYear) +1);
+firstYrInd3 = ((2020 - startYear) +1);
 lastYrInd = ((2020 - startYear) +1);
-for dInd = 1 : length(diseaseLabels);
+for dInd = 1 : length(diseaseLabels)
     ccIncHivAgeTime_med = squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 1));
+    ccIncHivAgeTime_lb = squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 5 , 1));
+    ccIncHivAgeTime_ub = squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 95 , 1));
 
-    ccIncRefTot = zeros(1 , size(ccIncHivAgeTime_med,2));       
+    ccIncRefTot = zeros(1 , size(ccIncHivAgeTime_med,2)); 
+    ccIncRefTot_lb = zeros(1 , size(ccIncHivAgeTime_lb,2)); 
+    ccIncRefTot_ub = zeros(1 , size(ccIncHivAgeTime_ub,2)); 
     for aInd = 1:age+4
         a = aInd;
         if aInd >= age
@@ -2185,21 +2425,42 @@ for dInd = 1 : length(diseaseLabels);
 
         if aInd <= age    
             ccIncRef = ccIncHivAgeTime_med(a , :) .* worldStandard_WP2015(aInd);
+            ccIncRef_lb = ccIncHivAgeTime_lb(a , :) .* worldStandard_WP2015(aInd);
+            ccIncRef_ub = ccIncHivAgeTime_ub(a , :) .* worldStandard_WP2015(aInd);
             if (a < 3)
                 ccIncRef = zeros(1 , size(ccIncHivAgeTime_med,2));
+                ccIncRef_lb = zeros(1 , size(ccIncHivAgeTime_lb,2));
+                ccIncRef_ub = zeros(1 , size(ccIncHivAgeTime_ub,2));
             end
         elseif aInd > age
             ccIncRef = ccIncHivAgeTime_med(a , :);
             ccIncRef = [(ones(1,aInd-a).*ccIncRef(1,1)) , ccIncRef(1,1:end-(aInd-a))];
             ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+            ccIncRef_lb = ccIncHivAgeTime_lb(a , :);
+            ccIncRef_lb = [(ones(1,aInd-a).*ccIncRef_lb(1,1)) , ccIncRef_lb(1,1:end-(aInd-a))];
+            ccIncRef_lb = ccIncRef_lb .* worldStandard_WP2015(aInd);
+            ccIncRef_ub = ccIncHivAgeTime_ub(a , :);
+            ccIncRef_ub = [(ones(1,aInd-a).*ccIncRef_ub(1,1)) , ccIncRef_ub(1,1:end-(aInd-a))];
+            ccIncRef_ub = ccIncRef_ub .* worldStandard_WP2015(aInd);
         end
         ccIncRefTot = ccIncRefTot + ccIncRef;
+        ccIncRefTot_lb = ccIncRefTot_lb + ccIncRef_lb;
+        ccIncRefTot_ub = ccIncRefTot_ub + ccIncRef_ub;
     end
     ccInc = ccIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
+    ccInc_lb = ccIncRefTot_lb ./ (sum(worldStandard_WP2015(1:age+4)));
+    ccInc_ub = ccIncRefTot_ub ./ (sum(worldStandard_WP2015(1:age+4)));
 
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(ccInc(firstYrInd:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
+    
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(ccInc_lb(firstYrInd3:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
+    writematrix(ccInc_ub(firstYrInd3:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
     
     if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_hpvHIVcalib')   
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
