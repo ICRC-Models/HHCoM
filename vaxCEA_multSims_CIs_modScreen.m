@@ -249,7 +249,7 @@ for k = 1 : loopSegmentsLength-1
             1 : intervens , 2 , 1 : age , 1 : risk));
         totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
             1 : intervens , 2 , 1 : age , 1 : risk));
-        hivPrevW(j , :) = (sum(vaxResult{n}.popVec(: , hivInds) , 2) ./ sum(vaxResult{n}.popVec(: , totInds) , 2)) .* 100;
+        hivPrevW(j , :) = (sum(vaxResult{n}.popVec(: , hivInds) , 2) ./ sum(vaxResult{n}.popVec(: , totInds) , 2));
                
         %% Proportion of total age-eligible HIV+ population on ART and VS (denominator: CD4-eligible and ineligible)
         artIndsF = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -264,12 +264,12 @@ for k = 1 : loopSegmentsLength-1
         artCovF(j , :) = (sum(vaxResult{n}.popVec(: , artIndsF) , 2) ./ (sum(vaxResult{n}.popVec(: , hivAllIndsF) , 2) + sum(vaxResult{n}.popVec(: , artIndsF) , 2))) .* 100;
         artCovM(j , :) = (sum(vaxResult{n}.popVec(: , artIndsM) , 2) ./ (sum(vaxResult{n}.popVec(: , hivAllIndsM) , 2) + sum(vaxResult{n}.popVec(: , artIndsM) , 2))) .* 100;
         
-        %% Proportion of total HIV+ population on ART and VS (denominator: CD4-eligible and ineligible); all ages
+        %% Proportion of total HIV+ women on ART and VS (denominator: CD4-eligible and ineligible); all ages
         artIndsW = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
         hivAllIndsW = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates, ...
             1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
-        artCovW(j , :) = (sum(vaxResult{n}.popVec(: , artIndsW) , 2) ./ (sum(vaxResult{n}.popVec(: , hivAllIndsW) , 2) + sum(vaxResult{n}.popVec(: , artIndsW) , 2))) .* 100;
+        artCovW(j , :) = (sum(vaxResult{n}.popVec(: , artIndsW) , 2) ./ (sum(vaxResult{n}.popVec(: , hivAllIndsW) , 2) + sum(vaxResult{n}.popVec(: , artIndsW) , 2)));
         
         %% Proportion of total HIV+ population on ART and VS by age
         for a = 1 : age
