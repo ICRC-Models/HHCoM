@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=simVax                           # Job name
+#SBATCH --job-name=simVax_mox                            # Job name
 #SBATCH --workdir=/gscratch/csde/carajb/HHCoM       # Working directory
 #SBATCH --mail-type=FAIL                            # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
@@ -9,8 +9,8 @@
 #SBATCH --account=csde                              # Allocation Definition
 #SBATCH --partition=csde
 #SBATCH --nodes=1                                   # Node resources
-#SBATCH --mem=58G                                   # Memory per node
-#SBATCH --time=10:00:00                             # Wall clock time limit hrs:min:sec
+#SBATCH --mem=58G                                  # Memory per node
+#SBATCH --time=04:00:00                             # Wall clock time limit hrs:min:sec
 
 pwd; hostname; date
 

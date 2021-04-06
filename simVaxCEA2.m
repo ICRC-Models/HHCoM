@@ -4,9 +4,9 @@ close all;clear all;clc
 %profile clear;
 
 %% Cluster information
-% pc = parcluster('local');    % create a local cluster object
-% pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-% parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Load calibrated parameters and reset general parameters based on changes to model
 disp('Start up')
@@ -49,7 +49,7 @@ riskDist(: , : , 2) = riskDistF;
 
 % Time
 c = fix(clock);
-currYear = 2018; %2020; % c(1); % get the current year
+currYear = 2020; % c(1); % get the current year
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 
@@ -68,13 +68,6 @@ for i = 1 : size(yr , 1) - 1          % interpolate epsA/epsR values at steps wi
         yr(i) : timeStep : yr(i + 1));
 end
 OMEGA = zeros(age , 1); % hysterectomy rate
-analProp = [0 , 0; 0 , 0; 0 ,0]; % [risk x gender]; proportion practicing anal sex (zero)
-vagTransM = 8 / 10 ^ 4 * ones(size(analProp , 1) , 1);
-vagTransF = 4 / 10 ^ 4 * ones(size(analProp , 1) , 1);
-transM = vagTransM .* (1 - analProp(: , 1));
-transF = vagTransF .* (1 - analProp(: , 2));
-betaHIV_F2M = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transF);
-betaHIV_M2F = bsxfun(@times , [7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0; 7 1 5.8 6.9 11.9 0.0] , transM);
 betaHIVF2M = zeros(age , risk , viral);
 betaHIVM2F = betaHIVF2M;
 for a = 1 : age % calculate per-partnership probability of HIV transmission
@@ -132,54 +125,31 @@ hpvOn = 1;
 circStartYear = 1990;
 vaxStartYear = 2014;
 
-% ART coverage
+% ART
 import java.util.LinkedList
-artDistList = LinkedList();
-artOutMult = 1.0; %0.95;
-minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artVScov = [2004 0.0 0.0; ...
-            2005 0.007745076 0.005731356; ...
-            2006 0.02943129 0.021779155; ...
-            2007 0.064284134 0.047570259; ...
-            2008 0.110754592 0.081958398; ...
-            2009 0.155676035 0.115200266; ...
-            2010 0.191303386 0.141564505; ...
-            2011 0.3485 0.2465; ...
-            2017 0.6375	0.5208; ...
-            2019 0.68 0.57]; % viral suppression among all PLHIV on ART in KZN, [year , females , males]
-artYr = [(artVScov(:,1) - 1); (2026 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ; 0.65] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ; 0.75] .* artOutMult; % population-level ART coverage in females
-artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
-artM_vec = cell(size(artYr , 1) - 1, 1);
-artF_vec = cell(size(artYr , 1) - 1, 1);
-for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
-    period = [artYr(i) , artYr(i + 1)];
-    artYr_vec{i} = interp1(period , artYr(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-    artM_vec{i} = interp1(period , maxRateM(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-    artF_vec{i} = interp1(period , maxRateF(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-end
+maxRateM_vec = [0.4 , 0.4];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateF_vec = [0.55 , 0.55];    % as of 2013. Scales up from this value in hiv2a. [age 4-6, age >6]
+maxRateM1 = maxRateM_vec(1);
+maxRateM2 = maxRateM_vec(2);
+maxRateF1 = maxRateF_vec(1);
+maxRateF2 = maxRateF_vec(2);
 
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-popIn = load([pwd , '/HHCoM_Results/toNow_021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit_6']); % ***SET ME***: name for historical run input file 
+popIn = load([pwd , '/HHCoM_Results/toNow_101719_singleAge_baseScreen_noBaseVax_2020']); % ***SET ME***: name for historical run input file 
 currPop = popIn.popLast;
 artDist = popIn.artDist;
 artDistList = popIn.artDistList;
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = '021420_singleAge_noBaseScreen_noBaseVax_2018_artLimsPop_origHivInit_Erasmus'; % ***SET ME***: name for simulation output file
+pathModifier = '101719_baseScreen_WHOP1_SCES12'; % ***SET ME***: name for simulation output file
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
 end
 
 % LAST YEAR & IMMMUNITY
-lastYear = 2061; %2121; % ***SET ME***: end year of simulation run
+lastYear = 2121; % ***SET ME***: end year of simulation run
 fImm(1 : age) = 1; % all infected individuals who clear HPV get natural immunity
 
 % SCREENING
@@ -190,7 +160,7 @@ whoScreenAges = [36 , 46]; %[26 , 29 , 32 , 35 , 38 , 41 , 44 , 47 , 50]; % ***S
 cisnetScreenAges = [36 , 46]; % ***SET ME***: ages that get screened when using the CISNET algorithm
 
 % VACCINATION
-vaxEff = [0.7];    % 9v-vaccine, used for all vaccine regimens present
+vaxEff = [0.9];    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -199,8 +169,8 @@ vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine e
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
-vaxAge = [10];
-vaxCover = [0.3 , 0.6 , 0.9];
+vaxAge = [10 : 15];
+vaxCover = [0.8 , 0.9];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
@@ -226,7 +196,7 @@ hpvSens = [0.0 , 0.0 , 0.881 , 0.881 , 0.881 , 0.881 , 0.881 , 0.0 , 0.0 , 0.0];
 hpvSensWHO = [0.0 , 0.0 , 0.90 , 0.94 , 0.94 , 0.94 , 0.94 , 0.0 , 0.0 , 0.0]; % HPV test sensitivity by HPV state
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0]; %[0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
+baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
 baseline.screenAge = 36;
 baseline.testSens = cytoSens;
 baseline.colpoRetain = 0.72;
@@ -590,7 +560,7 @@ parfor n = 1 : nTests
         if hivOn
             [~ , pop , hivDeaths(i , : , :) , artTreat] =...
                 ode4xtra(@(t , pop) hiv2a(t , pop , vlAdvancer , artDist , muHIV , ...
-                kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , ...
+                kCD4 ,  maxRateM1 , maxRateM2 , maxRateF1 , maxRateF2 , disease , ...
                 viral , gender , age , risk , k , hivInds , ...
                 stepsPerYear , year) , tspan , popIn);
             artTreatTracker(i , : , : , : , :  ,:) = artTreat;
