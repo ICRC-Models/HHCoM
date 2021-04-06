@@ -52,7 +52,7 @@ paramDir = [pwd , '\Params\'];
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
 
 %% LOAD SAVED RESULTS
-% ***SET ME***: save names of potential scenarios to analyze as variables
+% ***SET ME***: save base directy name and names of potential scenarios to analyze as variables
 baseDirName = 'Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_SA-S';
 dirName_S0 = [baseDirName , '0_6_1'];
 dirName_S1 = [baseDirName , '1_6_1'];
@@ -66,10 +66,9 @@ dirName_S8 = [baseDirName , '8_6_1'];
 dirName_S9 = [baseDirName , '9_6_1']; 
 dirName_S10 = [baseDirName , '10_6_1'];
 
-% ***SET ME***: choose which scenarios you want to save data in Excel for
 simVec = {dirName_S0 , dirName_S1 , dirName_S2 , dirName_S3 , dirName_S4 , ...
-    dirName_S5 , dirName_S6 , dirName_S7 , dirName_S8 , dirName_S9 , dirName_S10};
-fileVec = {'0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '8' , '9' , '10'}; 
+    dirName_S5 , dirName_S6 , dirName_S7 , dirName_S8 , dirName_S9 , dirName_S10};    % ***SET ME***: choose which scenarios you want to plot
+fileVec = {'0' , '1' , '2' , '3' , '4' , '5' , '6' , '7' , '8' , '9' , '10'};    % ***SET ME***: Excel file name string matching 
 colorVec = {[0.5 , 0.5 , 0.5] , [0.5 , 0.5 , 0.5] , [0.5 , 0.5 , 0.5] , [0 0.4470 0.7410] , ...
     [0 0.4470 0.7410] , [0.4660 , 0.6740 , 0.1880] , [0.4660 , 0.6740 , 0.1880] , ...
     [0.8500 0.3250 0.0980] , [0.8500 0.3250 0.0980] , [0.4940 , 0.1840 , 0.5560] , [0.4940 , 0.1840 , 0.5560]}; 
@@ -122,6 +121,7 @@ for j = 1 : nResults
 %         h.LineStyle = '--';
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
@@ -167,6 +167,7 @@ for j = 1 : nResults
 %         h.FaceAlpha = 0.3;
 %         h.LineStyle = '--';
 end
+% Dummy plots for desired legend style and order
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
@@ -212,6 +213,7 @@ for j = 1 : nResults
 %         h.FaceAlpha = 0.3;
 %         h.LineStyle = '--';
 end
+% Dummy plots for desired legend style and order
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
@@ -257,6 +259,7 @@ title('Percent reduction in cervical cancer cases');
 % %         h.FaceAlpha = 0.3;
 % %         h.LineStyle = '--';
 % end
+% % Dummy plots for desired legend style and order
 % f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 % f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
 % f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{8});
@@ -290,6 +293,7 @@ for j = 1 : nResults
 %         h.LineStyle = '--';
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
@@ -346,6 +350,7 @@ for jInd = 1 : nResults  %length(incRedSceVec)
     %     h.LineStyle = '--';
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{1}); 
 f(2) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{4});
 f(3) = plot(NaN,NaN,'o','MarkerEdgeColor' , colorVec{6});
@@ -388,6 +393,7 @@ for jInd = 1 : length(sceInds)
         ovrScrnVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
 f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
 f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
@@ -426,7 +432,7 @@ set(fig,'DefaultAxesFontSize' , 18);
 falsePosVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds));
 for jInd = 1 : length(sceInds)
     j = sceInds(jInd);
-    if (j == 6 || j == 7)
+    if (j == 6 || j == 7) % genotyping scenarios
         for dInd = 1 : length(diseaseSheetInds)
             d = diseaseSheetInds{dInd};
             % Load results
@@ -454,6 +460,7 @@ for jInd = 1 : length(sceInds)
         end
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
 f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
 f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
@@ -492,7 +499,7 @@ set(fig,'DefaultAxesFontSize' , 18);
 overTreatVec = zeros(length(sceInds) , length(diseaseSheetInds));
 for jInd = 1 : length(sceInds)
     j = sceInds(jInd);
-    if (j == 6 || j == 7)
+    if (j == 6 || j == 7) % genotyping scenarios
         for dInd = 1 : length(diseaseSheetInds)
             d = diseaseSheetInds{dInd};
             % Load results
@@ -522,6 +529,7 @@ for jInd = 1 : length(sceInds)
         end
     end
 end
+% Dummy plots for desired legend style and order
 f(1) = bar(NaN,NaN,'FaceColor' , 'r'); hold all;
 f(2) = bar(NaN,NaN,'FaceColor' , 'b'); hold all;
 f(3) = bar(NaN,NaN,'FaceColor' , [0 0.5 0]); hold all;
