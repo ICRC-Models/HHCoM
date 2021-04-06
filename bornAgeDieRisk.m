@@ -1,14 +1,12 @@
 % Births and deaths module
 % Simulates births and non-disease related deaths in a
 % population.
-% More comments about births here....
 % Accepts a population matrix as input and returns dPop, a matrix of
 % derivatives that describes the change in the population's subgroups due
 % to births and deaths.
 
 % Aging module
 % Ages population.
-% 1/5th of the previous age group progresses into the next age group each year.
 % Aged cohort is redistributed into new risk groups upon entry into new age
 % group. Risk group status in previous age group does not affect risk group
 % status in new age group. Risk redistribution is solely age dependent.
@@ -17,18 +15,20 @@
 % to aging.
 
 function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
-        gender , age , fertility , fertMat , fertMat2 , hivFertPosBirth , ...
-        hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , deathMat , circMat , circMat2 , ...
-        MTCTRate , circStartYear , ageInd , riskInd , riskDist , ...
+        gender , age , fivYrAgeGrpsOn , fertMat , fertMat2 , fertMat3 , fertMat4 , ...
+        hivFertPosBirth , hivFertNegBirth , hivFertPosBirth2 , hivFertNegBirth2 , ...
+        hivFertPosBirth3 , hivFertNegBirth3 , hivFertPosBirth4 , hivFertNegBirth4 , ...
+        dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
+        dFertPos3 , dFertNeg3 , dFertMat3 , ...
+        deathMat , deathMat2 , deathMat3 , deathMat4 , ...
+        dDeathMat , dDeathMat2 , dDeathMat3 , ...
+        MTCTRate , ageInd , riskInd , riskDist , ...
         stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
-sumall = @(x)sum(x(:));
 
-%% births and deaths
-%fertility = zeros(age , 6);
+%% Calculate MTCT rate
 kHiv = MTCTRate(1); % year <= 2004
-% linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant
-% after 2008
+% linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant after 2008
 if year > 2008
     kHiv = MTCTRate(3);
 elseif year > 2005
@@ -43,21 +43,30 @@ elseif year > 2004
     kHiv = mtctVec(ind);
 end
 
-if year > 1990 && year <= 2015
-    dt = (year - 1990) * stepsPerYear;
-    dFertPos = (hivFertPosBirth2 - hivFertPosBirth) ...
-        ./ ((2015 - 1990) * stepsPerYear);
-    hivFertPosBirth = hivFertPosBirth + dFertPos .* dt;
-    dFertNeg = (hivFertNegBirth2 - hivFertNegBirth) ...
-        ./ ((2015 - 1990) * stepsPerYear);
-    hivFertNegBirth = hivFertNegBirth + dFertNeg .* dt;
-    dFertMat = (fertMat2 - fertMat) ...
-        ./ ((2015 - 1990) * stepsPerYear);
-    fertMat = fertMat + dFertMat .* dt;
-elseif year >= 2015
-    fertMat = fertMat2;
+%% Calculate births: HIV-negative and HIV-positive births
+if (year > 1960) && (year <= 2000)
+    dt = (year - 1960) * stepsPerYear;
+    hivFertPosBirth = hivFertPosBirth + dFertPos1 .* dt;
+    hivFertNegBirth = hivFertNegBirth + dFertNeg1 .* dt;
+    fertMat = fertMat + dFertMat1 .* dt;
+elseif (year > 2000) && (year <= 2010)
     hivFertPosBirth = hivFertPosBirth2;
     hivFertNegBirth = hivFertNegBirth2;
+    fertMat = fertMat2;
+elseif (year > 2010) && (year <= 2020)
+    dt = (year - 2010) * stepsPerYear;
+    hivFertPosBirth = hivFertPosBirth2 + dFertPos2 .* dt;
+    hivFertNegBirth = hivFertNegBirth2 + dFertNeg2 .* dt;
+    fertMat = fertMat2 + dFertMat2 .* dt;
+elseif (year > 2020) && (year <= 2035)
+    dt = (year - 2020) * stepsPerYear;
+    hivFertPosBirth = hivFertPosBirth3 + dFertPos3 .* dt;
+    hivFertNegBirth = hivFertNegBirth3 + dFertNeg3 .* dt;
+    fertMat = fertMat3 + dFertMat3 .* dt;
+elseif (year > 2035)
+    hivFertPosBirth = hivFertPosBirth4;
+    hivFertNegBirth = hivFertNegBirth4;
+    fertMat = fertMat4;
 end
 
 hivFertPosBirth = hivFertPosBirth .* kHiv;
@@ -69,28 +78,29 @@ end
 
 births = fertMat * pop + hivFertNegBirth * pop;
 hivBirths = hivFertPosBirth * pop;
+
+%% Calculate deaths
+if (year >= 1950) && (year < 1985)
+    dt = (year - 1950) * stepsPerYear;
+    deathMat = deathMat + dDeathMat .* dt;
+elseif (year >= 1985) && (year < 2000)
+    dt = (year - 1985) * stepsPerYear;
+    deathMat = deathMat2 + dDeathMat2 .* dt;
+elseif (year >= 2000) && (year < 2020)
+    dt = (year - 2000) * stepsPerYear;
+    deathMat = deathMat3 + dDeathMat3 .* dt;
+elseif (year >= 2020)
+    deathMat = deathMat4;
+end
 deaths = deathMat * pop;
 
-circBirths = births * 0;
-if (year > circStartYear) && (year <= currYear)
-    circBirths = circMat * births;
-elseif (year > currYear) && (year <= 2030)
-    dt = (year - currYear) * stepsPerYear;
-    dCircMat = (circMat2 - circMat) ...
-        ./ ((2030 - currYear) * stepsPerYear);
-    circMat = circMat + dCircMat .* dt;
-    circBirths = circMat * births;
-elseif year > 2030
-    circBirths = circMat2 * births;
-end
-
 %% Aging and risk proportion redistribution
-
-% prospective population after accounting for births, circumcised births,
-% hiv births, and deaths
-prosPop = pop + circBirths + births + hivBirths + deaths;
-
+% Initialize dPop
 dPop = zeros(size(pop));
+
+% prospective population after accounting for births, and deaths
+prosPop = pop + births + hivBirths + deaths;
+
 for g = 1 : gender
     for a = 2 : age
         aPrev = ageInd(g , a - 1 , :);
@@ -107,20 +117,18 @@ for g = 1 : gender
         popR2Tot = sumall(pop(r2));
         popR3Tot = sumall(pop(r3));
         
-        % get prospective risk distribution if staying in same risk group when
-        % aging
-        agedOut = sumall(prosPop(aPrev)); % age 1/5th of previous age group
-        agedProsp = agedOut; % age 1/5th of previous age group into current age group
+        % get prospective risk distribution if staying in same risk group when aging
+        agedOut = (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* sumall(prosPop(aPrev)); % age 1/5th of previous age group
+        agedProsp = agedOut + fivYrAgeGrpsOn * ((4/5) .* sumall(prosPop(aCurr))); % age 1/5th of previous age group into current age group
         riskTarget = agedProsp .* riskDist(a , : , g);
-        riskNeed = riskTarget; % numbers needed to fill risk groups
-        riskAvail = [popR1Tot , popR2Tot , popR3Tot];
+        riskNeed = riskTarget - ((4/5) .* [sumall(prosPop(r1To)) , sumall(prosPop(r2To)) , sumall(prosPop(r3To))]); % numbers needed to fill risk groups
+        riskAvail = (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* [popR1Tot , popR2Tot , popR3Tot];
         riskDiff = riskNeed - riskAvail; % difference between numbers needed and available for each risk group
         riskFrac1 = 0;
         riskFrac2 = 0;
         riskFrac3 = 0;
         
-        % find fraction of every compartment that must be moved to maintain
-        % risk group distribution
+        % find fraction of every compartment that must be moved to maintain risk group distribution
         if riskDiff(3) > 0 % if risk 3 deficient
             % start with moving from risk 2 to risk 3
             if riskAvail(2) > 0
@@ -176,13 +184,13 @@ for g = 1 : gender
             riskAvail(3) = riskAvail(3) - sum(pop(r3) .* riskFrac3);
         end
         
-        dPop(r1To) = dPop(r1To) + pop(r1);
-        dPop(r2To) = dPop(r2To) + pop(r2);
-        dPop(r3To) = dPop(r3To) + pop(r3); 
+        dPop(r1To) = dPop(r1To) + (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r1);
+        dPop(r2To) = dPop(r2To) + (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r2);
+        dPop(r3To) = dPop(r3To) + (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3); 
         
-        dPop(r1) = dPop(r1) - pop(r1);
-        dPop(r2) = dPop(r2) - pop(r2);
-        dPop(r3) = dPop(r3) - pop(r3); 
+        dPop(r1) = dPop(r1) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r1);
+        dPop(r2) = dPop(r2) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r2);
+        dPop(r3) = dPop(r3) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3);
 
         % Remove screened status as people age out of screened age groups
         if (year >= hpvScreenStartYear)
@@ -197,15 +205,18 @@ for g = 1 : gender
                 dPop(vaxXscreen(:,aOut)) = dPop(vaxXscreen(:,aOut)) + vaxScreend;
             end
         end
-         
     end
     % age last age group
-    dPop(r1To) = dPop(r1To) - pop(r1To);
-    dPop(r2To) = dPop(r2To) - pop(r2To);
-    dPop(r3To) = dPop(r3To) - pop(r3To);
-    
+    dPop(r1To) = dPop(r1To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r1To);
+    dPop(r2To) = dPop(r2To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r2To);
+    dPop(r3To) = dPop(r3To) - (1.0/max(1 , (5*fivYrAgeGrpsOn))) .* pop(r3To);
 end
 
-extraOut{1} = abs(deaths);
-dPop = dPop + circBirths + births + hivBirths + deaths;
+% Account for births, deaths, and aging
+dPop = dPop + births + hivBirths + deaths;
+
+%% Save outputs and convert dPop to a column vector for output to ODE solver
+extraOut{1} = abs(sumall(deaths)); %abs(deaths);
+
 dPop = sparse(dPop);
+

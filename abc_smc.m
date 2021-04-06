@@ -4,13 +4,19 @@
 
 function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
 t = tstep_abc;
-alpha = 0.6;
+alpha = 0.4;
 p_acc_min = 0.05;
 date = date_abc;
 
 t_prev = t-1;
 t_curr = t;
 t_next = t+1;
+
+%% Cluster information
+pc = parcluster('local');    % create a local cluster object
+pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
+parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %% Load all particles 
 paramDir = [pwd , '/Params/'];
@@ -19,26 +25,33 @@ pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter
 negSumLogLmatrix = load([paramDir , 'negSumLogL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent log-likelihoods
 
 %% Filter out failed parameter sets (timed-out, etc.)
-numSubsets = size(negSumLogLmatrix,1)/17; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
-negS_format = reshape(negSumLogLmatrix , [17,numSubsets]); % first row is paramSetIdx, next 16 rows log-likelihoods for that sub-set
+numSubsets = size(negSumLogLmatrix,1)/5; % calculate number of sub-sets that actually ran (vs. timed-out, failed, etc.)
+negS_format = reshape(negSumLogLmatrix , [5,numSubsets]); % first row is paramSetIdx, next 4 rows log-likelihoods for that sub-set
 
 [uniqueN uInds v] = unique(negS_format(1,:) , 'first'); % remove duplicate sub-set runs
 negS_format = negS_format(:,uInds);
 numSubsets = size(negS_format,2); % reset as number unique sub-sets
 
-maxV = min(max(negS_format(1,:)) , nSets-15); % find maximum paramSetIdx
-setVec = [1:16:maxV];
+maxV = min(max(negS_format(1,:)) , nSets-3); % find maximum paramSetIdx
+setVec = [1:4:maxV];
 missingV = [];
+extraVll = [];
 keepV = [];
-for j = 1 : length(setVec) % identify failed parameter sets
+keepVll = [];
+for j = 1 : length(setVec) % identify failed or extra parameter sets
      if ~any(setVec(j) == negS_format(1,:)) 
-         missingV = [missingV , [setVec(j) : setVec(j)+15]];
+         missingV = [missingV , [setVec(j) : setVec(j)+3]];
+         extraVll = [extraVll , setVec(j)];
      else
-         keepV = [keepV , [setVec(j) : setVec(j)+15]];
+         keepV = [keepV , [setVec(j) : setVec(j)+3]];
+         keepVll = [keepVll , find(setVec(j) == negS_format(1,:))];
      end
 end
 paramSetMatrix = paramSetMatrix(:,keepV); % filter and save only successful parameter sets from matrix
 numFltrdSets = length(keepV); % number sets that successfully ran
+
+negS_format = negS_format(:,keepVll);
+numSubsets = size(negS_format,2); % reset as number sub-sets with extra sets removed
 
 fileF = ['filteredSets_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of successfully run parameter sets
 csvwrite([paramDir, fileF] , paramSetMatrix);
@@ -103,6 +116,9 @@ fileALL = ['alphaLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save sor
 csvwrite([paramDir, fileALL] , alphaNegS_ordered);
 
 alphaWeights = masterWeights(inds(1:(masterNumFltrdSets*alpha)));
+fileB = ['alphaWeightsB4norm_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
+csvwrite([paramDir, fileB] , alphaWeights);
+
 %% Normalize weights
 normWeights = alphaWeights./sum(alphaWeights);
 fileW = ['alphaWeights_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of weights of top alpha-proportion of particles
@@ -156,9 +172,8 @@ if p_acc > p_acc_min
    
         parfor iS = 1 : length(not_in_prior)
             i = not_in_prior(iS);
-            v = 2 .* var(alphaSets,0,2); % 2x variance of previous accepted particles (normalized by numPart-1)
+            v = 2 .* var(alphaSets,normWeights,2); % 2x weighted variance of previous accepted particles
             stddev = v .^ (1/2);
-            %stddev = std(alphaSets,0,2); % standard deviation of sample by parameter (normalized by numPart-1)
             
             new_particlesT = zeros(select_particles_length + 1 , 1);
             new_particlesT(2:end) = normrnd(select_particles(:,i) , stddev);
@@ -182,3 +197,34 @@ if p_acc > p_acc_min
     fileD = ['paramSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
     csvwrite([paramDir, fileD] , new_particles(2:end,:));
 end
+
+%% If on Phase 2 of calibration, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
+%  Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
+resampleSubsetSets = load([paramDir , 'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 random parameter sample
+if t_curr == 0
+    % Save initial set of resampled particles
+    masterResampleSubsetMatrix = resampleSubsetSets;
+    fileMresample = ['masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+    csvwrite([paramDir, fileMresample] , masterResampleSubsetMatrix);
+elseif t_curr > 0
+    % Append resampled particles in iteration t-1 to particles in iteration t
+    alphaResampleSubset_prev = load([paramDir , 'alphaResampleSubset_calib_' , date , '_' , num2str(t_prev) , '.dat']);
+    masterResampleSubsetMatrix = [alphaResampleSubset_prev , resampleSubsetSets];
+    fileMresample = ['masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat'];
+    csvwrite([paramDir, fileMresample] , masterResampleSubsetMatrix);
+end
+alphaResampleSubset = masterResampleSubsetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
+fileAlphaResample = ['alphaResampleSubset_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of top alpha-proportion of Ph1 resampled sets
+csvwrite([paramDir, fileAlphaResample] , alphaResampleSubset);
+
+ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20_20_top50Sets.dat']);
+ph1sample = datasample(ph1_top50Sets, round(n_new_particles) , 2); % resample
+ph1sampleSubset = [ph1sample(1:21,:); ph1sample(26,:)]; % keep subset of resampled parameter set
+
+file = ['resampleSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , ph1sample)
+
+file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
+paramDir = [pwd , '/Params/'];
+csvwrite([paramDir, file] , ph1sampleSubset)

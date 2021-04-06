@@ -1,15 +1,16 @@
 #!/bin/bash
 
 #SBATCH --job-name=abc                               # Job name
-#SBATCH --workdir=/gscratch/csde/carajb/HHCoM        # Working directory
+#SBATCH --chdir=/gscratch/csde/carajb/HHCoM          # Working directory
 #SBATCH --mail-type=FAIL                             # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
 #SBATCH --export=all                                 # Export environment variables to the batch job session
 
-#SBATCH --account=csde                               # Allocation Definition
-#SBATCH --partition=csde
+#SBATCH --account=csde-ckpt                          # Allocation Definition
+#SBATCH --partition=ckpt
 #SBATCH --nodes=1                                    # Node resources
-#SBATCH --mem=58G                                    # Memory per node
+#SBATCH --ntasks-per-node=28                         # CPUs per node
+#SBATCH --mem=120G                                   # Memory per node
 #SBATCH --time=24:00:00                              # Wall clock time limit hrs:min:sec	
 
 pwd; hostname; date

@@ -14,11 +14,6 @@ function lhsPatternSrch(tstep_abc , date_abc)
 t_curr = tstep_abc;
 date = date_abc;
 
-%% Load parameters
-paramDir = [pwd ,'/Params/'];
-load([paramDir,'settings'])
-load([paramDir,'general'])
-
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
 pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
@@ -28,8 +23,8 @@ parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max
 [paramsAll] = genParamStruct();
 
 %% Latin hypercube sampling of parameter space
-nSets = 50;
-pIdx = [1,2,5,6,7,8,9,10,19,22,25];    % indices in paramsAll cell array
+nSets = 1;
+pIdx = [1,2,5,6,7,8,9,10,18];    % indices in paramsAll cell array
 
 paramsSub = cell(length(pIdx),1);
 p = 0;

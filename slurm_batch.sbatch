@@ -1,19 +1,19 @@
 #!/bin/bash
 
-#SBATCH --job-name=batch_test_${SETIDX}              # Job name
-#SBATCH --workdir=/gscratch/csde/carajb/HHCoM        # Working directory
+#SBATCH --job-name=batch                             # Job name
+#SBATCH --chdir=/gscratch/csde/carajb/HHCoM          # Working directory
 #SBATCH --mail-type=FAIL           		     # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
 #SBATCH --mail-user=carajb@uw.edu
-#SBATCH --export=all                    	     # Export environment variables to the batch job session
+#SBATCH --export=all                                 # Export environment variables to the batch job session
 
-#SBATCH --account=csde      	                     # Allocation Definition
-#SBATCH --partition=csde
-#SBATCH --nodes=1   		 		     # Node resources
-#SBATCH --mem=58G   		                     # Memory per node
-#SBATCH --time=02:00:00 	                     # Wall clock time limit hrs:min:sec
-#SBATCH --qos=MaxJobs10
+#SBATCH --account=csde-ckpt    	                     # Allocation Definition
+#SBATCH --partition=ckpt
+#SBATCH --nodes=1                                    # Node resources
+#SBATCH --ntasks-per-node=28  		             # CPUs per node
+#SBATCH --mem=185G   		                     # Memory per node
+#SBATCH --time=08:00:00 	                     # Wall clock time limit hrs:min:sec
 
-pwd; hostname; date
+pwd; hostname; date #--qos=MaxJobs4
 
 echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
 echo "${SETIDX}" 
@@ -26,7 +26,7 @@ export DATE
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/carajb/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "sensitivityAnalysis3_prt2(${SETIDX} , ${TCURR} , '${DATE}')"
+matlab -nodisplay -nosplash -r "calib2_sumll4sets(${SETIDX} , ${TCURR} , '${DATE}')"
 
 rm -r /gscratch/csde/carajb/$SLURM_JOB_ID
 
