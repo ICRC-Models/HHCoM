@@ -48,7 +48,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'224','256','271','388','394','476','592','682','854','1008','1300'};    % 22Apr20Ph2V11
+fileInds = {'2513','2639','2983','2320','3135','2554','3254','2836','2941','2929'};    % 22Apr20Ph2V11
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -100,7 +100,7 @@ hpvNeg2005 = hpv2005;
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_26Oct20_noBaseVax_baseScreen_hpvHIVcalib_1_' , fileInds{j}];
+    pathModifier = ['toNow_28Feb21_noBaseVax_baseScreen_hpvHIVcalib_1_' , fileInds{j}];
     load([resultsDir , pathModifier])
    
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
@@ -642,12 +642,16 @@ DHS_KAIS = [2003 6.7 5.8 7.6;
 
 figure()
 
-plot(tVec , mean(hiv_prev) , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
+plot(tVec , mean(hiv_prev), HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
 DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')
+hold on
+plot(tVec, max(hiv_prev,[],1),'--')
+hold on
+plot(tVec, min(hiv_prev,[],1),'--')
 hold on 
 xlabel('Year'); ylabel('Proportion of Population (%)'); 
 title({'HIV Prevalence (Ages 15-54)'})
-legend('Model Mean' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)')
+legend('Model Mean' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)','Model Max','Model Min')
 xlim([1980 2020])
 ylim([0, 15])
 
@@ -726,7 +730,7 @@ title('hrHPV Prevalence in 2000 - All females, not including CIN2+');
 grid on;
 
 %% HPV prevalence in HIV+ women (including CIN)
-ageGroup = {'15 - 29' , '30 - 34' , '35 - 39' , '40 - 44' , '45 - 54'};
+ageGroup = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' }; 
 
 % Calibration error bars
 meanObs = hpv_hiv2009_dObs(: , 2) .* 100;
