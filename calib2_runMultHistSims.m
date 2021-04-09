@@ -6,7 +6,7 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function calib2_runMultSims(paramSetIdx , tstep_abc , date_abc)
+function calib2_runMultHistSims(paramSetIdx , tstep_abc , date_abc)
 
 t_curr = tstep_abc;
 date = date_abc;
@@ -18,7 +18,7 @@ numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
 %%
-nPrlSets = 5; %numCPUperNode;
+nPrlSets = 25;
 
 %% Load all particles
 paramDir = [pwd , '/Params/'];
@@ -26,17 +26,18 @@ masterSetMatrix = load([paramDir , 'masterSets_calib_' , date , '_' , num2str(t_
 pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
 orderedLL = load([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent ordered log-likelihoods
 
-%% Get indices and parameter values of top 25 sets (*(25/10220))
+%% Get indices and parameter values of numBestFits*2 sets
 numBestFits = 25;
-numSets25 = size(orderedLL , 1)*(numBestFits/10220);
-top25Inds = orderedLL(1:numSets25,1);
-top25Params = masterSetMatrix(:,top25Inds);
+numSets50 = size(orderedLL , 1)*((numBestFits*2)/5600);
+specIndsList = [1 : 25];
+top50Inds = orderedLL(specIndsList,1);
+top50Params = masterSetMatrix(:,top50Inds);
 
 %% If on Phase 2 of calibration, uncomment the following to plot resampled Ph1 parameters + Ph2 parameters
 pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
 masterResampleSubsetMatrix = load([paramDir , 'masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 resampled parameters
-masterCombinedPhaseMatrix = [masterResampleSubsetMatrix ; masterSetMatrix];
-top25Params = masterCombinedPhaseMatrix(:,top25Inds);
+masterCombinedPhaseMatrix = [masterSetMatrix(1:27,:); masterResampleSubsetMatrix(1:19,:); masterSetMatrix(28,:); masterResampleSubsetMatrix(20:22,:); masterSetMatrix(29:34,:)];
+top50Params = masterCombinedPhaseMatrix(:,top50Inds);
 
 %% Set up paramsSub for indexing into paramSet matrix
 [paramsAll] = genParamStruct();
@@ -49,21 +50,12 @@ for s = 1 : length(pIdx)
 end
 
 %% Obtain model output for each set of sampled parameters
-%negSumLogLSetAll = zeros(numBestFits,1);
-%for m = 1 : nPrlSets : numBestFits
-    %negSumLogLSet = zeros(nPrlSets,1);
-    subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
+for m = paramSetIdx : nPrlSets : (numBestFits+paramSetIdx-1)
+    subMatrixInds = [m : (m + nPrlSets - 1)];
     %subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
-        paramSet = top25Params(:,subMatrixInds(n));
-        futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
-        %[negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (m + n - 1) , tstep_abc , date_abc);
-        %negSumLogLSet(n,1) = negSumLogL;
+        paramSet = top50Params(:,subMatrixInds(n));
+        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , specIndsList(m + n - 1) , tstep_abc , date_abc);
     end
-    %negSumLogLSetAll(m : (m + nPrlSets - 1) , 1) = negSumLogLSet;
-%end
+end
 
-%% Save negSumLogL values
-%file = ['negSumLogL_runSims_' , date , '_' , num2str(t_curr) , '.dat'];
-%paramDir = [pwd , '/Params/'];
-%csvwrite([paramDir, file] , negSumLogLSetAll)
