@@ -48,7 +48,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'2513','2639','2983','2320','3135','2554','3254','2836','2941','2929'};    % 22Apr20Ph2V11
+fileInds = {'2513','2639','2983','2320','3135','2554','3254'};    % 22Apr20Ph2V11
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -127,7 +127,7 @@ loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
     parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
-        pathModifier = ['toNow_26Oct20_noBaseVax_baseScreen_hpvHIVcalib_1_' , fileInds{j}];
+        pathModifier = ['toNow_28Feb21_noBaseVax_baseScreen_hpvHIVcalib_1_' , fileInds{j}];
         histResult = load([resultsDir , pathModifier]);
 
         %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
@@ -654,16 +654,16 @@ DHS_KAIS = [2003 6.7 5.8 7.6;
 
 figure()
 
-<<<<<<< HEAD
-plot(tVec , mean(hiv_prev), HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
-=======
+
+
+
 plot([startYear : timeStep : currYear] , mean(hiv_prev) , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
->>>>>>> 6812c929e256714b10454f37b020e5ead81502a5
 DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')
+
 hold on
-plot(tVec, max(hiv_prev,[],1),'--')
+plot([startYear : timeStep : currYear], max(hiv_prev,[],1),'--')
 hold on
-plot(tVec, min(hiv_prev,[],1),'--')
+plot([startYear : timeStep : currYear], min(hiv_prev,[],1),'--')
 hold on 
 xlabel('Year'); ylabel('Proportion of Population (%)'); 
 title({'HIV Prevalence (Ages 15-54)'})
