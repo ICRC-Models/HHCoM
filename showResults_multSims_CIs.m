@@ -121,6 +121,10 @@ hpv_nonVax = cc_vax;
 
 
 resultsDir = [pwd , '\HHCoM_Results\'];
+figuresDir = [pwd, '\HHCoM_Figures\'];
+t = datetime();
+groupDir = strcat(figuresDir,"Figures",int2str(t.Month), "_" , int2str(t.Day),"_",int2str(t.Hour),"_",int2str(t.Minute));
+mkdir(groupDir);
 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -483,6 +487,8 @@ legend('(Kenya Population Census) Observed Kenya, ages 0-79: mean, 2SD' , ...
     ['Model, ages 0-79: ' , num2str(nRuns) , '-sets mean'] , ['Model, ages 0-79: ' , num2str(nRuns) , '-sets minimum'] , ...
     ['Model, ages 0-79: ' , num2str(nRuns) , '-sets maximum'] , 'Location' , 'NorthWest');
 grid on;
+saveas(gcf,strcat(groupDir,'/populationByYear.fig'));
+close(gcf);
 
 %% Population size by 5-year age groups over time vs. Kenya Population Census data (calibration)
 % Calibration error bars
@@ -570,6 +576,9 @@ legend('(Kenya Population Census) Observed Kenya, ages 70-74: mean, 2SD' , ...
     ['ages 70-74: ' , num2str(nRuns) , '-sets minimum'] , ...
     ['ages 70-74: ' , num2str(nRuns) , '-sets maximum'] , '...' , 'Location' , 'north');
 
+saveas(gcf,strcat(groupDir,'/ageGroupSizeByTime.fig'));
+close(gcf);
+
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
 %% HIV prevalence by age and gender over time vs. DHS and KAIS (calibration)
@@ -641,6 +650,9 @@ elseif gInd == 3
 end
 end
 
+saveas(gcf,strcat(groupDir,'/hivPrevByAgeGender.fig'));
+close(gcf);
+
 
 %%HIV Prevalence
 % Compared to observed HIV data
@@ -670,6 +682,9 @@ title({'HIV Prevalence (Ages 15-54)'})
 legend('Model Mean' , 'Kenya (Spectrum)', 'Kenya (DHS/KAIS)','Model Max','Model Min')
 xlim([1980 2020])
 ylim([0, 15])
+
+saveas(gcf,strcat(groupDir,'/hivPrevByTime.fig'));
+close(gcf);
 
 
 %% ********************************** HPV FIGURES **********************************************************************************************
@@ -720,6 +735,9 @@ legend('(Luchter, 2010) Observed Kenya: mean, 2SD' , ...
 title('hrHPV Prevalence in 2006 - High-risk females, HIV-');
 grid on;
 
+saveas(gcf,strcat(groupDir,'/hpvPrevHighRiskWomen.fig'));
+close(gcf);
+
 %% HPV prevalence in all women (not including CIN2+) by age
 ageGroup = {'25 - 29' , '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54'};
 
@@ -745,6 +763,8 @@ legend('(DeVuyst, 2003) Observed Kenya: mean, 2SD' , ...
 title('hrHPV Prevalence in 2000 - All females, not including CIN2+');
 grid on;
 
+saveas(gcf,strcat(groupDir,'/hpvPrevAllWomen.fig'));
+close(gcf);
 %% HPV prevalence in HIV+ women (including CIN)
 ageGroup = {'15-19' , '20-24' , '25-29' , '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' }; 
 
@@ -770,6 +790,8 @@ legend('(DeVuyst, 2012; BJC) Observed Kenya: mean, 2SD' , ...
 title('hrHPV Prevalence in 2009 - Females, HIV+');
 grid on;
 
+saveas(gcf,strcat(groupDir,'/hpvPrevForHivPos.fig'));
+close(gcf);
 
 %Yamada,2009: HIV+ family planning/gyn health center, any HPV prevalence, but >50% types tested for
 
@@ -827,6 +849,9 @@ title(['Kenya HPV prevalence in women in 2005'])
 
 ylim([0 100])
 
+saveas(gcf,strcat(groupDir,'/hpvPrevByHiv.fig'));
+close(gcf);
+
 
 
 %% ********************************** CIN FIGURES *********************************************************************************************
@@ -855,6 +880,9 @@ title('CIN 2/3 Prevalence in 2007 - Females, HIV+')
 ylim([0 25])
 grid on;
 
+saveas(gcf,strcat(groupDir,'/cin23Prev2007.fig'));
+close(gcf);
+
 %% CIN1 prevalence among women aged 20-50 in 2010 by HIV status 
 diseaseGroup = {'HIV-negative' , 'HIV-positive'};
 
@@ -879,6 +907,9 @@ title('CIN1 Prevalence in 2010 - Females aged 20-50')
 ylim([0 25])
 grid on;
 
+saveas(gcf,strcat(groupDir,'/cin1ByHiv2007.fig'));
+close(gcf);
+
 %% CIN2/3 prevalence among women aged 20-50 in 2010 by HIV status 
 diseaseGroup = {'HIV-negative' , 'HIV-positive'};
 
@@ -902,6 +933,9 @@ xlabel('HIV Status'); ylabel('CIN2/3 Prevalence (%)')
 title('CIN2/3 Prevalence in 2010 - Females aged 20-50')
 ylim([0 25])
 grid on;
+
+saveas(gcf,strcat(groupDir,'/cin23ByHiv2007.fig'));
+close(gcf);
 
 
 %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
@@ -951,6 +985,9 @@ legend('(Globocan, 2012) Observed SA: mean, 2SD' , ...
     ['Model, WLWHIV on ART: ' , num2str(nRuns) , '-sets mean'] , ['Model: ' , num2str(nRuns) , '-sets minimum'] , ['Model: ' , num2str(nRuns) , '-sets maximum'] , ...
     'Location' , 'Northwest');
 grid on;
+
+saveas(gcf,strcat(groupDir,'/ccByAge.fig'));
+close(gcf);
 
 
 %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
@@ -1083,3 +1120,5 @@ legend('Observed 2012: mean, 2SD' , 'Observed 2012- 9v' , 'Observed 2012- non-9v
     'Model- 9v: ' , num2str(nRuns) , '-sets mean' , 'Model- 9v: ' , num2str(nRuns) , '-sets minimum' , 'Model- 9v: ' , num2str(nRuns) , '-sets maximum' , ...
     'Model- non-9v: ' , num2str(nRuns) , '-sets mean' , 'Model- non-9v: ' , num2str(nRuns) , '-sets minimum' , 'Model- non-9v: ' , num2str(nRuns) , '-sets maximum');
 grid on;
+saveas(gcf,strcat(groupDir,'/hpvTypeDistribution.fig'));
+close(gcf);
