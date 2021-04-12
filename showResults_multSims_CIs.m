@@ -211,7 +211,7 @@ hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 
 resultsDir = [pwd , '\HHCoM_Results\'];
-baseFileName = 'toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_noHiv-Intrvn_';
+baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_';
 
 loopSegments = {0 , round(nRuns/2) , nRuns};  %{0 , 10 , 20 , 30 , 40 , 50};
 loopSegmentsLength = length(loopSegments);
@@ -1414,26 +1414,23 @@ cinPos_sdev = (cinPos2015_dObs(: , 3).^(1/2)).*2 .* 100;
 cinNeg_mean = cinNeg2015_dObs(: , 2) .* 100;
 cinNeg_sdev = (cinNeg2015_dObs(: , 3).^(1/2)).*2 .* 100;
 
-figure;
+figure('DefaultAxesFontSize' , 18);
 subplot(1 , 2 , 1);
 errorbar(1 : length(cinPos_mean) , cinPos_mean , cinPos_sdev , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-plot(1 , mean((cin1Pos2015 .* 100),1)' , 'ko' , ...
-   1 , min((cin1Pos2015 .* 100),[],1)' , 'k*' , ...
-    1 , max((cin1Pos2015 .* 100),[],1)' , 'k*');
-plot(2 , mean((cin2Pos2015 .* 100),1)' , 'ko' , ...
-    2 , min((cin2Pos2015 .* 100),[],1)' , 'k*' , ...
-    2 , max((cin2Pos2015 .* 100),[],1)' , 'k*');
-plot(3 , mean((cin3Pos2015 .* 100),1)' , 'ko' , ...
-    3 , min((cin3Pos2015 .* 100),[],1)' , 'k*' , ...
-    3 , max((cin3Pos2015 .* 100),[],1)' , 'k*');
-legend('(Kuhn, 2020) Observed CIN1,2,3 Cape Town: mean, 2SD' , 'Model, CIN1: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, CIN2: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, CIN3: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
+plot([1,2,3] , [mean((cin1Pos2015 .* 100),1)' , mean((cin2Pos2015 .* 100),1)' , mean((cin3Pos2015 .* 100),1)'] , 'k');
+hold all;
+x2 = [[1,2,3] , fliplr([1,2,3])];
+inBetween = [[max((cin1Pos2015 .* 100),[],1)' , max((cin2Pos2015 .* 100),[],1)' , max((cin3Pos2015 .* 100),[],1)'] , ...
+    fliplr([min((cin1Pos2015 .* 100),[],1)' , min((cin2Pos2015 .* 100),[],1)' , min((cin3Pos2015 .* 100),[],1)'])];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets range');
 set(gca , 'xtick' , 1 : 3 , 'xtickLabel' , {'CIN1' , 'CIN2' , 'CIN3'});
 ylabel('Prevalence (%)')
-title('Prevalence in 2015 - Females aged 30-65, HIV+')
+title('2015: Women living with HIV aged 30-65')
 ylim([0 25])
 grid on;
 
@@ -1441,22 +1438,19 @@ subplot(1 , 2 , 2)
 errorbar(1 : length(cinNeg_mean) , cinNeg_mean , cinNeg_sdev , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-plot(1 , mean((cin1Neg2015 .* 100),1)' , 'ko' , ...
-    1 , min((cin1Neg2015 .* 100),[],1)' , 'k*' , ...
-    1 , max((cin1Neg2015 .* 100),[],1)' , 'k*');
-plot(2 , mean((cin2Neg2015 .* 100),1)' , 'ko' , ...
-    2 , min((cin2Neg2015 .* 100),[],1)' , 'k*' , ...
-    2 , max((cin2Neg2015 .* 100),[],1)' , 'k*');
-plot(3 , mean((cin3Neg2015 .* 100),1)' , 'ko' , ...
-    3 , min((cin3Neg2015 .* 100),[],1)' , 'k*' , ...
-    3 , max((cin3Neg2015 .* 100),[],1)' , 'k*');
-legend('(Kuhn, 2020) Observed CIN1,2,3 Cape Town: mean, 2SD' , 'Model, CIN1: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, CIN2: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, CIN3: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
+plot([1,2,3] , [mean((cin1Neg2015 .* 100),1)' , mean((cin2Neg2015 .* 100),1)' , mean((cin3Neg2015 .* 100),1)'] , 'k')
+hold all;
+x2 = [[1,2,3] , fliplr([1,2,3])];
+inBetween = [[max((cin1Neg2015 .* 100),[],1)' , max((cin2Neg2015 .* 100),[],1)' , max((cin3Neg2015 .* 100),[],1)'] , ...
+    fliplr([min((cin1Neg2015 .* 100),[],1)' , min((cin2Neg2015 .* 100),[],1)' , min((cin3Neg2015 .* 100),[],1)'])];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets range');
 set(gca , 'xtick' , 1 : 3 , 'xtickLabel' , {'CIN1' , 'CIN2' , 'CIN3'});
 ylabel('Prevalence (%)')
-title('Prevalence in 2015 - Females aged 30-65, HIV-')
-ylim([0 10])
+title('2015: HIV-negative women aged 30-65')
+ylim([0 25])
 grid on;
 
 
