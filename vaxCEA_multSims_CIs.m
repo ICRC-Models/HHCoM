@@ -1553,131 +1553,159 @@ legend('Observed KZN, ages 15-19' , ...
 %% ********************************** HPV FIGURES **********************************************************************************************
 
 %% HPV Prevalence by age in 2002 and 2018 vs. McDonald 2014 data (calibration)
-ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '*17* - 19' , '20 -24' , '25 - 29' ,...
-    '30 -34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
-    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-
-% Calibration error bars
-meanObs = hpv_hiv_dObs(: , 2);
-sdevObs = (hpv_hiv_dObs(: , 3).^(1/2)).*2;
-meanNeg = hpv_hivNeg_dObs(: , 2);
-sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)).*2;
-
-figure;
-subplot(3,1,1);
-errorbar(4 : length(meanObs)+4-1 , meanObs , sdevObs , ...
-    'rs' , 'LineWidth' , 1.5);
-hold all;
-plot(1 : age , mean(hpv_hiv(: , : , 1),1)' , 'k-' , ...
-    1 : age , min(hpv_hiv(: , : , 1),[],1)' , 'k--' , ...
-    1 : age , max(hpv_hiv(: , : , 1),[],1)' , 'k--' , 'LineWidth' , 1.5);
-hold all;
-plot(1 : age , mean(hpv_hiv(: , : , 2),1)' , 'b-' , ...
-    1 : age , min(hpv_hiv(: , : , 2),[],1)' , 'b--' , ...
-    1 : age , max(hpv_hiv(: , : , 2),[],1)' , 'b--' , 'LineWidth' , 1.5);
-set(gca , 'xtickLabel' , ageGroup);
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('hrHPV Prevalence');
-ylim([0 1]);
-legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
-    'Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');title('HIV+'); grid on;
-
-subplot(3,1,2);
-errorbar(4 : length(meanObs)+4-1 , meanNeg , sdevNeg , ...
-    'rs' , 'LineWidth' , 1.5);
-hold all;
-plot(1 : age , mean(hpv_hivNeg(: , : , 1),1)' , 'k-' , ...
-    1 : age , min(hpv_hivNeg(: , : , 1),[],1)' , 'k--' , ...
-    1 : age , max(hpv_hivNeg(: , : , 1),[],1)' , 'k--' , 'LineWidth' , 1.5);
-hold all;
-plot(1 : age , mean(hpv_hivNeg(: , : , 2),1)' , 'b-' , ...
-    1 : age , min(hpv_hivNeg(: , : , 2),[],1)' , 'b--' , ...
-    1 : age , max(hpv_hivNeg(: , : , 2),[],1)' , 'b--' , 'LineWidth' , 1.5);
-set(gca , 'xtickLabel' , ageGroup);
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('hrHPV Prevalence');
-ylim([0 1]);
-legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
-    'Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
-title('HIV-');
-grid on;
-
-subplot(3,1,3);
 ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
     '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
-plot(1 : age , mean(hpv_hivTot(: , : , 1),1)' , 'b-' , ...
-    1 : age , min(hpv_hivTot(: , : , 1),[],1)' , 'b--' , ...
-    1 : age , max(hpv_hivTot(: , : , 1),[],1)' , 'b--' , 'LineWidth' , 1.5);
+
+% Calibration error bars
+meanObs = hpv_hiv_dObs(: , 2).*100;
+sdevObs = (hpv_hiv_dObs(: , 3).^(1/2)).*2.*100;
+meanNeg = hpv_hivNeg_dObs(: , 2).*100;
+sdevNeg = (hpv_hivNeg_dObs(: , 3).^(1/2)).*2.*100;
+
+figure('DefaultAxesFontSize' , 18);
+subplot(2,1,1);
+errorbar(4 : length(meanObs)+4-1 , meanObs , sdevObs , ...
+    'rs' , 'LineWidth' , 1.5);
+hold all;
+plot(1 : age , mean(hpv_hiv(: , : , 1),1)'.*100 , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : age , min(hpv_hiv(: , : , 1),[],1)' , 'k--' , ...
+%     1 : age , max(hpv_hiv(: , : , 1),[],1)' , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [1 : age , fliplr([1 : age])];
+inBetween = [max(squeeze(hpv_hiv(: , : , 1)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_hiv(: , : , 1)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : age , mean(hpv_hiv(: , : , 2),1)' , 'b-' , ...
+%     1 : age , min(hpv_hiv(: , : , 2),[],1)' , 'b--' , ...
+%     1 : age , max(hpv_hiv(: , : , 2),[],1)' , 'b--' , 'LineWidth' , 1.5);
 set(gca , 'xtickLabel' , ageGroup);
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('hrHPV Prevalence');
-ylim([0 1]);
-legend('Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
-title('All');
-grid on;
-sgtitle('Female hrHPV Prevalence (includes CIN) by HIV status');
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)');
+ylim([0 100]);
+legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
+    'Model: 25-sets mean' , 'Model: 25-sets range'); % , ...
+    %'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+title('2002: WLWHIV'); grid on;
 
-%% HPV prevalence by age and HIV status in 2008 vs. Mbulawa data (calibration)
+subplot(2,1,2);
+errorbar(4 : length(meanObs)+4-1 , meanNeg , sdevNeg , ...
+    'rs' , 'LineWidth' , 1.5);
+hold all;
+plot(1 : age , mean(hpv_hivNeg(: , : , 1),1)'.*100 , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : age , min(hpv_hivNeg(: , : , 1),[],1)' , 'k--' , ...
+%     1 : age , max(hpv_hivNeg(: , : , 1),[],1)' , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [1 : age , fliplr([1 : age])];
+inBetween = [max(squeeze(hpv_hivNeg(: , : , 1)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_hivNeg(: , : , 1)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : age , mean(hpv_hivNeg(: , : , 2),1)' , 'b-' , ...
+%     1 : age , min(hpv_hivNeg(: , : , 2),[],1)' , 'b--' , ...
+%     1 : age , max(hpv_hivNeg(: , : , 2),[],1)' , 'b--' , 'LineWidth' , 1.5);
+set(gca , 'xtickLabel' , ageGroup);
+set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)');
+ylim([0 100]);
+legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
+    'Model: 25-sets mean' , 'Model: 25-sets range'); % , ...
+    %'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+title('2002: HIV-negative women'); grid on;
+
+% subplot(3,1,3);
+% ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+%     '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+%     '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
+% plot(1 : age , mean(hpv_hivTot(: , : , 1),1)' , 'b-' , ...
+%     1 : age , min(hpv_hivTot(: , : , 1),[],1)' , 'b--' , ...
+%     1 : age , max(hpv_hivTot(: , : , 1),[],1)' , 'b--' , 'LineWidth' , 1.5);
+% set(gca , 'xtickLabel' , ageGroup);
+% set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+% xlabel('Age Group'); ylabel('hrHPV Prevalence');
+% ylim([0 1]);
+% legend('Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+% title('All');
+% grid on;
+%sgtitle('Female hrHPV Prevalence (includes CIN) by HIV status');
+
+%% HPV prevalence by age and HIV status in 2008, 2018 vs. Mbulawa data (calibration)
 ageGroup = {'15-24' , '25-34' , '35-44' , '45-64'};
 
 % Calibration error bars
-meanObs = hpv_hivM2008_dObs(: , 2);
-sdevObs = (hpv_hivM2008_dObs(: , 3).^(1/2)).*2;
-meanNeg = hpv_hivMNeg2008_dObs(: , 2);
-sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)).*2;
+meanObs = hpv_hivM2008_dObs(: , 2).*100;
+sdevObs = (hpv_hivM2008_dObs(: , 3).^(1/2)).*2.*100;
+meanNeg = hpv_hivMNeg2008_dObs(: , 2).*100;
+sdevNeg = (hpv_hivMNeg2008_dObs(: , 3).^(1/2)).*2.*100;
 
-figure;
-subplot(3,1,1)
+figure('DefaultAxesFontSize' , 18);
+subplot(2,1,1)
 errorbar(1 : length(meanObs) , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : length(meanObs) , mean(hpv_hivM(: , : , 1),1) , 'k-' , ...
-    1 : length(meanObs) , min(hpv_hivM(: , : , 1),[],1) , 'k--' , ...
-    1 : length(meanObs) , max(hpv_hivM(: , : , 1),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(1 : length(meanObs) , mean(hpv_hivM(: , : , 1),1).*100 , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : length(meanObs) , min(hpv_hivM(: , : , 1),[],1) , 'k--' , ...
+%     1 : length(meanObs) , max(hpv_hivM(: , : , 1),[],1) , 'k--' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : length(meanObs) , mean(hpv_hivM(: , : , 2),1) , 'b-' , ...
-    1 : length(meanObs) , min(hpv_hivM(: , : , 2),[],1) , 'b--' , ...
-    1 : length(meanObs) , max(hpv_hivM(: , : , 2),[],1) , 'b--' , 'LineWidth' , 1.5);
+x2 = [1 : length(meanObs) , fliplr([1 : length(meanObs)])];
+inBetween = [max(squeeze(hpv_hivM(: , : , 1)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_hivM(: , : , 1)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : length(meanObs) , mean(hpv_hivM(: , : , 2),1) , 'b-' , ...
+%     1 : length(meanObs) , min(hpv_hivM(: , : , 2),[],1) , 'b--' , ...
+%     1 : length(meanObs) , max(hpv_hivM(: , : , 2),[],1) , 'b--' , 'LineWidth' , 1.5);
 set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
 legend('(Mbulawa, 2015) Observed SA: mean, 2SD' , ...
-    'Model, 2008: 25-sets mean' , 'Model, 2008: 25-sets minimum' , 'Model, 2008: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
-xlabel('Age Group'); ylabel('hrHPV Prevalence'); ylim([0 1]);
-title('HIV+');
+    'Model: 25-sets mean' , 'Model: 25-sets range');
+    %'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
+title('2008: MLWHIV');
 grid on;
 
-subplot(3,1,2)
+subplot(2,1,2)
 errorbar(1 : length(meanObs) , meanNeg , sdevNeg , ...
     'rs' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : length(meanObs) , mean(hpv_hivMNeg(: , : , 1),1) , 'k-' , ...
-    1 : length(meanObs) , min(hpv_hivMNeg(: , : , 1),[],1) , 'k--' , ...
-    1 : length(meanObs) , max(hpv_hivMNeg(: , : , 1),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(1 : length(meanObs) , mean(hpv_hivMNeg(: , : , 1),1).*100 , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : length(meanObs) , min(hpv_hivMNeg(: , : , 1),[],1) , 'k--' , ...
+%     1 : length(meanObs) , max(hpv_hivMNeg(: , : , 1),[],1) , 'k--' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : length(meanObs) , mean(hpv_hivMNeg(: , : , 2),1) , 'b-' , ...
-    1 : length(meanObs) , min(hpv_hivMNeg(: , : , 2),[],1) , 'b--' , ...
-    1 : length(meanObs) , max(hpv_hivMNeg(: , : , 2),[],1) , 'b--' , 'LineWidth' , 1.5);
+x2 = [1 : length(meanObs) , fliplr([1 : length(meanObs)])];
+inBetween = [max(squeeze(hpv_hivMNeg(: , : , 1)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_hivMNeg(: , : , 1)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : length(meanObs) , mean(hpv_hivMNeg(: , : , 2),1) , 'b-' , ...
+%     1 : length(meanObs) , min(hpv_hivMNeg(: , : , 2),[],1) , 'b--' , ...
+%     1 : length(meanObs) , max(hpv_hivMNeg(: , : , 2),[],1) , 'b--' , 'LineWidth' , 1.5);
 set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
 legend('(Mbulawa, 2015) Observed SA: mean, 2SD' , ...
-    'Model, 2008: 25-sets mean' , 'Model, 2008: 25-sets minimum' , 'Model, 2008: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
-xlabel('Age Group'); ylabel('hrHPV Prevalence'); ylim([0 1]);
-title('HIV-');
+    'Model: 25-sets mean' , 'Model: 25-sets range');
+    %'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+xlabel('Age Group'); ylabel('hrHPV Prevalence (%)'); ylim([0 100]);
+title('2008: HIV-negative men');
 grid on;
 
-subplot(3,1,3);
-plot(1 : length(meanObs) , mean(hpv_hivMtot(: , : , 1),1) , 'b-' , ...
-    1 : length(meanObs) , min(hpv_hivMtot(: , : , 1),[],1) , 'b--' , ...
-    1 : length(meanObs) , max(hpv_hivMtot(: , : , 1),[],1) , 'b--' , 'LineWidth' , 1.5);
-set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
-legend('Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
-xlabel('Age Group'); ylabel('hrHPV Prevalence'); ylim([0 1]);
-title('General');
-grid on;
-sgtitle('Male hrHPV Prevalence by HIV status');
+% subplot(3,1,3);
+% plot(1 : length(meanObs) , mean(hpv_hivMtot(: , : , 1),1) , 'b-' , ...
+%     1 : length(meanObs) , min(hpv_hivMtot(: , : , 1),[],1) , 'b--' , ...
+%     1 : length(meanObs) , max(hpv_hivMtot(: , : , 1),[],1) , 'b--' , 'LineWidth' , 1.5);
+% set(gca , 'xtick' , [1 : length(ageGroup)] , 'xtickLabel' , ageGroup);
+% legend('Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum');
+% xlabel('Age Group'); ylabel('hrHPV Prevalence'); ylim([0 1]);
+% title('General');
+% grid on;
+% sgtitle('Male hrHPV Prevalence by HIV status');
 
 %% Female HPV Prevalence by broad age groups and HIV status in 2019
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
@@ -1946,7 +1974,7 @@ end
 
 %% HPV incidence by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
-for dInd = 1 : length(diseaseLabels);
+for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'HPV-9vInc_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
@@ -1959,78 +1987,92 @@ end
 
 %% ********************************** CIN FIGURES *********************************************************************************************
 
-%% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002 vs. McDonald 2014 data (calibration)
-ageGroup = {'0-4' , '5-9' , '10-14' , '*17*-19' , '20-24' , '25-29' ,...
-    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
-    '60-64' , '65-69' , '70-74' , '75-79'};
+%% CIN2/3 prevalence for All HR HPV types combined by HIV status and age in 2002, 2018 vs. McDonald 2014 data (calibration)
+ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+    '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
 % Calibration error bars
-cinPos_mean = cinPos2002_dObs(: , 2);
-cinPos_sdev = (cinPos2002_dObs(: , 3).^(1/2)).*2;
-cinNeg_mean = cinNeg2002_dObs(: , 2);
-cinNeg_sdev = (cinNeg2002_dObs(: , 3).^(1/2)).*2;
+cinPos_mean = cinPos2002_dObs(: , 2).*100;
+cinPos_sdev = (cinPos2002_dObs(: , 3).^(1/2)).*2.*100;
+cinNeg_mean = cinNeg2002_dObs(: , 2).*100;
+cinNeg_sdev = (cinNeg2002_dObs(: , 3).^(1/2)).*2.*100;
 
-figure;
-subplot(3 , 1 , 1);
+figure('DefaultAxesFontSize' , 18);
+subplot(2 , 1 , 1);
 errorbar(4 : length(cinPos_mean)+4-1 , cinPos_mean' , cinPos_sdev' , ...
     'rs' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : age , mean(squeeze(cinPosAge(:,1,:)),1)' , 'k-' , ...
-    1 : age , min(squeeze(cinPosAge(:,1,:)),[],1)' , 'k--' , ...
-    1 : age , max(squeeze(cinPosAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
+plot(1 : age , mean(squeeze(cinPosAge(:,1,:)),1).*100' , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : age , min(squeeze(cinPosAge(:,1,:)),[],1)' , 'k--' , ...
+%     1 : age , max(squeeze(cinPosAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : age , mean(squeeze(cinPosAge(:,2,:)),1)' , 'b-' , ...
-    1 : age , min(squeeze(cinPosAge(:,2,:)),[],1)' , 'b--' , ...
-    1 : age , max(squeeze(cinPosAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
+x2 = [1 : age , fliplr([1 : age])];
+inBetween = [max(squeeze(cinPosAge(:,1,:)),[],1).*100 , ...
+    fliplr(min(squeeze(cinPosAge(:,1,:)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : age , mean(squeeze(cinPosAge(:,2,:)),1)' , 'b-' , ...
+%     1 : age , min(squeeze(cinPosAge(:,2,:)),[],1)' , 'b--' , ...
+%     1 : age , max(squeeze(cinPosAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
 legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
-    'Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
-    'Location' , 'northwest');
+    'Model: 25-sets mean' , 'Model: 25-sets range' , 'Location' , 'northwest');
+%     'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
+%     'Location' , 'northwest');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('CIN 2/3 Prevalence')
-title('WLWHIV')
-ylim([0 0.3])
+xlabel('Age Group'); ylabel('CIN 2/3 Prevalence (%)')
+title('2002: WLWHIV')
+ylim([0 40])
 grid on;
 
-subplot(3 , 1 , 2)
+subplot(2 , 1 , 2)
 errorbar(4 : length(cinNeg_mean)+4-1 , cinNeg_mean' , cinNeg_sdev' , ...
     'rs' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : age , mean(squeeze(cinNegAge(:,1,:)),1)' , 'k-' , ...
-    1 : age , min(squeeze(cinNegAge(:,1,:)),[],1)' , 'k--' , ...
-    1 : age , max(squeeze(cinNegAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
+plot(1 : age , mean(squeeze(cinNegAge(:,1,:)),1).*100' , 'k-' , 'LineWidth' , 1.5); %...
+%     1 : age , min(squeeze(cinNegAge(:,1,:)),[],1)' , 'k--' , ...
+%     1 : age , max(squeeze(cinNegAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
 hold all;
-plot(1 : age , mean(squeeze(cinNegAge(:,2,:)),1)' , 'b-' , ...
-    1 : age , min(squeeze(cinNegAge(:,2,:)),[],1)' , 'b--' , ...
-    1 : age , max(squeeze(cinNegAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
+x2 = [1 : age , fliplr([1 : age])];
+inBetween = [max(squeeze(cinNegAge(:,1,:)),[],1).*100 , ...
+    fliplr(min(squeeze(cinNegAge(:,1,:)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+% hold all;
+% plot(1 : age , mean(squeeze(cinNegAge(:,2,:)),1)' , 'b-' , ...
+%     1 : age , min(squeeze(cinNegAge(:,2,:)),[],1)' , 'b--' , ...
+%     1 : age , max(squeeze(cinNegAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
 hold all;
 legend('(McDonald, 2014) Observed Cape Town: mean, 2SD' , ...
-    'Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
-    'Location' , 'northwest');
+    'Model: 25-sets mean' , 'Model: 25-sets range' , 'Location' , 'northwest');
+%     'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
+%     'Location' , 'northwest');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('CIN 2/3 Prevalence')
-title('HIV-negative women')
-ylim([0 0.1])
+xlabel('Age Group'); ylabel('CIN 2/3 Prevalence (%)')
+title('2002: HIV-negative women')
+ylim([0 40])
 grid on;
 
-subplot(3 , 1 , 3);
-plot(1 : age , mean(squeeze(cinGenAge(:,1,:)),1)' , 'k-' , ...
-    1 : age , min(squeeze(cinGenAge(:,1,:)),[],1)' , 'k--' , ...
-    1 : age , max(squeeze(cinGenAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
-hold all;
-plot(1 : age , mean(squeeze(cinGenAge(:,2,:)),1)' , 'b-' , ...
-    1 : age , min(squeeze(cinGenAge(:,2,:)),[],1)' , 'b--' , ...
-    1 : age , max(squeeze(cinGenAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
-legend('Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
-    'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
-    'Location' , 'northwest');
-set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
-xlabel('Age Group'); ylabel('CIN 2/3 Prevalence')
-title('General')
-ylim([0 0.2])
-grid on;
-sgtitle('CIN2/3 Prevalence by HIV status');
+% subplot(3 , 1 , 3);
+% plot(1 : age , mean(squeeze(cinGenAge(:,1,:)),1)' , 'k-' , ...
+%     1 : age , min(squeeze(cinGenAge(:,1,:)),[],1)' , 'k--' , ...
+%     1 : age , max(squeeze(cinGenAge(:,1,:)),[],1)' , 'k--' , 'LineWidth' , 1.5);
+% hold all;
+% plot(1 : age , mean(squeeze(cinGenAge(:,2,:)),1)' , 'b-' , ...
+%     1 : age , min(squeeze(cinGenAge(:,2,:)),[],1)' , 'b--' , ...
+%     1 : age , max(squeeze(cinGenAge(:,2,:)),[],1)' , 'b--' , 'LineWidth' , 1.5);
+% legend('Model, 2002: 25-sets mean' , 'Model, 2002: 25-sets minimum' , 'Model, 2002: 25-sets maximum' , ...
+%     'Model, 2018: 25-sets mean' , 'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
+%     'Location' , 'northwest');
+% set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+% xlabel('Age Group'); ylabel('CIN 2/3 Prevalence')
+% title('General')
+% ylim([0 0.2])
+% grid on;
+% sgtitle('CIN2/3 Prevalence by HIV status');
 
 %% CIN2/3 prevalence for All HR HPV types combined by HIV status over time
 figure;
@@ -2210,9 +2252,9 @@ legend('(Globocan, 2012) Observed SA: mean, 2SD' , 'Model, general: 25-sets mean
     'Model: 25-sets minimum' , 'Model: 25-sets maximum');
    
 %% Cervical cancer incidence in 2018 by age vs. Globocan 2018 data (calibration)
-ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
-    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' , ...
-    '60-64' , '65-69' , '70-74' , '75-79'};
+ageGroup = {'0 - 4' , '5 - 9' , '10 - 14' , '15 - 19' , '20 - 24' , '25 - 29' ,...
+    '30 - 34' , '35 - 39' , '40 - 44' , '45 - 49' , '50 - 54' , '55 - 59' ,...
+    '60 - 64' , '65 - 69' , '70 - 74' , '75 - 79'};
 
 % Load adjusted Globocan 2018 rates for KZN
 file = [pwd , '/Config/Reweighted_GlobocanCC_rates.xlsx'];
@@ -2239,7 +2281,7 @@ h.LineStyle = '--';
 xlabel('Age Group'); ylabel('Cervical cancer incidence per 100K');
 set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
 ylim([0 300]); grid on;
-title(['Cervical Cancer Incidence in 2018 by age']);
+%title(['Cervical Cancer Incidence in 2018 by age']);
 legend('(Globocan, 2018) Observed SA: mean, 2SD' , 'Estimated KZN, adjusted Globocan 2018' , ...
     'Model, general: 25-sets median' , ...
     'Model: 25-sets range' , 'Location' , 'NorthWest');
@@ -2618,130 +2660,201 @@ disp(['Cervical cancer incidence women ages 15-74 in 2019: Ratio (ART/noART) = '
 %% ************************** HPV/CIN/CC TYPE DISTRIBUTION FIGURES *******************************************************************************
 
 %% HPV type distribution by state over time (coinfections grouped as 9v-type HPV) (calibration)
+firstYrInd = ((2000 - startYear) +1);
 
 % HPV infected
 % Calibration error bars
-meanObs = hpv_dist_dObs(: , 2);
-sdevObs = (hpv_dist_dObs(: , 3).^(1/2)).*2;
-figure;
+meanObs = hpv_dist_dObs(: , 2).*100;
+sdevObs = (hpv_dist_dObs(: , 3).^(1/2)).*2.*100;
+figure('DefaultAxesFontSize' , 18);
 subplot(2,3,1)
 errorbar([2012, 2012] , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5);
 hold on;
-plot(2012 , 0.4682 , 'k*');
+plot(2012 , 0.4682*100 , 'k*');
 hold on;
-plot(2012 , 0.5318 , 'b*');
+plot(2012 , 0.5318*100 , 'b*');
 hold on;
-plot(monthlyTimespan , mean(squeeze(hpv_vax(:,1,:)),1) , 'k-' , ...
-    monthlyTimespan , min(squeeze(hpv_vax(:,1,:)),[],1) , 'k--' , ...
-    monthlyTimespan , max(squeeze(hpv_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(hpv_vax(:,1,firstYrInd:end)),1).*100 , 'k-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(hpv_vax(:,1,:)),[],1) , 'k--' , ...
+%     monthlyTimespan , max(squeeze(hpv_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(hpv_vax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_vax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
 hold on;
-plot(monthlyTimespan , mean(squeeze(hpv_nonVax(:,1,:)),1) , 'b-' , ...
-    monthlyTimespan , min(squeeze(hpv_nonVax(:,1,:)),[],1) , 'b--' , ...
-    monthlyTimespan , max(squeeze(hpv_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
-xlabel('Year'); ylabel('Prevalence Proportion by Type');
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(hpv_nonVax(:,1,firstYrInd:end)),1).*100 , 'b-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(hpv_nonVax(:,1,:)),[],1) , 'b--' , ...
+%     monthlyTimespan , max(squeeze(hpv_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(hpv_nonVax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(hpv_nonVax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'b');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+xlabel('Year'); ylabel('Prevalence proportion (%)');
 title('HPV');
-ylim([0 1]);
+ylim([0 100]);
 xlim([2010 2015]);
 grid on;
 
 % CIN1
 % Calibration error bars
-meanObs = cin1_dist_dObs(: , 2);
-sdevObs = (cin1_dist_dObs(: , 3).^(1/2)).*2;
-subplot(2,3,2)
+meanObs = cin1_dist_dObs(: , 2).*100;
+sdevObs = (cin1_dist_dObs(: , 3).^(1/2)).*2.*100;
+subplot(2,3,2);
 errorbar([2012, 2012] , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5);
 hold on;
-plot(2012 , 0.5192 , 'k*');
+plot(2012 , 0.5192*100 , 'k*');
 hold on;
-plot(2012 , 0.4808 , 'b*');
+plot(2012 , 0.4808*100 , 'b*');
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin1_vax(:,1,:)),1) , 'k-' , ...
-    monthlyTimespan , min(squeeze(cin1_vax(:,1,:)),[],1) , 'k--' , ...
-    monthlyTimespan , max(squeeze(cin1_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin1_vax(:,1,firstYrInd:end)),1).*100 , 'k-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin1_vax(:,1,:)),[],1) , 'k--' , ...
+%     monthlyTimespan , max(squeeze(cin1_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin1_vax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin1_vax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin1_nonVax(:,1,:)),1) , 'b-' , ...
-    monthlyTimespan , min(squeeze(cin1_nonVax(:,1,:)),[],1) , 'b--' , ...
-    monthlyTimespan , max(squeeze(cin1_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
-ylim([0 1]);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin1_nonVax(:,1,firstYrInd:end)),1).*100 , 'b-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin1_nonVax(:,1,:)),[],1) , 'b--' , ...
+%     monthlyTimespan , max(squeeze(cin1_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin1_nonVax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin1_nonVax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'b');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+ylim([0 100]);
 xlim([2010 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type');
+xlabel('Year'); ylabel('Prevalence proportion (%)');
 title('CIN1');
 grid on;
 
 % CIN2
 subplot(2,3,3);
-plot(2012 , 0.6281 , 'k*');
+plot(2012 , 0.6281*100 , 'k*');
 hold on;
-plot(2012 , 0.3719 , 'b*');
+plot(2012 , 0.3719*100 , 'b*');
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin2_vax(:,1,:)),1) , 'k-' , ...
-    monthlyTimespan , min(squeeze(cin2_vax(:,1,:)),[],1) , 'k--' , ...
-    monthlyTimespan , max(squeeze(cin2_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin2_vax(:,1,firstYrInd:end)),1).*100 , 'k-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin2_vax(:,1,:)),[],1) , 'k--' , ...
+%     monthlyTimespan , max(squeeze(cin2_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin2_vax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin2_vax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin2_nonVax(:,1,:)),1) , 'b-' , ...
-    monthlyTimespan , min(squeeze(cin2_nonVax(:,1,:)),[],1) , 'b--' , ...
-    monthlyTimespan , max(squeeze(cin2_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
-ylim([0 1]);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin2_nonVax(:,1,firstYrInd:end)),1).*100 , 'b-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin2_nonVax(:,1,:)),[],1) , 'b--' , ...
+%     monthlyTimespan , max(squeeze(cin2_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin2_nonVax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin2_nonVax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'b');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+ylim([0 100]);
 xlim([2010 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type');
+xlabel('Year'); ylabel('Prevalence proportion (%)');
 title('CIN2');
 grid on;
 
 % CIN3
 % Calibration error bars
-meanObs = cin3_dist_dObs(: , 2);
-sdevObs = (cin3_dist_dObs(: , 3).^(1/2)).*2;
+meanObs = cin3_dist_dObs(: , 2).*100;
+sdevObs = (cin3_dist_dObs(: , 3).^(1/2)).*2.*100;
 subplot(2,3,4)
 errorbar([2012, 2012] , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5);
 hold on;
-plot(2012 , 0.7371 , 'k*');
+plot(2012 , 0.7371*100 , 'k*');
 hold on;
-plot(2012 , 0.2629 , 'b*');
+plot(2012 , 0.2629*100 , 'b*');
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin3_vax(:,1,:)),1) , 'k-' , ...
-    monthlyTimespan , min(squeeze(cin3_vax(:,1,:)),[],1) , 'k--' , ...
-    monthlyTimespan , max(squeeze(cin3_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin3_vax(:,1,firstYrInd:end)),1).*100 , 'k-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin3_vax(:,1,:)),[],1) , 'k--' , ...
+%     monthlyTimespan , max(squeeze(cin3_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin3_vax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin3_vax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
 hold on;
-plot(monthlyTimespan , mean(squeeze(cin3_nonVax(:,1,:)),1) , 'b-' , ...
-    monthlyTimespan , min(squeeze(cin3_nonVax(:,1,:)),[],1) , 'b--' , ...
-    monthlyTimespan , max(squeeze(cin3_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
-ylim([0 1]);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cin3_nonVax(:,1,firstYrInd:end)),1).*100 , 'b-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cin3_nonVax(:,1,:)),[],1) , 'b--' , ...
+%     monthlyTimespan , max(squeeze(cin3_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cin3_nonVax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cin3_nonVax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'b');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+ylim([0 100]);
 xlim([2010 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type');
+xlabel('Year'); ylabel('Prevalence proportion (%)');
 title('CIN3');
 grid on;
 
 % CC
 % Calibration error bars
-meanObs = cc_dist_dObs(: , 2);
-sdevObs = (cc_dist_dObs(: , 3).^(1/2)).*2;
+meanObs = cc_dist_dObs(: , 2).*100;
+sdevObs = (cc_dist_dObs(: , 3).^(1/2)).*2.*100;
 subplot(2,3,5)
 errorbar([2012, 2012] , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
-plot(2012 , 0.8578 , 'k*');
+plot(2012 , 0.8578*100 , 'k*');
 hold on;
-plot(2012 , 0.1422 , 'b*');
+plot(2012 , 0.1422*100 , 'b*');
 hold on;
-plot(monthlyTimespan , mean(squeeze(cc_vax(:,1,:)),1) , 'k-' , ...
-    monthlyTimespan , min(squeeze(cc_vax(:,1,:)),[],1) , 'k--' , ...
-    monthlyTimespan , max(squeeze(cc_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cc_vax(:,1,firstYrInd:end)),1).*100 , 'k-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cc_vax(:,1,:)),[],1) , 'k--' , ...
+%     monthlyTimespan , max(squeeze(cc_vax(:,1,:)),[],1) , 'k--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cc_vax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cc_vax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
 hold on;
-plot(monthlyTimespan , mean(squeeze(cc_nonVax(:,1,:)),1) , 'b-' , ...
-    monthlyTimespan , min(squeeze(cc_nonVax(:,1,:)),[],1) , 'b--' , ...
-    monthlyTimespan , max(squeeze(cc_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
-ylim([0 1]);
+plot(monthlyTimespan(firstYrInd:end) , mean(squeeze(cc_nonVax(:,1,firstYrInd:end)),1).*100 , 'b-' , 'LineWidth' , 1.5);
+%     monthlyTimespan , min(squeeze(cc_nonVax(:,1,:)),[],1) , 'b--' , ...
+%     monthlyTimespan , max(squeeze(cc_nonVax(:,1,:)),[],1) , 'b--' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan(firstYrInd:end) , fliplr(monthlyTimespan(firstYrInd:end))];
+inBetween = [max(squeeze(cc_nonVax(:,1,firstYrInd:end)),[],1).*100 , ...
+    fliplr(min(squeeze(cc_nonVax(:,1,firstYrInd:end)),[],1)).*100];
+h = fill(x2 , inBetween , 'b');
+h.FaceAlpha = 0.3;
+h.LineStyle = '--';
+ylim([0 100]);
 xlim([2010 2015]);
-xlabel('Year'); ylabel('Prevalence Proportion by Type')
+xlabel('Year'); ylabel('Prevalence proportion (%)')
 title('Cervical Cancer')
 legend('Observed 2012: mean, 2SD' , 'Observed 2012- 9v' , 'Observed 2012- non-9v' , ...
-    'Model- 9v: 25-sets mean' , 'Model- 9v: 25-sets minimum' , 'Model- 9v: 25-sets maximum' , ...
-    'Model- non-9v: 25-sets mean' , 'Model- non-9v: 25-sets minimum' , 'Model- non-9v: 25-sets maximum');
+    'Model- 9v: 25-sets mean' , 'Model- 9v: 25-sets range' , ...
+    'Model- non-9v: 25-sets mean' , 'Model- non-9v: 25-sets range');
 grid on;
-sgtitle('Type distribution by state (coinfections grouped as 9v-type HPV), ages 0-79');
+%sgtitle('Type distribution by state (coinfections grouped as 9v-type HPV), ages 0-79');
 
 %% HPV type distribution by state in 2000 and 2018 (coinfections grouped as 9v-type HPV)
 % HPV infected
