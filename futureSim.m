@@ -199,6 +199,10 @@ noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
+noVaxToScreenTreatImmVaxHpv = zeros(disease , viral , hpvNonVaxStates , numScreenAge , risk);
+vaxToScreenTreatImmVaxHpv = noVaxToScreenTreatImmVaxHpv;
+noVaxToScreenTreatImmNonVaxHpv = zeros(disease , viral , hpvVaxStates , numScreenAge , risk);
+vaxToScreenTreatImmNonVaxHpv = noVaxToScreenTreatImmNonVaxHpv;
 noVaxToScreenTreatVaxHpv = zeros(disease , viral , hpvNonVaxStates , numScreenAge , risk);
 vaxToScreenTreatVaxHpv = noVaxToScreenTreatVaxHpv;
 noVaxToScreenTreatNonVaxHpv = zeros(disease , viral , hpvVaxStates , numScreenAge , risk);
@@ -227,6 +231,10 @@ for aS = 1 : numScreenAge
 
                             noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatImmNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 7 , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatImmNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 7 , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 3 , 2 , a , r));
@@ -389,9 +397,11 @@ n = 1; %parfor n = 1 : nTests
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
-                    vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
-                    noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
-                    vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge);
+                    vaxToScreenTreatImm , noVaxToScreenTreatImmVaxHpv , vaxToScreenTreatImmVaxHpv , ...
+                    noVaxToScreenTreatImmNonVaxHpv , vaxToScreenTreatImmNonVaxHpv , ...        
+                    noVaxToScreenTreatHpv , vaxToScreenTreatHpv , noVaxToScreenTreatVaxHpv , ...
+                    vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , vaxToScreenTreatNonVaxHpv , ...
+                    noVaxToScreenHyst , vaxToScreenHyst , numScreenAge);
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);  % for next module
                 if any(pop(end , :) <  0)
