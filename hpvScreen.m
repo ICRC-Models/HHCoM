@@ -43,7 +43,7 @@ for i = 1 : length(screenAlgs)
                     for s = 1 : hpvNonVaxStates
                         for x = 1 : endpoints
                             for r = 1 : risk
-                                fracScreend = (sumall(pop(screenAgeS(d,v,h,s,x,:,aS,r))) / sumall(pop(screenAgeAll(d,v,h,s,x,:,aS,r)))); % find proportion of population that is currently screened
+                                fracScreend = (sumall(pop(screenAgeS(d,v,aS,r))) / sumall(pop(screenAgeAll(d,v,aS,r)))); % find proportion of population that is currently screened
                                 if screenRateAge - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
                                     screenCover = max(0 , (screenRateAge - fracScreend) ./ (1 - fracScreend)); % screen enough people in each compartment to reach target
 
