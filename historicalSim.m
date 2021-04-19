@@ -131,8 +131,8 @@ end
 % Create screening indices
 numScreenAge = length(screenAlgs.screenAge);
 agesComb = screenAlgs.screenAge{1};
-screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
-screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
+screenAgeAll = zeros(disease , viral , numScreenAge , risk);
+screenAgeS = zeros(disease , viral , numScreenAge , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
@@ -165,8 +165,8 @@ for aS = 1 : numScreenAge
                 for s = 1 : hpvNonVaxStates
                     for x = 1 : endpoints
                         for r = 1 : risk
-                            screenAgeAll(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 1 : intervens , 2 , a , r)); 
-                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 3 : intervens , 2 , a , r));
+                            screenAgeAll(d,v,aS,r) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , r)); 
+                            screenAgeS(d,v,aS,r) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 3 : intervens , 2 , a , r));
 
                             noVaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 1 , 2 , a , r)));
                             noVaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
