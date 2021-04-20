@@ -377,12 +377,12 @@ sceInds = [3 , 4 , 6 , 8 , 10];
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18)
 
-ovrScrnVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds));
-for jInd = 1 : length(sceInds)
+ovrScrnVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds)); % initialize output vector
+for jInd = 1 : length(sceInds) % loop through scenarios
     j = sceInds(jInd);
-    for dInd = 1 : length(diseaseSheetInds)
+    for dInd = 1 : length(diseaseSheetInds) % loop through HIV disease states
         d = diseaseSheetInds{dInd};
-        % Load results
+        % Load results from Excel
         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
             'SA_screening_S' , fileVec{j} , '.xlsx'];
         scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103');
@@ -401,6 +401,7 @@ f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all;
 f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
 f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
 
+% Create bar plot
 b = bar([1:5],reshape(permute(ovrScrnVec,[1,3,2]),[5,9]) , 'stacked');
 set(b(1:3),'FaceColor','r');
 set(b(4:6),'FaceColor','b');
@@ -429,13 +430,13 @@ sceInds = [3 , 4 , 6 , 8 , 10];
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
 
-falsePosVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds));
-for jInd = 1 : length(sceInds)
+falsePosVec = zeros(length(sceInds) , 3 , length(diseaseSheetInds)); % initialize output vector
+for jInd = 1 : length(sceInds) % loop through scenarios
     j = sceInds(jInd);
-    if (j == 6 || j == 7) % genotyping scenarios
-        for dInd = 1 : length(diseaseSheetInds)
+    if (j == 6 || j == 7) % genotyping scenarios (only women with 9v-type HPV screen positive)
+        for dInd = 1 : length(diseaseSheetInds) % loop through HIV disease states
             d = diseaseSheetInds{dInd};
-            % Load results
+            % Load results from Excel; multiply by the proportion that falsely screen positive
             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
                 'SA_screening_S' , fileVec{j} , '.xlsx'];
             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1);
@@ -445,10 +446,10 @@ for jInd = 1 : length(sceInds)
             falsePosVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
             falsePosVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
         end
-    else
-        for dInd = 1 : length(diseaseSheetInds)
+    else % all non-gentotyping scenarios
+        for dInd = 1 : length(diseaseSheetInds) % loop through HIV disease states
             d = diseaseSheetInds{dInd};
-            % Load results
+            % Load results from Excel; multiply by the proportion that falsely screen positive
             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
                 'SA_screening_S' , fileVec{j} , '.xlsx'];
             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1);
@@ -468,6 +469,7 @@ f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all;
 f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
 f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
 
+% Create the bar plot
 b = bar([1:5],reshape(permute(falsePosVec,[1,3,2]),[5,9]) , 'stacked');
 set(b(1:3),'FaceColor','r');
 set(b(4:6),'FaceColor','b');
@@ -491,18 +493,18 @@ sceScrnPos = {spCyto.testSens , spCyto.testSens , spCyto.testSens , ...
     spGentyp.testSens , spGentyp.testSens , ...
     spAve.testSens , spAve.testSens , ...
     spHpvAve.testSens , spHpvAve.testSens};
-sceTreat = {0 , 0 , 0 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95};
+sceTreat = {0 , 0 , 0 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95 , 0.95}; % Proportion of women with false-positive screen results who are treated, by scenario
 sceInds = [3 , 4 , 6 , 8 , 10];
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
 
-overTreatVec = zeros(length(sceInds) , length(diseaseSheetInds));
-for jInd = 1 : length(sceInds)
+overTreatVec = zeros(length(sceInds) , length(diseaseSheetInds)); % initialize output vector
+for jInd = 1 : length(sceInds) % loop through scenarios
     j = sceInds(jInd);
-    if (j == 6 || j == 7) % genotyping scenarios
-        for dInd = 1 : length(diseaseSheetInds)
+    if (j == 6 || j == 7) % genotyping scenarios (only women with 9v-type HPV screen positive)
+        for dInd = 1 : length(diseaseSheetInds) % loop through HIV disease states
             d = diseaseSheetInds{dInd};
-            % Load results
+            % Load results from Excel; multiply by the proportion that falsely screen positive * proportion who are treated
             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
                 'SA_screening_S' , fileVec{j} , '.xlsx'];
             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1) .* sceTreat{j};
@@ -512,10 +514,10 @@ for jInd = 1 : length(sceInds)
             overTreatVec(jInd , 2 , dInd) = scrnHpvHivTime(end,1);
             overTreatVec(jInd , 1 , dInd) = scrnCin1HivTime(end,1);
         end
-    else
-        for dInd = 1 : length(diseaseSheetInds)
+    else % all non-genotyping scenarios
+        for dInd = 1 : length(diseaseSheetInds) % loop through HIV disease states
             d = diseaseSheetInds{dInd};
-            % Load results
+            % Load results from Excel; multiply by the proportion that falsely screen positive * proportion who are treated
             fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
                 'SA_screening_S' , fileVec{j} , '.xlsx'];
             scrnSusHivTime = readmatrix(fname , 'Sheet' , diseaseLabels{d} , 'Range' , 'C3:C103') .* sceScrnPos{j}(diseaseScrnInds{dInd},1) .* sceTreat{j};
@@ -537,6 +539,7 @@ f(4) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 1.0); hold all;
 f(5) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.6); hold all;
 f(6) = bar(NaN,NaN,'FaceColor' , 'k' , 'FaceAlpha' , 0.2);
 
+% Create the bar plot
 b = bar([1:5],reshape(permute(overTreatVec,[1,3,2]),[5,9]) , 'stacked');
 set(b(1:3),'FaceColor','r');
 set(b(4:6),'FaceColor','b');
