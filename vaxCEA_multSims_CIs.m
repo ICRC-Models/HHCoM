@@ -201,11 +201,17 @@ cin1_vax = cc_vax;
 cin1_nonVax = cc_vax;
 hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
+typeDist = zeros(nRuns , 5 , 6 , 4 , age , length(monthlyTimespan));
 % HPV vaccination and screening
 newScreenTime = zeros(nRuns , length(screenAnnualTimespan));
 screenCovTime = zeros(nRuns , length(screenMonthlyTimespan));
-screenTotAnnual35 = zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
-screenTotAnnual45 = zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
+screenCovTime45 = screenCovTime;
+screenTotAnnual35 = zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
+screenTotAnnual45 = zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
+% treatImmTot35 = zeros(nRuns , 5 , length(screenMonthlyTimespan)); 
+% treatImmTot45 = treatImmTot35;
+% treatHpvTot35 = treatImmTot35;
+% treatHpvTot45 = treatImmTot35;
 vaxCoverage = zeros(nRuns , length(monthlyTimespan));
 vaxCoverageAge = zeros(nRuns , age , length(monthlyTimespan));
 vaxTotAge = zeros(nRuns , age , 5 , length(monthlyTimespan));
@@ -214,7 +220,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_WHO-SCES' , sceNum , '_'];
+baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_WHO-SCES' , sceNum , '_'];
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
@@ -222,7 +228,7 @@ for k = 1 : loopSegmentsLength-1
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
         nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -237,7 +243,9 @@ for k = 1 : loopSegmentsLength-1
         vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
         vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
-        %vaxResult{n}.newScreen = [curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)]; %[vaxResult{n}.newScreen(1 : end , : , : , : , : , : , : , : , :)];
+        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , :)]; %[curr.newScreen(1 : end , : , : , : , : , : , : , : , :); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , : , : , :)];
+        %vaxResult{n}.newTreatImm = [vaxResult{n}.newTreatImm(1 : end , : , : , : , : , : , : , : , :)];
+        %vaxResult{n}.newTreatHpv = [vaxResult{n}.newTreatHpv(1 : end , : , : , : , : , : , : , : , :)];
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
@@ -942,6 +950,151 @@ for k = 1 : loopSegmentsLength-1
                 ./ sum(vaxResult{n}.popVec(: , hpvInds_tot) , 2);
         end
         
+        %% HPV type distribution by state over time (split out by HPV type)
+        typeDistTemp = zeros(1 , 5 , 6 , 4 , age , length(monthlyTimespan));
+        for dInd = 1 : diseaseIndsLength_typeDist
+            d = diseaseInds_typeDist{dInd};
+            for aInd = 1 : age
+                aGroup = aInd;
+            
+                hpvInds_vaxAll = toInd(allcomb(d , 1 : viral , 2 , [1 : 2 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                hpvInds_vaxOnly = toInd(allcomb(d , 1 : viral , 2 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                hpvInds_nonVaxAll = toInd(allcomb(d , 1 : viral , [1 : 2 , 7] , 2 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                hpvInds_nonVaxOnly = toInd(allcomb(d , 1 : viral , [1 , 7] , 2 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                hpvInds_tot = unique([toInd(allcomb(d , 1 : viral , 2 , [1 : 2 , 7] , ...
+                        1 , 1 : intervens , 2 , aGroup , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                        [1 , 7] , 2 , 1 , 1 : intervens , 2 , aGroup , 1 : risk))]);
+                typeDistTemp(1 , dInd , 1 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , hpvInds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , hpvInds_tot) , 2);
+                typeDistTemp(1 , dInd , 1 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , hpvInds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , hpvInds_tot) , 2);
+                typeDistTemp(1 , dInd , 1 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , hpvInds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , hpvInds_tot) , 2);
+                typeDistTemp(1 , dInd , 1 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , hpvInds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , hpvInds_tot) , 2);
+
+                cin1Inds_vaxAll = toInd(allcomb(d , 1 : viral , 3 , [1 : 3 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin1Inds_vaxOnly = toInd(allcomb(d , 1 : viral , 3 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin1Inds_nonVaxAll = toInd(allcomb(d , 1 : viral , [1 : 3 , 7] , 3 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin1Inds_nonVaxOnly = toInd(allcomb(d , 1 : viral , [1 , 7] , 3 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin1Inds_tot = unique([toInd(allcomb(d , 1 : viral , 3 , [1 : 3 , 7] , ...
+                        1 , 1 : intervens , 2 , aGroup , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                        [1 : 2 , 7] , 3 , 1 , 1 : intervens , 2 , aGroup , 1 : risk))]);
+                typeDistTemp(1 , dInd , 2 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , cin1Inds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin1Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 2 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , cin1Inds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin1Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 2 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , cin1Inds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin1Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 2 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , cin1Inds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin1Inds_tot) , 2);
+
+                cin2Inds_vaxAll = toInd(allcomb(d , 1 : viral , 4 , [1 : 4 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin2Inds_vaxOnly = toInd(allcomb(d , 1 : viral , 4 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin2Inds_nonVaxAll = toInd(allcomb(d , 1 : viral , [1 : 4 , 7] , 4 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin2Inds_nonVaxOnly = toInd(allcomb(d , 1 : viral , [1 , 7] , 4 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin2Inds_tot = unique([toInd(allcomb(d , 1 : viral , 4 , [1 : 4 , 7] , ...
+                        1 , 1 : intervens , 2 , aGroup , 1 : risk)); toInd(allcomb(d, 1 : viral , ...
+                        [1 : 3 , 7] , 4 , 1 , 1 : intervens , 2 , aGroup , 1 : risk))]);
+                typeDistTemp(1 , dInd , 3 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , cin2Inds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin2Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 3 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , cin2Inds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin2Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 3 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , cin2Inds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin2Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 3 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , cin2Inds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin2Inds_tot) , 2);
+
+                cin3Inds_vaxAll = toInd(allcomb(d , 1 : viral , 5 , [1 : 5 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin3Inds_vaxOnly = toInd(allcomb(d , 1 : viral , 5 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin3Inds_nonVaxAll = toInd(allcomb(d , 1 : viral , [1 : 5 , 7] , 5 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin3Inds_nonVaxOnly = toInd(allcomb(d , 1 : viral , [1 , 7] , 5 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk));
+                cin3Inds_tot = unique([toInd(allcomb(d , 1 : viral , 5 , [1 : 5 , 7] , ...
+                        1 , 1 : intervens , 2 , aGroup , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                        [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , aGroup , 1 : risk))]);
+                typeDistTemp(1 , dInd , 4 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , cin3Inds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin3Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 4 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , cin3Inds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin3Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 4 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , cin3Inds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin3Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 4 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , cin3Inds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin3Inds_tot) , 2);
+
+
+                cin23Inds_vaxAll = [toInd(allcomb(d , 1 : viral , 4 , [1 : 4 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , 5 , [1 : 5 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk))];
+                cin23Inds_vaxOnly = [toInd(allcomb(d , 1 : viral , 4 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , 5 , [1 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk))];
+                cin23Inds_nonVaxAll = [toInd(allcomb(d , 1 : viral , [1 : 4 , 7] , 4 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , [1 : 5 , 7] , 5 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk))];
+                cin23Inds_nonVaxOnly = [toInd(allcomb(d , 1 : viral , [1 , 7] , 4 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , [1 , 7] , 5 , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk))];
+                cin23Inds_tot = unique([toInd(allcomb(d , 1 : viral , 5 , [1 : 5 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , 4 , [1 : 4 , 7] , ...
+                    1 , 1 : intervens , 2 , aGroup , 1 : risk)); 
+                    toInd(allcomb(d , 1 : viral , ...
+                    [1 : 4 , 7] , 5 , 1 , 1 : intervens , 2 , aGroup , 1 : risk)); ...
+                    toInd(allcomb(d , 1 : viral , ...
+                    [1 : 3 , 7] , 4 , 1 , 1 : intervens , 2 , aGroup , 1 : risk))]); 
+                typeDistTemp(1 , dInd , 5 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , cin23Inds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin23Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 5 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , cin23Inds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin23Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 5 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , cin23Inds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin23Inds_tot) , 2);
+                typeDistTemp(1 , dInd , 5 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , cin23Inds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , cin23Inds_tot) , 2);
+
+
+                ccInds_vaxAll = toInd(allcomb(d , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
+                    1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk));
+                ccInds_vaxOnly = toInd(allcomb(d , 1 : viral , 6 , [1 , 7] , ...
+                    1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk));
+                ccInds_nonVaxAll = toInd(allcomb(d , 1 : viral , hpvVaxStates , 6 , ...
+                    1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk));
+                ccInds_nonVaxOnly = toInd(allcomb(d , 1 : viral , [1 , 7] , 6 , ...
+                    1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk));
+                ccInds_tot = unique([toInd(allcomb(d , 1 : viral , 6 , 1 : hpvNonVaxStates , ...
+                        1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk)); toInd(allcomb(d , 1 : viral , ...
+                        [1 : 5 , 7] , 6 , 1 : 3 , 1 : intervens , 2 , aGroup , 1 : risk))]);
+                typeDistTemp(1 , dInd , 6 , 1 , aInd , :) = sum(vaxResult{n}.popVec(: , ccInds_vaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , ccInds_tot) , 2);
+                typeDistTemp(1 , dInd , 6 , 2 , aInd , :) = sum(vaxResult{n}.popVec(: , ccInds_vaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , ccInds_tot) , 2);
+                typeDistTemp(1 , dInd , 6 , 3 , aInd , :) = sum(vaxResult{n}.popVec(: , ccInds_nonVaxAll) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , ccInds_tot) , 2);
+                typeDistTemp(1 , dInd , 6 , 4 , aInd , :) = sum(vaxResult{n}.popVec(: , ccInds_nonVaxOnly) , 2)...
+                    ./ sum(vaxResult{n}.popVec(: , ccInds_tot) , 2);
+            end
+        end
+        typeDist(j , : , : , : , : , :) = typeDistTemp;
+        
         
         %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
         
@@ -958,16 +1111,40 @@ for k = 1 : loopSegmentsLength-1
 %             1 : endpoints , 1 : intervens , 2 , 8 , 1 : risk));
 %         screenF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
 %             1 : endpoints , [3 , 4] , 2 , 8 , 1 : risk));
-%         
+% 
 %         screenCovTime(j , :) = ...
+%             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , screenF) , 2) ./ ...
+%             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2);
+        
+        %% Screening coverage ages 45-49
+%         allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%             1 : endpoints , 1 : intervens , 2 , 10 , 1 : risk));
+%         screenF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+%             1 : endpoints , [3 , 4] , 2 , 10 , 1 : risk));
+%         
+%         screenCovTime45(j , :) = ...
 %             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , screenF) , 2) ./ ...
 %             sum(vaxResult{n}.popVec(((2020 - startYear) * stepsPerYear +1):end , allF) , 2);
          
         %% Total number of women screened annually by age and disease status
+        for dInd = 1 : diseaseVecLength_ccInc
+            d = diseaseVec_ccInc{dInd};
+            screenTotAnnual35(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , 1 , :),2),3),4),5),6),7));
+            screenTotAnnual45(j , dInd , :) = annlyz(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , 2 , :),2),3),4),5),6),7));
+        end
+
+       %% Total number of women treated to immune by age and disease status
 %         for dInd = 1 : diseaseVecLength_ccInc
 %             d = diseaseVec_ccInc{dInd};
-%             screenTotAnnual35(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , 1 , : , :),2),3),4),5),6),7),8),9));
-%             %screenTotAnnual45(j , dInd , :) = annlz(sum(sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , : , : , : , : , 2 , : , :),2),3),4),5),6),7),8),9));
+%             treatImmTot35(j , dInd , :) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newTreatImm(: , d , : , : , : , 1 , :),2),3),4),5),6),7);
+%             treatImmTot45(j , dInd , :) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newTreatImm(: , d , : , : , : , 2 , :),2),3),4),5),6),7);
+%         end
+        
+        %% Total number of women treated with persistent HPV by age and disease status
+%         for dInd = 1 : diseaseVecLength_ccInc
+%             d = diseaseVec_ccInc{dInd};
+%             treatHpvTot35(j , dInd , :) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newTreatHpv(: , d , : , : , : , 1 , :),2),3),4),5),6),7);
+%             treatHpvTot45(j , dInd , :) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newTreatHpv(: , d , : , : , : , 2 , :),2),3),4),5),6),7);
 %         end
         
         %% Vaccine coverage overall
@@ -3054,6 +3231,52 @@ for dInd = 1 : length(diseaseLabels)
         squeeze(max(squeeze(cc_nonVax(:,d,((2019 - startYear) * stepsPerYear +1))) , [] , 1))]]] , fname)
 end
 
+%% Age-standardized HPV type distribution by state in 2020 (split out by HPV type)
+% Note: the age-standardization process shifts the prevalence of the
+% last modelled age group to the next age group in the following year.
+% However, prevalence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed HPV infected during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+hIndVec = {'HPV' , 'CIN1' , 'CIN2' , 'CIN3' , 'CIN23' , 'CC'};
+firstYrInd = ((2020 - startYear) * stepsPerYear +1);
+
+for hInd = 1 : 6    % HPV state (HPV, CIN1, CIN2, CIN3 , CIN2/3 , CC)
+    disp(['HPV state: ' , hIndVec{hInd}])
+    for cInd = 1 : 4    % coinfection status (vaxAll, vaxOnly, nonVaxAll, nonVaxOnly)
+        typeDistHivAge = squeeze(typeDist(: , 1 , hInd ,cInd , : , 1 : end));
+        numTot = zeros(size(typeDistHivAge,1) , 1 , size(typeDistHivAge,3));       
+        for aInd = 1:age+4
+            a = aInd;
+            if aInd >= age
+                a = age;
+            end
+            if aInd <= age    
+                numAge =typeDistHivAge(: , a , :) .* worldStandard_WP2015(aInd);
+                if (a < 3)
+                    numAge = zeros(size(typeDistHivAge,1) , 1 , size(typeDistHivAge,3));
+                end
+            elseif aInd > age
+                numAge = typeDistHivAge(: , a , :);
+                numAge = cat(3 , (ones(size(numAge,1),1,aInd-a).*numAge(:,1,1)) , numAge(: , 1 ,1:end-(aInd-a)));
+                numAge = numAge .* worldStandard_WP2015(aInd);
+            end
+            numTot = numTot + numAge;
+        end
+        typeDistTot = numTot ./ (sum(worldStandard_WP2015(1:age+4)));
+
+        disp(['Median: ' , num2str(squeeze(median(squeeze(typeDistTot(: , 1 , (end-firstYrInd))) , 1))) , ...
+            ' 10th: ' , num2str(squeeze(prctile(squeeze(typeDistTot(: , 1 , (end-firstYrInd))) , 10 , 1))) , ...
+            '90th: ' , num2str(squeeze(prctile(squeeze(typeDistTot(: , 1 , (end-firstYrInd))) , 90 , 1)))])
+    end
+end
+
 
 %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
 
@@ -3074,10 +3297,42 @@ end
 %     screenMonthlyTimespan , min(screenCovTime,[],1) , 'k--' , ...
 %     screenMonthlyTimespan , max(screenCovTime,[],1) , 'k--' , 'LineWidth' , 1.5);
 % xlabel('Time'); ylabel('Screening coverage');
-% xlim([2020 2100]); ylim([0 0.3]); grid on;
+% xlim([2020 2100]); ylim([0 1.0]); grid on;
 % title(['Screening coverage ages 35-39']);
 % legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
 %     'Location' , 'northwest');
+
+%% Screening coverage ages 45-49
+% figure;   
+% plot(screenMonthlyTimespan , mean(screenCovTime45,1) , 'k-' , ...
+%     screenMonthlyTimespan , min(screenCovTime45,[],1) , 'k--' , ...
+%     screenMonthlyTimespan , max(screenCovTime45,[],1) , 'k--' , 'LineWidth' , 1.5);
+% xlabel('Time'); ylabel('Screening coverage');
+% xlim([2020 2100]); ylim([0 1.0]); grid on;
+% title(['Screening coverage ages 45-49']);
+% legend('Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
+%     'Location' , 'northwest');
+
+%% Total number of women screened annually by age and disease status (2020-2120) into existing template
+diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N) ' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N) W'};
+firstYrInd =((2020 - startYear) +1); %1;
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
+     writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
+     writematrix(squeeze(median(squeeze(screenTotAnnual45(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B15')
+end
+
+% if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_hpvHIVcalib')
+%     diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N)' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N)'};
+%     firstYrInd = ((1990 - startYear) +1);
+%     lastYrInd = ((2020 - startYear) +1);
+%     for dInd = 1 : length(diseaseLabels)
+%         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
+%         writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : lastYrInd))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
+%     end  
+% end
 
 %% Total number of women screened annually by age and disease status
 % diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
@@ -3090,26 +3345,27 @@ end
 %         squeeze(min(squeeze(screenTotAnnual35(: , dInd , :)) , [] , 1)) ; ...
 %         squeeze(max(squeeze(screenTotAnnual35(: , dInd , :)) , [] , 1))]]] , fname)
 % end
- 
-%% Total number of women screened annually by age and disease status (2020-2120) into existing template
-% diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N) ' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N) W'};
-% firstYrInd =((2020 - startYear) +1); %1;
-% for dInd = 1 : length(diseaseLabels)
+
+%% Total number of women treated to immune by age and disease status
+% diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+% for dInd = 1 : 1
 %     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
-%         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
-%     writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
-%     %writematrix(squeeze(median(squeeze(screenTotAnnual45(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B15')
+%         'TreatImmTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+%     writematrix([[0 ; 35 ; 45] , ...
+%         [[currYear : timeStep : (lastYear-1)] ;
+%         [squeeze(median(squeeze(treatImmTot35(: , dInd , 1:end-5)) , 1)) ; ...
+%         squeeze(median(squeeze(treatImmTot45(: , dInd , 1:end-5)) , 1))]]] , fname)
 % end
-% 
-% if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_hpvHIVcalib')
-%     diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N)' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N)'};
-%     firstYrInd = ((1990 - startYear) +1);
-%     lastYrInd = ((2020 - startYear) +1);
-%     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
-%             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
-%         writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : lastYrInd))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
-%     end  
+
+%% Total number of women treated with persistent HPV by age and disease status
+% diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
+% for dInd = 1 : 1
+%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%         'TreatHpvTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
+%     writematrix([[0 ; 35 ; 45] , ...
+%         [[currYear : timeStep : (lastYear-1)] ;
+%         [squeeze(median(squeeze(treatHpvTot35(: , dInd , 1:end-5)) , 1)) ; ...
+%         squeeze(median(squeeze(treatHpvTot45(: , dInd , 1:end-5)) , 1))]]] , fname)
 % end
 
 %% Vaccine coverage overall
