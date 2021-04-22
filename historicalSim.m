@@ -595,7 +595,7 @@ if calibBool
         age , gender , risk , startYear , stepsPerYear , annlz)
     
     if isnan(negSumLogL)
-        negSumLogL = -10000000.00;
+        negSumLogL = -10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00;
     end
     
 else
