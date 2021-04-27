@@ -56,22 +56,22 @@ paramDir = [pwd , '\Params\'];
 % ***SET ME***: name of directory where files are located
 dirName = 'Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_CISNET-S0_6_1';
 
-% ***SET ME***: names of teams with data to plot
-teamVec = {'UW' , 'NSWCC'};
+% ***SET ME***: names of teams with data to plot; should match team names in input file names
+teamVec = {'UW' , 'DC'};
 nTeams = length(teamVec);
-% ***SET ME***: scenario numbers to plot
+% ***SET ME***: scenario numbers to plot; should match scenario names in input file names
 sceVec = {'S0' , 'S1' , 'S2'};
 nSces = length(sceVec);
 
-% ***SET ME***: plot titles
+% ***SET ME***: legend titles
 plotTits = {'' , 'UW: No HIV' , '      : HIV, no ART' , '      : HIV, observed ART' , ...
-    'NSWCC: No HIV' , '      : HIV, no ART' , '      : HIV, observed ART'};
+    'DC: No HIV' , '      : HIV, no ART' , '      : HIV, observed ART'};
 plotTits2 = {'UW: Total' , '      : HIV-negative' , '      : HIV-positive, all' , ...
-    'NSWCC: Total' , '      : HIV-negative' , '      : HIV-positive, all'};
+    'DC: Total' , '      : HIV-negative' , '      : HIV-positive, all'};
 plotTits3 = {'Total' , 'HIV-negative' , 'HIV-positive, all' , 'HIV-positive, untreated' , 'HIV-positive, on ART'};
-colorVec = {[0 0.4470 0.7410] , [0.4660 , 0.6740 , 0.1880] , [0.8500 0.3250 0.0980]}; 
-styleVec = {'-' , '--' , ':'};
-widthVec = {4.0 , 0.5 , 2.0};
+colorVec = {[0 0.4470 0.7410] , [0.4660 , 0.6740 , 0.1880] , [0.8500 0.3250 0.0980]}; % plot line colors
+styleVec = {'-' , '--' , ':'}; % plot line styles (for plots by scenario)
+widthVec = {4.0 , 0.5 , 2.0}; % pot line widths (for plots by HIV status)
 
 % Plot settings
 reset(0)
@@ -90,7 +90,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot(t82on , hpvPrevTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -128,7 +128,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
             numHpvTot = zeros(1 , size(hpv_hivAgeW_dis,2));       
@@ -158,7 +158,7 @@ for i = 1 : nTeams
 end
 
 legend(plotTits{:} , 'Location' , 'northeast');
-xlim([1980 2121]); ylim([0 1.0]);
+xlim([1980 2121]); ylim([0 0.5]);
 grid on;
 xlabel('Year'); ylabel('AS-HPV prevalence among women');
 
@@ -187,7 +187,7 @@ for i = 1 : nTeams
         for dInd = 1 : 3 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot([1:length(ageGroup)] , hpvPrevTime(year2021,:) , 'Color' , colorVec{i} , 'LineWidth' , widthVec{dInd});
@@ -212,7 +212,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot(t82on , ccIncTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -251,7 +251,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
             numCCTot = zeros(1 , size(ccIncAge_dis,2));       
@@ -315,7 +315,7 @@ for i = 1 : nTeams
         for dInd = 1 : 3 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot([1:length(ageGroup)] , ccIncTime(year2021,:) , 'Color' , colorVec{i} , 'LineWidth' , widthVec{dInd});
@@ -329,6 +329,10 @@ grid on;
 xlabel('Age Group'); ylabel('Crude cervical cancer incidence'); title('S2: HIV, observed ART; Year: 2018')
 
 %% Crude cumulative cervical cancer cases over time
+% Note: need to check UW trends (more cumulative cases of CC in S0 compared
+% to S1/2). This may be due to drastic difference in population size between
+% scenarios due to large impact of HIV-associated mortality and no scale up 
+% of ART until the 2000s.
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
 t82on = (1982:2121)';
@@ -337,15 +341,15 @@ t82onLen = length(t82on);
 xline(2021);
 for i = 1 : nTeams
     for j = 1 : nSces  
-        for dInd = 1 : 1 %5
+        for dInd = 2 : 2 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
             ccCasesTime = readmatrix(fname , 'Sheet' , 'CC case counts' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)]);
             ccCasesTotTime = sum(ccCasesTime,2);
             ccCasesCumTime = cumsum(ccCasesTotTime);
             hold all;
-            p = plot(t82on , ccCasesCumTime , 'Color' , colorVec{i} , 'LineWidth' , widthVec{j});
+            p = plot(t82on , ccCasesCumTime , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
         end
     end
 end
@@ -368,19 +372,19 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
         fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
         hivPrevTime = readmatrix(fname , 'Sheet' , 'HIV prevalence' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
         p = plot(t82on , hivPrevTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
     end
 end
 
-legend('' , plotTits{2:end} , 'Location' , 'northwest');    %'(SA DHS) Observed SA, ages 15+' , 
-xlim([1980 2121]); ylim([0 1.0]);
+legend('' , plotTits{2:end} , 'Location' , 'northeast');    %'(SA DHS) Observed SA, ages 15+' , 
+xlim([1980 2121]); ylim([0 0.5]);
 grid on;
 xlabel('Year'); ylabel('Crude HIV prevalence among women');
 
-%% Crude ART coverage over time
+%% Crude proportion on ART + VS over time
 fig = figure;
 set(fig,'DefaultAxesFontSize' , 18);
 t82on = (1982:2121)';
@@ -388,12 +392,12 @@ t82onLen = length(t82on);
 
 xline(2021);
 hold all;
-plot((artYr + 1) , maxRateF , 'ro');
+plot([(artYr(1:end-1) + 1) ; 2020] , [maxRateF(1:end-1) ; 0.627829] , 'ro');
 for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
         fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042020.xlsx'];
+            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
         artCovTime = readmatrix(fname , 'Sheet' , 'ART coverage' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
         p = plot(t82on , artCovTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -403,6 +407,6 @@ end
 legend('' , 'Observed KZN, on ART + VS' , plotTits{2:end} , 'Location' , 'northeast');
 xlim([1980 2121]); ylim([0 1.0]);
 grid on;
-xlabel('Year'); ylabel('ART coverage among women');
+xlabel('Year'); ylabel('Proportion on ART + VS among women');
 
 
