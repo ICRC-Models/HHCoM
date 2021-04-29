@@ -13,7 +13,7 @@ date = date_abc;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
@@ -55,7 +55,7 @@ for m = paramSetIdx : nPrlSets : (numBestFits+paramSetIdx-1)
     %subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
         paramSet = top50Params(:,subMatrixInds(n));
-        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , specIndsList(m + n - 1) , tstep_abc , date_abc);
+        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , orderedLL(n+m-1,1) , tstep_abc , date_abc);
     end
 end
 

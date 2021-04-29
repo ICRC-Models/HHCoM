@@ -1,4 +1,4 @@
-% function[] = showResults_multSims_CIs()
+function[] = showResults_multSims_CIs(fileList)
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -48,7 +48,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-fileInds = {'76','87','273','315','316','407','2814','2964','3165','3187','3198','3242'};    % 22Apr20Ph2V11
+files = fileList;    % 22Apr20Ph2V11
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -129,7 +129,7 @@ mkdir(groupDir);
 
 for j = 1 : nRuns
     % Load results
-    pathModifier = ['toNow_28Feb21_noBaseVax_baseScreen_hpvHIVcalib_2_' , fileInds{j}];
+    pathModifier = [files(j)];
     histResult = load([resultsDir , pathModifier]);
 
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************

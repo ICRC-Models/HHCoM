@@ -106,6 +106,52 @@ masterNumFltrdSets = length(master_negS_ordered_flatDat);
 fileLL = ['orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of sorted log-likelihoods
 csvwrite([paramDir, fileLL] , [inds , vals]);
 
+
+
+
+nBestFits = 15;
+templatename = "Params/orderedLL_calib_";
+resultsTemplate =  "toNow_";
+resultsTemplateEnd = "_noBaseVax_baseScreen_hpvHIVcalib_";
+iterationCounter = zeros(nSets,1);
+filename = strcat(templatename,date,"_",int2str(0),".dat");
+bestfits = [load(filename),iterationCounter];
+filesList = strings(nBestFits,1);
+%% 
+
+for j = 1:t
+    filename = strcat(templatename,date,"_",int2str(j),".dat");
+    temp = [load(filename),iterationCounter];
+    
+    for i = 1:nSets
+        
+        if temp(i,1) <= alpha*nSets
+            temp(i,:) = bestfits(temp(i,1),:);
+        else
+            temp(i,1) = temp(i,1)-alpha*nSets;
+            temp(i,3) = j;
+        end
+    end
+    bestfits = temp;
+    
+end
+
+for b = 1 : nBestFits
+    filesList(b) = strcat(resultsTemplate,date,resultsTemplateEnd,int2str(bestfits(b,3)),"_",int2str(bestfits(b,1)));
+end
+
+showResults_multSims_CIs(filesList);
+
+
+
+
+
+
+
+
+
+
+
 %% Save accepted particles from iteration t and their associated data
 alphaSets = masterSetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
 fileAlpha = ['alphaParamSets_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of top alpha-proportion of particles
