@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -43,7 +43,7 @@ fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year 
 % SCREENING
 % Instructions: Choose either the original baseline screening algorithm or the screening paper cytology algorithm
 %   Screening coverage, HIV groups, and ages are set automatically below 
-screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 3 for spCyto)
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 3 for spCyto)
 
 % VACCINATION
 % Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
@@ -57,7 +57,7 @@ rVaxWane = 0.0; % rate of waning vaccine immunity
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
-vaxRate = 0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
+vaxRate = 0.0; %0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
