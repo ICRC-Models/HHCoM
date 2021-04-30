@@ -341,7 +341,7 @@ t82onLen = length(t82on);
 xline(2021);
 for i = 1 : nTeams
     for j = 1 : nSces  
-        for dInd = 2 : 2 %5
+        for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
