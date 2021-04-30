@@ -521,7 +521,7 @@ for k = 1 : loopSegmentsLength-1
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             ccAnlHivTime(j , dInd , :) = ...
-                squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , : , :),2),3),4)));
+                annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , : , :),2),3),4));
         end
         
         %% Annual cervical cancer cases by HIV status and age over time
@@ -529,7 +529,7 @@ for k = 1 : loopSegmentsLength-1
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 ccAnlHivAgeTime(j , dInd , a , :) = ...
-                    squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , a , :),2),3),4)));
+                    annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , a , :),2),3),4));
             end
         end
         
@@ -1428,7 +1428,7 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
     'ART_comparative_modeling_outcome_templates_030421.xlsx'];
 writematrix(outputVec , fname , 'Sheet' , 'ICC-Crude');
 
-%% Write cumulative cervical cancer cases by by HIV status over time (2020-2120) into existing template
+%% Write cumulative cervical cancer cases by HIV status over time (2020-2120) into existing template
 % diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
 % for dInd = 1 : length(diseaseLabels)
 %     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
