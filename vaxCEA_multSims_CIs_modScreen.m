@@ -67,11 +67,11 @@ nRuns = length(fileInds);
 
 % Initialize model output plots
 % Timespans
-monthlyTimespan = [startYear : (1/6) : lastYear];
+monthlyTimespan = [startYear : timeStep : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
 futAnnualTimespan = [currYear : lastYear-1];
-midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
+midAnnualTimespan = [(startYear+0.5) : ((lastYear-1)+0.5)];
 % Total population size
 popSize = zeros(nRuns , length(monthlyTimespan));
 % Population age distribution
@@ -431,7 +431,7 @@ for k = 1 : loopSegmentsLength-1
         fac = 10 ^ 5;
         for i = 1 : ccYearVecLength
             yr = ccYearVec(i);
-            incTimeSpan = [((yr - startYear) * stepsPerYear +1) : ((yr - startYear) * stepsPerYear +6)];
+            incTimeSpan = [((yr - startYear) * stepsPerYear +1) : ((yr - startYear) * stepsPerYear +stepsPerYear)];
             for a = 1 : age
                 allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
                     1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
@@ -1620,9 +1620,9 @@ sgtitle('Type distribution by state (coinfections grouped as 9v-type HPV), ages 
 
 %% Vaccine coverage overall
 figure;   
-plot(midAnnualTimespan , mean(vaxCoverage(: , (4 : stepsPerYear : end)),1) , 'k-' , ...
-    midAnnualTimespan , min(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , ...
-    midAnnualTimespan , max(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(midAnnualTimespan , mean(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),1) , 'k-' , ...
+    midAnnualTimespan , min(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),[],1) , 'k--' , ...
+    midAnnualTimespan , max(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
 xlabel('Time'); ylabel('Vaccine coverage');
 xlim([2020 2100]); ylim([0 1]); grid on;
 title(['Vaccine coverage']);
@@ -1636,7 +1636,7 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
 
 figure;    
 for a = 1 : age
-    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (4 : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
+    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (((stepsPerYear/2)+1) : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
 end
 xlabel('Year'); ylabel('Vaccine coverage');
