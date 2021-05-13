@@ -56,7 +56,7 @@ paramDir = [pwd , '\Params\'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2121;
+lastYear = 2122;
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
@@ -79,13 +79,13 @@ nRuns = length(fileInds);
 
 % Initialize model output plots
 % Timespans
-monthlyTimespan = [startYear : (1/6) : lastYear];
+monthlyTimespan = [startYear : timeStep : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
 annualTimespan = [startYear : lastYear-1];
 futAnnualTimespan = [2019 : lastYear-1];
-midAnnualTimespan = [(startYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
-screenAnnualTimespan = [(2020+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))];
-screenMonthlyTimespan = [2020 : (1/6) : lastYear];
+midAnnualTimespan = [(startYear+0.5) : ((lastYear-1)+0.5)];
+screenAnnualTimespan = [(2020+0.5) : ((lastYear-1)+0.5)];
+screenMonthlyTimespan = [2020 : timeStep : lastYear];
 screenMonthlyTimespan = screenMonthlyTimespan(1 : end-1);
 % Total population size
 popSize = zeros(nRuns , length(monthlyTimespan));
@@ -206,8 +206,8 @@ typeDist = zeros(nRuns , 5 , 6 , 4 , age , length(monthlyTimespan));
 newScreenTime = zeros(nRuns , length(screenAnnualTimespan));
 screenCovTime = zeros(nRuns , length(screenMonthlyTimespan));
 screenCovTime45 = screenCovTime;
-screenTotAnnual35 = zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
-screenTotAnnual45 = zeros(nRuns , 5 , length([(currYear+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))])); %zeros(nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
+screenTotAnnual35 = zeros(nRuns , 5 , length([(currYear+0.5) : ((lastYear-1)+0.5)])); %zeros(nRuns , 5 , length([(1925+0.5) : ((lastYear-1)+0.5)]));
+screenTotAnnual45 = zeros(nRuns , 5 , length([(currYear+0.5) : ((lastYear-1)+0.5)])); %zeros(nRuns , 5 , length([(1925+0.5) : ((lastYear-1)+0.5)]));
 % treatImmTot35 = zeros(nRuns , 5 , length(screenMonthlyTimespan)); 
 % treatImmTot45 = treatImmTot35;
 % treatHpvTot35 = treatImmTot35;
@@ -220,7 +220,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_WHO-SCES' , sceNum , '_'];
+baseFileName = ['22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_gbV_'];
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
@@ -228,7 +228,7 @@ for k = 1 : loopSegmentsLength-1
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
         nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
@@ -764,7 +764,7 @@ for k = 1 : loopSegmentsLength-1
         fac = 10 ^ 5;
         for i = 1 : ccYearVecLength
             yr = ccYearVec(i);
-            incTimeSpan = [((yr - startYear) * stepsPerYear +1) : ((yr - startYear) * stepsPerYear +6)];
+            incTimeSpan = [((yr - startYear) * stepsPerYear +1) : ((yr - startYear) * stepsPerYear +stepsPerYear)];
             for a = 1 : age
                 allF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
                     1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
@@ -1316,14 +1316,14 @@ for dInd = 1 : length(diseaseLabels)
         'WmnYrs_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
-        [squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , 1)) ; ...
-        squeeze(min(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , [] , 1)) ; ...
-        squeeze(max(squeeze(popSizeAgeF(: , dInd , : , (4 : stepsPerYear : end))) , [] , 1))]]] , fname)   
+        [squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1) : stepsPerYear : end))) , 1)) ; ...
+        squeeze(min(squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1) : stepsPerYear : end))) , [] , 1)) ; ...
+        squeeze(max(squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1) : stepsPerYear : end))) , [] , 1))]]] , fname)   
 end
 
 %% Write female total population size by 5-year age groups over time (2019-2120) into existing template
 diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
-firstYrInd = ((2019 - startYear) * stepsPerYear +4);
+firstYrInd = ((2019 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
@@ -1331,7 +1331,7 @@ for dInd = 1 : length(diseaseLabels)
 end
 
 diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
-firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
@@ -1368,8 +1368,8 @@ end
 
 if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_WHO')
     diseaseLabels = {'All - Pop (P-Y) W' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
-    firstYrInd = ((1990 - startYear) * stepsPerYear +4);
-    lastYrInd = ((2020 - startYear) * stepsPerYear +4);
+    firstYrInd = ((1990 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
+    lastYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
     for dInd = 1 : length(diseaseLabels)
         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
@@ -1934,7 +1934,7 @@ sgtitle('Female hrHPV Prevalence (includes CIN) by HIV status');
 
 %% Female hrHPV prevalence by 5-year age groups over time               
 diseaseLabels = {'Pop(All) (hrHPV)' , 'HIV-  (hrHPV)' , 'HIV+   (hrHPV)' , 'HIV+ no ART  (hrHPV)' , 'HIV+ ART  (hrHPV)'};
-firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
@@ -1958,7 +1958,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 diseaseLabels = {'Pop(All) (hrHPV)' , 'HIV-  (hrHPV)' , 'HIV+   (hrHPV)' , 'HIV+ no ART  (hrHPV)' , 'HIV+ ART  (hrHPV)'};
 firstYrRange2 = (lastYear-1) - 2020;
 for dInd = 1 : length(diseaseLabels)
-    hpvHivAgeF_dis = squeeze(hpvHivAgeF(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+    hpvHivAgeF_dis = squeeze(hpvHivAgeF(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end)));
 
     numHpvTot = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));       
     for aInd = 1:age+4
@@ -1987,7 +1987,7 @@ end
    
 %% Female VT-hrHPV prevalence by 5-year age groups over time
 diseaseLabels = {'Pop(All) (vtHPV)' , 'HIV-  (vtHPV)' , 'HIV+   (vtHPV)' , 'HIV+ no ART  (vtHPV)' , 'HIV+ ART  (vtHPV)'};
-firstYrInd = ((2020 - startYear) * stepsPerYear +4);   
+firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));   
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
@@ -2011,7 +2011,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 diseaseLabels = {'Pop(All) (vtHPV)' , 'HIV-  (vtHPV)' , 'HIV+   (vtHPV)' , 'HIV+ no ART  (vtHPV)' , 'HIV+ ART  (vtHPV)'};
 firstYrRange2 = (lastYear-1) - 2020;
 for dInd = 1 : length(diseaseLabels)
-    hpvHivAgeF_dis = squeeze(hpv9VHivAgeF(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+    hpvHivAgeF_dis = squeeze(hpv9VHivAgeF(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end)));
 
     numHpvTot = zeros(size(hpvHivAgeF_dis,1) , 1 , size(hpvHivAgeF_dis,3));       
     for aInd = 1:age+4
@@ -2311,7 +2311,7 @@ end
 
 %% Female hrHPV prevalence by 5-year age groups over time               
 diseaseLabels = {'Pop(All) (CIN2+)' , 'HIV- (CIN2+)' , 'HIV+  (CIN2+)' , 'HIV+ no ART  (CIN2+)' , 'HIV+ ART  (CIN2+)'};
-firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
@@ -2335,7 +2335,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 diseaseLabels = {'Pop(All) (CIN2+)' , 'HIV- (CIN2+)' , 'HIV+  (CIN2+)' , 'HIV+ no ART  (CIN2+)' , 'HIV+ ART  (CIN2+)'};
 firstYrRange2 = (lastYear-1) - 2020;
 for dInd = 1 : length(diseaseLabels)
-    cin23HivAge_dis = squeeze(cin23HivAge(: , dInd , : , (4:stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (4:stepsPerYear:end)));
+    cin23HivAge_dis = squeeze(cin23HivAge(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end))) ./ squeeze(popSizeAgeF(: , dInd , : , (((stepsPerYear/2)+1):stepsPerYear:end)));
 
     numCinTot = zeros(size(cin23HivAge_dis,1) , 1 , size(cin23HivAge_dis,3));       
     for aInd = 1:age+4
@@ -3289,8 +3289,8 @@ for hInd = 1 : 6    % HPV state (HPV, CIN1, CIN2, CIN3 , CIN2/3 , CC)
     for i = 1 : 4
         if (i == 1) || (i == 4) 
             if i == 1
-                squeeze((typePrevTot(hInd , 1 , : , 1 , (end-firstYrInd)) + typePrevTot(hInd , 4 , : , 1 , (end-firstYrInd))))' - squeeze((typePrevTot(hInd , 2 , : , 1 , (end-firstYrInd)) + typePrevTot(hInd , 3 , : , 1 , (end-firstYrInd))))'
-                squeeze(sum(typeDist(: , 1 , hInd , 1 , : , (end-firstYrInd)) , 5) + sum(typeDist(: , 1 , hInd , 4 , : , (end-firstYrInd)) , 5))' - squeeze(sum(typeDist(: , 1 , hInd , 2 , : , (end-firstYrInd)) , 5) + sum(typeDist(: , 1 , hInd , 3 , : , (end-firstYrInd)) , 5))'
+                squeeze((typePrevTot(hInd , 1 , : , 1 , (end-firstYrInd)) + typePrevTot(hInd , 4 , : , 1 , (end-firstYrInd))))' - squeeze((typePrevTot(hInd , 2 , : , 1 , (end-firstYrInd)) + typePrevTot(hInd , 3 , : , 1 , (end-firstYrInd))))';
+                squeeze(sum(typeDist(: , 1 , hInd , 1 , : , (end-firstYrInd)) , 5) + sum(typeDist(: , 1 , hInd , 4 , : , (end-firstYrInd)) , 5))' - squeeze(sum(typeDist(: , 1 , hInd , 2 , : , (end-firstYrInd)) , 5) + sum(typeDist(: , 1 , hInd , 3 , : , (end-firstYrInd)) , 5))';
             end
             typeDistTot(hInd , i , : , 1 , :) = typePrevTot(hInd , i , : , 1 , :) ./ (typePrevTot(hInd , 1 , : , 1 , :) + typePrevTot(hInd , 4 , : , 1 , :));
         elseif (i == 2) || (i == 3)
@@ -3365,7 +3365,7 @@ end
 %     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
 %         'ScreenTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
 %     writematrix([[0 ; 35 ; 35 ; 35] , ...
-%         [[(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))] ;
+%         [[(1925+0.5) : ((lastYear-1)+0.5)] ;
 %         [squeeze(median(squeeze(screenTotAnnual35(: , dInd , :)) , 1)) ; ...
 %         squeeze(min(squeeze(screenTotAnnual35(: , dInd , :)) , [] , 1)) ; ...
 %         squeeze(max(squeeze(screenTotAnnual35(: , dInd , :)) , [] , 1))]]] , fname)
@@ -3395,9 +3395,9 @@ end
 
 %% Vaccine coverage overall
 figure;   
-plot(midAnnualTimespan , mean(vaxCoverage(: , (4 : stepsPerYear : end)),1) , 'k-' , ...
-    midAnnualTimespan , min(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , ...
-    midAnnualTimespan , max(vaxCoverage(: , (4 : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
+plot(midAnnualTimespan , mean(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),1) , 'k-' , ...
+    midAnnualTimespan , min(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),[],1) , 'k--' , ...
+    midAnnualTimespan , max(vaxCoverage(: , (((stepsPerYear/2)+1) : stepsPerYear : end)),[],1) , 'k--' , 'LineWidth' , 1.5);
 xlabel('Time'); ylabel('Vaccine coverage');
 xlim([2020 2100]); ylim([0 1]); grid on;
 title(['Vaccine coverage']);
@@ -3411,7 +3411,7 @@ ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
 
 figure;    
 for a = 1 : age
-    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (4 : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
+    plot(midAnnualTimespan , mean(squeeze(vaxCoverageAge(: , a , (((stepsPerYear/2)+1) : stepsPerYear : end))),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
 end
 xlabel('Year'); ylabel('Vaccine coverage');
@@ -3441,14 +3441,14 @@ for dInd = 1 : length(diseaseLabels)
         'VaxTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
-        [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , 1)) ; ...
-        squeeze(min(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1)) ; ...
-        squeeze(max(squeeze(vaxTotAge(: , : , dInd , (4 : stepsPerYear : end))) , [] , 1))]]] , fname)
+        [squeeze(median(squeeze(vaxTotAge(: , : , dInd , (((stepsPerYear/2)+1) : stepsPerYear : end))) , 1)) ; ...
+        squeeze(min(squeeze(vaxTotAge(: , : , dInd , (((stepsPerYear/2)+1) : stepsPerYear : end))) , [] , 1)) ; ...
+        squeeze(max(squeeze(vaxTotAge(: , : , dInd , (((stepsPerYear/2)+1) : stepsPerYear : end))) , [] , 1))]]] , fname)
 end 
 
 %% Total vaccinated by age and disease status (2020-2120) into existing template
 diseaseLabels = {'Vaccinated (All) (N)' , 'Vaccinated (HIV-) (N)' , 'Vaccinated (HIV+) (N)' , 'Vaccinated (HIV+ not on ART)(N)' , 'Vaccinated (HIV+ on ART) (N)'};
-firstYrInd = ((2020 - startYear) * stepsPerYear +4);
+firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
