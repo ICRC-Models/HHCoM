@@ -239,7 +239,7 @@ for i = 1 : length(typeDistYearVec)
 end
 
 %% Cervical cancer incidence in 2011 applied to 2009 --> CJB note: need to change year and add more years to this, not functional
-% incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +6)];
+% incTimeSpan = [((2009 - startYear) * stepsPerYear +1) : ((2009 - startYear) * stepsPerYear +stepsPerYear)];
 % fac = 10 ^ 5;
 % worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 %     247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
@@ -279,7 +279,7 @@ end
 % dVar =  [dVar ; ___];
 
 %% Cervical cancer incidence in 2012 by age
-incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
+incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +stepsPerYear)];
 fac = 10 ^ 5;
 
 ccInc2012 = zeros(13 , 1);
@@ -297,7 +297,7 @@ end
 % dVar =  [dVar ; ccInc2012_dObs(: , 3)];
 
 %% Cervical cancer incidence in 2018 by age
-incTimeSpan = [((2018 - startYear) * stepsPerYear +1) : ((2018 - startYear) * stepsPerYear +6)];
+incTimeSpan = [((2018 - startYear) * stepsPerYear +1) : ((2018 - startYear) * stepsPerYear +stepsPerYear)];
 fac = 10 ^ 5;
 
 ccInc2018 = zeros(12 , 1);
