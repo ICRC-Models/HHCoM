@@ -113,9 +113,14 @@ nBestFits = 15;
 templatename = "Params/orderedLL_calib_";
 resultsTemplate =  "toNow_";
 resultsTemplateEnd = "_noBaseVax_baseScreen_hpvHIVcalib_";
-iterationCounter = zeros(nSets,1);
+
 filename = strcat(templatename,date,"_",int2str(0),".dat");
+
+totalSets=size(load(filename),1);
+
+iterationCounter = zeros(totalSets,1);
 bestfits = [load(filename),iterationCounter];
+
 filesList = strings(nBestFits,1);
 %% 
 
@@ -123,12 +128,12 @@ for j = 1:t
     filename = strcat(templatename,date,"_",int2str(j),".dat");
     temp = [load(filename),iterationCounter];
     
-    for i = 1:nSets
+    for i = 1:totalSets
         
-        if temp(i,1) <= alpha*nSets
+        if temp(i,1) <= alpha*totalSets
             temp(i,:) = bestfits(temp(i,1),:);
         else
-            temp(i,1) = temp(i,1)-alpha*nSets;
+            temp(i,1) = temp(i,1)-alpha*totalSets;
             temp(i,3) = j;
         end
     end
