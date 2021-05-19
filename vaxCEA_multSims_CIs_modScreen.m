@@ -1384,7 +1384,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
     23477 9261 2155];
 
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
-firstYrRange = (lastYear-1) - currYear;
+firstYrRange = (lastYear-1) - (currYear-1);
 firstYrRange2 = (lastYear-1) - 1982;
 t82on = (1982:(lastYear-1))';
 outputVec = [];
