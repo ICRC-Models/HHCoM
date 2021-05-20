@@ -122,7 +122,7 @@ iterationCounter = zeros(totalSets,1);
 bestfits = [load(filename),iterationCounter];
 
 filesList = strings(nBestFits,1);
-%% 
+
 
 for j = 1:t
     filename = strcat(templatename,date,"_",int2str(j),".dat");

@@ -49,7 +49,7 @@ set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
 files = fileList;    % 22Apr20Ph2V11
-nRuns = length(fileInds);
+nRuns = length(fileList);
 
 % Initialize model output plots
 % Total population size
@@ -120,8 +120,8 @@ hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 
 
-resultsDir = [pwd , '\HHCoM_Results\'];
-figuresDir = [pwd, '\HHCoM_Figures\'];
+resultsDir = [pwd , '/HHCoM_Results/'];
+figuresDir = [pwd, '/HHCoM_Figures/'];
 t = datetime();
 groupDir = strcat(figuresDir,"Figures",int2str(t.Month), "_" , int2str(t.Day),"_",int2str(t.Hour),"_",int2str(t.Minute));
 mkdir(groupDir);
@@ -129,8 +129,8 @@ mkdir(groupDir);
 
 for j = 1 : nRuns
     % Load results
-    pathModifier = [files(j)];
-    histResult = load([resultsDir , pathModifier]);
+    pathModifier = files(j);
+    histResult = load(strcat(resultsDir , pathModifier));
 
     %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
