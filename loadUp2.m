@@ -57,7 +57,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2020;
+currYear = 2021;
 endYear = currYear;
 years = endYear - startYear;
 
@@ -810,8 +810,8 @@ artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult; % population-level ART coverage in females
+maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult; % population-level ART coverage in males
+maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -834,7 +834,7 @@ vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960
             0.143 0.201 0.14 0.12; ... % 2010
             0.172 0.242 0.191 0.143; ... % 2012
             0.459 0.42 0.318 0.204; ... % 2017 
-            0.70  0.70 0.70  0.70];   % 2030 [year x age group]
+            0.459 0.42 0.318 0.204];   % 2030 [year x age group]
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
@@ -879,31 +879,31 @@ hpvSensWHO = [0.0 , 0.0 , 0.90 , 0.94; ... % WHO HPV DNA test (susceptible/immun
               0.0 , 0.0 , 0.90 , 0.94]; 
 cytoSensSP = [0.07 , 0.07 , 0.57 , 0.57; ... % Screening paper cytology
               0.07 , 0.07 , 0.57 , 0.57; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
-              0.15 , 0.15 , 0.52 , 0.52; ... %   rows: (HIV-negative , HIV-positive untreated, HIV-positive on ART)
+              0.15 , 0.15 , 0.52 , 0.52; ... %   rows: HIV disease status
               0.15 , 0.15 , 0.52 , 0.52; ...
               0.15 , 0.15 , 0.52 , 0.52; ...
               0.15 , 0.15 , 0.52 , 0.52; ...
               0.15 , 0.15 , 0.52 , 0.52; ...
               0.11 , 0.11 , 0.55 , 0.55];   
-hpvSensSP = [0.0 , 0.15 , 0.85 , 0.85; ... % Screening paper HPV DNA test
-             0.0 , 0.15 , 0.85 , 0.85; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
-             0.0 , 0.06 , 0.94 , 0.94; ... %   rows: (HIV-negative , HIV-positive untreated, HIV-positive on ART)
-             0.0 , 0.06 , 0.94 , 0.94; ...
-             0.0 , 0.06 , 0.94 , 0.94; ...
-             0.0 , 0.06 , 0.94 , 0.94; ...
-             0.0 , 0.06 , 0.94 , 0.94; ...
-             0.0 , 0.10 , 0.90 , 0.90];   
-hpvGentypSensSP = [0.0 , 0.92 , 0.92 , 0.92; ... % Screening paper HPV DNA test + genotyping
-                   0.0 , 0.92 , 0.92 , 0.92; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
-                   0.0 , 0.92 , 0.92 , 0.92; ... %   rows: (HIV-negative , HIV-positive untreated, HIV-positive on ART)
-                   0.0 , 0.92 , 0.92 , 0.92; ... %   Women who are infected with 9v HPV who screen positive. 
-                   0.0 , 0.92 , 0.92 , 0.92; ... %   No women who are non-9vHPV+ screen positive unless they are co-infected with 9vHPV.
-                   0.0 , 0.92 , 0.92 , 0.92; ...
-                   0.0 , 0.92 , 0.92 , 0.92; ...
-                   0.0 , 0.92 , 0.92 , 0.92];                    
+hpvSensSP = [0.0 , 0.85 , 0.85 , 0.85; ... % Screening paper HPV DNA test
+             0.0 , 0.85 , 0.85 , 0.85; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+             0.0 , 0.94 , 0.94 , 0.94; ... %   rows: HIV disease status
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.90 , 0.90 , 0.90];   
+hpvGentypSensSP = [0.0 , 0.85 , 0.85 , 0.85; ... % Screening paper HPV DNA test + genotyping
+                   0.0 , 0.85 , 0.85 , 0.85; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   rows: HIV disease status
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   Women who are infected with 9v HPV who screen positive. 
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   No women who are non-9vHPV+ screen positive unless they are co-infected with 9vHPV.
+                   0.0 , 0.94 , 0.94 , 0.94; ...
+                   0.0 , 0.94 , 0.94 , 0.94; ...
+                   0.0 , 0.90 , 0.90 , 0.90];                    
 viaSensSP = [0.16 , 0.16 , 0.98 , 0.98; ... % Screening paper AVE
              0.16 , 0.16 , 0.98 , 0.98; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
-             0.22 , 0.22 , 0.98 , 0.98; ... %   rows: (HIV-negative , HIV-positive untreated, HIV-positive on ART)
+             0.22 , 0.22 , 0.98 , 0.98; ... %   rows: HIV disease status
              0.22 , 0.22 , 0.98 , 0.98; ... 
              0.22 , 0.22 , 0.98 , 0.98; ... 
              0.22 , 0.22 , 0.98 , 0.98; ... 
