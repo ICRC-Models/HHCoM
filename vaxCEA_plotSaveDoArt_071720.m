@@ -121,6 +121,7 @@ cIndsArtOnOff = {3 : 7 , 3 : 5 , 6 , 7};
 cIndsArtOnOffLength = length(cIndsArtOnOff);
 cd4DistAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 4);
 cd4DiscontAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 4);
+netAnnArtG_multSims = zeros(length([startYear : lastYear-1]) , nRuns , gender);
 cIndsCD4Trans = {6 , 7};
 cIndsCD4TransLength = length(cIndsCD4Trans);
 cd4TransAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3 , 2);
@@ -610,6 +611,15 @@ for k = 1 : loopSegmentsLength-1
                 cd4DiscontAgeC_multSims(: , j , aInd , cInd) = discont_subC(1 : end)';
             end
         end
+        
+        %% NET NUMBER NEWLY INITIATING ART DURING EACH YEAR BY GENDER
+        % ART initiation - ART discontinuation = net starting ART during year
+        for gInd = 1 : gender
+            g = gInd;
+            netAnnualART = annlz(sum(sum(sum(sum(sum(vaxResult{n}.artTreatTracker(: , : , : , g , 4 : age , :), 2), 3), 4), 5), 6)) - ...
+                annlz(sum(sum(sum(sum(sum(vaxResult{n}.artDiscont(: , : , : , g , 4 : age , :), 2), 3), 4), 5), 6));
+            netAnnArtG_multSims(: , j , gInd) = netAnnualART(1 : end)';
+        end
 
         %% CD4 TRANSITIONS BY AGE
         % Calculate combined
@@ -1040,6 +1050,20 @@ for c = 1 : length(cInds)
             cd4DiscontAgeC_multSims(: , : , a-3 , c)] , fname)
     end
 end
+
+%% Save net number newly initiating ART during each year by gender
+% female
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'Raw_net_ART_init_females_aged15-79.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(netAnnArtG_multSims(: , : , 2)) , 2) , ...
+    min(squeeze(netAnnArtG_multSims(: , : , 2)) , [] , 2) , max(squeeze(netAnnArtG_multSims(: , : , 2)) , [] , 2) , ...
+    squeeze(netAnnArtG_multSims(: , : , 2))] , fname)
+% male 
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'Raw_net_ART_init_males_aged15-79.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(squeeze(netAnnArtG_multSims(: , : , 1)) , 2) , ...
+    min(squeeze(netAnnArtG_multSims(: , : , 1)) , [] , 2) , max(squeeze(netAnnArtG_multSims(: , : , 1)) , [] , 2) , ...
+    squeeze(netAnnArtG_multSims(: , : , 1))] , fname)
 
 %% Save CD4 transitions by age
 cInds = {6 , 7};
