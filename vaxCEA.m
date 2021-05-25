@@ -46,19 +46,19 @@ function vaxCEA(pathModifier)
 annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
 % Load results
-pathModifier = '14Dec20_stochMod_noVax';
+pathModifier = '15Jan_stochMod_noVax';
 nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']), 1 );
-curr = load([pwd , '\HHCoM_Results\toNow_14DEC20_stochMod_2']); % Historical output up to current year
+curr = load([pwd , '\HHCoM_Results\toNow_15Jan_stochMod_50']); % Historical output up to current year
 
 clear cell;
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+resultFileName = [pwd , '\HHCoM_Results\vaxSimResult50'];
 if waning
     resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
-    vaxResult{n} = load([resultFileName , num2str(n), '.mat']); 
+    vaxResult{n} = load([resultFileName, '.mat']); 
     % concatenate vectors/matrices of population up to current year to population
     % matrices for years past current year
     vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
@@ -100,7 +100,7 @@ art = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
 
 genArray = {hivNeg , hivNoART , art};   
 
-for n = 1 : 5
+for n = 1
 totalPop0_79 = sum(vaxResult{n}.popVec(:,genArray{1}),2) + sum(vaxResult{n}.popVec(:,genArray{2}),2) + sum(vaxResult{n}.popVec(:,genArray{3}),2);
 
 file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
@@ -245,7 +245,7 @@ hivObsGender(:,3) = [2003 2007 2009 2012];
 hivObsGender(:,1) = [8.7 8.4 8.0 6.9]; 
 hivObsGender(:,2) = [4.6 5.4 4.6 4.4]; 
 
-n = 2;
+n = 1;
 
 for g = 1 : 2
     artInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -316,6 +316,19 @@ xlswrite(excelfile, cols1, sheet, 'M1')
 xlswrite(excelfile, cols2, sheet, 'M2')
 %xlswrite(excelfile, [tVec(331: stepsPerYear :end)', hivPrev(331:stepsPerYear:end) ], sheet, 'J3')
 xlswrite(excelfile, [hivPrev(331:stepsPerYear:end) ], sheet, 'M3')
+%% vaccination coverge 
+vaxCoverageAge = zeros(length(tVec));
+ for a = 1 : age
+    vaxInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , [2 , 4] , 2 , 3:5 , 1 : risk));
+    popInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , 3:5 , 1 : risk));
+    vaxCoverageAge(a , :) = sum(vaxResult{1}.popVec(: , vaxInds) , 2) ./ sum(vaxResult{1}.popVec(: , popInds) , 2);
+ end
+
+ plot(tVec , vaxCoverageAge(3, :))
+ xlim([2020 2070])
+   
 
 %% CC incidence and incidence reduction (not age-standardized)
 inds = {':' , 1 : 2 , 3 : 7 , 8 , 3 : 8};
@@ -373,7 +386,7 @@ figure();
         vaxResult{n}.ccIncNoART = ccIncNoART;
     end
     
-    for n = 4
+    for n = 1
     plot(vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncAll , linStyle{n}, ...
         vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivNeg ,linStyle{n},...
         vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivPos ,linStyle{n},...
@@ -488,7 +501,7 @@ for n = 1 : nSims
 end
     %%
     figure()
-    for n = 4
+    for n = 1
         plot(vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncAll , linStyle{n}, ...
         vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivNeg ,linStyle{n},...
         vaxResult{n}.tVec(1 : stepsPerYear : end) , vaxResult{n}.ccIncHivPos ,linStyle{n},...
@@ -600,7 +613,7 @@ xlabel('Year')
 
 ylabel('Proportion of HIV-Negative Males Circumcised by Broad Age Groups (%)')
 title('Circumcision Indicator')
-xlim([1960 2120]);
+xlim([2000 2070]);
 grid on;
 legend('0-4, Model' , '15-19' , '20-24' , '25-49' , '50+' , ...
     '0-4, Observed' , '15-19' , '20-24' , '25-49' , '50+' , 'Location' , 'NorthWest');

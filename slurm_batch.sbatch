@@ -16,7 +16,7 @@ pwd; hostname; date  #--qos=MaxJobs4
 
 echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
 TCURR=0
-DATE=14DEC20
+DATE=15Jan
 SETIDX=1
 echo "${SETIDX}" 
 export SETIDX

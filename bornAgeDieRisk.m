@@ -27,8 +27,7 @@ function [dPop , extraOut] = bornAgeDieRisk(t , pop , year , ...
         vaxScreen , vaxXscreen , hpvScreenStartYear)
 
 %% Calculate MTCT rate
-kHiv = MTCTRate(1); % year <= 2004
-% linearly increase MTCT rate from 2004 to 2005, 2005 to 2008. Constant after 2008
+kHiv = MTCTRate(1); 
 if year > 2013
     kHiv = MTCTRate(3);
 elseif year > 2007
@@ -58,12 +57,12 @@ elseif (year > 1990) && (year <= 2020)
     hivFertPosBirth = hivFertPosBirth2 + dFertPos2 .* dt;
     hivFertNegBirth = hivFertNegBirth2 + dFertNeg2 .* dt;
     fertMat = fertMat2 + dFertMat2 .* dt;
-elseif (year > 2020) && (year <= 2070)
+elseif (year > 2020) && (year <= 2050)
     dt = (year - 2020) * stepsPerYear;
     hivFertPosBirth = hivFertPosBirth3 + dFertPos3 .* dt;
     hivFertNegBirth = hivFertNegBirth3 + dFertNeg3 .* dt;
     fertMat = fertMat3 + dFertMat3 .* dt ;
-elseif (year > 2070)
+elseif (year > 2050)
     hivFertPosBirth = hivFertPosBirth4;
     hivFertNegBirth = hivFertNegBirth4;
     fertMat = fertMat4;

@@ -42,7 +42,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
 tic
 
 paramDir = [pwd , '/Params/'];
-calibBool = 0;
+% calibBool = 0;
 %% Set and save general parameters
 
 % Time
@@ -473,8 +473,8 @@ if calibBool && any(29 == pIdx)
     kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * kCin3_Cin2Mult(1);
     kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2) * kCin3_Cin2Mult(2);
 else
-    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.4;
-    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 3.4; %original multiplier 1.7
+    kCin3_Cin2(1 : 5 , 1) = kCin3_Cin2_orig(1 , 1) * 1.3;
+    kCin3_Cin2(1 : 5 , 2) = kCin3_Cin2_orig(1 , 2)* 3.3; %original multiplier 1.7
 end
 
 % CIN3 to unlocalized cancer, ages 10-24
@@ -484,8 +484,8 @@ if calibBool && any(30 == pIdx)
     kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) * kCC_Cin3Mult(1);
     kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) * kCC_Cin3Mult(2);
 else
-    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2.1;
-    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 6.7;
+    kCC_Cin3(1 : 5 , 1) = kCC_Cin3_orig(1 , 1) .* 2.0;
+    kCC_Cin3(1 : 5 , 2) = kCC_Cin3_orig(1 , 2) .* 6.6;
 end
 
 % HPV to Well (or natural immunity), ages 10-24
@@ -528,8 +528,8 @@ if calibBool && any(34 == pIdx)
     kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1) * kCin2_Cin3Mult(1);
     kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * kCin2_Cin3Mult(2);
 else
-    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1)* 1 ;
-    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.4;
+    kCin2_Cin3(1 : 5 , 1) = kCin2_Cin3_orig(1 , 1)* 1.1 ;
+    kCin2_Cin3(1 : 5 , 2) = kCin2_Cin3_orig(1 , 2) * 0.5;
 end
 
 
@@ -577,7 +577,7 @@ load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
 
 circProtect = 0.55;
 % Protection from circumcision and condoms
-circProtect = [[circProtect; 0.3] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
+circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
 %% Save HPV natural history parameters
@@ -618,7 +618,7 @@ if ~fivYrAgeGrpsOn
     end
 end
 
-% HPV clearance multiplier for HIV-positive persons 
+% HPV immunity clearance multiplier for HIV-positive persons 
 rImmuneHiv = [1.4167; 1.5682; 1.9722; 2.8333];
 
 % HPV infection multiplier for HIV-positive persons
@@ -793,7 +793,7 @@ end
 
 % Intervention start years
 hivStartYear = 1978;
-circStartYear = 1980;
+circStartYear = 1960;
 circNatStartYear = 2008;
 vaxStartYear = 2021;
 %%
@@ -831,18 +831,18 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.08; 0.16; 0.16; 0.16; 0.16; 0.16]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
+baseline.screenCover = [0.0; 0.04; 0.074; 0.074; 0.074; 0.074; 0.074]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.333; % assummed
+baseline.colpoRetain = 0.72; % Khozaim, 2013, Gyne & Obst
 baseline.cinTreatEff = [0.97 , 0.97 , 0.67 , 0.67 , 0.66 , 0.66 , 0.66 , 0.71]; % cryo efficacy in HIV+ based on Greene et al 2020 and in HIV- based on Kuhn et al2010
-baseline.cinTreatRetain = 0.25; % assumed
-baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP including treatment failure
-baseline.cinTreatHpvPersistHivNeg = baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1)); % 0.185; proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
-baseline.ccTreatRetain = 0.2; % assumed
+baseline.cinTreatRetain = 0.5; % Khozaim, 2013, Gyne & Obst 
+baseline.cinTreatHpvPersist = 0.7; % HPV persistence with cryo including treatment failure among HIV+ DeVuyst, 2014
+baseline.cinTreatHpvPersistHivNeg = 0.195; % Torne, 2012 BJOG; baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1));  proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
+baseline.ccTreatRetain = 0.4; % Khozaim, 2013, Gyne & Obst
 baseline.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
@@ -851,16 +851,16 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.1; 0.30; 0.30; 0.30; 0.30; 0.30];
+cisnet.screenCover = [0.0; 0.04; 0.123; 0.123; 0.123; 0.123; 0.123];
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 cisnet.testSens = cytoSens2;
-cisnet.colpoRetain = 0.333; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
+cisnet.colpoRetain = baseline.colpoRetain; % Khozaim, 2013, Gyne & Obst; 0.333; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
-cisnet.cinTreatRetain = 0.25; % assumed
-cisnet.cinTreatHpvPersist = 0.28; % HPV persistence with cryotherapy including treatment failure
-cisnet.cinTreatHpvPersistHivNeg = cisnet.cinTreatHpvPersist - (1-cisnet.cinTreatEff(1)); % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy
-cisnet.ccTreatRetain = 0.2; % assumed
+cisnet.cinTreatRetain = baseline.cinTreatRetain ; % Khozaim, 2013, Gyne & Obst  0.25; % assumed
+cisnet.cinTreatHpvPersist = 0.7; % HPV persistence with cryo including treatment failure among HIV+ DeVuyst, 2014
+cisnet.cinTreatHpvPersistHivNeg = 0.195; % Torne, 2012 BJOG; cisnet.cinTreatHpvPersist - (1-cisnet.cinTreatEff(1)); % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy
+cisnet.ccTreatRetain = baseline.ccTreatRetain; % Khozaim, 2013, Gyne & Obst ; 0.2; % assumed
 cisnet.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];

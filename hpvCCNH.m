@@ -51,11 +51,11 @@ for d = 1 : disease
     elseif d == 8
         rHivHpv_Clear = hpv_hivClear(1); % Infection clearance multiplier
         rHiv = rImmuneHiv(1); % Multiplier for immunity clearance for HIV+
-        c3c2Mult = c3c2Mults(1) .* .7; % CIN2 -> CIN3 progression multiplier
+        c3c2Mult = c3c2Mults(1) ; % CIN2 -> CIN3 progression multiplier
         c2c1Mult = c2c1Mults(1); % CIN1 -> CIN2 progression multiplier
-        c1c2Mult = hpv_hivClear(1) * 1.45; % CIN2 -> CIN1 regression multiplier
+        c1c2Mult = hpv_hivClear(1) ; % CIN2 -> CIN1 regression multiplier
         rHivHpvMult = 1; %hpv_hivClear(1);%hpvClearMult(1); % Regression multiplier, compounds c1c2Mult
-        c2c3Mult = hpv_hivClear(1) * 1.55 ; % CIN3 -> CIN2 regression multiplier
+        c2c3Mult = hpv_hivClear(1)  ; % CIN3 -> CIN2 regression multiplier
         deathCC = muCC(5 , :); % HIV-positive on ART CC-associated mortality
     end
     

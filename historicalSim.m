@@ -34,7 +34,8 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-% pathModifier = 'toNow_determMod_final_artDiscontFix';
+ %pathModifier = 'toNow_determMod_final_artDiscontFix';
+ %pathModifier = 'toNow_determMod_popFertFix';
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups

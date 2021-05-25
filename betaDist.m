@@ -32,8 +32,8 @@ var_y = (a_y*b_y)/(((a_y+b_y)^2) * (a_y + b_y + 1))
 
 %% List of 100 random selected HIV, HPV, and HIV-HPV interaction paramer sets
 
-file = [pwd , '\hiv_hpv_probs.xlsx']
-probs = xlsread(file, 'B1:CW3')
+file = [pwd , '\hiv_hpv_probs3.xlsx'];
+probs = xlsread(file, 'B1:CW3');
 paramDir = [pwd , '\Params\'];
 % save(fullfile(paramDir ,'stochasticParamsets'), 'probs' );
 dlmwrite([paramDir ,'stochasticParamsets.dat'], probs)
