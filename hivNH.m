@@ -34,6 +34,7 @@ elseif (year >= 2020)
 end
 
 %% Calculate ART treatment coverage
+% Note: begin scale-up to the given coverage level in the prior year so that the desired coverage is reached BY that year
 artOut = zeros(gender , age ,risk);
 artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(disease , viral , gender , age , risk);
 treat = zeros(disease , viral , gender , age ,risk);
