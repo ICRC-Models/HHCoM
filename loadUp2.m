@@ -805,7 +805,23 @@ end
 hyst = 0; % bool to turn background hysterectomy on or off
 OMEGA = zeros(age , 1); % hysterectomy rate
 
-% ART coverage
+% ART+VS coverage
+% Instructions: listed below are three common options for ART scale-up (set
+% the variables as exemplified below)
+%   1) Linear scale-up to 90-90-90 targets from 2017 to 2030
+%      Run historicalSim and futureSim using the values below:
+%       maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult;
+%       maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult;
+%   2) Stabilization at 2017 values
+%      Run historicalSim and futureSim using the values below:
+%       maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult;
+%       maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult;
+%   3) Stabilization at 2020 values (assume linear scale-up to 90-90-90
+%      from 2017 to 2030, but then stabilize at intermediate 2020 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       maxRateM = [artVScov((1:end-1),3) ; 0.508333 ; 0.508333] .* artOutMult;
+%       maxRateF = [artVScov((1:end-1),2) ; 0.627829 ; 0.627829] .* artOutMult;
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
@@ -826,6 +842,22 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
 end
 
 % VMMC coverage
+% Instructions: listed below are three common options for VMMC scale-up (set
+% the variables as exemplified below)
+%   1) Linear scale-up to 70% target from 2017 to 2030
+%      Run historicalSim and futureSim using the values below:
+%       0.459 0.42 0.318 0.204; ... % 2017 
+%       0.70  0.70 0.70  0.70];   % 2030 [year x age group]
+%   2) Stabilization at 2017 values
+%      Run historicalSim and futureSim using the values below:
+%       0.459 0.42 0.318 0.204; ... % 2017 
+%       0.459 0.42 0.318 0.204];   % 2030 [year x age group]
+%   3) Stabilization at 2020 values (assume linear scale-up to 70% target
+%      from 2017 to 2030, but then stabilize at intermediate 2020 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       0.514542 0.484615 0.406362 0.318554; ... % 2017 
+%       0.514542 0.484615 0.406362 0.318554];   % 2030 [year x age group]
 vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2017; 2030];
 circ_aVec = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960

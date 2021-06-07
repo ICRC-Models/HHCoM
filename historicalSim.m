@@ -60,6 +60,11 @@ vaxAge = 2;
 vaxRate = 0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
+% ART + VIRAL SUPPRESSION & VMMC COVERAGE
+% Instructions: In loadUp2.m, go to the section titled "Save intervention
+%   parameters." In the sub-sections labeled "ART+VS coverage" and "VMMC
+%   coverage", select your desired scale-up assumptions    % ***SET ME***: ART & VMMC scale-up assumptions
+
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...

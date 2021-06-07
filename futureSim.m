@@ -91,6 +91,11 @@ vaxAgeL = 5;    % age group to vaccinate
 vaxCoverL = 0.5;    % vaccine coverage
 vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
 
+% ART + VIRAL SUPPRESSION & VMMC COVERAGE
+% Instructions: In loadUp2.m, go to the section titled "Save intervention
+%   parameters." In the sub-sections labeled "ART+VS coverage" and "VMMC
+%   coverage", select your desired scale-up assumptions    % ***SET ME***: ART & VMMC scale-up assumptions
+
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
