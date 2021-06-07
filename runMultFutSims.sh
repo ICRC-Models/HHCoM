@@ -2,7 +2,7 @@ USRNAME=carajb    # SET ME: your username
 echo "${USRNAME}"
 export USRNAME
 
-DIRPATH=/gscratch/csde/${USRNAME}    # SET ME: path to your HHCoM directory
+DIRPATH=/gscratch/csde/${USRNAME}/HHCoM    # SET ME: path to your HHCoM directory
 echo "${DIRPATH}"
 export DIRPATH
 
@@ -23,6 +23,6 @@ echo "Running future simulations."
 #for i in $(seq 1 1 25); do
     SETIDX=1   #$i
     export SETIDX
-    sbatch -p csde -A csde slurm_runMultFutSims.sbatch
+    sbatch -p csde -A csde --mail-user=${USRNAME}@uw.edu slurm_runMultFutSims.sbatch    # note: values passed from command line have precedence over values defined in job script
 #done
 

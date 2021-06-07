@@ -1,9 +1,7 @@
 #!/bin/bash
 
-#SBATCH --job-name=batch                    # Job name
-#SBATCH --chdir=${DIRPATH}/HHCoM          # Working directory
+#SBATCH --job-name=historical                    # Job name
 #SBATCH --mail-type=FAIL           		    # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
-#SBATCH --mail-user=${USRNAME}@uw.edu
 #SBATCH --export=all                        # Export environment variables to the batch job session
 
 #SBATCH --account=csde-ckpt    	            # Allocation Definition
@@ -26,6 +24,8 @@ echo "${TCURR}"
 export TCURR
 echo "${DATE}"
 export DATE
+
+cd ${DIRPATH}
 
 export TZ="America/Los_Angeles"
 module load matlab_2018a
