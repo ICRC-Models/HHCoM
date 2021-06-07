@@ -14,8 +14,8 @@
 pwd; hostname; date #--qos=MaxJobs4
 
 echo "Running MATLAB script for future sims in parallel with calibrated parameter sets"
-echo "${carajb}"
-export carajb
+echo "${USRNAME}"
+export USRNAME
 echo "${DIRPATH}"
 export DIRPATH
 echo "${SETIDX}" 
