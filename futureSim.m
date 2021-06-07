@@ -23,8 +23,8 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_2v57BaseVax_spCyto
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
 pathModifier = [date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S0_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
-if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
-    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+if ~ exist([pwd , '/HHCoM_Results/' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/' , pathModifier, '/'])
 end
 
 % AGE GROUPS

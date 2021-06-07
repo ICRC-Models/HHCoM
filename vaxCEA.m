@@ -54,13 +54,13 @@ function vaxCEA(pathModifier)
 %annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
 % Load results
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow_19May20_baseVax_baseScreen_handCalibModel']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
 if waning
-    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
+    resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxWaneSimResult'];
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
@@ -3179,7 +3179,7 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %         hold all
 %         
 %         % Save reduction results
-% %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+% %         fname = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
 % %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_Mort' , '.xlsx'];
 % %         sname = [plotTits1{i} , '_MortRed'];
 % %         if exist(fname , 'file') == 2
@@ -3323,7 +3323,7 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %     legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
 % end
 % saveResults = [tVec(1 : stepsPerYear : end)' , saveResults];
-% fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
+% fname = [pwd , '\HHCoM_Results\' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
 % xlswrite(fname , saveResults)
 % 
 % % Age-standardized

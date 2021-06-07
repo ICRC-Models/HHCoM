@@ -220,18 +220,18 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_gbV_'];
+baseFileName = ['Vaccine22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_gbV_'];
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
     parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
-        nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+        nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
         curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
-        resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+        resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
@@ -1312,7 +1312,7 @@ sgtitle('Age Distribution');
 %% Female total population size by 5-year age groups over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'WmnYrs_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
@@ -1325,7 +1325,7 @@ end
 diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
 firstYrInd = ((2019 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -1333,27 +1333,27 @@ end
 diseaseLabels = {'All - Pop (P-Y)' , 'HIV- (P-Y)' , 'HIV+ (P-Y)' , 'HIV+ no ART (P-Y)' , 'HIV+ ART (P-Y)'};
 firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(prctile(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 5 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(prctile(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 95 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -1361,7 +1361,7 @@ end
 diseaseLabels = {'All - Pop (N)' , 'HIV- (N)' , 'HIV+ (N)' , 'HIV+ no ART (N)' , 'HIV+ ART (N)'};
 firstYrInd = ((2019 - startYear) * stepsPerYear +4);
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_CumulativeImpact_CC-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -1371,7 +1371,7 @@ if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_shortNam
     firstYrInd = ((1990 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
     lastYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
     for dInd = 1 : length(diseaseLabels)
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
         writematrix(squeeze(median(squeeze(popSizeAgeF(: , dInd , : , (firstYrInd : stepsPerYear : lastYrInd))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
     end  
@@ -1900,7 +1900,7 @@ grid on;
 %% Female HPV Prevalence by broad age groups and HIV status in 2019
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'HPVprevF2019_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)'] , ...
         [2019 ;
@@ -1936,7 +1936,7 @@ sgtitle('Female hrHPV Prevalence (includes CIN) by HIV status');
 diseaseLabels = {'Pop(All) (hrHPV)' , 'HIV-  (hrHPV)' , 'HIV+   (hrHPV)' , 'HIV+ no ART  (hrHPV)' , 'HIV+ ART  (hrHPV)'};
 firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(hpvHivAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -1980,7 +1980,7 @@ for dInd = 1 : length(diseaseLabels)
         numHpvTot = numHpvTot + numHpv;
     end
     hpvCumTot = numHpvTot;
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_hrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(hpvCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
 end
@@ -1989,7 +1989,7 @@ end
 diseaseLabels = {'Pop(All) (vtHPV)' , 'HIV-  (vtHPV)' , 'HIV+   (vtHPV)' , 'HIV+ no ART  (vtHPV)' , 'HIV+ ART  (vtHPV)'};
 firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));   
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(hpv9VHivAgeF(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -2033,7 +2033,7 @@ for dInd = 1 : length(diseaseLabels)
         numHpvTot = numHpvTot + numHpv;
     end
     hpvCumTot = numHpvTot;
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_VThrHPV_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(hpvCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
 end
@@ -2152,8 +2152,8 @@ legend('Model, general: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-se
 
 %% HPV incidence by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
-for dInd = 1 : length(diseaseLabels);
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'HPVinc_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [annualTimespan ;
@@ -2165,7 +2165,7 @@ end
 %% HPV incidence by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'HPV-9vInc_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [annualTimespan ;
@@ -2298,7 +2298,7 @@ plot(monthlyTimespan , mean(cinGenTime(: , :),1)' , 'k-' , ...
 %% CIN2/3 Prevalence by broad age groups and HIV status in 2019
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'CINprevF2019_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)'] , ...
         [2019 ;
@@ -2313,7 +2313,7 @@ end
 diseaseLabels = {'Pop(All) (CIN2+)' , 'HIV- (CIN2+)' , 'HIV+  (CIN2+)' , 'HIV+ no ART  (CIN2+)' , 'HIV+ ART  (CIN2+)'};
 firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(cin23HivAge(: , dInd , : , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')   
 end
@@ -2357,7 +2357,7 @@ for dInd = 1 : length(diseaseLabels)
         numCinTot = numCinTot + numCin;
     end
     cinCumTot = numCinTot;
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CIN2+_Prevalence-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(cinCumTot(: , : , (end-firstYrRange2):end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')   
 end
@@ -2532,8 +2532,8 @@ legend('(Globocan, 2005, 2012, 2018) Observed SA crude ??????' , ...
 
 %% Cervical cancer incidence by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
-for dInd = 1 : length(diseaseLabels);
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+for dInd = 1 : length(diseaseLabels)
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'ICC_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [annualTimespan ;
@@ -2546,7 +2546,7 @@ end
 diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
 firstYrInd = ((2019 - startYear) +1);
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
@@ -2554,12 +2554,12 @@ end
 diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
 firstYrInd = ((2020 - startYear) +1);
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 5 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(prctile(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:end)) , 95 , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
@@ -2569,7 +2569,7 @@ if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_shortNam
     firstYrInd = ((1990 - startYear) +1);
     lastYrInd = ((2020 - startYear) +1);
     for dInd = 1 : length(diseaseLabels)
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
         writematrix(squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , 3:age , firstYrInd:lastYrInd)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
     end  
@@ -2592,7 +2592,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
 
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'ICC-medAS_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     ccIncHivAgeTime_med = squeeze(median(squeeze(ccIncHivAgeTime(: , dInd , : , :)) , 1));
 
@@ -2683,19 +2683,19 @@ for dInd = 1 : length(diseaseLabels)
     ccInc_lb = ccIncRefTot_lb ./ (sum(worldStandard_WP2015(1:age+4)));
     ccInc_ub = ccIncRefTot_ub ./ (sum(worldStandard_WP2015(1:age+4)));
 
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(ccInc(firstYrInd:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
     
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(ccInc_lb(firstYrInd3:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(ccInc_ub(firstYrInd3:end) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B4')
     
     if (vaxResultInd == 3) && contains(baseFileName , 'noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_WHO')   
-        fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
         writematrix(ccInc(firstYrInd2:lastYrInd) , fname , 'Sheet' , diseaseLabels2{dInd} , 'Range' , 'B4')    
     end
@@ -2704,7 +2704,7 @@ end
 %% Cumulative cervical cancer cases by HIV status and age over time
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'CumCC_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [futAnnualTimespan ;
@@ -2716,7 +2716,7 @@ end
 %% Write cumulative cervical cancer cases by 5-year age groups over time (2019-2120) into existing template
 diseaseLabels = {'Pop(All) CCC' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_CumulativeImpact_CC-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(ccCumHivAgeTime(: , dInd , 3:age , :)) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B8')   
 end
@@ -2739,7 +2739,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
     23477 9261 2155];
 
 firstYrInd = ((2019 - startYear) +1);
-fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
     'UofW_CumulativeImpact_CC-standardised-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
 diseaseLabels = {'Pop(All) CCC' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
 for dInd = 1 : length(diseaseLabels)
@@ -3194,7 +3194,7 @@ diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll'};
 diseaseLabelsInds = {1 , 2 , 5};
 for dInd = 1 : length(diseaseLabels)
     d = diseaseLabelsInds{dInd};
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'HPVtypeDist2019_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)' ; (1:8)'] , ...
         [2019 ;
@@ -3342,7 +3342,7 @@ end
 diseaseLabels = {'Screened (All) (N)' , 'Screened (HIV-) (N) ' , 'Screened (HIV+) (N)' , 'Screened (HIV+ not on ART) (N)' , 'Screened (HIV+ on ART) (N) W'};
 firstYrInd = ((2020 - startYear) +1); %1;
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
      writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
      %writematrix(squeeze(median(squeeze(screenTotAnnual45(: , dInd , (firstYrInd : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B15')
@@ -3353,7 +3353,7 @@ end
 %     firstYrInd = ((1990 - startYear) +1);
 %     lastYrInd = ((2020 - startYear) +1);
 %     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
 %             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
 %         writematrix(squeeze(median(squeeze(screenTotAnnual35(: , dInd , (firstYrInd : lastYrInd))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B13')
 %     end  
@@ -3362,7 +3362,7 @@ end
 %% Total number of women screened annually by age and disease status
 % diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 % for dInd = 1 : length(diseaseLabels)
-%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
 %         'ScreenTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
 %     writematrix([[0 ; 35 ; 35 ; 35] , ...
 %         [[(1925+0.5) : ((lastYear-1)+0.5)] ;
@@ -3374,7 +3374,7 @@ end
 %% Total number of women treated to immune by age and disease status
 % diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 % for dInd = 1 : 1
-%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
 %         'TreatImmTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
 %     writematrix([[0 ; 35 ; 45] , ...
 %         [[currYear : timeStep : (lastYear-1)] ;
@@ -3385,7 +3385,7 @@ end
 %% Total number of women treated with persistent HPV by age and disease status
 % diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 % for dInd = 1 : 1
-%     fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+%     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
 %         'TreatHpvTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
 %     writematrix([[0 ; 35 ; 45] , ...
 %         [[currYear : timeStep : (lastYear-1)] ;
@@ -3437,7 +3437,7 @@ legend('Model, 0-4: 25-sets mean' , ...
 %% Total vaccinated by age and disease status
 diseaseLabels = {'General' , 'HIV_neg' , 'HIV_posAll' , 'HIV_posNoArt' , 'HIV_posArt'};
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'VaxTot_' , diseaseLabels{dInd} , '_' , fileKey{n} , '.csv'];
     writematrix([[0 ; (1:age)' ; (1:age)' ; (1:age)'] , ...
         [midAnnualTimespan ;
@@ -3450,7 +3450,7 @@ end
 diseaseLabels = {'Vaccinated (All) (N)' , 'Vaccinated (HIV-) (N)' , 'Vaccinated (HIV+) (N)' , 'Vaccinated (HIV+ not on ART)(N)' , 'Vaccinated (HIV+ on ART) (N)'};
 firstYrInd = ((2020 - startYear) * stepsPerYear +((stepsPerYear/2)+1));
 for dInd = 1 : length(diseaseLabels)
-    fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'UofW_Coverage-(2020-2120)_S' , fileKeyNums{n} , '.xlsx'];
     writematrix(squeeze(median(squeeze(vaxTotAge(: , : , dInd , (firstYrInd : stepsPerYear : end))) , 1)) , fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B6')
 end
