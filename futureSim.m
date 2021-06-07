@@ -61,12 +61,12 @@ waning = 0;    % turn waning on or off
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];    % age groups to vaccinate
 vaxCoverB = 0.0; %0.57; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented) before 2020); last dose, first dose pilot
-vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
 vaxCover = [0.8 , 0.9];    % vaccine coverages
-vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination

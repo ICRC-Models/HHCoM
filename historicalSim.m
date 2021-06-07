@@ -54,9 +54,9 @@ screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm t
 vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
+vaxAge = 2;
 vaxRate = 0.0; %0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
-vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
