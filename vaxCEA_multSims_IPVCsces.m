@@ -69,10 +69,13 @@ fileTits = {'Baseline with 57% girls vax' , ...
     '57% girls multi-cohort vax' , ...
     '57% girls + boys multi-cohort vax' , ...
     '57% girls multi-cohort + catch-up vax'};
+fileTits2 = {'Girls-only multi-cohort, Median' , '  Uncertainty range' , ...
+    'Gender-neutral multi-cohort, Median' , '  Uncertainty range' , ...
+    'Girls-only multi-cohort + catch-up, Median' , '  Uncertainty range'};
 
 % Plot settings
 reset(0)
-set(0 , 'defaultlinelinewidth' , 1.5)
+set(0 , 'defaultlinelinewidth' , 2.0)
 
 nResults = length(simVec);
 
@@ -236,3 +239,44 @@ for j = 1 : nResults
     disp([' Minimum: ' , num2str(min(ccCumCasesAverted , [] , 1))])
     disp([' Maximum: ' , num2str(max(ccCumCasesAverted , [] , 1))])
 end
+
+%% Vaccine efficiency over time
+fig = figure;
+set(fig,'DefaultAxesFontSize' , 18);
+colorVec = {[0.5 , 0.5, 0.5] , 'b' , 'r'};
+
+fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
+    'CumulativeImpact_CC-standardised_wUncert-(2020-2120)_S' , fileVec2{1} , '.xlsx'];
+ccCumCasesTot_base = readmatrix(fname , 'Sheet' , 'Pop(All) CCC' , 'Range' , ['A5:CW29']);
+
+for j = 2 : nResults 
+    fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+        'CumulativeImpact_CC-standardised_wUncert-(2020-2120)_S' , fileVec2{j} , '.xlsx'];
+    ccCumCasesTot = readmatrix(fname , 'Sheet' , 'Pop(All) CCC' , 'Range' , ['A5:CW29']);
+    ccCumCasesAverted = ccCumCasesTot_base - ccCumCasesTot;
+
+    fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+        'RoutineSchoolVax_wUncert-(byYear)_S' , fileVec2{j} , '.xlsx'];
+    routineVaxTot = readmatrix(fname , 'Sheet' , 'HIV+ on ART (CCC)' , 'Range' , ['A4:CW28']); % Note: sheet name doesn't make sense; accidently autopopulated variable from previous section
+    fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+        'CUVax_wUncert-(byYear)_S' , fileVec2{j} , '.xlsx'];
+    cuVaxTot = readmatrix(fname , 'Sheet' , 'HIV+ on ART (CCC)' , 'Range' , ['A4:CW28']); % Note: sheet name doesn't make sense; accidently autopopulated variable from previous section
+    personsVaxTot = (routineVaxTot./2) + (cuVaxTot./3);
+    
+    vaxPersonsPerCase = cumsum(personsVaxTot,2) ./ ccCumCasesAverted;
+    
+    hold all;
+    p = plot([2021:2121] , median(vaxPersonsPerCase , 1) , 'Color' , colorVec{j-1})
+    hold all;
+    x2 = [[2021:2121] , fliplr([2021:2121])];
+    inBetween = [max(vaxPersonsPerCase , [] , 1) , fliplr(min(vaxPersonsPerCase , [] , 1))];
+    colorP = get(p,'Color');
+    h = fill(x2 , inBetween , colorP);
+    h.FaceAlpha = 0.2;
+    h.LineStyle = '--';
+    set(h,'EdgeColor', colorP);
+    set(gca, 'YScale', 'log'); ax = gca; ax.XGrid = 'on';
+    xlim([2020 2121]); ylim([0 10^12]);
+    ylabel('Vaccine efficiency (log scale)'); xlabel('Year');
+end
+legend(fileTits2{1:end})

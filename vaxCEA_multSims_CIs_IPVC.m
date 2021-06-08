@@ -1,5 +1,5 @@
 function [] = vaxCEA_multSims_CIs_IPVC(vaxResultInd , sceNum , fileNameNums)
-% example: vaxCEA_multSims_CIs(1 , '34' , {'3' , '4' , '0'})
+% example: vaxCEA_multSims_CIs_IPVC(1 , '34' , {'3' , '4' , '0'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -100,8 +100,8 @@ ccCumHivTime = zeros(nRuns , 5 , length([2021 : 2121]));
 diseaseVec_ccInc = {[1 : disease] , [1 : 2] , [3 : 8] , [3 : 7] , 8};
 diseaseVecLength_ccInc = length(diseaseVec_ccInc);
 % HPV vaccination and screening
-cumVaxSchool = zeros(nRuns , 1);
-cumVaxCU = zeros(nRuns , 1);
+cumVaxSchool = zeros(nRuns , length([2021 : 2121]));
+cumVaxCU = zeros(nRuns , length([2021 : 2121]));
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
@@ -136,8 +136,8 @@ for k = 1 : loopSegmentsLength-1
         vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
         vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
         vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
-        vaxResult{n}.vaxdSchool = vaxResult{n}.vaxdSchool(2 : end , :);
-        vaxResult{n}.vaxdCU = vaxResult{n}.vaxdCU(2 : end , :);
+        vaxResult{n}.vaxdSchool = vaxResult{n}.vaxdSchool(1 : end , :);
+        vaxResult{n}.vaxdCU = vaxResult{n}.vaxdCU(1 : end , :);
         vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 
     %     noVaxInd = nSims;
@@ -255,10 +255,10 @@ for k = 1 : loopSegmentsLength-1
         %% ************************** SCREENING & VACCINATION FIGURES *******************************************************************************
         
         %% Total number school-based vaccines administered
-        cumVaxSchool(j , 1) = sum(vaxResult{n}.vaxdSchool(:,1)) * 2;
+        cumVaxSchool(j , :) = annlz(vaxResult{n}.vaxdSchool(:,1)) * 2;
 
         %% Total number CU vaccines administered
-        cumVaxCU(j , 1) = sum(vaxResult{n}.vaxdCU(:,1)) * 3;
+        cumVaxCU(j , :) = annlz(vaxResult{n}.vaxdCU(:,1)) * 3;
         
     end
 end
@@ -820,16 +820,16 @@ end
 
 %% Total number school-based vaccines administered
 fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-    'RoutineSchoolVax_wUncert-(2021-2121)_S' , fileKeyNums{n} , '.xlsx'];
-writematrix([squeeze(median(cumVaxSchool(: , 1) , 1)) ; ...
-    squeeze(min(cumVaxSchool(: , 1) , [] , 1)) ; ...
-    squeeze(max(cumVaxSchool(: , 1) , [] , 1)) ; ...
-    cumVaxSchool(: , 1)] , fname , 'Sheet' , diseaseLabels{dInd})
+    'RoutineSchoolVax_wUncert-(byYear)_S' , fileKeyNums{n} , '.xlsx'];
+writematrix([squeeze(median(cumVaxSchool(: , :) , 1)) ; ...
+    squeeze(min(cumVaxSchool(: , :) , [] , 1)) ; ...
+    squeeze(max(cumVaxSchool(: , :) , [] , 1)) ; ...
+    cumVaxSchool(: , :)] , fname , 'Sheet' , diseaseLabels{dInd})
 
 %% Total number CU vaccines administered
 fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-    'CUVax_wUncert-(2021-2121)_S' , fileKeyNums{n} , '.xlsx'];
-writematrix([squeeze(median(cumVaxCU(: , 1) , 1)) ; ...
-    squeeze(min(cumVaxCU(: , 1) , [] , 1)) ; ...
-    squeeze(max(cumVaxCU(: , 1) , [] , 1)) ; ...
-    cumVaxCU(: , 1)] , fname , 'Sheet' , diseaseLabels{dInd})
+    'CUVax_wUncert-(byYear)_S' , fileKeyNums{n} , '.xlsx'];
+writematrix([squeeze(median(cumVaxCU(: , :) , 1)) ; ...
+    squeeze(min(cumVaxCU(: , :) , [] , 1)) ; ...
+    squeeze(max(cumVaxCU(: , :) , [] , 1)) ; ...
+    cumVaxCU(: , :)] , fname , 'Sheet' , diseaseLabels{dInd})
