@@ -25,6 +25,7 @@ fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
 nRuns = length(fileInds);
 % Plot specifications and scenarios
 colorList = {'k' , 'b'}; % , 'r'};
+%colorList = {[0.5,0.5,0.5] , [0,0.50196,0.50196]}; % , 'r'}; % for VMMC sensitivity analysis figure
 iIndList = {1 , 2}; % , 3};
 sceFileNameList = {'_DoART' , '_diagHiv075_DoART'}; % , '_DoART'};
 
