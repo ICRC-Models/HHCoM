@@ -1,8 +1,8 @@
-TCURR=6    # calibration iteration
+TCURR=2    # calibration iteration
 echo "${TCURR}"
 export TCURR
 
-DATE=28Feb21    # date
+DATE=13Jun21    # date
 echo "${DATE}"
 export DATE
 
@@ -28,9 +28,6 @@ echo "Running simulations, first try."
 SEQ28all=($(seq 1 28 ${NSETS}))    # set up for NSETS=5600
 LENGTH28=${#SEQ28all[@]}
 echo "${LENGTH28}"
-
-
-
 NSLKEY=$(($NSETS * 9 / 7))
 
 
@@ -54,7 +51,6 @@ for i in $(seq 1 5 ${LENGTH28}); do
         sleep 5400
     fi
 done
-
 
 HOURS=60 ##max number of hours to check before giving up
 
