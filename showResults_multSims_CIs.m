@@ -211,7 +211,7 @@ hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 
 resultsDir = [pwd , '\HHCoM_Results\'];
-baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_discontFxd_';
+baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screencovFxd_';
 
 loopSegments = {0 , round(nRuns/2) , nRuns};  %{0 , 10 , 20 , 30 , 40 , 50};
 loopSegmentsLength = length(loopSegments);
@@ -741,79 +741,120 @@ for y = 1 : length(years)
     end
 end
 
+popYearVec = unique(popAgeDist_dObs(: ,1));
+
 % Calibration error bars
 meanObs = [popAgeDist_dObs(1:16 , 2) , popAgeDist_dObs(17:32 , 2) , popAgeDist_dObs(33:48 , 2)]';
 sdevObs = ([popAgeDist_dObs(1:16 , 3) , popAgeDist_dObs(17:32 , 3) , popAgeDist_dObs(33:48 , 3)]'.^(1/2)).*2;
 
-figure;
+figure('DefaultAxesFontSize' , 18);
 subplot(1,3,1);
 set(gca,'ColorOrderIndex',1)
 calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , ...
     unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) ,];
 errorbar(calibYrs , meanObs(: , 1:7) , sdevObs(: , 1:7) , ...
-    's' , 'LineWidth' , 1.5);
+    's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
+% set(gca,'ColorOrderIndex',1)
+% plot(years , popProp_obs(: , 1:7) , 'o');
+% hold on;
 for a = 1 : 7
     set(gca,'ColorOrderIndex',a)
-    plot(popAgeYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
+    p = plot(popYearVec' , mean(popProp(: , : , a),1) , '-' , 'LineWidth' , 1.5);
     hold all;
     set(gca,'ColorOrderIndex',a)
-    plot(popAgeYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
-    set(gca,'ColorOrderIndex',a)
-    plot(popAgeYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
+    c = get(p,'Color');
+    x2 = [popYearVec' , fliplr(popYearVec')];
+    inBetween = [max(popProp(: , : , a) , [] , 1) , fliplr(min(popProp(: , : , a) , [] , 1))];
+    h = fill(x2 , inBetween , c);
+    h.FaceColor = c;
+    h.EdgeColor = c;
+    h.FaceAlpha = 0.3;
+    h.LineStyle = 'none';
+%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
+%     set(gca,'ColorOrderIndex',a)
+%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
 end
-ylim([0.05 0.18]);
+ylim([0.05 0.25]); grid on;
 ylabel('Population proportion by age'); xlabel('Year');
 legend('(Statistics SA) Observed KZN, ages 0-4: mean, 2SD' , 'ages 5-9: mean, 2SD' , 'ages 10-14: mean, 2SD' , 'ages 15-19: mean, 2SD' , 'ages 20-24: mean, 2SD' , 'ages 25-29: mean, 2SD' , 'ages 30-34: mean, 2SD' , ...
-    'Model, ages 0-4: 25-sets mean' , 'ages 0-4: 25-sets minimum' , 'ages 0-4: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 0-4: mean' , 'range' , '...' , 'Location' , 'north'); %'ages 5-9: mean' , 'range' , 'ages 10-14: mean' , 'range' , 'ages 15-19: mean' , 'range' , 'ages 20-24: mean' , 'range' , ...
+     %'ages 25-29: mean' , 'range' , 'ages 30-34: mean' , 'range', 'Location' , 'north');
 
 subplot(1,3,2);
 set(gca,'ColorOrderIndex',1)
 calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , ...
     unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) ,];
 errorbar(calibYrs , meanObs(: , 8:14) , sdevObs(: , 8:14) , ...
-    's' , 'LineWidth' , 1.5);
+    's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
+% set(gca,'ColorOrderIndex',1)
+% plot(years , popProp_obs(: , 8:14) , 'o');
+% hold on;
 for a = 8 : 14
     set(gca,'ColorOrderIndex',a-7)
-    plot(popAgeYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
+    p = plot(popYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
-    set(gca,'ColorOrderIndex',a-7)
-    plot(popAgeYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
-    set(gca,'ColorOrderIndex',a-7)
-    plot(popAgeYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
+    set(gca,'ColorOrderIndex',a)
+    c = get(p,'Color');
+    x2 = [popYearVec' , fliplr(popYearVec')];
+    inBetween = [max(popProp(: , : , a) , [] , 1) , fliplr(min(popProp(: , : , a) , [] , 1))];
+    h = fill(x2 , inBetween , c);
+    h.FaceColor = c;
+    h.EdgeColor = c;
+    h.FaceAlpha = 0.3;
+    h.LineStyle = 'none';
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-7)
+%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-7)
+%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
 end
-ylim([0.0 0.13]);
-ylabel('Population proportion by age'); xlabel('Year');
+ylim([0.0 0.15]); grid on;
+xlabel('Year'); %ylabel('Population proportion by age'); 
 legend('(Statistics SA) Observed KZN, ages 35-39: mean, 2SD' , 'ages 40-44: mean, 2SD' , 'ages 45-49: mean, 2SD' , 'ages 50-54: mean, 2SD' , 'ages 55-59: mean, 2SD' , 'ages 60-64: mean, 2SD' , 'ages 65-69: mean, 2SD' , ...
-    'Model, ages 35-39: 25-sets mean' , 'ages 35-39: 25-sets minimum' , 'ages 35-39: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 35-39: mean' , 'range' , '...' , 'Location' , 'north'); %'ages 40-44: mean' , 'range' , 'ages 45-49: mean' , 'range' , ...
+    %'ages 50-54: mean' , 'range', 'ages 55-59: mean' , 'range' , 'ages 60-64: mean' , 'range' , 'ages 65-69: mean' , 'range' , 'Location' , 'north');
 
 
 subplot(1,3,3);
 set(gca,'ColorOrderIndex',1)
 calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1))];
 errorbar(calibYrs , meanObs(: , 15:16) , sdevObs(: , 15:16) , ...
-    's' , 'LineWidth' , 1.5);
+    's' , 'LineWidth' , 1.5); %'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
+% set(gca,'ColorOrderIndex',1)
+% plot(years , popProp_obs(: , 15:16) , 'o');
+% hold on;
 for a = 15 : 16
     set(gca,'ColorOrderIndex',a-14)
-    plot(popAgeYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
+    p = plot(popYearVec , mean(popProp(: , : , a),1)' , '-' , 'LineWidth' , 1.5);
     hold all;
-    set(gca,'ColorOrderIndex',a-14)
-    plot(popAgeYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
-    set(gca,'ColorOrderIndex',a-14)
-    plot(popAgeYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
-    hold all;
+    set(gca,'ColorOrderIndex',a)
+    c = get(p,'Color');
+    x2 = [popYearVec' , fliplr(popYearVec')];
+    inBetween = [max(popProp(: , : , a) , [] , 1) , fliplr(min(popProp(: , : , a) , [] , 1))];
+    h = fill(x2 , inBetween , c);
+    h.FaceColor = c;
+    h.EdgeColor = c;
+    h.FaceAlpha = 0.3;
+    h.LineStyle = 'none';
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-14)
+%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-14)
+%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
 end
-ylim([0.0 0.04]);
-ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
+ylim([0.0 0.04]); grid on;
+xlabel('Year'); %title('KZN age distribution in 5-year groups'); ylabel('Population proportion by age'); 
 legend('(Statistics SA) Observed KZN, ages 70-74: mean, 2SD' , 'ages 75-79: mean, 2SD' , ...
-    'Model, ages 70-74: 25-sets mean' , 'ages 70-74: 25-sets minimum' , 'ages 70-74: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 70-74: mean' , 'range' , '...' , 'Location' , 'north'); %, 'ages 75-79: mean' , 'range' , 'Location' , 'north');
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
@@ -1417,7 +1458,7 @@ cinNeg_sdev = (cinNeg2015_dObs(: , 3).^(1/2)).*2 .* 100;
 figure('DefaultAxesFontSize' , 18);
 subplot(1 , 2 , 1);
 errorbar(1 : length(cinPos_mean) , cinPos_mean , cinPos_sdev , ...
-    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+    'rs' , 'LineWidth' , 1.5 , 'MarkerFaceColor' , 'r'); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
 plot([1,2,3] , [mean((cin1Pos2015 .* 100),1)' , mean((cin2Pos2015 .* 100),1)' , mean((cin3Pos2015 .* 100),1)'] , 'k');
 hold all;
@@ -1426,17 +1467,17 @@ inBetween = [[max((cin1Pos2015 .* 100),[],1)' , max((cin2Pos2015 .* 100),[],1)' 
     fliplr([min((cin1Pos2015 .* 100),[],1)' , min((cin2Pos2015 .* 100),[],1)' , min((cin3Pos2015 .* 100),[],1)'])];
 h = fill(x2 , inBetween , 'k');
 h.FaceAlpha = 0.3;
-h.LineStyle = '--';
-legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets range');
+h.LineStyle = 'none';
+legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Modeled KZN: mean' , 'Modeled KZN: range');
 set(gca , 'xtick' , 1 : 3 , 'xtickLabel' , {'CIN1' , 'CIN2' , 'CIN3'});
 ylabel('Prevalence (%)')
-title('2015: Women living with HIV aged 30-65')
+title('2015: WLHIV aged 30-65')
 ylim([0 25])
 grid on;
 
 subplot(1 , 2 , 2)
 errorbar(1 : length(cinNeg_mean) , cinNeg_mean , cinNeg_sdev , ...
-    'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
+    'rs' , 'LineWidth' , 1.5 , 'MarkerFaceColor' , 'r'); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold on;
 plot([1,2,3] , [mean((cin1Neg2015 .* 100),1)' , mean((cin2Neg2015 .* 100),1)' , mean((cin3Neg2015 .* 100),1)'] , 'k')
 hold all;
@@ -1446,7 +1487,7 @@ inBetween = [[max((cin1Neg2015 .* 100),[],1)' , max((cin2Neg2015 .* 100),[],1)' 
 h = fill(x2 , inBetween , 'k');
 h.FaceAlpha = 0.3;
 h.LineStyle = '--';
-legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Model: 25-sets mean' , 'Model: 25-sets range');
+legend('(Kuhn, 2020) Observed Cape Town: mean, 2SD' , 'Modeled KZN: mean' , 'Modeled KZN: range');
 set(gca , 'xtick' , 1 : 3 , 'xtickLabel' , {'CIN1' , 'CIN2' , 'CIN3'});
 ylabel('Prevalence (%)')
 title('2015: HIV-negative women aged 30-65')
