@@ -1,10 +1,12 @@
 ##############################################################################################
+library(dplyr)
+library(ggplot2)
 
 pres_size <- 28
 
 # PLOTS
 
-cea_path <- "C:/Users/msahu/Documents/Other_Research/DO_ART/Code/HHCoM/CEA/"
+cea_path <- "C:/Users/msahu/Documents/Other_Research/DO_ART/HHCoM/CEA/"
 
 # Stacked bar chart of breakdown of costs - Scenario 1
 
@@ -30,11 +32,11 @@ scen1_costs <- art_costs %>%
 ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
   scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
-  ylab("Cost per capita (2020 USD)") +
+  ylab("Cost per capita (2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
         legend.title = element_text(size = pres_size),
-        legend.text = element_text(size = pres_size)) +
+        legend.text = element_text(size = pres_size)) 
   ylim(0,60)
 
 
@@ -63,7 +65,7 @@ scen2_costs <- art_costs %>%
 ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
   scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
-  ylab("Cost per capita (2020 USD)") +
+  ylab("Cost per capita (2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
         legend.title = element_text(size = pres_size),

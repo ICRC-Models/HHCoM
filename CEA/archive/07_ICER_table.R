@@ -6,38 +6,22 @@
 
 ###########################################################################################
 
-# Incremental Cumulative Costs 
+# Incremental Cumulative Costs
 
 lev <- c("total","pc")
 
 for (i in 2) {
   for (l in lev) {
       
-      t <- read.csv(paste0(cea_path,"results/dr3/costs/inc_costs_cum_",l,"_scen",i,".csv"))
+      t <- read.csv(paste0(cea_path,"costs/inc_costs_cum_",l,"_scen",i,".csv"))
       
       x <- t[t$year==horizon_year,-1] %>% # Extract all sets for year of interest, minus year column
-      # Recalculate mean, min, max                                                  cv./,
+      # Recalculate mean, min, max
       mutate(mean=rowMeans(.[,4:28]),
              min=apply(.[,4:28], 1,FUN=min), 
              max=apply(.[,4:28], 1,FUN=max)) 
       
-      print(paste(horizon_year, "inc cos
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  ts", l, "scenario", i, ":",round(x$mean,0)))  
+      print(paste(horizon_year, "inc costs", l, "scenario", i, ":",round(x$mean,0)))  
       print(paste(horizon_year, "inc costs", l, "scenario MIN", i, ":",round(x$min,0)))  
       print(paste(horizon_year, "inc costs", l, "scenario MAX", i, ":",round(x$max,0)))  
       
@@ -47,7 +31,7 @@ for (i in 2) {
 }  
 
 
-# All Effects - UNDISCOUNTED OUTCOMES.
+# All Effects
 
 vars <- c("cases", "deaths", "qaly", "daly")
 lev <- c("pct", "raw")
@@ -57,8 +41,8 @@ for (v in vars) {
     for (l in lev) {
   
       ifelse(v!="qaly",
-        t <- read.csv(paste0(cea_path,"results/dr0/",v,"/",v,"_cum_averted_",l,"_scen",i,".csv")),
-        t <- read.csv(paste0(cea_path,"results/dr0/",v,"/",v,"_cum_gained_",l,"_scen",i,".csv")))
+        t <- read.csv(paste0(cea_path,"effects/",v,"/",v,"_cum_averted_",l,"_scen",i,".csv")),
+        t <- read.csv(paste0(cea_path,"effects/",v,"/",v,"_cum_gained_",l,"_scen",i,".csv")))
       
       x <- t[t$year==horizon_year,-1] %>% # Extract all sets minus year, minus year column
         # Recalculate mean, min, max

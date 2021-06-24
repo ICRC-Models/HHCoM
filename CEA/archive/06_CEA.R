@@ -356,6 +356,7 @@ ggplot(data=net_daly_1, aes(x=year, y=daly_burden, group=set_name)) +
 
 
 costs_cum_2 <- read.csv(paste0(cea_path,"costs/cost_cum_total_scen2.csv")) %>% 
+  select(-X) %>% 
   reshape2::melt(id="year",value.name="costs") %>% 
   rename(set_name=variable)
 
@@ -383,6 +384,7 @@ ggplot(data=net_daly_2, aes(x=year, y=daly_burden, group=set_name)) +
 # Annual Percent Deaths Averted 
 
 deaths <- read.csv(paste0(cea_path,"effects/deaths/deaths_averted_pct_scen2.csv")) %>% 
+  select(-X) %>% 
   # reshape long
   melt(id="year",value.name="pct_deaths_averted_2") %>% 
   rename(set_name=variable) %>% 
@@ -399,6 +401,7 @@ ggplot(data=deaths, aes(x=year, y=pct_deaths_averted_2,group=set_name)) +
   ylim(0,50)
 
 deaths_cum <- read.csv(paste0(cea_path,"effects/deaths/deaths_cum_averted_pct_scen2.csv")) %>% 
+  select(-X) %>% 
   # reshape long
   melt(id="year",value.name="pct_deaths_averted_2") %>% 
   rename(set_name=variable) %>% 
@@ -563,6 +566,6 @@ Figure2b <- ggplot(data=NHB_daly, aes(x=threshold, y=nhb/1000)) +
   
   # Add notes
   annotate(geom = "label", x = 950, y = -10000, label = "HIV Investment Case \n Threshold = $750", size= 6) +
-  annotate(geom = "label", x = 300, y = -10000, label = paste0("Incremental Cost per \n DALY averted = $148"), size= 6)
+  annotate(geom = "label", x = 300, y = -10000, label = paste0("Incremental Cost per \n DALY averted = $90"), size= 6)
   
 ggsave(Figure2b, file = paste0(cea_path,"figures/Figure2b.pdf"), width = 12, height = 8)

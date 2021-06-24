@@ -9,13 +9,9 @@
 
 horizon_year <- 2060
 
-# Discount rate of 3%
+# Discount rate
 
-discount_rate <- .0
-dr <- "dr0"
-
-
-##############################################################################
+discount_rate <- .03   
 
 # Set up DO ART parameters: enrollment assumptions
 
