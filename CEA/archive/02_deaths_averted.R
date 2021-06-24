@@ -143,7 +143,7 @@ csv_list <- list("deaths_scen1",
                  "deaths_cum_averted_pct_scen3")
 
 
-lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/deaths/",x,".csv"), row.names = F))
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"results/",dr,"/deaths/",x,".csv"), row.names = F))
 
 # Remove excess DFs, source for next script
 

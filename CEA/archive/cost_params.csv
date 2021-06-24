@@ -1,5 +1,6 @@
 param_name,param_val,lb,ub,year,lb_year,ub_year,currency,definition,param_source,lb_source,ub_source
-home_testing_pc,5.52,2,20.5,2012,2020,2014,usd,Home HTC (average of negative and positive test),"Meyer-Rath, PLoS One, 2019",Shapiro et al self-testing (https://www.orasure.com/),SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
+home_testing_pc_pos,5.81,2,20.5,2012,2020,2014,usd,Home HTC (positive test),"Meyer-Rath, PLoS One, 2019",Shapiro et al self-testing (https://www.orasure.com/),SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
+home_testing_pc_neg,5.23,2,20.5,2012,2020,2014,usd,Home HTC (negative test),"Meyer-Rath, PLoS One, 2019",Shapiro et al self-testing (https://www.orasure.com/),SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
 hosp_200,125.5,71.5,222.5,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4<200","Meyer Rath, 2013, Table 2A",,
 hosp_200_350,58,39,97,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 200-350","Meyer Rath, 2013, Table 2A",,
 hosp_350,39,23,76,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 350+","Meyer Rath, 2013, Table 2A",,

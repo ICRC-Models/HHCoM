@@ -1,7 +1,7 @@
 
 # Compile cases averted across DO-ART scenarios, combined for Males and Females
 # MSahu
-# September 10, 2020
+# April 28, 2021
 
 # NOTE that annual incidence is calculated per 100 HIV-negative persons 
 
@@ -138,7 +138,7 @@ for (x in 1:3) {
     addYearCol(., horizon_year = horizon_year)  
   
   assign(paste0("hiv_neg_scen",x),hiv_neg)
-  
+                                                                       
 }
 
 # New cases
@@ -228,7 +228,7 @@ csv_list <- list("cases_scen1",
                  "cases_cum_averted_pct_scen2",
                  "cases_cum_averted_pct_scen3")
 
-lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"effects/cases/",x,".csv"), row.names = F))
+lapply(csv_list, function(x) write.csv(get(x), file=paste0(cea_path,"results/", dr, "/cases/",x,".csv"), row.names = F))
 
 # Remove excess DFs, source for next script
 
