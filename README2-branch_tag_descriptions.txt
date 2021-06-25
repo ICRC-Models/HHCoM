@@ -63,6 +63,7 @@ Trial calibration attempt
   022120_backup_10Feb20calib
 
 KwaZulu-Natal model outputs (presentation, abstract, result set, etc.):
+  062521_output_WHOcompareModelPaper (also used for IPVC2021 abstract)
   100720_output_whoCompare
   062320_output_IPVC2020
   101819_output_5yearAgeGroups-whoReport
