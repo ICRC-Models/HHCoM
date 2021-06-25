@@ -3,19 +3,7 @@
 
 #############################################################################
 
-## PARAMETERS ##
 
-# Set time horizon
-
-horizon_year <- 2060
-
-# Discount rate of 3%
-
-discount_rate <- .0
-dr <- "dr0"
-
-
-##############################################################################
 
 # Set up DO ART parameters: enrollment assumptions
 
@@ -41,11 +29,11 @@ DOARTpct_tested <- 0.9
 
 # FUNCTIONS #
 
-# Add year column from 2020 to time horizon
+# Add year column from 2020 to 2060
 
-addYearCol <- function(x, horizon_year) {
+addYearCol <- function(x) {
   x %>% 
-    mutate(year= 2020:horizon_year) %>% 
+    mutate(year= 2020:2060) %>% 
     select(year, everything()) 
 }
 
