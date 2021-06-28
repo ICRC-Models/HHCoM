@@ -996,7 +996,8 @@ end
 
 %% Import and save calibration data
 % file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
-% 
+% hivPrevF_dObs = zeros(31, 3); 
+% hivPrevM_dObs =  zeros(34, 3);
 % ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidence Rate 2012, by age
 % ccInc2012_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H10:I22');
 % 
@@ -1031,18 +1032,18 @@ end
 % hpv_hiv2009_dObs(: , 1) = xlsread(file , 'Calibration' , 'E47:E51'); % HPV Prevalence in HIV+ women, by age
 % hpv_hiv2009_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H47:I51');
 % 
-% hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'E52:E72'); % HIV Prevalence in Women 2003, 2007, and 2009, by age
-% hivPrevF_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H52:I72');
-% hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'E73:E96'); % HIV Prevalence in Men 2003, 2007, and 2009, by age
-% hivPrevM_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H73:I96');
-% hivPrevAll_dObs(: , 1) = xlsread(file , 'Calibration' , 'E97:E106'); % HIV Prevalence in all in 2012, by age
-% hivPrevAll_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H97:I106');
+% hivPrevF_dObs(: , 1) = xlsread(file , 'Calibration' , 'E52:E82'); % HIV Prevalence in Women 2003, 2007, and 2009, by age
+% hivPrevF_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H52:I82');
+% hivPrevM_dObs(: , 1) = xlsread(file , 'Calibration' , 'E83:E116'); % HIV Prevalence in Men 2003, 2007, and 2009, by age
+% hivPrevM_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H83:I116');
+% hivPrevAll_dObs(: , 1) = xlsread(file , 'Calibration' , 'E117:E126'); % HIV Prevalence in all in 2012, by age
+% hivPrevAll_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H117:I126');
 %  
-% popAgeDist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E107:E170');  % Population age distribution in 1979, 1989, 1990, and 2009
-% popAgeDist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H107:I170'); 
+% popAgeDist_dObs(: , 1) = xlsread(file , 'Calibration' , 'E127:E190');  % Population age distribution in 1979, 1989, 1990, and 2009
+% popAgeDist_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H127:I190'); 
 % 
-% totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E171:E174'); % Total population size in 1979, 1989, 1990, and 2009
-% totPopSize_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H171:I174');
+% totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E191:E194'); % Total population size in 1979, 1989, 1990, and 2009
+% totPopSize_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H191:I194');
 %  
 % save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
 %     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
