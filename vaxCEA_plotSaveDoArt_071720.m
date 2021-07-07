@@ -105,6 +105,8 @@ hivPrevM_multSims = hivPrevF_multSims;
 hivPrevC_multSims = hivPrevF_multSims;
 hivPrevF1559_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivPrevM1559_multSims = hivPrevF1559_multSims;
+hivPrevF1019_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+hivPrevM1019_multSims = hivPrevF1019_multSims;
 artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 artPrevM_multSims = artPrevF_multSims;
 artPrevC_multSims = artPrevF_multSims;
@@ -421,9 +423,7 @@ for k = 1 : loopSegmentsLength-1
 %             xlabel('Year'); ylabel('Combined HIV prevalence, ages 15-79'); title(cTits{cInd});
 %             xlim([1980 2060]); ylim([0.0 0.5]);
 %             grid on;
-        end
-        
-        
+        end   
         
         %% HIV PREVALENCE BY GENDER, AGES 15-59, FOR HIV-TB MODEL
         % Calculate female HIV prevalence
@@ -445,6 +445,27 @@ for k = 1 : loopSegmentsLength-1
         totPopM = sum(vaxResult{n}.popVec(: , totIndsM) , 2);
         hivPrevM = bsxfun(@rdivide , hivPopM , totPopM);
         hivPrevM1559_multSims(: , j) = hivPrevM(1 : stepsPerYear : end).*100;
+        
+        %% HIV PREVALENCE BY GENDER, AGES 10-19, FOR HIV-TB MODEL
+        % Calculate female HIV prevalence
+        hivIndsF = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 3 : 4 , 1 : risk));
+        totIndsF = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 3 : 4 , 1 : risk));
+        hivPopF = sum(vaxResult{n}.popVec(: , hivIndsF) , 2);
+        totPopF = sum(vaxResult{n}.popVec(: , totIndsF) , 2);
+        hivPrevF = bsxfun(@rdivide , hivPopF , totPopF);
+        hivPrevF1019_multSims(: , j) = hivPrevF(1 : stepsPerYear : end).*100;
+        
+        % Calculate male HIV prevalence
+        hivIndsM = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 , 3 : 4 , 1 : risk));
+        totIndsM = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 , 3 : 4 , 1 : risk));
+        hivPopM = sum(vaxResult{n}.popVec(: , hivIndsM) , 2);
+        totPopM = sum(vaxResult{n}.popVec(: , totIndsM) , 2);
+        hivPrevM = bsxfun(@rdivide , hivPopM , totPopM);
+        hivPrevM1019_multSims(: , j) = hivPrevM(1 : stepsPerYear : end).*100;
 
         %% ART PREVALENCE 
         % Calculate female ART prevalence
@@ -973,6 +994,20 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
 writematrix([tVec(1 : stepsPerYear : end)' , mean(hivPrevM1559_multSims(: , :) , 2) , ...
     min(hivPrevM1559_multSims(: , :) , [] , 2) , max(hivPrevM1559_multSims(: , :) , [] , 2) , ...
     hivPrevM1559_multSims(: , :)] , fname)
+
+%% Save HIV prevalence by gender, ages 10-19, for HIV-TB model
+% female
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'HIV_prevalence_females_aged10-19_forHivTB' , '.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(hivPrevF1019_multSims(: , :) , 2) , ...
+    min(hivPrevF1019_multSims(: , :) , [] , 2) , max(hivPrevF1019_multSims(: , :) , [] , 2) , ...
+    hivPrevF1019_multSims(: , :)] , fname)
+% male
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'HIV_prevalence_males_aged10-19_forHivTB' , '.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(hivPrevM1019_multSims(: , :) , 2) , ...
+    min(hivPrevM1019_multSims(: , :) , [] , 2) , max(hivPrevM1019_multSims(: , :) , [] , 2) , ...
+    hivPrevM1019_multSims(: , :)] , fname)
 
 %% Save ART prevalence
 % female
