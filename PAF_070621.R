@@ -5,16 +5,16 @@
 # 1. Cervical cancer cases
 # 2. Cervical cancer incidence rates (raw)
 # 3. Cervical cancer incidence rates (age-standardized)
-# 4. HIV prevalence in females Cervical cancer 
+# 4. HIV prevalence in females 
 # For each, there should be separate tabs/sheets for each of the following groups: the Total population, HIV-negative women, HIV-positive untreated women, HIV-positive women on ART, all HIv-positive women __IN THAT ORDER__. 
 # Within each tab column 1 should show the year of simulation from 2020 to 2070. Column 2 should show the outcome for the relevant year, group, and scenario
 
 ## The filepaths and names correspond to these scenarios:
-# S0 = Cytology at age 35 with 48% coverage throughout the timeframe. 9v HPV vaccination at 57%
-# S0b = Cytology at ages 35 and 45 with 48% coverage throughout the timeframe. 9v HPV vaccination at 57%
-# S1 = HPV screening at ages 35 and 45 scaled up to 90% by 2045 throughout the timeframe. 9v HPV vaccination at 90%
-# S2 = S2 but with screening for WLHIV every 3 years ages 25-49
-# S3 = S2 but with catch-up vaccination for WLHIV ages 15-24 at 50%
+# S0b = Cytology at age 35 with 48% coverage throughout the timeframe. 9v HPV vaccination at 57%. No ART scale-up.
+# S0 = Cytology at age 35 with 48% coverage throughout the timeframe. 9v HPV vaccination at 57%. ART scale-up to 90-90-90 by 2030.
+# S1 = HPV screening at ages 35 and 45 scaled up to 90% by 2045 throughout the timeframe. 9v HPV vaccination at 90%. ART scale-up to 90-90-90 by 2030.
+# S2 = S1 but with catch-up vaccination for WLHIV ages 15-24 at 50%. ART scale-up to 90-90-90 by 2030.
+# S3 = S2 but with screening for WLHIV every 3 years ages 25-49. ART scale-up to 90-90-90 by 2030.
 
 ##########
 # SETUP # ----
@@ -38,36 +38,36 @@ library("viridis")
 ## Set directory to folder where output is stored <<--
 # setwd("C:/Users/dpwhite/Dropbox/HPV and cervical cancer modeling/Papers/PAF from HIV/Model output")
 # For use on my Mac
-setwd("/Users/darcywhite/Dropbox/HPV and cervical cancer modeling/Papers/PAF from HIV/Model output")
+setwd("H:/HHCoM/HHCoM_Results/22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_hivInt2017_pHIV-S0_6_1")
 
 ## Set filepaths <<--
 # List file names for files containing incidence output for each scenario
 # These files are expected to have one tab for each population subgroup (All, HIV-, untreated HIV+, treated HIV+, all HIV+)
 # and for each tab to list the years in column 1 and the outcome in column 2
-S0.stART.inc.path <- "PAF_crudeAnnualCC_S0.xlsx"
-S0.stART.ir.path <- "PAF_crudeICC_S0.xlsx"
-S0.stART.sir.path <- "PAF_ASICC_S0.xlsx"
-S0.stART.hiv.path <- "PAF_crudeHivFaged15plus_S0.xlsx"
+S0b.stART.inc.path <- "PAF_crudeAnnualCC_S0.xlsx"
+S0b.stART.ir.path <- "PAF_crudeICC_S0.xlsx"
+S0b.stART.sir.path <- "PAF_ASICC_S0.xlsx"
+S0b.stART.hiv.path <- "PAF_crudeHivFaged15plus_S0.xlsx"
 
-S1.stART.inc.path <- "PAF_crudeAnnualCC_S1.xlsx"
-S1.stART.ir.path <- "PAF_crudeICC_S1.xlsx"
-S1.stART.sir.path <- "PAF_ASICC_S1.xlsx"
-S1.stART.hiv.path <- "PAF_crudeHivFaged15plus_S1.xlsx"
+S0.inART.inc.path <- "PAF_crudeAnnualCC_S1.xlsx"
+S0.inART.ir.path <- "PAF_crudeICC_S1.xlsx"
+S0.inART.sir.path <- "PAF_ASICC_S1.xlsx"
+S0.inART.hiv.path <- "PAF_crudeHivFaged15plus_S1.xlsx"
 
-S2.stART.inc.path <- "PAF_crudeAnnualCC_S2.xlsx"
-S2.stART.ir.path <- "PAF_crudeICC_S2.xlsx"
-S2.stART.sir.path <- "PAF_ASICC_S2.xlsx"
-S2.stART.hiv.path <- "PAF_crudeHivFaged15plus_S2.xlsx"
+S1.inART.inc.path <- "PAF_crudeAnnualCC_S2.xlsx"
+S1.inART.ir.path <- "PAF_crudeICC_S2.xlsx"
+S1.inART.sir.path <- "PAF_ASICC_S2.xlsx"
+S1.inART.hiv.path <- "PAF_crudeHivFaged15plus_S2.xlsx"
 
-S3.stART.inc.path <- "PAF_crudeAnnualCC_S3.xlsx"
-S3.stART.ir.path <- "PAF_crudeICC_S3.xlsx"
-S3.stART.sir.path <- "PAF_ASICC_S3.xlsx"
-S3.stART.hiv.path <- "PAF_crudeHivFaged15plus_S3.xlsx"
+S2.inART.inc.path <- "PAF_crudeAnnualCC_S3.xlsx"
+S2.inART.ir.path <- "PAF_crudeICC_S3.xlsx"
+S2.inART.sir.path <- "PAF_ASICC_S3.xlsx"
+S2.inART.hiv.path <- "PAF_crudeHivFaged15plus_S3.xlsx"
 
-S4.stART.inc.path <- "PAF_crudeAnnualCC_S4.xlsx"
-S4.stART.ir.path <- "PAF_crudeICC_S4.xlsx"
-S4.stART.sir.path <- "PAF_ASICC_S4.xlsx"
-S4.stART.hiv.path <- "PAF_crudeHivFaged15plus_S4.xlsx"
+S3.inART.inc.path <- "PAF_crudeAnnualCC_S4.xlsx"
+S3.inART.ir.path <- "PAF_crudeICC_S4.xlsx"
+S3.inART.sir.path <- "PAF_ASICC_S4.xlsx"
+S3.inART.hiv.path <- "PAF_crudeHivFaged15plus_S4.xlsx"
 
 ## Specify whether the excel sheets contain a header row with variable names (TRUE/FALSE)  <<--
 header <- FALSE
@@ -85,30 +85,30 @@ read_excel_allsheets <- function(filename, tibble = FALSE) {
   x
 }
 
-S0.stART.inc <- read_excel_allsheets(S0.stART.inc.path)
-S0.stART.ir <- read_excel_allsheets(S0.stART.ir.path)
-S0.stART.sir <- read_excel_allsheets(S0.stART.sir.path)
-S0.stART.hiv <- read_excel_allsheets(S0.stART.hiv.path)
+S0b.stART.inc <- read_excel_allsheets(S0b.stART.inc.path)
+S0b.stART.ir <- read_excel_allsheets(S0b.stART.ir.path)
+S0b.stART.sir <- read_excel_allsheets(S0b.stART.sir.path)
+S0b.stART.hiv <- read_excel_allsheets(S0b.stART.hiv.path)
 
-S1.stART.inc <- read_excel_allsheets(S1.stART.inc.path)
-S1.stART.ir <- read_excel_allsheets(S1.stART.ir.path)
-S1.stART.sir <- read_excel_allsheets(S1.stART.sir.path)
-S1.stART.hiv <- read_excel_allsheets(S1.stART.hiv.path)
+S0.inART.inc <- read_excel_allsheets(S0.inART.inc.path)
+S0.inART.ir <- read_excel_allsheets(S0.inART.ir.path)
+S0.inART.sir <- read_excel_allsheets(S0.inART.sir.path)
+S0.inART.hiv <- read_excel_allsheets(S0.inART.hiv.path)
 
-S2.stART.inc <- read_excel_allsheets(S2.stART.inc.path)
-S2.stART.ir <- read_excel_allsheets(S2.stART.ir.path)
-S2.stART.sir <- read_excel_allsheets(S2.stART.sir.path)
-S2.stART.hiv <- read_excel_allsheets(S2.stART.hiv.path)
+S1.inART.inc <- read_excel_allsheets(S1.inART.inc.path)
+S1.inART.ir <- read_excel_allsheets(S1.inART.ir.path)
+S1.inART.sir <- read_excel_allsheets(S1.inART.sir.path)
+S1.inART.hiv <- read_excel_allsheets(S1.inART.hiv.path)
 
-S3.stART.inc <- read_excel_allsheets(S3.stART.inc.path)
-S3.stART.ir <- read_excel_allsheets(S3.stART.ir.path)
-S3.stART.sir <- read_excel_allsheets(S3.stART.sir.path)
-S3.stART.hiv <- read_excel_allsheets(S3.stART.hiv.path)
+S2.inART.inc <- read_excel_allsheets(S2.inART.inc.path)
+S2.inART.ir <- read_excel_allsheets(S2.inART.ir.path)
+S2.inART.sir <- read_excel_allsheets(S2.inART.sir.path)
+S2.inART.hiv <- read_excel_allsheets(S2.inART.hiv.path)
 
-S4.stART.inc <- read_excel_allsheets(S4.stART.inc.path)
-S4.stART.ir <- read_excel_allsheets(S4.stART.ir.path)
-S4.stART.sir <- read_excel_allsheets(S4.stART.sir.path)
-S4.stART.hiv <- read_excel_allsheets(S4.stART.hiv.path)
+S3.inART.inc <- read_excel_allsheets(S3.inART.inc.path)
+S3.inART.ir <- read_excel_allsheets(S3.inART.ir.path)
+S3.inART.sir <- read_excel_allsheets(S3.inART.sir.path)
+S3.inART.hiv <- read_excel_allsheets(S3.inART.hiv.path)
 
 colnames <- c("year", "median", "min", "max", "sim1", "sim2", "sim3", "sim4", "sim5", "sim6", "sim7", "sim8", "sim9",
   "sim10", "sim11", "sim12", "sim13", "sim14", "sim15", "sim16", "sim17", "sim18", "sim19", "sim20",
@@ -118,42 +118,42 @@ colnames <- c("year", "median", "min", "max", "sim1", "sim2", "sim3", "sim4", "s
 # DEFINE DATA PROCESSING FUNCTIONS AND BASIC PLOT SETTINGS # ----
 ##########
 
-combinesheets <- function(scenario){
-  # Set column names
-  scenario <- lapply(scenario, setNames, colnames)
-  # Add outcome variables
-  scenario[[1]]$outcome <- "CCC"
-  scenario[[2]]$outcome <- "CCC"
-  scenario[[3]]$outcome <- "CCC"
-  scenario[[4]]$outcome <- "CCC"
-  scenario[[5]]$outcome <- "CCC"
-  scenario[[6]]$outcome <- "ICC"
-  scenario[[7]]$outcome <- "ICC"
-  scenario[[8]]$outcome <- "ICC"
-  scenario[[9]]$outcome <- "ICC"
-  scenario[[10]]$outcome <- "ICC"
-  scenario[[11]]$outcome <- "OS"
-  scenario[[12]]$outcome <- "OS"
-  scenario[[13]]$outcome <- "OS"
-  scenario[[14]]$outcome <- "OS"
-  scenario[[15]]$outcome <- "OS"
-  scenario[[16]]$outcome <- "SCRN"
-  scenario[[17]]$outcome <- "SCRN"
-  scenario[[18]]$outcome <- "SCRN"
-  scenario[[19]]$outcome <- "SCRN"
-  scenario[[20]]$outcome <- "SCRN"
- 
-  
-  # Combine into one sheet
-  out <- rbind.data.frame(scenario[[1]], scenario[[2]], scenario[[3]], scenario[[4]], scenario[[5]],
-                          scenario[[6]], scenario[[7]], scenario[[8]], scenario[[9]], scenario[[10]],
-                          scenario[[11]], scenario[[12]], scenario[[13]], scenario[[14]], scenario[[15]],
-                          scenario[[16]], scenario[[17]], scenario[[18]], scenario[[19]], scenario[[20]])
-  out[,c(2:6)] <- sapply(out[,c(2:6)], as.numeric)
-  return(out)
-}
+#combinesheets <- function(scenario){
+#  # Set column names
+#  scenario <- lapply(scenario, setNames, colnames)
+#  # Add outcome variables
+#  scenario[[1]]$outcome <- "CCC"
+#  scenario[[2]]$outcome <- "CCC"
+#  scenario[[3]]$outcome <- "CCC"
+#  scenario[[4]]$outcome <- "CCC"
+#  scenario[[5]]$outcome <- "CCC"
+#  scenario[[6]]$outcome <- "ICC"
+#  scenario[[7]]$outcome <- "ICC"
+#  scenario[[8]]$outcome <- "ICC"
+#  scenario[[9]]$outcome <- "ICC"
+#  scenario[[10]]$outcome <- "ICC"
+#  scenario[[11]]$outcome <- "OS"
+#  scenario[[12]]$outcome <- "OS"
+#  scenario[[13]]$outcome <- "OS"
+#  scenario[[14]]$outcome <- "OS"
+#  scenario[[15]]$outcome <- "OS"
+#  scenario[[16]]$outcome <- "SCRN"
+#  scenario[[17]]$outcome <- "SCRN"
+#  scenario[[18]]$outcome <- "SCRN"
+#  scenario[[19]]$outcome <- "SCRN"
+#  scenario[[20]]$outcome <- "SCRN"
+# 
+#  
+#  # Combine into one sheet
+#  out <- rbind.data.frame(scenario[[1]], scenario[[2]], scenario[[3]], scenario[[4]], scenario[[5]],
+#                          scenario[[6]], scenario[[7]], scenario[[8]], scenario[[9]], scenario[[10]],
+#                          scenario[[11]], scenario[[12]], scenario[[13]], scenario[[14]], scenario[[15]],
+#                          scenario[[16]], scenario[[17]], scenario[[18]], scenario[[19]], scenario[[20]])
+#  out[,c(2:6)] <- sapply(out[,c(2:6)], as.numeric)
+#  return(out)
+#}
 
-# Function to round years, set column names, restrict to years 2000 to 2021, and combine estimates from all groups onto one sheet
+# Function to round years, set column names, restrict to years 2000 to 2121, and combine estimates from all groups onto one sheet
 dataprep.absnum <- function(scenario){
   # Set column names
   scenario <- lapply(scenario, setNames, colnames)
@@ -188,14 +188,17 @@ dataprep.hivprev <- function(scenario){
 #                               HIVpos_noART = scenario[,4]/scenario[1,4], HIVpos_ART = scenario[,5]/scenario[1,5], HIVpos =  scenario[,6]/scenario[1,6]) 
 #  return(pctreduc)
 # }
-# 
+ 
 # Function to calculate the percent of cases attributable to WLHIV - for now set to use the median
 calc_prophiv <- function(scenario){
-  prophiv <- as.data.frame(matrix(ncol = 30, nrow = 122))
+  prophiv <- as.data.frame(matrix(ncol = 29, nrow = 122))
   colnames(prophiv) <- colnames(scenario)[1:29]
   prophiv$year <- seq(2000, 2121, 1)
   for(i in c(2000:2121)){
-    prophiv[prophiv$year == i , c(2:29)] <- scenario[scenario$group == "HIVpos_all" & scenario$year == i, c(2:29)] / scenario[scenario$group == "Total" & scenario$year == i,  c(2:29)]
+    prophiv[prophiv$year == i , c(5:29)] <- scenario[scenario$group == "HIVpos_all" & scenario$year == i, c(5:29)] / scenario[scenario$group == "Total" & scenario$year == i,  c(5:29)]
+    prophiv[prophiv$year == i , c(2:4)] <- c(apply(prophiv[prophiv$year == i , c(5:29)] , 1 , median) , 
+                                             apply(prophiv[prophiv$year == i , c(5:29)] , 1 , min) , 
+                                             apply(prophiv[prophiv$year == i , c(5:29)] , 1 , max))
   }
   return(prophiv)
 }
@@ -205,8 +208,14 @@ calc_prophiv_cuml <- function(scenario, yearstart, yearend){
   scenario.trunc <- filter(scenario, year >=yearstart, year <= yearend)
   cuml <- scenario.trunc %>% group_by(group) %>% summarise(across(c(median:sim25), sum))
   prophiv.cuml <- cuml[cuml$group == "HIVpos_all", c(2:29)] / cuml[cuml$group == "Total", c(2:29)]
+  prophiv.cuml[1,c(1:3)] <- c(apply(prophiv.cuml[1,c(4:28)] , 1 , median) , 
+                               apply(prophiv.cuml[1,c(4:28)] , 1 , min) , 
+                               apply(prophiv.cuml[1,c(4:28)] , 1 , max))
   prophiv.cuml$outcome = "Cuml proportion of cases in WLHIV"
   propart.cuml <- cuml[cuml$group == "HIVpos_VS", c(2:29)] / cuml[cuml$group == "Total", c(2:29)]
+  propart.cuml[1,c(1:3)] <- c(apply(propart.cuml[1,c(4:28)] , 1 , median) , 
+                            apply(propart.cuml[1,c(4:28)] , 1 , min) , 
+                            apply(propart.cuml[1,c(4:28)] , 1 , max))
   propart.cuml$outcome = "Cuml proportion of cases in VS WLHIV"
   out <- rbind.data.frame(prophiv.cuml, propart.cuml)
   return(out)
@@ -224,30 +233,30 @@ colors <- RColorBrewer::brewer.pal(5, "Set2")
 # COMBINE ESTIMATES FOR EACH SCENARIO ONTO ONE SHEET # ----
 ##########
 
-S0.stART.inc.comb <- dataprep.absnum(S0.stART.inc)
-S0.stART.ir.comb <- dataprep.absnum(S0.stART.ir)
-S0.stART.sir.comb <- dataprep.absnum(S0.stART.sir)
-S0.stART.hiv.comb <- dataprep.hivprev(S0.stART.hiv)
+S0b.stART.inc.comb <- dataprep.absnum(S0b.stART.inc)
+S0b.stART.ir.comb <- dataprep.absnum(S0b.stART.ir)
+S0b.stART.sir.comb <- dataprep.absnum(S0b.stART.sir)
+S0b.stART.hiv.comb <- dataprep.hivprev(S0b.stART.hiv)
 
-S1.stART.inc.comb <- dataprep.absnum(S1.stART.inc)
-S1.stART.ir.comb <- dataprep.absnum(S1.stART.ir)
-S1.stART.sir.comb <- dataprep.absnum(S1.stART.sir)
-S1.stART.hiv.comb <- dataprep.hivprev(S1.stART.hiv)
+S0.inART.inc.comb <- dataprep.absnum(S0.inART.inc)
+S0.inART.ir.comb <- dataprep.absnum(S0.inART.ir)
+S0.inART.sir.comb <- dataprep.absnum(S0.inART.sir)
+S0.inART.hiv.comb <- dataprep.hivprev(S0.inART.hiv)
 
-S2.stART.inc.comb <- dataprep.absnum(S2.stART.inc)
-S2.stART.ir.comb <- dataprep.absnum(S2.stART.ir)
-S2.stART.sir.comb <- dataprep.absnum(S2.stART.sir)
-S2.stART.hiv.comb <- dataprep.hivprev(S2.stART.hiv)
+S1.inART.inc.comb <- dataprep.absnum(S1.inART.inc)
+S1.inART.ir.comb <- dataprep.absnum(S1.inART.ir)
+S1.inART.sir.comb <- dataprep.absnum(S1.inART.sir)
+S1.inART.hiv.comb <- dataprep.hivprev(S1.inART.hiv)
 
-S3.stART.inc.comb <- dataprep.absnum(S3.stART.inc)
-S3.stART.ir.comb <- dataprep.absnum(S3.stART.ir)
-S3.stART.sir.comb <- dataprep.absnum(S3.stART.sir)
-S3.stART.hiv.comb <- dataprep.hivprev(S3.stART.hiv)
+S2.inART.inc.comb <- dataprep.absnum(S2.inART.inc)
+S2.inART.ir.comb <- dataprep.absnum(S2.inART.ir)
+S2.inART.sir.comb <- dataprep.absnum(S2.inART.sir)
+S2.inART.hiv.comb <- dataprep.hivprev(S2.inART.hiv)
 
-S4.stART.inc.comb <- dataprep.absnum(S4.stART.inc)
-S4.stART.ir.comb <- dataprep.absnum(S4.stART.ir)
-S4.stART.sir.comb <- dataprep.absnum(S4.stART.sir)
-S4.stART.hiv.comb <- dataprep.hivprev(S4.stART.hiv)
+S3.inART.inc.comb <- dataprep.absnum(S3.inART.inc)
+S3.inART.ir.comb <- dataprep.absnum(S3.inART.ir)
+S3.inART.sir.comb <- dataprep.absnum(S3.inART.sir)
+S3.inART.hiv.comb <- dataprep.hivprev(S3.inART.hiv)
 
 
 ##########
@@ -278,35 +287,35 @@ S4.stART.hiv.comb <- dataprep.hivprev(S4.stART.hiv)
 # S3.inART.sir.comb
 
 # Combine into a DF for raw IR
-S0.stART.ir.comb$scenario <- "Baseline cytology and vaccination"
-S1.stART.ir.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
-S2.stART.ir.comb$scenario <- "S1 + more frequent screening for WLHIV"
-S3.stART.ir.comb$scenario <- "S2 + 50% catch-up vaccination for WLHIV"
-S4.stART.ir.comb$scenario <- "scenario description"
+S0b.stART.ir.comb$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+S0.inART.ir.comb$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+S1.inART.ir.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
+S2.inART.ir.comb$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+S3.inART.ir.comb$scenario <- "S2 + more frequent screening for WLHIV"
 
-ir.comb.stART <- rbind.data.frame(S0.stART.ir.comb, S1.stART.ir.comb, S2.stART.ir.comb, S3.stART.ir.comb, S4.stART.ir.comb)
-ir.comb.stART$scenario <- factor(ir.comb.stART$scenario, levels = c("Baseline cytology and vaccination", 
+ir.comb.inART <- rbind.data.frame(S0b.stART.ir.comb, S0.inART.ir.comb, S1.inART.ir.comb, S2.inART.ir.comb, S3.inART.ir.comb)
+ir.comb.inART$scenario <- factor(ir.comb.inART$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                        "Baseline cytology and vaccination, with ART scale-up",
                                                         "Scaled up HPV testing and 90% vaccination",
-                                                        "S1 + more frequent screening for WLHIV",
-                                                        "S2 + 50% catch-up vaccination for WLHIV",
-                                                        "scenario description"))
-ir.comb.stART$outcome <- "Crude Incidence Rates"
+                                                        "S1 + 50% catch-up vaccination for WLHIV",
+                                                        "S2 + more frequent screening for WLHIV"))
+ir.comb.inART$outcome <- "Crude Incidence Rates"
 
 # Combine into a DF for standardized IR
-S0.stART.sir.comb$scenario <- "Baseline cytology and vaccination"
-S1.stART.sir.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
-S2.stART.sir.comb$scenario <- "S1 + more frequent screening for WLHIV"
-S3.stART.sir.comb$scenario <- "S2 + 50% catch-up vaccination for WLHIV"
-S4.stART.sir.comb$scenario <- "scenario description"
+S0b.stART.sir.comb$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+S0.inART.sir.comb$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+S1.inART.sir.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
+S2.inART.sir.comb$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+S3.inART.sir.comb$scenario <- "S2 + more frequent screening for WLHIV"
 
 
-sir.comb.stART <- rbind.data.frame(S0.stART.sir.comb, S1.stART.sir.comb, S2.stART.sir.comb, S3.stART.sir.comb, S4.stART.sir.comb)
-sir.comb.stART$scenario <- factor(sir.comb.stART$scenario, levels = c("Baseline cytology and vaccination", 
+sir.comb.inART <- rbind.data.frame(S0b.stART.sir.comb, S0.inART.sir.comb, S1.inART.sir.comb, S2.inART.sir.comb, S3.inART.sir.comb)
+sir.comb.inART$scenario <- factor(sir.comb.inART$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                                    "Baseline cytology and vaccination, with ART scale-up",
                                                                     "Scaled up HPV testing and 90% vaccination",
-                                                                    "S1 + more frequent screening for WLHIV",
-                                                                    "S2 + 50% catch-up vaccination for WLHIV",
-                                                                    "scenario description"))
-sir.comb.stART$outcome <- "AS Incidence Rates"
+                                                                    "S1 + 50% catch-up vaccination for WLHIV",
+                                                                    "S2 + more frequent screening for WLHIV"))
+sir.comb.inART$outcome <- "AS Incidence Rates"
 
 
 ##########
@@ -314,41 +323,41 @@ sir.comb.stART$outcome <- "AS Incidence Rates"
 ##########
 
 # Combine into a DF
-S0.stART.inc.comb$scenario <- "Baseline cytology and vaccination"
-S1.stART.inc.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
-S2.stART.inc.comb$scenario <- "S1 + more frequent screening for WLHIV"
-S3.stART.inc.comb$scenario <- "S2 + 50% catch-up vaccination for WLHIV"
-S4.stART.inc.comb$scenario <- "scenario description"
+S0b.stART.inc.comb$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+S0.inART.inc.comb$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+S1.inART.inc.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
+S2.inART.inc.comb$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+S3.inART.inc.comb$scenario <- "S2 + more frequent screening for WLHIV"
 
-inc.comb.stART <- rbind.data.frame(S0.stART.inc.comb, S1.stART.inc.comb, S2.stART.inc.comb, S3.stART.inc.comb, S4.stART.inc.comb)
-inc.comb.stART$scenario <- factor(inc.comb.stART$scenario, levels = c("Baseline cytology and vaccination", 
+inc.comb.inART <- rbind.data.frame(S0b.stART.inc.comb, S0.inART.inc.comb, S1.inART.inc.comb, S2.inART.inc.comb, S3.inART.inc.comb)
+inc.comb.inART$scenario <- factor(inc.comb.inART$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                        "Baseline cytology and vaccination, with ART scale-up",
                                                         "Scaled up HPV testing and 90% vaccination",
-                                                        "S1 + more frequent screening for WLHIV",
-                                                        "S2 + 50% catch-up vaccination for WLHIV",
-                                                        "scenario description"))
-inc.comb.stART$outcome <- "Incident cases"
+                                                        "S1 + 50% catch-up vaccination for WLHIV",
+                                                        "S2 + more frequent screening for WLHIV"))
+inc.comb.inART$outcome <- "Incident cases"
 
 
-ratesandcases.stART <- rbind.data.frame(inc.comb.stART, ir.comb.stART, sir.comb.stART)
+ratesandcases.inART <- rbind.data.frame(inc.comb.inART, ir.comb.inART, sir.comb.inART)
 
 ##########
 # Combine HIV prevalence across scenarios # ----
 ##########
 
 # Combine into a DF
-S0.stART.hiv.comb$scenario <- "Baseline cytology and vaccination"
-S1.stART.hiv.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
-S2.stART.hiv.comb$scenario <- "S1 + more frequent screening for WLHIV"
-S3.stART.hiv.comb$scenario <- "S2 + 50% catch-up vaccination for WLHIV"
-S4.stART.hiv.comb$scenario <- "scenario description"
+S0b.stART.hiv.comb$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+S0.inART.hiv.comb$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+S1.inART.hiv.comb$scenario <- "Scaled up HPV testing and 90% vaccination"
+S2.inART.hiv.comb$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+S3.inART.hiv.comb$scenario <- "S2 + more frequent screening for WLHIV"
 
-hiv.comb.stART <- rbind.data.frame(S0.stART.hiv.comb, S1.stART.hiv.comb, S2.stART.hiv.comb, S3.stART.hiv.comb, S4.stART.hiv.comb)
-hiv.comb.stART$scenario <- factor(hiv.comb.stART$scenario, levels = c("Baseline cytology and vaccination", 
+hiv.comb.inART <- rbind.data.frame(S0b.stART.hiv.comb, S0.inART.hiv.comb, S1.inART.hiv.comb, S2.inART.hiv.comb, S3.inART.hiv.comb)
+hiv.comb.inART$scenario <- factor(hiv.comb.inART$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                          "Baseline cytology and vaccination, with ART scale-up",
                                                           "Scaled up HPV testing and 90% vaccination",
-                                                          "S1 + more frequent screening for WLHIV",
-                                                          "S2 + 50% catch-up vaccination for WLHIV",
-                                                          "scenario description"))
-hiv.comb.stART$outcome <- "HIV prevalence"
+                                                          "S1 + 50% catch-up vaccination for WLHIV",
+                                                          "S2 + more frequent screening for WLHIV"))
+hiv.comb.inART$outcome <- "HIV prevalence"
 
 
 
@@ -356,34 +365,34 @@ hiv.comb.stART$outcome <- "HIV prevalence"
 # CALCULATE PAF in each year and cumulative PAF for each scenario # ----
 ##########
 
-(prophiv.S0.stART <- calc_prophiv(S0.stART.inc.comb))
-calc_prophiv_cuml(S0.stART.inc.comb, 2021, 2121)
+(prophiv.S0b.stART <- calc_prophiv(S0b.stART.inc.comb))
+calc_prophiv_cuml(S0b.stART.inc.comb, 2021, 2121)
 
-(prophiv.S1.stART <- calc_prophiv(S1.stART.inc.comb))
-calc_prophiv_cuml(S1.stART.inc.comb, 2021, 2121)
+(prophiv.S0.inART <- calc_prophiv(S0.inART.inc.comb))
+calc_prophiv_cuml(S0.inART.inc.comb, 2021, 2121)
 
-(prophiv.S2.stART <- calc_prophiv(S2.stART.inc.comb))
-calc_prophiv_cuml(S2.stART.inc.comb, 2021, 2121)
+(prophiv.S1.inART <- calc_prophiv(S1.inART.inc.comb))
+calc_prophiv_cuml(S1.inART.inc.comb, 2021, 2121)
 
-(prophiv.S3.stART <- calc_prophiv(S3.stART.inc.comb))
-calc_prophiv_cuml(S3.stART.inc.comb, 2021, 2121)
+(prophiv.S2.inART <- calc_prophiv(S2.inART.inc.comb))
+calc_prophiv_cuml(S2.inART.inc.comb, 2021, 2121)
 
-(prophiv.S4.stART <- calc_prophiv(S4.stART.inc.comb))
-calc_prophiv_cuml(S4.stART.inc.comb, 2021, 2121)
+(prophiv.S3.inART <- calc_prophiv(S3.inART.inc.comb))
+calc_prophiv_cuml(S3.inART.inc.comb, 2021, 2121)
 
 # Combine into a data frame
-prophiv.S0.stART$scenario <- "Baseline cytology and vaccination"
-prophiv.S1.stART$scenario <- "Scaled up HPV testing and 90% vaccination"
-prophiv.S2.stART$scenario <- "S1 + more frequent screening for WLHIV"
-prophiv.S3.stART$scenario <- "S2 + 50% catch-up vaccination for WLHIV"
-prophiv.S4.stART$scenario <- "scenario description"
+prophiv.S0b.stART$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+prophiv.S0.inART$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+prophiv.S1.inART$scenario <- "Scaled up HPV testing and 90% vaccination"
+prophiv.S2.inART$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+prophiv.S3.inART$scenario <- "S2 + more frequent screening for WLHIV"
 
-prophiv.stART.comb <- rbind.data.frame(prophiv.S0.stART, prophiv.S1.stART, prophiv.S2.stART, prophiv.S3.stART, prophiv.S4.stART)
-prophiv.stART.comb$scenario <- factor(prophiv.stART.comb$scenario, levels = c("Baseline cytology and vaccination", 
+prophiv.inART.comb <- rbind.data.frame(prophiv.S0b.stART, prophiv.S0.inART, prophiv.S1.inART, prophiv.S2.inART, prophiv.S3.inART)
+prophiv.inART.comb$scenario <- factor(prophiv.inART.comb$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                          "Baseline cytology and vaccination, with ART scale-up",
                                                           "Scaled up HPV testing and 90% vaccination",
-                                                          "S1 + more frequent screening for WLHIV",
-                                                          "S2 + 50% catch-up vaccination for WLHIV",
-                                                          "scenario description"))
+                                                          "S1 + 50% catch-up vaccination for WLHIV",
+                                                          "S2 + more frequent screening for WLHIV"))
 
 
 ############################
@@ -393,41 +402,42 @@ prophiv.stART.comb$scenario <- factor(prophiv.stART.comb$scenario, levels = c("B
 colors <- RColorBrewer::brewer.pal(5, "Set2")
 
 ## Look at *median* outcomes across scenarios.
-sir.comb.stART %>%  # Change the name of the dataframe to different outcomes (ir.comb.stART, sir.comb.stART, inc.comb.stART, )
-  filter(group %in% c("Total", "HIVneg", "HIVpos_noART", "HIVpos_VS")) %>%
+sir.comb.inART %>%  # Change the name of the dataframe to different outcomes (ir.comb.inART, sir.comb.inART, inc.comb.inART, )
+  filter(group %in% c("Total", "HIVneg", "HIVpos_all" , "HIVpos_noART", "HIVpos_VS")) %>%
   ggplot() + 
     geom_line(aes(x=year, y = median, colour = scenario)) +
     facet_wrap(vars(group), scales = "free")
 
-ggplot(prophiv.stART.comb) + 
+ggplot(prophiv.inART.comb) + 
     geom_line(aes(x=year, y = median, colour = scenario)) +
     #geom_line(data = hiv.comb.inART, aes(x=year, y = median, colour = scenario)) +
-    geom_line(data = hiv.comb.stART, aes(x=year, y = median, colour = scenario), linetype = "dashed")
+    geom_line(data = hiv.comb.inART, aes(x=year, y = median, colour = scenario), linetype = "dashed")
 
 
 ### Incidence rates
 ## Building up the scenarios for presentation
 
-# Scenario 0 - Total pop only
-#png("irS0_tot.png", width = 800, height = 400)
-pdf("irS0_tot.pdf", width = 10, height = 5)
-S0.stART.ir.comb %>%
+# Scenario 0b - Total pop only
+png("sirS0b_tot.png", width = 800, height = 400)
+#pdf("sirS0b_tot.pdf", width = 10, height = 5)
+S0b.stART.sir.comb %>%
   filter(group == "Total") %>%
   ggplot() + 
     geom_line(aes(x = year, y = median), colour = "black", size = 1.25) +
     scale_y_continuous(breaks = seq(0, 105, 25), limits = c(0, 115)) +
-    labs(x = "year", y = "Incidence rate per 100,000 women") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black")) +
     plot_background 
 dev.off()
 
-# Scenario 0 - Adding in HIV states
-#png("irS0_byhiv.png", width = 800, height = 400)
-pdf("irS0_byhiv.pdf", width = 10, height = 5) # legend position for this size shoudl be c(0.85, 0.85)
-#pdf("irS0_byhiv.small.pdf", width = 6, height = 5)  # save it again at half size, and change legend position to c(0.8, 0.85)
-S0.stART.ir.comb %>%
+# Scenario 0b - Adding in HIV states
+png("sirS0b_byhiv.png", width = 800, height = 400)
+#pdf("sirS0b_byhiv.pdf", width = 10, height = 5) # legend position for this size should be c(0.85, 0.85)
+#pdf("sirS0b_byhiv.small.pdf", width = 6, height = 5)  # save it again at half size, and change legend position to c(0.8, 0.85)
+S0b.stART.sir.comb %>%
   filter(group %in% c("Total", "HIVneg", "HIVpos_all")) %>%
   ggplot() + 
     geom_line(aes(x = year, y = median, colour = group), size = 1.25) +
@@ -436,18 +446,15 @@ S0.stART.ir.comb %>%
                         labels = c("All females", "HIV-negative", "HIV-positive"),
                         name = NULL) +
     scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
-    labs(x = "year", y = "Incidence rate per 100,000 women") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.8, 0.85)) +
     plot_background 
 dev.off()
-
-
-===> STOPPED UPDATING HERE
-
 
 # png("irS0_byhivandart.png", width = 800, height = 400)
 # ggplot(S0b.stART.ir.comb) + 
@@ -469,225 +476,349 @@ dev.off()
 #     plot_background
 # dev.off()
 
-# Add in scenario with increasing ART
-#png("irS0b_byhiv_inART.png", width = 800, height = 400)
-pdf("irS0b_byhiv_inART.pdf", width = 6, height = 5)
+# Add in S0 with increasing ART
+png("sirS0bS0_byhiv_inART.png", width = 800, height = 400)
+#pdf("sirS0bS0_byhiv_inART.pdf", width = 6, height = 5)
 ggplot() + 
-    geom_line(data = S0b.stART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.75, alpha = 0.55) +
-    geom_line(data = S0b.stART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1.5, alpha = 0.55) +
-    geom_line(data = S0b.stART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1.5, alpha = 0.55) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1) +
-    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos" = colors[3]),
-                        breaks = c("Total", "HIVneg", "HIVpos"),
+    geom_line(data = filter(S0b.stART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.75, alpha = 0.45) +
+    geom_line(data = filter(S0b.stART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1.5, alpha = 0.45) +
+    geom_line(data = filter(S0b.stART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1.5, alpha = 0.45) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                        breaks = c("Total", "HIVneg", "HIVpos_all"),
                         labels = c("All females", "HIV-negative", "HIV-positive"),
                         name = NULL) +
-    scale_y_continuous(breaks = seq(0, 105, 25), limits = c(0, 115)) +
-    labs(x = "year", y = "Incidence rate per 100,000 women") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+    labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.8, 0.85)) +
     plot_background 
+dev.off()
+
+png("irS0bS0_byhiv_inART.png", width = 800, height = 400)
+#pdf("irS0bS0_byhiv_inART.pdf", width = 6, height = 5)
+ggplot() + 
+  geom_line(data = filter(S0b.stART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.75, alpha = 0.45) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1.5, alpha = 0.45) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1.5, alpha = 0.45) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                      breaks = c("Total", "HIVneg", "HIVpos_all"),
+                      labels = c("All females", "HIV-negative", "HIV-positive"),
+                      name = NULL) +
+  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  labs(x = "Year", y = "Crude incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.85)) +
+  plot_background 
 dev.off()
 
 # Add in S1 with increasing ART
-#png("irS0bS1_byhiv.png", width = 800, height = 400)
-pdf("irS0bS1_byhiv.pdf", width = 6, height = 5)
+#png("sirS0S1_byhiv.png", width = 800, height = 400)
+pdf("sirS0S1_byhiv.pdf", width = 6, height = 5)
 ggplot() + 
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1) +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25, linetype = "dashed") +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1, linetype = "dashed") +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1, linetype = "dashed") +
-    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos" = colors[3]),
-                        breaks = c("Total", "HIVneg", "HIVpos"),
+    geom_line(data = filter(S0.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+    geom_line(data = filter(S1.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+    geom_line(data = filter(S1.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+    geom_line(data = filter(S1.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                        breaks = c("Total", "HIVneg", "HIVpos_all"),
                         labels = c("All females", "HIV-negative", "HIV-positive"),
                         name = NULL) +
-    scale_y_continuous(breaks = seq(0, 105, 25), limits = c(0, 115)) +
-    labs(x = "year", y = "Incidence rate per 100,000 women") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+    labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.8, 0.85)) +
     plot_background 
 dev.off()
 
+#png("irS0S1_byhiv.png", width = 800, height = 400)
+pdf("irS0S1_byhiv.pdf", width = 6, height = 5)
+ggplot() + 
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                      breaks = c("Total", "HIVneg", "HIVpos_all"),
+                      labels = c("All females", "HIV-negative", "HIV-positive"),
+                      name = NULL) +
+  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.85)) +
+  plot_background 
+dev.off()
+
+
+# Add in S2,S3 with increasing ART
+#png("sirS0S1S2S3_byhiv.png", width = 800, height = 400)
+#pdf("sirS0S1S2S3_byhiv.pdf", width = 10, height = 5)
+pdf("sirS0S1S2S3_byhiv.small.pdf", width = 6, height = 5) # half size
+ggplot() + 
+    geom_line(data = filter(S0.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+    geom_line(data = filter(S0.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+    geom_line(data = filter(S1.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+    geom_line(data = filter(S1.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+    geom_line(data = filter(S1.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+    geom_line(data = filter(S2.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotdash") +
+    geom_line(data = filter(S2.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotdash") +
+    geom_line(data = filter(S2.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotdash") +
+    geom_line(data = filter(S3.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotted") +
+    geom_line(data = filter(S3.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotted") +
+    geom_line(data = filter(S3.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotted") +
+    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                        breaks = c("Total", "HIVneg", "HIVpos_all"),
+                        labels = c("All females", "HIV-negative", "HIV-positive"),
+                        name = NULL) +
+    scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "year", y = "Age-standardized incidence rate per 100,000 women") +
+    theme(axis.title = element_text(size =12),
+          axis.text = element_text(size = 14),
+          axis.line = element_line(color = "black"),
+          legend.text = element_text(size = 14),
+          legend.position = c(0.8, 0.85)) +
+    plot_background 
+dev.off()
 
 # Add in S3 with increasing ART
-#png("irS0bS1S3_byhiv.png", width = 800, height = 400)
-#pdf("irS0bS1S3_byhiv.pdf", width = 10, height = 5)
-pdf("irS0bS1S3_byhiv.small.pdf", width = 6, height = 5) # half size
+#png("sirS0S1S3_byhiv.png", width = 800, height = 400)
+#pdf("sirS0S1S3_byhiv.pdf", width = 10, height = 5)
+pdf("sirS0S1S3_byhiv.small.pdf", width = 6, height = 5) # half size
 ggplot() + 
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1) +
-    geom_line(data = S0b.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1) +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25, linetype = "dashed") +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1, linetype = "dashed") +
-    geom_line(data = S1.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1, linetype = "dashed") +
-    geom_line(data = S3.inART.ir.comb, aes(x = year, y = Total, colour = "Total"), size = 1.25, linetype = "dotdash") +
-    geom_line(data = S3.inART.ir.comb, aes(x = year, y = HIVneg, colour = "HIVneg"), size = 1, linetype = "dotdash") +
-    geom_line(data = S3.inART.ir.comb, aes(x = year, y = HIVpos, colour = "HIVpos"), size = 1, linetype = "dotdash") +
-    scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos" = colors[3]),
-                        breaks = c("Total", "HIVneg", "HIVpos"),
-                        labels = c("All females", "HIV-negative", "HIV-positive"),
-                        name = NULL) +
-    scale_y_continuous(breaks = seq(0, 105, 25), limits = c(0, 115)) +
-    labs(x = "year", y = "Incidence rate per 100,000 women") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
-          axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
-          legend.position = c(0.8, 0.85)) +
-    plot_background 
+  geom_line(data = filter(S0.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+  geom_line(data = filter(S0.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  geom_line(data = filter(S1.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S3.inART.sir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.sir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.sir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotted") +
+  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                      breaks = c("Total", "HIVneg", "HIVpos_all"),
+                      labels = c("All females", "HIV-negative", "HIV-positive"),
+                      name = NULL) +
+  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  labs(x = "year", y = "Age-standardized incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size =12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.85)) +
+  plot_background 
 dev.off()
 
 
-### PAF and HIV prevalence
+### Proportion of cases in WLHIV and HIV prevalence
 
 ## Scenario S0b
-pdf("paf.s0b.small.pdf", width = 6, height = 5) 
-ggplot(paf.S0b.stART) +
-    geom_area(aes(x = year, y = paf_hiv), fill = colors[3]) +
+pdf("prophiv.s0b.small.pdf", width = 6, height = 5) 
+ggplot(prophiv.S0b.stART) +
+    geom_area(aes(x = year, y = median), fill = colors[3]) +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    labs(x = "year", y = "Proportion of cases among WLHIV") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Proportion of cases among WLHIV") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.85, 0.85)) +
     plot_background
 dev.off()
 
 # Add HIV prevalence
-pdf("paf.prev.s0b.small.pdf", width = 6, height = 5) # save again at half size
+pdf("prophiv.prev.s0b.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = paf.S0b.stART, aes(x = year, y = paf_hiv), fill = colors[3]) +
-    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") + 
+    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = colors[3]) +
+    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.85, 0.85)) +
     plot_background
 dev.off()
 
-## Scenario S0b with increasing ART
-pdf("paf.prev.s0b.inART.small.pdf", width = 6, height = 5) # save again at half size
+## Scenario S0 with increasing ART
+pdf("prophiv.prev.s0bS0.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = paf.S0b.stART, aes(x = year, y = paf_hiv), fill = colors[3], alpha = 0.6) +
-    geom_area(data = paf.S0b.inART, aes(x = year, y = paf_hiv), fill = colors[3], alpha = 0.6) +
-    geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#486199") +
-    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = Prevalence), fill = "#8B7DCA") + 
-    geom_area(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") + 
-    geom_line(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), colour = "#3C2F74") +
+    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
+    geom_area(data = prophiv.S0.inART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
+    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#8B7DCA") + 
+    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
+    geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median), colour = "#3C2F74") +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+    theme(axis.title = element_text(size = 12),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.85, 0.85)) +
     plot_background
 dev.off()
 
 #Highlight the initial increase in PAF and then eventual decrease
-S0b.min <- pmin(paf.S0b.stART$paf_hiv, paf.S0b.inART$paf_hiv)
-paf.S0b.min <- cbind.data.frame(year = paf.S0b.stART$year, min_paf = S0b.min)
+S0b.min <- pmin(prophiv.S0b.stART$median, prophiv.S0.inART$median)
+prophiv.S0b.min <- cbind.data.frame(year = prophiv.S0b.stART$year, min_prophiv = S0b.min)
 
-pdf("paf.prev.s0b.inART.showincr.small.pdf", width = 6, height = 5) 
+pdf("prophiv.prev.s0bS0.inART.showincr.small.pdf", width = 6, height = 5) 
 ggplot() +
-    geom_area(data = paf.S0b.inART, aes(x = year, y = paf_hiv), fill = "#A4F283") +
-    geom_area(data = paf.S0b.stART, aes(x = year, y = paf_hiv), fill = colors[3], alpha = 0.6) +
-    geom_area(data = paf.S0b.min, aes(x = year, y = min_paf), fill = colors[3]) +
-    geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#486199") +
-    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = Prevalence), fill = "#8B7DCA") + 
-    geom_area(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") + 
-    geom_line(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), colour = "#3C2F74") +
+    geom_area(data = prophiv.S0.inART, aes(x = year, y = median), fill = "#A4F283") +
+    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
+    geom_area(data = prophiv.S0b.min, aes(x = year, y = min_prophiv), fill = colors[3]) +
+    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#8B7DCA") + 
+    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
+    geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median), colour = "#3C2F74") +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.85, 0.85)) +
     plot_background
 dev.off()
 
-pdf("paf.prev.s0b.inART.showdecr.small.pdf", width = 6, height = 5) 
+pdf("prophiv.prev.s0bS0.inART.showdecr.small.pdf", width = 6, height = 5) 
 ggplot() +
-    geom_area(data = paf.S0b.inART, aes(x = year, y = paf_hiv), fill = "#A4F283") +
-    geom_area(data = paf.S0b.stART, aes(x = year, y = paf_hiv), fill = "#C76F98", alpha = 0.8) +
-    geom_area(data = paf.S0b.min, aes(x = year, y = min_paf), fill = colors[3]) +
-    geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#486199") +
-    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = Prevalence), fill = "#8B7DCA") + 
-    geom_area(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") + 
-    geom_line(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), colour = "#3C2F74") +
+    geom_area(data = prophiv.S0.inART, aes(x = year, y = median), fill = "#A4F283") +
+    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = "#C76F98", alpha = 0.8) +
+    geom_area(data = prophiv.S0b.min, aes(x = year, y = min_prophiv), fill = colors[3]) +
+    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#8B7DCA") + 
+    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
+    geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median), colour = "#3C2F74") +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = c(0.85, 0.85)) +
     plot_background
 dev.off()
 
 ## Add in S1
-pdf("paf.prev.s0bs1.inART.small.pdf", width = 6, height = 5) # save again at half size
+pdf("prophiv.prev.s0s1.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = paf.S0b.inART, aes(x = year, y = paf_hiv, fill = "Baseline")) +
-    geom_area(data = paf.S1.inART, aes(x = year, y = paf_hiv, fill = "S1"), alpha = 0.55) +
-    geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#486199") +
-    geom_line(data = paf.S1.inART, aes(x = year, y = paf_hiv), colour = "#486199", linetype = "dashed") +
-    # geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#738ABF") +
-    # geom_line(data = paf.S1.inART, aes(x = year, y = paf_hiv), colour = "#7AB4F5") +
-    geom_area(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") +
+    geom_area(data = prophiv.S0.inART, aes(x = year, y = median, fill = "Baseline")) +
+    geom_area(data = prophiv.S1.inART, aes(x = year, y = median, fill = "S1"), alpha = 0.55) +
+    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+    geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#486199", linetype = "dashed") +
+    # geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#738ABF") +
+    # geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#7AB4F5") +
+    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
     scale_fill_manual(values = c("Baseline" = colors[3], "S1" = "#97C4F7"),
-                                          breaks = c("Baseline", "S1"),
-                                          labels = c("Baseline screening and vaccination", "Scaled up HPV testing and 90% vax"),
+                                          breaks = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination"),
+                                          labels = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination"),
                                           name = NULL) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = "none") +
     plot_background
 dev.off()
 
 ## Add in S3
-pdf("paf.prev.s0bs1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+pdf("prophiv.prev.s0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = paf.S0b.inART, aes(x = year, y = paf_hiv, fill = "Baseline")) +
-    geom_area(data = paf.S1.inART, aes(x = year, y = paf_hiv, fill = "S1"), alpha = 0.55) +
-    geom_area(data = paf.S3.inART, aes(x = year, y = paf_hiv, fill = "S3")) +
-    geom_line(data = paf.S0b.inART, aes(x = year, y = paf_hiv), colour = "#486199") +
-    geom_line(data = paf.S1.inART, aes(x = year, y = paf_hiv), colour = "#486199", linetype = "dashed") +
-    geom_line(data = paf.S3.inART, aes(x = year, y = paf_hiv), colour = "#486199", linetype = "dotdash") +
-    geom_area(data = S0b.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#5F4BB6") +
-    # geom_area(data = S1.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#A15AD1") + 
-    # geom_area(data = S3.inART.hiv.comb, aes(x = year, y = Prevalence), fill = "#8771EB") +
+    geom_area(data = prophiv.S0.inART, aes(x = year, y = median, fill = "Baseline")) +
+    geom_area(data = prophiv.S1.inART, aes(x = year, y = median, fill = "S1"), alpha = 0.55) +
+    geom_area(data = prophiv.S3.inART, aes(x = year, y = median, fill = "S3")) +
+    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+    geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#486199", linetype = "dashed") +
+    geom_line(data = prophiv.S3.inART, aes(x = year, y = median), colour = "#486199", linetype = "dotdash") +
+    geom_area(data = S1.inART.hiv.comb, aes(x = year, y = median), fill = "#A15AD1") + 
+    geom_area(data = S3.inART.hiv.comb, aes(x = year, y = median), fill = "#8771EB") +
+    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") +
     scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
     scale_fill_manual(values = c("Baseline" = colors[3], "S1" = "#97C4F7", "S3" = "#A0C9F8"),
                       breaks = c("Baseline", "S1", "S3"),
-                      labels = c("Baseline screening and vaccination", "Scaled up HPV testing and 90% vax",
-                                 "Increased HPV screening and catch-up vax for WLHIV"),
+                      labels = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination",
+                                 "S2 + more frequent screening for WLHIV"),
                       name = NULL) +
     labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 18),
-          axis.text = element_text(size = 16),
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
           axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 18),
+          legend.text = element_text(size = 14),
           legend.position = "none") +
     plot_background
+dev.off()
+
+## Add in S2
+pdf("prophiv.prev.s0s1S2.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_area(data = prophiv.S0.inART, aes(x = year, y = median, fill = "Baseline")) +
+  geom_area(data = prophiv.S1.inART, aes(x = year, y = median, fill = "S1"), alpha = 0.55) +
+  geom_area(data = prophiv.S2.inART, aes(x = year, y = median, fill = "S3")) +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+  geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#486199", linetype = "dashed") +
+  geom_line(data = prophiv.S2.inART, aes(x = year, y = median), colour = "#486199", linetype = "dotdash") +
+  geom_area(data = S1.inART.hiv.comb, aes(x = year, y = median), fill = "#A15AD1") + 
+  geom_area(data = S3.inART.hiv.comb, aes(x = year, y = median), fill = "#8771EB") +
+  geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_fill_manual(values = c("Baseline" = colors[3], "S1" = "#97C4F7", "S3" = "#A0C9F8"),
+                    breaks = c("Baseline", "S1", "S3"),
+                    labels = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination",
+                               "S1 + 50% catch-up vaccination for WLHIV"),
+                    name = NULL) +
+  labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = "none") +
+  plot_background
 dev.off()
 
 # ggplot(paf.inART.comb) + 
@@ -696,7 +827,7 @@ dev.off()
 #     geom_line(aes(x = year, y = Prevalence, colour = scenario))
 
     
-## Extract statistics
+## Extract statistics !!!!!!!!!!!!!!!!!!!!!!NOT UPDATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Incidence rates in 2000, 2020, and 2070 and % change
 (startend.stART <- filter(S0b.start.ir.comb, year %in% c(2000, 2020, 2070), scenario == "Baseline w/ 2x cytology"))
 startend.stART %>% group_by(scenario) %>% mutate(pctchange_gen_2020 = Total[year == 2020] / Total[year == 2000],
