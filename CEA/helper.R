@@ -1,31 +1,8 @@
-# Helper functions and parameters
-# November 18, 2020
+# Helper functions 
+# Last update: July 1, 2021
+# Msahu
 
-#############################################################################
-
-
-
-# Set up DO ART parameters: enrollment assumptions
-
-females_ART_scen1 <- .6223
-females_ART_scen2 <- .657
-females_ART_scen3 <- .857
-
-males_ART_scen1 <- .3978
-males_ART_scen2 <- .655
-males_ART_scen3 <- .857
-
-males_enrolment_clinic <- 51/72
-males_enrolment_cbART <- 21/72
-
-females_enrolment_clinic <- 70/73
-females_enrolment_cbART <- 3/73
-
-# Set up DO ART % tested scalar
-
-DOARTpct_tested <- 0.9
-
-##############################################################################
+# ===================================================================================
 
 # FUNCTIONS #
 
@@ -58,4 +35,13 @@ discount <- function(x, discount_rate) {
     select(mean, min, max,everything())
 }
 
+# Cumulative sum
 
+df_cumsum <- function(df) {
+  
+  df <- cumsum(df[, -1]) %>% 
+    addYearCol() %>% 
+    recalcFuns()
+  
+  return(df)
+}

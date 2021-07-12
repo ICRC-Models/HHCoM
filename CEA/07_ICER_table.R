@@ -21,23 +21,7 @@ for (i in 2) {
              min=apply(.[,4:28], 1,FUN=min), 
              max=apply(.[,4:28], 1,FUN=max)) 
       
-      print(paste(horizon_year, "inc cos
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  ts", l, "scenario", i, ":",round(x$mean,0)))  
+      print(paste(horizon_year, "inc costs", l, "scenario", i, ":",round(x$mean,0)))  
       print(paste(horizon_year, "inc costs", l, "scenario MIN", i, ":",round(x$min,0)))  
       print(paste(horizon_year, "inc costs", l, "scenario MAX", i, ":",round(x$max,0)))  
       

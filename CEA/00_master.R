@@ -1,8 +1,8 @@
 # MASTER SCRIPT
-# September 7, 2020
+# Update: June 24, 2021
 # MSahu
 
-# Set up 
+# Set up  -------------------------------------------------------------------------------------
 
 rm(list=ls())
 
@@ -10,34 +10,54 @@ library("dplyr")
 
 setwd("C:/Users/msahu/Documents/Other_Research/DO_ART/HHCoM/")
 main_path <- "DoArtOutputs/"
+vmmc_path <- "DoArtOutputs/Sensitivity_VMMCscaleUp/"
 cea_path <- "CEA/"
-helper_path <- "CEA/"
 
-# PRIMARY ANALYSIS
+# Set up parameters ---------------------------------------------------------------------------
 
-source(paste0(helper_path, "helper.R"))
+# Scenarios
+
+scenarios <- c("Scenario1", "Scenario2", "Scenario2a")
+names(scenarios) <- c("Standard of care",
+                      "HTC + Community ART",
+                      "HTC only")
+alt_scenarios <- scenarios[!scenarios =="Scenario1"]
+
+# VMMC Scale-Up
+
+version <- c(main_path, vmmc_path)
+names(version) <- c("main","vmmc")
+
+# Discount rate of 3%
+
+discount_rate <- c(0, .03, .05)
+names(discount_rate) <- c("dr0", "dr3", "dr5")
+
+# Column names 
+
+df_names <- c("year","mean", "min","max", paste0("s",1:25))
+
+# Time horizon
+
+horizon_year <- 2060
+
+
+# Set up DO ART % tested scalar
+
+DOARTpct_tested <- 0.9
+
+# PRIMARY ANALYSIS -----------------------------------------------------------------------------
+
+source(paste0(cea_path, "helper.R"))
 source(paste0(cea_path, "01_cases_averted.R"))
 source(paste0(cea_path, "02_deaths_averted.R"))
 source(paste0(cea_path, "03_QALYS_gained.R"))
-source(paste0(cea_path, "04_DALYs_averted_dr0.R"))
-source(paste0(cea_path, "05_costs_dr3.R"))  # MUST BE CONNECTED TO VPN, or will get error
+source(paste0(cea_path, "04_DALYs_averted.R"))
+source(paste0(cea_path, "05_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
 source(paste0(cea_path, "07_ICER_table.R"))  
-source(paste0(helper_path, "helper.R"))
+source(paste0(cea_path, "helper.R"))
 
-
-# SENSITIVITY ANALYSIS  - VMMC SCALE-UP SCENARIO
-
-main_path <- "DoArtOutputs/Sensitivity_VMMCscaleUp/"
-cea_path <- "CEA/Sensitivity_VMMCscaleUp/"
-
-source(paste0(helper_path, "helper.R"))
-source(paste0("CEA/01_cases_averted.R"))
-source(paste0("CEA/02_deaths_averted.R"))
-source(paste0("CEA/03_QALYS_gained.R"))
-source(paste0("CEA/04_DALYs_averted.R"))
-# source(paste0("CEA/05_costs_VMMC.R"))  # MUST BE CONNECTED TO VPN, or will get error
-
-# SENSITIVITY ANALYSIS  
+## SENSITIVITY ANALYSIS  
 # 1. Local life expectancy 
 #2. VARY TIME HORIZON (2030, 2045)
 

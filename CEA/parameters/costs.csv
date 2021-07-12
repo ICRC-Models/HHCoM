@@ -1,0 +1,13 @@
+param_name,param_val,lb,ub,year,lb_year,ub_year,currency,definition,param_source,lb_source,ub_source
+home_testing_pc_pos,5.81,2,20.5,2012,2020,2014,usd,Home HTC (positive test),"Meyer-Rath, PLoS One, 2019",Shapiro et al self-testing (https://www.orasure.com/),SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
+home_testing_pc_neg,5.23,2,20.5,2012,2020,2014,usd,Home HTC (negative test),"Meyer-Rath, PLoS One, 2019",Shapiro et al self-testing (https://www.orasure.com/),SEARCH: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089839/
+hosp_CD4_below200_noART,125.5,71.5,222.5,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4<200","Meyer Rath, 2013, Table 2A",,
+hosp_CD4_200-350_noART,58,39,97,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 200-350","Meyer Rath, 2013, Table 2A",,
+hosp_CD4_350plus_noART,39,23,76,2009,2009,2009,usd,"Pre-ART hospitalization costs, CD4 350+","Meyer Rath, 2013, Table 2A",,
+hosp_onART,45,23,80,2009,2009,2009,usd,"Post-ART hospitalization costs, CD4 350+ (assumes everyone on ART has CD4+ >350)","Meyer Rath, 2013, Table 2A",,
+cb_art_y1,310.84,250,618.68,2018,2018,2018,usd,"Community-based ART, Year 1","DO ART , Table S13 - Volume-weighted mean","DO ART multi-month scripting scenario, Allen 10/30","DO ART ""steady-state"" programmatic scenario"
+cb_art_sub,245.42,199,500.88,2018,2018,2018,usd,"Community-based ART, Subsequent Years","DO ART , Table S13 - Volume-weighted mean","DO ART multi-month scripting scenario, Allen 10/30","DO ART ""steady-state"" programmatic scenario"
+standard_art,249.15,109.55,315.39,2018,2018,2017,usd,Standard of Care ART for Adults in SA,"Meyer-Rath, PLoS One, 2019","Nichols, AIDS 2020
+SDC6 (12 mo retained)
+","Thomas 2021, popART"
+circumcision,95.15,76.12,132.9,2011,2011,2018,usd,"Male medical circumcision, per circumcision","Meyer-Rath, PLoS One, 2019",,

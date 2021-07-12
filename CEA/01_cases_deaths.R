@@ -3,14 +3,14 @@
 # Update: June 24, 2021
 # MSahu
 
-# NOTE that annual incidence is calculated per 100 HIV-negative persons 
-
-# To Do:
-# Check discounting rates
-
 #=============================================================================================================
 
 # IMPORT Raw Cases & Deaths (males and females combined, age 15-79)
+
+# Remember:
+# Annual incidence is calculated per 100 HIV-negative persons 
+# Annual mortality is calculated per capita
+# But use raw cases here
 
 # ============================================================================================================
 
@@ -19,34 +19,34 @@ measure <- c("HIV_incidence", "HIV_mortality")
 # Create list of dataframes
 # One per scenario (4), discount rate (3), and measure (2)
 
-raw_outcomes_list <- vector(mode = "list")
+outcomes_list <- vector(mode = "list")
 
-for (m in measure) {
+for (v in names(version)) {  
 
-  for (x in scenarios) {
-    
-    for (d in discount_rate) {
+  for (m in measure) {  
+  
+    for (x in scenarios) {
       
-      temp <- read.csv(paste0(main_path, x, "/Raw_", m, "_combined_ages15-79.csv"), header=F) %>% 
+      for (d in names(discount_rate)) {
         
-        # Set up column names and restrict to 2020:2060
-        setNames(paste0("s",-3:25)) %>% 
-        rename(year=1, mean=2, min=3, max=4) %>% 
-        filter(year>=2020) %>% 
+        temp <- read.csv(paste0(main_path, x, "/Raw_", m, "_combined_ages15-79.csv"), header=F) %>% 
+          
+          # Set up column names and restrict to 2020:2060
+          setNames(df_names) %>% 
+          filter(year>=2020) %>% 
+          
+          # Discount 
+          discount(., discount_rate = discount_rate[d]) %>% 
+          addYearCol()
         
-        # Discount 
-        discount(., discount_rate = d) %>% 
-        addYearCol()
-      
-      raw_outcomes_list[[length(raw_outcomes_list) + 1]] <- temp
-      
+        outcomes_list[[length(outcomes_list) + 1]] <- temp
+        
+        names(outcomes_list)[length(outcomes_list)] <- paste(x, m, d, v, sep = ".")
+        
+      }
     }
   }
 }
-
-names(raw_outcomes_list) <- apply(expand.grid(names(discount_rate), scenarios, measure), 1, paste, collapse=".")
-
-# NEED TO CHECK DISCOUNT RATES worked properly, and everything is named correctly! (use HE book)
 
 #==============================================================================================================
 
@@ -57,103 +57,92 @@ names(raw_outcomes_list) <- apply(expand.grid(names(discount_rate), scenarios, m
 # New list of dataframes - cumulative sum
 # One per scenario (4), discount rate (3), and measure (2)
 
-cum_outcomes_list <- vector(mode = "list")
+outcomes_cum_list <- vector(mode = "list")
 
-df_cumsum <- function(df) {
- 
-  df <- cumsum(df[, -1]) %>% 
-    addYearCol() %>% 
-    recalcFuns()
-  
-    return(df)
-}
-
-cum_outcomes_list <- lapply(raw_outcomes_list, df_cumsum)
+outcomes_cum_list <- lapply(outcomes_list, df_cumsum)
 
 #==============================================================================================================
 
-# Calculate Cases & Deaths Averted (males and females combined, age 15-79)
+# Calculate Cases & Deaths Averted (males and females combined, age 15-79), and Percents
 
 # =============================================================================================================
 
-# Annual -------------------------------------------------------------------------------------------------------
+# Set up lists
 
-annual_averted_list <- vector(mode = "list")
+outcomes_avrt_ann_list <- vector(mode = "list")
+outcomes_avrt_cum_list <- vector(mode = "list")
 
-for (m in measure) {
-  
-  for (x in scenarios) {
+for (v in names(version)) {  
+
+  for (m in measure) {
     
-    for (d in names(discount_rate)) {
+    for (x in scenarios) {
       
-      # Substract : Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario
-      
-      temp <- ( raw_outcomes_list[[paste(d,"Scenario1",m, sep =".")]][, -1] -  # Scenario 1
-              
-              raw_outcomes_list[[paste(d,x,m, sep =".")]][, -1] ) %>%  # Other Scenario
-      
-              addYearCol() %>%  recalcFuns()
+      for (d in names(discount_rate)) {
         
-      annual_averted_list[[length(annual_averted_list) + 1]] <- temp
-      
+        # Annual --------------------------------------------------------------------------------------------------
+        
+        # Substract : Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario
+        
+        temp <- ( outcomes_list[[paste("Scenario1",m,d,v, sep =".")]][, -1] -  # Scenario 1
+                
+                outcomes_list[[paste(x,m,d,v, sep =".")]][, -1] ) %>%  # Other Scenario
+        
+                addYearCol() %>%  recalcFuns()
+          
+        outcomes_avrt_ann_list[[length(outcomes_avrt_ann_list) + 1]] <- temp
+        
+        # Cumuluative ---------------------------------------------------------------------------------------------
+        
+        # Substract : Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario
+        
+        temp <- ( outcomes_cum_list[[paste("Scenario1",m,d,v, sep =".")]][, -1] -  # Scenario 1
+                     
+                     outcomes_cum_list[[paste(x,m,d,v, sep =".")]][, -1] ) %>%  # Other Scenario
+          
+          addYearCol() %>%  recalcFuns()
+        
+        outcomes_avrt_cum_list[[length(outcomes_avrt_cum_list) + 1]] <- temp
+        
+        names(outcomes_avrt_cum_list)[length(outcomes_avrt_cum_list)] <- paste(x, m, d, v, sep = ".")
+        
+      }
     }
   }
 }
 
-names(annual_averted_list) <- apply(expand.grid(names(discount_rate), scenarios, measure), 1, paste, collapse=".")
-
-# Cumulative -----------------------------------------------------------------------------------------------------
-
-cum_averted_list <- vector(mode = "list")
-
-for (m in measure) {
-  
-  for (x in scenarios) {
-    
-    for (d in names(discount_rate)) {
-      
-      # Substract : Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario
-      
-      temp <- ( cum_outcomes_list[[paste(d,"Scenario1",m, sep =".")]][, -1] -  # Scenario 1
-                  
-                  cum_outcomes_list[[paste(d,x,m, sep =".")]][, -1] ) %>%  # Other Scenario
-        
-        addYearCol() %>%  recalcFuns()
-      
-      cum_averted_list[[length(cum_averted_list) + 1]] <- temp
-      
-    }
-  }
-}
-
-names(cum_averted_list) <- apply(expand.grid(names(discount_rate), scenarios, measure), 1, paste, collapse=".")
 
 # Percents (Cumulative) -------------------------------------------------------------------------------------------
 
-pct_cum_averted_list <- vector(mode = "list")
+outcomes_avrt_cum_pct_list <- vector(mode = "list")
 
-for (m in measure) {
-  
-  for (x in scenarios) {
+for (v in names(version)) {  
+
+  for (m in measure) {
     
-    for (d in names(discount_rate)) {
+    for (x in scenarios) {
       
-      # Percent: 100 * (Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario ) / (Cases/Deaths in Scenario 1)
-      
-      temp <- ( 100 * (( cum_outcomes_list[[paste(d,"Scenario1",m, sep =".")]][, -1] -  # Scenario 1
-                  
-                 cum_outcomes_list[[paste(d,x,m, sep =".")]][, -1] ) /  # Other Scenario
-                 
-                 cum_outcomes_list[[paste(d,"Scenario1",m, sep =".")]][, -1])) %>%  # Scenario 1
+      for (d in names(discount_rate)) {
         
-        addYearCol() %>%  recalcFuns()
-      
-      pct_cum_averted_list[[length(pct_cum_averted_list) + 1]] <- temp
-      
+        # Percent: 100 * (Cases/Deaths in Scenario 1 - Cases/Deaths in Alternate Scenario ) / (Cases/Deaths in Scenario 1)
+        
+        temp <- ( 100 * (( outcomes_cum_list[[paste("Scenario1",m,d,v, sep =".")]][, -1] -  # Scenario 1
+                    
+                   outcomes_cum_list[[paste(x,m,d,v, sep =".")]][, -1] ) /  # Other Scenario
+                   
+                   outcomes_cum_list[[paste("Scenario1",m,d,v, sep =".")]][, -1])) %>%  # Scenario 1
+          
+          addYearCol() %>%  recalcFuns()
+        
+        outcomes_avrt_cum_pct_list[[length(outcomes_avrt_cum_pct_list) + 1]] <- temp
+        
+        names(outcomes_avrt_cum_pct_list)[length(outcomes_avrt_cum_pct_list)] <- paste(x, m, d, v, sep = ".")
+        
+      }
     }
   }
 }
 
-names(pct_cum_averted_list) <- apply(expand.grid(names(discount_rate), scenarios, measure), 1, paste, collapse=".")
-
 rm(temp)
+
+
