@@ -6,6 +6,8 @@
 
 # NOTE: Must be connected to IHME VPN for currency conversion function 
 
+# To edit any parameters, go to Excel files in "CEA/parameters"
+
 # TO do: 
 # 1. Double check multiplication, Line 203
 # 2. Testing costs - need to add HIV positive not virally suppressed??
@@ -320,16 +322,25 @@ cost_cb_art <- c(costs["cb_art_y1"], # 1st year
 # SCALARS  ---------------------------------------------------------------------------------------
 
 # DO ART parameters: assumptions for # people on community versus clinic ART
+# See "art_paramaeters" Excel doc for scalars, and "Scenario Details" Word Doc July 8, 2021 for decisions
 
-# For Scenario 2, create scalars of cb-ART versus community ART based on viral suppression in
-#       Scenario 1  versus Scenario 2
+art_distn <- as.data.frame(readxl::read_excel(paste0(cea_path,"parameters/art_parameters.xls"), sheet = "Table_3")) 
 
-# See "doart_scenarios" Excel doc for details of making these scalars, likely need to revist
+# Also, scalars for percent of peopls on ART who are VS
 
-art_scalars <- as.data.frame(readxl::read_excel(paste0(cea_path,"parameters/doart_scenarios.xls"))) %>% 
-  select("Sex", "Scenario", "soc_art_rate", "cb_art_rate") 
+art_scalars <- as.data.frame(readxl::read_excel(paste0(cea_path,"parameters/art_parameters.xls"), sheet = "Table_2")) 
 
-# LOOP ----------------------------------------------------------------------------------------------
+vs_col <- "Percent who achieve viral suppression of PLHIV who know their status and initiate ART"
+
+FpctVS_soc <- art_scalars[art_scalars$`Treatment intervention`=="Clinic ART" & art_scalars$Gender == "Women", vs_col]
+
+FpctVS_cbArt <- art_scalars[art_scalars$`Treatment intervention`=="Community ART" & art_scalars$Gender == "Women", vs_col]
+
+MpctVS_soc <- art_scalars[art_scalars$`Treatment intervention`=="Clinic ART" & art_scalars$Gender == "Men", vs_col]
+
+MpctVS_cbArt <- art_scalars[art_scalars$`Treatment intervention`=="Community ART" & art_scalars$Gender == "Men", vs_col]
+
+# LOOP ------------------------------------------------------------------------------------------------------
                                    
 costs_art_list <- vector(mode = "list")
 
@@ -342,13 +353,13 @@ for (v in names(version)) {
       # POPULATION  ----------------------------------------------------------------------------------------
       # Calculated as: Prevalent cases on ART + raw net initiation (starting ART - discontinuing ART)
       
-        # Prevalent cases, by gender
+        # Prevalent cases on ART and VS, by gender
         
         Fpop_prev_art <- raw_pop_list[[paste(x, "females", v, sep =".")]][, -1] 
         
         Mpop_prev_art <- raw_pop_list[[paste(x, "males", v, sep =".")]][, -1] 
         
-        # Raw net ART initiation, by gender  (new inititation minus discontinuation)
+        # Raw net ART initiation (ART and VS), by gender  (new inititation minus discontinuation)
         
         Fpop_init_art <- read.csv(paste0(main_path,x,"/Raw_net_ART_init_females_aged15-79.csv"), header=F) %>% 
           setNames(df_names) %>%  # Column names
@@ -358,23 +369,23 @@ for (v in names(version)) {
           setNames(df_names) %>%  # Column names
           filter(year>=2020)  %>%  select(-year) # Restrict to 2020:2060
         
-        # Set up scalars (% of people on community versus SOC ART)
-        
-        Fscalar_soc <- art_scalars[art_scalars$Scenario==x & art_scalars$Sex == "Female", "soc_art_rate"]
+        # Set up scalars (Proportion of people on community versus SOC ART)
           
+        Fscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Women", "Distribution Clinic ART"]
+            
         Fscalar_cbArt <- 1 - Fscalar_soc
-        
-        Mscalar_soc <- art_scalars[art_scalars$Scenario==x & art_scalars$Sex == "Male", "soc_art_rate"]
-        
+          
+        Mscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Men", "Distribution Clinic ART"]
+          
         Mscalar_cbArt <- 1 - Mscalar_soc
         
         # Population
         
-        pop_soc = Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art) + 
-                  Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)
+        pop_soc = (Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_soc  + 
+                  (Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)) / MpctVS_soc 
         
-        pop_cb_art = Fscalar_cbArt * (Fpop_prev_art + 0.5 * Fpop_init_art) + 
-                     Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art)  
+        pop_cb_art = (Fscalar_cbArt * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_cbArt + 
+                     Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art) / MpctVS_cbArt
       
       # COST ------------------------------------------------------------------------------------------------
       
@@ -398,8 +409,10 @@ for (v in names(version)) {
   }
 }
 
-rm(Fscalar_soc, Fscalar_cbArt, Mscalar_soc, Mscalar_cbArt,
+rm(art_scalars, art_distn, vs_col,
+   Fscalar_soc, Fscalar_cbArt, Mscalar_soc, Mscalar_cbArt,
    Fpop_init_art, Fpop_prev_art, Mpop_init_art, Mpop_prev_art,
+   FpctVS_soc, FpctVS_cbArt, MpctVS_soc, MpctVS_cbArt, 
    pop_soc, pop_cb_art, art_cost, soc_art_cost, cb_art_cost)
 
 #================================================================================================

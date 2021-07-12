@@ -37,3 +37,4 @@ scen2_cost <- costs_total_list$Scenario2.total.dr0.main$mean[[41]]
 
 
 ((scen2_cost - scen1_cost)/scen1_cost)*100
+
