@@ -29,16 +29,16 @@ scen1_costs <- art_costs %>%
   rename(Year=year,
          `Cost Category`=variable)
 
-p1 <- ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost/1e9, x=Year)) + 
+p1 <- ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
   scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
-  ylab("Total cost (billions, 2020 USD)") + theme_bw() +
+  ylab("Total cost (millions, 2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
         legend.title = element_text(size = pres_size),
         legend.text = element_text(size = pres_size),
         title = element_text(size = title_size))  +
-  ylim(0,3)  +
+  ylim(0,500)  +
   ggtitle("Standard of Care \n Scenario")
 
 # Stacked bar chart of breakdown of costs - Scenario 2
@@ -62,7 +62,7 @@ scen2_costs <- art_costs %>%
   rename(Year=year,
          `Cost Category`=variable)
 
-p2 <- ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost/1e9, x=Year)) + 
+p2 <- ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
   scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
   ylab("Total cost (billions, 2020 USD)") + theme_bw() +
@@ -71,7 +71,7 @@ p2 <- ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost/1e9, x=Year)) +
         legend.title = element_text(size = pres_size),
         legend.text = element_text(size = pres_size),
         title = element_text(size = title_size))  +
-  ylim(0,3)  +
+  ylim(0,500)  +
   ggtitle("Home Testing + Community ART \n Scenario")
 
 ggarrange(p1, p2, ncol = 2)
@@ -105,7 +105,7 @@ ggplot(total_costs, aes(y=Cost/1e9, x=Year, fill = Scenario)) +
         legend.title = element_text(size = pres_size),
         legend.text = element_text(size = pres_size),
         title = element_text(size = title_size))
-  ylim(0,3)  
+  
 
 # --------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 # MASTER SCRIPT
-# Update: June 24, 2021
+# Update: July 21, 2021
 # MSahu
 
 # Set up  -------------------------------------------------------------------------------------
@@ -49,11 +49,15 @@ DOARTpct_tested <- 0.9
 # PRIMARY ANALYSIS -----------------------------------------------------------------------------
 
 source(paste0(cea_path, "helper.R"))
-source(paste0(cea_path, "01_cases_averted.R"))
-source(paste0(cea_path, "02_deaths_averted.R"))
-source(paste0(cea_path, "03_QALYS_gained.R"))
-source(paste0(cea_path, "04_DALYs_averted.R"))
+source(paste0(cea_path, "01_cases_deaths.R"))
+
+# Set whether we want to include the VS scalar ("on"/"off")
+vs_scalar = "off"
 source(paste0(cea_path, "05_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
+
+# source(paste0(cea_path, "03_QALYS_gained.R"))
+source(paste0(cea_path, "04_DALYs_averted.R"))
+
 source(paste0(cea_path, "07_ICER_table.R"))  
 source(paste0(cea_path, "helper.R"))
 

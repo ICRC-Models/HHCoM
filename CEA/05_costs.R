@@ -355,9 +355,9 @@ for (v in names(version)) {
       
         # Prevalent cases on ART and VS, by gender
         
-        Fpop_prev_art <- raw_pop_list[[paste(x, "females", v, sep =".")]][, -1] 
+        Fpop_prev_art <- raw_prev_list[[paste(x, "females", "onART", v, sep =".")]][, -1] 
         
-        Mpop_prev_art <- raw_pop_list[[paste(x, "males", v, sep =".")]][, -1] 
+        Mpop_prev_art <- raw_prev_list[[paste(x, "males", "onART", v, sep =".")]][, -1] 
         
         # Raw net ART initiation (ART and VS), by gender  (new inititation minus discontinuation)
         
@@ -381,11 +381,23 @@ for (v in names(version)) {
         
         # Population
         
-        pop_soc = (Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_soc  + 
-                  (Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)) / MpctVS_soc 
+        if (vs_scalar == "on") {
         
-        pop_cb_art = (Fscalar_cbArt * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_cbArt + 
-                     Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art) / MpctVS_cbArt
+          pop_soc = (Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_soc  + 
+                    (Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)) / MpctVS_soc 
+          
+          pop_cb_art = (Fscalar_cbArt * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_cbArt + 
+                       Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art) / MpctVS_cbArt
+        }
+        
+        if (vs_scalar == "off") {
+          
+          pop_soc = Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)  + 
+                    Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)
+          
+          pop_cb_art = Fscalar_cbArt * (Fpop_prev_art + 0.5 * Fpop_init_art) + 
+                       Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art)
+        }
       
       # COST ------------------------------------------------------------------------------------------------
       
