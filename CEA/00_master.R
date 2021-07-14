@@ -42,17 +42,15 @@ df_names <- c("year","mean", "min","max", paste0("s",1:25))
 horizon_year <- 2060
 
 
-# Set up DO ART % tested scalar
-
-DOARTpct_tested <- 0.9
-
 # PRIMARY ANALYSIS -----------------------------------------------------------------------------
+
+# Primary settings
+
+vs_scalar = "on" # include the scalar to get from ART + VS to ART
+vmmc_cost = "off" # do not include VMMC costs
 
 source(paste0(cea_path, "helper.R"))
 source(paste0(cea_path, "01_cases_deaths.R"))
-
-# Set whether we want to include the VS scalar ("on"/"off")
-vs_scalar = "off"
 source(paste0(cea_path, "05_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
 
 # source(paste0(cea_path, "03_QALYS_gained.R"))
