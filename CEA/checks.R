@@ -4,6 +4,18 @@
 
 # CHECK COLUMNS NAMED AS EXPECTED
 
+#################################################################################################################
+
+# Check discounter working as expected
+
+d <- 0.03
+
+newDF <- as.data.frame(matrix(data = rep(1,41*29), ncol = 29, nrow = 41)) %>% 
+  setNames(df_names) %>% select(-year) %>% 
+  discount(., discount_rate = 0.03) 
+
+# Double checked with Drummond book - working perfectly
+
 
 ###################################################################################################################
 

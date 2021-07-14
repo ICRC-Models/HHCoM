@@ -9,11 +9,8 @@
 # To edit any parameters, go to Excel files in "CEA/parameters"
 
 # TO do: 
-# 1. Double check multiplication, Line 203
-# 2. Testing costs - need to add HIV positive not virally suppressed??
-# 3. SENSITIVITY ANALYSIS
-# 4. SCALARS of community versus clinic ART - check!!
-# 4. Total cost - add VMMC?
+# 1. SENSITIVITY ANALYSIS
+# 2. Total cost - add VMMC?
 
 # =====================================================================================
 
@@ -23,7 +20,7 @@ setwd("/")
 
 library(pacman)
 
-source('H:/repos/fgh/FGH_2019/04_functions/currency_conversion.R')
+source('H:/repos/fgh/FUNCTIONS/currency_conversion.R')
 
 setwd("C:/Users/msahu/Documents/Other_Research/DO_ART/HHCoM/")
 
@@ -42,7 +39,8 @@ cost_inflated <- currency_conversion(data = cost_params,
                       col.loc = "iso3", 
                       base.year = 2020, 
                       col.currency="currency", 
-                      col.currency.year="year")
+                      col.currency.year="year",
+                      converter.version = 5.2)
 
 costs <- cost_inflated[["param_val"]]
 names(costs) <- cost_inflated[["param_name"]]
@@ -171,6 +169,8 @@ for (v in names(version)) {
     for (x in scenarios) {
       
       for (d in names(discount_rate)) {
+        
+        # Prevalent cases (undiscounted)
       
         for (c in cd4_cat) {
       
@@ -190,22 +190,21 @@ for (v in names(version)) {
           
           names(temp_list)[length(temp_list)] <- paste(x, v, c, sep = ".")
           
-          ## DOUBLE CHECK: for some reason this doesn't perfectly add up for prevalence * cost
       }
       
-      # Incident cases (undiscounted)
-      
-      inc <-  outcomes_list[[paste(x, "HIV_incidence", "dr0", v, sep =".")]][, -1] 
-      
-      hosp_cost = 0.5 * inc * inc_cost 
-      
-      temp_list[[length(temp_list) + 1]] <- hosp_cost
-      
-      names(temp_list)[length(temp_list)] <- paste(x, v, "incident_cases", sep = ".")
+        # Incident cases (undiscounted)
+        
+        inc <-  outcomes_list[[paste(x, "HIV_incidence", "dr0", v, sep =".")]][, -1] 
+        
+        hosp_cost = 0.5 * inc * inc_cost 
+        
+        temp_list[[length(temp_list) + 1]] <- hosp_cost
+        
+        names(temp_list)[length(temp_list)] <- paste(x, v, "incident_cases", sep = ".")
       
       # Aggregate total costs, by scenario
       
-      scenario_hosp_cost <-  Reduce(`+`, temp_list[grep(paste(x,v, sep="."), names(temp_list))] )
+      scenario_hosp_cost <-  Reduce(`+`, temp_list[grep(paste(x,v, sep="."), names(temp_list))] ) 
       
       # Discount 
       
@@ -216,6 +215,10 @@ for (v in names(version)) {
       costs_hosp_list[[length(costs_hosp_list) + 1]] <- scenario_hosp_cost # Add to list
       
       names(costs_hosp_list)[length(costs_hosp_list)] <- paste(x, "hosp", d, v, sep = ".") # Name
+      
+      # Reset as empty list
+      
+      temp_list <- vector(mode = "list")
     }     
   }
 }
@@ -308,6 +311,9 @@ rm(pop_htc_hivUndiag, pop_htc_hivNeg, htc_cost_neg, htc_cost_pos, scenario_hosp_
 # Multiply prevalence of people on ART by the ART costs, using scalar for percentage on community 
 # versus clinic-based ART (disaggregated for males and females)
 
+# We use a scalar for percentage of people on ART who are virally suppressed to back-calculate the
+# total number of people on ART
+
 # Cases starting / discontinuing ART: calculate costs for 1/2 year (disaggregated by M/F)
 
 #================================================================================================
@@ -343,6 +349,8 @@ MpctVS_cbArt <- art_scalars[art_scalars$`Treatment intervention`=="Community ART
 # LOOP ------------------------------------------------------------------------------------------------------
                                    
 costs_art_list <- vector(mode = "list")
+costs_cbArt_list <- vector(mode = "list")
+costs_socArt_list <- vector(mode = "list")
 
 for (v in names(version)) {  
   
@@ -353,13 +361,13 @@ for (v in names(version)) {
       # POPULATION  ----------------------------------------------------------------------------------------
       # Calculated as: Prevalent cases on ART + raw net initiation (starting ART - discontinuing ART)
       
-        # Prevalent cases on ART and VS, by gender
+        # Prevalent cases on ART who are virally suppressed (ART + VS), by gender
         
         Fpop_prev_art <- raw_prev_list[[paste(x, "females", "onART", v, sep =".")]][, -1] 
         
         Mpop_prev_art <- raw_prev_list[[paste(x, "males", "onART", v, sep =".")]][, -1] 
         
-        # Raw net ART initiation (ART and VS), by gender  (new inititation minus discontinuation)
+        # Raw net ART initiation (ART + VS), by gender  (new inititation minus discontinuation)
         
         Fpop_init_art <- read.csv(paste0(main_path,x,"/Raw_net_ART_init_females_aged15-79.csv"), header=F) %>% 
           setNames(df_names) %>%  # Column names
@@ -379,7 +387,7 @@ for (v in names(version)) {
           
         Mscalar_cbArt <- 1 - Mscalar_soc
         
-        # Population
+        # Total population on ART - backcalculated using scalars for % people on ART virally suppressed
         
         if (vs_scalar == "on") {
         
@@ -413,9 +421,21 @@ for (v in names(version)) {
         discount(., discount_rate = discount_rate[d]) %>%
         addYearCol() %>% recalcFuns()
       
+      soc_art_cost <- soc_art_cost %>% 
+        discount(., discount_rate = discount_rate[d]) %>%
+        addYearCol() %>% recalcFuns()
+      
+      cb_art_cost <- cb_art_cost %>% 
+        discount(., discount_rate = discount_rate[d]) %>%
+        addYearCol() %>% recalcFuns()
+      
       costs_art_list[[length(costs_art_list) + 1]] <- art_cost # Add to list
+      costs_socArt_list[[length(costs_socArt_list) + 1]] <- soc_art_cost # Add to list
+      costs_cbArt_list[[length(costs_cbArt_list) + 1]] <- cb_art_cost # Add to list
       
       names(costs_art_list)[length(costs_art_list)] <- paste(x, "art", d, v, sep = ".") # Name
+      names(costs_socArt_list)[length(costs_socArt_list)] <- paste(x, "socArt", d, v, sep = ".") # Name
+      names(costs_cbArt_list)[length(costs_cbArt_list)] <- paste(x, "cbArt", d, v, sep = ".") # Name
       
     }     
   }
@@ -494,7 +514,11 @@ for (v in names(version)) {
         
         costs_art_list[[paste(x, "art", "dr0",v, sep = ".")]][, -1] 
         
-      # add VMMC???
+        if (vmmc_cost == "on") {
+          
+          costs_vmmc_list[[paste(x, "vmmc", "dr0",v, sep = ".")]][, -1] 
+          
+        }
       
       # Discount 
       

@@ -10,28 +10,33 @@ pres_size = 40
 
 # Stacked bar chart of breakdown of costs - Scenario 1
 
-art_costs <- costs_art_list$Scenario1.art.dr0.main %>% 
+cbArt_costs <- costs_cbArt_list$Scenario1.cbArt.dr3.main %>% 
   select(year,mean) %>% 
-  rename(ART=mean)
+  rename(`Community ART` = mean)
 
-hosp_costs <- costs_hosp_list$Scenario1.hosp.dr0.main %>% 
+socArt_costs <- costs_socArt_list$Scenario1.socArt.dr3.main %>% 
+  select(year, mean) %>% 
+  rename(`Clinic ART` = mean)
+
+hosp_costs <- costs_hosp_list$Scenario1.hosp.dr3.main %>% 
   select(year,mean) %>% 
   rename(Hospital=mean)
 
-test_costs <- costs_test_list$Scenario1.test.dr0.main %>% 
+test_costs <- costs_test_list$Scenario1.test.dr3.main %>% 
   select(year,mean) %>% 
   rename(Testing=mean)
 
-scen1_costs <- art_costs %>% 
+scen1_costs <- cbArt_costs %>% 
+  left_join(socArt_costs, by = "year") %>% 
   left_join(hosp_costs, by="year") %>% 
   left_join(test_costs, by="year") %>% 
-  reshape2::melt(id.var="year", measure.vars=c("ART","Hospital","Testing"), value.name = "Cost") %>% 
+  reshape2::melt(id.var="year", measure.vars=c("Community ART","Clinic ART", "Hospital","Testing"), value.name = "Cost") %>% 
   rename(Year=year,
          `Cost Category`=variable)
 
-p1 <- ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
+ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
+  scale_fill_manual(values = c("darkorange1","#42B540FF", "#00468BFF", "#AD002AFF")) +
   ylab("Total cost (millions, 2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
@@ -43,51 +48,54 @@ p1 <- ggplot(scen1_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) +
 
 # Stacked bar chart of breakdown of costs - Scenario 2
 
-art_costs <- costs_art_list$Scenario2.art.dr0.main %>% 
+cbArt_costs <- costs_cbArt_list$Scenario2.cbArt.dr3.main %>% 
   select(year,mean) %>% 
-  rename(ART=mean)
+  rename(`Community ART` = mean)
 
-hosp_costs <- costs_hosp_list$Scenario2.hosp.dr0.main %>% 
+socArt_costs <- costs_socArt_list$Scenario2.socArt.dr3.main %>% 
+  select(year, mean) %>% 
+  rename(`Clinic ART` = mean)
+
+hosp_costs <- costs_hosp_list$Scenario2.hosp.dr3.main %>% 
   select(year,mean) %>% 
   rename(Hospital=mean)
 
-test_costs <- costs_test_list$Scenario2.test.dr0.main %>% 
+test_costs <- costs_test_list$Scenario2.test.dr3.main %>% 
   select(year,mean) %>% 
   rename(Testing=mean)
 
-scen2_costs <- art_costs %>% 
+scen2_costs <- cbArt_costs %>% 
+  left_join(socArt_costs, by = "year") %>% 
   left_join(hosp_costs, by="year") %>% 
   left_join(test_costs, by="year") %>% 
-  reshape2::melt(id.var="year", measure.vars=c("ART","Hospital","Testing"), value.name = "Cost") %>% 
+  reshape2::melt(id.var="year", measure.vars=c("Community ART","Clinic ART", "Hospital", "Testing"), value.name = "Cost") %>% 
   rename(Year=year,
          `Cost Category`=variable)
 
-p2 <- ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
+ggplot(scen2_costs, aes(fill=`Cost Category`, y=Cost/1e6, x=Year)) + 
   geom_bar(position="stack", stat="identity") +
-  scale_fill_manual(values = c("#42B540FF","#00468BFF", "#AD002AFF")) +
-  ylab("Total cost (billions, 2020 USD)") + theme_bw() +
+  scale_fill_manual(values = c("darkorange1","#42B540FF", "#00468BFF", "#AD002AFF")) +
+  ylab("Total cost (millions, 2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
         legend.title = element_text(size = pres_size),
         legend.text = element_text(size = pres_size),
         title = element_text(size = title_size))  +
   ylim(0,500)  +
-  ggtitle("Home Testing + Community ART \n Scenario")
-
-ggarrange(p1, p2, ncol = 2)
+  ggtitle("HTC + Community ART \n Scenario")
 
 
 #--------------------------------------------------------------------------------
 
 # Total costs for scenario 1 versus 2
 
-scen1_costs <- costs_total_list$Scenario1.total.dr0.main %>% 
+scen1_costs <- costs_total_list$Scenario1.total.dr3.main %>% 
   select(year,mean) %>% 
   rename(`Cost` =mean,
          `Year` = year) %>% 
   mutate(Scenario = "Standard of Care")
 
-scen2_costs <- costs_total_list$Scenario2.total.dr0.main  %>% 
+scen2_costs <- costs_total_list$Scenario2.total.dr3.main  %>% 
   select(year,mean) %>% 
   rename(`Cost` =mean,
          `Year` = year) %>% 
@@ -96,181 +104,14 @@ scen2_costs <- costs_total_list$Scenario2.total.dr0.main  %>%
 total_costs <- scen1_costs %>% 
   rbind(scen2_costs)
 
-ggplot(total_costs, aes(y=Cost/1e9, x=Year, fill = Scenario)) + 
+ggplot(total_costs, aes(y=Cost/1e6, x=Year, fill = Scenario)) + 
   geom_bar(position="dodge", stat="identity") +
   scale_fill_manual(values = c("blue4","dodgerblue3")) +
-  ylab("Total cost (billions, 2020 USD)") + theme_bw() +
+  ylab("Total cost (millions, 2020 USD)") + theme_bw() +
   theme(axis.title=element_text(size=pres_size),
         axis.text=element_text(size=pres_size),
         legend.title = element_text(size = pres_size),
         legend.text = element_text(size = pres_size),
-        title = element_text(size = title_size))
+        title = element_text(size = title_size)) +
+  ylim(0, 500)
   
-
-# --------------------------------------------------------------------------------
-
-
-# Annual costs (per capita, full population)
-
-costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen1.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual costs per capita (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,100)
-
-costs <- read.csv(paste0(cea_path,"costs/cost_annual_pc_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual costs per capita (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,100) 
-
-
-# Annual costs (total)
-
-costs <- read.csv(paste0(cea_path,"costs/cost_annual_total_scen1.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual costs per capita (in millions of 2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,500)
-
-costs <- read.csv(paste0(cea_path,"costs/cost_annual_total_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual costs per capita (in millions of 2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  ylim(0,500)
-
-
-# Incremental costs (per capita)
-
-costs <- read.csv(paste0(cea_path,"costs/inc_costs_annual_pc_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual incremental costs per capita (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
-
-costs <- read.csv(paste0(cea_path,"costs/inc_costs_cum_pc_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Incremental cumulative costs per capita (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18))  +
-  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
-
-# Incremental costs (total)
-
-costs <- read.csv(paste0(cea_path,"costs/inc_costs_annual_total_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs/1000000,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Annual incremental costs (millions of 2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18)) +
-  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey") +
-  scale_y_continuous(labels = function(x) format(x, scientific = F)) 
-
-costs <- read.csv(paste0(cea_path,"costs/inc_costs_cum_pc_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Cumulative costs per capita (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18))  +
-  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
-
-
-costs <- read.csv(paste0(cea_path,"costs/inc_costs_cum_total_scen2.csv")) %>% 
-  select(-X) %>% 
-  # reshape long
-  melt(id="year",value.name="costs") %>% 
-  rename(set_name=variable) %>% 
-  mutate(size=ifelse(set_name %in% c("mean","min","max"),"bold","normal"))
-
-ggplot(data=costs, aes(x=year, y=costs,group=set_name)) +
-  geom_line(aes(color=set_name,size=size)) +
-  scale_size_manual(values=c(1.5,.1)) +
-  xlab("Year") +
-  ylab("Cumulative costs - total population (2020 USD)") +
-  theme_cowplot() +
-  theme(axis.title=element_text(size=18),
-        axis.text=element_text(size=18))  +
-  geom_hline(yintercept = 0,linetype="dashed",color="darkgrey")
