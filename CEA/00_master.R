@@ -47,7 +47,7 @@ horizon_year <- 2060
 # Primary settings
 
 vs_scalar = "on" # include the scalar to get from ART + VS to ART
-vmmc_cost = "off" # do not include VMMC costs
+vmmc_cost = "on" # do not include VMMC costs
 
 source(paste0(cea_path, "helper.R"))
 source(paste0(cea_path, "01_cases_deaths.R"))

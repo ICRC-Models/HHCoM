@@ -2,7 +2,7 @@
 
 # Calculate average annual costs per year
 # Author: Mita Sahu
-# Last update: July 1, 2021
+# Last update: July 13, 2021
 
 # NOTE: Must be connected to IHME VPN for currency conversion function 
 
@@ -466,7 +466,7 @@ for (v in names(version)) {
       
       # Population
       
-      vmmc_pop <- read.csv(paste0(main_path,x,"/Raw_VMMC_male_ages15-79.csv"), header=F) %>% 
+      vmmc_pop <- read.csv(paste0( get(paste0(v, "_path")), x,"/Raw_VMMC_male_ages15-79.csv"), header=F) %>% 
         setNames(df_names) %>%  # Column names
         filter(year>=2020)  %>%  select(-year) # Restrict to 2020:2060
       
