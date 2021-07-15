@@ -2,6 +2,13 @@
 # Update: July 21, 2021
 # MSahu
 
+# To Do List
+# 1. Fix DALYS - discounting and all-cause mortality. Also fix discontinuation/continuation
+# 2. Fix ICER table for cleaner output
+
+# 3. Fix NHB tables to neatly output
+# 5. Tornado plot!!
+
 # Set up  -------------------------------------------------------------------------------------
 
 rm(list=ls())
@@ -39,38 +46,51 @@ df_names <- c("year","mean", "min","max", paste0("s",1:25))
 
 # Time horizon
 
-horizon_year <- 2060
+hrzn <- 2060
+bia_hrzn = 2024
 
 
-# PRIMARY ANALYSIS -----------------------------------------------------------------------------
+## SENSITIVITY ANALYSIS SETUP (turn off) -------------------------------------------------------------
+
+# Set up DF with list of sensitivitity analyses
+
+lengthSN = 5 # Number of sensitivity analyses
+
+snDF <- data.frame(sn_type = rep("Cost", lengthSN),
+                   sn_name = c("Home testing", "Hospitalization", "Community ART", "Clinic ART", "VMMC"),
+                   sn_no = c(1:lengthSN))
+
+# Bounds
+
+bound <- c("lower", "upper")
+snDF <- snDF %>% crossing(bound) %>% mutate(bound_abb = ifelse(bound == "lower", "lb", "ub")) %>% 
+  arrange(sn_no, bound)
+
+# Labels
+
+snDF <- snDF %>% 
+  mutate(name_abb = paste0( "sn" , sn_no, ".", bound_abb),
+         sn_name_full = paste(sn_type, "for", sn_name, " - ", bound, sep = " "))
+
+# Set on or off!
+
+snDF$ON_or_OFF = F
 
 # Primary settings
 
-vs_scalar = "on" # include the scalar to get from ART + VS to ART
-vmmc_cost = "on" # do not include VMMC costs
+vs_scalar = T # include the scalar to get from ART + VS to ART
+vmmc_cost = F # do not include VMMC costs
+
+# ---------------------------------------------------------------------------------------------------
 
 source(paste0(cea_path, "helper.R"))
 source(paste0(cea_path, "01_cases_deaths.R"))
-source(paste0(cea_path, "05_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
+source(paste0(cea_path, "02_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
+source(paste0(cea_path, "04_icer_bia.R"))
 
-# source(paste0(cea_path, "03_QALYS_gained.R"))
-source(paste0(cea_path, "04_DALYs_averted.R"))
-
-source(paste0(cea_path, "07_ICER_table.R"))  
-source(paste0(cea_path, "helper.R"))
-
-## SENSITIVITY ANALYSIS  
-# 1. Local life expectancy 
-#2. VARY TIME HORIZON (2030, 2045)
+# TO DO
+# source(paste0(cea_path, "03_daly_qaly.R"))
+# source(paste0(cea_path, "04_ICER_table.R"))  
 
 
-# To Do List
-# 1. Fix DALYS - discounting and all-cause mortality. Also fix discontinuation/continuation
-# 2. Fix ICER table for cleaner output
-# Costs: add hospitalization costs for incident cases?
-# 3. Fix NHB tables to neatly output
-# 4. Allow for variation of costs - lower and upper bounds
-# 5. Tornado plot!!
-# 6. Scenario 3 analysis
-# 7. Scenario 2a analysis/
-# 8. Check undiscounted numbers match Cara's
+# ---------------------------------------------------------------------------------------------------

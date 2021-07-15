@@ -1,0 +1,3 @@
+iso3,province,activity,budget,currency,year,source,notes
+ZAF,KZN,DOH HIV expenditure,4549482765,rand,2016,"Consolidated Spending Report, Annex 10 (p. 78)","this is the total spending from annex 11 for each district in KZN plus ""whole province"" spending"
+ZAF,KZN,DOH ART spending,3361233775,rand,2016,"Consolidated Spending Report, Annex 15 (p. 80)",

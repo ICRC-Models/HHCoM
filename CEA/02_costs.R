@@ -8,9 +8,9 @@
 
 # To edit any parameters, go to Excel files in "CEA/parameters"
 
-# TO do: 
-# 1. SENSITIVITY ANALYSIS
-# 2. Total cost - add VMMC?
+# TO Do:
+# Two-way sensitivity analysis
+# Consider testing costs
 
 # =====================================================================================
 
@@ -31,21 +31,71 @@ setwd("C:/Users/msahu/Documents/Other_Research/DO_ART/HHCoM/")
 
 # =======================================================================================
 
+# Read in parameters
+
 cost_params <- read.csv(paste0(cea_path,"parameters/costs.csv")) %>% 
-  mutate(iso3="USA") 
+  mutate(iso3="USA",
+         final_cost = param_val,
+         final_year = year)
+
+# SENSITIVITY ANALYSIS ------------------------------------------------------------------
+
+# Pull from sensitivity dataframe
+
+sensitivity = snDF[snDF$sn_type=="Cost", ]$ON_or_OFF
+names(sensitivity) = snDF[snDF$sn_type=="Cost", ]$name_abb
+
+# Get indices
+
+sn1_index <- c(which(cost_params$param_name == "home_testing_pc_pos"), 
+              which(cost_params$param_name == "home_testing_pc_neg"))
+
+sn2_index <- c(which(cost_params$param_name == "hosp_CD4_below200_noART"),  
+               which(cost_params$param_name == "hosp_CD4_200-350_noART"),
+               which(cost_params$param_name == "hosp_CD4_350plus_noART"),
+               which(cost_params$param_name == "hosp_onART"))
+
+sn3_index <- c(which(cost_params$param_name == "cb_art_y1"),  
+               which(cost_params$param_name == "cb_art_sub"))
+
+sn4_index <- which(cost_params$param_name == "standard_art")
+
+sn5_index <- which(cost_params$param_name == "circumcision")
+
+# Set updated values
+
+for (i in names(sensitivity)) {
+  
+  sn_no = stringr::str_sub(i, start = 3, end = 3)  
+  bound = stringr::str_sub(i, start = 5, end = 6)
+  row_index = get(paste0("sn",sn_no,"_index"))
+  
+  if (sensitivity[i] == T & bound == "lb") {
+    cost_params$final_cost[row_index] = cost_params$lb[row_index]; 
+    cost_params$final_year[row_index] = cost_params$lb_year[row_index]
+  } 
+  
+  if (sensitivity[i] == T & bound == "ub") {
+    cost_params$final_cost[row_index] = cost_params$ub[row_index]; 
+    cost_params$final_year[row_index] = cost_params$ub_year[row_index]
+  } 
+}
+
+rm(sensitivity)
+
+# INFLATE ---------------------------------------------------------------------------------
 
 cost_inflated <- currency_conversion(data = cost_params,
-                      col.value = "param_val",
+                      col.value = "final_cost",
                       col.loc = "iso3", 
                       base.year = 2020, 
                       col.currency="currency", 
-                      col.currency.year="year",
+                      col.currency.year="final_year",
                       converter.version = 5.2)
 
-costs <- cost_inflated[["param_val"]]
+costs <- cost_inflated[["final_cost"]]
 names(costs) <- cost_inflated[["param_name"]]
 
-# Here: add 8 versions of the costs, with lower bounds , etc.
 
 # ========================================================================================
 
@@ -389,7 +439,7 @@ for (v in names(version)) {
         
         # Total population on ART - backcalculated using scalars for % people on ART virally suppressed
         
-        if (vs_scalar == "on") {
+        if (vs_scalar == T) {
         
           pop_soc = (Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)) / FpctVS_soc  + 
                     (Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)) / MpctVS_soc 
@@ -398,7 +448,7 @@ for (v in names(version)) {
                        Mscalar_cbArt * (Mpop_prev_art + 0.5 * Mpop_init_art) / MpctVS_cbArt
         }
         
-        if (vs_scalar == "off") {
+        if (vs_scalar == F) {
           
           pop_soc = Fscalar_soc * (Fpop_prev_art + 0.5 * Fpop_init_art)  + 
                     Mscalar_soc * (Mpop_prev_art + 0.5 * Mpop_init_art)
@@ -514,7 +564,7 @@ for (v in names(version)) {
         
         costs_art_list[[paste(x, "art", "dr0",v, sep = ".")]][, -1] 
         
-        if (vmmc_cost == "on") {
+        if (vmmc_cost == T) {
           
           costs_vmmc_list[[paste(x, "vmmc", "dr0",v, sep = ".")]][, -1] 
           
@@ -538,7 +588,7 @@ for (v in names(version)) {
 
 costs_cum_list <- vector(mode = "list")
 
-costs_cum_list <- lapply(costs_total_list, df_cumsum)
+costs_cum_list <- lapply(costs_total_list, df_cumsum) 
 
 #==============================================================================================================
 
