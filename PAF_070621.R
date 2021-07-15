@@ -189,7 +189,7 @@ dataprep.hivprev <- function(scenario){
 #  return(pctreduc)
 # }
  
-# Function to calculate the percent of cases attributable to WLHIV - for now set to use the median
+# Function to calculate the proportion of cases among WLHIV
 calc_prophiv <- function(scenario){
   prophiv <- as.data.frame(matrix(ncol = 29, nrow = 122))
   colnames(prophiv) <- colnames(scenario)[1:29]
@@ -203,7 +203,35 @@ calc_prophiv <- function(scenario){
   return(prophiv)
 }
 
-# Function to calculate the cumulative percent of cases attributable to WLHIV. prophiv.cuml = proportion of cases in WLHIV, propart.cuml = proportion of cases in virally suppressed WLHIV
+# Function to calculate the proportion of cases among WLHIV divided by HIV prevalence
+calc_ccHivRatio <- function(propCasesHiv , hivPrev){
+  ccHivRatio <- as.data.frame(matrix(ncol = 29, nrow = 122))
+  colnames(ccHivRatio) <- colnames(propCasesHiv)[1:29]
+  ccHivRatio$year <- seq(2000, 2121, 1)
+  for(i in c(2000:2121)){
+    ccHivRatio[ccHivRatio$year == i , c(5:29)] <- propCasesHiv[propCasesHiv$year == i, c(5:29)] / hivPrev[hivPrev$year == i,  c(5:29)]
+    ccHivRatio[ccHivRatio$year == i , c(2:4)] <- c(apply(ccHivRatio[ccHivRatio$year == i , c(5:29)] , 1 , median) , 
+                                             apply(ccHivRatio[ccHivRatio$year == i , c(5:29)] , 1 , min) , 
+                                             apply(ccHivRatio[ccHivRatio$year == i , c(5:29)] , 1 , max))
+  }
+  return(ccHivRatio)
+}
+
+# Function to calculate the percent of cases among WLHIV with VS
+calc_prophivVS <- function(scenario){
+  prophivVS <- as.data.frame(matrix(ncol = 29, nrow = 122))
+  colnames(prophivVS) <- colnames(scenario)[1:29]
+  prophivVS$year <- seq(2000, 2121, 1)
+  for(i in c(2000:2121)){
+    prophivVS[prophivVS$year == i , c(5:29)] <- scenario[scenario$group == "HIVpos_VS" & scenario$year == i, c(5:29)] / scenario[scenario$group == "Total" & scenario$year == i,  c(5:29)]
+    prophivVS[prophivVS$year == i , c(2:4)] <- c(apply(prophivVS[prophivVS$year == i , c(5:29)] , 1 , median) , 
+                                             apply(prophivVS[prophivVS$year == i , c(5:29)] , 1 , min) , 
+                                             apply(prophivVS[prophivVS$year == i , c(5:29)] , 1 , max))
+  }
+  return(prophivVS)
+}
+
+# Function to calculate the cumulative proportion of cases among WLHIV. prophiv.cuml = proportion of cases in WLHIV, propart.cuml = proportion of cases in virally suppressed WLHIV
 calc_prophiv_cuml <- function(scenario, yearstart, yearend){
   scenario.trunc <- filter(scenario, year >=yearstart, year <= yearend)
   cuml <- scenario.trunc %>% group_by(group) %>% summarise(across(c(median:sim25), sum))
@@ -366,18 +394,28 @@ hiv.comb.inART$outcome <- "HIV prevalence"
 ##########
 
 (prophiv.S0b.stART <- calc_prophiv(S0b.stART.inc.comb))
+(ccHivRatio.S0b.stART <- calc_ccHivRatio(prophiv.S0b.stART , S0b.stART.hiv.comb))
+(prophivVS.S0b.stART <- calc_prophivVS(S0b.stART.inc.comb))
 calc_prophiv_cuml(S0b.stART.inc.comb, 2021, 2121)
 
 (prophiv.S0.inART <- calc_prophiv(S0.inART.inc.comb))
+(ccHivRatio.S0.inART <- calc_ccHivRatio(prophiv.S0.inART , S0.inART.hiv.comb))
+(prophivVS.S0.inART <- calc_prophivVS(S0.inART.inc.comb))
 calc_prophiv_cuml(S0.inART.inc.comb, 2021, 2121)
 
 (prophiv.S1.inART <- calc_prophiv(S1.inART.inc.comb))
+(ccHivRatio.S1.inART <- calc_ccHivRatio(prophiv.S1.inART , S1.inART.hiv.comb))
+(prophivVS.S1.inART <- calc_prophivVS(S1.inART.inc.comb))
 calc_prophiv_cuml(S1.inART.inc.comb, 2021, 2121)
 
 (prophiv.S2.inART <- calc_prophiv(S2.inART.inc.comb))
+(ccHivRatio.S2.inART <- calc_ccHivRatio(prophiv.S2.inART , S2.inART.hiv.comb))
+(prophivVS.S2.inART <- calc_prophivVS(S2.inART.inc.comb))
 calc_prophiv_cuml(S2.inART.inc.comb, 2021, 2121)
 
 (prophiv.S3.inART <- calc_prophiv(S3.inART.inc.comb))
+(ccHivRatio.S3.inART <- calc_ccHivRatio(prophiv.S3.inART , S3.inART.hiv.comb))
+(prophivVS.S3.inART <- calc_prophivVS(S3.inART.inc.comb))
 calc_prophiv_cuml(S3.inART.inc.comb, 2021, 2121)
 
 # Combine into a data frame
@@ -393,6 +431,33 @@ prophiv.inART.comb$scenario <- factor(prophiv.inART.comb$scenario, levels = c("B
                                                           "Scaled up HPV testing and 90% vaccination",
                                                           "S1 + 50% catch-up vaccination for WLHIV",
                                                           "S2 + more frequent screening for WLHIV"))
+
+ccHivRatio.S0b.stART$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+ccHivRatio.S0.inART$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+ccHivRatio.S1.inART$scenario <- "Scaled up HPV testing and 90% vaccination"
+ccHivRatio.S2.inART$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+ccHivRatio.S3.inART$scenario <- "S2 + more frequent screening for WLHIV"
+
+ccHivRatio.inART.comb <- rbind.data.frame(ccHivRatio.S0b.stART, ccHivRatio.S0.inART, ccHivRatio.S1.inART, ccHivRatio.S2.inART, ccHivRatio.S3.inART)
+ccHivRatio.inART.comb$scenario <- factor(ccHivRatio.inART.comb$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                                              "Baseline cytology and vaccination, with ART scale-up",
+                                                                              "Scaled up HPV testing and 90% vaccination",
+                                                                              "S1 + 50% catch-up vaccination for WLHIV",
+                                                                              "S2 + more frequent screening for WLHIV"))
+
+prophivVS.S0b.stART$scenario <- "Baseline cytology and vaccination, no ART scale-up"
+prophivVS.S0.inART$scenario <- "Baseline cytology and vaccination, with ART scale-up"
+prophivVS.S1.inART$scenario <- "Scaled up HPV testing and 90% vaccination"
+prophivVS.S2.inART$scenario <- "S1 + 50% catch-up vaccination for WLHIV"
+prophivVS.S3.inART$scenario <- "S2 + more frequent screening for WLHIV"
+
+prophivVS.inART.comb <- rbind.data.frame(prophivVS.S0b.stART, prophivVS.S0.inART, prophivVS.S1.inART, prophivVS.S2.inART, prophivVS.S3.inART)
+prophivVS.inART.comb$scenario <- factor(prophivVS.inART.comb$scenario, levels = c("Baseline cytology and vaccination, no ART scale-up", 
+                                                                              "Baseline cytology and vaccination, with ART scale-up",
+                                                                              "Scaled up HPV testing and 90% vaccination",
+                                                                              "S1 + 50% catch-up vaccination for WLHIV",
+                                                                              "S2 + more frequent screening for WLHIV"))
+
 
 
 ############################
@@ -516,7 +581,8 @@ ggplot() +
                       labels = c("All females", "HIV-negative", "HIV-positive"),
                       name = NULL) +
   scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
-  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   labs(x = "Year", y = "Crude incidence rate per 100,000 women") +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
@@ -566,7 +632,8 @@ ggplot() +
                       labels = c("All females", "HIV-negative", "HIV-positive"),
                       name = NULL) +
   scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
-  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   labs(x = "Year", y = "Age-standardized incidence rate per 100,000 women") +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
@@ -609,6 +676,37 @@ ggplot() +
     plot_background 
 dev.off()
 
+#png("irS0S1S2S3_byhiv.png", width = 800, height = 400)
+#pdf("irS0S1S2S3_byhiv.pdf", width = 10, height = 5)
+pdf("irS0S1S2S3_byhiv.small.pdf", width = 6, height = 5) # half size
+ggplot() + 
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S2.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotdash") +
+  geom_line(data = filter(S2.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotdash") +
+  geom_line(data = filter(S2.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotdash") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotted") +
+  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                      breaks = c("Total", "HIVneg", "HIVpos_all"),
+                      labels = c("All females", "HIV-negative", "HIV-positive"),
+                      name = NULL) +
+  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+  scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  labs(x = "year", y = "Crude incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size =12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.85)) +
+  plot_background 
+dev.off()
+
 # Add in S3 with increasing ART
 #png("sirS0S1S3_byhiv.png", width = 800, height = 400)
 #pdf("sirS0S1S3_byhiv.pdf", width = 10, height = 5)
@@ -631,6 +729,35 @@ ggplot() +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   labs(x = "year", y = "Age-standardized incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size =12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.8, 0.85)) +
+  plot_background 
+dev.off()
+
+#png("irS0S1S3_byhiv.png", width = 800, height = 400)
+#pdf("irS0S1S3_byhiv.pdf", width = 10, height = 5)
+pdf("irS0S1S3_byhiv.small.pdf", width = 6, height = 5) # half size
+ggplot() + 
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotted") +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotted") +
+  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
+                      breaks = c("Total", "HIVneg", "HIVpos_all"),
+                      labels = c("All females", "HIV-negative", "HIV-positive"),
+                      name = NULL) +
+  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  labs(x = "year", y = "Crude incidence rate per 100,000 women") +
   theme(axis.title = element_text(size =12),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
@@ -674,24 +801,47 @@ ggplot() +
 dev.off()
 
 ## Scenario S0 with increasing ART
+#pdf("prophiv.prev.s0bS0.inART.small.pdf", width = 6, height = 5) # save again at half size
+#ggplot() +
+#    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
+#    geom_area(data = prophiv.S0.inART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
+#    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+#    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#8B7DCA") + 
+#    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
+#    geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median), colour = "#3C2F74") +
+#    scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+#    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+#    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+#    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
+#    theme(axis.title = element_text(size = 12),
+#          axis.text = element_text(size = 14),
+#          axis.line = element_line(color = "black"),
+#          legend.text = element_text(size = 14),
+#          legend.position = c(0.85, 0.85)) +
+#    plot_background
+#dev.off()
+
+## Scenario S0 with increasing ART
 pdf("prophiv.prev.s0bS0.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = prophiv.S0b.stART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
-    geom_area(data = prophiv.S0.inART, aes(x = year, y = median), fill = colors[3], alpha = 0.6) +
-    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
-    geom_area(data = S0b.stART.hiv.comb, aes(x = year, y = median), fill = "#8B7DCA") + 
-    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") + 
-    geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median), colour = "#3C2F74") +
-    scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
-    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-    labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 12),
-          axis.text = element_text(size = 14),
-          axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 14),
-          legend.position = c(0.85, 0.85)) +
-    plot_background
+  geom_line(data = prophiv.S0b.stART, aes(x = year, y = median , colour = "propCases"), size = 1.75, alpha = 0.45) +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25) +
+  geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75, alpha = 0.45) + 
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  labs(x = "Year", y = "Proportion") +
+  scale_colour_manual(values = c("propCases" = "#486199", "hivPrev" = "#3C2F74"),
+                      breaks = c("propCases", "hivPrev"),
+                      labels = c("Proportion of cases in WLHIV", "HIV prevalence"),
+                      name = NULL) +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.75, 0.85)) +
+  plot_background
 dev.off()
 
 #Highlight the initial increase in PAF and then eventual decrease
@@ -765,32 +915,57 @@ ggplot() +
 dev.off()
 
 ## Add in S3
+#pdf("prophiv.prev.s0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+#ggplot() +
+#    geom_area(data = prophiv.S0.inART, aes(x = year, y = median, fill = "Baseline")) +
+#    geom_area(data = prophiv.S1.inART, aes(x = year, y = median, fill = "S1"), alpha = 0.55) +
+#    geom_area(data = prophiv.S3.inART, aes(x = year, y = median, fill = "S3")) +
+#    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
+#    geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#486199", linetype = "dashed") +
+#    geom_line(data = prophiv.S3.inART, aes(x = year, y = median), colour = "#486199", linetype = "dotdash") +
+#    geom_area(data = S1.inART.hiv.comb, aes(x = year, y = median), fill = "#A15AD1") + 
+#    geom_area(data = S3.inART.hiv.comb, aes(x = year, y = median), fill = "#8771EB") +
+#    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") +
+#    scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+#    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+#    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+#    scale_fill_manual(values = c("Baseline" = colors[3], "S1" = "#97C4F7", "S3" = "#A0C9F8"),
+#                      breaks = c("Baseline", "S1", "S3"),
+#                      labels = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination",
+#                                 "S2 + more frequent screening for WLHIV"),
+#                      name = NULL) +
+#    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
+#    theme(axis.title = element_text(size = 14),
+#          axis.text = element_text(size = 14),
+#          axis.line = element_line(color = "black"),
+#          legend.text = element_text(size = 14),
+#          legend.position = "none") +
+#    plot_background
+#dev.off()
+
+## Add in S3
 pdf("prophiv.prev.s0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-    geom_area(data = prophiv.S0.inART, aes(x = year, y = median, fill = "Baseline")) +
-    geom_area(data = prophiv.S1.inART, aes(x = year, y = median, fill = "S1"), alpha = 0.55) +
-    geom_area(data = prophiv.S3.inART, aes(x = year, y = median, fill = "S3")) +
-    geom_line(data = prophiv.S0.inART, aes(x = year, y = median), colour = "#486199") +
-    geom_line(data = prophiv.S1.inART, aes(x = year, y = median), colour = "#486199", linetype = "dashed") +
-    geom_line(data = prophiv.S3.inART, aes(x = year, y = median), colour = "#486199", linetype = "dotdash") +
-    geom_area(data = S1.inART.hiv.comb, aes(x = year, y = median), fill = "#A15AD1") + 
-    geom_area(data = S3.inART.hiv.comb, aes(x = year, y = median), fill = "#8771EB") +
-    geom_area(data = S0.inART.hiv.comb, aes(x = year, y = median), fill = "#5F4BB6") +
-    scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
-    #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
-    scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-    scale_fill_manual(values = c("Baseline" = colors[3], "S1" = "#97C4F7", "S3" = "#A0C9F8"),
-                      breaks = c("Baseline", "S1", "S3"),
-                      labels = c("Baseline cytology and vaccination, with ART scale-up", "Scaled up HPV testing and 90% vaccination",
-                                 "S2 + more frequent screening for WLHIV"),
-                      name = NULL) +
-    labs(x = "year", y = "Proportion of cases / HIV prevalence") +
-    theme(axis.title = element_text(size = 14),
-          axis.text = element_text(size = 14),
-          axis.line = element_line(color = "black"),
-          legend.text = element_text(size = 14),
-          legend.position = "none") +
-    plot_background
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "propCases"), size = 1.75) +
+  geom_line(data = prophiv.S1.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dashed") +
+  geom_line(data = prophiv.S3.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dotdash") +
+  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75) + 
+  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dashed") +
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dotdash") +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  scale_colour_manual(values = c("propCases" = "#486199", "hivPrev" = "#3C2F74"),
+                    breaks = c("propCases" , "hivPrev"),
+                    labels = c("Proportion of cases in WLHIV", "HIV prevalence"),
+                    name = NULL) +
+  labs(x = "year", y = "Proportion of cases / HIV prevalence") +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.75, 0.85)) +
+  plot_background
 dev.off()
 
 ## Add in S2
@@ -825,6 +1000,104 @@ dev.off()
 #     geom_line(aes(x = year, y = paf_hiv, colour = scenario))
 # ggplot(hiv.comb.inART) +
 #     geom_line(aes(x = year, y = Prevalence, colour = scenario))
+
+
+
+
+
+
+
+### Proportion of cases in WLHIV and WLHIV+VS and HIV prevalence
+
+## Scenario S0 with increasing ART
+pdf("prophivVS.prev.s0bS0.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_line(data = prophiv.S0b.stART, aes(x = year, y = median , colour = "propCases"), size = 1.75, alpha = 0.45) +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25) +
+  geom_line(data = prophivVS.S0b.stART, aes(x = year, y = median , colour = "propCasesVS"), size = 1.75, alpha = 0.45) +
+  geom_line(data = prophivVS.S0.inART, aes(x = year, y = median, colour = "propCasesVS"), size = 1.25) +
+  #geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75, alpha = 0.45) + 
+  #geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  labs(x = "Year", y = "Proportion") +
+  scale_colour_manual(values = c("propCases" = "#486199", "propCasesVS" = "chartreuse3"), #, "hivPrev" = "#3C2F74"),
+                      breaks = c("propCases", "propCasesVS"), # , "hivPrev"),
+                      labels = c("Proportion of cases in WLHIV", "Proportion of cases in WLHIV+VS"), # , "HIV prevalence"),
+                      name = NULL) +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.75, 0.85)) +
+  plot_background
+dev.off()
+
+## Add in S3
+pdf("prophivVS.prev.s0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "propCases"), size = 1.75) +
+  geom_line(data = prophiv.S1.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dashed") +
+  geom_line(data = prophiv.S3.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dotdash") +
+  geom_line(data = prophivVS.S0.inART, aes(x = year, y = median, colour = "propCasesVS"), size = 1.75) +
+  geom_line(data = prophivVS.S1.inART, aes(x = year, y = median, colour = "propCasesVS"), size = 1.25, linetype = "dashed") +
+  geom_line(data = prophivVS.S3.inART, aes(x = year, y = median, colour = "propCasesVS"), size = 1.25, linetype = "dotdash") +
+  #geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75) + 
+  #geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dashed") +
+  #geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dotdash") +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  scale_colour_manual(values = c("propCases" = "#486199", "propCasesVS" = "chartreuse3"), #, "hivPrev" = "#3C2F74"),
+                      breaks = c("propCases", "propCasesVS" ), #, "hivPrev"),
+                      labels = c("Proportion of cases in WLHIV", "Proportion of cases in WLHIV+VS"), # , "HIV prevalence"),
+                      name = NULL) +
+  labs(x = "year", y = "Proportion of cases / HIV prevalence") +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.75, 0.85)) +
+  plot_background
+dev.off()
+
+
+
+
+
+
+
+### Ratio of proportion of cases within WLHIV to HIV prevalence
+
+## S0, S0b, S1, S3
+pdf("ccHivRatio.s0S0bs1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_line(data = ccHivRatio.S0b.stART, aes(x = year, y = median , colour = "ccHivRatio"), size = 1.75, alpha = 0.45) +
+  geom_line(data = ccHivRatio.S0.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.75) +
+  geom_line(data = ccHivRatio.S1.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.25, linetype = "dashed") +
+  geom_line(data = ccHivRatio.S3.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.25, linetype = "dotdash") +
+  #scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  scale_colour_manual(values = c("ccHivRatio" = "black"),
+                      breaks = c("ccHivRatio"),
+                      labels = c("Proportion cases among WLHIV / HIV prevalence"),
+                      name = NULL) +
+  labs(x = "year", y = "Ratio") +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 14),
+        legend.position = c(0.75, 0.85)) +
+  plot_background
+dev.off()
+
+ccHivRatio
+
+
+
+
 
     
 ## Extract statistics !!!!!!!!!!!!!!!!!!!!!!NOT UPDATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
