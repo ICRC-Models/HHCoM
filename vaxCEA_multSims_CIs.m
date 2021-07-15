@@ -172,9 +172,9 @@ cinNegTime = cinGenTime;
 cin_hivTot2020 = zeros(nRuns , diseaseVecLength_fHpv , ageVecLength_fHPV);
 cin23HivAge = zeros(nRuns , 5 , age , length(monthlyTimespan));
 % CC incidence
-ccYearVec = [2005 2012 2018];
+ccYearVec = [2005 2012 2018 2020];
 ccYearVecLength = length(ccYearVec);
-ccIncAge = zeros(nRuns , 3 , age);
+ccIncAge = zeros(nRuns , 4 , age);
 ccIncTime = zeros(nRuns , length(annualTimespan));
 ccIncTimeNeg = ccIncTime;
 ccIncTimePos = ccIncTime;
@@ -821,7 +821,7 @@ for k = 1 : loopSegmentsLength-1
         
         %% ****************************** CERVICAL CANCER FIGURES ****************************************************************************************
     
-        %% Cervical cancer incidence in 2005, 2012, 2018 by age vs. Globocan data and other sources (calibration)
+        %% Cervical cancer incidence in 2005, 2012, 2018, 2020 by age vs. Globocan data and other sources (calibration)
         fac = 10 ^ 5;
         for i = 1 : ccYearVecLength
             yr = ccYearVec(i);
@@ -1638,11 +1638,11 @@ for g = 1 : gender
 %         hivF2(: , 2) = (hivPrevF_dObs(((yrInd-1)*7+1):(yrInd*7) , 3).^(1/2)).*2 .* 100; % calibration SD
         
         subplot(3 , 3 , yrInd); %subplot(2 , 3 , yrInd);
-        hivPrevs = hivM2;
+        %hivPrevs = hivM2;
         hivPrevs2 = hivPrevM_val;
         hivModel = hivAgeM;
         if g == 2
-            hivPrevs = hivF2;
+            %hivPrevs = hivF2;
             hivModel = hivAgeF;
             hivPrevs2 = hivPrevF_val;
         end
@@ -2440,6 +2440,41 @@ set(gca , 'xtick' , 1 : length(ageGroup)+4 , 'xtickLabel' , ageGroup);
 ylim([0 300]); xlim([1 age]); grid on; box on;
 %title(['Cervical Cancer Incidence in 2018 by age']);
 legend('(Globocan, 2018) Observed SA: mean, 2SD' , 'Estimated KZN, adjusted Globocan 2018' , ...
+    'Modeled KZN: mean' , ...
+    'Modeled KZN: range' , 'Location' , 'Northwest');
+
+%% Cervical cancer incidence in 2020 by age vs. Globocan 2020 data (validation)
+ageGroup = {'0-4' , '5-9' , '10-14' , '15-19' , '20-24' , '25-29' ,...
+    '30-34' , '35-39' , '40-44' , '45-49' , '50-54' , '55-59' ,...
+    '60-64' , '65-69' , '70-74' , '75-79'};  
+
+% Load Globocan 2020 rates for SA
+file = [pwd , '/Config/Validation_targets.xlsx'];
+ccInc2020SA(:,1) = xlsread(file , 'Validation' , 'G358:G369');
+
+% Load adjusted Globocan 2020 rates for KZN
+file = [pwd , '/Config/Validation_targets.xlsx'];
+ccInc2020adjKZN(:,1) = xlsread(file , 'Validation' , 'G371:G382');
+
+figure('DefaultAxesFontSize' , 18); 
+% Plot observed data
+plot(4 : age-1 , ccInc2020SA , 'ro' , 'MarkerFaceColor' , 'r');
+hold all;
+plot(4 : age-1 , ccInc2020adjKZN , 'r*');
+hold all;
+% General
+plot(1 : age , mean(squeeze(ccIncAge(: , 3 , 1:end)),1) , 'k-' , 'LineWidth' , 1.5);
+hold all;
+x2 = [[1 : age] , fliplr([1 : age])];
+inBetween = [max(squeeze(ccIncAge(: , 3 , 1:end)),[],1) , fliplr(min(squeeze(ccIncAge(: , 3 , 1:end)),[],1))];
+h = fill(x2 , inBetween , 'k');
+h.FaceAlpha = 0.2;
+h.LineStyle = 'none';
+ylabel('Cervical cancer incidence per 100,000 women'); xlabel('Age Group'); 
+set(gca , 'xtick' , 1 : length(ageGroup)+4 , 'xtickLabel' , ageGroup);
+ylim([0 300]); xlim([1 age]); grid on; box on;
+%title(['Cervical Cancer Incidence in 2020 by age']);
+legend('(Globocan, 2020) Observed SA: mean, 2SD' , 'Estimated KZN, adjusted Globocan 2020' , ...
     'Modeled KZN: mean' , ...
     'Modeled KZN: range' , 'Location' , 'Northwest');
 
