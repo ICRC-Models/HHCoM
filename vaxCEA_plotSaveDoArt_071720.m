@@ -97,7 +97,7 @@ hivIncAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3);
 hivIncAllAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 hivIncAllAgeF_multSims = hivIncAllAgeC_multSims;
 hivIncAllAgeM_multSims = hivIncAllAgeC_multSims;
-% HIV PREVALENCE
+% HIV PREVALENCE, ART COVERAGE
 cIndsHivPrev = {3 : 8 , 3 : 5 , 6 , 7 , 8};
 cIndsHivPrevLength = length(cIndsHivPrev);
 hivPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns , 5);
@@ -110,10 +110,16 @@ hivPrevM1019_multSims = hivPrevF1019_multSims;
 artPrevF_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
 artPrevM_multSims = artPrevF_multSims;
 artPrevC_multSims = artPrevF_multSims;
+artPrevF1559_multSims = zeros(length([startYear : lastYear-1]) , nRuns);
+artPrevM1559_multSims = artPrevF1559_multSims;
 % POPULATION CD4 DISTRIBUTION
 cd4DistVec = {7 , 6 , [3 : 5] , 8}; % CD4<200, CD4>=200, on ART
 cd4DistVecLength = length(cd4DistVec);
 cd4PropMF1559 = zeros(length(tVecYr) , nRuns , cd4DistVecLength , gender);
+% POPULATION HIV DISTRIBUTION
+hivDistVec = {[1:2] , [3:6] , 7 , 8}; % HIV-neg, CD4>=200, CD4<200, on ART
+hivDistVecLength = length(hivDistVec);
+hivDistMF1559 = zeros(length(tVecYr) , nRuns , hivDistVecLength , gender);
 % ART INIT CD4 DISTRIBUTION/TRANSITIONS
 cIndsCD4Dist = {3 : 5 , 6 , 7};
 cIndsCD4DistLength = length(cIndsCD4Dist);
@@ -315,6 +321,20 @@ for k = 1 : loopSegmentsLength-1
                     sum(vaxResult{n}.popVec([1 : stepsPerYear : end] , hivInds) , 2);
             end
         end
+        
+        %% HIV DISTRIBUTION BY GENDER, AGES 15-59 FOR HIV-TB MODEL        
+        for gInd = 1 : gender
+            gGroup = gInd;
+            for cInd = 1 : hivDistVecLength
+                c = hivDistVec{cInd};
+                propInds = toInd(allcomb(c , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                    1 : intervens , gGroup , 4 : 12 , 1 : risk));
+                popInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+                    1 : intervens , gGroup , 4 : 12 , 1 : risk));
+                hivDistMF1559(: , j , cInd , gInd) = sum(vaxResult{n}.popVec([1 : stepsPerYear : end] , propInds) , 2) ./ ...
+                    sum(vaxResult{n}.popVec([1 : stepsPerYear : end] , popInds) , 2);
+            end
+        end
 
         %% HIV INCIDENCE CASES BY AGE
         % Calculate combined HIV incidence
@@ -467,7 +487,7 @@ for k = 1 : loopSegmentsLength-1
         hivPrevM = bsxfun(@rdivide , hivPopM , totPopM);
         hivPrevM1019_multSims(: , j) = hivPrevM(1 : stepsPerYear : end).*100;
 
-        %% ART PREVALENCE 
+        %% ART PREVALENCE
         % Calculate female ART prevalence
         artIndsF = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
             1 : intervens , 2 , 4 : age , 1 : risk));
@@ -539,6 +559,28 @@ for k = 1 : loopSegmentsLength-1
 %         xlim([1980 2060]); ylim([0.0 1.0]);
 %         legend('Model: ages 15-79'); % Insert observed data description
 %         grid on;
+
+        %% ART COVERAGE, FOR HIV-TB MODEL
+        % Calculate female ART prevalence
+        artIndsF = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 4 : 12 , 1 : risk));
+        hivIndsF = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 4 : 12 , 1 : risk));
+        artPopF = sum(vaxResult{n}.popVec(: , artIndsF) , 2);
+        hivPopF = sum(vaxResult{n}.popVec(: , hivIndsF) , 2);
+        artPrevF = bsxfun(@rdivide , artPopF , hivPopF);
+        artPrevF1559_multSims(: , j) = artPrevF(1 : stepsPerYear : end);
+
+        % Calculate male ART prevalence
+        artIndsM = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 , 4 : 12 , 1 : risk));
+        hivIndsM = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 , 4 : 12 , 1 : risk));
+        artPopM = sum(vaxResult{n}.popVec(: , artIndsM) , 2);
+        hivPopM = sum(vaxResult{n}.popVec(: , hivIndsM) , 2);
+        artPrevM = bsxfun(@rdivide , artPopM , hivPopM);
+        artPrevM1559_multSims(: , j) = artPrevM(1 : stepsPerYear : end);
+
 
         %% CD4 DISTRIBUTION AT ART INITIATION
         cTits = {'CD4 350plus' , 'CD4 200-350' , 'CD4 below200'};
@@ -895,6 +937,20 @@ writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncM1559_multSims , 2) , ..
     min(hivIncM1559_multSims , [] , 2) , max(hivIncM1559_multSims , [] , 2) , ...
     hivIncM1559_multSims] , fname)  
 
+%% Save ART coverage by gender, ages 15-59, for HIV-TB model
+% female
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'ART_coverage_females_aged15-59_forHivTB' , '.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(artPrevF1559_multSims , 2) , ...
+    min(artPrevF1559_multSims , [] , 2) , max(artPrevF1559_multSims , [] , 2) , ...
+    artPrevF1559_multSims] , fname)
+% male
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'ART_coverage_males_aged15-59_forHivTB' , '.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(artPrevM1559_multSims , 2) , ...
+    min(artPrevM1559_multSims , [] , 2) , max(artPrevM1559_multSims , [] , 2) , ...
+    artPrevM1559_multSims] , fname)  
+
 %% Save CD4 distribution by gender, ages 15-59 for HIV-TB model
 outputVec = [];
 for g = 1 : gender
@@ -910,6 +966,23 @@ for g = 1 : gender
 end
 fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
     'CD4distribution_MF_aged15-59_forHivTB_revised' , '.csv'];
+writematrix(outputVec , fname) 
+
+%% Save HIV distribution by gender, ages 15-59 for HIV-TB model
+outputVec = [];
+for g = 1 : gender
+    for cInd = 1 : hivDistVecLength
+       outputVec = [outputVec; ...
+           [tVecYr' , ones(length(tVecYr),1).*g , ...
+           ones(length(tVecYr),1).*cInd , ...
+           mean(squeeze(hivDistMF1559(: , : , cInd , g)) , 2) , ...
+           min(squeeze(hivDistMF1559(: , : , cInd , g)) , [] , 2) , ...
+           max(squeeze(hivDistMF1559(: , : , cInd , g)) , [] , 2) , ...
+           squeeze(hivDistMF1559(: , : , cInd , g))]];
+    end
+end
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'HIVdistribution_MF_aged15-59_forHivTB' , '.csv'];
 writematrix(outputVec , fname) 
 
 %% Save HIV incidence by age
