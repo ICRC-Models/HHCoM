@@ -1957,6 +1957,117 @@ legend('VMMC scale-up + Clinic ART, mean' , 'range' , ...
     'VMMC scale-up + HTC + Community ART, mean' , 'range'); % , 'Scenario 3, mean' , 'range');
 grid on;
 
+%% Cases/deaths averted box plot
+figure('DefaultAxesFontSize' , 16);
+
+yearList = {'' , 'Women' , 'Men' , ''};
+
+% female cases
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{1} , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_incidence_females_ages15-79' , '.csv'];
+hivIncFbase = xlsread(fname);
+hivIncFbase = hivIncFbase((2020-startYear)+1 : end , :);
+hivIncFbase(: , 2:end) = cumsum(hivIncFbase(: , 2:end)) ./ 1000000;
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{2} , '_S' , num2str(2) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_incidence_females_ages15-79' , '.csv'];
+hivIncF = xlsread(fname);
+hivIncF = hivIncF((2020-startYear)+1 : end , :);
+hivIncF(: , 2:end) = cumsum(hivIncF(: , 2:end)) ./ 1000000;
+casesAvertedF = hivIncFbase(: , 5:29) - hivIncF(: , 5:29);
+casesAvertedF_CI = [mean(casesAvertedF , 2) , min(casesAvertedF , [] , 2) , max(casesAvertedF , [] , 2)];
+
+% male cases
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{1} , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_incidence_males_ages15-79' , '.csv'];
+hivIncMbase = xlsread(fname);
+hivIncMbase = hivIncMbase((2020-startYear)+1 : end , :);
+hivIncMbase(: , 2:end) = cumsum(hivIncMbase(: , 2:end)) ./ 1000000;
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{2} , '_S' , num2str(2) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_incidence_males_ages15-79' , '.csv'];
+hivIncM = xlsread(fname);
+hivIncM = hivIncM((2020-startYear)+1 : end , :);
+hivIncM(: , 2:end) = cumsum(hivIncM(: , 2:end)) ./ 1000000;
+casesAvertedM = hivIncMbase(: , 5:29) - hivIncM(: , 5:29);
+casesAvertedM_CI = [mean(casesAvertedM , 2) , min(casesAvertedM , [] , 2) , max(casesAvertedM , [] , 2)];
+
+subplot(2 , 2 , 1);
+errorbar([2,3] , [casesAvertedF_CI(end , 1) , casesAvertedM_CI(end , 1)] , ...
+    [casesAvertedF_CI(end , 1) , casesAvertedM_CI(end , 1)] - [casesAvertedF_CI(end , 2) , casesAvertedM_CI(end , 2)] , ...
+    [casesAvertedF_CI(end , 3) , casesAvertedM_CI(end , 3)] - [casesAvertedF_CI(end , 1) , casesAvertedM_CI(end , 1)], ...
+    'ks' , 'LineWidth' , 1 , 'MarkerFaceColor' , 'k' , 'CapSize' , 10 , 'MarkerSize' , 8);
+ylim([0 1]); xlim([1.5 3.5]); ylabel('Cumulative HIV cases averted (millions)'); title('2020-2060');
+set(gca , 'xtickLabel' , yearList);
+set(gca , 'xtick' , 1 : length(yearList) , 'xtickLabel' , yearList);
+set(gca, 'YGrid', 'on', 'XGrid', 'off');
+yticks([0,0.2,0.4,0.6,0.8,1.0]);
+yticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+subplot(2 , 2 , 2);
+errorbar([2,3] , [casesAvertedF_CI((2025-currYear)+1 , 1) , casesAvertedM_CI((2025-currYear)+1 , 1)] , ...
+    [casesAvertedF_CI((2025-currYear)+1 , 1) , casesAvertedM_CI((2025-currYear)+1 , 1)] - [casesAvertedF_CI((2025-currYear)+1 , 2) , casesAvertedM_CI((2025-currYear)+1 , 2)] , ...
+    [casesAvertedF_CI((2025-currYear)+1 , 3) , casesAvertedM_CI((2025-currYear)+1 , 3)] - [casesAvertedF_CI((2025-currYear)+1 , 1) , casesAvertedM_CI((2025-currYear)+1 , 1)], ...
+    'ks' , 'LineWidth' , 1 , 'MarkerFaceColor' , 'k' , 'CapSize' , 10 , 'MarkerSize' , 8);
+ylim([0 1]); xlim([1.5 3.5]); title('2020-2025'); %ylabel('Cumulative HIV cases averted (in millions)'); 
+set(gca , 'xtickLabel' , yearList);
+set(gca , 'xtick' , 1 : length(yearList) , 'xtickLabel' , yearList);
+yticks([0,0.2,0.4,0.6,0.8,1.0]);
+yticklabels({'','','','','',''});
+set(gca, 'YGrid', 'on', 'XGrid', 'off');
+
+% female mortality
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{1} , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_mortality_females_ages15-79' , '.csv'];
+hivMortFbase = xlsread(fname);
+hivMortFbase = hivMortFbase((2020-startYear)+1 : end , :);
+hivMortFbase(: , 2:end) = cumsum(hivMortFbase(: , 2:end)) ./ 1000000;
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{2} , '_S' , num2str(2) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_mortality_females_ages15-79' , '.csv'];
+hivMortF = xlsread(fname);
+hivMortF = hivMortF((2020-startYear)+1 : end , :);
+hivMortF(: , 2:end) = cumsum(hivMortF(: , 2:end)) ./ 1000000;
+deathsAvertedF = hivMortFbase(: , 5:29) - hivMortF(: , 5:29);
+deathsAvertedF_CI = [mean(deathsAvertedF , 2) , min(deathsAvertedF , [] , 2) , max(deathsAvertedF , [] , 2)];
+
+% male mortality
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{1} , '_S' , num2str(1) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_mortality_males_ages15-79' , '.csv'];
+hivMortMbase = xlsread(fname);
+hivMortMbase = hivMortMbase((2020-startYear)+1 : end , :);
+hivMortMbase(: , 2:end) = cumsum(hivMortMbase(: , 2:end)) ./ 1000000;
+
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileNameShort , sceFileNameList{2} , '_S' , num2str(2) , '_' , fileInds{1} , '\' , ...
+    'Raw_HIV_mortality_males_ages15-79' , '.csv'];
+hivMortM = xlsread(fname);
+hivMortM = hivMortM((2020-startYear)+1 : end , :);
+hivMortM(: , 2:end) = cumsum(hivMortM(: , 2:end)) ./ 1000000;
+deathsAvertedM = hivMortMbase(: , 5:29) - hivMortM(: , 5:29);
+deathsAvertedM_CI = [mean(deathsAvertedM , 2) , min(deathsAvertedM , [] , 2) , max(deathsAvertedM , [] , 2)];
+
+
+subplot(2 , 2 , 3);
+errorbar([2,3] , [deathsAvertedF_CI(end , 1) , deathsAvertedM_CI(end , 1)] , ...
+    [deathsAvertedF_CI(end , 1) , deathsAvertedM_CI(end , 1)] - [deathsAvertedF_CI(end , 2) , deathsAvertedM_CI(end , 2)] , ...
+    [deathsAvertedF_CI(end , 3) , deathsAvertedM_CI(end , 3)] - [deathsAvertedF_CI(end , 1) , deathsAvertedM_CI(end , 1)], ...
+    'ks' , 'LineWidth' , 1 , 'MarkerFaceColor' , 'k' , 'CapSize' , 10 , 'MarkerSize' , 8);
+ylim([0 1]); xlim([1.5 3.5]); ylabel('Cumulative HIV deaths averted (millions)'); 
+set(gca , 'xtickLabel' , yearList);
+set(gca , 'xtick' , 1 : length(yearList) , 'xtickLabel' , yearList);
+yticks([0,0.2,0.4,0.6,0.8,1.0]);
+yticklabels({'0.0','0.2','0.4','0.6','0.8','1.0'});
+set(gca, 'YGrid', 'on', 'XGrid', 'off');
+subplot(2 , 2 , 4);
+errorbar([2,3] , [deathsAvertedF_CI((2025-currYear)+1 , 1) , deathsAvertedM_CI((2025-currYear)+1 , 1)] , ...
+    [deathsAvertedF_CI((2025-currYear)+1 , 1) , deathsAvertedM_CI((2025-currYear)+1 , 1)] - [deathsAvertedF_CI((2025-currYear)+1 , 2) , deathsAvertedM_CI((2025-currYear)+1 , 2)] , ...
+    [deathsAvertedF_CI((2025-currYear)+1 , 3) , deathsAvertedM_CI((2025-currYear)+1 , 3)] - [deathsAvertedF_CI((2025-currYear)+1 , 1) , deathsAvertedM_CI((2025-currYear)+1 , 1)], ...
+    'ks' , 'LineWidth' , 1 , 'MarkerFaceColor' , 'k' , 'CapSize' , 10 , 'MarkerSize' , 8);ylim([0 1]); xlim([1.5 3.5]); %ylabel('Cumulative HIV deaths averted (in millions)'); 
+set(gca , 'xtickLabel' , yearList);
+set(gca , 'xtick' , 1 : length(yearList) , 'xtickLabel' , yearList);
+yticks([0,0.2,0.4,0.6,0.8,1.0]);
+yticklabels({'','','','','',''});
+set(gca, 'YGrid', 'on', 'XGrid', 'off');
+
 %% Plot cumulative HIV deaths
 figure('DefaultAxesFontSize' , 18);
 
