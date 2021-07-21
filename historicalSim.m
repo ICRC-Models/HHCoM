@@ -40,6 +40,11 @@ pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-07
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
+% SCREENING
+% Instructions: Choose either the original baseline screening algorithm or the screening paper cytology algorithm
+%   Screening coverage, HIV groups, and ages are set automatically below 
+screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 3 for spCyto)
+
 % VACCINATION
 % Instructions: If you want no historical vaccination/ no vaccination in your baseline scenario, set baseline vaccine coverage to zero. 
 %   Otherwise, set it to 0.86 (the historical coverage level for 9 year-olds) times an adjustment for the bivalent vaccine. We are 
@@ -53,7 +58,12 @@ rVaxWane = 0.0; % rate of waning vaccine immunity
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAge = 2;
 vaxRate = 0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
-vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
+
+% ART + VIRAL SUPPRESSION & VMMC COVERAGE
+% Instructions: In loadUp2.m, go to the section titled "Save intervention
+%   parameters." In the sub-sections labeled "ART+VS coverage" and "VMMC
+%   coverage", select your desired scale-up assumptions    % ***SET ME***: ART & VMMC scale-up assumptions
 
 % HIV TESTING CAMPAIGN
 propHivDiagBaseline = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males, females)
@@ -78,8 +88,9 @@ propHivDiagBaseline = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -107,15 +118,29 @@ propHivDiagBaseline = [0.78 , 0.889]; % proportion diagnosed from SABSSMV (males
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
 
 %% Screening
-screenAlgorithm = 1;
-screenAlgs{1} = baseline;
+if (screenAlgorithm == 1)
+    % Baseline screening algorithm
+    screenAlgs = baseline;
+elseif (screenAlgorithm == 3)
+    % Screening paper cytology algorithm
+    screenAlgs = spCyto;
+end
+screenAlgs.genTypBool = 0;
+screenAlgs.screenHivGrps = {[1:disease]};
+screenAlgs.screenAge = {8};
+screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
+screenAlgs.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
+for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
+    period = [screenYrs(i) , screenYrs(i + 1)];
+    screenAlgs.screenCover_vec{i} = interp1(period , screenAlgs.screenCover(i : i + 1 , 1) , ...
+        screenYrs(i) : timeStep : screenYrs(i + 1));
+end
 
 % Create screening indices
-numScreenAge = length(screenAlgs{1}.screenAge);
-agesComb = screenAlgs{1}.screenAge;
-ageMultsComb = screenAlgs{1}.screenAgeMults;
-screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
-screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
+numScreenAge = length(screenAlgs.screenAge);
+agesComb = screenAlgs.screenAge{1};
+screenAgeAll = zeros(disease , viral , numScreenAge , risk , hpvVaxStates*hpvNonVaxStates*endpoints*intervens);
+screenAgeS = zeros(disease , viral , numScreenAge , risk , hpvVaxStates*hpvNonVaxStates*endpoints*2);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
@@ -126,6 +151,10 @@ noVaxToScreenTreatHpv = noVaxToScreenTreatImm;
 vaxToScreenTreatHpv = noVaxToScreenTreatImm;
 noVaxToScreenHyst = noVaxToScreenTreatImm;
 vaxToScreenHyst = noVaxToScreenTreatImm;
+noVaxToScreenTreatImmVaxHpv = zeros(disease , viral , hpvNonVaxStates , numScreenAge , risk);
+vaxToScreenTreatImmVaxHpv = noVaxToScreenTreatImmVaxHpv;
+noVaxToScreenTreatImmNonVaxHpv = zeros(disease , viral , hpvVaxStates , numScreenAge , risk);
+vaxToScreenTreatImmNonVaxHpv = noVaxToScreenTreatImmNonVaxHpv;
 noVaxToScreenTreatVaxHpv = zeros(disease , viral , hpvNonVaxStates , numScreenAge , risk);
 vaxToScreenTreatVaxHpv = noVaxToScreenTreatVaxHpv;
 noVaxToScreenTreatNonVaxHpv = zeros(disease , viral , hpvVaxStates , numScreenAge , risk);
@@ -144,8 +173,8 @@ for aS = 1 : numScreenAge
                 for s = 1 : hpvNonVaxStates
                     for x = 1 : endpoints
                         for r = 1 : risk
-                            screenAgeAll(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 1 : intervens , 2 , a , r)); 
-                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 3 : intervens , 2 , a , r));
+                            screenAgeAll(d,v,aS,r,:) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , r)); 
+                            screenAgeS(d,v,aS,r,:) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 3 : intervens , 2 , a , r));
 
                             noVaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 1 , 2 , a , r)));
                             noVaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
@@ -154,6 +183,10 @@ for aS = 1 : numScreenAge
 
                             noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 4 , 2 , a , r));
+                            noVaxToScreenTreatImmNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 7 , 1 , 3 , 2 , a , r));
+                            vaxToScreenTreatImmNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 7 , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatHpv(d,v,aS,r) = toInd(allcomb(d , v , 2 , 2 , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 3 , 2 , a , r));
@@ -355,7 +388,7 @@ for i = iStart : length(s) - 1
         
     end
 
-    if hpvOn
+    if hpvOn % (Note: model not set up for HPV to be off; would need to add hpvOn bool logic to seeding of initial HPV infections)
         % HPV NATURAL HISTORY
         % Progression and clearance of HPV
         % Progression and regression of precancerous lesions
@@ -391,9 +424,11 @@ for i = iStart : length(s) - 1
                 = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                 screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
                 noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
-                vaxToScreenTreatImm , noVaxToScreenTreatHpv , vaxToScreenTreatHpv , ...
-                noVaxToScreenTreatVaxHpv , vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , ...
-                vaxToScreenTreatNonVaxHpv , noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , ageMultsComb);
+                vaxToScreenTreatImm , noVaxToScreenTreatImmVaxHpv , vaxToScreenTreatImmVaxHpv , ...
+                noVaxToScreenTreatImmNonVaxHpv , vaxToScreenTreatImmNonVaxHpv , ...        
+                noVaxToScreenTreatHpv , vaxToScreenTreatHpv , noVaxToScreenTreatVaxHpv , ...
+                vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , vaxToScreenTreatNonVaxHpv , ...
+                noVaxToScreenHyst , vaxToScreenHyst , numScreenAge);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)

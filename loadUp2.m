@@ -18,8 +18,9 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -53,11 +54,11 @@ paramDir = [pwd , '/Params/'];
 %% Set and save general parameters
 
 % Time
-stepsPerYear = 6;
+stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2020;
-endYear = currYear; %2015; %currYear;
+currYear = 2021;
+endYear = currYear;
 years = endYear - startYear;
 
 % Compartments
@@ -804,11 +805,33 @@ end
 hyst = 0; % bool to turn background hysterectomy on or off
 OMEGA = zeros(age , 1); % hysterectomy rate
 
-% ART coverage
+% ART+VS coverage
+% Instructions: listed below are four common options for ART scale-up (set
+% the variables as exemplified below)
+%   1) Linear scale-up to 90-90-90 targets from 2017 to 2030
+%      Run historicalSim and futureSim using the values below:
+%       maxRateM = [artVScov(:,3) ; 0.729] .* artOutMult;
+%       maxRateF = [artVScov(:,2) ; 0.729] .* artOutMult;
+%   2) Stabilization at 2017 values
+%      Run historicalSim and futureSim using the values below:
+%       maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult;
+%       maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult;
+%   3) Stabilization at 2020 values (assume linear scale-up to 90-90-90
+%      from 2017 to 2030, but then stabilize at intermediate 2020 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       maxRateM = [artVScov((1:end-1),3) ; 0.508333 ; 0.508333] .* artOutMult;
+%       maxRateF = [artVScov((1:end-1),2) ; 0.627829 ; 0.627829] .* artOutMult;
+%   4) Stabilization at 2021 values (assume linear scale-up to 90-90-90
+%      from 2017 to 2030, but then stabilize at intermediate 2021 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       maxRateM = [artVScov((1:end-1),3) ; 0.530400 ; 0.530400] .* artOutMult;
+%       maxRateF = [artVScov((1:end-1),2) ; 0.637946 ; 0.637946] .* artOutMult;
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2020 - 1)]; % assuming 90-90-90 target reached by 2030
+artYr = [(artVScov(:,1) - 1); (2020 - 1)]; % assuming 90-90-90 target reached by 2030; subtract years by 1 so that desired coverage is reached BY the given year
 maxRateM = [artVScov(1:end-1,3) ; 0.51 ; 0.72] .* artOutMult; % population-level ART coverage in males
 maxRateF = [artVScov(1:end-1,2) ; 0.70 ; 0.73] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
@@ -825,6 +848,28 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
 end
 
 % VMMC coverage
+% Instructions: listed below are four common options for VMMC scale-up (set
+% the variables as exemplified below)
+%   1) Linear scale-up to 70% target from 2017 to 2030
+%      Run historicalSim and futureSim using the values below:
+%       0.459 0.42 0.318 0.204; ... % 2017 
+%       0.70  0.70 0.70  0.70];   % 2030 [year x age group]
+%   2) Stabilization at 2017 values
+%      Run historicalSim and futureSim using the values below:
+%       0.459 0.42 0.318 0.204; ... % 2017 
+%       0.459 0.42 0.318 0.204];   % 2030 [year x age group]
+%   3) Stabilization at 2020 values (assume linear scale-up to 70% target
+%      from 2017 to 2030, but then stabilize at intermediate 2020 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       0.514542 0.484615 0.406362 0.318554; ... % 2017 
+%       0.514542 0.484615 0.406362 0.318554];   % 2030 [year x age group]
+%   4) Stabilization at 2021 values (assume linear scale-up to 70% target
+%      from 2017 to 2030, but then stabilize at intermediate 2021 values)
+%      Run historicalSim using the values from 1), then run futureSim using
+%      the values below:
+%       0.533087 0.506154 0.435725 0.356698; ... % 2017
+%       0.533087 0.506154 0.435725 0.356698];   % 2030 [year x age group]
 vmmcYr = [circStartYear; 2000; 2008; 2010; 2012; 2020; 2030];
 circ_aVec = {4 , 5 , [6:10] , [11:age]}; % Ages: (15-19), (20-24), (25-49), (50+)
 vmmcRate = [0.04 0.06 0.0 0.0; ... % 1960
@@ -849,82 +894,137 @@ end
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 
-% Screening test sensitivities
-cytoSens = [0.0 , 0.57 , 0.57]; % pap smear (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
-hpvSens = [0.0 , 0.881 , 0.881]; % careHPV (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
-hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test (susceptible/infected/CIN1/immune (unused) , CIN2 , CIN3/CC)
+% Proportion of women screened who screen positive
+%   for CIN2+, this represents test sensitivity. 
+%   for susceptible/immune/infected/CIN1, this represents (1-specificity)
+cytoSens = [0.0 , 0.0 , 0.57 , 0.57; ... % Cytology 
+            0.0 , 0.0 , 0.57 , 0.57; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+            0.0 , 0.0 , 0.57 , 0.57; ... %   rows: HIV disease status
+            0.0 , 0.0 , 0.57 , 0.57; ...
+            0.0 , 0.0 , 0.57 , 0.57; ...
+            0.0 , 0.0 , 0.57 , 0.57; ...
+            0.0 , 0.0 , 0.57 , 0.57; ...
+            0.0 , 0.0 , 0.57 , 0.57];
+hpvSens = [0.0 , 0.0 , 0.881 , 0.881; ... % careHPV (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+           0.0 , 0.0 , 0.881 , 0.881; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+           0.0 , 0.0 , 0.881 , 0.881; ... %   rows: HIV disease status
+           0.0 , 0.0 , 0.881 , 0.881; ...
+           0.0 , 0.0 , 0.881 , 0.881; ...
+           0.0 , 0.0 , 0.881 , 0.881; ...
+           0.0 , 0.0 , 0.881 , 0.881; ...
+           0.0 , 0.0 , 0.881 , 0.881]; 
+hpvSensWHO = [0.0 , 0.0 , 0.90 , 0.94; ... % WHO HPV DNA test (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+              0.0 , 0.0 , 0.90 , 0.94; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+              0.0 , 0.0 , 0.90 , 0.94; ... %   rows: HIV disease status
+              0.0 , 0.0 , 0.90 , 0.94; ...
+              0.0 , 0.0 , 0.90 , 0.94; ...
+              0.0 , 0.0 , 0.90 , 0.94; ...
+              0.0 , 0.0 , 0.90 , 0.94; ...
+              0.0 , 0.0 , 0.90 , 0.94]; 
+cytoSensSP = [0.07 , 0.07 , 0.57 , 0.57; ... % Screening paper cytology
+              0.07 , 0.07 , 0.57 , 0.57; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+              0.15 , 0.15 , 0.52 , 0.52; ... %   rows: HIV disease status
+              0.15 , 0.15 , 0.52 , 0.52; ...
+              0.15 , 0.15 , 0.52 , 0.52; ...
+              0.15 , 0.15 , 0.52 , 0.52; ...
+              0.15 , 0.15 , 0.52 , 0.52; ...
+              0.11 , 0.11 , 0.55 , 0.55];   
+hpvSensSP = [0.0 , 0.85 , 0.85 , 0.85; ... % Screening paper HPV DNA test
+             0.0 , 0.85 , 0.85 , 0.85; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+             0.0 , 0.94 , 0.94 , 0.94; ... %   rows: HIV disease status
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.94 , 0.94 , 0.94; ...
+             0.0 , 0.90 , 0.90 , 0.90];   
+hpvGentypSensSP = [0.0 , 0.85 , 0.85 , 0.85; ... % Screening paper HPV DNA test + genotyping
+                   0.0 , 0.85 , 0.85 , 0.85; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   rows: HIV disease status
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   Women who are infected with 9v HPV who screen positive. 
+                   0.0 , 0.94 , 0.94 , 0.94; ... %   No women who are non-9vHPV+ screen positive unless they are co-infected with 9vHPV.
+                   0.0 , 0.94 , 0.94 , 0.94; ...
+                   0.0 , 0.94 , 0.94 , 0.94; ...
+                   0.0 , 0.90 , 0.90 , 0.90];                    
+viaSensSP = [0.16 , 0.16 , 0.98 , 0.98; ... % Screening paper AVE
+             0.16 , 0.16 , 0.98 , 0.98; ... %   columns: (susceptible/immune , infected/CIN1 , CIN2 , CIN3/CC)
+             0.22 , 0.22 , 0.98 , 0.98; ... %   rows: HIV disease status
+             0.22 , 0.22 , 0.98 , 0.98; ... 
+             0.22 , 0.22 , 0.98 , 0.98; ... 
+             0.22 , 0.22 , 0.98 , 0.98; ... 
+             0.22 , 0.22 , 0.98 , 0.98; ... 
+             0.19 , 0.19 , 0.98 , 0.98];   
+         
+% Treatment retention (proportion who return and comply with treatment)
+cryoRetain = 0.51; % with three-visit algorithm (cytology + colpo + cryotherapy treatment)
+leepRetain = 0.80; % LEEP
+thrmlRetain = 0.95; % thermal ablation
+ccRetain = 0.40; % cancer treatment
+eligLeep = [0.0 , 0.1 , 0.3]; % percent referred to/ eligible for LEEP (CIN1 , CIN2 , CIN3)
+
+% Treatment efficacy with LEEP/cryotherapy/thermal ablation
+treatEff_hivNeg = 0.905; % HIV-negative
+treatEff_hivPos = 0.766; % HIV-positive untreated
+treatEff_hivArt = 0.84; % HIV-positive, on ART + VS
+
+% HPV persistence
+persAblat = 0.48; % HPV persistence with cryotherapy/thermal ablation including treatment failure
+persAblatHivNeg = persAblat - (1 - treatEff_hivNeg); % 0.385; proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy/thermal ablation
+persLeep = 0.28; % HPV persistence with LEEP including treatment failure
+persLeepHivNeg = persLeep - (1 - treatEff_hivNeg); % 0.185; proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
+persLeepCryo = persAblatHivNeg.*(1-eligLeep) + persLeepHivNeg.*eligLeep; % columns: (infected/CIN1 , CIN2 , CIN3)
+persLeepThrml = persAblatHivNeg.*(1 - ((eligLeep.*leepRetain)./(eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain))) ...
+    + persLeepHivNeg.*(((eligLeep.*leepRetain)./(eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain))); % columns: (infected/CIN1 , CIN2 , CIN3)
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48];
-baseline.diseaseInds = [1 : disease];
-baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
-baseline.screenAgeMults = [1.0]; % / max(1 , fivYrAgeGrpsOn*5)
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.72;
-baseline.cinTreatEff = [0.905 , 0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766]; % cryotherapy/LEEP effectiveness by HIV status
-baseline.cinTreatRetain = 0.51;
-baseline.cinTreatHpvPersist = 0.28; % HPV persistence with LEEP including treatment failure; used only for cinTreatHpvPersist calculation
-baseline.cinTreatHpvPersistHivNeg = baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1)); % 0.185; proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
-baseline.ccTreatRetain = 0.40;
-baseline.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    baseline.screenCover_vec{i} = interp1(period , baseline.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
+baseline.colpoRetain = 0.72; % proportion who return for colposcopy; assume 100% sensitivity and specificity
+baseline.treatRetain = [0.0 , cryoRetain , cryoRetain , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+baseline.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,6)]; % cryotherapy/LEEP effectiveness by HIV status
+baseline.cinTreatHpvPersistHivNeg = [persLeepHivNeg.*ones(1,4)]; % proportion of effectively treated HIV-negative women who have persistent HPV after LEEP (infected , CIN1 , CIN2 , CIN3)
 
-% CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90];
-cisnet.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-cisnet.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
-cisnet.testSens = hpvSens;
-cisnet.colpoRetain = 0.81*0.85; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
-cisnet.cinTreatEff = baseline.cinTreatEff;
-cisnet.cinTreatRetain = 1.0;
-cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with cryotherapy including treatment failure; used only for cinTreatHpvPersist calculation
-cisnet.cinTreatHpvPersistHivNeg = cisnet.cinTreatHpvPersist - (1-cisnet.cinTreatEff(1)); % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy
-cisnet.ccTreatRetain = 1.0;
-cisnet.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    cisnet.screenCover_vec{i} = interp1(period , cisnet.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
-
-% WHO screening algorithm - version a
-who.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
+% WHO screening algorithm
 who.testSens = hpvSensWHO;
-who.colpoRetain = 1.0;
+who.colpoRetain = 1.0; % no triage with colposcopy
+who.treatRetain = [0.0 , 0.90 , 0.90 , 0.90]; % proportion who return/comply with treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
 who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0]; % 100% treatment efficacy
-who.cinTreatRetain = 0.90; % treatment compliance
-who.cinTreatHpvPersist = 0.0; % not used 
-who.cinTreatHpvPersistHivNeg = 0.185; % proportion of effectively treated HIV-negative women who have persistent HPV after treatment
-who.ccTreatRetain = 0.90; % treatment compliance
-who.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    who.screenCover_vec{i} = interp1(period , who.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
+who.cinTreatHpvPersistHivNeg = [persLeepHivNeg.*ones(1,4)]; % proportion of effectively treated HIV-negative women who have persistent HPV after treatment (infected , CIN1 , CIN2 , CIN3)
 
-% WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
-whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
-whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
-whob.screenAgeMults = [(1.0) , (1.0)];  % / max(1 , fivYrAgeGrpsOn*5))
-whob.testSens = hpvSensWHO;
-whob.colpoRetain = 1.0;
-whob.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0]; % 100% treatment efficacy
-whob.cinTreatRetain = 0.90; % treatment compliance
-whob.cinTreatHpvPersist = 0.0; % not used
-whob.cinTreatHpvPersistHivNeg = 0.185; % proportion of effectively treated HIV-negative women who have persistent HPV after treatment
-whob.ccTreatRetain = 0.90; % treatment compliance
-whob.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
-for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
-    period = [screenYrs(i) , screenYrs(i + 1)];
-    whob.screenCover_vec{i} = interp1(period , whob.screenCover(i : i + 1 , 1) , ...
-        screenYrs(i) : timeStep : screenYrs(i + 1));
-end
+% Screening paper - cytology algorithm
+spCyto.testSens = cytoSensSP;
+spCyto.colpoRetain = 0.72; % proportion who return for colposcopy; assume 100% sensitivity and specificity
+spCyto.treatRetain = [0.0 , cryoRetain , cryoRetain , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+spCyto.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
+spCyto.cinTreatHpvPersistHivNeg = [persAblat , persLeepCryo]; % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy/LEEP (infected , CIN1 , CIN2 , CIN3)
+
+% Screening paper - HPV DNA -and-treat algorithm
+spHpvDna.testSens = hpvSensSP;
+spHpvDna.colpoRetain = 1.0; % no triage with colposcopy
+spHpvDna.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+spHpvDna.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
+spHpvDna.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
+
+% Screening paper - HPV DNA + genotyping -and-treat algorithm
+spGentyp.testSens = hpvGentypSensSP;
+spGentyp.colpoRetain = 1.0; % no triage with colposcopy
+spGentyp.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+spGentyp.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
+spGentyp.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
+
+% Screening paper - AVE -and-treat algorithm
+spAve.testSens = viaSensSP;
+spAve.colpoRetain = 1.0; % no triage with colposcopy
+spAve.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+spAve.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
+spAve.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
+
+% Screening paper - HPV DNA + AVE triage -and-treat algorithm
+spHpvAve.testSens = hpvSensSP .* viaSensSP;
+spHpvAve.colpoRetain = 1.0; % no triage with colposcopy
+spHpvAve.treatRetain = [[eligLeep.*leepRetain + (1-eligLeep).*thrmlRetain] , ccRetain]; % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+spHpvAve.cinTreatEff = [treatEff_hivNeg.*ones(1,2) , treatEff_hivPos.*ones(1,5) , treatEff_hivArt]; % cryotherapy/LEEP/thermal ablation effectiveness by HIV status
+spHpvAve.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of effectively treated HIV-negative women who have persistent HPV after thermal ablation/LEEP (infected , CIN1 , CIN2 , CIN3)
+
 
 %% Import and save calibration data
 % file = [pwd , '/Config/Calibration_targets.xlsx'];

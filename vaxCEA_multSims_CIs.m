@@ -22,8 +22,9 @@ paramDir = [pwd , '\Params\'];
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -459,19 +460,19 @@ end
 %% Population size over time vs. Statistics South Africa data (calibration/validation)
 popYearVec = unique(totPopSize_dObs(: ,1));
 % Load calibration/validation data from Excel (years, values)
-file = [pwd , '/Config/Population_validation_targets.xlsx'];
+file = [pwd , '/Config/Validation_targets.xlsx'];
 historicalPop0_69 = zeros(5,2);
 futurePop0_69 = zeros(16,2);
-historicalPop0_69(:,1) = xlsread(file , 'Demographics' , 'B91:F91'); % years
-historicalPop0_69(:,2) = xlsread(file , 'Demographics' , 'B130:F130') .* 1000; % estimates
-futurePop0_69(:,1) = xlsread(file , 'Demographics' , 'C144:R144'); % years
-futurePop0_69(:,2) = xlsread(file , 'Demographics' , 'C146:R146') .* 1000; % projections
+historicalPop0_69(:,1) = xlsread(file , 'Validation' , 'D100:D104'); % years
+historicalPop0_69(:,2) = xlsread(file , 'Validation' , 'G100:G104') .* 1000; % estimates
+futurePop0_69(:,1) = xlsread(file , 'Validation' , 'D105:D120'); % years
+futurePop0_69(:,2) = xlsread(file , 'Validation' , 'G105:G120') .* 1000; % projections
 
 % Calibration error bars
 meanObs = totPopSize_dObs(: , 2);
 sdevObs = (totPopSize_dObs(: , 3).^(1/2)).*2;
 
-figure;
+figure('DefaultAxesFontSize' , 18);
 errorbar(totPopSize_dObs(: , 1) , meanObs , sdevObs , ...
     'rs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
 hold all;
@@ -704,7 +705,23 @@ hivRaw(:,:,2) = hivPrevF_dObs(: , 4:5);
 
 for i = 1 : length(unique(hivPrevM_dObs(: ,1)))
     for g = 1 : gender
-        hivData(i,1,g) = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g))) .* 100;
+        prev = (sumall(hivRaw(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g)));
+        hivData(i,1,g) = prev * 100;
+        var = (prev*(1-prev)) / sumall(hivRaw(((i-1)*7+1):(i*7) , 2 , g));
+        hivData(i,2,g) = (var ^ (1/2)) * 2 * 100;
+    end
+end
+
+% Load validation data
+file = [pwd , '/Config/Validation_targets.xlsx'];
+hivData2(: , : , 1) = zeros(length([2010:2016]) , 1);
+hivData2(: , : , 2) = zeros(length([2010:2016]) , 1);
+hivRaw2(:,:,1) = xlsread(file , 'Validation' , 'E2:F50'); % AHRI, males, by age 15-49, [2010 to 2016]
+hivRaw2(:,:,2) = xlsread(file , 'Validation' , 'E51:F99'); %AHRI, females, by age 15-49, [2010 to 2016]
+for i = 1 : length([2010:2016])
+    for g = 1 : gender
+        prev2 = (sumall(hivRaw2(((i-1)*7+1):(i*7) , 1 , g)) ./ sumall(hivRaw2(((i-1)*7+1):(i*7) , 2 , g)));
+        hivData2(i,1,g) = prev2 * 100;
     end
 end
 
@@ -935,6 +952,48 @@ end
 %     legend('(IHME model) Observed KZN: val, lower lb, upper lb' , ...
 %         'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum')
 % end
+
+%% Proportion HIV-negative males circumcised by broad age groups over time
+circPropYr_obs = vmmcYr;
+circProp_obs = vmmcRate' .* 100;
+
+figure('DefaultAxesFontSize' , 18);
+p1 = plot(circPropYr_obs , circProp_obs , 'o');
+set(p1, {'MarkerFaceColor'}, get(p1,'Color')); 
+hold on;
+set(gca,'ColorOrderIndex',1)
+p = plot(monthlyTimespan , squeeze(mean(circProp,1)) , '-' , 'LineWidth' , 1.5);
+hold all;
+x2 = [monthlyTimespan , fliplr(monthlyTimespan)];
+inBetween = [squeeze(max(squeeze(circProp),[],1)) , fliplr(squeeze(min(squeeze(circProp),[],1)))];
+colorVecP = get(p,'Color');
+h1 = fill(x2 , inBetween(1,:) , colorVecP{1});
+h1.FaceAlpha = 0.3;
+h1.LineStyle = 'none';
+h2 = fill(x2 , inBetween(2,:) , colorVecP{2});
+h2.FaceAlpha = 0.3;
+h2.LineStyle = 'none';
+h3 = fill(x2 , inBetween(3,:) , colorVecP{3});
+h3.FaceAlpha = 0.3;
+h3.LineStyle = 'none';
+h4 = fill(x2 , inBetween(4,:) , colorVecP{4});
+h4.FaceAlpha = 0.3;
+h4.LineStyle = 'none';
+xlim([1960 2040]); ylim([0 80]);
+xlabel('Year'); ylabel('HIV-negative men circumcised(%)')
+grid on;
+legend('Empirical target KZN, ages 15-19' , ...
+    'Empirical target KZN, ages 20-24' , 'Empirical target KZN, ages 25-49' , ...
+    'Empirical target KZN, ages 50+' , ...
+    'Modeled KZN, ages 15-19: 25-sets mean' , ...
+    'Modeled KZN, ages 20-24: 25-sets mean' , ...
+    'Modeled KZN, ages 25-49: 25-sets mean'  , ...
+    'Modeled KZN, ages 50+: 25-sets mean' , ...
+    'range' , ...
+    'range' , ...
+    'range' , ...
+    'range' , 'Location' , 'northwest');
+
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
@@ -1274,5 +1333,4 @@ end
 %     'Model- 9v: 25-sets mean' , 'Model- 9v: 25-sets minimum' , 'Model- 9v: 25-sets maximum' , ...
 %     'Model- non-9v: 25-sets mean' , 'Model- non-9v: 25-sets minimum' , 'Model- non-9v: 25-sets maximum');
 % grid on;
-
 
