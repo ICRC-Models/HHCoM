@@ -2,7 +2,7 @@
 % Note: "particle" : a set of parameters
 % Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
-function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
+function [] = abc_smc(tstep_abc , date_abc , nSets , username)  %(alpha , p_acc_min)
 t = tstep_abc;
 alpha = 0.4;
 p_acc_min = 0.05;
@@ -14,7 +14,7 @@ t_next = t+1;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 

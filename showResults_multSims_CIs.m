@@ -22,8 +22,9 @@ paramDir = [pwd , '\Params\'];
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -186,7 +187,6 @@ cin1_vax = cc_vax;
 cin1_nonVax = cc_vax;
 hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
-
 
 resultsDir = [pwd , '\HHCoM_Results\'];
 for j = 1 : nRuns
@@ -638,7 +638,7 @@ popYearVec = unique(popAgeDist_dObs(: ,1));
 meanObs = [popAgeDist_dObs(1:16 , 2) , popAgeDist_dObs(17:32 , 2) , popAgeDist_dObs(33:48 , 2)]';
 sdevObs = ([popAgeDist_dObs(1:16 , 3) , popAgeDist_dObs(17:32 , 3) , popAgeDist_dObs(33:48 , 3)]'.^(1/2)).*2;
 
-figure;
+figure('DefaultAxesFontSize' , 18);
 subplot(1,3,1);
 set(gca,'ColorOrderIndex',1)
 calibYrs = [unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , unique(popAgeDist_dObs(: , 1)) , ...
@@ -660,10 +660,11 @@ for a = 1 : 7
     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
     hold all;
 end
-ylim([0.05 0.18]);
+ylim([0.05 0.25]); grid on;
 ylabel('Population proportion by age'); xlabel('Year');
 legend('(Statistics SA) Observed KZN, ages 0-4: mean, 2SD' , 'ages 5-9: mean, 2SD' , 'ages 10-14: mean, 2SD' , 'ages 15-19: mean, 2SD' , 'ages 20-24: mean, 2SD' , 'ages 25-29: mean, 2SD' , 'ages 30-34: mean, 2SD' , ...
-    'Model, ages 0-4: 25-sets mean' , 'ages 0-4: 25-sets minimum' , 'ages 0-4: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 0-4: mean' , 'range' , '...' , 'Location' , 'north'); %'ages 5-9: mean' , 'range' , 'ages 10-14: mean' , 'range' , 'ages 15-19: mean' , 'range' , 'ages 20-24: mean' , 'range' , ...
+     %'ages 25-29: mean' , 'range' , 'ages 30-34: mean' , 'range', 'Location' , 'north');
 
 subplot(1,3,2);
 set(gca,'ColorOrderIndex',1)
@@ -685,11 +686,28 @@ for a = 8 : 14
     set(gca,'ColorOrderIndex',a-7)
     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
     hold all;
+    set(gca,'ColorOrderIndex',a)
+    c = get(p,'Color');
+    x2 = [popYearVec' , fliplr(popYearVec')];
+    inBetween = [max(popProp(: , : , a) , [] , 1) , fliplr(min(popProp(: , : , a) , [] , 1))];
+    h = fill(x2 , inBetween , c);
+    h.FaceColor = c;
+    h.EdgeColor = c;
+    h.FaceAlpha = 0.3;
+    h.LineStyle = 'none';
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-7)
+%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-7)
+%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
 end
-ylim([0.0 0.13]);
-ylabel('Population proportion by age'); xlabel('Year');
+ylim([0.0 0.15]); grid on;
+xlabel('Year'); %ylabel('Population proportion by age'); 
 legend('(Statistics SA) Observed KZN, ages 35-39: mean, 2SD' , 'ages 40-44: mean, 2SD' , 'ages 45-49: mean, 2SD' , 'ages 50-54: mean, 2SD' , 'ages 55-59: mean, 2SD' , 'ages 60-64: mean, 2SD' , 'ages 65-69: mean, 2SD' , ...
-    'Model, ages 35-39: 25-sets mean' , 'ages 35-39: 25-sets minimum' , 'ages 35-39: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 35-39: mean' , 'range' , '...' , 'Location' , 'north'); %'ages 40-44: mean' , 'range' , 'ages 45-49: mean' , 'range' , ...
+    %'ages 50-54: mean' , 'range', 'ages 55-59: mean' , 'range' , 'ages 60-64: mean' , 'range' , 'ages 65-69: mean' , 'range' , 'Location' , 'north');
 
 
 subplot(1,3,3);
@@ -711,11 +729,27 @@ for a = 15 : 16
     set(gca,'ColorOrderIndex',a-14)
     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
     hold all;
+    set(gca,'ColorOrderIndex',a)
+    c = get(p,'Color');
+    x2 = [popYearVec' , fliplr(popYearVec')];
+    inBetween = [max(popProp(: , : , a) , [] , 1) , fliplr(min(popProp(: , : , a) , [] , 1))];
+    h = fill(x2 , inBetween , c);
+    h.FaceColor = c;
+    h.EdgeColor = c;
+    h.FaceAlpha = 0.3;
+    h.LineStyle = 'none';
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-14)
+%     plot(popYearVec , min(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
+%     set(gca,'ColorOrderIndex',a-14)
+%     plot(popYearVec , max(popProp(: , : , a),[],1)' , '--' , 'LineWidth' , 1.5);
+%     hold all;
 end
-ylim([0.0 0.04]);
-ylabel('Population proportion by age'); xlabel('Year'); %title('KZN age distribution in 5-year groups');
+ylim([0.0 0.04]); grid on;
+xlabel('Year'); %title('KZN age distribution in 5-year groups'); ylabel('Population proportion by age'); 
 legend('(Statistics SA) Observed KZN, ages 70-74: mean, 2SD' , 'ages 75-79: mean, 2SD' , ...
-    'Model, ages 70-74: 25-sets mean' , 'ages 70-74: 25-sets minimum' , 'ages 70-74: 25-sets maximum' , '...' , 'Location' , 'north');
+    'Modeled KZN, ages 70-74: mean' , 'range' , '...' , 'Location' , 'north'); %, 'ages 75-79: mean' , 'range' , 'Location' , 'north');
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
 
@@ -1117,73 +1151,6 @@ for g = 1 : gender
         'Model: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum')
 end
 
-%% Background + HIV-associated mortality by gender for ages 15-64 over time vs. (Reniers, 2014) data (validation)
-mortYearVec = [2005 , 2008 , 2011];
-
-% (Reniers, 2014) crude death rate estimates for KZN, ages 15-64
-mortF_hivNeg_val = [3.2 5.3 1.9; ...
-                    3.9 5.9 2.6; ...
-                    4.5 6.7 3.0] .* 100; % [2005, 2008, 2011] (val, upper, lower)
-mortF_hivPos_val = [53.2 64.4 44.0; ...
-                    36.8 43.3 31.3; ...
-                    22.7 27.1 19.1] .* 100;
-mortM_hivNeg_val = [5.5 8.5 3.6; ...
-                    8.1 11.6 5.6;
-                    7.3 11.0 4.9] .* 100; % [2005, 2008, 2011] (val, upper, lower)
-mortM_hivPos_val = [91.3 116.6 71.5; ...
-                    74.0 90.8 60.2; ...
-                    50.2 61.8 40.8] .* 100;
-
-figure;
-subplot(1 , 2 , 1)
-errorbar(mortYearVec , mortM_hivNeg_val(: , 1)' , ...
-    mortM_hivNeg_val(: , 1)' - mortM_hivNeg_val(: , 3)' , ...
-    mortM_hivNeg_val(: , 2)' - mortM_hivNeg_val(: , 1)' , ...
-    'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
-hold all;
-errorbar(mortYearVec , mortM_hivPos_val(: , 1)' , ...
-    mortM_hivPos_val(: , 1)' - mortM_hivPos_val(: , 3)' , ...
-    mortM_hivPos_val(: , 2)' - mortM_hivPos_val(: , 1)' , ...
-    'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
-hold all;
-plot(mortYearVec , mean(squeeze(mortM_hivNeg(: , :)),1)' , 'k-' , ...
-    mortYearVec , min(squeeze(mortM_hivNeg(: , :)),[],1)' , 'k--' , ...
-    mortYearVec , max(squeeze(mortM_hivNeg(: , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
-hold all;
-plot(mortYearVec , mean(squeeze(mortM_hivPos(: , :)),1)' , 'k-' , ...
-    mortYearVec , min(squeeze(mortM_hivPos(: , :)),[],1)' , 'k--' , ...
-    mortYearVec , max(squeeze(mortM_hivPos(: , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
-xlabel('Year'); ylabel('Bkrnd + HIV mortality per 100K'); title('Males aged 15-64'); grid on;
-xlim([2000 2020]); %ylim([0 10]);
-legend('(Reniers, 2014) Observed KZN, HIV-: val, lower lb, upper lb' , ...
-    '(Reniers, 2014) Observed KZN, HIV+: val, lower lb, upper lb' , ...
-    'Model, HIV-: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, HIV+: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
-
-subplot(1 , 2 , 2)
-errorbar(mortYearVec , mortF_hivNeg_val(: , 1)' , ...
-    mortF_hivNeg_val(: , 1)' - mortF_hivNeg_val(: , 3)' , ...
-    mortF_hivNeg_val(: , 2)' - mortF_hivNeg_val(: , 1)' , ...
-    'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
-hold all;
-errorbar(mortYearVec , mortF_hivPos_val(: , 1)' , ...
-    mortF_hivPos_val(: , 1)' - mortF_hivPos_val(: , 3)' , ...
-    mortF_hivPos_val(: , 2)' - mortF_hivPos_val(: , 1)' , ...
-    'cs' , 'LineWidth' , 1.5); % , 'Color' , [0.9290, 0.6940, 0.1250])
-hold all;
-plot(mortYearVec , mean(squeeze(mortF_hivNeg(: , :)),1)' , 'k-' , ...
-    mortYearVec , min(squeeze(mortF_hivNeg(: , :)),[],1)' , 'k--' , ...
-    mortYearVec , max(squeeze(mortF_hivNeg(: , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
-hold all;
-plot(mortYearVec , mean(squeeze(mortF_hivPos(: , :)),1)' , 'k-' , ...
-    mortYearVec , min(squeeze(mortF_hivPos(: , :)),[],1)' , 'k--' , ...
-    mortYearVec , max(squeeze(mortF_hivPos(: , :)),[],1)' , 'k--' , 'LineWidth' , 1.5);
-xlabel('Year'); ylabel('Bkrnd + HIV mortality per 100K'); title('Females aged 15-64'); grid on;
-xlim([2000 2020]); %ylim([0 10]);
-legend('(Reniers, 2014) Observed KZN, HIV-: val, lower lb, upper lb' , ...
-    '(Reniers, 2014) Observed KZN, HIV+: val, lower lb, upper lb' , ...
-    'Model, HIV-: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum' , ...
-    'Model, HIV+: 25-sets mean' , 'Model: 25-sets minimum' , 'Model: 25-sets maximum');
 
 %% Background + HIV-associated mortality for PLWHIV for ages 15-64 over time vs. (Reniers, 2014) data (validation)
 mortYearVec = [2005 , 2008 , 2011];

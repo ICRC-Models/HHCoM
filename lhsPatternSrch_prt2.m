@@ -4,7 +4,7 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn)
+function lhsPatternSrch_prt2(paramSetIdx , tstep , dateIn , username)
 
 %dateIn = '29Aug19';
 %tstep = 0;
@@ -34,7 +34,7 @@ initParams = paramSetMatrix(:,paramSetIdx);
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/carajb' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %% Obtain model output for each set of sampled parameters
