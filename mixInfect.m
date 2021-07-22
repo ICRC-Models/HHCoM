@@ -11,7 +11,8 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     beta_hpvVax_mod , beta_hpvNonVax_mod , vaxInds , nonVInds , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
-    circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
+    circProtect , condProtect , condUse , prepStartYear , prepCoverage , prepProtect , ...
+    betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult, hivSus , toHiv , hivCurr)
 
 %% Initialize dPop and output vectors
@@ -279,7 +280,7 @@ peakYear = 2000;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = zeros(risk, length(yrVec)-1);
 for r = 1 : risk
-condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
+    condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
 end
 condUse = condUseVec(1: risk, 1); % year <= peakYear
 if year < peakYear && year > condStart
@@ -288,23 +289,39 @@ if year < peakYear && year > condStart
 elseif year >= peakYear
     condUse = condUseVec(1:risk, end);
 end
-%%
-% calculate psi vectors for protective factors
-% HIV
-cond_hiv = 1-(condProtect(:,1) .* condUse');
-psi_hiv = zeros(gender, disease, risk); 
-% condom usage and condom protection rates
-for r = 1 : risk
-psi_hiv(:, :, r) = ones(gender,disease) .* cond_hiv(:, r); % condom use only for all disease states
-psi_hiv(:,2, r) = (1 - circProtect(:,1)) .* cond_hiv(:, r);
+
+% find PrEP use according to the present year
+if year >= prepStartYear
+    prepCov = prepCoverage;
+else
+    prepCov = zeros(gender,age,risk,2);
 end
-% condom use + circumcision protection for d=2
+
+% Calculate psi vectors for protective factors
+% Notes: condProtect and circProtect are matrices with dims [gender,2], 
+%   where columns represent HIV protection and HPV protection. 
+%   condUse is a vector with dims [risk,1]
+
+% HIV
+cond_hiv = 1-(condProtect(:,1) .* condUse'); % [gender,risk], condom use coverage and protection rates
+psi_hiv = zeros(gender, disease, age, risk); % initialize psi vector
+for r = 1 : risk
+    psi_hiv(:, :, :, r) = ones(gender, disease, age) .* cond_hiv(:, r); % condom use only for all disease states
+    for a = 1 : age
+        prep_hiv = 1- ...
+            (prepCov(:,a,r,1).*prepProtect(:,a,r,1) + prepCov(:,a,r,2).*prepProtect(:,a,r,2)); 
+            % [gender,age,risk], PrEP coverage and protection rates for partial use (4th dim=1) and fully efficacious use (4th dim=2)
+        psi_hiv(:, 1, a, r) = prep_hiv(:,1) .* cond_hiv(:, r); % replace with condom use + PrEP protection for d=1
+        psi_hiv(:, 2, a, r) = prep_hiv(:,1) .* (1 - circProtect(:, 1)) .* cond_hiv(:, r); % replace with condom use + PrEP + circumcision protection for d=2
+    end
+end
+
 %HPV
 cond_hpv = 1-(condProtect(:,2) * condUse'); % condom usage and condom protection rates
-psi_hpv = zeros(gender, disease, risk);
+psi_hpv = zeros(gender, disease, risk); % initialize psi vector
 for r = 1 : risk
-psi_hpv(:, :, r) = ones(gender,disease) .* cond_hpv(:, r);
-psi_hpv(:,2, r) = (1 - circProtect(:,2)) .* cond_hpv(:, r);
+    psi_hpv(:, :, r) = ones(gender,disease) .* cond_hpv(:, r); % condom use only for all disease states
+    psi_hpv(:,2, r) = (1 - circProtect(:,2)) .* cond_hpv(:, r); % condom use + circumcision protection for d=2
 end
 
 %% HPV Infection
@@ -531,9 +548,9 @@ for h = 1 : hpvVaxStates
 
                             % Calculate infections
                             mInfected = min(lambdaMultM .* lambda(1 , a , r)...
-                                .* psi_hiv(1,d,r) , 0.999) .* pop(mSus); % infected males
+                                .* psi_hiv(1,d,a,r) , 0.999) .* pop(mSus); % infected males
                             fInfected = min(lambdaMultF .* lambda(2 , a , r)...
-                                .* psi_hiv(2,d,r) , 0.999) .* pop(fSus); % infected females
+                                .* psi_hiv(2,d,a,r) , 0.999) .* pop(fSus); % infected females
 
                             % HIV incidence tracker
                             newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);

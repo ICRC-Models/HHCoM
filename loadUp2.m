@@ -15,6 +15,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
+    prepStartYear , prepCoverage , prepProtect , ...
     hivStartYear , circStartYear ,circNatStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
     circProtect , condProtect , MTCTRate , hyst , OMEGA , ...
     ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , cin1_dist_dObs , ...
@@ -560,26 +561,6 @@ for a = 1 : length(ageTrends)
     kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
 end
 
-%% %% Save intervention parameters
-
-%Import from Excel HIV intervention parameters
-% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-% circProtect = xlsread(file , 'Protection' , 'B18');
-% condProtect = xlsread(file , 'Protection' , 'B19');
-% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
-%     'condProtect' , 'MTCTRate' , 'artVScov');
-
-% Load pre-saved HIV intervention parameters
-load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
-
-circProtect = 0.55;
-% Protection from circumcision and condoms
-circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
-condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
-
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
 
@@ -750,7 +731,49 @@ else
     artHpvMult = 1.0;
 end
 
-%%
+%% Save intervention parameters
+
+%Import from Excel HIV intervention parameters
+% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+% circProtect = xlsread(file , 'Protection' , 'B18');
+% condProtect = xlsread(file , 'Protection' , 'B19');
+% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
+%     'condProtect' , 'MTCTRate' , 'artVScov');
+
+file = [pwd , '/Config/PrEP_parameters_Kenya.xlsx'];
+prepProtect(1,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by partial PrEP use
+prepProtect(2,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by partial PrEP use
+prepProtect(1,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by full PrEP use
+prepProtect(2,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by full PrEP use
+prepCoverage(1,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with partial PrEP use
+prepCoverage(2,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with partial PrEP use
+prepCoverage(1,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with full PrEP use
+prepCoverage(2,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with full PrEP use
+save(fullfile(paramDir ,'prepParamsFrmExcel'), 'prepProtect' , 'prepCoverage');
+
+% Load pre-saved HIV intervention parameters
+load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+load([paramDir , 'prepParamsFrmExcel'] , 'prepProtect' , 'prepCoverage');
+
+% Intervention start years
+hivStartYear = 1978;
+circStartYear = 1960;
+circNatStartYear = 2008;
+prepStartYear = currYear;
+vaxStartYear = 2021;
+
+% save to hand calibration params file for documentation (set in mixInfect.m)
+condStart = 1995;
+peakYear = 2000;
+
+circProtect = 0.55;
+% Protection from circumcision and condoms
+circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
+condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
+
 % Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
@@ -762,10 +785,6 @@ else
         condUse = .05; %changed from 20%
     end
 end
-
-% save to hand calibration params file for documentation
-condStart = 1995;
-peakYear = 2000;
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
@@ -791,11 +810,6 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
         artYr(i) : timeStep : artYr(i + 1));
 end
 
-% Intervention start years
-hivStartYear = 1978;
-circStartYear = 1960;
-circNatStartYear = 2008;
-vaxStartYear = 2021;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
