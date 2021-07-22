@@ -81,38 +81,38 @@ annlz = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear));
 
 % % Import from Excel initial population size, male risk distribution, 
 % % background mortality, fertility, partnerships, and acts per partnership
-% file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
-% popInit = xlsread(file , 'Population' , 'B169:C184'); 
-% popInit = popInit .* 1000; 
-% riskDistM = xlsread(file , 'Sexual behavior' , 'F259:H274');
-% riskDistF = xlsread(file , 'Sexual behavior' , 'C259:E274');
-% mue = zeros(age , gender);
-% mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
-% mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
-% mue2 = zeros(age , gender);
-% mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
-% mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
-% mue2(1, :) = mue2(1, :) .* 2;
-% mue2(7:16, :) = mue2(7:16, :) .* .92;
-% mue3 = zeros(age , gender) ;
-% mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
-% mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
-% mue3(1, :)= mue3(1 , :) .* 2 ;
-% mue3(7:16, :) = mue3(7:16, :) .* .92;
-% mue4 = zeros(age , gender);
-% mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % post 2020
-% mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-% mue4(1, :)= mue4(1 , :) .* 2;
-% mue5(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % to 2070
-% mue5(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
-% fertility = xlsread(file , 'Fertility' , 'D104:I119');
-% %fertility =fertility ;
-% partnersM = xlsread(file , 'Sexual behavior' , 'C279:E294');
-% partnersF = xlsread(file , 'Sexual behavior' , 'F279:H294');
-% maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
-% femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
-% save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , 'riskDistF', ...
-%     'mue' , 'mue2' , 'mue3' , 'mue4' , 'mue5', 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
+file = [pwd , '/Config/Nyanza_parameters.xlsx'];
+popInit = xlsread(file , 'Population' , 'B169:C184');  
+popInit = popInit .* 1000; 
+riskDistM = xlsread(file , 'Sexual behavior' , 'F54:H69');
+riskDistF = xlsread(file , 'Sexual behavior' , 'C54:E69');
+mue = zeros(age , gender);
+mue(: , 1) = xlsread(file , 'Mortality' , 'C94:C109'); %1950
+mue(: , 2) = xlsread(file , 'Mortality' , 'D94:D109');
+mue2 = zeros(age , gender);
+mue2(: , 1) = xlsread(file , 'Mortality' , 'G94:G109'); %1985
+mue2(: , 2) = xlsread(file , 'Mortality' , 'H94:H109');
+mue2(1, :) = mue2(1, :) .* 2;
+mue2(7:16, :) = mue2(7:16, :) .* .92;
+mue3 = zeros(age , gender) ;
+mue3(: , 1) = xlsread(file , 'Mortality' , 'K94:K109'); % 2000
+mue3(: , 2) = xlsread(file , 'Mortality' , 'L94:L109');
+mue3(1, :)= mue3(1 , :) .* 2 ;
+mue3(7:16, :) = mue3(7:16, :) .* .92;
+mue4 = zeros(age , gender);
+mue4(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % post 2020
+mue4(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
+mue4(1, :)= mue4(1 , :) .* 2;
+mue5(: , 1) = xlsread(file , 'Mortality' , 'O94:O109'); % to 2070
+mue5(: , 2) = xlsread(file , 'Mortality' , 'P94:P109');
+fertility = xlsread(file , 'Fertility' , 'D104:I119');
+%fertility =fertility ;
+partnersM = xlsread(file , 'Sexual behavior' , 'O54:Q69');
+partnersF = xlsread(file , 'Sexual behavior' ,  'L54:N69');
+maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
+femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
+save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , 'riskDistF', ...
+    'mue' , 'mue2' , 'mue3' , 'mue4' , 'mue5', 'fertility' , 'partnersM' ,  'partnersF' , 'maleActs' , 'femaleActs');
 
 % Load pre-saved initial population size by age and gender, male risk distribution by age, 
 % background mortality by age and gender, and fertility by age and gender
@@ -277,7 +277,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.1; 0.2; 0.3; 0.2; 0.1; 0.1];
+    epsA = [0.1; 0.2; 0.3; 0.2; 0.2; 0.2];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -389,7 +389,7 @@ if calibBool && any(38 == pIdx);
     idx = find(38 == pIdx);
     hiv_hpvMult = paramSet(paramsSub{idx}.inds(:));
 else
-    hiv_hpvMult = 1.9; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
+    hiv_hpvMult = 1; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 end
 
 %% Import HPV/CIN/CC transition data from Excel

@@ -33,8 +33,8 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
- %pathModifier = 'toNow_determMod_final_artDiscontFix';
+%pathModifier = ['toNow_' , date , '_stochMod_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , 'Nyanza_0' ];
  %pathModifier = 'toNow_determMod_popFertFix';
 
 % AGE GROUPS
