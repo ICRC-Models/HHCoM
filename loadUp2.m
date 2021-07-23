@@ -15,6 +15,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
+    prepStartYear , prepCoverage , prepProtect , ...
     hivStartYear , circStartYear ,circNatStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
     circProtect , condProtect , MTCTRate , hyst , OMEGA , ...
     ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , cin1_dist_dObs , ...
@@ -48,7 +49,7 @@ paramDir = [pwd , '/Params/'];
 % Time
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
-startYear = 1925;
+startYear = 1960;
 currYear = 2020;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
@@ -109,6 +110,7 @@ fertility = xlsread(file , 'Fertility' , 'D104:I119');
 %fertility =fertility ;
 partnersM = xlsread(file , 'Sexual behavior' , 'O54:Q69');
 partnersF = xlsread(file , 'Sexual behavior' ,  'L54:N69');
+partnersF(:, 2:3) = partnersM(:, 2:3);
 maleActs = xlsread(file , 'Sexual behavior' , 'D168:F183');
 femaleActs = xlsread(file , 'Sexual behavior' , 'D188:F203');
 save(fullfile(paramDir ,'demoParamsFrmExcel'), 'popInit' , 'riskDistM' , 'riskDistF', ...
@@ -277,7 +279,7 @@ if calibBool && any(6 == pIdx);
     %epsA = paramSet(paramsSub{idx}.inds(:));
     epsA = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsA = [0.1; 0.2; 0.3; 0.2; 0.2; 0.2];
+    epsA = [0.3; 0.3; 0.3];
 end
 % Mixing by risk group
 if calibBool && any(7 == pIdx);
@@ -285,10 +287,10 @@ if calibBool && any(7 == pIdx);
     %epsR = paramSet(paramsSub{idx}.inds(:));
     epsR = ones(3,1).*paramSet(paramsSub{idx}.inds(:));
 else
-    epsR = [0.3; 0.4; 0.4; 0.3; 0.3; 0.3];
+    epsR = [0.3; 0.3; 0.3];
 end
 %%
-yr = [1975; 1980; 1985; 1988; 1995; 2000];
+yr = [1980; 1990; 2000];
 %%
 % epsA_vec = cell(size(yr , 1) - 1, 1); % save data over time interval in a cell array
 % epsR_vec = cell(size(yr , 1) - 1, 1);
@@ -343,7 +345,7 @@ if calibBool && any(35 == pIdx);
     idx = find(35 == pIdx);
     baseVagTrans = paramSet(paramsSub{idx}.inds(:));
 else
-    baseVagTrans = [0.00099]; % Gray, 2001; Lancet: 0.0011 (95% CI 0.0008-0.0015);
+    baseVagTrans = [0.0011]; % Gray, 2001; Lancet: 0.0011 (95% CI 0.0008-0.0015);
 end
 
 % HIV tranmission rate % make HIV M-> F trans the smae 
@@ -560,26 +562,6 @@ for a = 1 : length(ageTrends)
     kCin2_Cin3(a + 5 , 2) = kCin2_Cin3(1 , 2) * ageTrends(a,8) * mult;
 end
 
-%% %% Save intervention parameters
-
-%Import from Excel HIV intervention parameters
-% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-% circProtect = xlsread(file , 'Protection' , 'B18');
-% condProtect = xlsread(file , 'Protection' , 'B19');
-% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
-%     'condProtect' , 'MTCTRate' , 'artVScov');
-
-% Load pre-saved HIV intervention parameters
-load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
-
-circProtect = 0.55;
-% Protection from circumcision and condoms
-circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
-condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
-
 %% Save HPV natural history parameters
 hpvOn = 1; % bool to turn HPV on or off although model not set up for HPV to be off
 
@@ -750,8 +732,50 @@ else
     artHpvMult = 1.0;
 end
 
-%%
-% Condom use
+%% Save intervention parameters
+
+%Import from Excel HIV intervention parameters
+% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+% circProtect = xlsread(file , 'Protection' , 'B18');
+% condProtect = xlsread(file , 'Protection' , 'B19');
+% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
+%     'condProtect' , 'MTCTRate' , 'artVScov');
+
+file = [pwd , '/Config/PrEP_parameters_Kenya.xlsx'];
+prepProtect(1,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by partial PrEP use
+prepProtect(2,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by partial PrEP use
+prepProtect(1,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by full PrEP use
+prepProtect(2,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by full PrEP use
+prepCoverage(1,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with partial PrEP use
+prepCoverage(2,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with partial PrEP use
+prepCoverage(1,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with full PrEP use
+prepCoverage(2,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with full PrEP use
+save(fullfile(paramDir ,'prepParamsFrmExcel'), 'prepProtect' , 'prepCoverage');
+
+% Load pre-saved HIV intervention parameters
+load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+load([paramDir , 'prepParamsFrmExcel'] , 'prepProtect' , 'prepCoverage');
+
+% Intervention start years
+hivStartYear = 1978;
+circStartYear = 1960;
+circNatStartYear = 2008;
+prepStartYear = currYear;
+vaxStartYear = 2021;
+
+% save to hand calibration params file for documentation (set in mixInfect.m)
+condStart = 1995;
+peakYear = 2000;
+
+circProtect = 0.55;
+% Protection from circumcision and condoms
+circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
+condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
+
+%% Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
@@ -762,10 +786,6 @@ else
         condUse = .05; %changed from 20%
     end
 end
-
-% save to hand calibration params file for documentation
-condStart = 1995;
-peakYear = 2000;
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
@@ -791,11 +811,6 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
         artYr(i) : timeStep : artYr(i + 1));
 end
 
-% Intervention start years
-hivStartYear = 1978;
-circStartYear = 1960;
-circNatStartYear = 2008;
-vaxStartYear = 2021;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -1496,7 +1511,7 @@ dFertMat3 = (fertMat4 - fertMat3) ./ ((2050 - 2020) * stepsPerYear);
 % 
 % d_partnersMmult(2, 1:5) =-logspace(log10(1.2), log10(0.25), 5);
 
-ptMult = [1 1.20 1 1 1 1];
+ptMult = [1 1 1 1 1 1];
 
 d_partnersMmult = ones(6, 30);
 d_partnersMmult(1, 1:18) = linspace(1, ptMult(1), 3 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
@@ -1607,12 +1622,10 @@ dDeathMat4 = (deathMat5 - deathMat4) ./ ((2070 - 2020) * stepsPerYear);
 dMue = (mue4 - mue3) ./ ((2020 - 2000) * stepsPerYear);
 
 %% Save hand calibration params 
-% pathModifier = 'toNow_toNow_determMod_final';
-% 
-% popInAge = [0.0002; 0.005; 0.006; 0.0002];
-% 
-% save(fullfile(paramDir , pathModifier), 'fertDeclineProp' , 'epsA' , 'epsR' , ...
-%     'baseVagTrans' , 'hiv_hpvMult' , 'circProtect' , 'condProtect' ,'perPartnerHpv_vax', ...
-%     'perPartnerHpv_nonV' , 'condUse' , 'condStart', 'peakYear', 'ptMult', 'ptMultYrs', 'riskAdj', 'riskAdjYrs', 'popInAge' )
+pathModifier = 'toNow_Nyanza';
+
+save(fullfile(paramDir , pathModifier), 'fertDeclineProp' , 'epsA' , 'epsR' , ...
+    'baseVagTrans' , 'hiv_hpvMult' , 'circProtect' , 'condProtect' ,'perPartnerHpv_vax', ...
+    'perPartnerHpv_nonV' , 'condUse' , 'condStart', 'peakYear', 'ptMult', 'ptMultYrs', 'riskAdj', 'riskAdjYrs' )
 
 toc

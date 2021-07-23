@@ -19,6 +19,7 @@ paramDir = [pwd , '\Params\'];
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
+    prepStartYear , prepCoverage , prepProtect , ...
     hivStartYear , circStartYear ,circNatStartYear , vaxStartYear , baseline , cisnet , who , whob , ...
     circProtect , condProtect , MTCTRate , hyst , OMEGA , ...
     ccInc2012_dObs , cc_dist_dObs , cin3_dist_dObs , cin1_dist_dObs , ...
@@ -97,113 +98,113 @@ screenMonthlyTimespan = [2020 : (1/6) : lastYear];
 screenMonthlyTimespan = screenMonthlyTimespan(1 : end-1);
 
 % Total population size
-popSize = zeros(length(fileKey), nRuns , gender, length(monthlyTimespan));
-popSizeAgeF = zeros(length(fileKey),nRuns , 5 , age , length(monthlyTimespan));
-% Population age distribution
-popPropF = zeros(length(fileKey),nRuns , length(popYearVec) , age);
-popPropBroadC = zeros(length(fileKey),nRuns , length(popYearVec) , ageVecLength_cPopDist);
-% Female risk distribution
-popRiskDistF = zeros(length(fileKey),nRuns , risk , length(monthlyTimespan));
-popRiskDistHivF = popRiskDistF;
-popRiskDistCinF = popRiskDistF;
-% Risk distribution by HIV status and gender
-popRiskDistHivProp = zeros(length(fileKey),nRuns , risk , gender , length(monthlyTimespan));
+% popSize = zeros(length(fileKey), nRuns , gender, length(monthlyTimespan));
+% popSizeAgeF = zeros(length(fileKey),nRuns , 5 , age , length(monthlyTimespan));
+% % Population age distribution
+% popPropF = zeros(length(fileKey),nRuns , length(popYearVec) , age);
+% popPropBroadC = zeros(length(fileKey),nRuns , length(popYearVec) , ageVecLength_cPopDist);
+% % Female risk distribution
+% popRiskDistF = zeros(length(fileKey),nRuns , risk , length(monthlyTimespan));
+% popRiskDistHivF = popRiskDistF;
+% popRiskDistCinF = popRiskDistF;
+% % Risk distribution by HIV status and gender
+% popRiskDistHivProp = zeros(length(fileKey),nRuns , risk , gender , length(monthlyTimespan));
 % 
-% HIV prevalence
-hivAgeM = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
-hivAgeF = hivAgeM;
-hivPrevGen = zeros(length(fileKey),nRuns , gender , length(monthlyTimespan));
-hivPrev = zeros(length(fileKey), nRuns, length(monthlyTimespan));
-hivPrevRiskF = zeros(length(fileKey),nRuns , risk , length(monthlyTimespan));
-% HIV deaths
-hivDeathsM = zeros(length(fileKey),nRuns , length(annualTimespan));
-hivDeathsF = hivDeathsM;
-hivInc = zeros(length(fileKey), nRuns, gender, length(annualTimespan));
-hivIncAgeM = zeros(length(fileKey), nRuns, age, length(annualTimespan));
-hivIncAgeF = hivIncAgeM;
-hivIncRiskF = zeros(length(fileKey), nRuns, risk, length(annualTimespan));
-hivCumCasesF = zeros(length(fileKey), nRuns, age , risk , length(annualTimespan));
-hivCumCasesM = hivCumCasesF;
-% ART coverage
-artCovM = zeros(length(fileKey),nRuns , length(monthlyTimespan));
-artCovF = artCovM;
-artCovAge = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
+% % HIV prevalence
+% hivAgeM = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
+% hivAgeF = hivAgeM;
+% hivPrevGen = zeros(length(fileKey),nRuns , gender , length(monthlyTimespan));
+% hivPrev = zeros(length(fileKey), nRuns, length(monthlyTimespan));
+% hivPrevRiskF = zeros(length(fileKey),nRuns , risk , length(monthlyTimespan));
+% % HIV deaths
+% hivDeathsM = zeros(length(fileKey),nRuns , length(annualTimespan));
+% hivDeathsF = hivDeathsM;
+% hivInc = zeros(length(fileKey), nRuns, gender, length(annualTimespan));
+% hivIncAgeM = zeros(length(fileKey), nRuns, age, length(annualTimespan));
+% hivIncAgeF = hivIncAgeM;
+% hivIncRiskF = zeros(length(fileKey), nRuns, risk, length(annualTimespan));
+% hivCumCasesF = zeros(length(fileKey), nRuns, age , risk , length(annualTimespan));
+% hivCumCasesM = hivCumCasesF;
+% % ART coverage
+% artCovM = zeros(length(fileKey),nRuns , length(monthlyTimespan));
+% artCovF = artCovM;
+% artCovAge = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
 
-% % Female HPV prevalence
-hpv_hiv = zeros(length(fileKey),nRuns , age , hpvYearVecLength);
-hpv_hivNeg = hpv_hiv;
-hpv_hivTot = zeros(length(fileKey),nRuns , age , 1);
-hpv_hiv_risk = zeros(length(fileKey),nRuns , length(ageVec_fHPV) );
-hpv_hivNeg_risk = hpv_hiv_risk;
-hpv_hivTot2020 = zeros(length(fileKey),nRuns , diseaseVecLength_fHpv , length(ageVec_fHPV2));
-% Male HPV prevalence
-hpv_hivM = zeros(length(fileKey),nRuns , 4 , 2);
-hpv_hivMNeg = hpv_hivM;
-hpv_hivMtot = hpv_hivM;
+% % % Female HPV prevalence
+% hpv_hiv = zeros(length(fileKey),nRuns , age , hpvYearVecLength);
+% hpv_hivNeg = hpv_hiv;
+% hpv_hivTot = zeros(length(fileKey),nRuns , age , 1);
+% hpv_hiv_risk = zeros(length(fileKey),nRuns , length(ageVec_fHPV) );
+% hpv_hivNeg_risk = hpv_hiv_risk;
+% hpv_hivTot2020 = zeros(length(fileKey),nRuns , diseaseVecLength_fHpv , length(ageVec_fHPV2));
+% % Male HPV prevalence
+% hpv_hivM = zeros(length(fileKey),nRuns , 4 , 2);
+% hpv_hivMNeg = hpv_hivM;
+% hpv_hivMtot = hpv_hivM;
 
-% HPV prevalence over time
-hpv_hivTimeF = zeros(length(fileKey),nRuns , length(monthlyTimespan));
-hpv_hivNegTimeF = hpv_hivTimeF;
-hpv_time = zeros(length(fileKey),nRuns , 2 , length(monthlyTimespan));
-% HPV incidence
-hpvIncTime = zeros(length(fileKey),nRuns , length(annualTimespan));
-hpvIncTimeNeg = hpvIncTime;
-hpvIncTimePos = hpvIncTime;
-hpvIncTimeArt = hpvIncTime;
-hpvIncTimePosAll = hpvIncTime;
-hpvIncHivRiskAgeTime = zeros(length(fileKey),nRuns , 5 , risk , age , length(annualTimespan));
-% CIN2/3 prevalence
-cinPosAge = zeros(length(fileKey),nRuns , 3);
-cinNegAge = cinPosAge;
-% cinGenAge = cinPosAge;
-cin1Age = zeros(length(fileKey),nRuns , length(4:13));
-cin3Age = cin1Age;
-cin_hivTot2020 = zeros(length(fileKey),nRuns , diseaseVecLength_fHpv , ageVecLength_fHPV);
-% CC incidence
-ccIncAge_all = zeros(length(fileKey),nRuns , 3 , age);
-ccIncAge_pos = ccIncAge_all;
-ccIncAge_neg = ccIncAge_all;
-ccIncAge_art = ccIncAge_all;
-ccIncTime = zeros(length(fileKey),nRuns , length(annualTimespan));
-ccIncTimeNeg = ccIncTime;
-ccIncTimePos = ccIncTime;
-ccIncTimeArt = ccIncTime;
-ccIncTimePosAll = ccIncTime;
-ccIncHivAgeTime = zeros(length(fileKey),nRuns , 5 , age , length(annualTimespan));
-ccCumHivAgeTime = zeros(length(fileKey),nRuns , 5 , age , length(annualTimespan));
+% % HPV prevalence over time
+% hpv_hivTimeF = zeros(length(fileKey),nRuns , length(monthlyTimespan));
+% hpv_hivNegTimeF = hpv_hivTimeF;
+% hpv_time = zeros(length(fileKey),nRuns , 2 , length(monthlyTimespan));
+% % HPV incidence
+% hpvIncTime = zeros(length(fileKey),nRuns , length(annualTimespan));
+% hpvIncTimeNeg = hpvIncTime;
+% hpvIncTimePos = hpvIncTime;
+% hpvIncTimeArt = hpvIncTime;
+% hpvIncTimePosAll = hpvIncTime;
+% hpvIncHivRiskAgeTime = zeros(length(fileKey),nRuns , 5 , risk , age , length(annualTimespan));
+% % CIN2/3 prevalence
+% cinPosAge = zeros(length(fileKey),nRuns , 3);
+% cinNegAge = cinPosAge;
+% % cinGenAge = cinPosAge;
+% cin1Age = zeros(length(fileKey),nRuns , length(4:13));
+% cin3Age = cin1Age;
+% cin_hivTot2020 = zeros(length(fileKey),nRuns , diseaseVecLength_fHpv , ageVecLength_fHPV);
+% % CC incidence
+% ccIncAge_all = zeros(length(fileKey),nRuns , 3 , age);
+% ccIncAge_pos = ccIncAge_all;
+% ccIncAge_neg = ccIncAge_all;
+% ccIncAge_art = ccIncAge_all;
+% ccIncTime = zeros(length(fileKey),nRuns , length(annualTimespan));
+% ccIncTimeNeg = ccIncTime;
+% ccIncTimePos = ccIncTime;
+% ccIncTimeArt = ccIncTime;
+% ccIncTimePosAll = ccIncTime;
+% ccIncHivAgeTime = zeros(length(fileKey),nRuns , 5 , age , length(annualTimespan));
+% ccCumHivAgeTime = zeros(length(fileKey),nRuns , 5 , age , length(annualTimespan));
 
 segi = [0.1212 0.1010 0.0909 0.0909 0.0808 0.0808 0.0606 ...
     0.0606 0.0606 0.0606 0.0505 0.0404 0.0404 0.0303 0.0202 0.0101];
 who = [0.0886 0.0869 0.086 0.0847  0.0822 0.0793 0.0761 0.0715 0.0659 ...
     0.0604 0.0537 0.0455 0.0372 0.0296 0.0221 0.0152];
-ccIncStd = zeros(length(fileKey),nRuns , length(diseaseVec_ccInc), length(annualTimespan));
-ccIncStd_who = ccIncStd;
-% Prevalence ratios
-hpv_prev_ratios = zeros(length(fileKey),nRuns , gender , 4 , 2);
-cin_prev_ratios = zeros(length(fileKey),nRuns , 4 , 2);
-cc_prev_ratios = zeros(length(fileKey),nRuns , 4 , 2);
-cc_inc_ratios = zeros(length(fileKey),nRuns , 4 , 2);
-% HPV/CIN/CC type distribution
-
-cc_vax = zeros(length(fileKey),nRuns , 4 , length(monthlyTimespan));
-cc_nonVax = cc_vax;
-cin23_vax = cc_vax;
-cin23_nonVax = cc_vax;
-cin3_vax = cc_vax;
-cin3_nonVax = cc_vax;
-cin2_vax = cc_vax;
-cin2_nonVax = cc_vax;
-cin1_vax = cc_vax;
-cin1_nonVax = cc_vax;
-hpv_vax = cc_vax;
-hpv_nonVax = cc_vax;
-% HPV vaccination and screening
-% % newScreenTime = zeros(length(fileKey),nRuns , length(screenAnnualTimespan));
-% % screenCovTime = zeros(length(fileKey),nRuns , length(screenMonthlyTimespan));
-% % screenTotAnnual = zeros(length(fileKey),nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
-vaxCoverage = zeros(length(fileKey),nRuns , length(monthlyTimespan));
-vaxCoverageAge = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
-vaxTotAge = zeros(length(fileKey),nRuns , age , 5 , length(monthlyTimespan));
+% ccIncStd = zeros(length(fileKey),nRuns , length(diseaseVec_ccInc), length(annualTimespan));
+% ccIncStd_who = ccIncStd;
+% % Prevalence ratios
+% hpv_prev_ratios = zeros(length(fileKey),nRuns , gender , 4 , 2);
+% cin_prev_ratios = zeros(length(fileKey),nRuns , 4 , 2);
+% cc_prev_ratios = zeros(length(fileKey),nRuns , 4 , 2);
+% cc_inc_ratios = zeros(length(fileKey),nRuns , 4 , 2);
+% % HPV/CIN/CC type distribution
+% 
+% cc_vax = zeros(length(fileKey),nRuns , 4 , length(monthlyTimespan));
+% cc_nonVax = cc_vax;
+% cin23_vax = cc_vax;
+% cin23_nonVax = cc_vax;
+% cin3_vax = cc_vax;
+% cin3_nonVax = cc_vax;
+% cin2_vax = cc_vax;
+% cin2_nonVax = cc_vax;
+% cin1_vax = cc_vax;
+% cin1_nonVax = cc_vax;
+% hpv_vax = cc_vax;
+% hpv_nonVax = cc_vax;
+% % HPV vaccination and screening
+% % % newScreenTime = zeros(length(fileKey),nRuns , length(screenAnnualTimespan));
+% % % screenCovTime = zeros(length(fileKey),nRuns , length(screenMonthlyTimespan));
+% % % screenTotAnnual = zeros(length(fileKey),nRuns , 5 , length([(1925+(3/stepsPerYear)) : ((lastYear-1)+(3/stepsPerYear))]));
+% vaxCoverage = zeros(length(fileKey),nRuns , length(monthlyTimespan));
+% vaxCoverageAge = zeros(length(fileKey),nRuns , age , length(monthlyTimespan));
+% vaxTotAge = zeros(length(fileKey),nRuns , age , 5 , length(monthlyTimespan));
 
 resultsDir = ['C:\HPV-HIVacq_model_9v'];
 
@@ -211,7 +212,7 @@ resultsDir = ['C:\HPV-HIVacq_model_9v'];
 % baseFileName = ['14DEC20_stochMod_'];
 loopSegments = (0 : round(nRuns/5) : nRuns);
 loopSegmentsLength = length(loopSegments);
-for z = 1:7
+for z = 6:7
     pathModifier = ['\Vaccine15Jan_stochMod9v_' , fileKey{z}]; % ***SET ME***: name of the folder containing futureSim results
 for k = 1 : loopSegmentsLength-1
     parfor j = loopSegments(k)+1 : loopSegments(k+1)
@@ -1649,7 +1650,7 @@ end
 % Annual number of new CC cases
 pct_ccCases_all = zeros(3, 146);
 for z = 1 : length(fileKey)
-   pct_ccCases_all = prctile(squeeze(sum(ccCumHivAgeTime(z, :, 1, :, :), 4)), [25 50 75], 1); 
+   pct_ccCases_all = prctile(squeeze(sum(ccCumHivAgeTime(z, :, 2, :, :), 4)), [25 50 75], 1); 
    CCtable5 = array2table([annualTimespan' pct_ccCases_all']); 
    CCtable5.Properties.VariableNames(1:size(CCtable5, 2)) = {'Year', [fileKey{z}, '_P25_ccCases_all'], ...
        [fileKey{z}, '_Med_ccCases_all'], [fileKey{z}, '_P75_ccCases_all'] };

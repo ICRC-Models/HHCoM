@@ -11,7 +11,8 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     beta_hpvVax_mod , beta_hpvNonVax_mod , vaxInds , nonVInds , ...
     lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
-    circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
+    circProtect , condProtect , condUse , prepStartYear , prepCoverage , prepProtect , ...
+    betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult, hivSus , toHiv , hivCurr)
 
 %% Initialize dPop and output vectors
@@ -25,6 +26,7 @@ newHiv = zeros(hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk)
 %% Find epsAge and epsRisk according to the present year (extent of assortative mixing) 
 % Random mixing (epsilon = 1), mixing proportional to relative sizes of all compartments
 % Assortative mixing (epsilon = 0), mixing among groups similar by age/risk
+
 dataYr1 = yr(1);
 dataYrLast = yr(size(yr , 1));
 baseYrInd = max(find(year >= yr , 1, 'last') , 1); % get index of first year <= current year
@@ -32,27 +34,16 @@ baseYr = yr(baseYrInd);
 if year <= dataYr1 % assortativity in 1st year
     epsA = epsA_vec{1}(1);
     epsR = epsR_vec{1}(1);
-elseif (year < yr(2)) && (year > dataYr1) % assortativity between 1st and last year
-    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-elseif (year < yr(3)) && (year >= yr(2)) % assortativity between 1st and last year
-    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-elseif (year < yr(4)) && (year >= yr(3)) % assortativity between 1st and last year
-    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
- elseif (year < yr(5)) && (year >= yr(4)) % assortativity between 1st and last year
-    epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-    epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
-elseif (year < dataYrLast) && (year >= yr(5)) % assortativity between 1st and last year
+elseif (year < dataYrLast) && (year > dataYr1) % assortativity between 1st and last year
     epsA = epsA_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
     epsR = epsR_vec{baseYrInd}(round((year - baseYr) * stepsPerYear) + 1);
 elseif year >= dataYrLast % assortativity in last year and after
-    lastIndA = size(epsA_vec , 2);
-    lastIndR = size(epsR_vec , 2);
+    lastIndA = size(epsA_vec , 1);
+    lastIndR = size(epsR_vec , 1);
     epsA = epsA_vec{lastIndA}(size(epsA_vec{lastIndA} , 2));
     epsR = epsR_vec{lastIndR}(size(epsR_vec{lastIndR} , 2));
 end
+
 %%
 if fivYrAgeGrpsOn
     %% Assign deltaR and deltaA (nature of assortative mixing by age and gender; Kronecker delta)
@@ -131,29 +122,29 @@ end
 %    yearInd = round((year - (1988 - (1/6))) * 6);
 %    partnersMmult = d_partnersMmult(yearInd);
 % end
-
-if (year >= 1975) && (year < 1978)
-    yearInd = round((year - (1975 - (1/6))) * 6);
-    partnersMmult(1) = d_partnersMmult(1, yearInd);
-    partnersMmult(2) = d_partnersMmult(2, yearInd);
-    partnersMmult(3) = d_partnersMmult(3, yearInd);
-elseif (year >= 1978) && (year < 1985)
-    partnersMmult(1) = d_partnersMmult(1, 18);
-    partnersMmult(2) = d_partnersMmult(2, 18);
-    partnersMmult(3) = d_partnersMmult(3, 18);
-elseif (year >= 1985) && (year < 1990)
-    yearInd2 = round((year - (1985 - (1/6))) * 6);
-    partnersMmult(1) = d_partnersMmult(4, yearInd2);
-    partnersMmult(2) = d_partnersMmult(5, yearInd2);
-    partnersMmult(3) = d_partnersMmult(6, yearInd2);
-end
-% partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
-% partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
-
-partnersM(4:6, 1:3) = partnersM(4:6, 1:3) .* partnersMmult(1);
-partnersF(4:6, 1:3) = partnersF(4:6, 1:3) .* partnersMmult(1);
-partnersM(7:10, 1:3) = partnersM(7:10, 1:3) .* partnersMmult(2);
-partnersF(7:10, 1:3) = partnersF(7:10, 1:3) .* partnersMmult(3);
+% 
+% if (year >= 1975) && (year < 1978)
+%     yearInd = round((year - (1975 - (1/6))) * 6);
+%     partnersMmult(1) = d_partnersMmult(1, yearInd);
+%     partnersMmult(2) = d_partnersMmult(2, yearInd);
+%     partnersMmult(3) = d_partnersMmult(3, yearInd);
+% elseif (year >= 1978) && (year < 1985)
+%     partnersMmult(1) = d_partnersMmult(1, 18);
+%     partnersMmult(2) = d_partnersMmult(2, 18);
+%     partnersMmult(3) = d_partnersMmult(3, 18);
+% elseif (year >= 1985) && (year < 1990)
+%     yearInd2 = round((year - (1985 - (1/6))) * 6);
+%     partnersMmult(1) = d_partnersMmult(4, yearInd2);
+%     partnersMmult(2) = d_partnersMmult(5, yearInd2);
+%     partnersMmult(3) = d_partnersMmult(6, yearInd2);
+% end
+% % partnersM(8:9, 1:3) = partnersM(8:9, 1:3) .* partnersMmult;
+% % partnersF(7:9, 1:3) = partnersF(7:9, 1:3) .* partnersMmult;
+% 
+% partnersM(4:6, 1:3) = partnersM(4:6, 1:3) .* partnersMmult(1);
+% partnersF(4:6, 1:3) = partnersF(4:6, 1:3) .* partnersMmult(1);
+% partnersM(7:10, 1:3) = partnersM(7:10, 1:3) .* partnersMmult(2);
+% partnersF(7:10, 1:3) = partnersF(7:10, 1:3) .* partnersMmult(3);
 
 % males
 c(1 , : , :) = partnersM;
@@ -279,7 +270,7 @@ peakYear = 2000;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = zeros(risk, length(yrVec)-1);
 for r = 1 : risk
-condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
+    condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
 end
 condUse = condUseVec(1: risk, 1); % year <= peakYear
 if year < peakYear && year > condStart
@@ -289,22 +280,36 @@ elseif year >= peakYear
     condUse = condUseVec(1:risk, end);
 end
 %%
-% calculate psi vectors for protective factors
-% HIV
-cond_hiv = 1-(condProtect(:,1) .* condUse');
-psi_hiv = zeros(gender, disease, risk); 
-% condom usage and condom protection rates
-for r = 1 : risk
-psi_hiv(:, :, r) = ones(gender,disease) .* cond_hiv(:, r); % condom use only for all disease states
-psi_hiv(:,2, r) = (1 - circProtect(:,1)) .* cond_hiv(:, r);
+% find PrEP use according to the present year
+if year >= prepStartYear
+    prepCov = prepCoverage;
+else
+    prepCov = zeros(gender,age,risk,2);
 end
-% condom use + circumcision protection for d=2
+
+% Calculate psi vectors for protective factors
+% Notes: condProtect and circProtect are matrices with dims [gender,2], 
+%   where columns represent HIV protection and HPV protection. 
+%   condUse is a vector with dims [risk,1]
+cond_hiv = 1-(condProtect(:,1) .* condUse'); % [gender,risk], condom use coverage and protection rates
+psi_hiv = zeros(gender, disease, age, risk); % initialize psi vector
+for r = 1 : risk
+psi_hiv(:, :, :, r) = ones(gender, disease, age) .* cond_hiv(:, r); % condom use only for all disease states
+    for a = 1 : age
+        prep_hiv = 1- ...
+            (prepCov(:,a,r,1).*prepProtect(:,a,r,1) + prepCov(:,a,r,2).*prepProtect(:,a,r,2)); 
+            % [gender,age,risk], PrEP coverage and protection rates for partial use (4th dim=1) and fully efficacious use (4th dim=2)
+        psi_hiv(:, 1, a, r) = prep_hiv(:,1) .* cond_hiv(:, r); % replace with condom use + PrEP protection for d=1
+        psi_hiv(:, 2, a, r) = prep_hiv(:,1) .* (1 - circProtect(:, 1)) .* cond_hiv(:, r); % replace with condom use + PrEP + circumcision protection for d=2
+    end
+end
+
 %HPV
 cond_hpv = 1-(condProtect(:,2) * condUse'); % condom usage and condom protection rates
-psi_hpv = zeros(gender, disease, risk);
+psi_hpv = zeros(gender, disease, risk); % initialize psi vector
 for r = 1 : risk
-psi_hpv(:, :, r) = ones(gender,disease) .* cond_hpv(:, r);
-psi_hpv(:,2, r) = (1 - circProtect(:,2)) .* cond_hpv(:, r);
+    psi_hpv(:, :, r) = ones(gender,disease) .* cond_hpv(:, r); % condom use only for all disease states
+    psi_hpv(:,2, r) = (1 - circProtect(:,2)) .* cond_hpv(:, r); % condom use + circumcision protection for d=2
 end
 
 %% HPV Infection
@@ -531,9 +536,9 @@ for h = 1 : hpvVaxStates
 
                             % Calculate infections
                             mInfected = min(lambdaMultM .* lambda(1 , a , r)...
-                                .* psi_hiv(1,d,r) , 0.999) .* pop(mSus); % infected males
+                                .* psi_hiv(1,d,a,r) , 0.999) .* pop(mSus); % infected males
                             fInfected = min(lambdaMultF .* lambda(2 , a , r)...
-                                .* psi_hiv(2,d,r) , 0.999) .* pop(fSus); % infected females
+                                .* psi_hiv(2,d,a,r) , 0.999) .* pop(fSus); % infected females
 
                             % HIV incidence tracker
                             newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);
