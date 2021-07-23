@@ -279,8 +279,8 @@ if year < peakYear && year > condStart
 elseif year >= peakYear
     condUse = condUseVec(1:risk, end);
 end
-%%
-% find PrEP use according to the present year
+
+%% find PrEP use according to the present year
 if year >= prepStartYear
     prepCov = prepCoverage;
 else
@@ -291,10 +291,11 @@ end
 % Notes: condProtect and circProtect are matrices with dims [gender,2], 
 %   where columns represent HIV protection and HPV protection. 
 %   condUse is a vector with dims [risk,1]
+% HIV
 cond_hiv = 1-(condProtect(:,1) .* condUse'); % [gender,risk], condom use coverage and protection rates
 psi_hiv = zeros(gender, disease, age, risk); % initialize psi vector
 for r = 1 : risk
-psi_hiv(:, :, :, r) = ones(gender, disease, age) .* cond_hiv(:, r); % condom use only for all disease states
+    psi_hiv(:, :, :, r) = ones(gender, disease, age) .* cond_hiv(:, r); % condom use only for all disease states
     for a = 1 : age
         prep_hiv = 1- ...
             (prepCov(:,a,r,1).*prepProtect(:,a,r,1) + prepCov(:,a,r,2).*prepProtect(:,a,r,2)); 

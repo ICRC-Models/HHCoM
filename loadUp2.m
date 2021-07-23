@@ -775,7 +775,7 @@ circProtect = 0.55;
 circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
 condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
 
-%% Condom use
+% Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
     condUse = paramSet(paramsSub{idx}.inds(:));
