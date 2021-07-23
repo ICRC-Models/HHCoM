@@ -59,6 +59,8 @@ dirName = 'Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_ad
 % ***SET ME***: names of teams with data to plot; should match team names in input file names
 teamVec = {'UW' , 'DC'};
 nTeams = length(teamVec);
+% ***SET ME***: date of most recent data to plot; should match dates in input file names from each team, respectively
+dateVec = {'07192021' , '03042021'};
 % ***SET ME***: scenario numbers to plot; should match scenario names in input file names
 sceVec = {'S0' , 'S1' , 'S2'};
 nSces = length(sceVec);
@@ -90,7 +92,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i}.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot(t82on , hpvPrevTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -128,7 +130,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
             numHpvTot = zeros(1 , size(hpv_hivAgeW_dis,2));       
@@ -187,7 +189,7 @@ for i = 1 : nTeams
         for dInd = 1 : 3 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot([1:length(ageGroup)] , hpvPrevTime(year2021,:) , 'Color' , colorVec{i} , 'LineWidth' , widthVec{dInd});
@@ -212,7 +214,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot(t82on , ccIncTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -251,7 +253,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
             numCCTot = zeros(1 , size(ccIncAge_dis,2));       
@@ -315,7 +317,7 @@ for i = 1 : nTeams
         for dInd = 1 : 3 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot([1:length(ageGroup)] , ccIncTime(year2021,:) , 'Color' , colorVec{i} , 'LineWidth' , widthVec{dInd});
@@ -344,7 +346,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccCasesTime = readmatrix(fname , 'Sheet' , 'CC case counts' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)]);
             ccCasesTotTime = sum(ccCasesTime,2);
             ccCasesCumTime = cumsum(ccCasesTotTime);
@@ -372,7 +374,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
         fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+            teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
         hivPrevTime = readmatrix(fname , 'Sheet' , 'HIV prevalence' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
         p = plot(t82on , hivPrevTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
@@ -397,7 +399,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
         fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-            teamVec{i} , '_' , sceVec{j} , '_outcome_template_03042021.xlsx'];
+            teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
         artCovTime = readmatrix(fname , 'Sheet' , 'ART coverage' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
         p = plot(t82on , artCovTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
