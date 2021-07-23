@@ -1,7 +1,7 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
-function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)    % input variables when using a calibration parameter set
+function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , username)    % input variables when using a calibration parameter set
 % futureSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
 % Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
@@ -9,7 +9,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
 
 %%  Variables/parameters to set based on your scenario
@@ -20,8 +20,8 @@ historicalIn = load([pwd , '/HHCoM_Results/toNow_30May20_K_increaseClearHIV_incr
 % DIRECTORY TO SAVE RESULTS
 pathModifier = '12Jun20_80VaxCov_CU15-24_Kenya'; % ***SET ME***: name for simulation output file
 % Directory to save results
-if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
-    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+if ~ exist([pwd , '/HHCoM_Results/' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/' , pathModifier, '/'])
 end
 
 % AGE GROUPS

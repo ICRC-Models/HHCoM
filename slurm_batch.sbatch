@@ -1,10 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=batch                              # Job name
-#SBATCH --chdir=/gscratch/csde/willmin/HHCoM          # Working directory
-#SBATCH --mail-type=FAIL           		              # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
-#SBATCH --mail-user=willmin@uw.edu
-#SBATCH --export=all                                  # Export environment variables to the batch job session
+#SBATCH --job-name=calibration                   # Job name
+#SBATCH --mail-type=FAIL           		         # Turn on e-mail notification (NONE,BEGIN,END,FAIL,ALL)
+#SBATCH --export=all                             # Export environment variables to the batch job session
 
 #SBATCH --account=csde-ckpt    	                 # Allocation Definition
 #SBATCH --partition=ckpt
@@ -16,6 +14,10 @@
 pwd; hostname; date #--qos=MaxJobs4
 
 echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
+echo "${USRNAME}"
+export USRNAME
+echo "${DIRPATH}"
+git export DIRPATH
 echo "${SETIDX}" 
 export SETIDX
 echo "${TCURR}"
@@ -23,11 +25,13 @@ export TCURR
 echo "${DATE}"
 export DATE
 
+cd ${DIRPATH}
+
 export TZ="America/Los_Angeles"
 module load matlab_2018a
-mkdir -p /gscratch/csde/willmin/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "calib2_sumll4sets(${SETIDX} , ${TCURR} , '${DATE}')"
+mkdir -p /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
+matlab -nodisplay -nosplash -r "calib2_sumll4sets(${SETIDX} , ${TCURR} , '${DATE}' , '${USRNAME}')"
 
-rm -r /gscratch/csde/willmin/$SLURM_JOB_ID
+rm -r /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
 
 date

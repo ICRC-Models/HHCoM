@@ -6,14 +6,14 @@
 % Saves:
 % 1) File: negSumLogL_calib_[date].dat (negative log likelihood for each parameter set in sub-set)
 
-function calib2_runMultHistSims(paramSetIdx , tstep_abc , date_abc)
+function calib2_runMultHistSims(paramSetIdx , tstep_abc , date_abc , username)
 
 t_curr = tstep_abc;
 date = date_abc;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
@@ -52,7 +52,6 @@ end
 %% Obtain model output for each set of sampled parameters
 for m = paramSetIdx : nPrlSets : (numBestFits+paramSetIdx-1)
     subMatrixInds = [m : (m + nPrlSets - 1)];
-    %subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
         paramSet = top50Params(:,subMatrixInds(n));
         [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , orderedLL(n+m-1,1) , tstep_abc , date_abc);

@@ -54,14 +54,14 @@ annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ ste
 
 % Load results
 pathModifier = '17Jun20_50VaxCov_vaxAge5-9_vaxEff1_reducedClearHiv_Kenya' %14Jun20_50VaxCov_singleYrbaseline_Kenya, 3Jun20_50VaxCov_reducFert_Kenya, 14Jun20_50VaxCov_baseline5-9_vaxEff1_Kenya
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']), 1 );
+nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']), 1 );
 curr = load([pwd , '\HHCoM_Results\toNow_17Jun20_K_decreaseClearHIV']); % Population up to current year
 
 clear cell;
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
 if waning
-    resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxWaneSimResult'];
+    resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxWaneSimResult'];
 end
 parfor n = 1 : nSims
     % load results from vaccine run into cell array
@@ -446,7 +446,7 @@ for i = 1 : length(inds)
         hold all
 %               
 %         % Save reduction results
-% %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+% %         fname = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
 % %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '.xlsx'];
 % %         sname = [plotTits1{i} , '_IncRed'];
 % %         if exist(fname , 'file') == 2
@@ -609,7 +609,7 @@ legend('15-19, model' , '20-24, model ' , '25-29, model' ,...
 %         hold all
 %         
 %         % Save reduction results
-% %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+% %         fname = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
 % %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_Mort' , '.xlsx'];
 % %         sname = [plotTits1{i} , '_MortRed'];
 % %         if exist(fname , 'file') == 2
@@ -1869,7 +1869,7 @@ for aInd = 1:length(aVec)
     legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
 end
 saveResults = [tVec(1 : stepsPerYear : end)' , saveResults];
-fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
+fname = [pwd , '\HHCoM_Results\' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
 xlswrite(fname , saveResults)
 
 % Age-standardized

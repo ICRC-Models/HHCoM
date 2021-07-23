@@ -2,7 +2,7 @@
 % Note: "particle" : a set of parameters
 % Maximizing the positive summed Log-Likelihood even thought variable naming is old and suggests minimizing the negative summed-LL 
 
-function [] = abc_smc(tstep_abc , date_abc , nSets)  %(alpha , p_acc_min)
+function [] = abc_smc(tstep_abc , date_abc , nSets , nFigSets , username)  %(alpha , p_acc_min)
 t = tstep_abc;
 alpha = 0.4;
 p_acc_min = 0.05;
@@ -14,7 +14,7 @@ t_next = t+1;
 
 %% Cluster information
 pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/willmin' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
 parpool(pc , numCPUperNode)    % start the pool with max number workers
 
@@ -106,30 +106,20 @@ masterNumFltrdSets = length(master_negS_ordered_flatDat);
 fileLL = ['orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']; % save file of sorted log-likelihoods
 csvwrite([paramDir, fileLL] , [inds , vals]);
 
-
-
-
-nBestFits = 15;
+%% Run showResults_multSims_CIs and save figures of model results with best-fitting sets compared to observed data into HHCoM_Figures directory
+nBestFits = nFigSets;
 templatename = "Params/orderedLL_calib_";
-resultsTemplate =  "toNow_";
+resultsTemplate = "toNow_";
 resultsTemplateEnd = "_noBaseVax_baseScreen_hpvHIVcalib_";
-
 filename = strcat(templatename,date,"_",int2str(0),".dat");
-
-totalSets=size(load(filename),1);
-
+totalSets = size(load(filename),1);
 iterationCounter = zeros(totalSets,1);
 bestfits = [load(filename),iterationCounter];
-
 filesList = strings(nBestFits,1);
-
-
 for j = 1:t
     filename = strcat(templatename,date,"_",int2str(j),".dat");
     temp = [load(filename),iterationCounter];
-    
     for i = 1:totalSets
-        
         if temp(i,1) <= alpha*totalSets
             temp(i,:) = bestfits(temp(i,1),:);
         else
@@ -138,7 +128,6 @@ for j = 1:t
         end
     end
     bestfits = temp;
-    
 end
 
 for b = 1 : nBestFits
@@ -146,16 +135,6 @@ for b = 1 : nBestFits
 end
 
 showResults_multSims_CIs(filesList);
-
-
-
-
-
-
-
-
-
-
 
 %% Save accepted particles from iteration t and their associated data
 alphaSets = masterSetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
