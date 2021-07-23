@@ -305,7 +305,7 @@ for r = 1 : risk
     end
 end
 
-%HPV
+%%HPV
 cond_hpv = 1-(condProtect(:,2) * condUse'); % condom usage and condom protection rates
 psi_hpv = zeros(gender, disease, risk); % initialize psi vector
 for r = 1 : risk
