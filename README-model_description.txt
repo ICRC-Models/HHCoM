@@ -114,12 +114,16 @@ Run model:
      mixInfect.m (HPV and HIV transmission)
      hivNH.m (HIV natural history)
      calcDist.m (calculate distribution of persons initiating ART)
+     artMinMax.m (calculate ART initiation/removal to maintain min/max coverage by age) 
+     artPopCov.m (calculate ART initiation/removal to maintain population level coverage)
      bornAgeDieRisk.m (demography)
      vmmc.m (voluntary male medical circumcision)
      hpvVaxSchool.m (HPV vaccination - school-based regimen)
      likeFun.m (calculate summed log-likelihood)
-   - visualize results using:
-     showResults.m
+   - process simulation output and visualize/save results using:
+     showResults.m (single simulations)
+     showResults_multSims_CIs.m (multiple simulations, script parallelized)
+     showResults_multSims.m (multiple simulations, not parallelized, trajectories vs. comparison to data)
 
 2) futureSim.m 
    - calculates future predictions
@@ -135,12 +139,22 @@ Run model:
      mixInfect.m (HPV and HIV transmission)
      hivNH.m (HIV natural history)
      calcDist.m (calculate distribution of persons initiating ART)
+     artMinMax.m (calculate ART initiation/removal to maintain min/max coverage by age) 
+     artPopCov.m (calculate ART initiation/removal to maintain population level coverage)
      bornAgeDieRisk.m (demography)
      vmmc.m (voluntary male medical circumcision)
      hpvVaxLmtd.m (HPV vaccination - vaccine limited years)
      hpvVaxSchool.m (HPV vaccination - school-based regimen)
      hpvVaxCU.m (HPV vaccination - catch-up regimen)
      parsave.m (save future results)
-   - visualize results using:
+   - process simulation output and visualize/save results for each scenario using:
      vaxCEA.m
+     vaxCEA_multSims_CIs.m (multiple simulations, script parallelized, designed for WHO analysis)
+     vaxCEA_multSims_CIs_IPVC.m (multiple simulations, script parallelized, designed for IPVC 2021 analysis)
+     vaxCEA_multSims_CIs_modScreen.m (multiple simulations, script parallelized, designed for SA screening and CISNET analyses)
+   - secondary visualization across scenarios:
+     vaxCEA_multSims_WHOsces.m (designed for WHO analysis)
+     vaxCEA_multSims_SAsces.m (designed for SA screening analysis)
+     vaxCEA_multSims_CISNETsces.m (designed for CISNET analysis)
+     vaxCEA_multSims_IPVCsces.m (designed for IPVC 2021 analysis)
 

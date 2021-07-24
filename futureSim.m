@@ -56,17 +56,17 @@ whoScreenAgeMults = [1.0 , 1.0]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40]; % ***SET M
 
 % Common parameters
 vaxEff = 1.0;    % 9v-vaccine efficacy, used for all vaccine regimens present
-waning = 0;    % turn waning on or off
+rVaxWane = 0.0; % rate of waning vaccine immunity
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];    % age groups to vaccinate
 vaxCoverB = 0.0; %0.57; %0.86;    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented) before 2020); last dose, first dose pilot
-vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
 vaxCover = [0.8 , 0.9];    % vaccine coverages
-vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
@@ -98,7 +98,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
     c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
-    condUse , screenYrs , hpvScreenStartYear , waning , ...
+    condUse , screenYrs , hpvScreenStartYear , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
@@ -118,7 +118,8 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     ccDisthpvNonVaxInds , cin1hpvVaxInds , cin2hpvVaxInds , cin3hpvVaxInds , ...
     cin1hpvNonVaxInds , cin2hpvNonVaxInds , cin3hpvNonVaxInds , normalhpvVaxInds , ...
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
-    infhpvNonVaxInds , ageInd , riskInd , ...
+    infhpvNonVaxInds , fromVaxNoScrnInds , fromVaxScrnInds , toNonVaxNoScrnInds , ...
+    toNonVaxScrnInds , ageInd , riskInd , ...
     hivNegNonVMMCinds , hivNegVMMCinds , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
@@ -191,8 +192,8 @@ if hivPosScreen
     agesComb = [agesComb , screenAlgs{2}.screenAge];
     ageMultsComb = [ageMultsComb , screenAlgs{2}.screenAgeMults];
 end
-screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
-screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
+screenAgeAll = zeros(disease , viral , numScreenAge , risk , hpvVaxStates*hpvNonVaxStates*endpoints*intervens);
+screenAgeS = zeros(disease , viral , numScreenAge , risk , hpvVaxStates*hpvNonVaxStates*endpoints*2);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
@@ -221,8 +222,8 @@ for aS = 1 : numScreenAge
                 for s = 1 : hpvNonVaxStates
                     for x = 1 : endpoints
                         for r = 1 : risk
-                            screenAgeAll(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 1 : intervens , 2 , a , r)); 
-                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 3 : intervens , 2 , a , r));
+                            screenAgeAll(d,v,aS,r,:) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 1 : intervens , 2 , a , r)); 
+                            screenAgeS(d,v,aS,r,:) = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , 3 : intervens , 2 , a , r));
 
                             noVaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 1 , 2 , a , r)));
                             noVaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
@@ -295,25 +296,7 @@ end
 lambdaMultVaxMat = zeros(age , nTests); % age-based vector for modifying lambda based on vaccination status
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff));
 for n = 1 : nTests
-    % No waning
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
-    
-    % Waning
-    effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 20; % number of years over which initial efficacy level wanes
-    if waning 
-        % Following a period (in years) where original efficacy is retained, 
-        % specified by 'effPeriod' , linearly scale down vaccine efficacy 
-        % to 0% over time period specificed by 'wanePeriod'
-        % To make waning rate equal in all scenarios, the linear rate of 
-        % waning is based on the least effective initial vaccine efficacy scenario.        
-        kWane = min(vaxEff) / round(wanePeriod / 5);     
-        vaxInit = vaxEff(vaxEffInd(n));
-        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : age , n) = ...
-            max(0 , linspace(vaxInit , ...
-            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
-            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); % ensures vaccine efficacy is >= 0
-    end
 end
 
 %% Simulation
@@ -380,9 +363,12 @@ parfor n = 1 : nTests
         popIn = popVec(i - 1 , :);
         
         if hpvOn
-            % Progression/regression from initial HPV infection to
-            % precancer stages and cervical cancer. Differential CC
-            % detection by CC stage and HIV status/CD4 count.
+            % HPV NATURAL HISTORY
+            % Progression and clearance of HPV
+            % Progression and regression of precancerous lesions
+            % Development and progression of cervical cancer
+            % Cervical cancer-associated mortality by stage and HIV status/CD4 count
+            % Waning vaccine immunity
             [~ , pop , newCC(i , : , : , :) , ccDeath(i , : , : , :)] ...
                 = ode4xtra(@(t , pop) ...
                 hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , ...
@@ -392,10 +378,12 @@ parfor n = 1 : nTests
                 cin3hpvNonVaxIndsFrom , ccLochpvNonVaxIndsTo , ccLochpvNonVaxIndsFrom , ...
                 ccReghpvNonVaxInds , ccDisthpvNonVaxInds , cin1hpvVaxInds , ...
                 cin2hpvVaxInds , cin3hpvVaxInds , cin1hpvNonVaxInds , ...
-                cin2hpvNonVaxInds , cin3hpvNonVaxInds , kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
+                cin2hpvNonVaxInds , cin3hpvNonVaxInds , fromVaxNoScrnInds , ...
+                fromVaxScrnInds , toNonVaxNoScrnInds , toNonVaxScrnInds , ...
+                kInf_Cin1 , kCin1_Cin2 , kCin2_Cin3 , ...
                 kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , kCin1_Inf , rNormal_Inf , ...
-                rImmune , fImm , kRL , kDR , maleHpvClearMult , disease , age , hpvVaxStates , ...
-                hpvNonVaxStates , hpvTypeGroups) , tspan , popIn);
+                rImmune , fImm , kRL , kDR , maleHpvClearMult , rVaxWane , disease , ...
+                age , hpvVaxStates , hpvNonVaxStates , hpvTypeGroups) , tspan , popIn);
             popIn = pop(end , :);  % for next module
             if any(pop(end , :) <  0)
                 disp('After hpv')
@@ -403,6 +391,9 @@ parfor n = 1 : nTests
             end
             
             if (year >= hpvScreenStartYear)
+                % CERVICAL CANCER SCREENING AND TREATMENT
+                % Screening
+                % Treatment
                 [dPop , newScreen(i , : , : , : , : , : , : , : , :)] ...
                     = hpvScreen(popIn , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -419,8 +410,11 @@ parfor n = 1 : nTests
             end
         end
         
-        % HIV and HPV mixing and infection module. Protective effects of condom
-        % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
+        % HPV AND HIV TRANSMISSION
+        % Heterosexual mixing by gender, age, and risk group
+        % Partnership adjustment
+        % HPV infection by type
+        % HIV infection and protection provided by condoms, circumcision, and ART
         [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
             newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax(i , : , : , : , : , :) , newHiv(i , : , : , : , : , : , :)] = ...
             ode4xtra(@(t , pop) mixInfect(t , pop , ...
@@ -439,8 +433,11 @@ parfor n = 1 : nTests
             break
         end
         
-        % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
-        % excess HIV mortality
+        % HIV NATURAL HISTORY
+        % CD4 progression
+        % Viral load progression
+        % ART initiation, dicontinuation, and scale-up by CD4 count
+        % HIV-associated mortality
         if hivOn
             [~ , pop , hivDeaths(i , : , : , :) , artTreatTracker(i , : , : , : , : , :) , ...
                 artDiscont(i , : , : , : , : , :)] =...
@@ -464,7 +461,11 @@ parfor n = 1 : nTests
             end
         end
         
-        % Birth, aging, risk redistribution module
+        % DEMOGRAPHY
+        % Births
+        % Mother-to-child HIV transmission
+        % Aging and risk-group redistribution
+        % Natural deaths
         [~ , pop , deaths(i , :)] = ode4xtra(@(t , pop) ...
             bornAgeDieRisk(t , pop , year , ...
             gender , age , fivYrAgeGrpsOn , fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
@@ -496,7 +497,8 @@ parfor n = 1 : nTests
                 break
             end
         end
-
+        
+        % HPV VACCINATION
         if (year >= vaxStartYear)
             % If within first vaxLimitYrs-many vaccine-limited years
             if vaxLimit && ((year - currYear) <= vaxLimitYrs)
@@ -513,7 +515,7 @@ parfor n = 1 : nTests
             
             % If vaccines are not limited
             else
-                % HPV vaccination module- school-based vaccination regimen
+                % School-based vaccination regimen
                 [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
                     vaxRate , toInd);
@@ -546,10 +548,6 @@ parfor n = 1 : nTests
     popVec = sparse(popVec); % compress population vectors
     
     filename = ['vaxSimResult' , num2str(simNum)];
-    if waning
-        filename = ['vaxWaneSimResult' , num2str(simNum)];
-    end
-    
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath , ...

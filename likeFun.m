@@ -318,7 +318,7 @@ for i = 1 : length(typeDistYearVec)
 end
 
 %% Cervical cancer incidence in 2012 by age
-incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +6)];
+incTimeSpan = [((2012 - startYear) * stepsPerYear +1) : ((2012 - startYear) * stepsPerYear +stepsPerYear)];
 fac = 10 ^ 5;
 
 ccInc2012 = zeros(13 , 1);
