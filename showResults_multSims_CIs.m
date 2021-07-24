@@ -580,10 +580,11 @@ close(gcf);
 
 %% HIV prevalence by age and gender over time vs. DHS and KAIS (calibration)
 % Calibration error bars
-hivM(: , 1) = hivPrevM_dObs(: , 2) .* 100; % mean
-hivM(: , 2) = (hivPrevM_dObs(: , 3).^(1/2)).*2 .* 100; % calibration SD
-hivF(: , 1) = hivPrevF_dObs(: , 2) .* 100; % mean
-hivF(: , 2) = (hivPrevF_dObs(: , 3).^(1/2)).*2 .* 100; % calibration SD
+hivM(: , 1) = hivPrevM_dObs(1:24 , 2) .* 100; % mean
+hivM(: , 2) = (hivPrevM_dObs(1:24 , 3).^(1/2)).*2 .* 100; % calibration SD
+hivF(: , 1) = hivPrevF_dObs(1:21 , 2) .* 100; % mean
+hivF(: , 2) = (hivPrevF_dObs(1:21 , 3).^(1/2)).*2 .* 100; % calibration SD
+
 hivAll(: , 1) = hivPrevAll_dObs(: , 2) .* 100; % mean
 hivAll(: , 2) = (hivPrevAll_dObs(: , 3).^(1/2)).*2 .* 100; % calibration SD
 
