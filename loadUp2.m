@@ -394,6 +394,103 @@ else
     hiv_hpvMult = 1; %multiplier from Houlihan et al - combined estimate 1.99, 95% CI 1.54-2.56
 end
 
+%% Save intervention parameters
+
+%Import from Excel HIV intervention parameters
+file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
+circProtect = xlsread(file , 'Protection' , 'B18');
+condProtect = xlsread(file , 'Protection' , 'B19');
+MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
+artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
+save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+
+file = [pwd , '/Config/PrEP_parameters_Kenya.xlsx'];
+prepProtect(1,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by partial PrEP use
+prepProtect(2,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by partial PrEP use
+prepProtect(1,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by full PrEP use
+prepProtect(2,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by full PrEP use
+prepCoverage(1,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with partial PrEP use
+prepCoverage(2,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with partial PrEP use
+prepCoverage(1,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with full PrEP use
+prepCoverage(2,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with full PrEP use
+save(fullfile(paramDir ,'prepParamsFrmExcel'), 'prepProtect' , 'prepCoverage');
+
+% Load pre-saved HIV intervention parameters
+load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
+    'condProtect' , 'MTCTRate' , 'artVScov');
+load([paramDir , 'prepParamsFrmExcel'] , 'prepProtect' , 'prepCoverage');
+
+% Intervention start years
+hivStartYear = 1978;
+circStartYear = 1960;
+circNatStartYear = 2008;
+prepStartYear = currYear;
+vaxStartYear = 2021;
+
+% save to hand calibration params file for documentation (set in mixInfect.m)
+condStart = 1995;
+peakYear = 2000;
+
+circProtect = 0.55;
+% Protection from circumcision and condoms
+circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
+condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
+
+% Condom use
+if calibBool && any(5 == pIdx);
+    idx = find(5 == pIdx);
+    condUse = paramSet(paramsSub{idx}.inds(:));
+else
+    if fivYrAgeGrpsOn
+        condUse = [0.12, 0.25, 0.35];
+    else
+        condUse = .05; %changed from 20%
+    end
+end
+
+
+% ART coverage
+artOutMult = 1.0; %0.95;
+minLim = (0.70/0.81); % minimum ART coverage by age
+maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
+artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
+maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
+artM_vec = cell(size(artYr , 1) - 1, 1);
+artF_vec = cell(size(artYr , 1) - 1, 1);
+for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
+    period = [artYr(i) , artYr(i + 1)];
+    artYr_vec{i} = interp1(period , artYr(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+    artM_vec{i} = interp1(period , maxRateM(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+    artF_vec{i} = interp1(period , maxRateF(i : i + 1 , 1) , ...
+        artYr(i) : timeStep : artYr(i + 1));
+end
+
+%%
+% VMMC coverage
+vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
+circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
+vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
+            0.715 0.89 0.883 0.893 0.83 0.50; ... % 2003
+            0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
+            0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
+            0.90 0.90 0.90 0.90 0.90 0.90];   % 2030 ideal: 90% [year x age group]
+vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
+vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
+for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
+    period = [vmmcYr(i) , vmmcYr(i + 1)];
+    xq = [vmmcYr(i) : timeStep : vmmcYr(i + 1)];
+    vmmcYr_vec{i} = interp1(period , vmmcYr(i : i + 1 , 1) , xq);
+    for aInd = 1 : length(circ_aVec)
+        vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
+    end
+end
+
+
 %% Import HPV/CIN/CC transition data from Excel
 % file = [pwd , '\Config\HPV_parameters.xlsx'];
 % 
@@ -732,104 +829,10 @@ else
     artHpvMult = 1.0;
 end
 
-%% Save intervention parameters
-
-%Import from Excel HIV intervention parameters
-% file = [pwd , '/Config/HIV_parameters_Kenya.xlsx'];
-% circProtect = xlsread(file , 'Protection' , 'B18');
-% condProtect = xlsread(file , 'Protection' , 'B19');
-% MTCTRate = xlsread(file , 'Disease Data' , 'B6:B8');
-% artVScov = xlsread(file , 'Protection' , 'A33:C46');    % [years , females , males] 
-% save(fullfile(paramDir ,'hivIntParamsFrmExcel'), 'circProtect' , ...
-%     'condProtect' , 'MTCTRate' , 'artVScov');
-
-file = [pwd , '/Config/PrEP_parameters_Kenya.xlsx'];
-prepProtect(1,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by partial PrEP use
-prepProtect(2,:,:,1) = ones(age,risk).*0.5; %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by partial PrEP use
-prepProtect(1,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Men, [age,risk], protection afforded by full PrEP use
-prepProtect(2,:,:,2) = ones(age,risk); %xlsread(file , 'Protection' , 'B18'); % Women, [age,risk], protection afforded by full PrEP use
-prepCoverage(1,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with partial PrEP use
-prepCoverage(2,:,:,1) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with partial PrEP use
-prepCoverage(1,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Men, [age,risk], proportion with full PrEP use
-prepCoverage(2,:,:,2) = zeros(age,risk); %xlsread(file , 'Coverage' , 'B18'); % Women, [age,risk], proportion with full PrEP use
-save(fullfile(paramDir ,'prepParamsFrmExcel'), 'prepProtect' , 'prepCoverage');
-
-% Load pre-saved HIV intervention parameters
-load([paramDir , 'hivIntParamsFrmExcel'] , 'circProtect' , ...
-    'condProtect' , 'MTCTRate' , 'artVScov');
-load([paramDir , 'prepParamsFrmExcel'] , 'prepProtect' , 'prepCoverage');
-
-% Intervention start years
-hivStartYear = 1978;
-circStartYear = 1960;
-circNatStartYear = 2008;
-prepStartYear = currYear;
-vaxStartYear = 2021;
-
-% save to hand calibration params file for documentation (set in mixInfect.m)
-condStart = 1995;
-peakYear = 2000;
-
-circProtect = 0.55;
-% Protection from circumcision and condoms
-circProtect = [[circProtect; 0] , [0; 0.23]];  % HIV protection (changed from 30% to 45%) , HPV protection (23% Wawer, 2011;  
-condProtect = [ones(gender,1).*condProtect , [0; 0]];    % HIV protection , HPV protection
-
-% Condom use
-if calibBool && any(5 == pIdx);
-    idx = find(5 == pIdx);
-    condUse = paramSet(paramsSub{idx}.inds(:));
-else
-    if fivYrAgeGrpsOn
-        condUse = [0.12, 0.25, 0.35];
-    else
-        condUse = .05; %changed from 20%
-    end
-end
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
 OMEGA = zeros(age , 1); % hysterectomy rate
-
-% ART coverage
-artOutMult = 1.0; %0.95;
-minLim = (0.70/0.81); % minimum ART coverage by age
-maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
-artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
-artM_vec = cell(size(artYr , 1) - 1, 1);
-artF_vec = cell(size(artYr , 1) - 1, 1);
-for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
-    period = [artYr(i) , artYr(i + 1)];
-    artYr_vec{i} = interp1(period , artYr(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-    artM_vec{i} = interp1(period , maxRateM(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-    artF_vec{i} = interp1(period , maxRateF(i : i + 1 , 1) , ...
-        artYr(i) : timeStep : artYr(i + 1));
-end
-
-%%
-% VMMC coverage
-vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
-circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
-vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
-            0.715 0.89 0.883 0.893 0.83 0.50; ... % 2003
-            0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
-            0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
-            0.90 0.90 0.90 0.90 0.90 0.90];   % 2030 ideal: 90% [year x age group]
-vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
-vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
-for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
-    period = [vmmcYr(i) , vmmcYr(i + 1)];
-    xq = [vmmcYr(i) : timeStep : vmmcYr(i + 1)];
-    vmmcYr_vec{i} = interp1(period , vmmcYr(i : i + 1 , 1) , xq);
-    for aInd = 1 : length(circ_aVec)
-        vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
-    end
-end
 
 %%
 % Vaccination
