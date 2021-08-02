@@ -104,10 +104,12 @@ dVar = [dVar ; hpv_hiv_dObs(: , 3); hpv_hivNeg_dObs(:, 3)];
 
 %% HIV prevalence by age and sex 
 hivYearVec = unique(hivPrevM_dObs(: ,1));
-hivAgeM = zeros(8 , length(hivYearVec));
-hivAgeF = zeros(7 , length(hivYearVec));
+hivAgeM = zeros(8 , length(hivYearVec)-1);
+hivAgeF = zeros(7 , length(hivYearVec)-1);
+hivAgeM2012 = zeros(10,1);
+hivAgeF2012 = zeros(10,1);
 
-for t = 1 : length(hivYearVec)
+for t = 1 : (length(hivYearVec)-1)
     for a = 4 : 10
         hivFInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
@@ -120,7 +122,9 @@ for t = 1 : length(hivYearVec)
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totFInds));
     end
 end
-for t = 1 : length(hivYearVec)
+
+
+for t = 1 : (length(hivYearVec)-1)
     for a = 4 : 11
         hivMInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
@@ -133,7 +137,42 @@ for t = 1 : length(hivYearVec)
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totMInds));
     end
 end
-mObs = [mObs ; hivAgeM(:) ; hivAgeF(:)];
+
+t = length(hivYearVec);
+for a = 4 : 13
+        hivFInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        artFInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        totFInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
+        hivAgeF2012(a - 3 , 1) =  (sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , hivFInds)) ...
+            + sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , artFInds))) ...
+            / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totFInds));
+        hivMInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+        artMInds = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+        totMInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+            1 : endpoints , 1 : intervens , 1 , a , 1 : risk));
+        hivAgeM2012(a - 3 , 1) =  (sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , hivMInds)) ...
+            + sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , artMInds))) ...
+            / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totMInds));
+end
+
+
+
+mObsCheck = [hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)]
+dMeanCheck = [hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)]
+dVarCheck = [hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)]
+length(mObsCheck)
+length(dMeanCheck)
+length(dVarCheck)
+
+
+
+
+mObs = [mObs ; hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)];
 dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
 dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];
 
