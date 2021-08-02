@@ -54,7 +54,7 @@ paramDir = [pwd , '\Params\'];
 %% LOAD SAVED RESULTS
 
 % ***SET ME***: name of directory where files are located
-dirName = 'Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_hpvHIVcalib_adjFert2_adjCCAgeMults3_KZNCC4_noVMMChpv_CISNET-S0_6_1';
+dirName = '22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_CISNET-S0_6_1';
 
 % ***SET ME***: names of teams with data to plot; should match team names in input file names
 teamVec = {'UW' , 'DC'};
@@ -92,7 +92,7 @@ for i = 1 : nTeams
         for dInd = 1 : 1 %5
             % Load results
             fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
-                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i}.xlsx'];
+                teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
             p = plot(t82on , hpvPrevTime(:,1) , 'Color' , colorVec{i} , 'LineStyle' , styleVec{j});
