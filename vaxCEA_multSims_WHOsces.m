@@ -71,9 +71,14 @@ dirName_P2_SCE11 = [baseDirName , 'WHO-SCES11_6_1'];
 simVec = {dirName_reductBaseline , dirName_reductBaseline , ...
     dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P2_SCE9};
 fileVec = {'sim0' , 'sim2' , 'sim2' , 'sim2' , 'sim2'};
+fileVec2 = {'0' , '2'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
 fileTits = {'S0 (no vax, baseline screen)' , 'S2' , ...
     'S4' , 'S6 (90% 9v, 2x WHO screen)' , 'S9 (90% 9v, HIV screening)'};
+%    'S0- orig method, med' , 'range' , ...
+%         'S0- new method, med' , 'range' , ...
+%         'S2- orig method, med' , 'range' , ...
+%         'S2- new method, med' , 'range'
 % % ***SET ME***: choose which scenarios you want to save data in Excel for
 % simVec = {dirName_reductBaseline , dirName_reductBaseline4 , ...
 %     dirName_reductBaseline , dirName_reductBaseline , ...
@@ -269,14 +274,148 @@ for j = 1 : nResults
 %         end
 %     end
 
+%     %% CC INCIDENCE - checking effect of method of calculating median
+%     %  Check 1 - effect of age-standardizing the median/lb/ub vs.
+%     %    age-standardizing all 25 simulation results and then calculating the
+%     %    median/lb/ub
+%     %  Check 2 - effect of calculating percent reduction in medians vs. the
+%     %    median percent reduction across all 25 simulations
+%     dInd = 1;
+%     diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+%     % Load results, method 1
+%     fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileVec2{j} , '.xlsx'];
+%     ccIncHivTime1_med = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%     fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileVec2{j} , '.xlsx'];
+%     ccIncHivTime1_lb = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%     fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%         'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileVec2{j} , '.xlsx'];
+%     ccIncHivTime1_ub = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%     ccIncHivTime1 = [ccIncHivTime1_med' , ccIncHivTime1_lb' , ccIncHivTime1_ub'];
+%     % Load results, method 2
+%     fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , 'ICC-checkAS_' , fileVec{j} , '.xlsx'];
+%     ccIncHivTime2 = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B1:AC102']);
+%     
+%     % Create figure
+%     if (j == 1) && (dInd == 1)
+%         fig = figure;
+%         set(fig,'DefaultAxesFontSize' , 18);
+%     end
+%     hold all;
+%     subplot(1,3,1);
+%     % Plot results, method 1
+%     p = plot([2019:2120] , ccIncHivTime1(:,1)' , '-');
+%     hold all;
+%     x2 = [[2019:2120] , fliplr([2019:2120])];
+%     inBetween = [ccIncHivTime1(:,3)' , fliplr(ccIncHivTime1(:,2)')];
+%     colorP = get(p,'Color');
+%     h = fill(x2 , inBetween , colorP);
+%     h.FaceAlpha = 0.3;
+%     h.LineStyle = '--';
+%     set(h,'EdgeColor', colorP);
+%     % Plot results, method 2
+%     p2 = plot([2019:2120] , ccIncHivTime2(:,1)' , '-');
+%     hold all;
+%     x2 = [[2019:2120] , fliplr([2019:2120])];
+%     inBetween = [ccIncHivTime2(:,3)' , fliplr(ccIncHivTime2(:,2)')];
+%     colorP = get(p2,'Color');
+%     h = fill(x2 , inBetween , colorP);
+%     h.FaceAlpha = 0.2;
+%     h.LineStyle = '--';
+%     set(h,'EdgeColor', colorP);
+%     axis([2019 2120 0 120])
+%     grid on;
+%     xlabel('Year'); ylabel('AS ICC per 100K');
+%     
+%     if j == 2
+%         % PERCENT REDUCTION
+%         % Baseline
+%         % Load results, method 1
+%         fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
+%             'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)_S' , fileVec2{1} , '.xlsx'];
+%         ccIncHivTime1_med = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%         fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
+%             'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)LUB_S' , fileVec2{1} , '.xlsx'];
+%         ccIncHivTime1_lb = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%         fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , ...
+%             'UofW_Impact_CC_IncidenceRates-standardised-(2020-2120)HUB_S' , fileVec2{1} , '.xlsx'];
+%         ccIncHivTime1_ub = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B4:CY4']);
+%         ccIncHivTime1_baseline = [ccIncHivTime1_med' , ccIncHivTime1_lb' , ccIncHivTime1_ub'];
+%         % Load results, method 2
+%         fname = [pwd , '\HHCoM_Results\' , simVec{1} , '\' , 'ICC-checkAS_' , fileVec{1} , '.xlsx'];
+%         ccIncHivTime2_baseline = readmatrix(fname , 'Sheet' , diseaseLabels{1} , 'Range' , ['B1:AC102']);
+% 
+%         hold all;
+%         subplot(1,3,2);
+%         % Plot results, method 1
+%         p3 = plot([2019:2120] , ((ccIncHivTime1(:,1)'-ccIncHivTime1_baseline(:,1)')./ccIncHivTime1_baseline(:,1)').*-100 , '-');
+%         hold all;
+%         x2 = [[2019:2120] , fliplr([2019:2120])];
+%         inBetween = [((ccIncHivTime1(:,3)'-ccIncHivTime1_baseline(:,3)')./ccIncHivTime1_baseline(:,3)').*-100 , ...
+%             fliplr(((ccIncHivTime1(:,2)'-ccIncHivTime1_baseline(:,2)')./ccIncHivTime1_baseline(:,2)').*-100)];
+%         colorP = get(p3,'Color');
+%         h = fill(x2 , inBetween , colorP);
+%         h.FaceAlpha = 0.3;
+%         h.LineStyle = '--';
+%         set(h,'EdgeColor', colorP);
+%         % Plot results, method 3
+%         p5 = plot([2019:2120] , ((ccIncHivTime2(:,1)'-ccIncHivTime2_baseline(:,1)')./ccIncHivTime2_baseline(:,1)').*-100 , '-');
+%         hold all;
+%         x2 = [[2019:2120] , fliplr([2019:2120])];
+%         inBetween = [((ccIncHivTime2(:,3)'-ccIncHivTime2_baseline(:,3)')./ccIncHivTime2_baseline(:,3)').*-100 , ...
+%             fliplr(((ccIncHivTime2(:,2)'-ccIncHivTime2_baseline(:,2)')./ccIncHivTime2_baseline(:,2)').*-100)];
+%         colorP = get(p5,'Color');
+%         h = fill(x2 , inBetween , colorP);
+%         h.FaceAlpha = 0.2;
+%         h.LineStyle = '--';
+%         set(h,'EdgeColor', colorP);
+%         axis([2019 2120 0 100])
+%         grid on;
+%         xlabel('Year'); ylabel('Percent reduction');
+%         legend('Orig method, med' , 'range' , ...
+%             'Inter method, med' , 'range');
+%         
+%         hold all;
+%         subplot(1,3,3);
+%         % Plot results, method 1
+%         p3 = plot([2019:2120] , ((ccIncHivTime1(:,1)'-ccIncHivTime1_baseline(:,1)')./ccIncHivTime1_baseline(:,1)').*-100 , '-');
+%         hold all;
+%         x2 = [[2019:2120] , fliplr([2019:2120])];
+%         inBetween = [((ccIncHivTime1(:,3)'-ccIncHivTime1_baseline(:,3)')./ccIncHivTime1_baseline(:,3)').*-100 , ...
+%             fliplr(((ccIncHivTime1(:,2)'-ccIncHivTime1_baseline(:,2)')./ccIncHivTime1_baseline(:,2)').*-100)];
+%         colorP = get(p3,'Color');
+%         h = fill(x2 , inBetween , colorP);
+%         h.FaceAlpha = 0.3;
+%         h.LineStyle = '--';
+%         set(h,'EdgeColor', colorP);
+%         % Plot results, method 2
+%         p4 = plot([2019:2120] , median(((ccIncHivTime2(:,4:28)'-ccIncHivTime2_baseline(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),1).*-100 , '-');
+%         hold all;
+%         x2 = [[2019:2120] , fliplr([2019:2120])];
+%         inBetween = [prctile(((ccIncHivTime2(:,4:28)'-ccIncHivTime2_baseline(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),95,1).*-100 , ...
+%             fliplr(prctile(((ccIncHivTime2(:,4:28)'-ccIncHivTime2_baseline(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),5,1).*-100)];
+%         colorP = get(p4,'Color');
+%         h = fill(x2 , inBetween , colorP);
+%         h.FaceAlpha = 0.2;
+%         h.LineStyle = '--';
+%         set(h,'EdgeColor', colorP);
+%         axis([2019 2120 0 100])
+%         grid on;
+%         xlabel('Year'); ylabel('Percent reduction');
+%         legend('Orig method, med' , 'range' , ...
+%             'New method, med' , 'range');
+%     end
+    
 end
 
 %%
 if j == nResults
+    %subplot(1,3,1);
     hold all;
-    plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*4.0 , 'k:')
+    plot ([2019:2120] , ones(1 , length([2019:2120])).*4.0 , 'k:')
     hold all;
-    plot (ccIncHivAgeTime(1 , 2:end) , ones(size(ccIncHivAgeTime,2)-1,1).*10.0 , 'k--')
+    plot ([2019:2120] , ones(1 , length([2019:2120])).*10.0 , 'k--')
     legend(fileTits{:} , ... %'General' , 'HIV-negative' , 'HIV-positive, all' , 'HIV-positive, untreated' , 'HIV-positive, on ART' , ...
        'Elimination: <4/100K' , 'Benchmark: <10/100K'); %
         %'P1-SCE0 (10sims) - adjusted KZN' , 'P1-SCE1 (10sims) - adjusted KZN' , 'P1-SCE2 (10sims) - adjusted KZN' , ...
