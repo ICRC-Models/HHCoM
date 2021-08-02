@@ -653,8 +653,7 @@ end
 saveas(gcf,strcat(groupDir,'/hivPrevByAgeGender.fig'));
 close(gcf);
 
-
-%%HIV Prevalence
+%% HIV Prevalence
 % Compared to observed HIV data
 
 file = [pwd , '/Config/Kenya_parameters_Feb20.xlsx'];
@@ -665,9 +664,6 @@ DHS_KAIS = [2003 6.7 5.8 7.6;
     2012 5.6 4.9 6.3];
 
 figure()
-
-
-
 
 plot([startYear : timeStep : currYear] , mean(hiv_prev) , HIV_Ken_spectrum(: , 1)' , HIV_Ken_spectrum(: , 2)' , '+', ...
 DHS_KAIS(:, 1)',  DHS_KAIS(:, 2)', 'o')

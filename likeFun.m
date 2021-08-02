@@ -123,7 +123,6 @@ for t = 1 : (length(hivYearVec)-1)
     end
 end
 
-
 for t = 1 : (length(hivYearVec)-1)
     for a = 4 : 11
         hivMInds = toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -160,17 +159,12 @@ for a = 4 : 13
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totMInds));
 end
 
-
-
 mObsCheck = [hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)]
 dMeanCheck = [hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)]
 dVarCheck = [hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)]
 length(mObsCheck)
 length(dMeanCheck)
 length(dVarCheck)
-
-
-
 
 mObs = [mObs ; hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)];
 dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
