@@ -234,7 +234,7 @@ for k = 1 : loopSegmentsLength-1
         
         %% HPV incidence by HIV status and age over time
         fac = 100;
-        for dInd = 1 : diseaseVecLength_ccInc;
+        for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             for a = 1 : age
                 allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -926,6 +926,56 @@ for dInd = 1 : length(diseaseLabels)
             'UofW_Pre-Impact_CC_IncidenceRates-standardised-(Before_2020)_S' , fileKeyNums{n} , 'f.xlsx'];
         writematrix(ccInc(firstYrInd2:lastYrInd) , fname , 'Sheet' , diseaseLabels2{dInd} , 'Range' , 'B4')    
     end
+end
+
+%% Write cervical cancer age-standardized incidence rates over time (2019-2120) with all parameter sets carried through age-standardization (check)
+% Note: the age-standardization process shifts the incidence rate of the
+% last modelled age group to the next age group in the following year.
+% However, CC incidence is NaN prior to HIV introduction in the
+% HIV-positive no ART group, and NaN prior to ART introduction in the
+% HIV-positive ART group. Since we have four age groups past the 16 we
+% model, a NaN value is present for four years past the introduction of
+% HIV/ART, leading to a NaN value for summed incidence during these 
+% years. We therefore lack data in this four-year interval in the
+% saved/plotted results.
+fac = 10 ^ 5;
+worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
+    247167 240167 226750 201603 171975 150562 113118 82266 64484 42237 ...
+    23477 9261 2155];
+diseaseLabels = {'Pop(All) ICC' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
+fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+    'ICC-checkAS_' , fileKey{n} , '.xlsx'];
+firstYrRange = (lastYear-1) - 2019;
+for dInd = 1 : length(diseaseLabels)
+    ccIncHivAgeTime_dis = squeeze(ccIncHivAgeTime(: , dInd , : , :));
+
+    ccIncRefTot = zeros(size(ccIncHivAgeTime_dis,1) , 1 , size(ccIncHivAgeTime_dis,3));       
+    for aInd = 1:age+4
+        a = aInd;
+        if aInd >= age
+            a = age;
+        end
+
+        if aInd <= age    
+            ccIncRef = ccIncHivAgeTime_dis(: , a , :) .* worldStandard_WP2015(aInd);
+            if (a < 3)
+                ccIncRef = zeros(size(ccIncHivAgeTime_dis,1) , 1 , size(ccIncHivAgeTime_dis,3));
+            end
+        elseif aInd > age
+            ccIncRef = ccIncHivAgeTime_dis(: , a , :);
+            ccIncRef = cat(3 , (ones(size(ccIncRef,1),1,aInd-a).*ccIncRef(:,1,1)) , ccIncRef(: , 1 ,1:end-(aInd-a)));
+            ccIncRef = ccIncRef .* worldStandard_WP2015(aInd);
+        end
+        ccIncRefTot = ccIncRefTot + ccIncRef;
+    end
+    ccInc = ccIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
+
+    writematrix([[2019 : lastYear-1]' , ...
+        squeeze(median(squeeze(ccInc(: , : , (end-firstYrRange):end)) , 1))' , ...
+        squeeze(prctile(squeeze(ccInc(: , : , (end-firstYrRange):end)) , 5 , 1))' , ...
+        squeeze(prctile(squeeze(ccInc(: , : , (end-firstYrRange):end)) , 95 , 1))' , ...
+        squeeze(ccInc(: , : , (end-firstYrRange):end))'] , ...
+        fname , 'Sheet' , diseaseLabels{dInd}); 
 end
 
 %% Cumulative cervical cancer cases by HIV status and age over time
