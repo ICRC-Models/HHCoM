@@ -17,7 +17,7 @@ echo "Running MATLAB script to get matrix size."
 echo "${USRNAME}"
 export USRNAME
 echo "${DIRPATH}"
-git export DIRPATH
+export DIRPATH
 echo "${TCURR}"
 export TCURR
 echo "${DATE}"
