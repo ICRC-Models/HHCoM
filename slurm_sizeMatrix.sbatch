@@ -28,7 +28,7 @@ cd ${DIRPATH}
 export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
-matlab -nodisplay -nosplash -r "idSizeMatrix(${TCURR} , '${DATE}' , '${USRNAME}')"
+matlab -nodisplay -nosplash -r "idSizeMatrix(${TCURR} , '${DATE}')"
 rm -r /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
 
 date
