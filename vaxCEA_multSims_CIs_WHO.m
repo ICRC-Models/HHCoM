@@ -1,5 +1,5 @@
 function [] = vaxCEA_multSims_CIs_WHO(vaxResultInd , sceNum , fileNameNums)
-% example: vaxCEA_multSims_CIs(1 , '34' , {'3' , '4' , '0'})
+% example: vaxCEA_multSims_CIs_WHO(1 , '34' , {'3' , '4' , '0'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
