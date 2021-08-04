@@ -17,7 +17,7 @@ echo "Running MATLAB script to estimate negSumLog for subset of parameter sets"
 echo "${USRNAME}"
 export USRNAME
 echo "${DIRPATH}"
-git export DIRPATH
+export DIRPATH
 echo "${SETIDX}" 
 export SETIDX
 echo "${TCURR}"

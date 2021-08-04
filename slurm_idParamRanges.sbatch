@@ -16,7 +16,7 @@ echo "Running MATLAB idParamRanges script to get parameter ranges of top fifty b
 echo "${USRNAME}"
 export USRNAME
 echo "${DIRPATH}"
-git export DIRPATH
+export DIRPATH
 echo "${TCURR}"
 export TCURR
 echo "${DATE}"
