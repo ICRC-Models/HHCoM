@@ -134,7 +134,7 @@ for b = 1 : nBestFits
     filesList(b) = strcat(resultsTemplate,date,resultsTemplateEnd,int2str(bestfits(b,3)),"_",int2str(bestfits(b,1)));
 end
 
-showResults_multSims_CIs(filesList);
+showResults_multSims_CIs(filesList , nBestFits , t , date);
 
 %% Save accepted particles from iteration t and their associated data
 alphaSets = masterSetMatrix(:,inds(1:(masterNumFltrdSets*alpha)));
