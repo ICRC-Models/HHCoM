@@ -570,25 +570,30 @@ dev.off()
 png("irS0bS0_byhiv_inART.png", width = 800, height = 400)
 #pdf("irS0bS0_byhiv_inART.pdf", width = 6, height = 5)
 ggplot() + 
-  geom_line(data = filter(S0b.stART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.75, alpha = 0.45) +
-  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1.5, alpha = 0.45) +
-  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1.5, alpha = 0.45) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", alpha = "artLevel"), size = 1.75) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", alpha = "artLevel"), size = 1.5) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", alpha = "artLevel"), size = 1.5) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total" , alpha = "artScale"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg" , alpha = "artScale"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all" , alpha = "artScale"), size = 1) +
   scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
                       breaks = c("Total", "HIVneg", "HIVpos_all"),
-                      labels = c("All females", "HIV-negative", "HIV-positive"),
-                      name = NULL) +
-  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+                      labels = c("All women", "HIV-negative", "Women with HIV"),
+                      name = "HIV status") +
+  scale_alpha_manual(values = c("artLevel" = 0.45, "artScale" = 1),
+                      breaks = c("artLevel", "artScale"),
+                      labels = c("Baseline", "Baseline, with ART scale-up"),
+                      name = "Scenario") +
+  scale_y_continuous(breaks = seq(0, 250, 25), limits = c(0, 250)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  labs(x = "Year", y = "Crude incidence rate per 100,000 women") +
+  labs(x = "Year", y = "Crude cervical cancer incidence rate per 100,000 women") +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 14),
-        legend.position = c(0.8, 0.85)) +
+        legend.text = element_text(size = 11),
+        legend.position = c(0.35, 0.85),
+        legend.box = "horizontal") +
   plot_background 
 dev.off()
 
@@ -741,28 +746,33 @@ dev.off()
 #pdf("irS0S1S3_byhiv.pdf", width = 10, height = 5)
 pdf("irS0S1S3_byhiv.small.pdf", width = 6, height = 5) # half size
 ggplot() + 
-  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1) +
-  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dashed") +
-  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dashed") +
-  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dashed") +
-  geom_line(data = filter(S3.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total"), size = 1.25, linetype = "dotted") +
-  geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg"), size = 1, linetype = "dotted") +
-  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all"), size = 1, linetype = "dotted") +
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "artScale"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "artScale"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "artScale"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "hpvEnhanc"), size = 1.25) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "hpvEnhanc"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "hpvEnhanc"), size = 1) +
+  geom_line(data = filter(S3.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "hivEnhanc"), size = 1.25) +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "hivEnhanc"), size = 1) +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "hivEnhanc"), size = 1) +
   scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
                       breaks = c("Total", "HIVneg", "HIVpos_all"),
-                      labels = c("All females", "HIV-negative", "HIV-positive"),
-                      name = NULL) +
-  scale_y_continuous(breaks = seq(0, 200, 25), limits = c(0, 200)) +
+                      labels = c("All women", "HIV-negative", "Women with HIV"),
+                      name = "HIV status") +
+  scale_linetype_manual(values = c("artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
+                     breaks = c("artScale" , "hpvEnhanc" , "hivEnhanc"),
+                     labels = c("Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                     name = "Scenario") +
+  scale_y_continuous(breaks = seq(0, 250, 25), limits = c(0, 250)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  labs(x = "year", y = "Crude incidence rate per 100,000 women") +
+  labs(x = "Year", y = "Crude cervical cancer incidence rate per 100,000 women") +
   theme(axis.title = element_text(size =12),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 14),
-        legend.position = c(0.8, 0.85)) +
+        legend.text = element_text(size = 11),
+        legend.position = c(0.45, 0.85),
+        legend.box = "horizontal") +
   plot_background 
 dev.off()
 
@@ -949,9 +959,9 @@ ggplot() +
   geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "propCases"), size = 1.75) +
   geom_line(data = prophiv.S1.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dashed") +
   geom_line(data = prophiv.S3.inART, aes(x = year, y = median, colour = "propCases"), size = 1.25, linetype = "dotdash") +
-  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75) + 
-  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dashed") +
-  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dotdash") +
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.75) + 
+  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dashed") +
+  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, colour = "hivPrev"), size = 1.25, linetype = "dotdash") +
   scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
@@ -965,6 +975,52 @@ ggplot() +
         axis.line = element_line(color = "black"),
         legend.text = element_text(size = 14),
         legend.position = c(0.75, 0.85)) +
+  plot_background
+dev.off()
+
+## Add in S3 + S0b - Proportion of cases only
+pdf("prophiv.prev.s0bs0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_line(data = prophiv.S0b.stART, aes(x = year, y = median, linetype = "artLevel"), colour = colors[3], size = 1.75, alpha = 0.45) +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, linetype = "artScale"), colour = colors[3], size = 1.75, alpha = 1.0) +
+  geom_line(data = prophiv.S1.inART, aes(x = year, y = median, linetype = "hpvEnhanc"), colour = colors[3], size = 1.25, alpha = 1.0) +
+  geom_line(data = prophiv.S3.inART, aes(x = year, y = median, linetype = "hivEnhanc"), colour = colors[3], size = 1.25, alpha = 1.0) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  scale_linetype_manual(values = c("artLevel" = "solid", "artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
+                        breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                        labels = c("Baseline" , "Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                        name = "Scenario") +
+  labs(x = "Year", y = "Proportion cases among women with HIV") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.35, 0.28)) +
+  plot_background
+dev.off()
+
+## Add in S3 + S0b - HIV prevalence only
+pdf("prophiv.prev.s0bs0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
+ggplot() +
+  geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, linetype = "artLevel"), colour = "black", size = 1.75, alpha = 0.45) + 
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, linetype = "artScale"), colour = "black", size = 1.75) + 
+  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, linetype = "hpvEnhanc"), colour = "black", size = 1.25, linetype = "dashed") +
+  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, linetype = "hivEnhanc"), colour = "black", size = 1.25, linetype = "dotdash") +
+  scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  scale_linetype_manual(values = c("artLevel" = "solid", "artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
+                        breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                        labels = c("Baseline" , "Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                        name = "Scenario") +
+  labs(x = "Year", y = "HIV prevalence") +
+  theme(axis.title = element_text(size = 12),
+        axis.text = element_text(size = 14),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 11),
+        legend.position = c(0.35, 0.75)) +
   plot_background
 dev.off()
 
@@ -1053,7 +1109,7 @@ ggplot() +
                       breaks = c("propCases", "propCasesVS" ), #, "hivPrev"),
                       labels = c("Proportion of cases in WLHIV", "Proportion of cases in WLHIV+VS"), # , "HIV prevalence"),
                       name = NULL) +
-  labs(x = "year", y = "Proportion of cases / HIV prevalence") +
+  labs(x = "Year", y = "Proportion of cases / HIV prevalence") +
   theme(axis.title = element_text(size = 14),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
@@ -1073,23 +1129,23 @@ dev.off()
 ## S0, S0b, S1, S3
 pdf("ccHivRatio.s0S0bs1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-  geom_line(data = ccHivRatio.S0b.stART, aes(x = year, y = median , colour = "ccHivRatio"), size = 1.75, alpha = 0.45) +
-  geom_line(data = ccHivRatio.S0.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.75) +
-  geom_line(data = ccHivRatio.S1.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.25, linetype = "dashed") +
-  geom_line(data = ccHivRatio.S3.inART, aes(x = year, y = median, colour = "ccHivRatio"), size = 1.25, linetype = "dotdash") +
-  #scale_y_continuous(breaks = seq(0, 1, 0.1), limits = c(0, 1)) +
+  geom_line(data = ccHivRatio.S0b.stART, aes(x = year, y = median, linetype = "artLevel"), colour = "black", size = 1.75, alpha = 0.45) +
+  geom_line(data = ccHivRatio.S0.inART, aes(x = year, y = median, linetype = "artScale"), colour = "black", size = 1.75) +
+  geom_line(data = ccHivRatio.S1.inART, aes(x = year, y = median, linetype = "hpvEnhanc"), colour = "black", size = 1.25) +
+  geom_line(data = ccHivRatio.S3.inART, aes(x = year, y = median, linetype = "hivEnhanc"), colour = "black", size = 1.25) +
+  scale_y_continuous(breaks = seq(1, 5, 1), limits = c(1, 5)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  scale_colour_manual(values = c("ccHivRatio" = "black"),
-                      breaks = c("ccHivRatio"),
-                      labels = c("Proportion cases among WLHIV / HIV prevalence"),
-                      name = NULL) +
-  labs(x = "year", y = "Ratio") +
-  theme(axis.title = element_text(size = 14),
+  scale_linetype_manual(values = c("artLevel" = "solid", "artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
+                        breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                        labels = c("Baseline" , "Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                        name = "Scenario") +
+  labs(x = "Year", y = "Ratio of proportion cases to HIV prevalence") +
+  theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 14),
-        legend.position = c(0.75, 0.85)) +
+        legend.text = element_text(size = 11),
+        legend.position = c(0.35, 0.78)) +
   plot_background
 dev.off()
 
