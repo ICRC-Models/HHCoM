@@ -71,7 +71,7 @@ dirName_P2_SCE11 = [baseDirName , 'WHO-SCES11_6_1'];
 simVec = {dirName_reductBaseline , dirName_reductBaseline , ...
     dirName_P1_SCE34 , dirName_P1_SCE56 , dirName_P2_SCE9};
 fileVec = {'sim0' , 'sim2' , 'sim2' , 'sim2' , 'sim2'};
-fileVec2 = {'0' , '2'};
+fileVec2 = {'0' , '2' , '4' , '6'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
 fileTits = {'S0 (no vax, baseline screen)' , 'S2' , ...
     'S4' , 'S6 (90% 9v, 2x WHO screen)' , 'S9 (90% 9v, HIV screening)'};
@@ -328,7 +328,7 @@ for j = 1 : nResults
 %     grid on;
 %     xlabel('Year'); ylabel('AS ICC per 100K');
 %     
-%     if j == 2
+%     if j > 1
 %         % PERCENT REDUCTION
 %         % Baseline
 %         % Load results, method 1
@@ -405,13 +405,21 @@ for j = 1 : nResults
 %         xlabel('Year'); ylabel('Percent reduction');
 %         legend('Orig method, med' , 'range' , ...
 %             'New method, med' , 'range');
+%         
+%         fname = [pwd , '\HHCoM_Results\' , simVec{j} , '\' , ...
+%             'PercentReduct-ASICC_S' , fileVec2{j} , '.xlsx'];
+%         writematrix([[2019 : 2120]' , ...
+%             squeeze(median(((ccIncHivTime2_baseline(:,4:28)'-ccIncHivTime2(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),1)') , ...
+%             squeeze(prctile(((ccIncHivTime2_baseline(:,4:28)'-ccIncHivTime2(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),5,1)') , ...
+%             squeeze(prctile(((ccIncHivTime2_baseline(:,4:28)'-ccIncHivTime2(:,4:28)')./ccIncHivTime2_baseline(:,4:28)'),95,1)')] , ...
+%             fname);
 %     end
     
 end
 
 %%
 if j == nResults
-    %subplot(1,3,1);
+%     subplot(1,3,1);
     hold all;
     plot ([2019:2120] , ones(1 , length([2019:2120])).*4.0 , 'k:')
     hold all;
