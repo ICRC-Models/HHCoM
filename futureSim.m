@@ -7,7 +7,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % profile clear;
 
-%% Cluster information
+%% Cluster information (only use if running multiple vaccination scenarios in parallel. Cannot do this if using parfor loop in calib2_runMultFutSims.m to run multiple parameter sets in parallel)
 %pc = parcluster('local');    % create a local cluster object
 %pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
 %parpool(pc , str2num(getenv('SLURM_CPUS_ON_NODE')))    % start the pool with max number workers
@@ -15,12 +15,12 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
-%historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']); % ***SET ME***: name for historical run input file 
+%historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']);
 historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
     'popLast' , 'artDistList' , 'artDist'); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
-%pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012'; % ***SET ME***: name for simulation output file
+%pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012';
 pathModifier = [date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S0_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/' , pathModifier, '/'])
@@ -47,7 +47,7 @@ sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with diffe
 sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
 
 % VACCINATION
-% Instructions: The model will run a scenario for each school-based vaccine coverage listed, plus a scenario with only baseline vaccine coverage.
+% Instructions: The model will set up a scenario for each school-based vaccine coverage listed in "vaxCover", plus a scenario with only baseline vaccine coverage as in "vaxCoverB".
 %   If you want no vaccination in your baseline scenario, set baseline vaccine coverage to zero. The school-based vaccine coverage of each scenario is applied to all 
 %   ages listed in that section. Therefore, if you assume baseline vaccination, your list of ages in the school-based vaccination algorithm should 
 %   include the age of baseline vaccination, and school-based vaccine coverage should be at least baseline vaccine coverage.
@@ -57,10 +57,10 @@ sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV sta
 %   If limited-vaccine years is turned on, this contraint is applied at the beginning of all the school-based vaccination scenarios, but not in the baseline 
 %   vaccination only scenario. After the designated number of vaccine limited years has passed, the model will use the school based vaccination parameters 
 %   and catch-up vaccination parameters if turned on.
-% Example: 
-%   Scenario 1: limited vaccine years --> school-based regimen for ages 9-14 at 86% coverage + catch-up coverage
-%   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage
-%   Scenario 3: baseline regimen for age 9 at 86% coverage
+% Example (scenarios set up for vaxCover = [0.86, 0.90]; and vaxCoverB = 0.86): 
+%   Scenario 1: limited vaccine years --> school-based regimen for ages 9-14 at 86% coverage + catch-up coverage (to run scenario, set vaxCoverInd = 1)
+%   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage (to run scenario, set vaxCoverInd = 2)
+%   Scenario 3: baseline regimen for age 9 at 86% coverage (to run scenario, set vaxCoverInd = 3)
 
 % Common parameters
 vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
@@ -74,6 +74,7 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
 vaxCover = [0.57];    % vaccine coverages
+vaxCoverInd = 1;    % index for the coverage in vaxCover vec to use for this simulation; use length(vaxCover)+1 to run the baseline scenario (Ex: vaxCoverInd=1 for specified scenario, vaxCoverInd=2 for baseline scenario)
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
 % Parameters for catch-up vaccination regimen
@@ -309,7 +310,7 @@ end
 
 %% Simulation
 %profile on
-n = 1; %parfor n = 1 : nTests
+n = vaxCoverInd; %parfor n = 1 : nTests (can only use parfor loop if not running multiple parameter sets in parallel
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
