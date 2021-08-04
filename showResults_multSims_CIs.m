@@ -211,7 +211,7 @@ hpv_vax = cc_vax;
 hpv_nonVax = cc_vax;
 
 resultsDir = [pwd , '\HHCoM_Results\'];
-baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screencovFxd_';
+baseFileName = 'toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screencovFxd_'; % ***SET ME***: name for historical run output file 
 
 loopSegments = {0 , round(nRuns/2) , nRuns};  %{0 , 10 , 20 , 30 , 40 , 50};
 loopSegmentsLength = length(loopSegments);

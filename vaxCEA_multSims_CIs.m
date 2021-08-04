@@ -1,5 +1,8 @@
 function [] = vaxCEA_multSims_CIs(vaxResultInd , sceNum , fileNameNums)
-% example: vaxCEA_multSims_CIs(1 , '34' , {'3' , '4' , '0'})
+% example: vaxCEA_multSims_CIs(1 , '34' , {'3' , '4' , '0'}) 
+%   Note: vaxResultInd corresponds to vaxCoverInd from futureSim, sceNum refers to 
+%   your directory name ending, and fileNameNums provides file name endings 
+%   for saved output files
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -56,7 +59,7 @@ paramDir = [pwd , '\Params\'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2122;
+lastYear = 2122; % ***SET ME***: last year of simulation from futureSim
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
@@ -227,7 +230,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['Vaccine22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_'];
+baseFileName = ['Vaccine22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_']; % ***SET ME***: name for future run output file 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
