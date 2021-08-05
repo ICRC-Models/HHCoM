@@ -742,28 +742,24 @@ ggplot() +
   plot_background 
 dev.off()
 
+# Crude ICC among all women
 #png("irS0S1S3_byhiv.png", width = 800, height = 400)
 #pdf("irS0S1S3_byhiv.pdf", width = 10, height = 5)
 pdf("irS0S1S3_byhiv.small.pdf", width = 6, height = 5) # half size
 ggplot() + 
-  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "artScale"), size = 1.25) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "artScale"), size = 1) +
-  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "artScale"), size = 1) +
-  geom_line(data = filter(S1.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "hpvEnhanc"), size = 1.25) +
-  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "hpvEnhanc"), size = 1) +
-  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "hpvEnhanc"), size = 1) +
-  geom_line(data = filter(S3.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "Total", linetype = "hivEnhanc"), size = 1.25) +
-  geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, colour = "HIVneg", linetype = "hivEnhanc"), size = 1) +
-  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, colour = "HIVpos_all", linetype = "hivEnhanc"), size = 1) +
-  scale_colour_manual(values = c("Total" = "black", "HIVneg" = "#38b1b1", "HIVpos_all" = colors[3]),
-                      breaks = c("Total", "HIVneg", "HIVpos_all"),
-                      labels = c("All women", "HIV-negative", "Women with HIV"),
-                      name = "HIV status") +
-  scale_linetype_manual(values = c("artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
-                     breaks = c("artScale" , "hpvEnhanc" , "hivEnhanc"),
-                     labels = c("Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+  geom_line(data = filter(S0b.stART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "artLevel", linetype = "Total"), size = 1.25) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "Total"), aes(x = year, y = median, colour = "artScale", linetype = "Total"), size = 1.25) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "Total", year > "2019"), aes(x = year, y = median, colour = "hpvEnhanc", linetype = "Total"), size = 1.25) +
+  geom_line(data = filter(S3.inART.ir.comb, group == "Total", year > "2019"), aes(x = year, y = median, colour = "hivEnhanc", linetype = "Total"), size = 1.25) +
+  scale_colour_manual(values = c("artLevel" = "grey45", "artScale" = "black", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
+                     breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                     labels = c("Baseline, no ART scale-up" , "Baseline" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
                      name = "Scenario") +
-  scale_y_continuous(breaks = seq(0, 250, 25), limits = c(0, 250)) +
+  scale_linetype_manual(values = c("Total" = "solid", "HIVpos_all" = "dashed" , "HIVneg" = "solid"),
+                        breaks = c("Total", "HIVpos_all" , "HIVneg"),
+                        labels = c("All women", "Women with HIV" , "HIV-negative"),
+                        name = "HIV status") +
+  scale_y_continuous(breaks = seq(0, 300, 50), limits = c(0, 300)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   labs(x = "Year", y = "Crude cervical cancer incidence rate per 100,000 women") +
@@ -771,8 +767,42 @@ ggplot() +
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
         legend.text = element_text(size = 11),
-        legend.position = c(0.45, 0.85),
-        legend.box = "horizontal") +
+        legend.key.width = unit(1.5, 'cm'),
+        legend.position = "bottom",
+        legend.direction="vertical") +
+  plot_background 
+dev.off()
+
+# Crude ICC among HIV-negative and women with HIV
+pdf("irS0S1S3_byhiv.small.pdf", width = 6, height = 5) # half size
+ggplot() + 
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, linetype = "HIVpos_all", colour = "artLevel"), size = 1) +
+  geom_line(data = filter(S0b.stART.ir.comb, group == "HIVneg"), aes(x = year, y = median, linetype = "HIVneg", colour = "artLevel"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVpos_all"), aes(x = year, y = median, linetype = "HIVpos_all", colour = "artScale"), size = 1) +
+  geom_line(data = filter(S0.inART.ir.comb, group == "HIVneg"), aes(x = year, y = median, linetype = "HIVneg", colour = "artScale"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVpos_all", year > "2019"), aes(x = year, y = median, linetype = "HIVpos_all", colour = "hpvEnhanc"), size = 1) +
+  geom_line(data = filter(S1.inART.ir.comb, group == "HIVneg", year > "2019"), aes(x = year, y = median, linetyper = "HIVneg", colour = "hpvEnhanc"), size = 1) +
+  geom_line(data = filter(S3.inART.ir.comb, group == "HIVpos_all", year > "2019"), aes(x = year, y = median, linetype = "HIVpos_all", colour = "hivEnhanc"), size = 1) +
+    geom_line(data = filter(S3.inART.ir.comb, group == "HIVneg", year > "2019"), aes(x = year, y = median, linetype = "HIVneg", colour = "hivEnhanc"), size = 1) +
+  scale_linetype_manual(values = c("HIVpos_all" = "dashed" , "HIVneg" = "solid"),
+                      breaks = c("HIVpos_all" , "HIVneg"),
+                      labels = c("Women with HIV" , "HIV-negative"),
+                      name = "HIV status") +
+  scale_colour_manual(values = c("artLevel" = "grey45", "artScale" = "black", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
+                      breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                      labels = c("Baseline, no ART scale-up" , "Baseline" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      name = "Scenario") +
+  scale_y_continuous(breaks = seq(0, 300, 50), limits = c(0, 300)) +
+  #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
+  scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
+  labs(x = "Year", y = "") +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.line = element_blank(),
+        legend.text = element_blank(),
+        legend.key.width = unit(1.5, 'cm'),
+        legend.position = "none",
+        legend.direction="vertical") +
   plot_background 
 dev.off()
 
@@ -978,43 +1008,53 @@ ggplot() +
   plot_background
 dev.off()
 
-## Add in S3 + S0b - Proportion of cases only
+## All scenarios - Proportion of cases and HIV prevalence
 pdf("prophiv.prev.s0bs0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-  geom_line(data = prophiv.S0b.stART, aes(x = year, y = median, linetype = "artLevel"), colour = colors[3], size = 1.75, alpha = 0.45) +
-  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, linetype = "artScale"), colour = colors[3], size = 1.75, alpha = 1.0) +
-  geom_line(data = prophiv.S1.inART, aes(x = year, y = median, linetype = "hpvEnhanc"), colour = colors[3], size = 1.25, alpha = 1.0) +
-  geom_line(data = prophiv.S3.inART, aes(x = year, y = median, linetype = "hivEnhanc"), colour = colors[3], size = 1.25, alpha = 1.0) +
+  geom_line(data = prophiv.S0b.stART, aes(x = year, y = median, colour = "artLevel", linetype = "propCases"), size = 1.75) +
+  geom_line(data = prophiv.S0.inART, aes(x = year, y = median, colour = "artScale", linetype = "propCases"), size = 1.75) +
+  geom_line(data = filter(prophiv.S1.inART, year > "2019"), aes(x = year, y = median, colour = "hpvEnhanc", linetype = "propCases"), size = 1.75) +
+  geom_line(data = filter(prophiv.S3.inART, year > "2019"), aes(x = year, y = median, colour = "hivEnhanc", linetype = "propCases"), size = 1.75) +
+  geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, colour = "artLevel", linetype = "hivPrev"), size = 1.75) + 
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "artScale", linetype = "hivPrev"), size = 1.75) + 
+  geom_line(data = filter(S1.inART.hiv.comb, year > "2019"), aes(x = year, y = median, colour = "hpvEnhanc", linetype = "hivPrev"), size = 1.75) +
+  geom_line(data = filter(S3.inART.hiv.comb, year > "2019"), aes(x = year, y = median, colour = "hivEnhanc", linetype = "hivPrev"), size = 1.75) +
   scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  scale_linetype_manual(values = c("artLevel" = "solid", "artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
-                        breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                        labels = c("Baseline" , "Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
-                        name = "Scenario") +
-  labs(x = "Year", y = "Proportion cases among women with HIV") +
+  scale_colour_manual(values = c("artLevel" = "grey45", "artScale" = "black", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
+                      breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                      labels = c("Baseline, no ART scale-up" , "Baseline" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      name = "Scenario") +
+  scale_linetype_manual(values = c("propCases" = "solid", "hivPrev" = "dashed"),
+                      breaks = c("propCases", "hivPrev"),
+                      labels = c("Proportion cases among women with HIV" , "HIV prevalence"),
+                      name = "Outcome") +
+  labs(x = "Year", y = "Proportion") +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
         legend.text = element_text(size = 11),
-        legend.position = c(0.35, 0.28)) +
+        legend.key.width = unit(1.5, 'cm'),
+        legend.position = "bottom",
+        legend.direction="vertical") +
   plot_background
 dev.off()
 
 ## Add in S3 + S0b - HIV prevalence only
 pdf("prophiv.prev.s0bs0s1S3.inART.small.pdf", width = 6, height = 5) # save again at half size
 ggplot() +
-  geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, linetype = "artLevel"), colour = "black", size = 1.75, alpha = 0.45) + 
-  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, linetype = "artScale"), colour = "black", size = 1.75) + 
-  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, linetype = "hpvEnhanc"), colour = "black", size = 1.25, linetype = "dashed") +
-  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, linetype = "hivEnhanc"), colour = "black", size = 1.25, linetype = "dotdash") +
+  geom_line(data = S0b.stART.hiv.comb, aes(x = year, y = median, colour = "artLevel"), linetype = "dashed", size = 1.75, alpha = 0.45) + 
+  geom_line(data = S0.inART.hiv.comb, aes(x = year, y = median, colour = "artScale"), linetype = "dashed", size = 1.75) + 
+  geom_line(data = S1.inART.hiv.comb, aes(x = year, y = median, colour = "hpvEnhanc"), linetype = "dashed", size = 1.25, linetype = "dashed") +
+  geom_line(data = S3.inART.hiv.comb, aes(x = year, y = median, colour = "hivEnhanc"), linetype = "dashed", size = 1.25, linetype = "dotdash") +
   scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  scale_linetype_manual(values = c("artLevel" = "solid", "artScale" = "solid", "hpvEnhanc" = "dashed", "hivEnhanc" = "dotted"),
-                        breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                        labels = c("Baseline" , "Baseline, with ART scale-up" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
-                        name = "Scenario") +
+  scale_colour_manual(values = c("artLevel" = "grey45", "artScale" = "black", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
+                      breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
+                      labels = c("Baseline, no ART scale-up" , "Baseline" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      name = "Scenario") +
   labs(x = "Year", y = "HIV prevalence") +
   theme(axis.title = element_text(size = 12),
         axis.text = element_text(size = 14),
@@ -1156,50 +1196,385 @@ ccHivRatio
 
 
     
-## Extract statistics !!!!!!!!!!!!!!!!!!!!!!NOT UPDATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# Incidence rates in 2000, 2020, and 2070 and % change
-(startend.stART <- filter(S0b.start.ir.comb, year %in% c(2000, 2020, 2070), scenario == "Baseline w/ 2x cytology"))
-startend.stART %>% group_by(scenario) %>% mutate(pctchange_gen_2020 = Total[year == 2020] / Total[year == 2000],
-                                                 pctchange_gen_2070 = Total[year == 2070] / Total[year == 2020],
-                                                 pctchange_neg_2020 = HIVneg[year == 2020] / HIVneg[year == 2000],
-                                                 pctchange_neg_2070 = HIVneg[year == 2070] / HIVneg[year == 2020],
-                                                 pctchange_pos_2020 = HIVpos[year == 2020] / HIVpos[year == 2000],
-                                                 pctchange_pos_2070 = HIVpos[year == 2070] / HIVpos[year == 2020]) %>%
-    filter(year == 2000) %>%
-    select(scenario, pctchange_gen_2020, pctchange_gen_2070, pctchange_neg_2020, pctchange_neg_2070, pctchange_pos_2020, pctchange_pos_2070)
+## Extract statistics
+# Incidence rates in 2001, 2021, 2031, 2056, and 2071
+#(startend.inART <- filter(S0.inART.ir.comb, year %in% c(2001, 2021, 2031, 2056, 2071), scenario == "Baseline cytology and vaccination, with ART scale-up"))
+# Percent change in crude cervical cancer incidence rate over time by HIV status
+#startend.inART %>% group_by(scenario) %>% mutate(pctchange_gen_2020 = Total[year == 2020] / Total[year == 2000],
+#                                                 pctchange_gen_2070 = Total[year == 2070] / Total[year == 2020],
+#                                                 pctchange_neg_2020 = HIVneg[year == 2020] / HIVneg[year == 2000],
+#                                                 pctchange_neg_2070 = HIVneg[year == 2070] / HIVneg[year == 2020],
+#                                                 pctchange_pos_2020 = HIVpos[year == 2020] / HIVpos[year == 2000],
+#                                                 pctchange_pos_2070 = HIVpos[year == 2070] / HIVpos[year == 2020]) %>%
+#    filter(year == 2000) %>%
+#    select(scenario, pctchange_gen_2020, pctchange_gen_2070, pctchange_neg_2020, pctchange_neg_2070, pctchange_pos_2020, pctchange_pos_2070)
     
-
-(startend.inART <- filter(ir.comb.inART, year %in% c(2000, 2020, 2070), scenario %in% c("Baseline w/ 2x cytology", 
+# Additional scenarios: percent change in crude cervical cancer incidence rate over time by HIV status
+(startend.inART <- filter(ir.comb.inART, year %in% c(2001, 2021, 2031, 2056, 2071), scenario %in% c("Baseline cytology and vaccination, no ART scale-up",
+                                                                                 "Baseline cytology and vaccination, with ART scale-up" ,                  
                                                                                  "Scaled up HPV testing and 90% vaccination",
-                                                                                 "S2 + 50% catch-up vaccination for WLHIV")))
-startend.inART %>% group_by(scenario) %>% mutate(pctchange_gen_2020 = Total[year == 2020] / Total[year == 2000],
-                                                 pctchange_gen_2070 = Total[year == 2070] / Total[year == 2020],
-                                           pctchange_neg_2020 = HIVneg[year == 2020] / HIVneg[year == 2000],
-                                           pctchange_neg_2070 = HIVneg[year == 2070] / HIVneg[year == 2020],
-                                           pctchange_pos_2020 = HIVpos[year == 2020] / HIVpos[year == 2000],
-                                           pctchange_pos_2070 = HIVpos[year == 2070] / HIVpos[year == 2020]) %>%
-    filter(year == 2000) %>%
-    select(scenario, pctchange_gen_2020, pctchange_gen_2070, pctchange_neg_2020, pctchange_neg_2070, pctchange_pos_2020, pctchange_pos_2070)
+                                                                                 "S2 + more frequent screening for WLHIV")))
+#startend.inART %>% group_by(scenario) %>% mutate(pctchange_gen_2020 = Total[year == 2020] / Total[year == 2000],
+#                                                 pctchange_gen_2070 = Total[year == 2070] / Total[year == 2020],
+#                                           pctchange_neg_2020 = HIVneg[year == 2020] / HIVneg[year == 2000],
+#                                           pctchange_neg_2070 = HIVneg[year == 2070] / HIVneg[year == 2020],
+#                                           pctchange_pos_2020 = HIVpos[year == 2020] / HIVpos[year == 2000],
+#                                           pctchange_pos_2070 = HIVpos[year == 2070] / HIVpos[year == 2020]) %>%
+#    filter(year == 2000) %>%
+#    select(scenario, pctchange_gen_2020, pctchange_gen_2070, pctchange_neg_2020, pctchange_neg_2070, pctchange_pos_2020, pctchange_pos_2070)
    
-    # Pctchange relative to baseline/other scenarios
-        (pctreducS1S0b <- cbind.data.frame(Total = 1 - (startend.inART$Total[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070] / 
-                                           startend.inART$Total[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070]),
-                                        HIVneg = 1 - (startend.inART$HIVneg[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070] / 
-                                           startend.inART$HIVneg[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070]),
-                                        HIVpos = 1 - (startend.inART$HIVpos[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070] / 
-                                            startend.inART$HIVpos[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070])))
-        (pctreducS3S0b <- cbind.data.frame(Total = 1 - (startend.inART$Total[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$Total[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070]),
-                                     HIVneg = 1 - (startend.inART$HIVneg[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$HIVneg[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070]),
-                                    HIVpos = 1 - (startend.inART$HIVpos[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$HIVpos[startend.inART$scenario == "Baseline w/ 2x cytology" & startend.inART$year == 2070])))
-        (pctreducS3S1 <- cbind.data.frame(Total = 1 - (startend.inART$Total[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$Total[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070]),
-                                    HIVneg = 1 - (startend.inART$HIVneg[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$HIVneg[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070]),
-                                    HIVpos = 1 - (startend.inART$HIVpos[startend.inART$scenario == "S2 + 50% catch-up vaccination for WLHIV" & startend.inART$year == 2070] / 
-                                        startend.inART$HIVpos[startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & startend.inART$year == 2070])))
+# Percent change in crude cervical cancer incidence relative to baseline scenario
+pctreducS0bS0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducS0bS0) <- c('med' , 'min' , 'max')
+pctreducS0bS0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducS0bS0[pctreducS0bS0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.inART[
+       startend.inART$group == "Total" &
+         startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+         startend.inART$year == i, c(5:29)] / 
+         startend.inART[startend.inART$group == "Total" &
+                          startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                          startend.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.inART[
+         startend.inART$group == "Total" &
+           startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+           startend.inART$year == i, c(5:29)] / 
+           startend.inART[startend.inART$group == "Total" &
+                            startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                            startend.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.inART[
+         startend.inART$group == "Total" &
+           startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+           startend.inART$year == i, c(5:29)] / 
+           startend.inART[startend.inART$group == "Total" &
+                            startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                            startend.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducS1S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducS1S0) <- c('med' , 'min' , 'max')
+pctreducS1S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducS1S0[pctreducS1S0$year == i , c(1:3)] <-
+      c(apply(1 - (startend.inART[
+         startend.inART$group == "Total" &
+         startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.inART$year == i, c(5:29)] / 
+         startend.inART[startend.inART$group == "Total" &
+         startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.inART$year == i, c(5:29)]) , 1 , median) ,
+      apply(1 - (startend.inART[
+         startend.inART$group == "Total" &
+         startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.inART$year == i, c(5:29)] / 
+         startend.inART[startend.inART$group == "Total" &
+         startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.inART$year == i, c(5:29)]) , 1 , min) , 
+      apply(1 - (startend.inART[
+        startend.inART$group == "Total" &
+        startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+        startend.inART$year == i, c(5:29)] / 
+        startend.inART[startend.inART$group == "Total" &
+        startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+        startend.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducS3S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducS3S0) <- c('med' , 'min' , 'max')
+pctreducS3S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducS3S0[pctreducS3S0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.inART[
+       startend.inART$group == "Total" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "Total" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , median) ,
+     apply(1 - (startend.inART[
+       startend.inART$group == "Total" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "Total" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , min) , 
+     apply(1 - (startend.inART[
+       startend.inART$group == "Total" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "Total" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , max))) }
+
+
+
+# Additional scenarios: HIV prevalence over time
+(startend.hivPrev.inART <- filter(hiv.comb.inART, year %in% c(2001, 2021, 2031, 2056, 2071), scenario %in% c("Baseline cytology and vaccination, no ART scale-up",
+                                                                                                    "Baseline cytology and vaccination, with ART scale-up" ,                  
+                                                                                                    "Scaled up HPV testing and 90% vaccination",
+                                                                                                    "S2 + more frequent screening for WLHIV")))
+# Percent change in HIV prevalence relative to baseline scenario
+pctreducHivS0bS0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducHivS0bS0) <- c('med' , 'min' , 'max')
+pctreducHivS0bS0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducHivS0bS0[pctreducHivS0bS0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducHivS1S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducHivS1S0) <- c('med' , 'min' , 'max')
+pctreducHivS1S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducHivS1S0[pctreducHivS1S0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.hivPrev.inART[
+       startend.hivPrev.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducHivS3S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducHivS3S0) <- c('med' , 'min' , 'max')
+pctreducHivS3S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducHivS3S0[pctreducHivS3S0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.hivPrev.inART[
+       startend.hivPrev.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.hivPrev.inART[
+         startend.hivPrev.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+         startend.hivPrev.inART$year == i, c(5:29)] / 
+         startend.hivPrev.inART[startend.hivPrev.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+         startend.hivPrev.inART$year == i, c(5:29)]) , 1 , max))) }
+
+
+
+# Additional scenarios: Proportion CC in women with HIV
+(startend.prophiv.inART <- filter(prophiv.inART.comb, year %in% c(2001, 2021, 2031, 2056, 2071), scenario %in% c("Baseline cytology and vaccination, no ART scale-up",
+                                                                                                             "Baseline cytology and vaccination, with ART scale-up" ,                  
+                                                                                                             "Scaled up HPV testing and 90% vaccination",
+                                                                                                             "S2 + more frequent screening for WLHIV")))
+# Percent change in the proportion of CC in women with HIV relative to baseline scenario
+pctreducPropHivS0bS0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducPropHivS0bS0) <- c('med' , 'min' , 'max')
+pctreducPropHivS0bS0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducPropHivS0bS0[pctreducPropHivS0bS0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.prophiv.inART[
+       startend.prophiv.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+         startend.prophiv.inART$year == i, c(5:29)] / 
+         startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                  startend.prophiv.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducPropHivS1S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducPropHivS1S0) <- c('med' , 'min' , 'max')
+pctreducPropHivS1S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducPropHivS1S0[pctreducPropHivS1S0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.prophiv.inART[
+       startend.prophiv.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+         startend.prophiv.inART$year == i, c(5:29)] / 
+         startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                  startend.prophiv.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , max))) }
+
+pctreducPropHivS3S0 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(pctreducPropHivS3S0) <- c('med' , 'min' , 'max')
+pctreducPropHivS3S0$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (pctreducPropHivS3S0[pctreducPropHivS3S0$year == i , c(1:3)] <-
+     c(apply(1 - (startend.prophiv.inART[
+       startend.prophiv.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+         startend.prophiv.inART$year == i, c(5:29)] / 
+         startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                  startend.prophiv.inART$year == i, c(5:29)]) , 1 , median) ,
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , min) , 
+       apply(1 - (startend.prophiv.inART[
+         startend.prophiv.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+           startend.prophiv.inART$year == i, c(5:29)] / 
+           startend.prophiv.inART[startend.prophiv.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+                                    startend.prophiv.inART$year == i, c(5:29)]) , 1 , max))) }
+
+
+
+# Rate ratio of cervical cancer incidence among women with HIV compared to HIV-negative women
+rateRatioS0 <- as.data.frame(matrix(ncol = 3, nrow = 5))
+colnames(rateRatioS0) <- c('med' , 'min' , 'max')
+rateRatioS0$year <- c(2001, 2021, 2031, 2056, 2071)
+for(i in c(2001, 2021, 2031, 2056, 2071)) { 
+  (rateRatioS0[rateRatioS0$year == i , c(1:3)] <-
+     c(apply((startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , median) ,
+     apply((startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , min) , 
+     apply((startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, with ART scale-up" & 
+       startend.inART$year == i, c(5:29)]) , 1 , max))) }
+
+rateRatioS0b <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(rateRatioS0b) <- c('med' , 'min' , 'max')
+rateRatioS0b$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (rateRatioS0b[rateRatioS0b$year == i , c(1:3)] <-
+     c(apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] , 1 , median) ,
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] , 1 , min) , 
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Baseline cytology and vaccination, no ART scale-up" & 
+       startend.inART$year == i, c(5:29)] , 1 , max))) }
+
+rateRatioS1 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(rateRatioS1) <- c('med' , 'min' , 'max')
+rateRatioS1$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (rateRatioS1[rateRatioS1$year == i , c(1:3)] <-
+     c(apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] , 1 , median) ,
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] , 1 , min) , 
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "Scaled up HPV testing and 90% vaccination" & 
+       startend.inART$year == i, c(5:29)] , 1 , max))) }
+
+rateRatioS3 <- as.data.frame(matrix(ncol = 3, nrow = 4))
+colnames(rateRatioS3) <- c('med' , 'min' , 'max')
+rateRatioS3$year <- c(2021, 2031, 2056, 2071)
+for(i in c(2021, 2031, 2056, 2071)) { 
+  (rateRatioS3[rateRatioS3$year == i , c(1:3)] <-
+     c(apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] , 1 , median) ,
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] , 1 , min) , 
+     apply(startend.inART[
+       startend.inART$group == "HIVpos_all" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] / 
+       startend.inART[startend.inART$group == "HIVneg" &
+       startend.inART$scenario == "S2 + more frequent screening for WLHIV" & 
+       startend.inART$year == i, c(5:29)] , 1 , max))) }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#  !!!!!!!!!!!!!!!!!!!!!!NOT UPDATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
         
     # find the peak year for each group
     (max.inc <- ir.comb.stART %>% filter(scenario == "Baseline w/ 2x cytology") %>% summarise_at(vars(Total, HIVneg, HIVpos), max))
