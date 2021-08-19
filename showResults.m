@@ -77,7 +77,7 @@ genArray = {hivNeg , hivNoART , art};
 totalPop0_79(g, :) = sum(popVec(:,genArray{1}),2) + sum(popVec(:,genArray{2}),2) + sum(popVec(:,genArray{3}),2);
 end
 % Load calibration data from Excel (years, values)
-file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
+file = [pwd , '/Config/Population_validation_targets_Kenya_manualCalibModel.xlsx'];
 historicalPop0_79 = zeros(15,2);
 futurePop = zeros(16,2);
 historicalPop0_79(:,1) = xlsread(file , 'Demographics' , 'B80:P80'); % years
@@ -189,7 +189,7 @@ xlswrite(filename,[years(1: 5 : end)', popNumYrs(1 : 5 : end, :)], sheet, 'J14')
 
 %% Fertility
 % Load validation data from Excel (years, values)
-file = [pwd , '/Config/Population_validation_targets_Kenya.xlsx'];
+file = [pwd , '/Config/Population_validation_targets_Kenya_manualCalibModel.xlsx'];
 fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
 
 fertilityVec = [];
