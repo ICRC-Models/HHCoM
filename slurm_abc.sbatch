@@ -17,7 +17,7 @@ echo "Running MATLAB abc_smc script to get next set of particles."
 echo "${USRNAME}"
 export USRNAME
 echo "${DIRPATH}"
-git export DIRPATH
+export DIRPATH
 echo "${TCURR}"
 export TCURR
 echo "${DATE}"
@@ -33,6 +33,6 @@ export TZ="America/Los_Angeles"
 module load matlab_2018a
 mkdir -p /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
 matlab -nodisplay -nosplash -r "abc_smc(${TCURR} , '${DATE}' , ${NSETS} , ${NFIGSETS} , '${USRNAME}')"
-rm -r /gscratch/csde/${USRName}/$SLURM_JOB_ID
+rm -r /gscratch/csde/${USRNAME}/$SLURM_JOB_ID
 
 date

@@ -16,7 +16,7 @@ echo "Running MATLAB script to identify failed simulations."
 echo "${USRNAME}"
 export USRNAME
 echo "${DIRPATH}"
-git export DIRPATH
+export DIRPATH
 echo "${TCURR}"
 export TCURR
 echo "${DATE}"

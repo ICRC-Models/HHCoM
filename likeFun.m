@@ -159,13 +159,6 @@ for a = 4 : 13
             / sum(popVec((hivYearVec(t) - startYear) * stepsPerYear +1 , totMInds));
 end
 
-mObsCheck = [hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)]
-dMeanCheck = [hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)]
-dVarCheck = [hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)]
-length(mObsCheck)
-length(dMeanCheck)
-length(dVarCheck)
-
 mObs = [mObs ; hivAgeM(:) ; hivAgeM2012(:) ; hivAgeF(:) ; hivAgeF2012(:)];
 dMean = [dMean ; hivPrevM_dObs(: , 2) ; hivPrevF_dObs(: , 2)];
 dVar =  [dVar ;  hivPrevM_dObs(: , 3) ; hivPrevF_dObs(: , 3)];

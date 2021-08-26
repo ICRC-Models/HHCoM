@@ -1,4 +1,4 @@
-function[] = showResults_multSims_CIs(fileList)
+function[] = showResults_multSims_CIs(fileList , nBestFits , tstep_abc , date)
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -50,7 +50,7 @@ reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
 % Indices of calib runs to plot
-files = fileList;    % 22Apr20Ph2V11
+files = fileList;
 nRuns = length(fileList);
 
 % Initialize model output plots
@@ -129,7 +129,8 @@ hpv_nonVax = cc_vax;
 resultsDir = [pwd , '/HHCoM_Results/'];
 figuresDir = [pwd, '/HHCoM_Figures/'];
 t = datetime();
-groupDir = strcat(figuresDir,"Figures",int2str(t.Month), "_" , int2str(t.Day),"_",int2str(t.Hour),"_",int2str(t.Minute));
+groupDir = strcat(figuresDir , 'Figures_' , date , '_' , num2str(tstep_abc) , '_' , num2str(nBestFits) , 'fits' , '-' , ...
+    int2str(t.Month) , '_' , int2str(t.Day) , '_' , int2str(t.Hour) , '_' , int2str(t.Minute));
 mkdir(groupDir);
 
 
@@ -643,10 +644,10 @@ for gInd = 1 : length(genVec)
     g = genVec{gInd};
     if gInd == 1
         hivPrevs = hivM;
-        hivModel = hivAgeM;
+        hivModel = hivAgeM(: , : , (1:(end-1)));
     elseif gInd == 2
         hivPrevs = hivF;
-        hivModel = hivAgeF;
+        hivModel = hivAgeF(: , : , (1:(end-1)));
     elseif gInd == 3
         hivPrevs = hivAll;
         hivModel = hivAgeAll;
