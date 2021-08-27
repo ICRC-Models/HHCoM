@@ -80,6 +80,10 @@ ageVecHpvHR = {[4:5],[6],[7:8],[9:10]};
 ageVecHpvHR_length = length(ageVecHpvHR);
 hpv_hiv = zeros(nRuns , 4);
 hpv_hivNeg = zeros(nRuns , 4);
+genPopHPV = zeros(nRuns,length([startYear:timeStep:currYear]));
+hivPosHPV = genPopHPV; 
+artHPV = genPopHPV; 
+hivNegHPV = genPopHPV; 
 % HPV prevalence in all women (not including CIN2+)
 hivPrevFnoCinvec = {6 , 7 , 8 , 9 , 10 , 11};
 hivPrevFnoCinvec_length = length(hivPrevFnoCinvec);
@@ -310,7 +314,43 @@ for j = 1 : nRuns
             ./ sum(histResult.popVec((yr - startYear) * stepsPerYear , ageInds)) * 100;
     end
 
-
+    %% HPV prevalence over time by HIV status among women
+    % General pop
+    hpvInds = unique([toInd(allcomb(1 : disease , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , 4 : age , 1 : risk)); toInd(allcomb(1 : disease , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , 4 : age , 1 : risk))]);
+    hpvPop = sum(histResult.popVec(: , hpvInds) , 2);
+    popTot = histResult.popVec(: , toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk)));
+    genPopHPV(j, :) = 100 * hpvPop ./ sum(popTot , 2);
+    
+    % HIV+, not on ART 
+    hpvHivInds = unique([toInd(allcomb(3 : 7 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , 4 : age , 1 : risk)); toInd(allcomb(3 : 7 , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , 4 : age , 1 : risk))]);
+    hpvHivPop = sum(histResult.popVec(: , hpvHivInds) , 2);
+    popHivTot = histResult.popVec(: , toInd(allcomb(3 : 7 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk)));
+    hivPosHPV(j, :) = 100 * hpvHivPop ./ sum(popHivTot , 2);
+    
+    %ART
+    hpvArtInds = unique([toInd(allcomb(8 , 6 , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , 4 : age , 1 : risk)); toInd(allcomb(8 , 6 , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , 4 : age , 1 : risk))]);
+    hpvArtPop = sum(histResult.popVec(: , hpvArtInds) , 2);
+    popArtTot = histResult.popVec(: , toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk)));
+    artHPV(j, :) =  100 * hpvArtPop ./ sum(popArtTot , 2);
+    
+    %HIV-
+    hpvHivNegInds = unique([toInd(allcomb(1 : 2 , 1 : viral , 2 : 5 , [1 : 5 , 7] , ...
+        1 , 1 : intervens , 2 , 4 : age , 1 : risk)); toInd(allcomb(1 : 2 , 1 : viral , ...
+        [1 : 5 , 7] , 2 : 5 , 1 , 1 : intervens , 2 , 4 : age , 1 : risk))]);
+    hpvHivNegPop = sum(histResult.popVec(: , hpvHivNegInds) , 2);
+    popHivNegTot = histResult.popVec(: , toInd(allcomb(1 : 2 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+        1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk)));
+    hivNegHPV(j, :) = 100 * hpvHivNegPop ./ sum(popHivNegTot , 2);
+    
     %% ********************************** CIN FIGURES *********************************************************************************************
     %% CIN2/3 prevalence among HIV+ women aged 20-50 in 2007
     yr = 2007;
@@ -686,6 +726,30 @@ close(gcf);
 
 %% ********************************** HPV FIGURES **********************************************************************************************
 
+%% HPV prevalence over time among women 
+figure;
+
+plot(mean(genPopHPV,1)' , 'k-' , min(genPopHPV,[],1)' , 'k--' , max(genPopHPV,[],1)' , 'k--' , ...
+    mean(hivPosHPV, 1)', 'r-' , min(hivPosHPV,[],1)' , 'r--' , max(hivPosHPV,[],1)' , 'r--' , ...
+    mean(artHPV, 1)', 'g-' , min(artHPV,[],1)' , 'g--' , max(artHPV,[],1)' , 'g--' , ...
+    mean(hivNegHPV, 1)', 'b-' , min(hivNegHPV,[],1)' , 'b--' , max(hivNegHPV,[],1)' , 'b--' , ...
+    'LineWidth' , 1.5);
+title('HPV prevalence over time in women by HIV status')
+xlabel('Year'); ylabel('Prevalence')
+xlim([1970 2020]); 
+legend(['General pop: ' , num2str(nRuns) , '-sets mean'] , ['General pop: ' , num2str(nRuns) , '-sets minimum'] , ...
+    ['General pop: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['HIV-positive: ' , num2str(nRuns) , '-sets mean'] , ['HIV-positive: ' , num2str(nRuns) , '-sets minimum'] , ...
+    ['HIV-positive: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['On ART: ' , num2str(nRuns) , '-sets mean'] , ['On ART: ' , num2str(nRuns) , '-sets minimum'] , ...
+    ['On ART: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['HIV-negative: ' , num2str(nRuns) , '-sets mean'] , ['HIV-negative: ' , num2str(nRuns) , '-sets minimum'] , ...
+    ['HIV-negative: ' , num2str(nRuns) , '-sets maximum'] , 'Location' , 'NorthWest');
+grid on;
+saveas(gcf,strcat(groupDir,'/hpvPrevByTime.fig'));
+close(gcf);
+
+
 %% HPV Prevalence in high risk women
 ageGroup = {'15 -24' , '25 - 29' , '30 - 39' , '40 - 49'};
 
@@ -794,29 +858,30 @@ close(gcf);
 
 % were HR: 16,18,31,33,35,39,45,51,52,56,58,59,67,68,82,(6,11,13,44),(26, 30, 53, 66,70)
 
-hpvHivObs(: , 1) = [1
-0.58
-0.56
-0.43
-0.46
-0.43
-NaN
-NaN
-NaN];
+hpvHivObs = [NaN NaN NaN
+0.66 0.58 0.75
+0.67 0.56 0.79
+0.57 0.45 0.71
+0.57 0.45 0.71
+0.46 0.43 0.68
+NaN NaN NaN
+NaN NaN NaN
+NaN NaN NaN];
 
 %Yamada 2009 : HIV- family planning/gyn health center
 
-hpvHivObs(: , 2) = [0.44
-0.25
-0.12
-0.15
-0.10
-0.10
-NaN
-NaN
-NaN];
+hpvNegObs = [NaN NaN NaN
+0.39 0.25 0.52
+0.30 0.12 0.47
+0.26 0.13 0.39
+0.26 0.13 0.39
+0.24 0.10 0.39
+NaN NaN NaN
+NaN NaN NaN
+NaN NaN NaN];
 
 hpvHivObs = hpvHivObs * 100;
+hpvNegObs = hpvNegObs * 100;
 
 % hpvNegObs = hpvNegObs * 100;
 
@@ -831,14 +896,17 @@ hold all;
 plot(1 : size(hpvNeg2005,2) , mean(hpvNeg2005) , 'o-')
 hold all;
 set(gca , 'xtickLabel' , ageGroup); 
-
-plot(1 : length(hpvHivObs) , hpvHivObs(: ,1) , '+--')
-plot(1 : length(hpvHivObs) , hpvHivObs(: ,2) , '+--')
+hold on;
+errorbar(1 : length(hpvHivObs) , hpvHivObs(:, 1) , hpvHivObs(:, 2:3) , ...
+    'x--' , 'LineWidth' , 1.5);
+hold on;
+errorbar(1 : length(hpvNegObs) , hpvNegObs(:, 1) , hpvNegObs(:, 2:3) , ...
+    'x--' , 'LineWidth' , 1.5);
 
 set(gca , 'xtick' , 1 : length(hpvHivObs) , 'xtickLabel' , ageGroup);
 
 legend('Model HIV-pos' , 'Model HIV-neg' ,...
-'Obs HIV-pos: Yamada (Nairobi, clinic)','Obs HIV-neg: Yamada (Nairobi, clinic)')
+'Obs HIV-pos: Yamada/Luchters','Obs HIV-neg: Yamada/Luchters')
 
 xlabel('Age Group'); ylabel('hrHPV Prevalence (%)')
 
