@@ -896,6 +896,17 @@ if contains(baseFileName , 'CISNET')
     writematrix(outputVec , fname , 'Sheet' , 'HIVprev-Crude');
 end
 
+if contains(baseFileName , 'SA')
+    firstYrInd = ((currYear - startYear)*stepsPerYear +1);
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+        'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
+    writematrix([squeeze(median(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
+        squeeze(min(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(max(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end)))'] , ...
+        fname , 'Sheet' , '(PREV)' , 'Range' , 'B3') 
+end
+
 %% Proportion of total HIV+ population on ART and VS (denominator: CD4-eligible and ineligible)
 figure('DefaultAxesFontSize' , 18);
 subplot(1,2,1);
