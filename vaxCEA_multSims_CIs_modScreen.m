@@ -83,6 +83,8 @@ hivAgeM = zeros(nRuns , age , length(monthlyTimespan));
 hivAgeF = hivAgeM;
 hivPrev = zeros(nRuns , gender , length(monthlyTimespan));
 hivPrevW = zeros(nRuns , length(monthlyTimespan));
+hivPrevW1579 = hivPrevW;
+hivPrevT1579 = hivPrevW;
 % ART coverage
 artCovM = zeros(nRuns , length(monthlyTimespan));
 artCovF = artCovM;
@@ -156,7 +158,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
+baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_hivInt2017_noVaxNoScreenNoVmmc_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
@@ -164,7 +166,7 @@ for k = 1 : loopSegmentsLength-1
         % Load results
         pathModifier = [baseFileName , fileInds{j}];
         nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_hivInt2017_SAscreenTech_noVaxNoScreenNoVmmc_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
@@ -251,7 +253,22 @@ for k = 1 : loopSegmentsLength-1
         totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
             1 : intervens , 2 , 1 : age , 1 : risk));
         hivPrevW(j , :) = (sum(vaxResult{n}.popVec(: , hivInds) , 2) ./ sum(vaxResult{n}.popVec(: , totInds) , 2));
-               
+        
+        %% HIV prevalence in women over time for ages 15+
+        hivInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 4 : age , 1 : risk));
+        totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 4 : age , 1 : risk));
+        hivPrevW1579(j , :) = (sum(vaxResult{n}.popVec(: , hivInds) , 2) ./ sum(vaxResult{n}.popVec(: , totInds) , 2));
+        
+        %% HIV prevalence in total population over time for ages 15+
+        hivInds = toInd(allcomb(3 : 8 , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 : gender , 4 : age , 1 : risk));
+        totInds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 1 : gender , 4 : age , 1 : risk));
+        hivPrevT1579(j , :) = (sum(vaxResult{n}.popVec(: , hivInds) , 2) ./ sum(vaxResult{n}.popVec(: , totInds) , 2));
+         
+        
         %% Proportion of total age-eligible HIV+ population on ART and VS (denominator: CD4-eligible and ineligible)
         artIndsF = toInd(allcomb(8 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens , 2 , 3 : age , 1 : risk));
@@ -896,15 +913,28 @@ if contains(baseFileName , 'CISNET')
     writematrix(outputVec , fname , 'Sheet' , 'HIVprev-Crude');
 end
 
+%% Write crude HIV prevalence in women aged 15+ over time
 if contains(baseFileName , 'SA')
     firstYrInd = ((currYear - startYear)*stepsPerYear +1);
     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
-    writematrix([squeeze(median(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
-        squeeze(min(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
-        squeeze(max(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
-        squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end)))'] , ...
-        fname , 'Sheet' , '(PREV)' , 'Range' , 'B3') 
+    writematrix([squeeze(median(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
+        squeeze(min(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(max(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end)))'] , ...
+        fname , 'Sheet' , '(WPREV)' , 'Range' , 'B3') 
+end
+
+%% Write crude HIV prevalence in total population aged 15+ over time
+if contains(baseFileName , 'SA')
+    firstYrInd = ((currYear - startYear)*stepsPerYear +1);
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+        'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
+    writematrix([squeeze(median(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
+        squeeze(min(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(max(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
+        squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end)))'] , ...
+        fname , 'Sheet' , '(TPREV)' , 'Range' , 'B3') 
 end
 
 %% Proportion of total HIV+ population on ART and VS (denominator: CD4-eligible and ineligible)
