@@ -7,12 +7,12 @@ master
   
 nonVaxInfections_DoArt
   -Setting: KwaZulu-Natal, South Africa
-  -Used for DO ART CEA analysis
+  -Used for DO ART CEA analysis, status quo clinic ART scenario
   -DoArtOutputs directory includes model outputs for DO ART analysis
 
 nonVaxInfections_DoArt_diagHiv
   -Setting: KwaZulu-Natal, South Africa
-  -Used for DO ART CEA analysis
+  -Used for DO ART CEA analysis, scenarios with 1x/5years home HTC
   -Includes wrapper equations to calculate percent of PLWHIV diagnosed/undiagnosed
   -vaxCEA_plotSaveDoArt_071720.m includes code to plot/save DO ART analysis outputs
   
@@ -28,13 +28,20 @@ nonVaxInfections_Kenya_national
   -Hand-calibrated
   -Assumes HPV affects HIV natural history
 
+nonVaxInfections_Nyanza
+  -Setting: Nyanza, Kenya
+  -Derived from Gui Liu dissertation model
+  -Hand-calibrated to HIV (HPV/CIN/cervical cancer calibration unfinished)
+  -Includes basic PrEP functionality
+
 PAF_HIV
   -Setting: KwaZulu-Natal, South Africa
-  -Used for PAF analysis
+  -Used for Darcy Rao's IPVC 2020 PAF analysis 
+  (follow-up paper uses master branch)
 
 OptScrnAge
   -Setting: KwaZulu-Natal, South Africa
-  -Used for optimal screening age analysis
+  -Used for Darcy Rao's IPVC 2020 optimal screening age analysis
   
   
 ---------------------------------------------------------
