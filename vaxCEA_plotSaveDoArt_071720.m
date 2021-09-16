@@ -95,6 +95,7 @@ hivIncFbyAge_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3);
 hivIncMbyAge_multSims = hivIncFbyAge_multSims;
 hivIncF1559_multSims = hivIncF_multSims;
 hivIncM1559_multSims = hivIncF_multSims;
+hivIncF1524_multSims = hivIncF_multSims;
 hivIncAgeC_multSims = zeros(length([startYear : lastYear-1]) , nRuns , age-3);
 hivIncAgeF_multSims = hivIncAgeC_multSims;
 hivIncAgeM_multSims = hivIncAgeC_multSims;
@@ -331,6 +332,15 @@ for k = 1 : loopSegmentsLength-1
         hivIncM = annlz(sum(sum(sum(sum(sum(vaxResult{n}.newHiv(: , : , : , : , 1 , 4 : 12 , ...
             1 : risk), 2), 3), 4), 6), 7)) ./ hivSus * 100;
         hivIncM1559_multSims(: , j) = hivIncM(1 : end)';
+        
+        %% HIV INCIDENCE AMONG WOMEN AGED 15-24
+        % Calculate female HIV incidence
+        hivSusInds = toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : endpoints , ...
+            1 : intervens , 2 , 4 : 5 , 1 : risk));
+        hivSus = annlz(sum(vaxResult{n}.popVec(: , hivSusInds) , 2)) ./ stepsPerYear;
+        hivIncF = annlz(sum(sum(sum(sum(sum(vaxResult{n}.newHiv(: , : , : , : , 2 , 4 : 5 , ...
+            1 : risk), 2), 3), 4), 6), 7)) ./ hivSus * 100;
+        hivIncF1524_multSims(: , j) = hivIncF(1 : end)';
         
         %% CD4 DISTRIBUTION BY GENDER, AGES 15-59 FOR HIV-TB MODEL        
         for gInd = 1 : gender
@@ -1016,6 +1026,14 @@ fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
 writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncM1559_multSims , 2) , ...
     min(hivIncM1559_multSims , [] , 2) , max(hivIncM1559_multSims , [] , 2) , ...
     hivIncM1559_multSims] , fname)  
+
+%% Save HIV incidence among women aged 15-24
+% female
+fname = [pwd , '\HHCoM_Results\Vaccine' , baseFileName , fileInds{1} , '\' , ...
+    'HIV_incidence_females_aged15-24' , '.csv'];
+writematrix([tVec(1 : stepsPerYear : end)' , mean(hivIncF1524_multSims , 2) , ...
+    min(hivIncF1524_multSims , [] , 2) , max(hivIncF1524_multSims , [] , 2) , ...
+    hivIncF1524_multSims] , fname)
 
 %% Save ART coverage by gender, ages 15-59, for HIV-TB model
 % female
