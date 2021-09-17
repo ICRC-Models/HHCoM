@@ -144,10 +144,11 @@ if calibBool && any(1 == pIdx)
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersM');
     partnersM(3 , 2:3) = partnersM(3 , 2:3) + 1;
     partnersM(4:16, 2:3) = zeros;
-    partnersM(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersM(4:6, 1);
-    partnersM(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersM(7:9, 1);
+    partnersM(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) + partnersM(4:6, 1);
+    partnersM(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) + partnersM(7:9, 1);
     partnersM(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersM(10:age, 1);
-    partnersM(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersM(4:6, 1);
+    partnersM(4, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersM(4, 1) * 2;
+    partnersM(5:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersM(5:6, 1);
     partnersM(7:10, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersM(7:10, 1);
     partnersM(11:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersM(11:age, 1);
 %     partnersM(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersM(3 , 3);
@@ -175,10 +176,11 @@ if calibBool && any(2 == pIdx)
     load([paramDir , 'demoParamsFrmExcel'] , 'partnersF');
     partnersF(3, 2: 3) = partnersF(3 , 2:3) + 1;
     partnersF(4:16, 2:3) = zeros;
-    partnersF(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) .* partnersF(4:6, 1);
-    partnersF(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) .* partnersF(7:9, 1);
+    partnersF(4:6, 2) = paramSet(paramsSub{idx}.inds(1)) + partnersF(4:6, 1);
+    partnersF(7:9, 2) = paramSet(paramsSub{idx}.inds(2)) + partnersF(7:9, 1);
     partnersF(10:age, 2) = paramSet(paramsSub{idx}.inds(3)) .* partnersF(10:age, 1);
-    partnersF(4:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersF(4:6, 1);
+    partnersF(4, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersF(4, 1) * 2;
+    partnersF(5:6, 3) = paramSet(paramsSub{idx}.inds(4)) .* partnersF(5:6, 1);
     partnersF(7:9, 3) = paramSet(paramsSub{idx}.inds(5)) .* partnersF(7:9, 1);
     partnersF(10:age, 3) = paramSet(paramsSub{idx}.inds(6)) .* partnersF(10:age, 1);
 %     partnersF(3 , 2) = paramSet(paramsSub{idx}.inds(7))*partnersF(3 , 3);
@@ -307,7 +309,8 @@ if calibBool && any(40 == pIdx);
     idx = find(40 == pIdx);
     ptMult = paramSet(paramsSub{idx}.inds(:))';
 else
-    ptMult = [1.2 2.4 1.1 1 1.4 1];
+%     ptMult = [1.2 2.4 1.1 1 1.4 1];
+    ptMult = [1 1 1 1 1 1];
 end
 d_partnersMmult = ones(6, 60);
 d_partnersMmult(1, 1:30) = linspace(1, ptMult(1), 5 * stepsPerYear); % multiplier for increasing pts in M aged 15 - 24
