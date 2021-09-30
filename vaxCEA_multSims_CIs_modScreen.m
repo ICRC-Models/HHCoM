@@ -78,6 +78,13 @@ popSize = zeros(nRuns , length(monthlyTimespan));
 popYearVec = [2018 2100];
 popYearVecLength = length(popYearVec);
 popPropF = zeros(nRuns , length(popYearVec) , age);
+% Fertility
+aFertVec = {4 5 6 7 8 9 10};
+aFertVec_length = length(aFertVec);
+dFertVec = {[1:2,8] , 3 , 4 , 5 , 6 , 7}; 
+dFertVec_length = length(dFertVec);
+allFTot = zeros(nRuns , aFertVec_length , length(monthlyTimespan));
+subFTot = zeros(nRuns , dFertVec_length , aFertVec_length , length(monthlyTimespan));
 % HIV prevalence
 hivAgeM = zeros(nRuns , age , length(monthlyTimespan));
 hivAgeF = hivAgeM;
@@ -215,7 +222,21 @@ for k = 1 : loopSegmentsLength-1
             end
         end
         
-            
+        %% Population of females with a uterus by 5-year age groups over time     
+        for aInd = 1 : aFertVec_length
+            aVal = aFertVec{aInd};
+            allDinds = toInd(allcomb(1 : disease , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                1 : 3 , 1 : intervens , 2 , aVal , 1 : risk));
+            allFTot(j , aInd , :) = sum(vaxResult{n}.popVec(:,allDinds) , 2);
+            for dInd = 1 : dFertVec_length
+                d = dFertVec{dInd};
+                subDinds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
+                    1 : 3 , 1 : intervens , 2 , aVal , 1 : risk));
+                subFTot(j , dInd , aInd , :) = sum(vaxResult{n}.popVec(:,subDinds) , 2);
+            end
+        end
+
+        
         %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
     
         %% HIV prevalence by age over time vs. AHRI (calibration)  
@@ -757,6 +778,70 @@ legend('(Statistics SA) Observed KZN, 2019' , 'Model, 2018: 25-sets mean' , ...
     'Model, 2018: 25-sets minimum' , 'Model, 2018: 25-sets maximum' , ...
     'Model, 2100: 25-sets mean' , 'Model, 2100: 25-sets minimum' , ...
     'Model, 2100: 25-sets maximum' , 'Location' , 'northeast');
+
+%% Fertility over time vs. UN data
+% Load validation data from Excel (years, values)
+file = [pwd , '/Config/Population_validation_targets.xlsx'];
+fertilityVal = xlsread(file , 'Demographics' , 'B4:G33');
+
+disp('Remember to update fertility multipliers if calibrating!!!!');
+fertDeclineProp = [0.44 ; 0.76];
+fertility2 = fertility .* fertDeclineProp(1,1);
+fertility3 = fertility2 .* fertDeclineProp(2,1);
+fertility4 = fertility3 .* 0.50;
+
+fertilityVec = [];
+fertYearVec = [startYear : 5 : lastYear];
+for y = 1 : length(fertYearVec)
+    year = fertYearVec(y);
+    fertilityAnl = fertility;
+    if year > 1960 && year <= 2000
+        dt = (year - 1960) * stepsPerYear;
+        dFert = (fertility2 - fertility) ...
+            ./ ((2000 - 1960) * stepsPerYear);
+        fertilityAnl = fertility + dFert .* dt;
+    elseif year > 2000 && year <= 2010
+        fertilityAnl = fertility2;
+    elseif year > 2010 && year <=2020
+        dt = (year - 2010) * stepsPerYear;
+        dFert = (fertility3 - fertility2) ...
+            ./ ((2020 - 2010) * stepsPerYear);
+        fertilityAnl = fertility2 + dFert .* dt;
+    elseif year > 2020 && year <= 2035
+        dt = (year - 2020) * stepsPerYear;
+        dFert = (fertility4 - fertility3) ...
+            ./ ((2035 - 2020) * stepsPerYear);
+        fertilityAnl = fertility3 + dFert .* dt;
+    elseif year > 2035
+        fertilityAnl = fertility4;
+    end
+    
+    aSum = 0;        
+    for aInd = 1 : aFertVec_length
+        for dInd = 1 : dFertVec_length
+            dProp = subFTot(: , dInd , aInd , ((y-1)*5*stepsPerYear+1)) ./ allFTot(: , aInd , ((y-1)*5*stepsPerYear+1));
+            aSum = aSum + fertilityAnl(aInd+3,dInd).*dProp*5;
+        end
+    end
+    fertilityVec = [fertilityVec; [year median(squeeze(aSum),1)]];
+end
+
+figure;
+plot(fertilityVec(:,1) , fertilityVec(:,2) , '-');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,2) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,3) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,4) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,5) , 'o');
+hold all;
+plot(fertilityVal(:,1) , fertilityVal(:,6) , 'o');
+title('Total fertility rate');
+legend('Model prediction' , 'SA estimates & projections (UN)' , 'Lower 95' , ...
+    'Lower 80' , 'Upper 80' , 'Upper 95');
+ylim([0 8]);
 
 
 %% ***************************** HIV AND HIV TREATMENT FIGURES ******************************************************************************
@@ -1425,7 +1510,7 @@ worldStandard_WP2015 = [325428 311262 295693 287187 291738 299655 272348 ...
     23477 9261 2155];
 
 diseaseLabels = {'Tot (ICC)' , 'HIV- (ICC)' , 'HIV+ (ICC)' , 'HIV+ no ART (ICC)' , 'HIV+ ART (ICC)'};
-firstYrRange = (lastYear-1) - (currYear-1);
+firstYrRange = (lastYear-1) - 1980;
 firstYrRange2 = (lastYear-1) - 1982;
 t82on = (1982:(lastYear-1))';
 outputVec = [];
@@ -1497,6 +1582,20 @@ if contains(baseFileName , 'CISNET')
     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'ICC-Crude');
+end
+
+diseaseLabels = {'Tot (CrudeICC)' , 'HIV- (CrudeICC)' , 'HIV+ (CrudeICC)' , 'HIV+ no ART (CrudeICC)' , 'HIV+ ART (CrudeICC)'};
+if contains(baseFileName , 'SA')
+    firstYrInd = ((1980 - startYear) +1);
+    for dInd = 1 : length(diseaseLabels)
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
+        writematrix([squeeze(median(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1))' , ...
+            squeeze(min(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , [] , 1))' , ...
+            squeeze(max(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , [] , 1))' , ...
+            squeeze(ccIncHivTime(: , dInd , (firstYrInd:end)))'] , ...
+            fname , 'Sheet' , diseaseLabels{dInd} , 'Range' , 'B3') 
+    end
 end
 
 %% Write cumulative cervical cancer cases by HIV status over time (2020-2120) into existing template
