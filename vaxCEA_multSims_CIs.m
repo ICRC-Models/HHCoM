@@ -1859,7 +1859,7 @@ h = fill(x2 , inBetween , [0.5,0.5,0.5]);
 h.FaceAlpha = 0.3;
 h.LineStyle = 'none';
 xlim([2000 2035]); ylim([0 100]);
-xlabel('Year'); ylabel('PLHIV aged 15-79 on ART & virally suppressed (%)')
+xlabel('Year'); ylabel('Persons with HIV aged 15-79 on ART & virally suppressed (%)')
 grid on; box on; %title('Females');
 legend('Empirical target KZN, men' , 'Modeled KZN, men: mean' , 'range' , ...
     'Empirical target KZN, women' , 'Modeled KZN, women: mean' , 'range' , ...
@@ -1907,7 +1907,7 @@ h4 = fill(x2 , inBetween(4,:) , colorVecP{4});
 h4.FaceAlpha = 0.3;
 h4.LineStyle = 'none';
 xlim([1960 2040]); ylim([0 80]);
-xlabel('Year'); ylabel('HIV-negative men circumcised(%)')
+xlabel('Year'); ylabel('Men without HIV circumcised (%)')
 grid on;
 legend('Empirical target KZN, ages 15-19' , ...
     'Empirical target KZN, ages 20-24' , 'Empirical target KZN, ages 25-49' , ...
