@@ -277,17 +277,29 @@ cAdj(isinf(cAdj)) = 0;
 
 %% Protection against HIV and HPV due to condom usage and circumcision
 % find condom use according to the present year
-condStart = 1995;
-peakYear = 2000;
+condStart = 1990;
+peakYear = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
-condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
-condUse = condUseVec(1); % year <= peakYear
+condUseVec = zeros(risk, length(yrVec)-1);
+for r = 1 : risk
+condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
+end
+condUse = condUseVec(1: risk, 1); % year <= peakYear
 if year < peakYear && year > condStart
     yrInd = year == yrVec;
-    condUse = condUseVec(yrInd);
+    condUse = condUseVec(1:risk, yrInd);
 elseif year >= peakYear
-    condUse = condUseVec(end);
+    condUse = condUseVec(1:risk, end);
 end
+% 
+% condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
+% condUse = condUseVec(1); % year <= peakYear
+% if year < peakYear && year > condStart
+%     yrInd = year == yrVec;
+%     condUse = condUseVec(yrInd);
+% elseif year >= peakYear
+%     condUse = condUseVec(end);
+% end
 
 % calculate psi vectors for protective factors
 % HIV

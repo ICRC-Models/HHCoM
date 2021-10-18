@@ -870,7 +870,7 @@ hpvHivObs = [NaN NaN NaN
 0.67 0.56 0.79
 0.57 0.45 0.71
 0.57 0.45 0.71
-0.46 0.43 0.68
+0.56 0.43 0.68
 NaN NaN NaN
 NaN NaN NaN
 NaN NaN NaN];
@@ -1193,8 +1193,8 @@ xlim([2010 2015]);
 xlabel('Year'); ylabel('Prevalence Proportion by Type (%)')
 title('Cervical Cancer')
 legend('Observed 2012: mean, 2SD' , 'Observed 2012- 9v' , 'Observed 2012- non-9v' , ...
-    'Model- 9v: ' , num2str(nRuns) , '-sets mean' , 'Model- 9v: ' , num2str(nRuns) , '-sets minimum' , 'Model- 9v: ' , num2str(nRuns) , '-sets maximum' , ...
-    'Model- non-9v: ' , num2str(nRuns) , '-sets mean' , 'Model- non-9v: ' , num2str(nRuns) , '-sets minimum' , 'Model- non-9v: ' , num2str(nRuns) , '-sets maximum');
+    ['Model- 9v: ' , num2str(nRuns) , '-sets mean'] , ['Model- 9v: ' , num2str(nRuns) , '-sets minimum'] , ['Model- 9v: ' , num2str(nRuns) , '-sets maximum'] , ...
+    ['Model- non-9v: ' , num2str(nRuns) , '-sets mean'] , ['Model- non-9v: ' , num2str(nRuns) , '-sets minimum'] , ['Model- non-9v: ' , num2str(nRuns) , '-sets maximum']);
 grid on;
 saveas(gcf,strcat(groupDir,'/hpvTypeDistribution.fig'));
 close(gcf);
