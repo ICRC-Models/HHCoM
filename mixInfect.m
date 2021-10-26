@@ -282,7 +282,7 @@ peakYear = 1995;
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = zeros(risk, length(yrVec)-1);
 for r = 1 : risk
-condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
+    condUseVec(r, :) = linspace(0 , condUse(r) , (peakYear - condStart) * stepsPerYear);
 end
 condUse = condUseVec(1: risk, 1); % year <= peakYear
 if year < peakYear && year > condStart
@@ -302,14 +302,18 @@ end
 % end
 
 % calculate psi vectors for protective factors
-% HIV
-cond_hiv = 1-(condProtect(:,1) .* condUse); % condom usage and condom protection rates
-psi_hiv = ones(gender,disease) .* cond_hiv; % condom use only for all disease states
-psi_hiv(:,2) = (1 - circProtect(:,1)) .* cond_hiv; % condom use + circumcision protection for d=2
-%HPV
-cond_hpv = 1-(condProtect(:,2) * condUse); % condom usage and condom protection rates
-psi_hpv = ones(gender,disease) .* cond_hpv;
-psi_hpv(:,2) = (1 - circProtect(:,2)) .* cond_hpv;
+psi_hiv = zeros(risk,gender,disease);
+psi_hpv = zeros(risk,gender,disease);
+for r = 1 : risk
+    % HIV
+    cond_hiv = 1-(condProtect(:,1) .* condUse(r,1)); % condom usage and condom protection rates
+    psi_hiv(r,:,:) = ones(gender,disease) .* cond_hiv; % condom use only for all disease states
+    psi_hiv(r,:,2) = (1 - circProtect(:,1)) .* cond_hiv; % condom use + circumcision protection for d=2
+    %HPV
+    cond_hpv = 1-(condProtect(:,2) * condUse(r,1)); % condom usage and condom protection rates
+    psi_hpv(r,:,:) = ones(gender,disease) .* cond_hpv;
+    psi_hpv(r,:,2) = (1 - circProtect(:,2)) .* cond_hpv;
+end
 
 %% HPV Infection
 % calculate per-partnership probability of HPV transmission
@@ -408,19 +412,19 @@ for a = ageSexDebut : age
 
                     % Calculate infections
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV (infection rate capped at 0.99) 
-                    mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d) * lambda(1 , a , r , 1)...
+                    mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(r,1,d) * lambda(1 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
-                    fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                    fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(r,2,d) * lambda(2 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(fhpvVaxSus);
-                    fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                    fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(r,2,d) * lambda(2 , a , r , 1)...
                         , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
 
                     % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV (infection rate capped at 0.99) 
-                    mInfectedNonVax = min(lambdaMultM * psi_hpv(1,d) * lambda(1 , a , r , 2)...
+                    mInfectedNonVax = min(lambdaMultM * psi_hpv(r,1,d) * lambda(1 , a , r , 2)...
                         , 0.999) .* pop(mhpvNonVaxSus);
-                    fInfectedNonVax = min(lambdaMultF * psi_hpv(2,d) * lambda(2 , a , r , 2)...
+                    fInfectedNonVax = min(lambdaMultF * psi_hpv(r,2,d) * lambda(2 , a , r , 2)...
                         , 0.999) .* pop(fhpvNonVaxSus);
-                    fInfectedNonVaxImm = min(lambdaMultF * lambdaMultImm(a) * psi_hpv(2,d) * lambda(2 , a , r , 2)...
+                    fInfectedNonVaxImm = min(lambdaMultF * lambdaMultImm(a) * psi_hpv(r,2,d) * lambda(2 , a , r , 2)...
                         , 0.999) .* pop(fhpvNonVaxImm);
               
 
@@ -523,9 +527,9 @@ for h = 1 : hpvVaxStates
 
                             % Calculate infections
                             mInfected = min(lambda(1 , a , r)...
-                                .* psi_hiv(1,d) , 0.999) .* pop(mSus); % infected males
+                                .* psi_hiv(r,1,d) , 0.999) .* pop(mSus); % infected males
                             fInfected = min(lambda(2 , a , r)...
-                                .* psi_hiv(2,d) , 0.999) .* pop(fSus); % infected females
+                                .* psi_hiv(r,2,d) , 0.999) .* pop(fSus); % infected females
 
                             % HIV incidence tracker
                             newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);
