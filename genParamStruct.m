@@ -34,7 +34,7 @@ paramsAll{2}.name = 'partnersF'; paramsAll{2}.length = 6; ... %1 %24;
 % condUse, [1 x 1]
 paramsAll{5}.name = 'condUse'; paramsAll{5}.length = 3; ...
     paramsAll{5}.lb = [0.07; 0.09; 0.1]; ...
-    paramsAll{5}.ub = [0.12; 0.34; 0.5];
+    paramsAll{5}.ub = [0.15; 0.34; 0.5];
 
 % epsA, [1 x 1]
 paramsAll{6}.name = 'epsA'; paramsAll{6}.length = 1; ... %3
