@@ -58,7 +58,7 @@ csvwrite([paramDir, file] , sample)
 
 %% If using parameters from a previous calibration or phase, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
 % Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
-pIdx_wPh1Resample = [pIdx(1,1:9) , 15,16,18,27,28,29,30,31,32,33,34 , pIdx(1,10) , 37,38,39];
+pIdx_wPh1Resample = [pIdx(1,1:9) , 15,16,18,27,28,29,30,31,32,33,34 , pIdx(1,10) , 37,38,39 , pIdx(1,11)];
 
 ph1_top50Sets = load([paramDir,'alphaParamSets_calib_22Apr20Ph2V11_6_top50Sets.dat']);
 ph1sample = datasample(ph1_top50Sets, nSets , 2); % resample
