@@ -27,7 +27,7 @@ TCURR=0    # t_curr, always zero for LHS
 echo "${TCURR}"
 export TCURR
 
-DATE=18Oct21    # SET ME: date identifier of calibration
+DATE=22Nov21    # SET ME: date identifier of calibration
 echo "${DATE}"
 export DATE
 

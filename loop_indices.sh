@@ -9,7 +9,7 @@ export DIRPATH
 TMIN=0    # SET ME: calibration iteration to start with
 TMAX=0    # SET ME: calibration iteration to end on
 
-DATE=18Oct21    # SET ME: date identifier of calibration
+DATE=22Nov21    # SET ME: date identifier of calibration
 echo "${DATE}"
 export DATE
 
