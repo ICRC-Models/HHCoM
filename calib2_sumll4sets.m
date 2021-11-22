@@ -50,8 +50,8 @@ parfor n = 1 : nPrlSets
     paramSet = [paramSetMatrix(1:29,subMatrixInds(n)) ; ...
         ph1sampleSubset(1:19,subMatrixInds(n)) ; ...
         paramSetMatrix(30,subMatrixInds(n)) ; ...
-        ph1sampleSubset(20:22,subMatrixInds(n) ;
-        paramSetMatrix(31:36))];
+        ph1sampleSubset(20:22,subMatrixInds(n)) ;
+        paramSetMatrix(31:36,subMatrixInds(n))];
     %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     negSumLogLSet(n,1) = negSumLogL;
