@@ -53,25 +53,25 @@ paramDir = [pwd , '\Params\'];
 
 %% LOAD SAVED RESULTS
 % ***SET ME***: save names of potential scenarios to analyze as variables
-baseDirName = 'Vaccine22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_';
-dirName_reductBaseline = [baseDirName , 'WHO-SCES0b_6_1'];
-dirName_SCE2_057 = [baseDirName , 'WHO-SCES2_057_6_1'];
-dirName_SCE2_057gbV = [baseDirName , 'WHO-SCES2_057gbV_6_1'];
-dirName_SCE7_057 = [baseDirName , 'WHO-SCES7_057_6_1']; % Note that these really should be named WHO-SCES8...
+baseDirName = '22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_';
+dirName_reductBaseline = ['Vaccine' , baseDirName , 'WHO-SCES0b_6_1'];
+dirName_SCE2_057 = ['Vaccine' , baseDirName , 'WHO-SCES2_057_6_1'];
+dirName_SCE2_057gbV = ['Vaccine' , baseDirName , 'WHO-SCES2_057gbV_6_1'];
+dirName_SCE7_057 = ['Vaccine' , baseDirName , 'WHO-SCES7_057_6_1']; % Note that these really should be named WHO-SCES8...
 
 % ***SET ME***: choose which scenarios you want to save data in Excel for
 simVec = {dirName_reductBaseline , dirName_SCE2_057 , ...
     dirName_SCE2_057gbV , dirName_SCE7_057};
 fileVec = {'sim0' , 'sim2' , 'sim2' , 'sim2'};
-fileVec2 = {'0b' , '2_057' , '2_057gbV' ,'7_057'};
+fileVec2 = {'0b' , '2_057' , '2_057gbV' ,'7_057'}; %{'2_g9only' , '2' , '2_gbV' , '7'};
 % ***SET ME***: make sure the names here correspond to scenarios in simVec above
-fileTits = {'Baseline with 57% girls vax' , ...
-    '57% girls multi-cohort vax' , ...
-    '57% girls + boys multi-cohort vax' , ...
-    '57% girls multi-cohort + catch-up vax'};
-fileTits2 = {'Girls-only multi-cohort, Median' , '  Uncertainty range' , ...
-    'Gender-neutral multi-cohort, Median' , '  Uncertainty range' , ...
-    'Girls-only multi-cohort + catch-up, Median' , '  Uncertainty range'};
+fileTits = {'Baseline' , ...
+    'Girls-only multi-age-cohort' , ...
+    'Gender-neutral multi-age-cohort' , ...
+    'Girls-only multi-age-cohort + catch-up'};
+fileTits2 = {'Girls-only multi-age-cohort, Median' , '  uncertainty range' , ...
+    'Gender-neutral multi-age-cohort, Median' , '  uncertainty range' , ...
+    'Girls-only multi-age-cohort + catch-up, Median' , '  uncertainty range'};
 
 % Plot settings
 reset(0)
@@ -138,7 +138,7 @@ for j = 1 : nResults
         p = plot([2020:2121] , ccInc(1 , :) , '-');
         axis([2020 2121 0 80])
         grid on;
-        xlabel('Year'); ylabel('AS ICC per 100K');
+        xlabel('Year'); ylabel('Age-standardized cervical cancer incidence per 100,000 women');
         title(diseaseTits{dInd});
         
         if j == nResults
