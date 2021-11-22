@@ -60,7 +60,7 @@ dirName = '22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_CISNET-S0
 teamVec = {'UW' , 'DC'};
 nTeams = length(teamVec);
 % ***SET ME***: date of most recent data to plot; should match dates in input file names from each team, respectively
-dateVec = {'07192021' , '03042021'};
+dateVec = {'07192021' , 'v5'};
 % ***SET ME***: scenario numbers to plot; should match scenario names in input file names
 sceVec = {'S0' , 'S1' , 'S2'};
 nSces = length(sceVec);
