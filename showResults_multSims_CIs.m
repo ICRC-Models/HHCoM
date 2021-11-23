@@ -62,7 +62,7 @@ popSize = zeros(nRuns , length(popYearVec));
 popYearVecAge = unique(popAgeDist_dObs(: ,1));
 popYearVecAge_length = length(popYearVecAge);
 popProp = zeros(nRuns , length(popYearVecAge) , age);
-% HIV prevalence
+% HIV prevalence, incidence
 hivPrevAFvec = {4 , 5 , 6 , 7 , 8 , 9 , 10};
 hivPrevAFvec_length = length(hivPrevAFvec);
 hivPrevAMvec = {4 , 5 , 6 , 7 , 8 , 9 , 10 , 11};
@@ -71,9 +71,9 @@ hivPrevACvec = {4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12 , 13};
 hivPrevACvec_length = length(hivPrevACvec);
 hivIncAVec = {[4:5], [4:10], [11:16], [4:16]};
 hivIncAVec_length = length(hivIncAVec);
-hivIncM = zeros(nRuns, length(hivIncAVec), length([startYear:timeStep:currYear]));
+hivIncM = zeros(nRuns, length(hivIncAVec), length([startYear:currYear-1]));
 hivIncF = hivIncM;
-hivIncRiskF = zeros(nRuns, risk, length([startYear:timeStep:currYear]));
+hivIncRiskF = zeros(nRuns, risk, length([startYear:currYear-1]));
 hivYearVec = unique(hivPrevM_dObs(: ,1));
 hivYearVec_length = length(hivYearVec);
 hivAgeM = zeros(nRuns , 8 , length(hivYearVec));
@@ -232,7 +232,7 @@ for j = 1 : nRuns
         1 : intervens , 1 : 2 , 4 : 11 , 1 : risk)));
     hiv_prev(j,:) = ((hivPop + art) ./ sum(popTot , 2) * 100)';
 
-    %% HIV incidence in board age groups 
+    %% HIV incidence in broad age groups 
     for aInd = 1 : hivIncAVec_length
              a = hivIncAVec{aInd};
                 hivSusIndsM = [toInd(allcomb(1 : 2 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -248,12 +248,11 @@ for j = 1 : nRuns
     end
          
     %% HIV incidence by age and risk among women
-    for rInd = 1 : risk
-        r = risk{rInd};
+    for r = 1 : risk
         hivSusInds = [toInd(allcomb(1 , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
             1 : endpoints , 1 : intervens, 2 , 4:16 , r))]; 
         hivSus = annlz(sum(histResult.popVec(1:end-1 , hivSusInds) , 2)) ./ stepsPerYear;
-        hivIncRiskF(j, rInd, :) = ...
+        hivIncRiskF(j, r, :) = ...
             annlz(sum(sum(sum(sum(sum(histResult.newHiv(1:end-1, :,:, :, 2, 4:16, r), 2), 3), 4), 6), 7)) ./ hivSus * 100;
     end
    
@@ -753,23 +752,23 @@ saveas(gcf,strcat(groupDir,'/hivPrevByTime.fig'));
 close(gcf);
 
 
- %% HIV incidence in board age groups vs UNAIDS estimates
+ %% HIV incidence in broad age groups vs UNAIDS estimates
 ageGroup = {'15-24', '15-49', '50+', '15+'};
 unaidsInc = [0.088 0.227 ; 0.111 0.184; 0.035 0.047; 0.099 0.162]; 
 
 figure() 
 for aInd = 1 : hivIncAVec_length
     subplot(2,2,aInd)
-    a = hivIncAVec(aInd);
+    a = hivIncAVec{aInd};
     plot(2019, unaidsInc(aInd, 1), 'b+', ...
         2019, unaidsInc(aInd, 2), 'r+');
     hold all;
-    plot([startYear:timeStep:currYear]', mean(squeeze(hivIncM(:, a, :)), 1)', 'b-', ...
-        [startYear:timeStep:currYear]', min(squueze(hivIncM(:, a, :)),[],1)' , 'b--' , ...
-        [startYear:timeStep:currYear]', max(squeeze(hivIncM(:, a, :)),[],1)' , 'b--' , ...
-        [startYear:timeStep:currYear]', mean(squeeze(hivIncF(:, a, :)), 1)', 'r-', ...
-        [startYear:timeStep:currYear]', min(squeeze(hivIncF(:, a, :)),[],1)' , 'r--' , ...
-        [startYear:timeStep:currYear]', max(squeeze(hivIncF(:, a, :)),[],1)' , 'r--' );
+    plot([startYear:currYear-1]', mean(squeeze(hivIncM(:, aInd, :)), 1)', 'b-', ...
+        [startYear:currYear-1]', min(squeeze(hivIncM(:, aInd, :)),[],1)' , 'b--' , ...
+        [startYear:currYear-1]', max(squeeze(hivIncM(:, aInd, :)),[],1)' , 'b--' , ...
+        [startYear:currYear-1]', mean(squeeze(hivIncF(:, aInd, :)), 1)', 'r-', ...
+        [startYear:currYear-1]', min(squeeze(hivIncF(:, aInd, :)),[],1)' , 'r--' , ...
+        [startYear:currYear-1]', max(squeeze(hivIncF(:, aInd, :)),[],1)' , 'r--' );
     title(['HIV incidence in '; ageGroup(aInd)])
     xlabel('Year'); ylabel('Rate Per 100');
     xlim([1985 2020])
@@ -787,9 +786,9 @@ close(gcf);
 %% HIV incidence by risk among women 15+
 figure()
 for r = 1 : risk
-     plot([startYear:timeStep:currYear]', mean(squeeze(hivIncRiskF(:, r, :)), 1)', '-', ...
-        [startYear:timeStep:currYear]', min(squueze(hivIncRiskF(:, r, :)),[],1)' , '--' , ...
-        [startYear:timeStep:currYear]', max(squeeze(hivIncRiskF(:, r, :)),[],1)' , '--');
+     plot([startYear:currYear-1]', mean(squeeze(hivIncRiskF(:, r, :)), 1)', '-', ...
+        [startYear:currYear-1]', min(squeeze(hivIncRiskF(:, r, :)),[],1)' , '--' , ...
+        [startYear:currYear-1]', max(squeeze(hivIncRiskF(:, r, :)),[],1)' , '--');
     hold all
 end
 xlabel('Year'); ylabel('Rate Per 100'); title('HIV incidence in women by risk group')
