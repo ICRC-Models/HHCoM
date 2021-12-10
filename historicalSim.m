@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_fertDec042-076_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_to2018_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_trackCD4-Discont_discontFxd_DoART_S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
 % AGE GROUPS

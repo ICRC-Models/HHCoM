@@ -57,7 +57,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2018;
+currYear = 2020;
 endYear = currYear;
 years = endYear - startYear;
 
