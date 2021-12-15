@@ -6,8 +6,8 @@ DIRPATH=/gscratch/csde/${USRNAME}/HHCoM    # SET ME: path to your HHCoM director
 echo "${DIRPATH}"
 export DIRPATH
 
-TMIN=0    # SET ME: calibration iteration to start with
-TMAX=0    # SET ME: calibration iteration to end on
+TMIN=1    # SET ME: calibration iteration to start with
+TMAX=1    # SET ME: calibration iteration to end on
 
 DATE=22Nov21    # SET ME: date identifier of calibration
 echo "${DATE}"
