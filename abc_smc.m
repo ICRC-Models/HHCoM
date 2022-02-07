@@ -230,6 +230,7 @@ end
 
 %% If using parameters from a previous calibration or phase, uncomment the following to resample a subset of parameters from best-fit sets of a previous phase.
 % Note: sections to uncomment for Phase 2 in calib1_lhs, calib2_sumll4sets, and abc_smc
+%{
 resampleSubsetSets = load([paramDir , 'resampleSubsetSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 random parameter sample
 if t_curr == 0
     % Save initial set of resampled particles
@@ -258,3 +259,4 @@ csvwrite([paramDir, file] , ph1sample)
 file = ['resampleSubsetSets_calib_' , date , '_' , num2str(t_next) , '.dat'];
 paramDir = [pwd , '/Params/'];
 csvwrite([paramDir, file] , ph1sampleSubset)
+%}
