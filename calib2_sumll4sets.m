@@ -49,9 +49,9 @@ end
 %% Obtain model output for each set of sampled parameters
 negSumLogLSet = zeros(nPrlSets,1);
 parfor n = 1 : nPrlSets
-    paramSet = [paramSetMatrix(1:29,subMatrixInds(n)) ; ...
-        paramSetMatrix(30,subMatrixInds(n)) ; ...
-        paramSetMatrix(31:36,subMatrixInds(n))];
+    paramSet = [paramSetMatrix(1:27,subMatrixInds(n)) ; ...
+        paramSetMatrix(28,subMatrixInds(n)) ; ...
+        paramSetMatrix(29:34,subMatrixInds(n))];
     %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
     negSumLogLSet(n,1) = negSumLogL;
@@ -72,7 +72,7 @@ dlmwrite([paramDir, file] , formatOutput , 'delimiter' , ',' , 'roffset' , 1 , '
 for j = 1 : nPrlSets
     pathModifier = ['toNow_' , date , '_noBaseVax_baseScreen_hpvHIVcalib_' , num2str(t_curr) , '_' , num2str(paramSetIdx + j - 1)];
     savdir = [pwd , '/HHCoM_Results/'];
-    if negSumLogLSet(j,1) < -95000000000000000000
+    if negSumLogLSet(j,1) < -91000000000000000000
         delete([savdir , pathModifier , '.mat']);
     end
 end
