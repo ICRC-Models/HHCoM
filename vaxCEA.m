@@ -21,8 +21,9 @@ function vaxCEA(pathModifier)
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
     hivStartYear , circStartYear , circNatStartYear , vaxStartYear , ...
-    baseline , cisnet , who , whob , circProtect , condProtect , MTCTRate , ...
-    hyst , OMEGA , ...
+    baseline , who , spCyto , spHpvDna , spGentyp , spAve , spHpvAve , ...
+    circProtect , condProtect , MTCTRate , hyst , ...
+    OMEGA , ...
     ccInc2012_dObs , ccInc2018_dObs , cc_dist_dObs , cin3_dist_dObs , ...
     cin1_dist_dObs , hpv_dist_dObs , cinPos2002_dObs , cinNeg2002_dObs , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
@@ -53,11 +54,11 @@ function vaxCEA(pathModifier)
 %annAvg = @(x) sum(reshape(x , stepsPerYear , size(x , 1) / stepsPerYear)) ./ stepsPerYear; % finds average value of a quantity within a given year
 
 % Load results
-nSims = size(dir([pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , '*.mat']) , 1);
+nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
 curr = load([pwd , '\HHCoM_Results\toNow_22Apr20Ph2V2_baseVax057_baseScreen_baseVMMC_fertDec042-076_2020ARTfxd_DoART_S1_11_1']); % Population up to current year
 
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'vaxSimResult'];
+resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
 for n = 2 %parfor n = 1 : nSims
     % load results from vaccine run into cell array
     vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
@@ -3177,7 +3178,7 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %         hold all
 %         
 %         % Save reduction results
-% %         fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
+% %         fname = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'Efficacy' , num2str(round(vaxResult{n}.vaxEff * 100)) , ...
 % %             'Coverage' , num2str(round(vaxResult{n}.vaxRate * 100)) , '_Mort' , '.xlsx'];
 % %         sname = [plotTits1{i} , '_MortRed'];
 % %         if exist(fname , 'file') == 2
@@ -3321,7 +3322,7 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %     legend('9-14' , '15-24' , '25-34' , '35-49' , '50-74');
 % end
 % saveResults = [tVec(1 : stepsPerYear : end)' , saveResults];
-% fname = [pwd , '\HHCoM_Results\Vaccine' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
+% fname = [pwd , '\HHCoM_Results\' , pathModifier , '\' , 'vaxCoverage' , '.xlsx'];
 % xlswrite(fname , saveResults)
 % 
 % % Age-standardized
@@ -3708,13 +3709,13 @@ legend('9v-type HPV, 80% vax' , 'Observed 2011: 9v' , 'Non-9v-type HPV, 80% vax'
 %     for v = 1 : 2
 %         for i = 1 : (length(vaxResult{1}.tVec) - length(curr.tVec))
 %         %HIV-
-%         rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v ));
+%         rpopHivNegTot(i,1) = sumall(vaxResult{1}.newScreen(i , [1,7:9] , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v ));
 % 
 %         %HIV+
-%         rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : 5 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v));
+%         rpopHivTot(i,1) = sumall(vaxResult{1}.newScreen(i , 2 : 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v));
 % 
 %         %ART
-%         rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 6 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , 1 : risk , v));
+%         rpopArtTot(i,1) = sumall(vaxResult{1}.newScreen(i , 10 , 1 : hpvVaxStates , 1 : hpvNonVaxStates , v));
 %         end
 % 
 %         subplot(1,3,1)

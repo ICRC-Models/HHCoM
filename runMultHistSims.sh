@@ -1,21 +1,26 @@
-TCURR=6    # t_curr
+USRNAME=carajb    # SET ME: your username
+echo "${USRNAME}"
+export USRNAME
+
+DIRPATH=/gscratch/csde/${USRNAME}/HHCoM    # SET ME: path to your HHCoM directory
+echo "${DIRPATH}"
+export DIRPATH
+
+TCURR=6    # t_curr, last iteration of calibration
 echo "${TCURR}"
 export TCURR
 
-DATE=22Apr20Ph2V11
+DATE=22Apr20Ph2V11    # date identifier of calibration
 echo "${DATE}"
 export DATE
 
-echo "Get matrix size."
 FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
-NSETS=$(<${FILE})
+NSETS=$(<${FILE})    # size of parameter matrix
 echo "${NSETS}" 
 export NSETS
 
-echo "Running specified simulation."
-#for i in $(seq 1 5 25); do
-    SETIDX=1    #$i
-    export SETIDX
-    sbatch -p csde -A csde slurm_runMultHistSims.sbatch
-#done
+echo "Running historical simulations."
+SETIDX=1
+export SETIDX
+sbatch -p csde -A csde --mail-user=${USRNAME}@uw.edu slurm_runMultHistSims.sbatch    # note: values passed from command line have precedence over values defined in job script
 

@@ -35,6 +35,7 @@ elseif (year >= 2020)
 end
 
 %% Calculate ART treatment coverage
+% Note: begin scale-up to the given coverage level in the prior year so that the desired coverage is reached BY that year
 artOut = zeros(gender , age ,risk);
 artDist = reshape(artDist, [disease , viral , gender , age , risk]); % zeros(disease , viral , gender , age , risk);
 treat = zeros(disease , viral , gender , age ,risk);
@@ -231,7 +232,7 @@ if year >= 2016
             minCoverLim = popCover{g}(end) * minLim;
             maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);
-        end     
+        end
 
         % Calculate treat/artOut matrices to maintain ART coverage min/max by age
         [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
