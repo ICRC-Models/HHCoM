@@ -8,22 +8,13 @@
 
 # To edit any parameters, go to Excel files in "CEA/parameters"
 
-# TO Do:
-# Two-way sensitivity analysis
-# Consider testing costs
-
 # =====================================================================================
 
 # Setup ; Read inflation converter from H drive
 
-setwd("/")
-
 library(pacman)
 
 source('H:/repos/fgh/FUNCTIONS/currency_conversion.R')
-
-setwd("C:/Users/msahu/Documents/Other_Research/DO_ART/HHCoM/")
-
 
 # =======================================================================================
 
@@ -60,7 +51,6 @@ sn3_index <- c(which(cost_params$param_name == "cb_art_y1"),
 
 sn4_index <- which(cost_params$param_name == "standard_art")
 
-sn5_index <- which(cost_params$param_name == "circumcision")
 
 # Set updated values
 
@@ -81,6 +71,7 @@ for (i in names(sensitivity)) {
   } 
 }
 
+
 rm(sensitivity)
 
 # INFLATE ---------------------------------------------------------------------------------
@@ -96,6 +87,14 @@ cost_inflated <- currency_conversion(data = cost_params,
 costs <- cost_inflated[["final_cost"]]
 names(costs) <- cost_inflated[["param_name"]]
 
+# Sensitivity Analysis for "Maximum Allowable Cost"
+
+if (max_allowable_cost == "ON") {
+  
+  costs[names(costs) == "cb_art_y1"] <- MAX_COST
+  costs[names(costs) == "cb_art_sub"] <- MAX_COST
+  
+}
 
 # ========================================================================================
 
@@ -374,7 +373,6 @@ cost_soc_art <- costs["standard_art"]
 cost_cb_art <- c(costs["cb_art_y1"], # 1st year
                   rep(costs["cb_art_sub"], 40)) # Subsequent years
 
-
 # SCALARS  ---------------------------------------------------------------------------------------
 
 # DO ART parameters: assumptions for # people on community versus clinic ART
@@ -428,12 +426,32 @@ for (v in names(version)) {
           filter(year>=2020)  %>%  select(-year) # Restrict to 2020:2060
         
         # Set up scalars (Proportion of people on community versus SOC ART)
+        
+        if (sn_pct_cbART_main == T) {
           
-        Fscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Women", "Distribution Clinic ART"]
-            
+          Fscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Women", "Distribution Clinic ART (Main)"]
+          
+          Mscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Men", "Distribution Clinic ART (Main)"]
+          
+        }
+        
+        if (sn_pct_cbART_lo == T) {
+          
+          Fscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Women", "Distribution Clinic ART (LB)"]
+          
+          Mscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Men", "Distribution Clinic ART (LB)"]
+          
+        }
+        
+        if (sn_pct_cbART_hi == T) {
+          
+          Fscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Women", "Distribution Clinic ART (UB)"]
+          
+          Mscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Men", "Distribution Clinic ART (UB)"]
+          
+        }
+              
         Fscalar_cbArt <- 1 - Fscalar_soc
-          
-        Mscalar_soc <- art_distn[art_distn$Scenario==x & art_distn$Sex == "Men", "Distribution Clinic ART"]
           
         Mscalar_cbArt <- 1 - Mscalar_soc
         
@@ -491,11 +509,11 @@ for (v in names(version)) {
   }
 }
 
-rm(art_scalars, art_distn, vs_col,
-   Fscalar_soc, Fscalar_cbArt, Mscalar_soc, Mscalar_cbArt,
-   Fpop_init_art, Fpop_prev_art, Mpop_init_art, Mpop_prev_art,
-   FpctVS_soc, FpctVS_cbArt, MpctVS_soc, MpctVS_cbArt, 
-   pop_soc, pop_cb_art, art_cost, soc_art_cost, cb_art_cost)
+# rm(art_scalars, art_distn, vs_col,
+#    Fscalar_soc, Fscalar_cbArt, Mscalar_soc, Mscalar_cbArt,
+#    Fpop_init_art, Fpop_prev_art, Mpop_init_art, Mpop_prev_art,
+#    FpctVS_soc, FpctVS_cbArt, MpctVS_soc, MpctVS_cbArt, 
+#    pop_soc, pop_cb_art, art_cost, soc_art_cost, cb_art_cost)
 
 #================================================================================================
 
@@ -564,9 +582,9 @@ for (v in names(version)) {
         
         costs_art_list[[paste(x, "art", "dr0",v, sep = ".")]][, -1] 
         
-        if (vmmc_cost == T) {
+        if (v == "vmmc") {
           
-          costs_vmmc_list[[paste(x, "vmmc", "dr0",v, sep = ".")]][, -1] 
+          + costs_vmmc_list[[paste(x, "vmmc", "dr0",v, sep = ".")]][, -1] 
           
         }
       
