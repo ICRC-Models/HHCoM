@@ -59,7 +59,7 @@ paramDir = [pwd , '\Params\'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2122; % ***SET ME***: last year of simulation from futureSim
+lastYear = 2121; % ***SET ME***: last year of simulation from futureSim
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
@@ -230,7 +230,7 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim2' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['Vaccine22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_WHO-SCES' , sceNum , '_']; % ***SET ME***: name for future run output file 
+baseFileName = ['Vaccine22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_WHO-SCES' , sceNum , '_']; % ***SET ME***: name for future run output file 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
 for k = 1 : loopSegmentsLength-1
@@ -238,7 +238,7 @@ for k = 1 : loopSegmentsLength-1
         % Load results
         pathModifier = [baseFileName , fileInds{j}]; % ***SET ME***: name for simulation output file
         nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_baseVax057_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_8ts-2021_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_noBaseVax_baseScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
@@ -1330,7 +1330,7 @@ legend('(Statistics SA) Observed KZN, 2019' , 'Model, 2018: 25-sets mean' , ...
 %% Population proportion by broad age groups over time
 % Load calibration data from Excel
 file = [pwd , '/Config/Calibration_targets.xlsx'];
-kzn_popByageC_yrs(: , 1) = xlsread(file , 'Calibration' , 'E255:E270').*1000;    % females by age in 2019
+kzn_popByageC_yrs(: , 1) = xlsread(file , 'Calibration' , 'E255:E270').*1000;    % total population by age in 2019
 popPropBroadC_obs = zeros(ageVecLength_cPopDist , 2);
 for aV = 1 : ageVecLength_cPopDist
     a = ageVec_cPopDist{aV};
@@ -1676,6 +1676,35 @@ for g = 1 : gender
             'Modeled KZN: mean' , 'Modeled KZN: range')
     end
     % sgtitle([gen{g} ,' HIV prevalence']);
+end
+
+% Women, 2016, validation only
+for g = 2 : gender
+    figure('DefaultAxesFontSize' , 10);
+    for yrInd = length(hivPrevYrVec2) 
+        yr = hivPrevYrVec2(yrInd);
+        hivModel = hivAgeF;
+        hivPrevs2 = hivPrevF_val;
+        hold all;            
+        scatter([1 : length(ageGroup)]' , hivPrevs2(((yrInd-1)*7+1):(yrInd*7), 1) , [] , 'r+');
+        hold all;
+        plot(1 : length(ageGroup) , median((squeeze(hivModel(: , [4:10] , ((yr - startYear) * stepsPerYear +1)).*100)),1) , 'k-' , 'LineWidth' , 1.5);
+        hold all;
+        x2 = [[1:length(ageGroup)] , fliplr([1:length(ageGroup)])];
+        inBetween = [max(squeeze(hivModel(: , [4:10] , ((yr - startYear) * stepsPerYear +1)).* 100),[],1) , ...
+            fliplr(min(squeeze(hivModel(: , [4:10] , ((yr - startYear) * stepsPerYear +1)).* 100),[],1))];
+        h = fill(x2 , inBetween , 'k');
+        h.FaceAlpha = 0.2;
+        h.LineStyle = 'none';
+        hold all;
+        set(gca , 'xtickLabel' , ageGroup);
+        set(gca , 'xtick' , 1 : length(ageGroup) , 'xtickLabel' , ageGroup);
+        xlabel('Age Group'); ylabel('HIV Prevalence (%)'); title(num2str(yr));
+        ylim([0 100]);
+        grid on;
+        legend('(AHRI): mean, 2SD' , ...
+            'Model: median' , 'Model: UR')
+    end
 end
 
 %% HIV prevalence over time for ages 15-49 vs. AHRI (validation) and HSRC data (validation)
