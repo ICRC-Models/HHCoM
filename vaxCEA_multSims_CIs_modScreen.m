@@ -56,7 +56,7 @@ paramDir = [pwd , '\Params\'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2122;  % ***SET ME***: last year of simulation (use 2022 for SA screening analysis)
+lastYear = 2122;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
