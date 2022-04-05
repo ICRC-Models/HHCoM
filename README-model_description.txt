@@ -152,6 +152,7 @@ Run model:
      vaxCEA_multSims_CIs.m (multiple simulations, script parallelized, designed for WHO analysis)
      vaxCEA_multSims_CIs_IPVC.m (multiple simulations, script parallelized, designed for IPVC 2021 analysis)
      vaxCEA_multSims_CIs_modScreen.m (multiple simulations, script parallelized, designed for SA screening and CISNET analyses)
+     vaxCEA_multSims_CIs_SACEA.m (multiple simulations, script parallelized, designed for SA screening cost-effectiveness analysis)
    - secondary visualization across scenarios:
      vaxCEA_multSims_WHOsces.m (designed for WHO analysis)
      vaxCEA_multSims_SAsces.m (designed for SA screening analysis)
