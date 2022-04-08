@@ -65,7 +65,7 @@ fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11
 nRuns = length(fileInds);
 
-% Initialize model output plots
+% Initialize model outputs
 % Timespans
 monthlyTimespan = [startYear : timeStep : lastYear];
 monthlyTimespan = monthlyTimespan(1 : end-1);
@@ -75,6 +75,57 @@ popSizeW_hivIndsLength = length(popSizeW_disInds);
 popSizeW_multSims = zeros(length(monthlyTimespan) , nRuns , popSizeW_disIndsLength , age, ___);
 
 
+% Select screening algorithm based on scenario number
+
+% Treatment retention (proportion who return and comply with treatment)
+%     Note: ideally these parameters would be fed into the script via loadUp2.m
+cryoRetain = 0.51; % with three-visit algorithm (cytology + colpo + cryotherapy treatment)
+leepRetain = 0.80; % LEEP
+thrmlRetain = 0.95; % thermal ablation
+ccRetain = 0.40; % cancer treatment
+eligLeep = [0.0 , 0.1 , 0.3]; % percent referred to/ eligible for LEEP (CIN1 , CIN2 , CIN3)
+
+if ((str2num(sceNum) == 0) || (str2num(sceNum) == 1)) % Scenarios 0 or 1
+    % Screening paper cytology algorithm
+    screenAlgs = spCyto;
+    screenAlgs.genTypBool = 0;
+    % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+    screenAlgs.leepRetain = zeros(1,4);
+    screenAlgs.cryoRetain = [0.0 , cryoRetain , cryoRetain , ccRetain];     
+    screenAlgs.thrmlRetain = zeros(1,4);    
+elseif ((str2num(sceNum) == 2) || (str2num(sceNum) == 3)) % Scenarios 2 or 3
+    % Screening paper HPV DNA -and-treat algorithm
+    screenAlgs = spHpvDna;
+    screenAlgs.genTypBool = 0;
+    % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+    screenAlgs.leepRetain = [[eligLeep.*leepRetain] , ccRetain]; 
+    screenAlgs.cryoRetain = zeros(1,4);
+    screenAlgs.thrmlRetain = [[(1-eligLeep).*thrmlRetain] , ccRetain];
+elseif ((str2num(sceNum) == 4) || (str2num(sceNum) == 5)) % Scenarios 4 or 5
+    % Screening paper HPV DNA+genotyping -and-treat algorithm
+    screenAlgs = spGentyp;
+    screenAlgs.genTypBool = 1;
+    % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+    screenAlgs.leepRetain = [[eligLeep.*leepRetain] , ccRetain]; 
+    screenAlgs.cryoRetain = zeros(1,4);
+    screenAlgs.thrmlRetain = [[(1-eligLeep).*thrmlRetain] , ccRetain]; 
+elseif ((str2num(sceNum) == 6) || (str2num(sceNum) == 7)) % Scenarios 6 or 7
+    % Screening paper AVE -and-treat algorithm
+    screenAlgs = spAve;
+    screenAlgs.genTypBool = 0;
+    % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+    screenAlgs.leepRetain = [[eligLeep.*leepRetain] , ccRetain]; 
+    screenAlgs.cryoRetain = zeros(1,4);
+    screenAlgs.thrmlRetain = [[(1-eligLeep).*thrmlRetain] , ccRetain]; 
+elseif ((str2num(sceNum) == 8) || (str2num(sceNum) == 9)) % Scenarios 8 or 9
+    % Screening paper HPV DNA + AVE triage -and-treat algorithm
+    screenAlgs = spHpvAve;
+    screenAlgs.genTypBool = 0;
+    % proportion who return for treatment (susceptible/immune/infected/CIN1 , CIN2 , CIN3 , CC)
+    screenAlgs.leepRetain = [[eligLeep.*leepRetain] , ccRetain]; 
+    screenAlgs.cryoRetain = zeros(1,4);
+    screenAlgs.thrmlRetain = [[(1-eligLeep).*thrmlRetain] , ccRetain]; 
+end
 
 
 resultsDir = [pwd , '\HHCoM_Results\'];
@@ -95,8 +146,8 @@ for k = 1 : loopSegmentsLength-1
         resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
-        % concatenate vectors/matrices of population up to current year to population
-        % matrices for years past current year
+        % concatenate vectors/matrices of population up to current year (prefix curr) to population
+        % matrices for years past current year (prefix vaxResult{n})
         vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)];
         vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)];
         vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : , :)];
@@ -147,7 +198,63 @@ for k = 1 : loopSegmentsLength-1
         
         
         
-        %% TOTAL NUMBER WHO RECEIVE HPV SCREENING
+        %% TOTAL NUMBER WHO RECEIVE HPV SCREENING/TREATMENT              
+        for a = 1 : age % Sum of newScreen(...) should equal 0 for ages not screened in a given HIV disease state
+            for dInd = 1 : popSizeW_disIndsLength % HIV disease states in template
+                d = popSizeW_disInds{dInd};
+                for h = 1 : hpvVaxStates % Vaccine-type HPV precancer state
+                    for s = 1 : hpvNonVaxStates % Non-vaccine-type HPV precancer state
+                        for x = 1 : endpoints % Cervical cancer or hysterectomy status
+                            % Apply selected screening/treatment algorithm
+                                % if you're susceptible/immune to both HPV types or have had a hysterectomy
+                                if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                % if you're infected with either HPV type
+                                elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==2))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgscryoRetain(1);
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                % if you have CIN1 of either HPV type
+                                elseif [( ((h==3) && ((s<=3) || (s==7))) || (((h<=3) || (h==7)) && (s==3)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==3))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgscryoRetain(1);
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                % if you have CIN2 of either HPV type
+                                elseif [( ((h==4) && ((s<=4) || (s==7))) || (((h<=4) || (h==7)) && (s==4)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==4))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.leepRetain(2);
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgscryoRetain(2);
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(2);
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                % if you have CIN3 of either HPV type
+                                elseif [( ((h==5) && ((s<=5) || (s==7))) || (((h<=5) || (h==7)) && (s==5)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==5))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.leepRetain(3);
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgscryoRetain(3);
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(3);
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                % if you have cervical cancer
+                                elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
+                                    numScreen(: , j , dInd , hInd, a) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , aInd , :),2),3),4),5),6),7);
+                                    numLEEP(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numCryo(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numThrml(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * 0.0;
+                                    numHyst(: , j , dInd , hInd, a) = numScreen(: , j , dInd , hInd, a) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(4);
+                                end
+
+                        end
+                    end
+                end
+            end
+        end
         
         
         
