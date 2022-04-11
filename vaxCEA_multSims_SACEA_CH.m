@@ -1,7 +1,7 @@
-function [] = vaxCEA_multSims_CIs_SACEA(vaxResultInd , sceNum , fileNameNums)
+function [] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums)
 % sceNum is scenario number
 % filNameNums is the parameter numbers? 
-% example: vaxCEA_multSims_CIs_SACEA(1 , '0' , {'0'})
+% example: vaxCEA_multSims_SACEA_CH(1 , '0' , {'0'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -269,134 +269,181 @@ j=1;
 %% TODO: think about how to incorporate scenario #, and parameter # into these matlab tables as well before export. 
 % Need to modify R script accordingly 
         
-        %% TOTAL NUMBER WHO RECEIVE NONAVALENT HPV VACCINE
-        % from vaxCEA_multSims_CIs.m
-        % vaxInds = zeros(viral , endpoints , gender , age , risk , disease * 5 * hpvNonVaxStates * intervens); % 5 HPV+ states
-        % toInd(allcomb(d,v,h,s,x,p,g,a,r)); note p=vax and screening
-        % history
-%         vaxTotAge = zeros(nRuns , age , 5 , length(monthlyTimespan));
-%         diseaseVec_ccInc = {[1 : disease] , [1 : 2] , [3 : 8] , [3 : 7] , 8}; % creates a cell with these vectors inside 
-%         % the above vectors are referring to all the different ways you
-%         % could group an HIV disease state (ex: HIV neg, HIV infected no
-%         % ART, HIV infected, on ART, etc)
-%         diseaseVecLength_ccInc = length(diseaseVec_ccInc); % 5 
-% 
-%         for dInd = 1 : diseaseVecLength_ccInc
-%             d = diseaseVec_ccInc{dInd}; 
-%             for a = 1 : age % you are trying to stratify results by d and age -- the two variables you are changing in the for loop
-%                 vaxInds = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-%                     1 : endpoints , [2 , 4] , 2 , a , 1 : risk)); % all the indexes that correspond to vaxInds in popVec
-%                 % vaxInds is specifically picking out p=2 and 4, vaccinated
-%                 % for HPV
-%                 vaxTotAge(j , a , dInd , :) = sum(vaxResult{n}.popVec(: , vaxInds), 2); % popVec vertical dimension is years, horizontal dimension is all the population data that corresponds with vaxInds at those years
-%             end
-%         end
+%% Stratify by HPV infection and CC state for population counts 
 
-        %% rewriting the above for this analysis
-            % stratify disease in to HIV neg (1,2) and then individual
-            % stratifications for 3-8
-        diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % 1 and 2 are HIV neg, 3:8 are HIV pos
-%         intervensVec_vax = {[3 4], [2 4]}; % 3 is screened, 2 and 4 are vaccinated
+% Description: CEA doesn't care about vaccine / non vaccine type infections. h and s are compared to see what is the more severe HPV state. 
+% If HPV state is cancer, then loop through the CC compartments. 
+% The combine the h, s, and x compartments into newHpvCcCateg, one column of the CEA data table shell. 
+% Output: ceaPopStates contains count info that is stratified by each
+% dimension. 
 
-        % TODO: i will combine the hpvVax and hpvNonVax states later on
+diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 
-        % initialize
-        % time, HIV pos/neg state (2), hpv vax state, hpv non vax state,
-        % endpoints (CC/hyst status), age
-        % outcome is intervens (screened and non-screened)
-        % Will combine HPV vax and non vax state together, and also
-        % endpoints if vaxstate
-        % hpvVaxState -1 is removing the 6, and then + endpoints is adding
-        % CC endpoints 
-        vaxTotVaxStates = zeros(length(monthlyTimespan), length(diseaseVec_vax), (hpvVaxStates-1+endpoints), intervens, age); 
+% Initializing ceaPopStates 
+    % dim 1 = time 
+    % dim 2 = HIV disease groupings
+        % 1 = HIV negative
+        % 2 = acute
+        % 3 = CD4 > 500
+        % 4 = CD4 500-350
+        % 5 = CD4 350-200
+        % 6 = CD4 <= 200
+        % 7 = HIV positive, ART 
+    % dim 3 = HPV vax groupings + CC endpoint groupings all consolidated 
+        % 11 = immune 
+        % 1 = susceptible
+        % 2 = infected 
+        % 3 = CIN1
+        % 4 = CIN2 
+        % 5 = CIN3 
+        % 6 = CC/hysterectomy 
+        % 7 = local CC
+        % 8 = regional CC 
+        % 9 = distant CC 
+        % 10 = hysterectomy 
+    % dim 4 = intervens (vaccination/screening state)
+    % dim 5 = age 
+ceaPopStates = zeros(length(monthlyTimespan), length(diseaseVec_vax), (hpvVaxStates+endpoints), intervens, age); 
 
-        for dInd = 1:length(diseaseVec_vax)
-            d = diseaseVec_vax{dInd};
+% Identify indices for popVec
+for dInd = 1 : length(diseaseVec_vax)
+    d = diseaseVec_vax{dInd}; 
 
-            % no need to stratify by viral load
+    for h = 0 : hpvVaxStates % note for loop starting at 0. i did this so that the order of vax states is least severe to most severe.
 
-            % stratify by vaccine type HPV precancer states, but you want
-            % to combine the vaccine type and non vaccine type into one
-            for h = 1 : hpvVaxStates
-            
-                for s = 1 : hpvNonVaxStates
+        for s = 0 : hpvNonVaxStates % note for loop starting at 0
 
-                    if h == s & h == 6 % if vax states match up and it's a CC state 
+            if h <= s % if hpvNonVaxStates is more severe of a state than hpvVaxStates
+                newHpvCcCateg = s; 
 
-                        for x = 1 : endpoints
+                if s == 0
+                    s1 = 7; % i arbitrarily made loop start with 0 to make comparison of h and s states easier, but it's not actually an index. s1 and h1 is the actual index. 
+                    newHpvCcCateg = 11; % update the index for the newHpvCcCateg to 11
+                else 
+                    s1 = s; 
+                end 
 
-                        % no need to stratify by p (intervens: vax and screening
-                        % history) because this is the data we are going to pull
-        
-                        % only want gender = 2 (female) 
+                if h == 0
+                    h1 = 7; 
+                else 
+                    h1 = h; 
+                end 
 
-                            for pInd = 1:length(intervensVec_vax)
-                                p = intervensVec_vax{pInd};
-        
-                                for a = 1 : age
-            
-                                % no need to stratify by risk
-            
-                                    vaxInds = toInd(allcomb(d, 1:viral, h, s, x, ...
-                                        p, 2, a, 1 : risk)); %  2 is only for female gender
-                
-                                    vaxTotVaxStates(:, dInd, h, s, x, pInd, a) = sum(vaxResult{n}.popVec(: , vaxInds), 2);
+                if newHpvCcCateg == 6 % if 6, then loop through CC compartment 
 
+                    for x = 1 : endpoints
+
+                        for p = 1 : intervens % want to stratify by all p for output
+
+                            for a = 1 : age
+                                newHpvCcCateg = x + 5; % create a new category that combines HPV and CC states 
+                                vaxInds = toInd(allcomb(d, 1:viral, 1:h1, s1, x, p, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
+                                ceaPopStates(1:end, dInd, newHpvCcCateg, p, a) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                             end
                         end
                     end
+                else % if you don't need to loop through the CC compartment 
+ 
+                    for p = 1 : intervens % can skip through looping through x 
+
+                        for a = 1 : age
+                            vaxInds = toInd(allcomb(d, 1:viral, 1:h1, s1, 1:endpoints, p, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
+                            ceaPopStates(1:end, dInd, newHpvCcCateg, p, a) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                        end 
+                    end 
+                end 
+            else % if s <= h 
+                newHpvCcCateg = h; % use h because h is more severe state than s  
+
+                % repeat everything from above, but this time stratifying by h instead of s
+
+                if s == 0
+                    s1 = 7; 
+                else 
+                    s1 = s; 
+                end 
+
+                if h == 0
+                    h1 = 7; 
+                    newHpvCcCateg = 11; 
+                else 
+                    h1 = h; 
                 end
-            end
-        end
 
-        % spread vaxTotVaxStates into a 2D matrix
-        for d = 1:length(diseaseVec_vax)
-            for h = 1:hpvVaxStates
-                for s = 1:hpvNonVaxStates
-                    for x = 1:endpoints
-                        for p = 1:length(intervensVec_vax)
-                            for a = 1:age
-                                % initalize 2D matrix
-                                vaxReshapeTemp = zeros(nTimepoints, ndims(vaxTotVaxStates)); 
+                if newHpvCcCateg == 6 % if 6, then loop through CC compartment 
 
-                                % set values of the matrix
-                                vaxReshapeTemp(:, 1:size(vaxReshapeTemp,2)+1) = ...
-                                    [transpose(monthlyTimespan), d.*ones(nTimepoints,1),...
-                                    h.*ones(nTimepoints,1), s.*ones(nTimepoints,1), x.*ones(nTimepoints,1), ...
-                                    p.*ones(nTimepoints,1), a.*ones(nTimepoints,1), vaxTotVaxStates(:, d, h, s, x, p, a)]; 
+                    for x = 1 : endpoints
 
-                                % append to the end 
-                                if exist('vaxReshape') == 0
-                                    vaxReshape = vaxReshapeTemp;
-                                else 
-                                    vaxReshape = [vaxReshape; vaxReshapeTemp];
-                                end
+                        for p = 1 : intervens % want to stratify by all p for output
 
-                                disp(d)
-
+                            for a = 1 : age
+                                newHpvCcCateg = x + 5; % create a new category that combines HPV and CC states 
+                                vaxInds = toInd(allcomb(d, 1:viral, h1, 1:s1, x, p, 2, a, 1:risk)); % notice stratify by h and not for s
+                                ceaPopStates(1:end, dInd, newHpvCcCateg, p, a) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                             end
                         end
                     end
+                else % if you don't need to loop through the CC compartment 
+
+                    for p = 1 : intervens % can skip through looping through x 
+
+                        for a = 1 : age
+                            newHpvCcCateg = h; 
+                            vaxInds = toInd(allcomb(d, 1:viral, h1, 1:s1, 1:endpoints, p, 2, a, 1:risk)); 
+                            ceaPopStates(1:end, dInd, newHpvCcCateg, p, a) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                        end
+                    end 
+                end 
+            end 
+        end 
+    end 
+end 
+
+% Read through ceaPopStates into a 2D matrix 
+% Columns
+    % timepoint
+    % HIV state 
+    % HPV/CC state 
+    % vaccination/screening state 
+    % age 
+    % count
+
+nTimepoints = length(monthlyTimespan);
+
+for d = 1 : length(diseaseVec_vax)
+    for g = 1 : size(ceaPopStates, 3) % g refers to newHpvCcCateg
+        for p = 1 : intervens
+            for a = 1 : age
+
+                % initialize 2D matrix 
+                ceaPopStatesReshapeTemp = zeros(nTimepoints, ndims(ceaPopStates)+1); 
+
+                % set values of the matrix 
+                ceaPopStatesReshapeTemp(1 : end, 1 : size(ceaPopStatesReshapeTemp,2)) = ...
+                    [transpose(monthlyTimespan), d.*ones(nTimepoints,1), ...
+                     g.*ones(nTimepoints,1), p.*ones(nTimepoints,1), ...
+                     a.*ones(nTimepoints,1), ceaPopStates(1:end, d, g, p, a)]; 
+
+                % append to the end 
+                if exist ('ceaPopStatesReshape') == 0 
+                    ceaPopStatesReshape = ceaPopStatesReshapeTemp;
+                else 
+                    ceaPopStatesReshape = [ceaPopStatesReshape; ceaPopStatesReshapeTemp]; 
                 end
             end
-        end
+        end 
+    end
+end 
 
+% turn into array, add scenario and parameter numbers, save as csv
+ceaPopStatesReshape = array2table(ceaPopStatesReshape, ...
+    'VariableNames', {'year', 'hivState', 'hpvCcState', 'vaxScreenState', 'age', 'count'}); 
+ceaPopStatesReshape.sceNum(:,1) = sceNum; 
+ceaPopStatesReshape.paramNum(:,1) = fileInds(j); 
 
-            % Add scenario and parameter numbers
-            vaxReshape = array2table(vaxReshape, ...
-            'VariableNames',{'year','disease','vaxTypeHPVState', 'nonvaxTypeHPVState', 'ccState', 'vaxScreenHistory', 'age', 'count'}); 
-            vaxReshape.sceNum(:,1) =  sceNum; 
-            vaxReshape.paramNum(:,1) = fileInds(j); 
-        
+writetable(ceaPopStatesReshape, [pwd '/SACEA/ceaPopStates.csv']); 
 
-
-        %% TOTAL NUMBER WHO RECEIVE HPV SCREENING
-        % newScreen = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , 2);
-        
-        
-        
-%     end
-% end
+%% TODO: HIV state is still showing up as only 2 categories, should be more. 
 
 %% Save population size and deaths by gender, age, and HIV/ART status to existing template
 ageLabelVec = {2, 7, 12, 17 , 22 , 27 , 32 , 37 , 42 , 47 , 52 , 57 , 62 , 67 , 72 , 77};    % median age of age group
