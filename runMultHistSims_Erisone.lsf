@@ -1,0 +1,56 @@
+#BSUB -q medium
+#BSUB -n 3
+#BSUB -R rusage[mem=6000] 
+
+# Some important variables to check (Can be removed later)
+echo '---PROCESS RESOURCE LIMITS---'
+ulimit -a
+echo '---SHARED LIBRARY PATH---'
+echo $LD_LIBRARY_PATH
+echo '---APPLICATION SEARCH PATH:---'
+echo $PATH
+echo '---LSF Parameters:---'
+printenv | grep '^LSF'
+echo '---LSB Parameters:---'
+printenv | grep '^LSB'
+echo '---LOADED MODULES:---'
+module list
+echo '---SHELL:---'
+echo $SHELL
+echo '---HOSTNAME:---'
+hostname
+echo '---GROUP MEMBERSHIP (files are created in the first group listed):---'
+groups
+echo '---DEFAULT FILE PERMISSIONS (UMASK):---'
+umask
+echo '---CURRENT WORKING DIRECTORY:---'
+pwd
+echo '---DISK SPACE QUOTA---'
+df .
+echo '---TEMPORARY SCRATCH FOLDER ($TMPDIR):---'
+echo $TMPDIR
+
+DIRPATH=/PHShome/clh89/Documents/DRIVE Model    # Path to the DRIVE model directory
+echo "${DIRPATH}"
+export DIRPATH
+
+TCURR=6    # t_curr, last iteration of calibration
+echo "${TCURR}"
+export TCURR
+
+DATE=22Apr20Ph2V11    # date identifier of calibration
+echo "${DATE}"
+export DATE
+
+FILE=./Params/matrixSize_calib_${DATE}_${TCURR}.dat
+NSETS=$(<${FILE})    # size of parameter matrix
+echo "${NSETS}" 
+export NSETS
+
+SETIDX=1
+export SETIDX
+
+cd ${DIRPATH}
+
+module load MATLAB/2020b
+matlab -nodisplay -nosplash -r "calib2_runMultHistSims(${SETIDX} , ${TCURR} , '${DATE}' , '${USRNAME}')"
