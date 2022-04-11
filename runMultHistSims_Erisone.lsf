@@ -2,6 +2,7 @@
 #BSUB -n 3
 #BSUB -R rusage[mem=6000] 
 
+# can remove the below
 # Some important variables to check (Can be removed later)
 echo '---PROCESS RESOURCE LIMITS---'
 ulimit -a
@@ -34,6 +35,10 @@ DIRPATH=/PHShome/clh89/Documents/DRIVE Model    # Path to the DRIVE model direct
 echo "${DIRPATH}"
 export DIRPATH
 
+USRNAME=clh89
+echo "${USRNAME}"
+export USRNAME
+
 TCURR=6    # t_curr, last iteration of calibration
 echo "${TCURR}"
 export TCURR
@@ -53,4 +58,6 @@ export SETIDX
 cd ${DIRPATH}
 
 module load MATLAB/2020b
+mkdir -p /scratch/c/${USRNAME}/$LSB_JOBID
 matlab -nodisplay -nosplash -r "calib2_runMultHistSims(${SETIDX} , ${TCURR} , '${DATE}' , '${USRNAME}')"
+rm -r /scratch/c/${USRNAME}/$LSB_JOBID

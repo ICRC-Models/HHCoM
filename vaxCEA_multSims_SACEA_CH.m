@@ -1,6 +1,8 @@
 function [] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums)
 % sceNum is scenario number
 % filNameNums is the parameter numbers? 
+% vaxResultInd is the number that often comes after the vaxSimResult matlab
+% file. Usually just 1. 
 % example: vaxCEA_multSims_SACEA_CH(1 , '0' , {'0'})
 
 %% Load parameters and results
@@ -60,6 +62,7 @@ set(0 , 'defaultlinelinewidth' , 1.5)
 
 lastYear = 2122;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
 
+%% TODO: Uncomment all the fileInds
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
 % code
@@ -87,50 +90,55 @@ n = vaxResultInd;
 baseFileName = ['Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
+diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
+
+%% Start of for loop for running each of the parameters 
+
 % for k = 1 : loopSegmentsLength-1
 %     parfor j = loopSegments{k}+1 : loopSegments{k+1}
 
-k=1;
+k=1; % temporarily only running a single parameter to test 
 j=1; 
-        % Load results
-        pathModifier = [baseFileName , fileInds{j}];
-        nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
 
-        vaxResult = cell(nSims , 1);
-        resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
+% Load results
+pathModifier = [baseFileName , fileInds{j}];
+nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
+curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
 
-        % load results from vaccine run into cell array
-        vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+vaxResult = cell(nSims , 1);
+resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
 
-        % concatenate vectors/matrices of population up to current year to population
-        % matrices for years past current year
-        % curr is historical model results 
-        % vaxResult is future model results
-        % this section of code combines the historical results with futur
-        % results
-        % ???????? why for vaxResult you start at row 2? Is it because of
-        % 2021 being double counted in both? 
-        vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)]; % consolidating historical population numbers with future
-        vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)]; % consolidating historical CC death #s with future... etc.
-        vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : , :)];
-        vaxResult{n}.deaths = [curr.deaths(1 : end, 1); vaxResult{n}.deaths(2 : end, 1)];
-        vaxResult{n}.newHpvVax = [curr.newHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvVax(2 : end , : , : , : , : , :)]; % infected with vaccine type HPV
-        vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
-        vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
-        vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
-        vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , :)]; %[curr.newScreen(1 : end , : , : , : , : , : , : ); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , :)];
-        vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
-        vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
-        vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
-        vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
+% load results from vaccine run into cell array
+vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
 
-    %     noVaxInd = nSims;
-    %     noV = vaxResult{noVaxInd};
-        tVec = vaxResult{n}.tVec; % time vector -- length is # of years * 6 time points per year
-        tVecYr = tVec(1 : stepsPerYear : end); % calculating the number of years. removing the time points in between the whole number years
-        
-        % Initialize variables
+% concatenate vectors/matrices of population up to current year to population
+% matrices for years past current year
+% curr is historical model results 
+% vaxResult is future model results
+% this section of code combines the historical results with futur
+% results
+% notice for vaxResult you start at row 2. likely because of
+% 2021 being double counted in both (?). 
+vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)]; % consolidating historical population numbers with future
+vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)]; % consolidating historical CC death #s with future... etc.
+vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : , :)];
+vaxResult{n}.deaths = [curr.deaths(1 : end, 1); vaxResult{n}.deaths(2 : end, 1)];
+vaxResult{n}.newHpvVax = [curr.newHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvVax(2 : end , : , : , : , : , :)]; % infected with vaccine type HPV
+vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
+vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
+vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
+vaxResult{n}.newScreen = [vaxResult{n}.newScreen(1 : end , : , : , : , : , : , :)]; %[curr.newScreen(1 : end , : , : , : , : , : , : ); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , :)];
+vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
+vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
+vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
+vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
+
+%     noVaxInd = nSims;
+%     noV = vaxResult{noVaxInd};
+tVec = vaxResult{n}.tVec; % time vector -- length is # of years * 6 time points per year
+tVecYr = tVec(1 : stepsPerYear : end); % calculating the number of years. removing the time points in between the whole number years
+
+% Initialize variables
 %         hpvYearVec = hpvYearVec_orig;
 
                
@@ -154,120 +162,124 @@ j=1;
         
         
         
-        %% TOTAL NUMBER OF DEATHS??? BY AGE, HIV STATE, HPV STATE;
-        % ccDeath: same format as ccInc = zeros(year, disease , age , hpvTypeGroups);
-        % hivDeaths: hivDeaths = zeros(length(s) - 1 , disease , gender , age)
-        % deaths(: not stratified by age?? Just by year x 1
-        % vector 
-        % Only want to filter for females
-        % The first index of all these death matrices is year as a number
-        % of 1 to 1182. That is the equivalent of monthlyTimeSpan. 
+%% TOTAL NUMBER OF DEATHS??? BY AGE, HIV STATE, HPV STATE;
+% ccDeath: same format as ccInc = zeros(year, disease , age , hpvTypeGroups);
+% hivDeaths: hivDeaths = zeros(length(s) - 1 , disease , gender , age)
+% deaths(: not stratified by age?? Just by year x 1
+% vector 
+% Only want to filter for females
+% The first index of all these death matrices is year as a number
+% of 1 to 1182. That is the equivalent of monthlyTimeSpan. 
 
-        % 1:1182 time spans (monthlyTimeSpan) 
-        % Disease states is popSizeW_hivInds = {1:2, 3, 4, 5, 6, 7, 8}; 
-        % Gender is 1 and 2
-        % 2 hpvTypeGroups: vaccine-type and non-vaccine-type 
+% 1:1182 time spans (monthlyTimeSpan) 
+% Disease states is popSizeW_hivInds = {1:2, 3, 4, 5, 6, 7, 8}; 
+% Gender is 1 and 2
+% 2 hpvTypeGroups: vaccine-type and non-vaccine-type 
 
-        % Questions: 
-        % - deaths is not stratified by anything. just by year. 
-        % - ccDeath and hivDeaths are not stratified by HPV state. Only by
-        % vaccine and non vaccine type. Is that okay?
+%% Cervical cancer deaths
+nTimepoints = length(monthlyTimespan);
 
-        % Cervical cancer deaths
-        nTimepoints = length(monthlyTimespan);
+% note: ccDeath stratifies by whether the CC was due to vaccine type or
+% non vaccine type HPV. we don't care to stratify by this in the shell. but
+% i will still pull this for now and can remove when cleaning in R. 
+for dInd = 1 : length(diseaseVec_vax)
+    d = diseaseVec_vax{dInd}; 
+    for a = 1 : age
+        for h = 1 : hpvTypeGroups
+            % initialize 2D matrix 
+            ccDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.ccDeath)); 
 
-            for d = 1 : disease
-                for a = 1 : age
-                    for h = 1 : hpvTypeGroups
+            % set values of the matrix
+            ccDeathReshapeTemp(1 : end, 1 : size(ccDeathReshapeTemp, 2)) = ...
+                [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), ...
+                a.*ones(nTimepoints,1), h.*ones(nTimepoints,1), vaxResult{n}.ccDeath(1 : end, d, a, h)]; 
 
-                        % initialize 2D matrix 
-                        ccDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.ccDeath)+1); 
-
-                        % set values of the matrix
-                        ccDeathReshapeTemp(1 : end, 1 : size(ccDeathReshapeTemp, 2)) = ...
-                            [transpose(monthlyTimespan), d.*ones(nTimepoints,1), ...
-                            a.*ones(nTimepoints,1), h.*ones(nTimepoints,1), vaxResult{n}.ccDeath(1 : end, d, a, h)]; 
-
-                        % append to the end 
-                        if exist('ccDeathReshape') == 0
-                            ccDeathReshape = ccDeathReshapeTemp;
-                        else 
-                            ccDeathReshape = [ccDeathReshape; ccDeathReshapeTemp];
-                        end
-
-                    end 
-                end
+            % append to the end 
+            if exist('ccDeathReshape') == 0
+                ccDeathReshape = ccDeathReshapeTemp;
+            else 
+                ccDeathReshape = [ccDeathReshape; ccDeathReshapeTemp];
             end
+        end 
+    end
+end
 
-        % Turn into table, add scenario and parameter numbers
-        ccDeathReshape = array2table(ccDeathReshape, ...
-            'VariableNames',{'year','disease','age', 'hpvTypeGroups', 'ccDeaths'});
-        ccDeathReshape.sceNum(:,1) =  sceNum; 
-        ccDeathReshape.paramNum(:,1) = fileInds(j); 
+% Turn into table, add scenario and parameter numbers
+ccDeathReshape = array2table(ccDeathReshape, ...
+    'VariableNames',{'year','disease','age', 'hpvTypeGroups', 'ccDeaths'});
+ccDeathReshape.sceNum(:,1) =  sceNum; 
+ccDeathReshape.paramNum(:,1) = fileInds(j); 
+
+% Add it to a running array of all the previous parameter runs.
+% If else statement if the starting array exists. If yes, add
+% it on. If not, create a new array. 
+if exist('ccDeathReshapeAllParam') == 0 
+    ccDeathReshapeAllParam = ccDeathReshape; 
+else 
+    ccDeathReshapeAllParam = [ccDeathReshapeAllParam; ccDeathReshape]; 
+end 
 
 
-        % HIV deaths
-            for d = 1 : disease
-                for a = 1 : age
+%% HIV deaths
+for d = 1 : disease
+    for a = 1 : age
+            % initialize 2D matrix 
+            hivDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.hivDeaths)); % can take out dimension for gender since we're only looking for gender==2 (female) 
 
-                        % initialize 2D matrix 
-                        hivDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.hivDeaths)); % can take out dimension for gender since we're only looking for gender==2 (female) 
+            % set values of the matrix
+            hivDeathReshapeTemp(1 : end, 1 : size(hivDeathReshapeTemp, 2)) = ...
+                [transpose(monthlyTimespan), d.*ones(nTimepoints,1), ...
+                a.*ones(nTimepoints,1), vaxResult{n}.hivDeaths(1 : end, d, 2, a)]; % set 2 for gender female 
 
-                        % set values of the matrix
-                        hivDeathReshapeTemp(1 : end, 1 : size(hivDeathReshapeTemp, 2)) = ...
-                            [transpose(monthlyTimespan), d.*ones(nTimepoints,1), ...
-                            a.*ones(nTimepoints,1), vaxResult{n}.hivDeaths(1 : end, d, 2, a)]; % set 2 for gender female 
-
-                        % append to the end 
-                        if exist('hivDeathReshape') == 0
-                            hivDeathReshape = hivDeathReshapeTemp;
-                        else 
-                            hivDeathReshape = [hivDeathReshape; hivDeathReshapeTemp];
-                        end
-
-                end
+            % append to the end 
+            if exist('hivDeathReshape') == 0
+                hivDeathReshape = hivDeathReshapeTemp;
+            else 
+                hivDeathReshape = [hivDeathReshape; hivDeathReshapeTemp];
             end
+    end
+end
 
-            % Add scenario and parameter numbers
-            hivDeathReshape = array2table(hivDeathReshape, ...
-            'VariableNames',{'year','disease','age', 'hivDeaths'}); 
-            hivDeathReshape.sceNum(:,1) =  sceNum; 
-            hivDeathReshape.paramNum(:,1) = fileInds(j); 
+% Add scenario and parameter numbers
+hivDeathReshape = array2table(hivDeathReshape, ...
+'VariableNames',{'year','disease','age', 'hivDeaths'}); 
+hivDeathReshape.sceNum(:,1) =  sceNum; 
+hivDeathReshape.paramNum(:,1) = fileInds(j); 
 
-        % All cause deaths
-             % initialize 2D matrix 
-                        allDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.deaths)); % can take out dimension for gender since we're only looking for gender==2 (female) 
+% Add it to a running array of all the previous parameter runs.
+if exist('hivDeathReshapeAllParam') == 0 
+    hivDeathReshapeAllParam = hivDeathReshape; 
+else 
+    hivDeathReshapeAllParam = [hivDeathReshapeAllParam; hivDeathReshape]; 
+end 
 
-                        % set values of the matrix
-                        allDeathReshapeTemp(1 : end, 1 : size(allDeathReshapeTemp, 2)) = ...
-                            [transpose(monthlyTimespan), vaxResult{n}.deaths(1 : end)]; 
+%% All cause deaths
+% initialize 2D matrix 
+        allDeathReshapeTemp = zeros(nTimepoints, ndims(vaxResult{n}.deaths)); % can take out dimension for gender since we're only looking for gender==2 (female) 
 
-                        % append to the end 
-                        if exist('allDeathReshape') == 0
-                            allDeathReshape = allDeathReshapeTemp;
-                        else 
-                            allDeathReshape = [allDeathReshape; allDeathReshapeTemp];
-                        end
+        % set values of the matrix
+        allDeathReshapeTemp(1 : end, 1 : size(allDeathReshapeTemp, 2)) = ...
+            [transpose(monthlyTimespan), vaxResult{n}.deaths(1 : end)]; 
 
-            % Add scenario and parameter numbers
-            allDeathReshape = array2table(allDeathReshape, ...
-            'VariableNames',{'year','allDeaths'}); 
-            allDeathReshape.sceNum(:,1) =  sceNum; 
-            allDeathReshape.paramNum(:,1) = fileInds(j); 
+        % append to the end 
+        if exist('allDeathReshape') == 0
+            allDeathReshape = allDeathReshapeTemp;
+        else 
+            allDeathReshape = [allDeathReshape; allDeathReshapeTemp];
+        end
 
+% Add scenario and parameter numbers
+allDeathReshape = array2table(allDeathReshape, ...
+'VariableNames',{'year','allDeaths'}); 
+allDeathReshape.sceNum(:,1) =  sceNum; 
+allDeathReshape.paramNum(:,1) = fileInds(j); 
 
-            % TODO: need to add a section outside the for loop where i
-            % append all the reshape tables to append the
-            % scenario/parameter data 
-
-        % Write all causes of death info into CSVs for cleaning in R...
-        % this should end up outside the for loop
-        writetable(ccDeathReshape,[pwd '/SACEA/ccDeaths.csv']);
-        writetable(hivDeathReshape, [pwd '/SACEA/hivDeaths.csv']); 
-        writetable(allDeathReshape, [pwd '/SACEA/allDeaths.csv']); 
-
-%% TODO: think about how to incorporate scenario #, and parameter # into these matlab tables as well before export. 
-% Need to modify R script accordingly 
+% Add it to a running array of all the previous parameter runs.
+if exist('allDeathReshapeAllParam') == 0 
+    allDeathReshapeAllParam = allDeathReshape; 
+else 
+    allDeathReshapeAllParam = [allDeathReshapeAllParam; allDeathReshape]; 
+end 
         
 %% Stratify by HPV infection and CC state for population counts 
 
@@ -276,8 +288,6 @@ j=1;
 % The combine the h, s, and x compartments into newHpvCcCateg, one column of the CEA data table shell. 
 % Output: ceaPopStates contains count info that is stratified by each
 % dimension. 
-
-diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 
 % Initializing ceaPopStates 
     % dim 1 = time 
@@ -441,42 +451,61 @@ ceaPopStatesReshape = array2table(ceaPopStatesReshape, ...
 ceaPopStatesReshape.sceNum(:,1) = sceNum; 
 ceaPopStatesReshape.paramNum(:,1) = fileInds(j); 
 
-writetable(ceaPopStatesReshape, [pwd '/SACEA/ceaPopStates.csv']); 
+% Add it to a running array of all the previous parameter runs.
+if exist('ceaPopStatesReshapeAllParam') == 0 
+    ceaPopStatesReshapeAllParam = ceaPopStatesReshape; 
+else 
+    ceaPopStatesReshapeAllParam = [ceaPopStatesReshapeAllParam; ceaPopStatesReshape]; 
+end 
 
-%% TODO: HIV state is still showing up as only 2 categories, should be more. 
-
-%% Save population size and deaths by gender, age, and HIV/ART status to existing template
-ageLabelVec = {2, 7, 12, 17 , 22 , 27 , 32 , 37 , 42 , 47 , 52 , 57 , 62 , 67 , 72 , 77};    % median age of age group
-hpvStateVec = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-hivStateVec = {1, 3, 4, 5, 6, 2};    % {HIV-negative, CD4>500, CD4350-500, CD4200-350, CD4<200, On ART}
-firstYrInd = ((2021 - startYear)*stepsPerYear +1);
-t2021on = tVec(firstYrInd:end)';    % row vector, times over timespan
-t2021onLen = length(t2021on);    % number of timesteps in timspan
-firstYrAnlInd = ((2021 - startYear) +1);
-outputVec = [];
-
-% for n = 1 : nRuns
-%     for aInd = 1 : age
-%         for dInd = 1 : popSizeGAD_disIndsLength
-%             for % hpv 9v
-%                 for % hpv non-9v
-%                     for % cc
-%                        outputVec = [outputVec; ...
-%                            [ones(t2021onLen,1).*str2num(sceNum) , ...    % column vector, scenario number
-%                            (ones(t2021onLen,1).*n) , ...    % column vector, parameter set number
-%                            t2021on , ...    % column vector, times
-%                            squeeze(popSizeW_multSims((firstYrInd:end) , n , dInd , aInd , __)) , ...    % column vector, number of women of designated category
-%                            ones(t2021onLen,1).*ageLabelVec{aInd} , ...    % column vector, age group
-%                            ones(t2021onLen,1).*hpvStateVec{dInd} , ...
-%                            ones(t2021onLen,1).*hivStateVec{hInd}]];
-%                     end
-%                 end
-%             end
-%         end
-%     end
+% end -- end for the for loops dictated by k and j 
 % end
 
-fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-'HIV_HPV_CEAtableshell_S' , num2str(fileInd) , '.xlsx'];
-writematrix(outputVec , fname , 'Range' , 'A2')
+%% Exporting to CSV 
+% Write all causes of death info into CSVs for cleaning in R...
+% this should end up outside the for loop for the parameters. 
+% TODO. This should end up outsid ethe for loop. And adjust the
+% file name to include the scenario number. 
+writetable(ccDeathReshapeAllParam,[pwd '/SACEA/ccDeaths_S' sceNum '.csv']);
+writetable(hivDeathReshapeAllParam, [pwd '/SACEA/hivDeaths_S' sceNum '.csv']); 
+writetable(allDeathReshapeAllParam, [pwd '/SACEA/allDeaths_S' sceNum '.csv']); 
+writetable(ceaPopStatesReshapeAllParam, [pwd '/SACEA/ceaPopStates_S' sceNum '.csv']); 
+
+%% TODO: think about how to incorporate scenario #, and parameter # into these matlab tables as well before export. 
+% Need to modify R script accordingly 
+
+% %% Save population size and deaths by gender, age, and HIV/ART status to existing template
+% ageLabelVec = {2, 7, 12, 17 , 22 , 27 , 32 , 37 , 42 , 47 , 52 , 57 , 62 , 67 , 72 , 77};    % median age of age group
+% hpvStateVec = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+% hivStateVec = {1, 3, 4, 5, 6, 2};    % {HIV-negative, CD4>500, CD4350-500, CD4200-350, CD4<200, On ART}
+% firstYrInd = ((2021 - startYear)*stepsPerYear +1);
+% t2021on = tVec(firstYrInd:end)';    % row vector, times over timespan
+% t2021onLen = length(t2021on);    % number of timesteps in timspan
+% firstYrAnlInd = ((2021 - startYear) +1);
+% outputVec = [];
+% 
+% % for n = 1 : nRuns
+% %     for aInd = 1 : age
+% %         for dInd = 1 : popSizeGAD_disIndsLength
+% %             for % hpv 9v
+% %                 for % hpv non-9v
+% %                     for % cc
+% %                        outputVec = [outputVec; ...
+% %                            [ones(t2021onLen,1).*str2num(sceNum) , ...    % column vector, scenario number
+% %                            (ones(t2021onLen,1).*n) , ...    % column vector, parameter set number
+% %                            t2021on , ...    % column vector, times
+% %                            squeeze(popSizeW_multSims((firstYrInd:end) , n , dInd , aInd , __)) , ...    % column vector, number of women of designated category
+% %                            ones(t2021onLen,1).*ageLabelVec{aInd} , ...    % column vector, age group
+% %                            ones(t2021onLen,1).*hpvStateVec{dInd} , ...
+% %                            ones(t2021onLen,1).*hivStateVec{hInd}]];
+% %                     end
+% %                 end
+% %             end
+% %         end
+% %     end
+% % end
+% 
+% fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+% 'HIV_HPV_CEAtableshell_S' , num2str(fileInd) , '.xlsx'];
+% writematrix(outputVec , fname , 'Range' , 'A2')
 
