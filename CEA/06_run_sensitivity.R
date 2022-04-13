@@ -256,8 +256,14 @@ lancet_red = "#AD002AFF"
 lancet_green = "#42B540FF"
 lancet_blue = "#00468BFF"
 
+if (hrzn %in% c(2030, 2060)) {tornado_UB = 800}
+if (hrzn == 2045) {}
+
+tornado_UB = 800
+tornado_LB = -100
+
 tornado <- ggplot(data = tornadoDF) + 
-  geom_hline(yintercept = seq(-100,800, by = 100), size = 1, color = "gray90") +
+  geom_hline(yintercept = seq(tornado_LB,tornado_UB, by = 100), size = 1, color = "gray90") +
   geom_rect(aes(ymax = ymax, ymin = ymin, xmax = xmax, xmin = xmin, fill = bound_abb)) +
   geom_errorbar(aes(ymin = UI_min, ymax = UI_max, x = as.numeric(Parameter)), width = 0.2) +
   theme_classic() + ylab("ICER per DALY averted ($)") +
@@ -275,14 +281,16 @@ tornado <- ggplot(data = tornadoDF) +
   geom_hline(yintercept = icer_base) +
   scale_x_continuous(breaks = c(1:length(order.parameters)), 
                      labels = order.parameters) +
-  scale_y_continuous(limits = c(-100, 800),
-                  breaks = seq(-100, 800, by = 100),
-                  labels = seq(-100, 800, by = 100))+
+  scale_y_continuous(limits = c(tornado_LB, tornado_UB),
+                  breaks = seq(tornado_LB, tornado_UB, by = 100),
+                  labels = seq(tornado_LB, tornado_UB, by = 100))+
   annotate(geom = "text", x = 4, y = 550, label = paste0("Cost-Effectiveness Threshold \n = $750 per DALY averted"), 
            size= 10, color = lancet_blue) + 
   coord_flip()
 
 # Save
 
-ggsave(plot = tornado, file = paste0(dir, "CEA/figures/Figure4.png"), device = "png",
+ggsave(plot = tornado, file = paste0(dir, "CEA/figures/Figure4_",hrzn,".pdf"), device = "pdf",
+       width = 25, height = 10)
+ggsave(plot = tornado, file = paste0(dir, "CEA/figures/Figure4_",hrzn,".eps"), device = "eps",
        width = 25, height = 10)

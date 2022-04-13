@@ -22,8 +22,6 @@ sn_dr_main = T
 sn_dr_lo = F
 sn_dr_hi = F 
 
-bia = F
-
 # Percentage on cb-ART (for Scenario 2 -- lines 425-447 of 03_costs Script)
 
 sn_pct_cbART_main = T

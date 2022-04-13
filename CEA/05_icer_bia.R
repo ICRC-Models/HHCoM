@@ -214,6 +214,10 @@ annual_budget <- incr_budget /5
 budget_impact = annual_budget / doh_annual_budget
 
 
+# Annualize the cost
+
+time_span = hrzn - 2020 + 1
+
 # PRINT
 
 
@@ -223,8 +227,8 @@ if (ICER_TABLE == "ON") {
     
     print("COST & BUDGET IMPACT")
     
-    print(paste0("Total annual incremental cost, 2020 USD = ", round(mean(inc_costs)/1e6/41, ROUND_millions), " million ", 
-                 " (UI = ",round(min(inc_costs)/1e6/41, ROUND_millions) ,", ",round(max(inc_costs)/1e6/41, ROUND_millions) ,")"))
+    print(paste0("Annual incremental cost (cumulative), 2020 USD = ", round(mean(inc_costs)/1e6/time_span, ROUND_millions), " million ", 
+                 " (UI = ",round(min(inc_costs)/1e6/time_span, ROUND_millions) ,", ",round(max(inc_costs)/1e6/time_span, ROUND_millions) ,")"))
     
     print(paste0("5-year Annual Program Cost, 2020 USD = ", round(mean(annual_budget)/1e6, ROUND_millions), " million ", 
                  " (UI = ",round(min(annual_budget)/1e6, ROUND_millions) ,", ",round(max(annual_budget)/1e6, ROUND_millions) ,")"))
@@ -239,8 +243,8 @@ if (ICER_TABLE == "OFF") {
  
   print("COST & BUDGET IMPACT")
   
-  print(paste0("Total annual incremental cost, 2020 USD = ", round(mean(inc_costs)/1e6/41, ROUND_millions), " million ", 
-               " (UI = ",round(min(inc_costs)/1e6/41, ROUND_millions) ,", ",round(max(inc_costs)/1e6/41, ROUND_millions) ,")"))
+  print(paste0("Total annual incremental cost, 2020 USD = ", round(mean(inc_costs)/1e6/time_span, ROUND_millions), " million ", 
+               " (UI = ",round(min(inc_costs)/1e6/time_span, ROUND_millions) ,", ",round(max(inc_costs)/1e6/time_span, ROUND_millions) ,")"))
   
   print(paste0("5-year Annual Program Cost, 2020 USD = ", round(mean(annual_budget)/1e6, ROUND_millions), " million ", 
                " (UI = ",round(min(annual_budget)/1e6, ROUND_millions) ,", ",round(max(annual_budget)/1e6, ROUND_millions) ,")"))

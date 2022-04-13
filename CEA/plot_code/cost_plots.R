@@ -260,24 +260,28 @@ p4_revised <- ggplot() +
   ggtitle("C) Cost Difference for Home Testing + Community ART \n compared with Standard of Care Scenario")
 
 
-fig2 <- ggarrange(p1, p2, p3, p4,  ncol = 1,
-                  label.x = 1, label.y = 1)
-
-ggsave(plot = fig2, file = paste0(dir, "CEA/figures/Figure2.png"), device = "png",
-       width = 8, height = 12)
-
-
-fig2_v2 <- ggarrange(p1, p3,p4,  ncol = 1,
-                  label.x = 1, label.y = 1)
-
-ggsave(plot = fig2_v2, file = paste0(dir, "CEA/figures/Figure2_v2.png"), device = "png",
-       width = 8, height = 12)
+# fig2 <- ggarrange(p1, p2, p3, p4,  ncol = 1,
+#                   label.x = 1, label.y = 1)
+# 
+# ggsave(plot = fig2, file = paste0(dir, "CEA/figures/Figure2.png"), device = "png",
+#        width = 8, height = 12)
+# 
+# 
+# fig2_v2 <- ggarrange(p1, p3,p4,  ncol = 1,
+#                   label.x = 1, label.y = 1)
+# 
+# ggsave(plot = fig2_v2, file = paste0(dir, "CEA/figures/Figure2_v2.png"), device = "png",
+#        width = 8, height = 12)
 
 fig2_v3 <- ggarrange(p1, p3,p4_revised,  ncol = 1,
                      label.x = 1, label.y = 1)
 
-ggsave(plot = fig2_v3, file = paste0(dir, "CEA/figures/Figure2_v3.png"), device = "png",
+ggsave(plot = fig2_v3, file = paste0(dir, "CEA/figures/Figure2.pdf"), device = "pdf",
        width = 8, height = 12)
+
+ggsave(plot = fig2_v3, file = paste0(dir, "CEA/figures/Figure2.eps"), device = "eps",
+       width = 8, height = 12)
+
 
 #--------------------------------------------------------------------------------
 

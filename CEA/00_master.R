@@ -62,7 +62,11 @@ source(paste0(cea_path, "01_setup_sensitivity.R"))
 source(paste0(cea_path, "02_cases_deaths.R"))
 source(paste0(cea_path, "03_costs.R"))  # MUST BE CONNECTED TO VPN, or will get error
 source(paste0(cea_path, "04_daly_qaly.R"))
+
+ICER_TABLE = "ON"
+bia = F
 source(paste0(cea_path, "05_icer_bia.R"))
+
 
 # ---------------------------------------------------------------------------------------------------
 

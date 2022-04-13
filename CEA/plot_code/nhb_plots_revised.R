@@ -162,9 +162,12 @@ ggsave(Figure3a, file = paste0(cea_path,"figures/Figure3b.pdf"), width = 12, hei
 # -----------------------------------------------------------------------------------------
 
 
+library(ggpubr)
+
 fig3 <- ggarrange(Figure3a, Figure3b,  ncol = 1,
                      label.x = 1, label.y = 1)
 
-ggsave(fig3, file = paste0(cea_path,"figures/Figure3.png"), width = 12, height = 10)
+ggsave(fig3, file = paste0(cea_path,"figures/Figure3.pdf"), width = 12, height = 10)
 
+ggsave(fig3, file = paste0(cea_path,"figures/Figure3.eps"), width = 12, height = 10)
 
