@@ -3,7 +3,9 @@ library(janitor)
 library(ggplot2)
 library(lubridate)
 
-setwd("Christine Documents/DRIVE Model/SACEA/") # *******SET ME***********
+rm(list = ls(all.names = TRUE))
+
+setwd("D:/Users/clh89/MATLAB/Projects/DRIVEModel/SACEA") # *******SET ME***********
 
 # Translating Matlab indexes for compartments into R factors
 hivCateg = data.frame("num" = seq(1,7,1),  
@@ -26,6 +28,7 @@ hpvHealthState = read.csv("hpvHealthState.csv")
 hivHealthState = read.csv("hivHealthState.csv")
 totalPerAge = read.csv("totalPerAge.csv")
 vax = read.csv("vax.csv")
+nonDisabHealthState = read.csv("nonDisabHealthState.csv")
 
 # DEATHS 
 
@@ -74,6 +77,14 @@ hivHealthState_clean <- hivHealthState %>%
   select(sceNum, paramVal, year, ageCateg, hivCateg, count) %>% unique %>% 
   spread(., hivCateg, count)
 
+# NON DISABILITY HEALTH STATES
+nonDisabHealthState_clean <- nonDisabHealthState %>% 
+  left_join(., ageCateg, by=c("age" = "num")) %>% 
+  left_join(., paramCateg, by=c("paramNum" = "num")) %>% 
+  mutate(sceNum = sceNum - 1) %>% 
+  select(sceNum, paramVal, year, ageCateg, count) %>% unique %>% 
+  rename(nonDisabCount = count)
+
 # VACCINATIONS
 vax_clean <- vax %>% 
   left_join(., ageCateg, by=c("age" = "num")) %>% 
@@ -89,6 +100,7 @@ combined <- deaths_clean %>%
   left_join(., hpvHealthState_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
   left_join(., hivHealthState_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
   left_join(., vax_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
+  left_join(., nonDisabHealthState_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
   mutate(numScreen = case_when(is.na(numScreen) ~ 0, TRUE ~ numScreen), # when these values are NA, convert to 0
          numLEEP = case_when(is.na(numLEEP) ~ 0, TRUE ~ numLEEP), 
          numCryo = case_when(is.na(numCryo) ~ 0, TRUE ~ numCryo), 
@@ -96,7 +108,7 @@ combined <- deaths_clean %>%
          numHyst = case_when(is.na(numHyst) ~ 0, TRUE ~ numHyst)) %>% 
   select(sceNum, paramVal, year, ageCateg, N, hpv.susceptible, hpv.immune, hpv.infected, cin1, cin2, cin3, 
           local.cc, regional.cc, distant.cc, hysterectomy, hiv.negative, hiv.art, hiv.500, hiv.350.500,
-          hiv.200.350, hiv.200, hiv.acute, nonavalCount, bivalCount, numScreen, numLEEP, numCryo, numThrml, numHyst,
+          hiv.200.350, hiv.200, hiv.acute, nonDisabCount, nonavalCount, bivalCount, numScreen, numLEEP, numCryo, numThrml, numHyst,
           allDeath, ccDeath, hivDeath) %>% unique 
 
 # Loop through scenarios and output the final files per scenario 

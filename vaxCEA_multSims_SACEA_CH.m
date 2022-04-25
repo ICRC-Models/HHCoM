@@ -1,4 +1,4 @@
-function [deaths, screenTreat, hpvHealthState, hivHealthState, totalPerAge, vax] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, hivHealthState,totalPerAge, vax)
+function [deaths, screenTreat, hpvHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -282,6 +282,18 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
             end
         end
     end
+
+% NON DISABILITY HEALTH STATES ***************************
+
+    nonDisabVector = [1 2 3 4 5 7]; % indices for the h and s comparments for the non-disability health states (everything except for cervical cancer or hysterectomy)
+
+    for a = 1 : age 
+        % pull popVec indices for all non-disability health states
+        % h and s are based on nonDisabVector
+        % disease is indices 1 and 2 (HIV negative)
+        nonDisabInds = toInd(allcomb(1:2, 1:viral, nonDisabVector, nonDisabVector, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
+        nonDisabHealthState(1:end, a, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, nonDisabInds), 2);
+    end 
 
 % HIV HEALTH STATES ************************************
 
