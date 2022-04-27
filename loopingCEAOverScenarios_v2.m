@@ -2,6 +2,8 @@
 % numbers, cleaning the output, turning into an array, and exporting to CSV for 
 % processing in R. 
 
+function loopingCEAOverScenarios_v2(username)
+
 clear;
 
 % Initialize variables
@@ -56,11 +58,11 @@ clear;
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
 % code
-% fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
-%      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
-%     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
-%     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
-fileInds = {'6_1', '6_6' '6_8'}; % FORTESTING
+fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
+     '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
+    '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
+    '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
+% fileInds = {'6_1'}; % FORTESTING
 nRuns = length(fileInds);
 
 lastYear = 2122; % manually set in futureSim 
@@ -81,8 +83,8 @@ vax = zeros(nTimepoints, age+1, nRuns, 10); % number of vaccinations is not stra
 nonDisabHealthState = zeros(nTimepoints, age+1, nRuns, 10); 
 
 %FORTESTING
-for sceNum = 0
-% for sceNum = 0 : 9 
+% for sceNum = [0 3]
+for sceNum = 0 : 9 
     sceString = num2str(sceNum); % turn sceNum into string sceString
 
     % Feeding in the zeroed result matrix, spitting out the same matrix but with all the counts added in for that scenario
@@ -191,3 +193,5 @@ writetable(hivHealthStateReshape, [pwd '/SACEA/hivHealthState.csv']);
 writetable(totalPerAgeReshape, [pwd '/SACEA/totalPerAge.csv']);
 writetable(vaxReshape, [pwd '/SACEA/vax.csv']);
 writetable(nonDisabHealthStateReshape, [pwd '/SACEA/nonDisabHealthState.csv'])
+
+end

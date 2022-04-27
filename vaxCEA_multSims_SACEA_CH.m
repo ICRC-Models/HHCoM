@@ -77,11 +77,11 @@ nTimepointsScreen = length(monthlyTimespanScreen);
 % Population outputs
 diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 % Results directory
-resultsDir = [pwd , '\HHCoM_Results\'];
+resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['Vaccine22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
+baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -145,9 +145,11 @@ end
 if ismember(str2num(sceNum), [0 1 2 4 6 8])
     sceScreenAges = [8]; 
     sceScreenInd = {1}; 
+    sceScreenIndAge = [8]; 
 else
-    sceScreenAges = [8 10 6 7 9]; 
-    sceScreenInd = {[1, 5] [2, 7] 3 4 5 6}; % these are the indices in newScreen. 2 and 7 should be summed. i and 5 should be summed. 
+    sceScreenAges = [8 10 6 7 8 9 10]; % how screening ages are arranged in newScreen 
+    sceScreenInd = {[1, 5] [2, 7] 3 4 6}; % these are the indices in newScreen. 2 and 7 should be summed. 1 and 5 should be summed. 
+    sceScreenIndAge = [8 10 6 7 9]; 
 end 
 
 %% START FOR LOOP FOR RUNNING PARAMETERS 
@@ -163,10 +165,10 @@ for k = 1 : loopSegmentsLength-1
 
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
-nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
+nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
 curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
+resultFileName = [pwd , '/HHCoM_Results/' , pathModifier, '/' , 'vaxSimResult'];
 
 % load results from vaccine run into cell array
 vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
@@ -326,8 +328,10 @@ numThrml = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates,
 numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
 
     for aInd = 1 : length(sceScreenInd) % modified to the ages that are screened  
-        a = sceScreenInd{aInd}; % the actual indices of newScreen
-        fullAgeInd = sceScreenAges(aInd); % the indices (1:16) to actually put the results in
+%         a = sceScreenInd{aInd}; % the actual indices of newScreen  
+        fullAgeInd = sceScreenIndAge(aInd); % the indices (1:16) to actually put the results in
+        a = sceScreenInd{aInd}; % indices within vaxResults.newScreen
+%         fullAgeInd = sceScreenAges(aInd); % the indices (1:16) to actually put the results in
         for dInd = 1 : disease % HIV disease states in template
             d = dInd; % originally d was separate from dInd due to the combination of d=2 and d=1 as HIV neg. now we don't care about stratifying. 
             for h = 1 : hpvVaxStates % Vaccine-type HPV precancer state
