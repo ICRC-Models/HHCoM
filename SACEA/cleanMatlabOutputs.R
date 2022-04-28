@@ -5,7 +5,9 @@ library(lubridate)
 
 rm(list = ls(all.names = TRUE))
 
-setwd("D:/Users/clh89/MATLAB/Projects/DRIVEModel/SACEA") # *******SET ME***********
+# setwd("D:/Users/clh89/MATLAB/Projects/DRIVEModel/SACEA") # *******SET ME***********
+
+setwd("C:/Users/justi/Documents/Christine Documents/DRIVE Model/SACEA/")
 
 # Translating Matlab indexes for compartments into R factors
 hivCateg = data.frame("num" = seq(1,7,1),  

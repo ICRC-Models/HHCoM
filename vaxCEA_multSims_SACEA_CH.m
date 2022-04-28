@@ -203,7 +203,7 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     vaxTemplate((size(curr.vaxdSchool,1)):end, 3) = vaxResult{n}.vaxdCU; % same as above
     vaxTotal = vaxTemplate(:, 1) + vaxTemplate(:, 2) + vaxTemplate(:, 3); % add up all the vaccine columns 
 
-    vax(:, 17, j, str2num(sceNum)+1) = vaxTotal; % input into the "all age" category 17
+    vax(:, 17, j) = vaxTotal; % input into the "all age" category 17
 
 % DEATHS **************************************
     ccDeath = zeros(nTimepoints, age); 
@@ -217,9 +217,9 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     end 
 
     % combine all death data into 3D matrix
-    deaths(:, 1:age, 1, j, str2num(sceNum)+1) = ccDeath;
-    deaths(:, 1:age, 2, j, str2num(sceNum)+1) = hivDeath; 
-    deaths(:, 17, 3, j, str2num(sceNum)+1) = vaxResult{n}.deaths(:); 
+    deaths(:, 1:age, 1, j) = ccDeath;
+    deaths(:, 1:age, 2, j) = hivDeath; 
+    deaths(:, 17, 3, j) = vaxResult{n}.deaths(:); 
 
 % HPV HEALTH STATES ****************************
 
@@ -245,11 +245,11 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
                         for x = 1 : endpoints
                             newHpvCcCateg = x + 5; % update newHpvCcCateg. create a new category that combines HPV and CC states 
                             vaxInds = toInd(allcomb(1:disease, 1:viral, 1:h1, s1, x, 1:intervens, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
-                            hpvHealthState(1:end, a, newHpvCcCateg, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                         end
                     else % if you don't need to loop through the CC compartment 
                         vaxInds = toInd(allcomb(1:disease, 1:viral, 1:h1, s1, 1:endpoints, 1:intervens, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
-                        hpvHealthState(1:end, a, newHpvCcCateg, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                        hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                     end 
                 else % if s < h 
                     newHpvCcCateg = h; % use h because h is more severe state than s  
@@ -273,12 +273,12 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
                         for x = 1 : endpoints
                             newHpvCcCateg = x + 5; % create a new category that combines HPV and CC states 
                             vaxInds = toInd(allcomb(1:disease, 1:viral, h1, 1:s1, x, 1:intervens, 2, a, 1:risk)); % notice stratify by h and not for s
-                            hpvHealthState(1:end, a, newHpvCcCateg, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                         end
 
                     else % if you don't need to loop through the CC compartment 
                             vaxInds = toInd(allcomb(1:disease, 1:viral, h1, 1:s1, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-                            hpvHealthState(1:end, a, newHpvCcCateg, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
                     end
                 end 
             end
@@ -294,7 +294,7 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
         % h and s are based on nonDisabVector
         % disease is indices 1 and 2 (HIV negative)
         nonDisabInds = toInd(allcomb(1:2, 1:viral, nonDisabVector, nonDisabVector, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-        nonDisabHealthState(1:end, a, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, nonDisabInds), 2);
+        nonDisabHealthState(1:end, a, j) = sum(vaxResult{n}.popVec(:, nonDisabInds), 2);
     end 
 
 % HIV HEALTH STATES ************************************
@@ -304,7 +304,7 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
             d = diseaseVec_vax{dInd}; 
 
             vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            hivHealthState(1:end, a, dInd, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+            hivHealthState(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end
     end 
 
@@ -312,12 +312,12 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
 
     for a = 1 : age 
         vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-        totalPerAge(1:end, a, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+        totalPerAge(1:end, a, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
     end 
 
     % Adding index 17 to the age dimension for the total number of people of all ages 
     vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
-    totalPerAge(1:end, 17, j, str2num(sceNum)+1) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+    totalPerAge(1:end, 17, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
 
 % SCREENING ************************************************
 
@@ -399,11 +399,11 @@ numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 
     numHystSquish = sum(sum(sum(sum(numHyst(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
 
     % put screen/treat in a third dimension
-    screenTreat(:, 1:age, 1, j, str2num(sceNum)+1) = numScreenSquish; 
-    screenTreat(:, 1:age, 2, j, str2num(sceNum)+1) = numLEEPSquish; 
-    screenTreat(:, 1:age, 3, j, str2num(sceNum)+1) = numCryoSquish; 
-    screenTreat(:, 1:age, 4, j, str2num(sceNum)+1) = numThrmlSquish; 
-    screenTreat(:, 1:age, 5, j, str2num(sceNum)+1) = numHystSquish; 
+    screenTreat(:, 1:age, 1, j) = numScreenSquish; 
+    screenTreat(:, 1:age, 2, j) = numLEEPSquish; 
+    screenTreat(:, 1:age, 3, j) = numCryoSquish; 
+    screenTreat(:, 1:age, 4, j) = numThrmlSquish; 
+    screenTreat(:, 1:age, 5, j) = numHystSquish; 
 
     end
 end % for loop end 
