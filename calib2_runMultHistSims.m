@@ -12,18 +12,16 @@ t_curr = tstep_abc;
 date = date_abc;
 
 %% Cluster information -- Running on UW cluster
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
-parpool(pc , numCPUperNode)    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/' , username , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
+% parpool(pc , numCPUperNode)    % start the pool with max number workers
 
-%% Cluster information -- Running on ERISOne cluster 
+%% Cluster information -- Erisone
 pc = parcluster('local'); 
-pc.JobStorageLocation = strcat('/scratch/c/', username, '/', getenv('LSB_JOBID')) % how to pull job id?
-numCPUperNode = 8 % how to pull CPUs on node? set to 8 as an initial test.
+pc.JobStorageLocation = getenv('TMPDIR'); % how to pull job id?
+numCPUperNode = 28; % how to pull CPUs on node? set to 8 as an initial test.
 parpool(pc, numCPUperNode)
-
-disp("Cluster information worked")
 
 %%
 nPrlSets = 25;
