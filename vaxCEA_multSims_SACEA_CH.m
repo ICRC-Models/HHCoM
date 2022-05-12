@@ -1,4 +1,4 @@
-function [deaths, screenTreat, hpvHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState)
+function [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState, scen0CinTx)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -221,68 +221,39 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     deaths(:, 1:age, 2, j) = hivDeath; 
     deaths(:, 17, 3, j) = vaxResult{n}.deaths(:); 
 
-% HPV HEALTH STATES ****************************
+% CC HEALTH STATES ****************************
 
-    for a = 1: age
-        for h = 0 : (hpvVaxStates-1)
-            for s = 0 : (hpvNonVaxStates-1)
-                if h <= s % if hpvNonVaxStates is more severe of a state than hpvVaxStates
-                    newHpvCcCateg = s;  
-                    if s == 0
-                        s1 = 7; % i arbitrarily made loop start with 0 to make comparison of h and s states easier, but it's not actually an index. s1 and h1 is the actual index. 
-                        newHpvCcCateg = 10; % update the index for the newHpvCcCateg to 10
-                    else 
-                        s1 = s; % s and s1 are the same, just that s switches what was originally 7 to 0
-                    end
+    for a = 1 : age 
+	    for x = 1 : endpoints 
+		    vaxInds1 = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 6, x, 1:intervens, 2, a, 1:risk));
+            vaxInds2 = toInd(allcomb(1:disease, 1:viral, 6, [1:5 7], x, 1:intervens, 2, a, 1:risk)); 
+            vaxInds = [vaxInds1; vaxInds2]; 
+		    ccHealthState(1:end, a, x, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+	    end 
+    end 
 
-                    if h == 0
-                        h1 = 7; 
-                    else 
-                        h1 = h; 
-                    end 
+% HPV HEALTH STATES ************************************
+% If you draw out a 7x7 matrix, you can map out what h and s values map out
+% to an overarching hpv health state category. So for example, for h=5
+% (CIN3), the overarching hpv health state is 5, so when h=5 and s is
+% anything lower than that, or when s=5 and h is anything lower than that.
+% when either s or h is 7 and the other is 5, that counts too. Note that I
+% completely took out h or s = 6 and separate calculate the CC health
+% states. I drew some pictures in by blue notebook that are helpful in
+% developing this piece of code. 
 
-                    if newHpvCcCateg == 6 % if 6, then loop through CC compartment 
-                        for x = 1 : endpoints
-                            newHpvCcCateg = x + 5; % update newHpvCcCateg. create a new category that combines HPV and CC states 
-                            vaxInds = toInd(allcomb(1:disease, 1:viral, 1:h1, s1, x, 1:intervens, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
-                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
-                        end
-                    else % if you don't need to loop through the CC compartment 
-                        vaxInds = toInd(allcomb(1:disease, 1:viral, 1:h1, s1, 1:endpoints, 1:intervens, 2, a, 1:risk)); % 2 is only for female gender; only stratify by s, not h, since s>h
-                        hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
-                    end 
-                else % if s < h 
-                    newHpvCcCateg = h; % use h because h is more severe state than s  
-
-                    % repeat everything from above, but this time stratifying by h instead of s
-
-                    if s == 0
-                        s1 = 7; 
-                    else 
-                        s1 = s; 
-                    end 
-
-                    if h == 0
-                        h1 = 7; 
-                        newHpvCcCateg = 10; 
-                    else 
-                        h1 = h; 
-                    end
-
-                    if newHpvCcCateg == 6 % if 6, then loop through CC compartment 
-                        for x = 1 : endpoints
-                            newHpvCcCateg = x + 5; % create a new category that combines HPV and CC states 
-                            vaxInds = toInd(allcomb(1:disease, 1:viral, h1, 1:s1, x, 1:intervens, 2, a, 1:risk)); % notice stratify by h and not for s
-                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
-                        end
-
-                    else % if you don't need to loop through the CC compartment 
-                            vaxInds = toInd(allcomb(1:disease, 1:viral, h1, 1:s1, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-                            hpvHealthState(1:end, a, newHpvCcCateg, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
-                    end
-                end 
-            end
-        end
+    for a = 1 : age
+	    for h = 1 : hpvVaxStates
+            if h < 7 
+		        vaxInds1 = toInd(allcomb(1:disease, 1:viral, [1:h 7], h, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
+		        vaxInds2 = toInd(allcomb(1:disease, 1:viral, h, [1:(h-1) 7], 1:endpoints, 1:intervens, 2, a, 1:risk)); 
+		        vaxInds = [vaxInds1; vaxInds2]; 
+		        hpvHealthState(1:end, a, h, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+            else % h=7 has different rules because only applicable is h=7 and s=7
+                vaxInds = toInd(allcomb(1:disease, 1:viral, 7, 7, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
+                hpvHealthState(1:end, a, 7, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); % note 6. hpv immune will be at index 6 in hpvHealthState
+            end 
+	    end
     end
 
 % NON DISABILITY HEALTH STATES ***************************
@@ -404,6 +375,32 @@ numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 
     screenTreat(:, 1:age, 3, j) = numCryoSquish; 
     screenTreat(:, 1:age, 4, j) = numThrmlSquish; 
     screenTreat(:, 1:age, 5, j) = numHystSquish; 
+
+    % Separate therapy count stratified by CC state for a one-off analysis
+    % Jacinda wants to do in her CEA only for scenario 0
+    % I used the same method of isolating h based on the highest value
+    % between the vax and nonvax hpv health state
+    for h = 1 : hpvVaxStates
+        if h < 7 
+            numLEEP_1 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, [1:h 7], h, 1:endpoints),2),3),4),5),6);
+            numLEEP_2 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, h, [1:(h-1) 7], 1:endpoints),2),3),4),5),6);
+            numLEEP_scen0 = numLEEP_1 + numLEEP_2; % hopefully this should result in a vector ??
+            
+            numCryo_1 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, [1:h 7], h, 1:endpoints),2),3),4),5),6);
+            numCryo_2 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, h, [1:(h-1) 7], 1:endpoints),2),3),4),5),6);
+            numCryo_scen0 = numCryo_1 + numCryo_2; % hopefully this should result in a vector ??
+
+            scen0CinTx(:, h, 1, j) = numLEEP_scen0; 
+            scen0CinTx(:, h, 2, j) = numCryo_scen0; 
+        else % h=7 has different rules because only applicable is h=7 and s=7
+            numLEEP_scen0 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, 7, 7, 1:endpoints),2),3),4),5),6); 
+            numCryo_scen0 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, 7, 7, 1:endpoints),2),3),4),5),6); 
+
+            scen0CinTx(:, h, 1, j) = numLEEP_scen0; 
+            scen0CinTx(:, h, 2, j) = numCryo_scen0; 
+        end 
+    end
+
 
     end
 end % for loop end 

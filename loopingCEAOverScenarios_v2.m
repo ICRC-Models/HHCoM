@@ -62,7 +62,7 @@ fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
-% fileInds = {'6_1'}; % FORTESTING
+% fileInds = {'6_1', '6_2'}; % FORTESTING
 nRuns = length(fileInds);
 
 lastYear = 2122; % manually set in futureSim 
@@ -76,6 +76,7 @@ nTimepointsFut = length(monthlyTimespanFut);
 % parallelizing the for loop
 loopSegments = {0 , round(10/2) , 10}; % running 10 scenarios
 loopSegmentsLength = length(loopSegments);
+
 for k = 1 : loopSegmentsLength-1 
     parfor j = loopSegments{k}+1 : loopSegments{k+1}
     
@@ -88,22 +89,24 @@ for k = 1 : loopSegmentsLength-1
     % Initialize result matrices 
     deaths = zeros(nTimepoints, age+1, 3, nRuns); % time, age (1:17), 3 death data elements, number of parameters, 10 scenarios
     screenTreat = zeros(nTimepointsFut, age+1, 5, nRuns); % time, age (1:16), 5 screen/treat data elements, number of parameters, 10 scenarios
-    hpvHealthState = zeros(nTimepoints, age+1, 10, nRuns); % time, age (1:16), 10 HPV/CC health states, number of parameters, 10 scenarios
+    hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 10 HPV/CC health states, number of parameters, 10 scenarios
+    ccHealthState = zeros(nTimepoints, age+1, 4, nRuns); 
     hivHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios
     totalPerAge = zeros(nTimepoints, age+1, nRuns); % to pull the N per age group at each time point , 10 scenarios
     vax = zeros(nTimepoints, age+1, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
     nonDisabHealthState = zeros(nTimepoints, age+1, nRuns); 
+    scen0CinTx = zeros(nTimepointsFut, endpoints, 2, nRuns); % 2 because only LEEP and cryo (for the 3rd dimension, 1 is LEEP 2 is cryo)
 
     % Feeding in the zeroed result matrix, spitting out the same matrix but with all the counts added in for that scenario
-    [deaths, screenTreat, hpvHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState] = ...
-        vaxCEA_multSims_SACEA_CH(1 , sceString , {'0'}, fileInds, deaths, screenTreat, hpvHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState);  
+    [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx] = ...
+        vaxCEA_multSims_SACEA_CH(1 , sceString , {'0'}, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx);  
 
 % turn all the result matrices into 2D 
     for param = 1 : nRuns
         for a = 1 : age + 1 
             % turning deaths into 2D 
             for var = 1 : 3 
-                if exist ('deathsReshape') == 0 
+                if (param == 1 && a ==1 && var == 1)
                     deathsReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
                                         param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), deaths(:, a, var, param)];
                 else
@@ -114,7 +117,7 @@ for k = 1 : loopSegmentsLength-1
             end 
             % turning screening/treatment matrix into 2D
             for var = 1 : 5 
-                if exist ('screenTreatReshape') == 0 
+                if (param == 1 && a ==1 && var == 1)
                     screenTreatReshape = [transpose(monthlyTimespanFut), a.*ones(nTimepointsFut,1), var.*ones(nTimepointsFut,1), ...
                                              param.*ones(nTimepointsFut,1), sce.*ones(nTimepointsFut,1), screenTreat(:, a, var, param)];
                 else
@@ -123,9 +126,9 @@ for k = 1 : loopSegmentsLength-1
                                              param.*ones(nTimepointsFut,1), sce.*ones(nTimepointsFut,1), screenTreat(:, a, var, param)];
                 end 
             end 
-            % turning hpv/cc health states matrix into 2D
-            for var = 1 : 10
-                if exist ('hpvHealthStateReshape') == 0 
+            % turning hpv health states matrix into 2D
+            for var = 1 : 7
+                if (param == 1 && a ==1 && var == 1)
                     hpvHealthStateReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
                                              param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hpvHealthState(:, a, var, param)];
                 else 
@@ -134,9 +137,20 @@ for k = 1 : loopSegmentsLength-1
                                              param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hpvHealthState(:, a, var, param)];
                 end
             end 
-            % turning hiv health staes matrix into 2D 
+            % turning cc health states matrix into 2D 
+            for var = 1 : 4
+                if (param == 1 && a ==1 && var == 1)
+                    ccHealthStateReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ccHealthState(:, a, var, param)];
+                else 
+                    ccHealthStateReshape = [ccHealthStateReshape; 
+                                            transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ccHealthState(:, a, var, param)];
+                end 
+            end 
+            % turning hiv health states matrix into 2D 
             for var = 1 : 7
-                if exist ('hivHealthStateReshape') == 0 
+                if (param == 1 && a ==1 && var == 1)
                     hivHealthStateReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
                                              param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hivHealthState(:, a, var, param)];
                 else 
@@ -146,7 +160,7 @@ for k = 1 : loopSegmentsLength-1
                 end
             end 
             % turning non disability health states matrix into 2D
-            if exist ('nonDisabHealthStateReshape') == 0
+            if (param == 1 && a ==1)
                 nonDisabHealthStateReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
                     sce.*ones(nTimepoints,1), nonDisabHealthState(:, a, param)]; 
             else 
@@ -155,7 +169,7 @@ for k = 1 : loopSegmentsLength-1
                                                     sce.*ones(nTimepoints,1), nonDisabHealthState(:, a, param)]; 
             end 
             % turning total per age matrix into 2D 
-            if (exist ('totalPerAgeReshape') == 0 || exist('vaxReshape') == 0)
+            if (param == 1 && a ==1)
                 totalPerAgeReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
                                         sce.*ones(nTimepoints,1), totalPerAge(:, a, param)]; 
                 vaxReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
@@ -172,12 +186,31 @@ for k = 1 : loopSegmentsLength-1
         disp(['Complete Scenario ', num2str(sce), ', Parameter ', num2str(param)])
     end
 
+% turn result matrices for scenario 0 cin analysis into 2D
+    for param = 1 : nRuns
+        for h = 1 : hpvVaxStates
+            % turning the cin treatment scenario 0 analysis into 2D 
+            for var = 1 : 2
+                if (param == 1 && h ==1 && var == 1)
+                    scen0CinTxReshape = [transpose(monthlyTimespanFut), h.*ones(nTimepointsFut,1), var.*ones(nTimepointsFut,1), ...
+                                         param.*ones(nTimepointsFut,1), sce.*ones(nTimepointsFut,1), scen0CinTx(:, h, var, param)]; 
+                else 
+                    scen0CinTxReshape = [scen0CinTxReshape; 
+                                            transpose(monthlyTimespanFut), h.*ones(nTimepointsFut,1), var.*ones(nTimepointsFut,1), ...
+                                            param.*ones(nTimepointsFut,1), sce.*ones(nTimepointsFut,1), scen0CinTx(:, h, var, param)]; 
+                end 
+            end 
+        end
+    end 
+
 % turn into arrays
 deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
 screenTreatReshape1 = array2table(screenTreatReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
 hpvHealthStateReshape1 = array2table(hpvHealthStateReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
+        'sceNum', 'count'}); 
+ccHealthStateReshape1 = array2table(ccHealthStateReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
 hivHealthStateReshape1 = array2table(hivHealthStateReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
@@ -187,15 +220,21 @@ vaxReshape1 = array2table(vaxReshape, 'VariableNames', {'year', 'age', 'paramNum
         'sceNum', 'count'}); 
 nonDisabHealthStateReshape1 = array2table(nonDisabHealthStateReshape, 'VariableNames', {'year', 'age', 'paramNum', ...
         'sceNum', 'count'}); 
+scen0CinTxReshape1 = array2table(scen0CinTxReshape, 'VariableNames', {'year', 'hpvState', 'categ', 'paramNum', 'sceNum', 'count'}); 
 
 % spit out into CSV 
 writetable(deathsReshape1,[pwd '/SACEA/deaths_S' sceString '.csv']);
 writetable(screenTreatReshape1, [pwd '/SACEA/screenTreat_S' sceString '.csv']); 
 writetable(hpvHealthStateReshape1, [pwd '/SACEA/hpvHealthState_S' sceString '.csv']); 
+writetable(ccHealthStateReshape1, [pwd '/SACEA/ccHealthState_S' sceString '.csv']);
 writetable(hivHealthStateReshape1, [pwd '/SACEA/hivHealthState_S' sceString '.csv']); 
 writetable(totalPerAgeReshape1, [pwd '/SACEA/totalPerAge_S' sceString '.csv']);
 writetable(vaxReshape1, [pwd '/SACEA/vax_S' sceString '.csv']);
-writetable(nonDisabHealthStateReshape1, [pwd '/SACEA/nonDisabHealthState_S' sceString '.csv'])
+writetable(nonDisabHealthStateReshape1, [pwd '/SACEA/nonDisabHealthState_S' sceString '.csv']);
+
+if sceNum == 0 % only write the cin / treatment file if in scenario 0 
+    writetable(scen0CinTxReshape1, [pwd '/SACEA/scen0CinTx_S0.csv']); 
+end 
 
     end
 end
