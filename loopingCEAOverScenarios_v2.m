@@ -82,7 +82,7 @@ for k = 1 : loopSegmentsLength-1
     
 % for(j = [0 3]) % FORTESTING
 
-    sceNum = j; 
+    sceNum = j - 1; 
     sceString = num2str(sceNum); % turn sceNum into string sceString
     sce = sceNum + 1; % add one since indices start at 1 (so scenarios will be 1-10 in this case) 
 
@@ -91,7 +91,7 @@ for k = 1 : loopSegmentsLength-1
     screenTreat = zeros(nTimepointsFut, age+1, 5, nRuns); % time, age (1:16), 5 screen/treat data elements, number of parameters, 10 scenarios
     hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 10 HPV/CC health states, number of parameters, 10 scenarios
     ccHealthState = zeros(nTimepoints, age+1, 4, nRuns); 
-    hivHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios
+    hivHealthState = zeros(nTimepoints, 11age+1, 7, nRuns); % time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios
     totalPerAge = zeros(nTimepoints, age+1, nRuns); % to pull the N per age group at each time point , 10 scenarios
     vax = zeros(nTimepoints, age+1, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
     nonDisabHealthState = zeros(nTimepoints, age+1, nRuns); 
