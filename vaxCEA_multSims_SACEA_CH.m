@@ -1,4 +1,4 @@
-function [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState, scen0CinTx)
+function [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -277,6 +277,14 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
             vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
             hivHealthState(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end
+    end 
+
+% NEW CERVICAL CANCER CASES ******************************
+
+    % vaxResult{n}.newCC % (time, disease, age, hpvTypeGroups (2))
+
+    for a = 1 : age 
+        newCC(:, a, j) = sum(sum(sum(vaxResult{n}.newCC(:, :, a, :),2),3),4);
     end 
 
 % TOTAL NUMBER OF PEOPLE PER AGE GROUP ********************
