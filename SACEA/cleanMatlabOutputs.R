@@ -36,6 +36,7 @@ for (sceNum in seq(0, 9, 1)) {
     vax = read.csv(paste0("vax_S", sceNum, ".csv"))
     nonDisabHealthState = read.csv(paste0("nonDisabHealthState_S", sceNum, ".csv"))
     ccHealthState = read.csv(paste0("ccHealthState_S", sceNum, ".csv"))
+    newCC = read.csv(paste0("newCC_S", sceNum, ".csv"))
     
     # DEATHS 
     
@@ -84,6 +85,15 @@ for (sceNum in seq(0, 9, 1)) {
       select(sceNum, paramVal, year, ageCateg, ccCateg, count) %>% unique %>% 
       spread(., ccCateg, count)
     
+    # NEW CERVICAL CANCER CASES 
+    
+    newCC_clean <- newCC %>% 
+      left_join(., ageCateg, by=c("age" = "num")) %>% 
+      left_join(., paramCateg, by=c("paramNum" = "num")) %>% 
+      mutate(sceNum = sceNum - 1) %>% 
+      select(sceNum, paramVal, year, ageCateg, count) %>% unique %>% 
+      rename(newCC = count)
+    
     # HIV HEALTH STATES 
     
     hivHealthState_clean <- hivHealthState %>% 
@@ -119,6 +129,7 @@ for (sceNum in seq(0, 9, 1)) {
       left_join(., hivHealthState_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
       left_join(., vax_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
       left_join(., nonDisabHealthState_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
+      left_join(., newCC_clean, by=c("sceNum", "paramVal", "year", "ageCateg")) %>% 
       mutate(numScreen = case_when(is.na(numScreen) ~ 0, TRUE ~ numScreen), # when these values are NA, convert to 0
              numLEEP = case_when(is.na(numLEEP) ~ 0, TRUE ~ numLEEP), 
              numCryo = case_when(is.na(numCryo) ~ 0, TRUE ~ numCryo), 
@@ -127,14 +138,14 @@ for (sceNum in seq(0, 9, 1)) {
       select(sceNum, paramVal, year, ageCateg, N, hpv.susceptible, hpv.immune, hpv.infected, cin1, cin2, cin3,
               local.cc, regional.cc, distant.cc, hysterectomy, hiv.negative, hiv.art, hiv.500, hiv.350.500,
               hiv.200.350, hiv.200, hiv.acute, nonDisabCount, nonavalCount, bivalCount, numScreen, numLEEP, numCryo, numThrml, numHyst,
-              allDeath, ccDeath, hivDeath) %>% unique
+              allDeath, ccDeath, hivDeath, newCC) %>% unique
     
   sceDf <- combined %>% 
-    filter(sceNum == i)
+    filter(sceNum == sceNum)
   
   ifelse(!dir.exists(paste0(getwd(), "/Outputs")), dir.create(paste0(getwd(), "/Outputs")), FALSE)
   
-  write.csv(sceDf, paste0(getwd(), "/Outputs/modelResultsForCea_S", i, ".csv"), row.names = FALSE)
+  write.csv(sceDf, paste0(getwd(), "/Outputs/modelResultsForCea_S", sceNum, ".csv"), row.names = FALSE)
 }
 
 # separately analyze `scen0CinTx_S0.csv`
@@ -148,4 +159,4 @@ scen0CinTx <- read.csv("scen0CinTx_S0.csv") %>%
   filter(hpvCateg %in% c("cin1", "cin2", "cin3")) %>% 
   select(year, sceNum, paramVal, hpvCateg, txType, count) %>% 
   spread(., hpvCateg, count) %>% 
-  write.csv(., paste0(getwd(), "/Outputs/scen0CinLeepCryo.csv"), row.names = FLASE)
+  write.csv(., paste0(getwd(), "/Outputs/scen0CinLeepCryo.csv"), row.names = FALSE)
