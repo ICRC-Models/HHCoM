@@ -1,5 +1,5 @@
 function [] = vaxCEA_multSims_CIs_modScreen(vaxResultInd , sceNum , fileNameNums)
-% example: vaxCEA_multSims_CIs_modScreen(1 , '3' , {'3'})
+% example: vaxCEA_multSims_CIs_modScreen(1 , '0' , {'0' , '__'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -165,18 +165,18 @@ resultsDir = [pwd , '\HHCoM_Results\'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
+baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_CISNET-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
-for k = 1 : loopSegmentsLength-1 % FORTESTING
-    parfor j = loopSegments{k}+1 : loopSegments{k+1} %FORTESTING
+for k = 1 : loopSegmentsLength-1
+    parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
         pathModifier = [baseFileName , fileInds{j}];
-        nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        nSims = size(dir([pwd , '\HHCoM_Results\' , pathModifier, '\' , '*.mat']) , 1);
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_wScaleUp_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
-        resultFileName = [pwd , '/HHCoM_Results/' , pathModifier, '/' , 'vaxSimResult'];
+        resultFileName = [pwd , '\HHCoM_Results\' , pathModifier, '\' , 'vaxSimResult'];
         % load results from vaccine run into cell array
         vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
         % concatenate vectors/matrices of population up to current year to population
@@ -706,10 +706,10 @@ for k = 1 : loopSegmentsLength-1 % FORTESTING
                 1 : endpoints , 1 : intervens , 2 , a , 1 : risk));
             vaxCoverageAge(j , a , :) = sum(vaxResult{n}.popVec(: , vaxInds) , 2) ./ sum(vaxResult{n}.popVec(: , popInds) , 2);
         end
-       
         
-    end 
-end 
+        
+    end
+end
 
 %% ***************************** DEMOGRAPHY FIGURES **********************************************************************************************
 
@@ -1001,9 +1001,8 @@ end
 %% Write crude HIV prevalence in women aged 15+ over time
 if contains(baseFileName , 'SA')
     firstYrInd = ((currYear - startYear)*stepsPerYear +1);
-%     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%         'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  % CH EDITED
-    fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+        'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
     writematrix([squeeze(median(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
         squeeze(min(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
         squeeze(max(squeeze(hivPrevW1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
@@ -1014,9 +1013,8 @@ end
 %% Write crude HIV prevalence in total population aged 15+ over time
 if contains(baseFileName , 'SA')
     firstYrInd = ((currYear - startYear)*stepsPerYear +1);
-%     fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%         'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  CH EDITED
-    fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+    fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+        'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
     writematrix([squeeze(median(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , 1))' , ...
         squeeze(min(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
         squeeze(max(squeeze(hivPrevT1579(: , (firstYrInd:stepsPerYear:end))) , [] , 1))' , ...
@@ -1541,9 +1539,8 @@ for dInd = 1 : length(diseaseLabels)
     ccInc = ccIncRefTot ./ (sum(worldStandard_WP2015(1:age+4)));
 
     if contains(baseFileName , 'SA')
-%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%             'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  CH EDITED
-        fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
         writematrix([squeeze(median(squeeze(ccInc(: , : , (end-firstYrRange):end)) , 1))' , ...
             squeeze(min(squeeze(ccInc(: , : , (end-firstYrRange):end)) , [] , 1))' , ...
             squeeze(max(squeeze(ccInc(: , : , (end-firstYrRange):end)) , [] , 1))' , ...
@@ -1591,9 +1588,8 @@ diseaseLabels = {'Tot (CrudeICC)' , 'HIV- (CrudeICC)' , 'HIV+ (CrudeICC)' , 'HIV
 if contains(baseFileName , 'SA')
     firstYrInd = ((1980 - startYear) +1);
     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%             'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  CH EDITED
-        fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];  
         writematrix([squeeze(median(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1))' , ...
             squeeze(min(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , [] , 1))' , ...
             squeeze(max(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , [] , 1))' , ...
@@ -1606,9 +1602,8 @@ end
 if contains(baseFileName , 'SA')
     diseaseLabels = {'Tot (CCC)' , 'HIV- (CCC)' , 'HIV+ (CCC)' , 'HIV+ no ART (CCC)' , 'HIV+ ART (CCC)'};
     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%             'SA_screening_S' , fileKeyNums{n} , '.xlsx']; CH EDITED
-        fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];
         writematrix([squeeze(median(squeeze(ccCumHivTime(: , dInd , :)) , 1))' , ...
             squeeze(min(squeeze(ccCumHivTime(: , dInd , :)) , [] , 1))' , ...
             squeeze(max(squeeze(ccCumHivTime(: , dInd , :)) , [] , 1))' , ...
@@ -1773,9 +1768,8 @@ sgtitle('Type distribution by state (coinfections grouped as 9v-type HPV), ages 
 if contains(baseFileName , 'SA')
     diseaseLabels = {'Tot (OS)' , 'HIV- (OS)' , 'HIV+ (OS)' , 'HIV+ no ART (OS)' , 'HIV+ ART (OS)'};
     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%             'SA_screening_S' , fileKeyNums{n} , '.xlsx']; CH EDITED
-        fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];
         writematrix([[squeeze(median(cumsum(squeeze(overScreenTotAnnualCum(: , dInd , 1 , :)),2) , 1))' , ...
                 squeeze(min(cumsum(squeeze(overScreenTotAnnualCum(: , dInd , 1 , :)),2) , [] , 1))' , ...
                 squeeze(max(cumsum(squeeze(overScreenTotAnnualCum(: , dInd , 1 , :)),2) , [] , 1))' , ...
@@ -1804,9 +1798,8 @@ end
 if contains(baseFileName , 'SA')
     diseaseLabels = {'Tot (S)' , 'HIV- (S)' , 'HIV+ (S)' , 'HIV+ no ART (S)' , 'HIV+ ART (S)'};
     for dInd = 1 : length(diseaseLabels)
-%         fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
-%             'SA_screening_S' , fileKeyNums{n} , '.xlsx']; % CH EDITED
-        fname = [pwd , '/HHCoM_Results/' , 'SA_screening_S', fileKeyNums{n} , '.xlsx']; % CH EDITED
+        fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
+            'SA_screening_S' , fileKeyNums{n} , '.xlsx'];
         writematrix([[squeeze(median(cumsum(squeeze(screenTotAnnualCum(: , dInd , 1 , :)),2) , 1))' , ...
                 squeeze(min(cumsum(squeeze(screenTotAnnualCum(: , dInd , 1 , :)),2) , [] , 1))' , ...
                 squeeze(max(cumsum(squeeze(screenTotAnnualCum(: , dInd , 1 , :)),2) , [] , 1))' , ...
