@@ -56,13 +56,14 @@ paramDir = [pwd , '/Params/'];
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2121;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
+lastYear = 2122;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
 
 % Indices of calib runs to plot
 fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11
+% fileInds = {'6_1', '6_2'}; % FORTESTING
 nRuns = length(fileInds);
 
 % Initialize model output plots
@@ -168,12 +169,16 @@ n = vaxResultInd;
 baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_CISNET-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
+
+% k=1; % FORTESTING
+% j=1; % FORTESTING
+
 for k = 1 : loopSegmentsLength-1
     parfor j = loopSegments{k}+1 : loopSegments{k+1}
         % Load results
         pathModifier = [baseFileName , fileInds{j}];
         nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_noHiv-Intrvn_6_6' , fileInds{j}]); % ***SET ME***: name for historical run output file 
+        curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_noHiv-Intrvn_' , fileInds{j}]); % ***SET ME***: name for historical run output file 
 
         vaxResult = cell(nSims , 1);
         resultFileName = [pwd , '/HHCoM_Results/' , pathModifier, '/' , 'vaxSimResult'];
@@ -993,11 +998,13 @@ if contains(baseFileName , 'CISNET')
     firstYrInd = ((1982 - startYear)*stepsPerYear +1);
     t82on = (1982:(lastYear-1))';
     outputVec = [t82on , mean(squeeze(hivPrevW(: , (firstYrInd:stepsPerYear:end))) , 1)'];   
-    sdevVec = [t82on , std(squeeze(hivPrevW(:, (firstYrInd:stepsPerYear:end))) , 1)']; 
+    minVec = [t82on , min(squeeze(hivPrevW(:, (firstYrInd:stepsPerYear:end))) , 1)']; 
+    maxVec = [t82on , max(squeeze(hivPrevW(:, (firstYrInd:stepsPerYear:end))) , 1)']; 
     fname = [pwd , '/HHCoM_Results/' , baseFileName , fileInds{1} , '/' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'HIVprev-Crude');
-    writematrix(sdevVec, fname , 'Sheet' , 'HIVprev-Crude-sdev'); 
+    writematrix(minVec, fname , 'Sheet' , 'HIVprev-Crude-min'); 
+    writematrix(maxVec, fname , 'Sheet' , 'HIVprev-Crude-max'); 
 end
 
 %% Write crude HIV prevalence in women aged 15+ over time
@@ -1062,11 +1069,13 @@ if contains(baseFileName , 'CISNET')
     firstYrInd = ((1982 - startYear)*stepsPerYear +1);
     t82on = (1982:(lastYear-1))';
     outputVec = [t82on , mean(squeeze(artCovW(: , (firstYrInd:stepsPerYear:end))) , 1)'];   
-    stdevVec = [t82on , std(squeeze(artCovW(: , (firstYrInd:stepsPerYear:end))) , 1)'];   
+    minVec = [t82on , min(squeeze(artCovW(: , (firstYrInd:stepsPerYear:end))) , 1)'];   
+    maxVec = [t82on , max(squeeze(artCovW(: , (firstYrInd:stepsPerYear:end))) , 1)']; 
     fname = [pwd , '/HHCoM_Results/' , baseFileName , fileInds{1} , '/' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'ARTprev-Crude');
-    writematrix(stdevVec, fname, 'Sheet', 'ARTprev-Crude-sdev');
+    writematrix(minVec, fname, 'Sheet', 'ARTprev-Crude-min');
+    writematrix(maxVec, fname, 'Sheet', 'ARTprev-Crude-max');
 end
 
 %% Proportion of total HIV+ population on ART and VS by age
@@ -1258,27 +1267,35 @@ if contains(baseFileName , 'CISNET')
     firstYrInd = ((1982 - startYear)*stepsPerYear +1);
     t82on = (1982:(lastYear-1))';
     outputVec = [];
-    stdevVec = []; 
+    minVec = []; 
+    maxVec = []; 
     for dInd = 1 : diseaseVecLength_ccInc    
         outputVecA = [];
-        stdevVecA = []; 
+        minVecA = []; 
+        maxVecA = []; 
         for a = 1 : age
             outputVecA = [outputVecA , mean(squeeze(hpv_hivAgeW(: , dInd , a , (firstYrInd:stepsPerYear:end))) , 1)'];
-            stdevVecA = [stdevVecA , std(squeeze(hpv_hivAgeW(: , dInd , a , (firstYrInd:stepsPerYear:end))) , 1)'];
+            minVecA = [minVecA , min(squeeze(hpv_hivAgeW(: , dInd , a , (firstYrInd:stepsPerYear:end))) , 1)'];
+            maxVecA = [maxVecA , max(squeeze(hpv_hivAgeW(: , dInd , a , (firstYrInd:stepsPerYear:end))) , 1)'];
         end
         outputVec = [outputVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
             mean(squeeze(hpv_hivW(: , dInd , (firstYrInd:stepsPerYear:end))) , 1)' , ...
             outputVecA]];   
-        stdevVec = [stdevVec ; ...
+        minVec = [minVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
-            std(squeeze(hpv_hivW(: , dInd , (firstYrInd:stepsPerYear:end))) , 1)' , ...
-            stdevVecA]];  
+            min(squeeze(hpv_hivW(: , dInd , (firstYrInd:stepsPerYear:end))) , 1)' , ...
+            minVecA]];  
+        maxVec = [maxVec ; ...
+            [t82on , ones(length(t82on),1).*dInd , ...
+            max(squeeze(hpv_hivW(: , dInd , (firstYrInd:stepsPerYear:end))) , 1)' , ...
+            maxVecA]];  
     end
     fname = [pwd , '/HHCoM_Results/' , baseFileName , fileInds{1} , '/' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'HPVprev-Crude');
-    writematrix(stdevVec, fname, 'Sheet', 'HPVprev-Crude-sdev');
+    writematrix(minVec, fname, 'Sheet', 'HPVprev-Crude-min');
+    writematrix(maxVec, fname, 'Sheet', 'HPVprev-Crude-max');
 end
 
 %% Write age-standardized HPV prevalence by HIV status over time
@@ -1581,27 +1598,35 @@ if contains(baseFileName , 'CISNET')
     firstYrInd = ((1982 - startYear) +1);
     t82on = (1982:(lastYear-1))';
     outputVec = [];
-    stdevVec = []; 
+    minVec = []; 
+    maxVec = []; 
     for dInd = 1 : diseaseVecLength_ccInc
         outputVecA = [];
-        stdevVecA = []; 
+        minVecA = []; 
+        maxVecA = []; 
         for a = 1 : age
             outputVecA = [outputVecA , mean(squeeze(ccIncHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
-            stdevVecA = [stdevVecA , std(squeeze(ccIncHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
+            minVecA = [minVecA , min(squeeze(ccIncHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
+            maxVecA = [maxVecA , max(squeeze(ccIncHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
         end
         outputVec = [outputVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
             mean(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
             outputVecA]];   
-        stdevVec = [stdevVec ; ...
+        minVec = [minVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
-            std(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
-            stdevVecA]];   
+            min(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
+            minVecA]];   
+        maxVec = [maxVec ; ...
+            [t82on , ones(length(t82on),1).*dInd , ...
+            max(squeeze(ccIncHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
+            maxVecA]];  
     end
     fname = [pwd , '/HHCoM_Results/' , baseFileName , fileInds{1} , '/' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'ICC-Crude');
-    writematrix(stdevVec, fname, 'Sheet', 'ICC-Crude-sdev'); 
+    writematrix(minVec, fname, 'Sheet', 'ICC-Crude-min'); 
+    writematrix(maxVec, fname, 'Sheet', 'ICC-Crude-max'); 
 end
 
 diseaseLabels = {'Tot (CrudeICC)' , 'HIV- (CrudeICC)' , 'HIV+ (CrudeICC)' , 'HIV+ no ART (CrudeICC)' , 'HIV+ ART (CrudeICC)'};
@@ -1637,27 +1662,35 @@ if contains(baseFileName , 'CISNET')
     firstYrInd = ((1982 - startYear) +1);
     t82on = (1982:(lastYear-1))';
     outputVec = [];
-    stdevVec = []; 
+    minVec = []; 
+    maxVec = []; 
     for dInd = 1 : diseaseVecLength_ccInc
         outputVecA = [];
-        stdevVecA = []; 
+        minVecA = []; 
+        maxVecA = []; 
         for a = 1 : age
             outputVecA = [outputVecA , mean(squeeze(ccAnlHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
-            stdevVecA = [stdevVecA , std(squeeze(ccAnlHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
+            minVecA = [minVecA , min(squeeze(ccAnlHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
+            maxVecA = [maxVecA , max(squeeze(ccAnlHivAgeTime(: , dInd , a , (firstYrInd:end))) , 1)'];
         end
         outputVec = [outputVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
             mean(squeeze(ccAnlHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
             outputVecA]];  
-        stdevVec = [stdevVec ; ...
+        minVec = [minVec ; ...
             [t82on , ones(length(t82on),1).*dInd , ...
-            std(squeeze(ccAnlHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
-            stdevVecA]]; 
+            min(squeeze(ccAnlHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
+            minVecA]]; 
+        maxVec = [maxVec ; ...
+            [t82on , ones(length(t82on),1).*dInd , ...
+            max(squeeze(ccAnlHivTime(: , dInd , (firstYrInd:end))) , 1)' , ...
+            maxVecA]]; 
     end
     fname = [pwd , '/HHCoM_Results/' , baseFileName , fileInds{1} , '/' , ...
         'ART_comparative_modeling_outcome_templates_030421.xlsx'];
     writematrix(outputVec , fname , 'Sheet' , 'CCC-Crude');
-    writematrix(stdevVec, fname, 'Sheet', 'CCC-Crude-sdev'); 
+    writematrix(minVec, fname, 'Sheet', 'CCC-Crude-min'); 
+    writematrix(maxVec, fname, 'Sheet', 'CCC-Crude-max');
 end
 
 
