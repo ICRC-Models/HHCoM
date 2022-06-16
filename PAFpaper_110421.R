@@ -786,7 +786,7 @@ ggplot() +
   geom_line(data = filter(S3.inART.ir.comb, group == "Total", year > "2019"), aes(x = year, y = median, colour = "hivEnhanc", linetype = "Total"), size = 1.25) +
   scale_colour_manual(values = c("artLevel" = "black", "artScale" = "grey45", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
                      breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                     labels = c("Baseline" , "ART scale-up only" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                     labels = c("Baseline" , "ART scale-up only" , "Enhanced cervical cancer interventions" , "Enhanced cervical cancer interventions for women with HIV"),
                      name = "Scenario") +
   scale_linetype_manual(values = c("Total" = "solid", "HIVpos_all" = "dotted" , "HIVneg" = "dashed"),
                         breaks = c("Total", "HIVpos_all" , "HIVneg"),
@@ -795,8 +795,8 @@ ggplot() +
   scale_y_continuous(breaks = seq(0, 200, 50), limits = c(0, 200)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  labs(x = "Year", y = "Crude cervical cancer incidence rate per 100,000 women") +
-  theme(axis.title = element_text(size =14),
+  labs(x = "", y = "Crude cervical cancer incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size =11),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
         legend.text = element_text(size = 11),
@@ -824,18 +824,18 @@ ggplot() +
                       name = "HIV status") +
   scale_colour_manual(values = c("artLevel" = "black", "artScale" = "grey45", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
                       breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                      labels = c("Baseline" , "ART scale-up only" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      labels = c("Baseline" , "ART scale-up only" , "Enhanced cervical cancer interventions" , "Enhanced cervical cancer interventions for women with HIV"),
                       name = "Scenario") +
   scale_y_continuous(breaks = seq(0, 200, 50), limits = c(0, 200)) +
   #scale_x_continuous(breaks = seq(2000 , 2120 , 20), limits = c(2000, 2120)) +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
-  labs(x = "Year", y = "") +
-  theme(axis.title = element_text(size =12),
+  labs(x = "Year", y = "Crude cervical cancer incidence rate per 100,000 women") +
+  theme(axis.title = element_text(size =11),
         axis.text = element_text(size = 14),
         axis.line = element_line(color = "black"),
-        legend.text = element_blank(),
+        legend.text = element_text(size = 11),
         legend.key.width = unit(1.5, 'cm'),
-        legend.position = "none",
+        legend.position = "bottom",
         legend.direction="vertical") +
   plot_background 
 dev.off()
@@ -1059,7 +1059,7 @@ ggplot() +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   scale_colour_manual(values = c("artLevel" = "black", "artScale" = "grey45", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
                       breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                      labels = c("Baseline", "ART scale-up only" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      labels = c("Baseline", "ART scale-up only" , "Enhanced cervical cancer interventions" , "Enhanced cervical cancer interventions for women with HIV"),
                       name = "Scenario") +
   scale_linetype_manual(values = c("propCases" = "solid", "hivPrev" = "dashed"),
                       breaks = c("propCases", "hivPrev"),
@@ -1235,7 +1235,7 @@ ggplot() +
   scale_x_continuous(breaks = seq(2000 , 2070 , 10), limits = c(2000, 2071)) +
   scale_colour_manual(values = c("artLevel" = "black", "artScale" = "grey45", "hpvEnhanc" = "dodgerblue2", "hivEnhanc" = "aquamarine3"),
                       breaks = c("artLevel" , "artScale" , "hpvEnhanc" , "hivEnhanc"),
-                      labels = c("Baseline", "ART scale-up only" , "Enhanced HPV interventions" , "Enhanced HPV interventions for women with HIV"),
+                      labels = c("Baseline", "ART scale-up only" , "Enhanced cervical cancer interventions" , "Enhanced cervical cancer interventions for women with HIV"),
                       name = "Scenario") +
   #scale_linetype_manual(values = c("propCases" = "solid"),
   #                      breaks = c("propCases"),
