@@ -1,5 +1,5 @@
 function [] = vaxCEA_multSims_CIs_pHIV(vaxResultInd , sceNum , fileNameNums)
-% example: vaxCEA_multSims_CIs_pHIV(1 , '0' , {'0' , '_'})
+% example: vaxCEA_multSims_CIs_pHIV(1 , '0' , {'S0' , '_'})
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -114,14 +114,14 @@ for k = 1 : loopSegmentsLength-1
         
         %% ****************************** CERVICAL CANCER OUTCOMES ****************************************************************************************
     
-        %% Cervical cancer incidence by HIV status over time
+        %% Cervical cancer incidence among women aged 15+ by HIV status over time
         fac = 10 ^ 5;
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             allF = toInd(allcomb(d , 1 : viral , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
-                1 : endpoints , 1 : intervens , 2 , 1 : age , 1 : risk));
+                1 : endpoints , 1 : intervens , 2 , 4 : age , 1 : risk));
             ccIncHivTime(j , dInd , :) = ...
-                (annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , 3 : age , :),2),3),4)) ./ ...
+                (annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , 4 : age , :),2),3),4)) ./ ...
                 (annlz(sum(vaxResult{n}.popVec(: , allF) , 2) ./ stepsPerYear)) * fac);
         end
         
@@ -138,18 +138,18 @@ for k = 1 : loopSegmentsLength-1
             end
         end
         
-        %% Cumulative cervical cancer cases by HIV status over time
+        %% Cumulative cervical cancer cases among women aged 15+ by HIV status over time
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
                 ccCumHivTime(j , dInd , :) = ...
-                    cumsum(squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((currYear - startYear) * stepsPerYear +1):end , d , : , :),2),3),4))),2);
+                    cumsum(squeeze(annlz(sum(sum(sum(vaxResult{n}.newCC(((currYear - startYear) * stepsPerYear +1):end , d , 4 : age , :),2),3),4))),2);
         end
         
-        %% Annual cervical cancer cases by HIV status over time
+        %% Annual cervical cancer cases among women aged 15+ by HIV status over time
         for dInd = 1 : diseaseVecLength_ccInc
             d = diseaseVec_ccInc{dInd};
             ccAnnlHivTime(j , dInd , :) = ...
-                annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , : , :),2),3),4));
+                annlz(sum(sum(sum(vaxResult{n}.newCC(: , d , 4 : age , :),2),3),4));
         end
         
      end
@@ -170,7 +170,7 @@ writematrix([[1980 : lastYear-1]' , ...
 
 %% ****************************** CERVICAL CANCER OUTCOMES ****************************************************************************************
 
-%% Write crude cervical cancer incidence by HIV status over time
+%% Write crude cervical cancer incidence among women aged 15+ by HIV status over time
 fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
     'PAF_crudeICC_' , fileNameNums{vaxResultInd} , '.xlsx'];
 firstYrInd = ((1980 - startYear) +1);
@@ -232,7 +232,7 @@ for dInd = 1 : length(diseaseLabels)
         fname , 'Sheet' , diseaseLabels{dInd}); 
 end
 
-%% Write annual cervical cancer cases by HIV status over time
+%% Write annual cervical cancer cases among women aged 15+ by HIV status over time
 fname = [pwd , '\HHCoM_Results\' , baseFileName , fileInds{1} , '\' , ...
     'PAF_crudeAnnualCC_' , fileNameNums{vaxResultInd} , '.xlsx'];
 firstYrInd = ((1980 - startYear) +1);
