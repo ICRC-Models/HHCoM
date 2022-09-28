@@ -1,7 +1,7 @@
 %function vaxCEA_multSims_CISNETsces()
 
 %% LOAD PARAMETERS
-paramDir = [pwd , '\Params\'];
+paramDir = [pwd , '/Params/'];
 
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
@@ -97,7 +97,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         for dInd = 1 : 1 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
@@ -135,7 +135,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         for dInd = 1 : 1 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
@@ -182,7 +182,7 @@ xlabel('Year'); ylabel('AS-HPV prevalence among women');
                                 for j = 1 % trying to facet wrap
                                     for dInd = 1 : 1 %5
                                         % Load results
-                                        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                         hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                         
@@ -231,7 +231,7 @@ xlabel('Year'); ylabel('AS-HPV prevalence among women');
                                 for j = 2 % trying to facet wrap
                                     for dInd = 1 : 1 %5
                                         % Load results
-                                        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                         hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                         
@@ -278,7 +278,7 @@ xlabel('Year'); ylabel('AS-HPV prevalence among women');
                                 for j = 3 % trying to facet wrap
                                     for dInd = 1 : 1 %5
                                         % Load results
-                                        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                         hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                         
@@ -325,7 +325,7 @@ xlabel('Year'); ylabel('AS-HPV prevalence among women');
                                 for j = 4 % trying to facet wrap
                                     for dInd = 1 : 1 %5
                                         % Load results
-                                        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                         hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                         
@@ -372,7 +372,7 @@ xlabel('Year'); ylabel('AS-HPV prevalence among women');
                                 for j = 5 % trying to facet wrap
                                     for dInd = 1 : 1 %5
                                         % Load results
-                                        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                         hpv_hivAgeW_dis = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                         
@@ -432,7 +432,7 @@ for i = 1 : nTeams
     for j = 4 : 4; 
         for dInd = 1 : 3 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             hpvPrevTime = readmatrix(fname , 'Sheet' , 'HPV prevalence' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
@@ -457,7 +457,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         for dInd = 1 : 1 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['C' , num2str(((dInd-1)*t82onLen+1+3)) , ':C' , num2str(dInd*t82onLen+3)]);
             hold all;
@@ -496,7 +496,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         for dInd = 1 : 1 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
             
@@ -546,7 +546,7 @@ xlabel('Year'); ylabel('AS-cervical cancer incidence (per 100K)');
                             for j = 1 : 1 % stratify by scenario  
                                 for dInd = 1 : 1 %5
                                     % Load results
-                                    fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                    fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                         teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                     ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                     
@@ -596,7 +596,7 @@ xlabel('Year'); ylabel('AS-cervical cancer incidence (per 100K)');
                             for j = 2:2 % stratify by scenario  
                                 for dInd = 1 : 1 %5
                                     % Load results
-                                    fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                    fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                         teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                     ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                     
@@ -646,7 +646,7 @@ xlabel('Year'); ylabel('AS-cervical cancer incidence (per 100K)');
                             for j = 3:3 % stratify by scenario  
                                 for dInd = 1 : 1 %5
                                     % Load results
-                                    fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                    fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                         teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                     ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                     
@@ -696,7 +696,7 @@ xlabel('Year'); ylabel('AS-cervical cancer incidence (per 100K)');
                             for j = 4 
                                 for dInd = 1 : 1 %5
                                     % Load results
-                                    fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+                                    fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                                         teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
                                     ccIncAge_dis = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)])';
                                     
@@ -761,7 +761,7 @@ for i = 1 : nTeams
     for j = 4 : 4; 
         for dInd = 1 : 3 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccIncTime = readmatrix(fname , 'Sheet' , 'CC incidence rate' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':T' , num2str(dInd*t82onLen+3)]);
             hold all;
@@ -790,7 +790,7 @@ for i = 1 : nTeams
     for j = 1 : nSces  
         for dInd = 1 : 1 %5
             % Load results
-            fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+            fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
                 teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
             ccCasesTime = readmatrix(fname , 'Sheet' , 'CC case counts' , 'Range' , ['D' , num2str(((dInd-1)*t82onLen+1+3)) , ':S' , num2str(dInd*t82onLen+3)]);
             ccCasesTotTime = sum(ccCasesTime,2);
@@ -818,7 +818,7 @@ xline(2021);
 for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
-        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
         hivPrevTime = readmatrix(fname , 'Sheet' , 'HIV prevalence' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
@@ -843,7 +843,7 @@ plot([(artYr(1:end-1) + 1) ; 2020] , [maxRateF(1:end-1) ; 0.627829] , 'ro');
 for i = 1 : nTeams
     for j = 1 : nSces  
         % Load results
-        fname = [pwd , '\HHCoM_Results\' , dirName , '\' , ...
+        fname = [pwd , '/HHCoM_Results/' , dirName , '/' , ...
             teamVec{i} , '_' , sceVec{j} , '_outcome_template_' , dateVec{i} , '.xlsx'];
         artCovTime = readmatrix(fname , 'Sheet' , 'ART coverage' , 'Range' , ['C' , num2str((1+3)) , ':C' , num2str(t82onLen+3)]);
         hold all;
