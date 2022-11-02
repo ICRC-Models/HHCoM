@@ -224,7 +224,7 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
 
     % Women count by age
     for a = 1 : age
-        womenCountAgeInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, age, 1:risk)); 
+        womenCountAgeInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
         womenCountAge(:, a, j) = sum(vaxResult{n}.popVec(:, womenCountAgeInds), 2); 
     end 
 
