@@ -1,4 +1,4 @@
-% DESCRIPTION: Looping vaxCEA_multSims_SACEA.m over all the scenario
+% DESCRIPTION: Looping vaxCEA_multSims_CISNET_UWRuns.m over all the scenario
 % numbers, cleaning the output, turning into an array, and exporting to CSV for 
 % processing in R. 
 
@@ -81,11 +81,11 @@ loopSegmentsLength = length(loopSegments);
 %     parfor j = loopSegments{k}+1 : loopSegments{k+1}
     
 % only run scenario 1
-for j = [2] % FORTESTING
+for j = [1] % FORTESTING
 
-    sceNum = j - 1; 
+    sceNum = j; 
     sceString = num2str(sceNum); % turn sceNum into string sceString
-    sce = sceNum + 1; % add one since indices start at 1 (so scenarios will be 1-10 in this case) 
+    sce = sceNum; % add one since indices start at 1 (so scenarios will be 1-10 in this case) 
 
     % Initialize result matrices 
     deaths = zeros(nTimepoints, age+1, 3, nRuns); % time, age (1:17), 3 death data elements, number of parameters, 10 scenarios
@@ -99,11 +99,14 @@ for j = [2] % FORTESTING
     scen0CinTx = zeros(nTimepointsFut, endpoints, 2, nRuns); % 2 because only LEEP and cryo (for the 3rd dimension, 1 is LEEP 2 is cryo)
     newCC = zeros(nTimepoints, age+1, nRuns); 
     hivDeath = zeros(nTimepoints, nRuns); 
-    womenCount = zeros(nTimepoints, nRuns); 
+    womenCount = zeros(nTimepoints, nRuns);
+    womenCountAge = zeros(nTimepoints, age, nRuns); 
+    hivPrev = zeros(nTimepoints, age, nRuns); 
+    hivPrevTotal = zeros(nTimepoints, nRuns); 
 
     % Feeding in the zeroed result matrix, spitting out the same matrix but with all the counts added in for that scenario
-    [hivDeath, womenCount] = ...
-        vaxCEA_multSims_CISNET_UWRuns(1 , sceString , {'0'}, fileInds, hivDeath, womenCount);  
+    [hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge] = ...
+        vaxCEA_multSims_CISNET_UWRuns(1 , sceString , {'0'}, fileInds, hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge);  
 
 % turn all the result matrices into 2D 
     for param = 1 : nRuns
@@ -116,6 +119,22 @@ for j = [2] % FORTESTING
             womenCountReshape = [womenCountReshape; ...
                         transpose(monthlyTimespan), param.*ones(nTimepoints, 1), sce.*ones(nTimepoints,1), womenCount(:, param)];
         end
+
+        for a = 1 : age
+            if (param == 1 && a == 1)
+                hivPrevReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                    hivPrev(:, a, param)]; 
+                womenCountAgeReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                    sce.*ones(nTimepoints,1), womenCountAge(:, a, param)]; 
+            else 
+                hivPrevReshape = [hivPrevReshape; ...
+                    transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                    sce.*ones(nTimepoints,1), womenCountAge(:, a, param)];
+                womenCountAgeReshape = [womenCountAgeReshape; ...
+                    transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                    sce.*ones(nTimepoints,1), womenCountAge(:, a, param)];
+            end 
+        end 
 
 %         for a = 1 : age + 1 
 %             % turning deaths into 2D 
@@ -243,6 +262,9 @@ for j = [2] % FORTESTING
 % newCCReshape1 = array2table(newCCReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
 hivDeathReshape1 = array2table(hivDeathReshape, 'VariableNames', {'year', 'paramNum', 'sceNum', 'count'});
 womenCountReshape1 = array2table(womenCountReshape, 'VariableNames', {'year', 'paramNum', 'sceNum', 'count'}); 
+womenCountAgeReshape1 = array2table(womenCountAgeReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
+hivPrevReshape1 = array2table(hivPrevReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
+
 
 % spit out into CSV 
 % writetable(deathsReshape1,[pwd '/SACEA/deaths_S' sceString '.csv']);
@@ -256,6 +278,8 @@ womenCountReshape1 = array2table(womenCountReshape, 'VariableNames', {'year', 'p
 % writetable(newCCReshape1, [pwd '/SACEA/newCC_S' sceString '.csv']); 
 writetable(hivDeathReshape1, [pwd '/CISNET/hivDeath_S' sceString '.csv']); 
 writetable(womenCountReshape1, [pwd '/CISNET/womenCount_S' sceString '.csv']); 
+writetable(womenCountAgeReshape1, [pwd '/CISNET/womenCountAge_S' sceString '.csv']); 
+writetable(hivPrevReshape1, [pwd '/CISNET/hivPrevAge_S' sceString '.csv']); 
 
 % if sceNum == 0 % only write the cin / treatment file if in scenario 0 
 %     writetable(scen0CinTxReshape1, [pwd '/SACEA/scen0CinTx_S0.csv']); 

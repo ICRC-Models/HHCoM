@@ -1,10 +1,7 @@
-function [hivDeath, womenCount] = vaxCEA_multSims_CISNET_UWRuns(vaxResultInd , sceNum , fileNameNums, fileInds, hivDeath, womenCount)
+function [hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge] = vaxCEA_multSims_CISNET_UWRuns(vaxResultInd , sceNum , fileNameNums, fileInds, hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge)
 % Description: This function links with the script
-% loopingCeaOverScenarios.m. It takes in initialized result variables and
-% places the results into 3D matrices. Looks at death counts,
-% screening/treatment counts, HPV/CC health state counts, HIV health state
-% counts, total counts per age at each time point, and vaccination counts. 
-% Example: vaxCEA_multSims_SACEA_CH(1 , '0' , {'0'})
+% loopingCISNETOverScenarios.m. It pulls specified results from the matlab
+% files outputted for the CISNET comparative analysis results.
 
 %% Load parameters and results
 paramDir = [pwd , '\Params\'];
@@ -224,6 +221,22 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     hivDeath(:, j) = sum(sum(sum(vaxResult{n}.hivDeaths(:, :, 2, :),2),3),4); % female = 2 for gender
     womenInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
     womenCount(:, j) = sum(vaxResult{n}.popVec(:, womenInds), 2); 
+
+    % Women count by age
+    for a = 1 : age
+        womenCountAgeInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, age, 1:risk)); 
+        womenCountAge(:, a, j) = sum(vaxResult{n}.popVec(:, womenCountAgeInds), 2); 
+    end 
+
+    % HIV prevalence per age
+    for a = 1 : age
+        hivPrevInds = toInd(allcomb(3:8, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk));
+        hivPrev(1:end, a, j) = sum(vaxResult{n}.popVec(:, hivPrevInds), 2); 
+    end 
+
+    % HIV prevalence total
+    hivPrevIndsTotal = toInd(allcomb(3:8, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
+    hivPrevTotal(1:end, j) = sum(vaxResult{n}.popVec(:, hivPrevIndsTotal), 2); 
 
     %     for a = 1 : age 
 %         vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
