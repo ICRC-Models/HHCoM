@@ -1,4 +1,4 @@
-function [hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge] = vaxCEA_multSims_CISNET_UWRuns(vaxResultInd , sceNum , fileNameNums, fileInds, hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge)
+function [hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge, womenCountDisease] = vaxCEA_multSims_CISNET_UWRuns(vaxResultInd , sceNum , fileNameNums, fileInds, hivDeath, womenCount, hivPrev, hivPrevTotal, womenCountAge, womenCountDisease)
 % Description: This function links with the script
 % loopingCISNETOverScenarios.m. It pulls specified results from the matlab
 % files outputted for the CISNET comparative analysis results.
@@ -221,6 +221,13 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     hivDeath(:, j) = sum(sum(sum(vaxResult{n}.hivDeaths(:, :, 2, :),2),3),4); % female = 2 for gender
     womenInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
     womenCount(:, j) = sum(vaxResult{n}.popVec(:, womenInds), 2); 
+    
+    % Women count by HIV disease state 
+    for d = 1 : disease 
+        womenCountDiseaseInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, ...
+            2, 1:age, 1:risk)); 
+        womenCountDisease(:, d, j) = sum(vaxResult{n}.popVec(:, womenCountDiseaseInds), 2); 
+    end 
 
     % Women count by age and sex 
     for a = 1 : age
