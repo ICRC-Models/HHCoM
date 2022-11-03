@@ -222,16 +222,20 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     womenInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
     womenCount(:, j) = sum(vaxResult{n}.popVec(:, womenInds), 2); 
 
-    % Women count by age
+    % Women count by age and sex 
     for a = 1 : age
-        womenCountAgeInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-        womenCountAge(:, a, j) = sum(vaxResult{n}.popVec(:, womenCountAgeInds), 2); 
+        for g = 1 : gender
+            womenCountAgeInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, g, a, 1:risk)); 
+            womenCountAge(:, a, g, j) = sum(vaxResult{n}.popVec(:, womenCountAgeInds), 2); 
+        end 
     end 
 
-    % HIV prevalence per age
+    % HIV prevalence per age and sex 
     for a = 1 : age
-        hivPrevInds = toInd(allcomb(3:8, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk));
-        hivPrev(1:end, a, j) = sum(vaxResult{n}.popVec(:, hivPrevInds), 2); 
+        for g = 1 : gender 
+            hivPrevInds = toInd(allcomb(3:8, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, g, a, 1:risk));
+            hivPrev(1:end, a, g, j) = sum(vaxResult{n}.popVec(:, hivPrevInds), 2); 
+        end 
     end 
 
     % HIV prevalence total
