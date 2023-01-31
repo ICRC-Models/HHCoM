@@ -28,9 +28,9 @@ nPrlSets = 25;
 
 %% Load all particles
 paramDir = [pwd , '/Params/'];
-masterSetMatrix = load([paramDir , 'masterSets_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent parameter sample
-pIdx = load([paramDir , 'pIdx_calib_' , date , '_0' , '.dat']); % load parameter indices
-orderedLL = load([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent ordered log-likelihoods
+masterSetMatrix = load(string(strjoin([paramDir , 'masterSets_calib_' , date , '_' , num2str(t_curr) , '.dat'],''))); % load most recent parameter sample
+pIdx = load(string(strjoin([paramDir , 'pIdx_calib_' , date , '_0' , '.dat'],''))); % load parameter indices
+orderedLL = load(string(strjoin([paramDir , 'orderedLL_calib_' , date , '_' , num2str(t_curr) , '.dat'],''))); % load most recent ordered log-likelihoods
 
 %% Get indices and parameter values of numBestFits*2  sets
 numBestFits = 25;
@@ -40,8 +40,8 @@ top50Inds = orderedLL(specIndsList,1); %orderedLL(1:numSets50,1);
 top50Params = masterSetMatrix(:,top50Inds);
 
 %% If on Phase 2 of calibration, uncomment the following to plot resampled Ph1 parameters + Ph2 parameters
-pIdx = load([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat']);
-masterResampleSubsetMatrix = load([paramDir , 'masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat']); % load most recent Ph1 resampled parameters
+pIdx = load(string(strjoin([paramDir,'pIdx_calib_' , date , '_0_wPh1Resample.dat'],'')));
+masterResampleSubsetMatrix = load(string(strjoin([paramDir , 'masterResampleSubsetMatrix_calib_' , date , '_' , num2str(t_curr) , '.dat'],''))); % load most recent Ph1 resampled parameters
 masterCombinedPhaseMatrix = [masterResampleSubsetMatrix ; masterSetMatrix];
 top50Params = masterCombinedPhaseMatrix(:,top50Inds);
 

@@ -296,7 +296,7 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
 % If continuing from checkpoint
 elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % Initial Population 
-    chckPntIn = load([pwd , '/HHCoM_Results/' , pathModifier]); % name for historical run input file 
+    chckPntIn = load(string(strjoin([pwd , '/HHCoM_Results/' , pathModifier],''))); % name for historical run input file 
     
     % Initialize time vector
     s = 1 : timeStep : years + 1 + timeStep;
