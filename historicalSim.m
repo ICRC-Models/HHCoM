@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_testingTreatmentUpTo1999_27Feb2023', num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '_testingTreatment_28Mar2023_v2', num2str(paramSetIdx)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -168,6 +168,8 @@ noVaxToScreenCancerNoTreat = zeros(disease , viral , 3 , numScreenAge ,risk);
 noVaxToScreenCancerTreat = noVaxToScreenCancerNoTreat;
 vaxToScreenCancerNoTreat = noVaxToScreenCancerNoTreat;
 vaxToScreenCancerTreat = noVaxToScreenCancerNoTreat;
+noVaxToScreenCancerNegScreen = noVaxToScreenCancerNoTreat; 
+vaxToScreenCancerNegScreen = noVaxToScreenCancerNoTreat; 
 udPop = zeros(disease, viral, hpvVaxStates, hpvNonVaxStates, 3, intervens, age, risk); 
 udPopNoTreat = udPop; 
 udPopTreat = udPop; 
@@ -211,8 +213,10 @@ for aS = 1 : numScreenAge
                             % for people with cancer
                             noVaxToScreenCancerNoTreat(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x+3 , 3 , 2 , a , r)));
                             noVaxToScreenCancerTreat(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x+6 , 3 , 2 , a , r)));
+                            noVaxToScreenCancerNegScreen(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
                             vaxToScreenCancerNoTreat(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x+3 , 4 , 2 , a , r)));
                             vaxToScreenCancerTreat(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x+6 , 4 , 2 , a , r)));
+                            vaxToScreenCancerNegScreen(d,v,h,s,xS,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 4 , 2 , a , r)));
 
                         end
                     end    
@@ -479,6 +483,7 @@ for i = iStart : length(s) - 1
             % Screening
             % Treatment
             % Symptomatic detection 
+
             [dPop , newScreen(i , : , : , : , : , : , :), ccTreat(i, : , : , : , : , : , : , :), ...
                 ccSymp(i, : , : , : , : , : , : , :)] ... 
                 = hpvScreen(pop , ...
@@ -490,7 +495,9 @@ for i = iStart : length(s) - 1
                     noVaxToScreenTreatHpv , vaxToScreenTreatHpv , noVaxToScreenTreatVaxHpv , ...
                     vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , vaxToScreenTreatNonVaxHpv , ...
                     noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , noVaxToScreenCancerNoTreat , noVaxToScreenCancerTreat , ...
-                    vaxToScreenCancerNoTreat , vaxToScreenCancerTreat, hystMult, kSymp, udPop, udPopNoTreat, udPopTreat, udPopHyst);
+                    vaxToScreenCancerNoTreat , vaxToScreenCancerTreat, hystMult, kSymp, udPop, udPopNoTreat, udPopTreat, udPopHyst, ...
+                    vaxToScreenCancerNegScreen, noVaxToScreenCancerNegScreen);
+            
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :); % for next module
             if any(pop(end , :) <  0)
@@ -501,9 +508,9 @@ for i = iStart : length(s) - 1
         pop = pop(end, :); 
 
         % SYMPTOMATIC CC DETECTION IN A NON-SCREENING YEAR
-        if (year < hpvScreenStartYear)
+%         if (year < hpvScreenStartYear)
             [dPop , ccSymp(i,:,:,:,:,:,:,:)] = symptomaticDetection(pop , ...
-                disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , intervens , age , ...
+                year , hpvScreenStartYear , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , intervens , age , ...
                 screenAlgs , kSymp, hystMult, udPop, udPopNoTreat, udPopTreat, udPopHyst, ccReghpvVaxInds); 
             pop(end , :) = pop(end , :) + dPop(end , :); 
             popIn = pop(end , :); % for next module
@@ -511,7 +518,7 @@ for i = iStart : length(s) - 1
                 disp('After symptomatic detection')
                 break
             end 
-        end 
+%         end 
         pop = pop(end, :); 
 
     end
