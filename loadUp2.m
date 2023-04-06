@@ -49,7 +49,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2020;
+currYear = 2021;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -820,7 +820,7 @@ end
 % Vaccination
 waning = 0;    % bool to turn waning on or off
 
-% Screening timeframe
+% Screening timeframe 
 screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 

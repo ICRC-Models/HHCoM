@@ -14,10 +14,16 @@ t_curr = tstep_abc;
 date = date_abc;
 
 %% Cluster information
-pc = parcluster('local');    % create a local cluster object
-pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
-numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
-parpool(pc , numCPUperNode)    % start the pool with max number workers
+% pc = parcluster('local');    % create a local cluster object
+% pc.JobStorageLocation = strcat('/gscratch/csde/guiliu' , '/' , getenv('SLURM_JOB_ID'))    % explicitly set the JobStorageLocation to the temp directory that was created in the sbatch script
+% numCPUperNode = str2num(getenv('SLURM_CPUS_ON_NODE'))
+% parpool(pc , numCPUperNode)    % start the pool with max number workers
+
+%% Cluster information for ERISONE
+pc = parcluster('local'); 
+pc.JobStorageLocation = getenv('TMPDIR'); % how to pull job id?
+numCPUperNode = 28; % how to pull CPUs on node? set to 8 as an initial test.
+parpool(pc, numCPUperNode)
 
 
 %% Load parameters
