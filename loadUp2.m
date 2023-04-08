@@ -49,7 +49,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2021;
+currYear = 2023;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -795,7 +795,7 @@ end
 hivStartYear = 1978;
 circStartYear = 1960;
 circNatStartYear = 2008;
-vaxStartYear = 2021;
+vaxStartYear = 2019;
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -821,7 +821,7 @@ end
 waning = 0;    % bool to turn waning on or off
 
 % Screening timeframe 
-screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
+screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
@@ -831,14 +831,14 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.04; 0.074; 0.074; 0.074; 0.074; 0.074]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
+baseline.screenCover = [0.0; 0.04; 0.074; 0.074; 0.074; 0.074]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 baseline.testSens = cytoSens;
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
 baseline.colpoRetain = 0.72; % Khozaim, 2013, Gyne & Obst
-baseline.cinTreatEff = [0.97 , 0.97 , 0.67 , 0.67 , 0.66 , 0.66 , 0.66 , 0.71]; % cryo efficacy in HIV+ based on Greene et al 2020 and in HIV- based on Kuhn et al2010
+baseline.cinTreatEff = [0.97 , 0.97 , 0.67 , 0.67 , 0.66 , 0.66 , 0.66 , 0.71];% cryo efficacy in HIV+ based on Greene et al 2020 and in HIV- based on Kuhn et al2010
 baseline.cinTreatRetain = 0.5; % Khozaim, 2013, Gyne & Obst 
 baseline.cinTreatHpvPersist = 0.7; % HPV persistence with cryo including treatment failure among HIV+ DeVuyst, 2014
 baseline.cinTreatHpvPersistHivNeg = 0.195; % Torne, 2012 BJOG; baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1));  proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
