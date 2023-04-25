@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_testingTreatment_28Mar2023_v2', num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '_testingTreatment_30Mar2023', num2str(paramSetIdx)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -273,9 +273,6 @@ lambdaMultVax = 1 - lambdaMultVaxMat;
 % If starting from beginning
 if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     
-
-    %TODO: i think i will need to change indices here
-
     % Initial Population 
     MpopStruc = riskDist(: , : , 1);
     FpopStruc = riskDist(: , : , 2);
@@ -348,6 +345,11 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = zeros(length(s) - 1 , 1);
     ccSymp = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , 3 , intervens , age , 3); 
     ccTreat = ccSymp; 
+    toScreenMult_collect = zeros(length(s)-1, disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
+    toScreenNoTreat_collect = toScreenMult_collect;
+    toScreenNeg_collect = toScreenMult_collect; 
+    toScreenTreat_collect = toScreenMult_collect; 
+    toScreenTreatHystMult_collect = toScreenMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -396,6 +398,11 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = chckPntIn.vaxdSchool;
     ccSymp = chckPntIn.ccSymp; 
     ccTreat = chckPntIn.ccTreat;
+    toScreenMult_collect = chckPntIn.toScreenMult_collect;
+    toScreenNoTreat_collect = chckPntIn.toScreenNoTreat_collect;
+    toScreenNeg_collect = chckPntIn.toScreenNeg_collect; 
+    toScreenTreat_collect = chckPntIn.toScreenTreat_collect; 
+    toScreenTreatHystMult_collect = chckPntIn.toScreenTreatHystMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -485,7 +492,9 @@ for i = iStart : length(s) - 1
             % Symptomatic detection 
 
             [dPop , newScreen(i , : , : , : , : , : , :), ccTreat(i, : , : , : , : , : , : , :), ...
-                ccSymp(i, : , : , : , : , : , : , :)] ... 
+                ccSymp(i, : , : , : , : , : , : , :), ...
+                toScreenMult_collect(i,:,:,:,:,:,:,:), toScreenNoTreat_collect(i,:,:,:,:,:,:,:), toScreenNeg_collect(i,:,:,:,:,:,:,:), ...
+                toScreenTreat_collect(i,:,:,:,:,:,:,:), toScreenTreatHystMult_collect(i,:,:,:,:,:,:,:)] ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens, endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -634,7 +643,8 @@ for i = iStart : length(s) - 1
             'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
             'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
             'ccSymp' , 'ccTreat' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3');
+            'startYear' , 'endYear' , 'i' , '-v7.3', ...
+            'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
     end
 
     disp(['Reached year ' num2str(year)])
@@ -653,7 +663,8 @@ save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec'
     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
     'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
     'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
+    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3', ...
+    'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
 
 disp(' ')
 disp('Simulation complete.')
