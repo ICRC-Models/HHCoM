@@ -93,7 +93,7 @@ j=1;
     % Initialize result matrices 
     deaths = zeros(nTimepoints, age, 4, 7, nRuns); % time, age (1:17), 3 death data elements, number of parameters, 10 scenarios
     ccHealthState = zeros(nTimepoints, age, 10, nRuns); 
-    newCC = zeros(nTimepoints, age, nRuns); 
+    newCC = zeros(nTimepoints, disease, age, 2, nRuns); 
     symptomatic = zeros(nTimepoints, age, 3, 3, nRuns);     
     treatment = zeros(nTimepoints, age, 3, 3, nRuns); 
     screening = zeros(nTimepoints, age, 3, 2, nRuns); 
@@ -148,13 +148,23 @@ j=1;
                 end
             end
 
-            if (param == 1 && a == 1)
-                newCCReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
-                                        newCC(:, a, param)]; 
-            else 
-                newCCReshape = [newCCReshape; 
-                                        transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
-                                        newCC(:, a, param)]; 
+            for d = 1 : disease 
+                for rand = 1 : 2
+
+                    if (param == 1 && a == 1 && d == 1 && rand == 1)
+
+                        newCCReshape = [transpose(monthlyTimespan), d.*ones(nTimepoints,1), a.*ones(nTimepoints,1), ...
+                                            rand.*ones(nTimepoints,1), ...
+                                            param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                                newCC(:, d, a, rand)]; 
+                    else 
+                        newCCReshape = [newCCReshape; 
+                                                transpose(monthlyTimespan), d.*ones(nTimepoints,1), a.*ones(nTimepoints,1), ...
+                                                rand.*ones(nTimepoints,1), ...
+                                                param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                                newCC(:, d, a, rand)]; 
+                    end 
+                end 
             end 
 
             for var = 1 : 3
@@ -196,7 +206,7 @@ deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'age', 'ca
         'sceNum', 'count'}); 
 ccHealthStateReshape1 = array2table(ccHealthStateReshape, 'VariableNames', {'year', 'age', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
-newCCReshape1 = array2table(newCCReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
+newCCReshape1 = array2table(newCCReshape, 'VariableNames', {'year', 'disease', 'age', 'vaxtype', 'paramNum', 'sceNum', 'count'}); 
 sympReshape1 = array2table(sympReshape, 'VariableNames', {'year', 'age', 'stage', 'categ', 'paramNum', ...
         'sceNum', 'count'}); 
 treatReshape1 = array2table(treatReshape, 'VariableNames', {'year', 'age', 'stage', 'categ', 'paramNum', ...

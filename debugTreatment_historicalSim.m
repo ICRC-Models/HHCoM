@@ -84,7 +84,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['toNow_22Apr20Ph2V11_testingTreatment_28Mar2023_v21']; % ***SET ME***: name for simulation output file
+baseFileName = ['toNow_22Apr20Ph2V11_testingTreatment_26Apr2023_fullsim1']; % ***SET ME***: name for simulation output file
 % Looping length 
 % loopSegments = {0 , round(nRuns/2) , nRuns};
 % loopSegmentsLength = length(loopSegments);
@@ -229,7 +229,11 @@ vaxResult{n}.newScreen = [curr.newScreen(1 : end, :, :, :, :, :, :, :)];
 % NEW CERVICAL CANCER CASES ******************************
 
     for a = 1 : age 
-        newCC(:, a, j) = sum(sum(sum(vaxResult{n}.newCC(:, :, a, :),2),3),4);
+        for d = 1 : disease 
+            for param = 1 : 2
+                newCC(:, d, a, param, j) = sum(sum(sum(vaxResult{n}.newCC(:, d, a, param),2),3),4);
+            end 
+        end 
     end 
 
 % SYMPTOMATIC CASES **************************************
