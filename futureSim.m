@@ -73,9 +73,26 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-vaxCover = [0.57];    % vaccine coverages
+% vaxCover = [0.57];    % vaccine coverages
 vaxCoverInd = 1;    % index for the coverage in vaxCover vec to use for this simulation; use length(vaxCover)+1 to run the baseline scenario (Ex: vaxCoverInd=1 for specified scenario, vaxCoverInd=2 for baseline scenario)
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
+
+gradScaleUp = 1; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage 
+
+if [gradScaleUp==1]
+    vaxCover = [0.57; 0.90]; % Coverage over time (Years: [2021; 2026])
+    vaxYrs = [2021; 2026];
+    vaxCover_vec = cell(size(vaxYrs , 1) - 1, 1); % save data over time interval in a cell array
+    for i = 1 : size(vaxYrs , 1) - 1          % interpolate values at steps within period
+        period = [vaxYrs(i) , vaxYrs(i + 1)];
+        vaxCover_vec{i} = interp1(period , vaxCover(i : i + 1 , 1) , ...
+            vaxYrs(i) : timeStep : vaxYrs(i + 1));
+    end
+    vaxCover = vaxCover_vec; 
+else 
+    vaxCover = [0.57];
+    vaxYrs = [2021]; 
+end 
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
