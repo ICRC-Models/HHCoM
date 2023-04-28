@@ -760,7 +760,7 @@ kDR = 0.025;
 % converting from monthly to yearly probability --> i = 1-(1-j)^2 (because our model runs every 2 months)
 % Campos monthly probability is 0.0039, 0.1333, 0.1746 for L, R, D
 
-kSymp = [0.00778479, 0.24883111, 0.31871484]; 
+kSymp = [0.0001, 0.24883111, 0.31871484]; 
 
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018
