@@ -40,7 +40,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , vaxRate_vec , vaxYrs] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
 
 tic
 
@@ -52,7 +52,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 1930;
+currYear = 2023;
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -813,7 +813,7 @@ end
 hivStartYear = 1978;
 circStartYear = 1960;
 circNatStartYear = 2008;
-vaxStartYear = 1927; % originally 2019
+vaxStartYear = 2019; % originally 2019
 %%
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -834,14 +834,13 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
     end
 end
 
-%%
-% Vaccination
+%% Vaccination waning
 waning = 0;    % bool to turn waning on or off
 
-% Single dose 
+%% Single dose 
 singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
 
-% Vaccination efficacy 
+%% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
 
 if singleDoseBool == 1
@@ -851,6 +850,29 @@ if singleDoseBool == 1
     vaxEff = vaxEff_mat(paramSetIdx);  
 else
     vaxEff = 1.0; % 9v vaccine
+end 
+
+%% Vaccine scale up
+
+vaxRateAdjust = 0.7/0.9; %bivalent/quadrivalent vaccine efficacy adjustment 
+
+gradScaleUp = 1; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage 
+
+if gradScaleUp==1
+    vaxRate = [0.0; 0.16] * vaxRateAdjust; % Coverage over time (Years: [2021; 2026])
+    vaxRate_NumVaccines = [0.0; 0.16]; % This is the coverage that will be used for costs 
+    vaxYrs = [1926; 1929];
+    vaxCover_vec = cell(size(vaxYrs , 1) - 1, 1); % save data over time interval in a cell array
+    vaxCover_NumVaccines_vec = cell(size(vaxYrs , 1) - 1, 1);
+    for i = 1 : size(vaxYrs , 1) - 1          % interpolate values at steps within period
+        period = [vaxYrs(i) , vaxYrs(i + 1)];
+        vaxCover_vec{i} = interp1(period , vaxRate(i : i + 1 , 1) , ...
+            vaxYrs(i) : timeStep : vaxYrs(i + 1));
+    end
+    vaxRate_vec = vaxCover_vec; 
+else 
+    vaxRate_vec = [0.16] * vaxRateAdjust;
+    vaxYrs = [1926]; 
 end 
 
 % Screening timeframe 

@@ -1,11 +1,24 @@
 % HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
 function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-    vaxRate , toInd)
+    vaxRate_vec , toInd , vaxYrs , year)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 hpvVaxd = 0;
+
+% Vaccination level
+    dataYr1 = vaxYrs(1);
+    dataYrLast = vaxYrs(size(vaxYrs , 1));
+    baseYrInd = max(find(year >= vaxYrs , 1, 'last') , 1); % get index of first year <= current year
+    baseYr = vaxYrs(baseYrInd);
+    vaxRate = vaxRate_vec{1}(1); % vax coverage up to 1st year
+    if year < dataYrLast && year > dataYr1 % vax coverage between 1st and last year
+        vaxRate = vaxRate_vec(round((year - baseYr) * stepsPerYear) + 1);
+    elseif year >= dataYrLast % vax coverage last year and after
+        lastInd = size(vaxRate_vec , 1);
+        vaxRate = vaxRate_vec(size(vaxRate_vec , 2));
+    end
 
 %% Apply school-based vaccination regimen
 for d = 1 : disease

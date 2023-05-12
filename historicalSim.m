@@ -51,9 +51,8 @@ screenAlgorithmNeg = 1; % ***SET ME***: If hivPosScreen=1, screening algorithm t
 % vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxRateAdjust = 0.7/0.9; %bivalent/quadrivalent vaccine efficacy adjustment 
 vaxAge = [10/max(1 , fivYrAgeGrpsOn*5)];
-vaxRate = 0.16 * vaxRateAdjust; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+% vaxRate = 0.16 * vaxRateAdjust; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -98,7 +97,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , vaxRate_vec , vaxYrs] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -632,12 +631,12 @@ for i = iStart : length(s) - 1
         end
     end
     
-    if ((year >= vaxStartYear) && (vaxRate > 0))
+    if ((year >= vaxStartYear)) %&& (vaxRate > 0))
         % HPV VACCINATION
         % School-based vaccination regimen
-        [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
+        [dPop , vaxdSchool(i , :)] = hpvVaxSchool(pop , disease , viral , risk , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-            vaxRate , toInd);
+            vaxRate_vec , toInd , vaxYrs , year); 
         pop(end , :) = pop(end , :) + dPop;
         if any(pop(end , :) < 0)
             disp('After hpvVaxSchool')
