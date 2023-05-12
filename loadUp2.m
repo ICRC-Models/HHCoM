@@ -37,7 +37,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3  , dFertMat3, d_partnersMmult, riskAdj, d_riskAdj, ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue, vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
 
 tic
 
@@ -819,6 +819,21 @@ end
 %%
 % Vaccination
 waning = 0;    % bool to turn waning on or off
+
+% Single dose 
+singleDoseBool = 0; % 1 for single dose vax efficacy, 0 for 2-dose
+
+% Vaccination efficacy 
+% Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
+
+if singleDoseBool == 1
+    filename = [paramDir 'VaxEfficacyRandVal.xlsx'];
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
+    vaxEff = vaxEff_mat(paramSetIdx);  
+else
+    vaxEff = 1.0; % 9v vaccine
+end 
 
 % Screening timeframe 
 screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];

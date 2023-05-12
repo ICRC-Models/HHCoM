@@ -14,21 +14,22 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_15Jan_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+% **old** historicalIn = load([pwd , ['/HHCoM_Results/toNow_15Jan_stochMod_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_' , date , '_stochMod_' , '2019vaxIntro_coverage16_nona_to2023_' , num2str(paramSetIdx)]]); 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['15Jan_stochMod_CU50']; % ***SET ME***: name for simulation output file
+pathModifier = ['08Apr_stochMod_2019vaxIntro_nona_to2023_S1.1']; % ***SET ME***: name for simulation output file
 % Directory to save results
-if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
-    mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
+if ~ exist([pwd , '/HHCoM_Results/' , pathModifier, '/'])
+    mkdir ([pwd, '/HHCoM_Results/' , pathModifier, '/'])
 end
 
 % AGE GROUPS
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2071; % ***SET ME***: end year of simulation run
+lastYear = 1935; % ***SET ME***: end year of simulation run
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -57,16 +58,16 @@ waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [3];
-vaxCoverB = 0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
+vaxCoverB = 0.0; %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
-vaxAge = [3];
-vaxCover = [0.86*(0.7/0.9)];
+vaxAge = [2];
+vaxCover = 0.33; 
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
 vaxAgeCU = [4 : 5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
 vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.5*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
@@ -119,7 +120,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3  , dFertMat3, d_partnersMmult, riskAdj, d_riskAdj, ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet, paramSetIdx);
 
 %% Screening
 
