@@ -1,7 +1,7 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-function [] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)
+function [] = modifiedhistoricalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , sympParams_in, sympRun)
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_stochMod_' , 'treatmentTest_11May23' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_', date, '_testingTreatment_changeSympProb_1925to1950_', num2str(sympRun), '_' num2str(paramSetIdx)]; 
  %pathModifier = 'toNow_determMod_final_artDiscontFix';
  %pathModifier = 'toNow_determMod_popFertFix';
 
@@ -85,7 +85,6 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     cin1hpvNonVaxInds , cin2hpvNonVaxInds , cin3hpvNonVaxInds , normalhpvVaxInds , ...
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
     infhpvNonVaxInds , ageInd , riskInd , ...
-%     kSymp , 
     hystMult , ...
     hivNegNonVMMCinds , hivNegVMMCinds , vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
@@ -97,6 +96,10 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
     ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+
+%% Modifying the rate of symptomatic detection
+
+kSymp = sympParams_in; 
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -657,7 +660,7 @@ for i = iStart : length(s) - 1
             'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
             'ccSymp' , 'ccTreat' , ...
             'startYear' , 'endYear' , 'i' , '-v7.3', ...
-            'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
+            'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect' , 'kSymp');
     end
 
     disp(['Reached year ' num2str(year)])
@@ -676,7 +679,7 @@ save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec'
     'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
     'ccSymp' , 'ccTreat' , ...
     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3', ...
-    'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
+    'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect' , 'kSymp');
 
 disp(' ')
 disp('Simulation complete.')
