@@ -9,11 +9,11 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_15Jan_stochMod_treatmentTest_11May23' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['TreatmentTesting_11May23']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_S0']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -23,7 +23,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2071; % ***SET ME***: end year of simulation run
+lastYear = 2123; % ***SET ME***: end year of simulation run
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -47,7 +47,7 @@ whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 %   Scenario 1: limited vaccine years --> school-based regimen for ages 9-14 at 86% coverage + catch-up coverage
 %   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage
 %   Scenario 3: baseline regimen for age 9 at 86% coverage
-vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
+% vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
 waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -56,8 +56,8 @@ vaxCoverB = 0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficac
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
-vaxAge = [3];
-vaxCover = [0.86*(0.7/0.9)];
+vaxAge = [2];
+vaxCover = [0*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 % Parameters for catch-up vaccination regimen
@@ -117,7 +117,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
 
 %% Screening
 
@@ -350,8 +350,7 @@ end
 %% Simulation
 %profile on
 
-%parfor n = 1 : nTests
-n = 1 
+parfor n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -616,7 +615,7 @@ n = 1
         ccSymp, ccTreat, toScreenMult_collect, toScreenNoTreat_collect, toScreenNeg_collect, ...
         toScreenTreat_collect, toScreenTreatHystMult_collect);
 
-%end
+end
 disp('Done')
 
 %profile viewer

@@ -1,6 +1,5 @@
 % HPV screening and treatment (Kenya)
-function[dPop , ccScreen , ccTreat , ...
-    toScreenMult_collect, toScreenNoTreat_collect, toScreenNeg_collect, toScreenTreat_collect, toScreenTreatHystMult_collect] = hpvScreen(pop , ...
+function[dPop , ccScreen , ccTreat ] = hpvScreen(pop , ...
     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -18,11 +17,6 @@ ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScree
 % ccTreatHpv = ccScreen;
 % ccTreatHyst = ccScreen;
 ccTreat = zeros(disease, hpvVaxStates, hpvNonVaxStates, 3, intervens, age, 3); 
-toScreenMult_collect = zeros(disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
-toScreenNoTreat_collect = toScreenMult_collect;
-toScreenNeg_collect = toScreenMult_collect; 
-toScreenTreat_collect = toScreenMult_collect; 
-toScreenTreatHystMult_collect = toScreenMult_collect; 
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs)
@@ -133,7 +127,7 @@ for i = 1 : length(screenAlgs)
                                         dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
 
                                     end 
-
+ 
                                     % updating the result matrices 
                                     % the number is intervens
                                     % x tells you what stage women were diagnosed at
@@ -150,13 +144,6 @@ for i = 1 : length(screenAlgs)
 
                                     ccTreat(d,h,s,x,3,a,3) = ccTreat(d,h,s,x,3,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
                                     ccTreat(d,h,s,x,4,a,3) = ccTreat(d,h,s,x,4,a,3) + sumall(toScreenTreatHystMult .* vaxScreend); 
-
-                                    % debugging: collecting rates into a results matrix
-                                    toScreenMult_collect(d,v,h,s,x,a,r) = toScreenMult; 
-                                    toScreenNoTreat_collect(d,v,h,s,x,a,r) = toScreenNoTreat; 
-                                    toScreenNeg_collect(d,v,h,s,x,a,r) = toScreenNeg; 
-                                    toScreenTreat_collect(d,v,h,s,x,a,r) = toScreenTreat;
-                                    toScreenTreatHystMult_collect(d,v,h,s,x,a,r) = toScreenTreatHystMult;
 
 
                                     % if you have CIN2+ of either HPV type and are susceptible or immune to the other HPV type

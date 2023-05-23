@@ -387,11 +387,6 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = zeros(length(s) - 1 , 1);
     ccSymp = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , 3 , intervens , age , 3); 
     ccTreat = ccSymp; 
-    toScreenMult_collect = zeros(length(s)-1, disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
-    toScreenNoTreat_collect = toScreenMult_collect;
-    toScreenNeg_collect = toScreenMult_collect; 
-    toScreenTreat_collect = toScreenMult_collect; 
-    toScreenTreatHystMult_collect = toScreenMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -436,11 +431,6 @@ elseif isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = chckPntIn.vaxdSchool;
     ccSymp = chckPntIn.ccSymp; 
     ccTreat = chckPntIn.ccTreat;
-    toScreenMult_collect = chckPntIn.toScreenMult_collect;
-    toScreenNoTreat_collect = chckPntIn.toScreenNoTreat_collect;
-    toScreenNeg_collect = chckPntIn.toScreenNeg_collect; 
-    toScreenTreat_collect = chckPntIn.toScreenTreat_collect; 
-    toScreenTreatHystMult_collect = chckPntIn.toScreenTreatHystMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -533,9 +523,7 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , : , : , :, :, :), ccTreat(i, : , : , : , : , : , : , :), ...
-                toScreenMult_collect(i,:,:,:,:,:,:,:), toScreenNoTreat_collect(i,:,:,:,:,:,:,:), toScreenNeg_collect(i,:,:,:,:,:,:,:), ...
-                toScreenTreat_collect(i,:,:,:,:,:,:,:), toScreenTreatHystMult_collect(i,:,:,:,:,:,:,:)]   ...
+            [dPop , newScreen(i , : , : , : , : , : , :, :, :), ccTreat(i, : , : , : , : , : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -681,8 +669,7 @@ for i = iStart : length(s) - 1
             'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ... % 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
             'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
             'ccSymp' , 'ccTreat' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3', ...
-            'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
+            'startYear' , 'endYear' , 'i' , '-v7.3');
     end
 
     disp(['Reached year ' num2str(year)])
@@ -700,8 +687,7 @@ save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec'
     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ... %'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
     'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
     'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3', ...
-    'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect');
+    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')
 disp('Simulation complete.')
