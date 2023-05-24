@@ -22,10 +22,10 @@ ccInc = zeros(disease , age , hpvTypeGroups);
 % cin1Inc = ccInc;
 % cin2Inc = ccInc;
 % cin3Inc = ccInc;
-ccDeath = ccInc;
+% ccDeath = ccInc;
 ccDeath_treat = ccInc;
 ccDeath_untreat = ccInc; 
-ccDeath_treat_stage = zeros(disease , age , hpvTypeGroups , 6); 
+% ccDeath_treat_stage = zeros(disease , age , hpvTypeGroups , 6); 
 
 %% Progress HPV disease states
 % Set transition multipliers based on HIV disease state
@@ -222,12 +222,12 @@ for d = 1 : disease
 
             % debugging
 
-                ccDeath_treat_stage(d , a , 1 , 1) = sum(deathCC_ud(1) * pop(ccLocVaxFrom)); 
-                ccDeath_treat_stage(d , a , 1 , 2) = sum(deathCC_ud(2) * pop(ccRegVax)); 
-                ccDeath_treat_stage(d , a , 1 , 3) = sum(deathCC_ud(3) * pop(ccDistVax)); 
-                ccDeath_treat_stage(d , a , 1 , 4) = sum(deathCC_d(1) * pop(ccLocVaxFrom_treat)); 
-                ccDeath_treat_stage(d , a , 1 , 5) = sum(deathCC_d(2) * pop(ccRegVax_treat)); 
-                ccDeath_treat_stage(d , a , 1 , 6) = sum(deathCC_d(3) * pop(ccDistVax_treat)); 
+                % ccDeath_treat_stage(d , a , 1 , 1) = sum(deathCC_ud(1) * pop(ccLocVaxFrom)); 
+                % ccDeath_treat_stage(d , a , 1 , 2) = sum(deathCC_ud(2) * pop(ccRegVax)); 
+                % ccDeath_treat_stage(d , a , 1 , 3) = sum(deathCC_ud(3) * pop(ccDistVax)); 
+                % ccDeath_treat_stage(d , a , 1 , 4) = sum(deathCC_d(1) * pop(ccLocVaxFrom_treat)); 
+                % ccDeath_treat_stage(d , a , 1 , 5) = sum(deathCC_d(2) * pop(ccRegVax_treat)); 
+                % ccDeath_treat_stage(d , a , 1 , 6) = sum(deathCC_d(3) * pop(ccDistVax_treat)); 
         end
        
         for h = 1 : hpvVaxStates
@@ -268,7 +268,7 @@ for d = 1 : disease
 %                     sum(deathCC(2) * pop(ccLocNonVaxFrom) ...
 %                     + deathCC(2) * pop(ccRegNonVax) + deathCC(3) * pop(ccDistNonVax));
 
-                                ccDeath_treat(d , a , 2) = ccDeath_treat(d , a , 2) + ...
+                ccDeath_treat(d , a , 2) = ccDeath_treat(d , a , 2) + ...
                     sum(deathCC_d(1) * pop(ccLocNonVaxFrom_treat) ...
                     + deathCC_d(2) * pop(ccRegNonVax_treat) + deathCC_d(3) * pop(ccDistNonVax_treat)); 
 
@@ -279,12 +279,12 @@ for d = 1 : disease
                 % debugging
 
                 % ccDeath by stage / treat / untreat
-                ccDeath_treat_stage(d , a , 2 , 1) = sum(deathCC_ud(1) * pop(ccLocNonVaxFrom)); 
-                ccDeath_treat_stage(d , a , 2 , 2) = sum(deathCC_ud(2) * pop(ccRegNonVax)); 
-                ccDeath_treat_stage(d , a , 2 , 3) = sum(deathCC_ud(3) * pop(ccDistNonVax)); 
-                ccDeath_treat_stage(d , a , 2 , 4) = sum(deathCC_d(1) * pop(ccLocNonVaxFrom_treat)); 
-                ccDeath_treat_stage(d , a , 2 , 5) = sum(deathCC_d(2) * pop(ccRegNonVax_treat)); 
-                ccDeath_treat_stage(d , a , 2 , 6) = sum(deathCC_d(3) * pop(ccDistNonVax_treat)); 
+                % ccDeath_treat_stage(d , a , 2 , 1) = sum(deathCC_ud(1) * pop(ccLocNonVaxFrom)); 
+                % ccDeath_treat_stage(d , a , 2 , 2) = sum(deathCC_ud(2) * pop(ccRegNonVax)); 
+                % ccDeath_treat_stage(d , a , 2 , 3) = sum(deathCC_ud(3) * pop(ccDistNonVax)); 
+                % ccDeath_treat_stage(d , a , 2 , 4) = sum(deathCC_d(1) * pop(ccLocNonVaxFrom_treat)); 
+                % ccDeath_treat_stage(d , a , 2 , 5) = sum(deathCC_d(2) * pop(ccRegNonVax_treat)); 
+                % ccDeath_treat_stage(d , a , 2 , 6) = sum(deathCC_d(3) * pop(ccDistNonVax_treat)); 
             end
         end
     end   
@@ -294,6 +294,6 @@ end
 extraOut{1} = ccInc;
 extraOut{2} = ccDeath_untreat;
 extraOut{3} = ccDeath_treat;
-extraOut{4} = ccDeath_treat_stage; 
+% extraOut{4} = ccDeath_treat_stage; 
 
 dPop = sparse(dPop);

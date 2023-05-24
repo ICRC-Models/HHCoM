@@ -6,7 +6,7 @@ function[dPop, ccSymp] = symptomaticDetection(pop , ...
 % There should be no hysterectomy in these years, so I am not including any symptomatic treatment with hysterectomy. 
 
 dPop = zeros(size(pop));
-ccSymp = zeros(disease , hpvVaxStates , hpvNonVaxStates , 3 , intervens , age , 3);
+ccSymp = zeros(disease , 3 , intervens , age , 3);
 % for ccSymp, the last compartment represents (1) symptomatic/treated, (2) symptomatic/untreated, (3) symptomatic/treated with hysterectomy
 
 if (year < hpvScreenStartYear)
@@ -32,8 +32,8 @@ if (year < hpvScreenStartYear)
                                         dPop(udPop(d,v,h,s,x,i,a,r)) = dPop(udPop(d,v,h,s,x,i,a,r)) - sympDetected; % remove from the undetected compartment 
     
                                         % update results matrices
-                                        ccSymp(d,h,s,x,i,a,1) = ccSymp(d,h,s,x,i,a,1) + sum(toSympTreat * sympDetected); %treated
-                                        ccSymp(d,h,s,x,i,a,2) = ccSymp(d,h,s,x,i,a,2) + sum(toSympUntreat * sympDetected); %untreated
+                                        ccSymp(d,x,i,a,1) = ccSymp(d,x,i,a,1) + sum(toSympTreat * sympDetected); %treated
+                                        ccSymp(d,x,i,a,2) = ccSymp(d,x,i,a,2) + sum(toSympUntreat * sympDetected); %untreated
                                         % ccSymp(d,h,s,x,i,a,3) = ccSymp(d,h,s,x,i,a,3) + sum(toSympTreatHyst * sympDetected); %hysterectomy. removed since there should be no treatment by hysterectomy. 
 								    end 
 							    end 
@@ -75,9 +75,9 @@ if (year >= hpvScreenStartYear)
                                     dPop(udPop(d,v,h,s,x,i,a,r)) = dPop(udPop(d,v,h,s,x,i,a,r)) - sympDetected; % remove from the undetected compartment 
 
                                     % update results matrices
-                                    ccSymp(d,h,s,x,i,a,1) = ccSymp(d,h,s,x,i,a,1) + sum(toSympTreat * sympDetected); %treated
-                                    ccSymp(d,h,s,x,i,a,2) = ccSymp(d,h,s,x,i,a,2) + sum(toSympUntreat * sympDetected); %untreated
-                                    ccSymp(d,h,s,x,i,a,3) = ccSymp(d,h,s,x,i,a,3) + sum(toSympTreatHyst * sympDetected); %hysterectomy. 
+                                    ccSymp(d,x,i,a,1) = ccSymp(d,x,i,a,1) + sum(toSympTreat * sympDetected); %treated
+                                    ccSymp(d,x,i,a,2) = ccSymp(d,x,i,a,2) + sum(toSympUntreat * sympDetected); %untreated
+                                    ccSymp(d,x,i,a,3) = ccSymp(d,x,i,a,3) + sum(toSympTreatHyst * sympDetected); %hysterectomy. 
 								end 
 							end 
 						end 

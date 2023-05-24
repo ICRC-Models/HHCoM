@@ -816,7 +816,7 @@ hivStartYear = 1978;
 circStartYear = 1960;
 circNatStartYear = 2008;
 vaxStartYear = 2019; % originally 2019
-%%
+
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
@@ -862,7 +862,7 @@ hpvScreenStartYear = screenYrs(1);
 cytoSens = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-pos persons  (based on Chung et al)
 cytoSens2 = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-neg persons
 hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
-hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
+hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
 % Baseline screening algorithm
 baseline.screenCover = [0.0; 0.04; 0.074; 0.074; 0.074; 0.074]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
