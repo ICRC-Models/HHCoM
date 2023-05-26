@@ -23,7 +23,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run
+lastYear = 2123; % ***SET ME***: end year of simulation run (for testing)
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -59,6 +59,8 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 vaxAge = [2];
 vaxCover = [0*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
+vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
@@ -350,7 +352,8 @@ end
 %% Simulation
 %profile on
 
-parfor n = 1 : nTests
+parfor n = 1 : nTests 
+% for n = 1 : nTests
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -387,25 +390,18 @@ parfor n = 1 : nTests
     % newCin1 = newCC;
     % newCin2 = newCC;
     % newCin3 = newCC;
-    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , 3 , numScreenAge , 2);
 %     newTreatImm = newScreen;
 %     newTreatHpv = newScreen;
 %     newTreatHyst = newScreen;
-    ccDeath = newCC;
     ccDeath_treat = newCC; 
     ccDeath_untreat = newCC; 
-    ccDeath_treat_stage = zeros(length(s) - 1 , disease , age , hpvTypeGroups , 6);
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
     vaxdCU = vaxdLmtd;
-    ccSymp = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , 3 , intervens , age , 3); 
+    ccSymp = zeros(length(s) - 1 , disease , 3 , intervens , age , 3); 
     ccTreat = ccSymp; 
-    toScreenMult_collect = zeros(length(s)-1, disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
-    toScreenNoTreat_collect = toScreenMult_collect;
-    toScreenNeg_collect = toScreenMult_collect; 
-    toScreenTreat_collect = toScreenMult_collect; 
-    toScreenTreatHystMult_collect = toScreenMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -441,6 +437,7 @@ parfor n = 1 : nTests
                 disp('After hpv')
                 break
             end
+            pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
                 [dPop , newScreen(i , : , : , : , :, :), ccTreat(i, : , : , : , : , :)]   ...
@@ -570,7 +567,7 @@ parfor n = 1 : nTests
                 % HPV vaccination module- school-based vaccination regimen
                 [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-                    vaxRate , toInd);
+                    vaxCover , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);
                 if any(pop(end , :) < 0)
@@ -595,6 +592,8 @@ parfor n = 1 : nTests
  
         % add results to population vector
         popVec(i , :) = pop(end , :);
+
+        disp(['Reached year ' num2str(year)])
     end
     popLast = sparse(popVec(end , :));
     popVec = sparse(popVec); % compress population vectors
@@ -608,8 +607,7 @@ parfor n = 1 : nTests
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath_treat , ccDeath_untreat , ...
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
-        currYear , lastYear , vaxRate , vaxEff , popLast , pathModifier, ...
-        ccSymp, ccTreat );
+        currYear , lastYear , vaxRate , vaxEff , ccSymp, ccTreat , popLast , pathModifier);
 
 end
 disp('Done')
