@@ -54,7 +54,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2023;
+currYear = 2023; % for testing
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -856,6 +856,7 @@ end
 
 % Screening timeframe 
 screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];
+% screenYrs = [1926; 1927; 1928; 1929; 1930; 1931]; % for testing
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities

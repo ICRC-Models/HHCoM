@@ -12,7 +12,7 @@ function[dPop , ccScreen , ccTreat ] = hpvScreen(pop , ...
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
-ccScreen = zeros(disease , viral , 3 , numScreenAge , 2);
+ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
 % ccTreatImm = ccScreen;
 % ccTreatHpv = ccScreen;
 % ccTreatHyst = ccScreen;
@@ -132,8 +132,8 @@ for i = 1 : length(screenAlgs)
                                     % the number is intervens
                                     % x tells you what stage women were diagnosed at
                                     % for ccTreat, the last compartment tells you whether women diagnosed at that stage were treated, untreated, or hysterectomy
-                                    ccScreen(d,v,x,aS,1) = ccScreen(d,v,x,aS,1) + sumall(noVaxScreend); % number screened
-                                    ccScreen(d,v,x,aS,2) = ccScreen(d,v,x,aS,2) + sumall(vaxScreend); 
+                                    ccScreen(d,v,h,s,x,aS,1) = ccScreen(d,v,h,s,x,aS,1) + sumall(noVaxScreend); % number screened
+                                    ccScreen(d,v,h,s,x,aS,2) = ccScreen(d,v,h,s,x,aS,2) + sumall(vaxScreend); 
 
                                     % ccTreat result matrix
                                     ccTreat(d,x,3,a,2) = ccTreat(d,x,3,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 

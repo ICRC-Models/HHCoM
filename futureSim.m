@@ -9,7 +9,8 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_30May23_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+% historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
@@ -23,7 +24,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run (for testing)
+lastYear = 2030; % ***SET ME***: end year of simulation run (for testing)
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -353,7 +354,7 @@ end
 %profile on
 
 parfor n = 1 : nTests 
-% for n = 1 : nTests
+% for n = 1 : nTests % for testing
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -390,7 +391,7 @@ parfor n = 1 : nTests
     % newCin1 = newCC;
     % newCin2 = newCC;
     % newCin3 = newCC;
-    newScreen = zeros(length(s) - 1 , disease , viral , 3 , numScreenAge , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
 %     newTreatImm = newScreen;
 %     newTreatHpv = newScreen;
 %     newTreatHyst = newScreen;
@@ -440,7 +441,7 @@ parfor n = 1 : nTests
             pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , :, :), ccTreat(i, : , : , : , : , :)]   ...
+                [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...

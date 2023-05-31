@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_stochMod_' , 'treatmentTest_11May23_2' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_stochMod_' , 'treatmentTest_30May23_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
  %pathModifier = 'toNow_determMod_final_artDiscontFix';
  %pathModifier = 'toNow_determMod_popFertFix';
 
@@ -59,7 +59,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 vaxRateAdjust = 0.7/0.9; %bivalent/quadrivalent vaccine efficacy adjustment 
 
-gradScaleUp = 1; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage 
+gradScaleUp = 1; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage
 
 stepsPerYear = 6; % ***SET ME***: If this changes in loadup2, you need to change it here as well
 timeStep = 1 / stepsPerYear; % ***SET ME***: same here
@@ -76,7 +76,7 @@ if gradScaleUp==1
     vaxRate_vec = vaxCover_vec; 
 else 
     vaxRate_vec = [0.16] * vaxRateAdjust;
-    vaxYrs = [2020]; 
+    vaxYrs = [2020]; % for testing 2020 orig
 end 
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -379,7 +379,7 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
     ccDeath_treat = newCC; 
     ccDeath_untreat = newCC; 
     % ccDeath_treat_stage = zeros(length(s) - 1 , age , hpvTypeGroups , 6); 
-    newScreen = zeros(length(s) - 1 , disease , viral , 3 , numScreenAge , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
 %     newTreatImm = newScreen;
 %     newTreatHpv = newScreen;
 %     newTreatHyst = newScreen;
@@ -522,7 +522,7 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , :, :), ccTreat(i, : , : , : , : , :)]   ...
+            [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -647,7 +647,7 @@ for i = iStart : length(s) - 1
         % School-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-            vaxRate_vec , toInd , vaxYrs , year , stepsPerYear); 
+            vaxRate_vec , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
         pop(end , :) = pop(end , :) + dPop;
         if any(pop(end , :) < 0)
             disp('After hpvVaxSchool')
