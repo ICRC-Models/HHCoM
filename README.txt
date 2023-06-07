@@ -8,3 +8,10 @@ This branch was developed for the Kenya single dose CEA.
 
 Author: Christine L Hathaway 
 Date: May 24, 2023
+
+Workflow for single dose CEA: 
+- historicalSim and futureSim 
+- Run calib2_sumll4sets on the cluster. Make sure to comment/uncomment historical or future sim depending on which one you are running. 
+- For MATLAB to CSV, use vaxCEA_multSims_mainFunction, which calls vaxCEA_multSims_processResults 
+- In KECEA, cleanMatlabOutputs.R transforms CSV files into CSV template files for the health econ analysis
+- modelAnalysis.Rmd transforms CSV files to produce figures
