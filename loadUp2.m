@@ -743,7 +743,7 @@ kDR = 0.025;
 % kSympR = 0.82035; 
 % kSympD = 0.90001;
 
-kSymp = [0.0005 0.045 0.8]; % calibration done on May 16
+kSymp = [0.00016 0.015 0.6]; % calibration done on May 16
 
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018

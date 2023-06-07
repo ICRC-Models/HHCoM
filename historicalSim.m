@@ -33,7 +33,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_stochMod_' , 'treatmentTest_30May23_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_stochMod_' , 'baseline_2dose_nowane' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
  %pathModifier = 'toNow_determMod_final_artDiscontFix';
  %pathModifier = 'toNow_determMod_popFertFix';
 
@@ -668,7 +668,7 @@ for i = iStart : length(s) - 1
             'newScreen' , 'ccDeath_treat', 'ccDeath_untreat' ,  ... % 'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
             'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
             'ccSymp' , 'ccTreat' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3');
+            'startYear' , 'endYear' , 'kSymp' , 'i' , '-v7.3');
     end
 
     disp(['Reached year ' num2str(year)])
@@ -686,7 +686,7 @@ save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec'
     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', ... %'ccDeath_treat_stage', ... %'newTreatImm' , 'newTreatHpv' , 'newTreatHyst' , ...
     'newCC' , 'artDist' , 'artDistList' , ... % 'artTreatTracker' , ...
     'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3');
+    'startYear' , 'endYear' , 'kSymp' , 'i' , 'popLast' , '-v7.3');
 
 disp(' ')
 disp('Simulation complete.')
