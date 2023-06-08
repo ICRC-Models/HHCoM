@@ -60,7 +60,7 @@ clear;
 fileInds = {'1'}; % FORTESTING
 nRuns = length(fileInds);
 
-lastYear = 2123; % manually set in futureSim
+lastYear = 2030; % manually set in futureSim
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
 monthlyTimespanFut = [endYear : timeStep : lastYear]; % screening time span starts at 2021
@@ -120,11 +120,11 @@ for j = [1] % FORTESTING
             for index = 1 : 2
                 if (param == 1 && a == 1 && index == 1)
                     vaxReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), vax(:, a, param)];
+                                        sce.*ones(nTimepoints,1), vax(:, a, index, param)];
                 else 
                     vaxReshape = [vaxReshape; 
                                         transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), vax(:, a, param)]; 
+                                        sce.*ones(nTimepoints,1), vax(:, a, index, param)]; 
                 end 
             end 
 

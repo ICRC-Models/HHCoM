@@ -6,10 +6,9 @@
 
 
 ####### TODO
-# - Make correction for the first year of vax 
-# - Make a correction for 2 vs 1 dose; will depend on the scenario
-# - Make a correction for the 0.7/0.9 coverage adjustment. You have to multiply by 0.9/0.7 to get the actual coverage value. 
-# - Reorder the age categories so they are in increasing order 
+# - Make correction for the first year of vax (I added, need to debug)
+# - Make a correction for 2 vs 1 dose; will depend on the scenario (I added, need to debug)
+# - Make a correction for the 0.7/0.9 coverage adjustment. You have to multiply by 0.9/0.7 to get the actual coverage value. (I added, need to debug)
 
 library(tidyverse)
 library(janitor)
@@ -24,7 +23,9 @@ numSces = 0 # number of scenarios to run through
 # Translating Matlab indexes for compartments into R factors
 ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
                      "ageCateg" = c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
-                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages"))
+                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages")) %>% 
+                  mutate(ageCateg = factor(ageCateg, levels=c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
+                                                              "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages")))
 hpvCateg = data.frame("index" = seq(1,7,1), 
                         "hpvCateg" = c("hpv.susceptible", "hpv.infected", "cin1", "cin2", "cin3", "cc", "hpv.immune"))
 dxCateg = data.frame("index" = seq(1,10,1), 
@@ -39,6 +40,8 @@ dxCCTreatCateg = data.frame("treat" = seq(1,3,1),
                                     "dxType" = c("dx, treated", "dx, untreated", "hysterectomy"))
 screenSympCCTreatCateg = data.frame("index" = c(1, 2), 
                                     "screenSymp" = c("screening", "symptoms"))
+sceDose = data.frame("index" = seq(0, 16, 1), 
+                     "dose" = c(2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
 
 # loop through each of the scenarios
 
@@ -65,7 +68,7 @@ for (sceNum in seq(0, numSces, 1)) {
       select(sceNum, paramNum, year, ageCateg, N, deathCateg, count) %>% unique %>% 
       spread(., deathCateg, count) %>% 
       mutate(ccDeath = ccDeath_treat + ccDeath_untreat) %>% 
-      select(-c(ccDeath_treat, ccDeath_untreat))
+      select(-c(ccDeath_treat, ccDeath_untreat)) 
     
     # SCREENING AND TREATMENT
     
@@ -132,13 +135,34 @@ for (sceNum in seq(0, numSces, 1)) {
       rename(newCC = count)
     
     # VACCINATIONS
+    # TODO: debug this, esp with the lead function in 2023
+    # don't need to do this for years beforehand because you can think of it like a "burn in", plus we aren't calculating costs before 2023. 
     vax_clean <- vax %>% 
       left_join(., ageCateg, by=c("age" = "index")) %>% 
       mutate(sceNum = sceNum - 1, 
              vaxType = case_when(vaxType == 1 ~ "N_vax_school", 
                                  vaxType == 2 ~ "N_vax_cu")) %>% 
       select(sceNum, paramNum, year, ageCateg, vaxType, count) %>% unique %>% 
-      spread(., vaxType, count) 
+      spread(., vaxType, count) %>% 
+      # for the vaccines in year 2023, the first timepoint is a burn in period, and is not reflective of the actual number of vaccines that would have been
+      # administered. so just for 2023.00, i take the num vaccines from the timepoint after. 
+      # don't need to do this for the catchup vaxxes because it is a muli-age-cohort vaccination
+      group_by(sceNum, paramNum, ageCateg) %>% 
+            arrange(sceNum, paramNum, ageCateg, year) %>% 
+            mutate(N_vax_school = case_when(year == 2023 & ageCateg == "all.ages" ~ lead(N_vax_school), 
+                                            TRUE ~ N_vax_school)) %>% ungroup %>% 
+      # correct for coverage adjustment for quadrivalent (0.7/0.9)
+      mutate(N_vax_school = N_vax_school * (0.9/0.7), 
+             N_vax_cu = N_vax_cu * (0.9/0.7)) %>% 
+      # times 2 for 2-dose scenarios
+      left_join(sceDose, by=c("index" = "sceNum")) %>%
+      mutate(N_vax_school = case_when(dose == 2 ~ N_vax_school * 2, 
+                                      TRUE ~ N_vax_school), 
+             N_vax_cu = case_when(dose == 2 ~ N_vax_cu * 2, 
+                                  TRUE ~ N_vax_cu)) %>% 
+      select(sceNum, paramNum, year, ageCateg, N_vax_cu, N_vax_school) 
+    
+    # two years that matter
     
     # Combine all the dfs
     combined <- deaths_clean %>% 
@@ -158,7 +182,7 @@ for (sceNum in seq(0, numSces, 1)) {
               cc_d_inc_ut, cc_d_inc_dx,
               cc_inc_hyst, 
               newCC, nScreened, nCinTreat, nColpo, 
-              allDeath, ccDeath, N_vax_school, N_vax_cu) %>% unique
+              allDeath, ccDeath, N_vax_school, N_vax_cu) %>% unique 
     
   sceDf <- combined %>% 
     filter(sceNum == sceNum)

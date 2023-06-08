@@ -55,7 +55,7 @@ paramDir = [pwd , '\Params\'];
     ccLochpvVaxIndsFrom_treat , ...
     ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , []);
 
-lastYear = 2123; % manually set in futureSim
+lastYear = 2030; % manually set in futureSim
 
 %% Setting file names, initializing variables 
 nRuns = length(fileInds);
@@ -172,12 +172,12 @@ j=1;
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_stochMod_treatmentTest_07Jun23_' , fileInds{j}]); % ***SET ME***: name for historical run output file
+curr = load([pwd , '/HHCoM_Results/toNow_07Jun23_stochMod_baseline_2dose_nowane' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxSimResult'];
 
 % load results from vaccine run into cell array
-% vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
 
 % concatenate vectors/matrices of population up to current year to population
 % matrices for years past current year
@@ -324,25 +324,37 @@ numCCTreat = zeros(nTimepoints, 3, age , 3, 2); % 2 is for treatment by screenin
                                 numColpo(: , fullAgeInd , h , s , x) = numScreen(: , fullAgeInd , h , s , x) * screenAlgs{1}.testSens(2) * colpoRetain; 
                                 numCinTreat(: , fullAgeInd , h , s , x) = 0.0; 
 
-                                % val after x is 1 for treatment from screening or 2 for treatment from symptoms 
-                                % 2nd val is 1 for treated, 2 for untreated, and 3 for hyst
-                                % don't need to multiply by cc treat retain because LTFU is already accounted for within the model
-
-                                % cc treatment from screening 
-                                numCCTreat(: , x , fullAgeInd , 1 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , fullAgeInd , 1),2),3),4),5),6); % treated
-                                numCCTreat(: , x , fullAgeInd , 2 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , fullAgeInd , 2),2),3),4),5),6); % untreated
-                                numCCTreat(: , x , fullAgeInd , 3 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , fullAgeInd , 3),2),3),4),5),6); % hyst
-
-                                % cc treatment from symptoms
-                                numCCTreat(: , x , fullAgeInd , 1 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , fullAgeInd , 1),2),3),4),5),6); % treated
-                                numCCTreat(: , x , fullAgeInd , 2 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , fullAgeInd , 2),2),3),4),5),6); % untreated
-                                numCCTreat(: , x , fullAgeInd , 3 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , fullAgeInd , 3),2),3),4),5),6); % hyst
                             end
-                         
+                  
                     end
                 end
             end
     end
+
+% DIAGNOSED CANCERS ************************************************
+
+for a = 1:age
+    for x = 1:3
+
+        % val after x is 1 for treatment from screening or 2 for treatment from symptoms 
+        % 2nd val is 1 for treated, 2 for untreated, and 3 for hyst
+        % don't need to multiply by cc treat retain because LTFU is already accounted for within the model
+
+        % cc treatment from screening 
+        numCCTreat(: , x , a , 1 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 1),2),3),4),5),6); % treated
+        numCCTreat(: , x , a , 2 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 2),2),3),4),5),6); % untreated
+        numCCTreat(: , x , a , 3 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 3),2),3),4),5),6); % hyst
+
+        % cc treatment from symptoms
+        numCCTreat(: , x , a , 1 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 1),2),3),4),5),6); % treated
+        numCCTreat(: , x , a , 2 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 2),2),3),4),5),6); % untreated
+        numCCTreat(: , x , a , 3 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 3),2),3),4),5),6); % hyst
+
+    end 
+end 
+
+
+% SQUISHING SCREENING AND DIAGNOSED CANCERS ************************
 
     % Sum all dimensions so that we're only stratifying by time and age
     numScreenSquish = sum(sum(sum(numScreen(:, 1:age, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3), 3),4),5);
