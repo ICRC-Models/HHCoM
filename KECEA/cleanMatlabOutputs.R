@@ -6,7 +6,7 @@
 
 
 ####### TODO
-# - Make correction for the first year of vax (I added, need to debug)
+# - Make correction for the first year of vax (need to decide how/if we want to address this)
 # - Make a correction for 2 vs 1 dose; will depend on the scenario (I added, need to debug)
 # - Make a correction for the 0.7/0.9 coverage adjustment. You have to multiply by 0.9/0.7 to get the actual coverage value. (I added, need to debug)
 
@@ -18,7 +18,8 @@ library(lubridate)
 rm(list = ls(all.names = TRUE))
 
 setwd("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/")  # *******SET ME***********
-numSces = 0 # number of scenarios to run through
+# numSces = 0 # number of scenarios to run through
+sces = c(0, 1, 2, 3, 4, 5, 6, 7, 8)
 
 # Translating Matlab indexes for compartments into R factors
 ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
@@ -45,7 +46,7 @@ sceDose = data.frame("index" = seq(0, 16, 1),
 
 # loop through each of the scenarios
 
-for (sceNum in seq(0, numSces, 1)) {
+for (sceNum in sces) {
 
     deaths = read.csv(paste0("deaths_S", sceNum, ".csv"))
     screenTreat = read.csv(paste0("screenTreat_S", sceNum, ".csv"))
@@ -135,8 +136,7 @@ for (sceNum in seq(0, numSces, 1)) {
       rename(newCC = count)
     
     # VACCINATIONS
-    # TODO: debug this, esp with the lead function in 2023
-    # don't need to do this for years beforehand because you can think of it like a "burn in", plus we aren't calculating costs before 2023. 
+    # TODO: decide whether or not we want to address the issue with the vax burn in period
     vax_clean <- vax %>% 
       left_join(., ageCateg, by=c("age" = "index")) %>% 
       mutate(sceNum = sceNum - 1, 
@@ -147,19 +147,25 @@ for (sceNum in seq(0, numSces, 1)) {
       # for the vaccines in year 2023, the first timepoint is a burn in period, and is not reflective of the actual number of vaccines that would have been
       # administered. so just for 2023.00, i take the num vaccines from the timepoint after. 
       # don't need to do this for the catchup vaxxes because it is a muli-age-cohort vaccination
-      group_by(sceNum, paramNum, ageCateg) %>% 
-            arrange(sceNum, paramNum, ageCateg, year) %>% 
-            mutate(N_vax_school = case_when(year == 2023 & ageCateg == "all.ages" ~ lead(N_vax_school), 
-                                            TRUE ~ N_vax_school)) %>% ungroup %>% 
+          
+      # 6/13/23: I am leaning towards not doing this anymore. In the grand scheme of things, if there is a spike in 2023, these 5-8 year olds will be vaccinated at some point
+      # we are just artificially bringing it forward in time to get around the 5-year age group issue. 
+      # group_by(sceNum, paramNum, ageCateg) %>% 
+      #       arrange(sceNum, paramNum, ageCateg, year) %>% 
+      #       mutate(N_vax_school_2 = case_when(year == 2023.167 & ageCateg == "all.ages" ~ lead(N_vax_school), 
+      #                                       TRUE ~ N_vax_school)) %>% ungroup %>% 
+      #     filter(paramNum == 18, ageCateg == "all.ages") %>% View()
       # correct for coverage adjustment for quadrivalent (0.7/0.9)
       mutate(N_vax_school = N_vax_school * (0.9/0.7), 
              N_vax_cu = N_vax_cu * (0.9/0.7)) %>% 
       # times 2 for 2-dose scenarios
-      left_join(sceDose, by=c("index" = "sceNum")) %>%
+      left_join(sceDose, by=c("sceNum"="index")) %>%
       mutate(N_vax_school = case_when(dose == 2 ~ N_vax_school * 2, 
+                                      dose == 1 & year>= 2019 & year <2023 ~ N_vax_school * 2, 
                                       TRUE ~ N_vax_school), 
              N_vax_cu = case_when(dose == 2 ~ N_vax_cu * 2, 
-                                  TRUE ~ N_vax_cu)) %>% 
+                                  dose == 1 & year>= 2019 & year <2023 ~ N_vax_cu * 2, 
+                                  TRUE ~ N_vax_cu)) %>%  
       select(sceNum, paramNum, year, ageCateg, N_vax_cu, N_vax_school) 
     
     # two years that matter
@@ -190,4 +196,19 @@ for (sceNum in seq(0, numSces, 1)) {
   ifelse(!dir.exists(paste0(getwd(), "/Outputs")), dir.create(paste0(getwd(), "/Outputs")), FALSE)
   
   write.csv(sceDf, paste0(getwd(), "/Outputs/modelResultsForCea_S", sceNum, ".csv"), row.names = FALSE)
+  
+  print(paste0("Scenario ", sceNum, " complete."))
+}
+
+######### Fixing issue where the scenario numbers in the CSV don't actually match with the actual scenario number #########
+
+scenarios <- seq(0,8,1)
+
+for (sce in scenarios) {
+      
+      read <- read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/Outputs/modelResultsForCea_S", sce, ".csv"))
+      
+      read <- read %>% mutate(sceNum = sce)
+      
+      write.csv(read, paste0(getwd(), "/Outputs/modelResultsForCea_S", sce, ".csv"), row.names = FALSE)
 }

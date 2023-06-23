@@ -1,0 +1,1095 @@
+---
+title: "epiAnalysis.Rmd"
+date: 6/8/2023
+author: Christine L Hathaway
+description: Creating figures and tables from the model results. No costs or DALYs averted here, just vaccine counts and CC cases. 
+---
+
+# Setup code
+```{r}
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+library(gcookbook)
+```
+
+Dictionaries
+```{r}
+rm(list = ls(all.names = TRUE))
+
+setwd("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/")  # *******SET ME***********
+numSces = 0 # number of scenarios to run through
+
+# Translating Matlab indexes for compartments into R factors
+ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
+                     "ageCateg" = c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
+                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages"))
+hpvCateg = data.frame("index" = seq(1,7,1), 
+                        "hpvCateg" = c("hpv.susceptible", "hpv.infected", "cin1", "cin2", "cin3", "cc", "hpv.immune"))
+dxCateg = data.frame("index" = seq(1,10,1), 
+                     "dxCateg" = c("undiagnosed", "undiagnosed", "undiagnosed", "dx, untreated", "dx, untreated", "dx, untreated", "dx, treated", "dx, treated", "dx, treated", "hysterectomy"))
+ccStageCateg = data.frame("index" = seq(1,10,1), 
+                          "stageCateg" = c("local", "regional", "distant", "local", "regional", "distant", "local", "regional", "distant", "hysterectomy"))
+deathsCateg = data.frame("index" = seq(1, 3, 1), 
+                         "deathsCateg" = c("treated cc", "untreated cc", "all cause"))
+screenTreatCateg = data.frame("index" = seq(1,3,1), 
+                              "screenTreatCateg" = c("nScreened", "nColpo", "nCinTreat"))
+dxCCTreatCateg = data.frame("treat" = seq(1,3,1), 
+                                    "dxType" = c("dx, treated", "dx, untreated", "hysterectomy"))
+screenSympCCTreatCateg = data.frame("index" = c(1, 2), 
+                                    "screenSymp" = c("screening", "symptoms"))
+sceDose = data.frame("index" = seq(0, 16, 1), 
+                     "dose" = c(2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+sceDesc = data.frame("sceNum" = seq(0, 16, 1), 
+                     "desc" = c("No vaccination", "2-dose, 31% coverage", "2-dose, 50% coverage", "2-dose, 70% coverage", "2-dose, 77% coverage", 
+                                "2-dose, 90% coverage", "1-dose, 77% coverage", "1-dose, 70% coverage", "1-dose, 90% coverage", 
+                                "15 yr efficacy, waning over 20 yrs", "20 yr efficacy, waning over 20 yrs", "25 yr efficacy, waning over 20 yrs", 
+                                "30 yr efficacy, waning over 20 yrs", "15 yr efficacy, waning over 10 yrs", "20 yr efficacy, waning over 10 yrs", 
+                                "25 yr efficacy, waning over 10 yrs", "30 yr efficacy, waning over 10 yrs"), 
+                     "dose" = c("No vaccination", "2-dose", "2-dose", "2-dose", "2-dose", "2-dose", "1-dose", "1-dose", "1-dose", "", "", "", "", "", "", "", ""), 
+                     "cover" = c("0%", "31%", "50%", "70%", "77%", "90%", "77%", "70%", "90%", "", "", "", "", "", "", "", ""))
+```
+
+Read in results
+```{r}
+setwd("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/")  # *******SET ME***********
+
+scenarios <- c(0, 1, 2, 3, 4, 5, 6, 7, 8) # *********SET ME*************
+
+deaths <- data.frame()
+screenTreat <- data.frame()
+hpvHealthState <- data.frame()
+totalPerAge <- data.frame()
+vax <- data.frame()
+ccHealthState <- data.frame()
+newCC <- data.frame()
+screenSympCCTreat <- data.frame()
+
+for (sce in scenarios) {
+
+    deaths_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/deaths_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    screenTreat_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/screenTreat_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    hpvHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/hpvHealthState_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    totalPerAge_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/totalPerAge_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    vax_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/vax_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    ccHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/ccHealthState_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    newCC_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/newCC_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+    screenSympCCTreat_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/screenSympCCTreat_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 1995)
+
+    deaths <- bind_rows(deaths, deaths_temp)
+    screenTreat <- bind_rows(screenTreat, screenTreat_temp)
+    hpvHealthState <- bind_rows(hpvHealthState, hpvHealthState_temp)
+    totalPerAge <- bind_rows(totalPerAge, totalPerAge_temp)
+    vax <- bind_rows(vax, vax_temp)
+    ccHealthState <- bind_rows(ccHealthState, ccHealthState_temp)
+    newCC <- bind_rows(newCC, newCC_temp)
+    screenSympCCTreat <- bind_rows(screenSympCCTreat, screenSympCCTreat_temp)
+    
+    print(paste0("Scenario ", sce, " done."))
+    
+}
+```
+
+Clean results
+```{r}
+deaths_2 <- deaths %>%
+      left_join(., ageCateg, by=c("age" = "index")) %>%
+      left_join(., (totalPerAge %>% rename(N=count)), by=c("sceNum", "paramNum", "year", "age")) %>%
+      left_join(., sceDesc, by="sceNum") %>% 
+      mutate(deathCateg = case_when(index == 1 ~ "ccDeath_treat",
+                               index == 2 ~ "ccDeath_untreat",
+                               index == 3 ~ "allDeath")) %>% 
+             # sceNum = sceNum - 1) %>% # the scenario actually starts at 0, but matlab indices start at 1
+      select(sceNum, paramNum, year, index, ageCateg, N, deathCateg, desc, dose, cover, count) %>% unique
+
+screenTreat_2 <- screenTreat %>%
+      left_join(., ageCateg, by=c("age" = "index")) %>%
+      left_join(., screenTreatCateg, by=c("index")) %>%
+      left_join(., sceDesc, by="sceNum") %>% 
+      # mutate(sceNum = sceNum - 1) %>%
+      group_by(sceNum, paramNum, year, screenTreatCateg) %>% 
+            mutate(sum = sum(count, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, screenTreatCateg, desc, dose, cover, sum) %>% unique %>% 
+      rename(count=sum)
+
+hpvHealthState_2 <- hpvHealthState %>%
+      left_join(., ageCateg, by=c("age" = "index")) %>%
+      left_join(., hpvCateg, by=c("healthState" = "index")) %>%
+      left_join(., sceDesc, by="sceNum") %>% 
+      # mutate(sceNum = sceNum - 1) %>%
+       group_by(sceNum, paramNum, year, hpvCateg) %>% 
+            mutate(sum = sum(count, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, hpvCateg, desc, dose, cover, sum) %>% unique %>% 
+      rename(count=sum)
+
+ccHealthState_2 <- ccHealthState %>% 
+      left_join(., ccStageCateg, by=c("endpoint" = "index")) %>% 
+      left_join(., dxCateg, by=c("endpoint" = "index")) %>% 
+      left_join(., sceDesc, by="sceNum") %>% 
+      group_by(sceNum, paramNum, year, stageCateg, dxCateg) %>% 
+            mutate(sum = sum(count, na.rm=TRUE)) %>%  ungroup %>% 
+      select(sceNum, paramNum, year, stageCateg, dxCateg, desc, dose, cover, sum) %>% unique %>% 
+      rename(count=sum)
+
+screenSympCCTreat_2 <- screenSympCCTreat %>% 
+          # left_join(., ccStageCateg, by=c("endpoint" = "index")) %>% 
+          left_join(., dxCCTreatCateg, by=c("treat")) %>% 
+          left_join(., screenSympCCTreatCateg, by=c("index")) %>% 
+          left_join(., sceDesc, by="sceNum") 
+
+newCC_2 <- newCC %>%
+  left_join(., ageCateg, by=c("age" = "index")) %>%
+  left_join(., sceDesc, by="sceNum") %>% 
+  # mutate(sceNum = sceNum - 1) %>%
+  rename(index = age) %>% 
+  select(sceNum, paramNum, year, index, ageCateg, desc, dose, cover, count) %>% unique %>%
+  rename(newCC = count) 
+
+vax_2 <- vax %>% 
+      left_join(., ageCateg, by=c("age" = "index")) %>% 
+      left_join(., sceDesc, by="sceNum") %>% 
+      mutate(vaxType = case_when(vaxType == 1 ~ "N_vax_school", 
+                                 vaxType == 2 ~ "N_vax_cu")) %>% 
+      select(sceNum, paramNum, year, ageCateg, vaxType, desc, cover, count) %>% unique %>% 
+      spread(., vaxType, count) %>% 
+      # for the vaccines in year 2023, the first timepoint is a burn in period, and is not reflective of the actual number of vaccines that would have been
+      # administered. so just for 2023.00, i take the num vaccines from the timepoint after. 
+      # don't need to do this for the catchup vaxxes because it is a muli-age-cohort vaccination
+      # group_by(sceNum, paramNum, ageCateg) %>% 
+      #       arrange(sceNum, paramNum, ageCateg, year) %>% 
+      #       mutate(N_vax_school = case_when(year == 2023 & ageCateg == "all.ages" ~ lead(N_vax_school), 
+      #                                       TRUE ~ N_vax_school)) %>% ungroup %>% 
+      # correct for coverage adjustment for quadrivalent (0.7/0.9)
+      mutate(N_vax_school = N_vax_school * (0.9/0.7), 
+             N_vax_cu = N_vax_cu * (0.9/0.7)) %>% 
+      # times 2 for 2-dose scenarios
+      left_join(sceDose, by=c("sceNum" = "index")) %>%
+      mutate(N_vax_school = case_when(dose == 2 ~ N_vax_school * 2, 
+                                      dose == 1 & year>= 2019 & year <2023 ~ N_vax_school * 2, 
+                                      TRUE ~ N_vax_school), 
+             N_vax_cu = case_when(dose == 2 ~ N_vax_cu * 2, 
+                                  dose == 1 & year>= 2019 & year <2023 ~ N_vax_cu * 2, 
+                                  TRUE ~ N_vax_cu)) %>%  
+      select(sceNum, paramNum, year, ageCateg, desc, cover, dose, N_vax_cu, N_vax_school) 
+
+```
+
+Saving results
+```{r}
+deaths <- deaths_2
+screenTreat <- screenTreat_2
+hpvHealthState <- hpvHealthState_2
+ccHealthState <- ccHealthState_2
+screenSympCCTreat <- screenSympCCTreat_2
+newCC <- newCC_2
+vax <- vax_2
+
+save(deaths, screenTreat, hpvHealthState, ccHealthState, screenSympCCTreat, newCC, vax, totalPerAge,  file="/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/Epi Analysis/ModelResults.RData")
+
+load(file = "/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/Epi Analysis/ModelResults.RData")
+```
+
+
+# CC incidence
+
+Age adjusted incidence rate
+Coverage is split by colour 
+Dose is split by line type
+```{r}
+worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+      rename(age = Age, 
+             worldPop = `2015 World Pop`) %>% 
+      select(age, worldPop) %>% 
+      bind_cols(., data.frame(index = seq(1, 16, 1)))
+
+incRate <-
+      newCC %>% 
+      left_join(worldStandard, by="index") %>% 
+      left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
+      filter(!ageCateg %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>% 
+      mutate(inc = (newCC/N)*100000*worldPop*6) %>% 
+      group_by(sceNum, paramNum, year) %>% 
+            mutate(sum_inc = sum(inc, na.rm=TRUE)) %>% ungroup %>% 
+            # filter(cover == "70%") %>% 
+            # View()
+      select(sceNum, paramNum, year, desc, cover, dose, sum_inc) %>% unique %>% 
+      # filter(year>=2022, year<=2025, sceNum==3) %>% View()
+      # calculate median of the params
+      group_by(sceNum, year) %>% 
+            mutate(inc_med = median(sum_inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year, desc:dose, inc_med) %>% unique %>%
+      # filter(year >= 2019 & year <= 2025) %>% 
+      arrange(sceNum, year) 
+
+incRate %>% 
+      filter(year >= 2020) %>% 
+      ggplot(., aes(x=year, y=inc_med, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Age adjusted CC incidence", 
+                 x="Year", 
+                 y="Age adjusted CC incidence", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            geom_hline(yintercept = 4, linetype = "dotted", color="grey")
+```
+
+Incidence rate ratio
+```{r}
+incRate_0 <- incRate %>% 
+      filter(sceNum == 0) %>% 
+      select(year, inc_med) %>% 
+      rename(inc_base = inc_med) %>% unique
+
+incRate_otherSces <- incRate %>% 
+      filter(sceNum != 0) 
+
+incRate_otherSces %>% 
+      filter(year>=2020) %>% 
+      left_join(incRate_0, by=c("year")) %>% 
+      mutate(incRatio = inc_med / inc_base) %>%
+      ggplot(., aes(x=year, y=incRatio, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Incidence rate ratio", 
+                 x="Year", 
+                 y="Incidence rate ratio", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            geom_hline(yintercept = 1, linetype = "dotted", color="grey")
+```
+
+# CC cases averted
+
+## Incremental 
+
+```{r}
+newCC_0 <- newCC %>% 
+      filter(sceNum == 0) %>% 
+      mutate(yrGrp = case_when(year>=2023 & year<2043 ~ "2023 to 2042", 
+                               year>=2043 & year<2063 ~ "2043 to 2062", 
+                               year>=2063 & year<2083 ~ "2063 to 2082", 
+                               year>=2083 & year<2103 ~ "2083 to 2102", 
+                               year>=2103 & year<2123 ~ "2103 to 2122")) %>% 
+      group_by(yrGrp, paramNum) %>% 
+            mutate(newCC_base = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(yrGrp, paramNum, newCC_base) %>% unique 
+
+newCC %>% 
+      filter(sceNum != 0) %>% 
+      mutate(yrGrp = case_when(year>=2023 & year<2043 ~ "2023 to 2042", 
+                               year>=2043 & year<2063 ~ "2043 to 2062", 
+                               year>=2063 & year<2083 ~ "2063 to 2082", 
+                               year>=2083 & year<2103 ~ "2083 to 2102", 
+                               year>=2103 & year<2123 ~ "2103 to 2122")) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(sceNum, paramNum, yrGrp) %>% 
+            mutate(newCC_others = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, newCC_others, desc, cover, dose) %>% unique %>% 
+      # join the base case 
+      left_join(newCC_0, by=c("yrGrp", "paramNum")) %>% 
+      mutate(cc_avert = newCC_base - newCC_others) %>%
+      # calculate median, max, min
+      group_by(sceNum, yrGrp) %>% 
+            mutate(med = median(cc_avert, na.rm=TRUE), 
+                   min = min(cc_avert, na.rm=TRUE), 
+                   max = max(cc_avert, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, yrGrp, med:max, desc, cover, dose) %>% unique %>% 
+      ggplot(., aes(x=yrGrp, y=med, fill=cover, alpha=dose)) + 
+            geom_bar(stat="identity", position="dodge", colour="black") + theme_bw() + 
+            scale_fill_viridis_d() + 
+            labs(title="Incremental CC cases averted", 
+                 x="Years", 
+                 y="Incremental CC cases averted", 
+                 fill="Vaccine coverage", 
+                 alpha="Dose") + 
+            geom_line(size=1.5) + 
+      scale_alpha_manual(values=c(0.7, 1)) +
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) + 
+            geom_errorbar(aes(ymin=min, ymax=max, group = paste(cover, dose)), width=.4,
+                          position=position_dodge(width=0.9, preserve = "single"), linetype="solid", size=0.6) 
+```
+
+## Cumulative
+
+```{r}
+newCC_0 <- newCC %>% 
+      filter(sceNum == 0) %>% 
+      mutate(yrGrp = case_when(year>=2023 & year<2043 ~ "2023 to 2042", 
+                               year>=2043 & year<2063 ~ "2043 to 2062", 
+                               year>=2063 & year<2083 ~ "2063 to 2082", 
+                               year>=2083 & year<2103 ~ "2083 to 2102", 
+                               year>=2103 & year<2123 ~ "2103 to 2122")) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(yrGrp, paramNum) %>% 
+            mutate(newCC_base = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(yrGrp, paramNum, newCC_base) %>% unique %>% 
+      arrange(paramNum, yrGrp) %>% 
+      group_by(paramNum) %>% 
+            mutate(cumsum_base = cumsum(newCC_base)) %>% ungroup %>% # TODO: check this
+      select(paramNum, yrGrp, cumsum_base) %>% unique
+
+newCC %>% 
+      filter(sceNum != 0) %>% 
+      mutate(yrGrp = case_when(year>=2023 & year<2043 ~ "2023 to 2042", 
+                               year>=2043 & year<2063 ~ "2043 to 2062", 
+                               year>=2063 & year<2083 ~ "2063 to 2082", 
+                               year>=2083 & year<2103 ~ "2083 to 2102", 
+                               year>=2103 & year<2123 ~ "2103 to 2122")) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(sceNum, paramNum, yrGrp) %>% 
+            mutate(newCC_others = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, newCC_others, desc, cover, dose) %>% unique %>% 
+      arrange(sceNum, paramNum, yrGrp) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(cumsum_others = cumsum(newCC_others)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, cumsum_others, desc, cover, dose) %>% unique %>% # TODO: check this
+      # join the base case 
+      left_join(newCC_0, by=c("yrGrp", "paramNum")) %>% 
+      mutate(cc_avert = cumsum_base - cumsum_others) %>%
+      # calculate median, max, min
+      group_by(sceNum, yrGrp) %>% 
+            mutate(med = median(cc_avert, na.rm=TRUE), 
+                   min = min(cc_avert, na.rm=TRUE), 
+                   max = max(cc_avert, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, yrGrp, med:max, desc, cover, dose) %>% unique %>% 
+      ggplot(., aes(x=yrGrp, y=med, fill=cover, alpha=dose)) + 
+            geom_bar(stat="identity", position="dodge", colour="black") + theme_bw() + 
+            scale_fill_viridis_d() + 
+            labs(title="Cumulative CC cases averted", 
+                 x="Years", 
+                 y="Cumulative CC cases averted", 
+                 fill="Vaccine coverage", 
+                 alpha="Dose") + 
+            # geom_line(size=1.5) + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) + 
+            scale_alpha_manual(values=c(0.7, 1)) +
+            geom_errorbar(aes(ymin=min, ymax=max, group = paste(cover, dose)), width=.4,
+                          position=position_dodge(width=0.9, preserve = "single"), linetype="solid", size=0.6) 
+```
+
+## Table form
+
+2072
+```{r}
+incRate_table <-
+      newCC %>% 
+      filter((year>=2072 & year<2073) | (year>=2122 & year<2123)) %>% 
+      left_join(worldStandard, by="index") %>% 
+      left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
+      filter(!ageCateg %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>% 
+      mutate(year_round = floor(year)) %>% 
+      group_by(year_round, sceNum, paramNum, ageCateg) %>% 
+            mutate(count = sum(newCC)) %>% ungroup %>% 
+      # select(year_round, year, ageCateg, sceNum, paramNum, desc:dose, count, N) %>% unique %>% 
+      mutate(inc = (count/N)*100000*worldPop) %>% 
+      filter(year_round == year) %>% 
+      group_by(sceNum, paramNum, year_round) %>% 
+            mutate(sum_inc = sum(inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, year_round, desc, cover, dose, sum_inc) %>% unique %>% 
+      rename(year = year_round) %>% 
+      group_by(sceNum, year) %>% 
+            mutate(inc_med = median(sum_inc, na.rm=TRUE), 
+                   inc_max = max(sum_inc, na.rm=TRUE), 
+                   inc_min = min(sum_inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year, desc:dose, inc_med:inc_min) %>% unique %>%
+      arrange(sceNum, year) 
+
+# baseline incidence 
+base_2072 <- incRate_table %>% 
+      filter(year == 2072) %>% 
+      filter(sceNum == 0) %>% 
+      rename(base_med = inc_med, 
+             base_max = inc_max, 
+             base_min = inc_min) %>% 
+      select(base_med:base_min)
+
+# 2072 perc reduction in incidence 
+
+newCC_0 <- newCC %>% 
+      filter(sceNum == 0) %>% 
+      mutate(yrGrp = case_when(year < 2073 ~ 2072, 
+                               year >= 2073 ~ 2122)) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(yrGrp, paramNum) %>% 
+            mutate(newCC_base = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(yrGrp, paramNum, newCC_base) %>% unique %>% 
+      arrange(paramNum, yrGrp) %>% 
+      group_by(paramNum) %>% 
+            mutate(cumsum_base = cumsum(newCC_base)) %>% ungroup %>% # TODO: check this
+      select(paramNum, yrGrp, cumsum_base) %>% unique 
+
+ccavert_2073 <- newCC %>% 
+      filter(sceNum != 0) %>% 
+      mutate(yrGrp = case_when(year < 2073 ~ 2072, 
+                               year >= 2073 ~ 2122)) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(sceNum, paramNum, yrGrp) %>% 
+            mutate(newCC_others = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, newCC_others, desc, cover, dose) %>% unique %>% 
+      arrange(sceNum, paramNum, yrGrp) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(cumsum_others = cumsum(newCC_others)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, cumsum_others, desc, cover, dose) %>% unique %>% # TODO: check this
+      # join the base case 
+      left_join(newCC_0, by=c("yrGrp", "paramNum")) %>% 
+      mutate(cc_avert = cumsum_base - cumsum_others) %>%
+      # calculate median, max, min
+      group_by(sceNum, yrGrp) %>% 
+            mutate(med = median(cc_avert, na.rm=TRUE), 
+                   min = min(cc_avert, na.rm=TRUE), 
+                   max = max(cc_avert, na.rm=TRUE)) %>% ungroup %>% 
+      filter(yrGrp == 2072) %>% 
+      select(desc, yrGrp, med:max) %>% unique %>% 
+      mutate(med = format(round(med), big.mark = ","), 
+             min = format(round(min), big.mark = ","), 
+             max = format(round(max), big.mark = ",")) %>% 
+      mutate(ccavert = paste0(med, " (", min, "-", max, ")")) %>% 
+      select(desc, ccavert)
+
+# put table together
+incRate_table %>% 
+      filter(year == 2072) %>% 
+      arrange(sceNum) %>% 
+      mutate(ccinc = paste0(round(inc_med, 1), " (", round(inc_min,1), "-", round(inc_max,1), ")")) %>% 
+      bind_cols(., base_2072) %>% 
+      mutate(perc_med = round((base_med - inc_med) / base_med * 100, 1)) %>% 
+      left_join(ccavert_2073, by="desc") %>% 
+      select(desc, ccinc, perc_med, ccavert) %>% 
+      mutate(perc_med = ifelse(desc=="No vaccination", "Reference", perc_med), 
+             ccavert = ifelse(desc=="No vaccination", "Reference", ccavert)) %>% 
+      rename(Scenario=desc, 
+             `CC incidence, per 100,000` = ccinc, 
+             `Percent reduction in incidence (median)` = perc_med, 
+             `Cumulative cancer cases averted` = ccavert)
+```
+
+2123
+```{r}
+incRate_table <-
+      newCC %>% 
+      filter((year>=2072 & year<2073) | (year>=2122 & year<2123)) %>% 
+      left_join(worldStandard, by="index") %>% 
+      left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
+      filter(!ageCateg %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>% 
+      mutate(year_round = floor(year)) %>% 
+      group_by(year_round, sceNum, paramNum, ageCateg) %>% 
+            mutate(count = sum(newCC)) %>% ungroup %>% 
+      # select(year_round, year, ageCateg, sceNum, paramNum, desc:dose, count, N) %>% unique %>% 
+      mutate(inc = (count/N)*100000*worldPop) %>% 
+      filter(year_round == year) %>% 
+      group_by(sceNum, paramNum, year_round) %>% 
+            mutate(sum_inc = sum(inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, year_round, desc, cover, dose, sum_inc) %>% unique %>% 
+      rename(year = year_round) %>% 
+      group_by(sceNum, year) %>% 
+            mutate(inc_med = median(sum_inc, na.rm=TRUE), 
+                   inc_max = max(sum_inc, na.rm=TRUE), 
+                   inc_min = min(sum_inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year, desc:dose, inc_med:inc_min) %>% unique %>%
+      arrange(sceNum, year) 
+
+# baseline incidence 
+base_2072 <- incRate_table %>% 
+      filter(year == 2122) %>% 
+      filter(sceNum == 0) %>% 
+      rename(base_med = inc_med, 
+             base_max = inc_max, 
+             base_min = inc_min) %>% 
+      select(base_med:base_min)
+
+# 2072 perc reduction in incidence 
+
+newCC_0 <- newCC %>% 
+      filter(sceNum == 0) %>% 
+      mutate(yrGrp = case_when(year < 2073 ~ 2072, 
+                               year >= 2073 ~ 2122)) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(yrGrp, paramNum) %>% 
+            mutate(newCC_base = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(yrGrp, paramNum, newCC_base) %>% unique %>% 
+      arrange(paramNum, yrGrp) %>% 
+      group_by(paramNum) %>% 
+            mutate(cumsum_base = cumsum(newCC_base)) %>% ungroup %>% # TODO: check this
+      select(paramNum, yrGrp, cumsum_base) %>% unique 
+
+ccavert_2073 <- newCC %>% 
+      filter(sceNum != 0) %>% 
+      mutate(yrGrp = case_when(year < 2073 ~ 2072, 
+                               year >= 2073 ~ 2122)) %>% 
+      filter(!is.na(yrGrp)) %>% 
+      group_by(sceNum, paramNum, yrGrp) %>% 
+            mutate(newCC_others = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, newCC_others, desc, cover, dose) %>% unique %>% 
+      arrange(sceNum, paramNum, yrGrp) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(cumsum_others = cumsum(newCC_others)) %>% ungroup %>% 
+      select(sceNum, paramNum, yrGrp, cumsum_others, desc, cover, dose) %>% unique %>% # TODO: check this
+      # join the base case 
+      left_join(newCC_0, by=c("yrGrp", "paramNum")) %>% 
+      mutate(cc_avert = cumsum_base - cumsum_others) %>%
+      # calculate median, max, min
+      group_by(sceNum, yrGrp) %>% 
+            mutate(med = median(cc_avert, na.rm=TRUE), 
+                   min = min(cc_avert, na.rm=TRUE), 
+                   max = max(cc_avert, na.rm=TRUE)) %>% ungroup %>% 
+      filter(yrGrp == 2122) %>% 
+      select(desc, yrGrp, med:max) %>% unique %>% 
+      mutate(med = format(round(med), big.mark = ","), 
+             min = format(round(min), big.mark = ","), 
+             max = format(round(max), big.mark = ",")) %>% 
+      mutate(ccavert = paste0(med, " (", min, "-", max, ")")) %>% 
+      select(desc, ccavert)
+
+# put table together
+incRate_table %>% 
+      filter(year == 2122) %>% 
+      arrange(sceNum) %>% 
+      mutate(ccinc = paste0(round(inc_med, 1), " (", round(inc_min,1), "-", round(inc_max,1), ")")) %>% 
+      bind_cols(., base_2072) %>% 
+      mutate(perc_med = round((base_med - inc_med) / base_med * 100, 1)) %>% 
+      left_join(ccavert_2073, by="desc") %>% 
+      select(desc, ccinc, perc_med, ccavert) %>% 
+      mutate(perc_med = ifelse(desc=="No vaccination", "Reference", perc_med), 
+             ccavert = ifelse(desc=="No vaccination", "Reference", ccavert)) %>% 
+      rename(Scenario=desc, 
+             `CC incidence, per 100,000` = ccinc, 
+             `Percent reduction in incidence (median)` = perc_med, 
+             `Cumulative cancer cases averted` = ccavert)
+```
+
+# Number of vaccines 
+
+Vaccines over time 
+```{r}
+vax %>% 
+      filter(year >= 2015, 
+             ageCateg == "all.ages") %>% 
+      group_by(sceNum, year) %>% 
+            mutate(med = median(N_vax_school, na.rm=TRUE), 
+                   min = min(N_vax_school, na.rm=TRUE), 
+                   max = max(N_vax_school, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year:dose, med:max) %>% unique %>% 
+      filter(year >= 2019, year <= 2024) %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=as.factor(dose))) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Number of vaccines (2019-2024)", 
+                 x="Year", 
+                 y="Number of vaccines", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() +
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+```
+
+
+Vaccines over time (after 2024)
+```{r}
+vax %>% 
+      filter(year >= 2015, 
+             ageCateg == "all.ages") %>% 
+      group_by(sceNum, year) %>% 
+            mutate(med = median(N_vax_school, na.rm=TRUE), 
+                   min = min(N_vax_school, na.rm=TRUE), 
+                   max = max(N_vax_school, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year:dose, med:max) %>% unique %>% 
+      filter(year >= 2024) %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=as.factor(dose))) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Number of vaccines (after 2024)", 
+                 x="Year", 
+                 y="Number of vaccines", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() +
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+      # geom_ribbon(aes(ymin=min, ymax=max), alpha=0.2)
+```
+
+Total number of vaccines from 2023 to 2123
+```{r}
+vax_df <- vax %>% 
+      filter(year >= 2023, 
+             ageCateg == "all.ages") %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(sum = sum(N_vax_school)) %>% ungroup %>% 
+      select(sceNum, paramNum, desc:dose, sum) %>% unique %>% 
+      group_by(sceNum) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup 
+
+
+      vax_df %>% 
+            select(sceNum, desc:dose, med:max) %>% unique %>% 
+      ggplot(., aes(x=desc, y=med, fill=cover, linetype=as.factor(dose))) + geom_bar(stat="identity", colour="black") + 
+            theme_bw() + 
+            scale_fill_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            labs(title="Number of vaccines from 2023 to 2123", 
+                 x="Scenario", 
+                 y="Number of vaccines", 
+                 fill="Vaccine coverage", 
+                 linetype="Dose") + 
+            geom_errorbar(aes(ymin=min, ymax=max), width=.4, linetype="solid", size=0.6) + 
+            theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1))
+```
+
+# Number of hysterectomies 
+
+```{r}
+hyst_df <- screenSympCCTreat %>% 
+      filter(treat==3) %>% 
+      group_by(sceNum, year, paramNum) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, year, paramNum, sum) %>% unique %>% 
+      group_by(sceNum, year) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, year, med:max) %>% unique 
+      
+hyst_df %>% 
+      left_join(sceDesc, by="sceNum") %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=as.factor(dose))) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Number of hysterectomies (median)", 
+                 x="Year", 
+                 y="Number of hysterectomies", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+      # geom_ribbon(aes(ymin=min, ymax= max, fill=cover), alpha=0.2)
+```
+
+Total number of hysterectomies from 2023 to 2123
+
+```{r}
+hyst_df2 <- screenSympCCTreat %>% 
+      filter(year>=2023) %>% 
+      filter(treat == 3) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, sum) %>% unique %>% 
+      group_by(sceNum) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, med:max) %>% unique %>% 
+      left_join(sceDesc, by="sceNum") 
+      
+hyst_dft2 %>% 
+      ggplot(., aes(x=desc, y=med, fill=cover, linetype=dose)) + geom_bar(stat="identity", colour="black") + 
+            theme_bw() + 
+            scale_fill_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            labs(title="Number of hysterectomies from 2023 to 2123", 
+                 x="Scenario", 
+                 y="Number of hysterectomies", 
+                 fill="Vaccine coverage", 
+                 linetype="Dose") + 
+            geom_errorbar(aes(ymin=min, ymax=max), width=.4, linetype="solid", size=0.6) + 
+            theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1))
+```
+
+# Number of CC deaths
+
+By year
+
+```{r}
+deaths %>% 
+      filter(deathCateg != "allDeath") %>% # i don't want to include all deaths
+      group_by(sceNum, paramNum, year) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, desc:cover, sum) %>% unique %>% 
+      group_by(sceNum, year) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, year, desc:cover, med:max) %>% unique %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Number of CC deaths", 
+                 x="Year", 
+                 y="Number of CC deaths", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+      # geom_ribbon(aes(ymin=min, ymax, max), fill=cover, alpha=0.2)
+```
+
+Age adjusted mortality rate
+
+```{r}
+worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+      rename(age = Age, 
+             worldPop = `2015 World Pop`) %>% 
+      select(age, worldPop) %>% 
+      bind_cols(., data.frame(index = seq(1, 16, 1)))
+
+mortRate <- deaths %>% 
+      filter(deathCateg != "allDeath") %>% # i don't want to include all deaths
+      # left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
+      group_by(sceNum, paramNum, year, index) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, index, desc:cover, sum, N) %>% unique %>% 
+      left_join(worldStandard, by="index") %>% 
+      mutate(mort = (sum/N)*100000*worldPop*6) %>% 
+      group_by(sceNum, paramNum, year) %>% 
+            mutate(sum_mort = sum(mort, na.rm=TRUE)) %>%  ungroup %>% 
+      select(sceNum, paramNum, year, desc, cover, dose, sum_mort) %>% unique %>% 
+      group_by(sceNum, year) %>% 
+            mutate(mort_med = median(sum_mort, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year, desc:dose, mort_med) %>% unique %>% 
+      filter(year >= 2020)
+
+mortRate %>% 
+      ggplot(., aes(x=year, y=mort_med, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Age adjusted CC mortality", 
+                 x="Year", 
+                 y="Age adjusted CC mortality", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+```
+
+
+# Number of screenings/colpo/cryo
+
+```{r}
+screenTreat_df <- screenTreat %>% 
+      # filter(screenTreatCateg == "nColpo") %>% 
+      group_by(sceNum, year, paramNum, screenTreatCateg) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, year, paramNum, screenTreatCateg, sum, cover, dose, desc) %>% unique %>% 
+      group_by(sceNum, year,screenTreatCateg) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, year, screenTreatCateg, med:max, cover, dose, desc) %>% unique %>% 
+      mutate(screenTreatCateg = case_when(screenTreatCateg == "nScreened" ~ "VIA", 
+                                          screenTreatCateg == "nColpo" ~ "Colposcopy", 
+                                          screenTreatCateg == "nCinTreat" ~ "Cryotherapy")) 
+
+screenTreat_df %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            facet_wrap(~screenTreatCateg, scales="free") + 
+            labs(title="Number of screening procedures", 
+                 x="Year", 
+                 y="Count", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+      # geom_ribbon(aes(ymin=min, ymax, max), fill=cover, alpha=0.2)
+```
+
+Total number of screening procedures from 2023 to 2123
+
+```{r}
+screenTreat_df2 <- screenTreat %>% 
+      filter(year>=2023) %>% 
+      # filter(screenTreatCateg == "nColpo") %>% 
+      group_by(sceNum, paramNum, screenTreatCateg) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, screenTreatCateg, sum, dose, cover, desc) %>% unique %>% 
+      group_by(sceNum, screenTreatCateg) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, screenTreatCateg, med:max, dose, cover, desc) %>% unique %>% 
+      mutate(screenTreatCateg = case_when(screenTreatCateg == "nScreened" ~ "VIA", 
+                                          screenTreatCateg == "nColpo" ~ "Colposcopy", 
+                                          screenTreatCateg == "nCinTreat" ~ "Cryotherapy")) 
+
+screenTreat_df2 %>% 
+      ggplot(., aes(x=desc, y=med, fill=cover, linetype=dose)) + geom_bar(stat="identity", position="dodge", colour="black") + 
+            facet_wrap( ~ screenTreatCateg, scales = "free_y", nrow=3) +
+            theme_bw() + 
+            scale_fill_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            labs(title="Number of procedures from 2023 to 2123", 
+                 x="Scenario", 
+                 y="Total", 
+                 fill="Coverage", 
+                 linetype="Dose") + 
+            geom_errorbar(aes(ymin=min, ymax=max), width=.4, linetype="solid", size=0.6) + 
+            theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1))
+```
+
+# Number of treated CCs
+
+```{r}
+screensympdf <- screenSympCCTreat %>% 
+      filter(year >= 2020) %>% 
+      mutate(treat = case_when(dxType %in% c("hysterectomy", "dx, treated") ~ "treated")) %>% 
+      filter(treat == "treated") %>% 
+      group_by(sceNum, year, paramNum) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, year, paramNum, sum, cover, dose, desc) %>% unique %>% 
+      group_by(sceNum, year) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, year, med:max, cover, dose, desc) %>% unique 
+
+screensympdf %>% 
+      ggplot(., aes(x=year, y=med, colour=cover, linetype=dose)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Number of CC treatment", 
+                 x="Year", 
+                 y="Number of CC treatment", 
+                 colour="Vaccine coverage", 
+                 linetype="Dose") + 
+            scale_colour_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) 
+      # geom_ribbon(aes(ymin=min, ymax, max), fill=cover, alpha=0.2)
+```
+
+Total treatment from 2023 to 2123
+
+```{r}
+screensympcctreat_df2 <- screenSympCCTreat %>% 
+      filter(year>=2023) %>% 
+      mutate(treat = case_when(dxType %in% c("hysterectomy", "dx, treated") ~ "treated")) %>% 
+      filter(treat == "treated") %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, sum, cover, dose, desc) %>% unique %>% 
+      group_by(sceNum) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max = max(sum)) %>% ungroup %>% 
+      select(sceNum, med:max, cover, dose, desc) %>% unique 
+
+screensympcctreat_df2 %>% 
+      ggplot(., aes(x=desc, y=med, fill=cover, linetype=dose)) + geom_bar(stat="identity", colour="black") + 
+            theme_bw() + 
+            scale_fill_viridis_d() + 
+            scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            labs(title="Number of CC treatment from 2023 to 2123", 
+                 x="Scenario", 
+                 y="Number of CC treatment", 
+                 fill="Vaccine coverage", 
+                 linetype="Dose") + 
+            geom_errorbar(aes(ymin=min, ymax=max), width=.4, linetype="solid", size=0.6) +
+            theme(axis.text.x = element_text(size = 10, angle = 45, hjust=1))
+```
+
+# Stage distributions
+
+## Prevalence 
+```{r}
+prevalencedf <- ccHealthState %>% 
+      filter(year>= 2020) %>% 
+      group_by(sceNum, paramNum, year, stageCateg) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, stageCateg, sum, dose, cover, desc) %>% unique %>% 
+      group_by(sceNum, year, stageCateg) %>% 
+            mutate(med = median(sum), 
+                   min = min(sum), 
+                   max= max(sum)) %>% ungroup %>% 
+      select(sceNum, year, stageCateg, med:max, dose, cover, desc) %>% unique %>% 
+      group_by(sceNum, year) %>% 
+            mutate(total = sum(med), 
+                   prop = med/total) %>% ungroup %>% 
+      select(sceNum, year, stageCateg, total, prop, dose, cover, desc) %>% unique
+
+prevalencedf %>% 
+      filter(year >= 2020) %>% 
+      ggplot(., aes(x=year, y=prop, fill=stageCateg)) + geom_bar(stat="identity", position="stack") + theme_bw() + 
+            facet_wrap(~desc) + 
+            scale_fill_viridis_d() + 
+            labs(title="Stage distribution (true CC cases)", 
+                 x="Year", 
+                 y="Proportion", 
+                 fill="Stage") 
+```
+
+
+## Incidence of dxed cancers
+```{r}
+screenSympCCTreat %>% tabyl(dxType)
+
+screensymcctreat2 <- screenSympCCTreat %>% 
+      group_by(year, sceNum, paramNum, endpoint) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(year, sceNum, paramNum, endpoint, sum, dose, cover, desc) %>% unique %>% 
+      group_by(year, sceNum, endpoint) %>% 
+            mutate(med = median(sum)) %>% ungroup %>% 
+      select(year, sceNum, endpoint, med, dose, cover, desc) %>% unique %>% 
+      mutate(stage = factor(case_when(endpoint==1 ~ "Local", 
+                                      endpoint==2 ~ "Regional", 
+                                      endpoint==3 ~ "Distant"), levels=c("Distant", "Regional", "Local"))) %>% 
+      group_by(year, sceNum) %>% 
+            mutate(total = sum(med), 
+                   prop = med/total) %>% ungroup %>% 
+      select(year, sceNum, stage, prop, dose, cover, desc) %>% unique
+
+screensymcctreat2 %>% 
+      filter(year >= 2020) %>% 
+      ggplot(., aes(x=year, y=prop, fill=stage)) + geom_bar(stat="identity", position="stack") + theme_bw() + 
+            facet_wrap(~desc) + 
+            scale_fill_viridis_d() + 
+            labs(title="Stage distribution (dxed CC cases)", 
+                 x="Year", 
+                 y="Proportion", 
+                 fill="Stage") 
+```
+
+
+## Validation of before-screening times 
+```{r}
+modelresult <- screenSympCCTreat %>% 
+      filter(year>=1999, year<2000, 
+             sceNum==0) %>% 
+      group_by(paramNum, endpoint) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(paramNum, endpoint, sum) %>% unique %>% 
+      group_by(paramNum) %>% 
+            mutate(total = sum(sum), 
+                   prop = sum/total) %>% ungroup %>% 
+      select(paramNum, endpoint, prop) %>% unique %>% 
+      group_by(endpoint) %>% 
+            mutate(med = median(prop), 
+                   min = min(prop), 
+                   max = max(prop)) %>% ungroup %>% 
+      select(endpoint, med:max) %>% unique %>% 
+      mutate(desc = "Model (1999)") %>% 
+      mutate(stage = factor(case_when(endpoint==1 ~ "Local", 
+                                      endpoint==2 ~ "Regional", 
+                                      endpoint==3 ~ "Distant"), levels=c("Distant", "Regional", "Local")))
+
+litresult <- data.frame(stage = c("Distant", "Regional", "Local"), 
+                        med = c(0.16, 0.6675, 0.17), 
+                        desc = "Kamangar et al")
+
+bind_rows(modelresult, litresult) %>% 
+      mutate(stage = factor(stage, levels=c("Distant", "Regional", "Local"))) %>% 
+      ggplot(., aes(x=desc, y=med, fill=stage)) + geom_bar(stat="identity", position="dodge") +
+            theme_bw() +
+            scale_fill_viridis_d() + 
+            labs(title="Stage distribution before screening", 
+                 x="Result source", 
+                 y="Proportion", 
+                 fill="Stage") + 
+            geom_errorbar(aes(ymin=min, ymax=max), width=.2, linetype="solid", size=0.6, position=position_dodge(0.9))
+```
+
+
+# Number needed to screen to avert 1 CC case
+
+# Prop cc cases averted vs. num vaxed per cc case averted
+
+```{r}
+# baseline cc cases
+newCC_0 <- newCC %>% 
+      filter(sceNum == 0) %>% 
+      filter(year >= 2023) %>% 
+      group_by(paramNum) %>% 
+            mutate(newCC_base = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(paramNum, newCC_base) %>% unique 
+
+# cc cases averted after 2023
+# left join the baseline to get cc cases averted 
+# calculate the prop averted 
+ccavert <- newCC %>% 
+      filter(sceNum != 0) %>% 
+      filter(year >= 2023) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(newCC_others = sum(newCC, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, newCC_others, desc, cover, dose) %>% unique %>% 
+      # join the base case 
+      left_join(newCC_0, by=c("paramNum")) %>% 
+      mutate(cc_avert = newCC_base - newCC_others, 
+             prop_avert = cc_avert/newCC_base) %>%
+      select(sceNum, paramNum, cc_avert, prop_avert, cover, dose, desc) %>% unique 
+
+# num vaxed after 2023 
+numvax <- vax %>% 
+      filter(year > 2023, 
+             ageCateg == "all.ages") %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(numvax = sum(N_vax_school, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, numvax) %>% unique
+
+ccavert <- ccavert %>%
+      left_join(numvax, by=c("paramNum", "sceNum")) %>% 
+      mutate(vaxpercc = numvax/cc_avert) 
+
+# convex hull code 
+
+get_convex_hull <- function(data) {
+  hull_points <- chull(data$prop_avert, data$vaxpercc)
+  data[c(hull_points, hull_points[1]), c("prop_avert", "vaxpercc")]
+}
+
+# Calculate convex hull coordinates for each unique dose and cover combination
+convex_hulls <- ccavert %>%
+  group_by(dose, cover) %>%
+  nest() %>%
+  mutate(convex_hull = map(data, get_convex_hull)) %>%
+  unnest(convex_hull)
+
+# Plot with separate convex hulls
+ccavert %>% 
+      ggplot(., aes(x=prop_avert, y=vaxpercc, colour=cover, shape=dose)) + geom_point() + theme_bw() +
+      geom_polygon(data = convex_hulls,
+               aes(x = prop_avert, y = vaxpercc, group = interaction(cover, dose), fill=cover),
+               alpha = 0.3) +
+      labs(title = "Proportion of CC cases averted vs. number of vaccines per CC case averted",
+           x = "Proportion of cervical cancer cases averted", 
+           y = "Number of vaccines per cervical cancer case averted", 
+           colour = "Coverage", 
+           shape = "Dose") + 
+      guides(fill = "none")
+```
+
+## Troubleshoot the one paramnum that is skewed
+
+```{r}
+ccavert2 <- ccavert %>% 
+      filter(paramNum != 18) 
+
+get_convex_hull <- function(data) {
+  hull_points <- chull(data$prop_avert, data$vaxpercc)
+  data[c(hull_points, hull_points[1]), c("prop_avert", "vaxpercc")]
+}
+
+# Calculate convex hull coordinates for each unique dose and cover combination
+convex_hulls <- ccavert2 %>%
+  group_by(dose, cover) %>%
+  nest() %>%
+  mutate(convex_hull = map(data, get_convex_hull)) %>%
+  unnest(convex_hull)
+
+# Plot with separate convex hulls
+ccavert2 %>% 
+      ggplot(., aes(x=prop_avert, y=vaxpercc, colour=cover, shape=dose)) + geom_point() + theme_bw() +
+      geom_polygon(data = convex_hulls,
+               aes(x = prop_avert, y = vaxpercc, group = interaction(cover, dose), fill=cover),
+               alpha = 0.3) +
+      labs(title = "Proportion of CC cases averted vs. number of vaccines per CC case averted",
+           x = "Proportion of cervical cancer cases averted", 
+           y = "Number of vaccines per cervical cancer case averted", 
+           colour = "Coverage", 
+           shape = "Dose") + 
+      guides(fill = "none")
+```
+
