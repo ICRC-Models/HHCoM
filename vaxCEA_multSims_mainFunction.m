@@ -54,13 +54,13 @@ clear;
 % Temporarily commenting out to only run one scenario first to test out
 % code
 %***SET ME***: this will likely change once we spit out all of the sim results
-% fileInds = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', ...
-%                 '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', ...
-%                 '22', '23', '24', '25'};    % 22Apr20Ph2V11 ***************SET ME****************
-fileInds = {'1'}; % FORTESTING
+fileInds = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10', ...
+                '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', ...
+                '22', '23', '24', '25'};    % 22Apr20Ph2V11 ***************SET ME****************
+% fileInds = {'1'}; % FORTESTING
 nRuns = length(fileInds);
 
-lastYear = 2030; % manually set in futureSim
+lastYear = 2123; % manually set in futureSim
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
 monthlyTimespanFut = [endYear : timeStep : lastYear]; % screening time span starts at 2021
@@ -70,16 +70,16 @@ nTimepointsFut = length(monthlyTimespanFut);
 fivYrAgeGrpsOn = 1;
 
 % parallelizing the for loop
-loopSegments = {0 , round(5/2) , 5}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
+loopSegments = {0 , round(2/2) , 9}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
 loopSegmentsLength = length(loopSegments);
 
 % scenarios = {'1.1', '1.2', '2.1', '2.2', '3.1'}; ***SET ME***: specify the scenarios to loop through
-scenarios = {'0'}; 
+scenarios = {'0', '1', '2', '3', '4', '5', '6', '7', '8'}; 
 
-% for k = 1 : loopSegmentsLength-1 
-%     parfor j = loopSegments{k}+1 : loopSegments{k+1}
+for k = 1 : loopSegmentsLength-1 
+    parfor j = loopSegments{k}+1 : loopSegments{k+1} % for testing (parfor)
     
-for j = [1] % FORTESTING
+% for j = [1] % FORTESTING
 
     sceNum = j - 1; 
     sceString = scenarios{j}; % turn sceNum into string sceString
@@ -215,5 +215,5 @@ writetable(totalPerAgeReshape1, [pwd '/KECEA/totalPerAge_S' sceString '.csv']);
 writetable(screenTreatReshape1, [pwd '/KECEA/screenTreat_S' sceString '.csv']);
 writetable(screenSympCCTreatReshape1, [pwd '/KECEA/screenSympCCTreat_S' sceString '.csv']);
 
-% end % closing the parfor loops 
+end % closing the parfor loops 
 end

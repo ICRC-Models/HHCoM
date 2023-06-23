@@ -55,7 +55,7 @@ paramDir = [pwd , '\Params\'];
     ccLochpvVaxIndsFrom_treat , ...
     ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , []);
 
-lastYear = 2030; % manually set in futureSim
+lastYear = 2123; % manually set in futureSim
 
 %% Setting file names, initializing variables 
 nRuns = length(fileInds);
@@ -163,11 +163,11 @@ screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 % the for and parfor basically loops through the first half of the
 % parameters, then the second half. but parfor allows them to run
 % independently of each other. 
-% for k = 1 : loopSegmentsLength-1
-%     for j = loopSegments{k}+1 : loopSegments{k+1} % trying just a for loop for now
+for k = 1 : loopSegmentsLength-1
+    for j = loopSegments{k}+1 : loopSegments{k+1} % trying just a for loop for now
 
-k=1; % temporarily only running a single parameter to test 
-j=1; 
+% k=1; % temporarily only running a single parameter to test 
+% j=1; 
 
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
@@ -177,7 +177,7 @@ vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxSimResult'];
 
 % load results from vaccine run into cell array
-vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
+vaxResult{n} = load([resultFileName , fileInds{j}, '.mat']);
 
 % concatenate vectors/matrices of population up to current year to population
 % matrices for years past current year
@@ -369,4 +369,4 @@ end
 
 end % for loop end 
 
-% end % function end 
+end % function end 
