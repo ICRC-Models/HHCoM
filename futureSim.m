@@ -9,12 +9,12 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_30May23_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_07Jun23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_S0']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_S9']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -24,7 +24,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2030; % ***SET ME***: end year of simulation run (for testing)
+lastYear = 2123; % ***SET ME***: end year of simulation run 
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -49,16 +49,16 @@ whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 %   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage
 %   Scenario 3: baseline regimen for age 9 at 86% coverage
 % vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
-waning = 0;    % turn waning on or off
+waning = 1;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
-vaxAgeB = [3];
+vaxAgeB = [2];
 vaxCoverB = 0*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment)
 vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2];
-vaxCover = [0*(0.7/0.9)];
+vaxCover = [0.90*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
@@ -334,19 +334,23 @@ for n = 1 : nTests
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 20; % number of years over which initial efficacy level wanes
+    wanePeriod = 30; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
         % to 0% over time period specificed by 'wanePeriod'
         % To make waning rate equal in all scenarios, the linear rate of 
-        % waning is based on the least effective initial vaccine efficacy scenario.        
+        % waning is based on the least effective initial vaccine efficacy
+        % scenario. 
         kWane = min(vaxEff) / round(wanePeriod / 5);     
         vaxInit = vaxEff(vaxEffInd(n));
-        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : age , n) = ...
-            max(0 , linspace(vaxInit , ...
+        waningEffVec = max(0 , linspace(vaxInit , ...
             vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
-            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); % ensures vaccine efficacy is >= 0
+            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); 
+        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : ... 
+            round(effPeriod / 5) + min(testParams2{n , 1}) - 1 + size(waningEffVec,1) - 1 , n) = ...
+            waningEffVec; % ensures vaccine efficacy is >= 0
+        lambdaMultVaxMat(1+(effPeriod/5)+(wanePeriod/5)+1:end,n) = 0; 
     end
 end
 
@@ -355,6 +359,7 @@ end
 
 parfor n = 1 : nTests 
 % for n = 1 : nTests % for testing
+
     simNum = n;
     vaxEff = testParams(n , 2);
     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
@@ -610,7 +615,7 @@ parfor n = 1 : nTests
         newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
         currYear , lastYear , vaxRate , vaxEff , ccSymp, ccTreat , popLast , pathModifier);
 
-end
+end 
 disp('Done')
 
 %profile viewer
