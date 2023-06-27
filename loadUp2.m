@@ -54,7 +54,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2023; % for testing
+currYear = 2023; 
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -815,7 +815,7 @@ end
 hivStartYear = 1978;
 circStartYear = 1960;
 circNatStartYear = 2008;
-vaxStartYear = 2019; % originally 2019
+vaxStartYear = 2019; 
 
 % VMMC coverage
 vmmcYr = [circStartYear; 2003; 2008; 2014; 2030];
@@ -837,10 +837,10 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
 end
 
 %% Vaccination waning
-waning = 0;    % bool to turn waning on or off
+waning = 1;    % bool to turn waning on or off
 
 %% Single dose 
-singleDoseBool = 0; % 1 for single dose vax efficacy, 0 for 2-dose
+singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
 
 %% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
@@ -856,7 +856,6 @@ end
 
 % Screening timeframe 
 screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];
-% screenYrs = [1926; 1927; 1928; 1929; 1930; 1931]; % for testing
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities

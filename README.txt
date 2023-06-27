@@ -15,3 +15,6 @@ Workflow for single dose CEA:
 - For MATLAB to CSV, use vaxCEA_multSims_mainFunction, which calls vaxCEA_multSims_processResults 
 - In KECEA, cleanMatlabOutputs.R transforms CSV files into CSV template files for the health econ analysis
 - modelAnalysis.Rmd transforms CSV files to produce figures
+
+Other notes: 
+- Scenario 10 is the only one that has a more condensed version of ccSymp and ccTreat. I did this because the cluster was running out of memory. So that means scenario 10 must be processed different from the other scenarios. 

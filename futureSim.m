@@ -357,8 +357,8 @@ end
 %% Simulation
 %profile on
 
-parfor n = 1 : nTests 
-% for n = 1 : nTests % for testing
+% parfor n = 1 : nTests 
+for n = 1 : nTests % for testing
 
     simNum = n;
     vaxEff = testParams(n , 2);
@@ -406,7 +406,7 @@ parfor n = 1 : nTests
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
     vaxdCU = vaxdLmtd;
-    ccSymp = zeros(length(s) - 1 , disease , 3 , intervens , age , 3); 
+    ccSymp = zeros(length(s) - 1 , 3 , age , 3); 
     ccTreat = ccSymp; 
     
     % ART
@@ -446,7 +446,7 @@ parfor n = 1 : nTests
             pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
-                [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , : , : , :)]   ...
+                [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -467,7 +467,7 @@ parfor n = 1 : nTests
  
 
         % SYMPTOMATIC CC DETECTION IN A NON-SCREENING YEAR
-            [dPop , ccSymp(i,:,:,:,:,:)] = symptomaticDetection(pop , ...
+            [dPop , ccSymp(i,:,:,:)] = symptomaticDetection(pop , ...
                 year , hpvScreenStartYear , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , intervens , age , ...
                 screenAlgs , kSymp, hystMult, udPop, udPopNoTreat, udPopTreat, udPopHyst, ccReghpvVaxInds); 
             pop(end , :) = pop(end , :) + dPop(end , :); 

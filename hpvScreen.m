@@ -13,7 +13,7 @@ function[dPop , ccScreen , ccTreat ] = hpvScreen(pop , ...
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
-ccTreat = zeros(disease, 3, age, 3); 
+ccTreat = zeros(3, age, 3); 
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs)
@@ -133,14 +133,14 @@ for i = 1 : length(screenAlgs)
                                     ccScreen(d,v,h,s,x,aS,2) = ccScreen(d,v,h,s,x,aS,2) + sumall(vaxScreend); 
 
                                     % ccTreat result matrix
-                                    ccTreat(d,x,3,a,2) = ccTreat(d,x,3,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 
-                                    ccTreat(d,x,4,a,2) = ccTreat(d,x,4,a,2) + sumall(toScreenNoTreat .* vaxScreend); 
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* vaxScreend); 
 
-                                    ccTreat(d,x,3,a,1) = ccTreat(d,x,3,a,1) + sumall(toScreenTreat .* noVaxScreend); % screened, treated 
-                                    ccTreat(d,x,4,a,1) = ccTreat(d,x,4,a,1) + sumall(toScreenTreat .* vaxScreend); 
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* noVaxScreend); % screened, treated 
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* vaxScreend); 
 
-                                    ccTreat(d,x,3,a,3) = ccTreat(d,x,3,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
-                                    ccTreat(d,x,4,a,3) = ccTreat(d,x,4,a,3) + sumall(toScreenTreatHystMult .* vaxScreend); 
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* vaxScreend); 
 
 
                                     % if you have CIN2+ of either HPV type and are susceptible or immune to the other HPV type
