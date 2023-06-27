@@ -13,10 +13,7 @@ function[dPop , ccScreen , ccTreat ] = hpvScreen(pop , ...
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
-% ccTreatImm = ccScreen;
-% ccTreatHpv = ccScreen;
-% ccTreatHyst = ccScreen;
-ccTreat = zeros(disease, 3, intervens, age, 3); 
+ccTreat = zeros(disease, 3, age, 3); 
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs)

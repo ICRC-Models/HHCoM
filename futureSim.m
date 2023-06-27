@@ -14,7 +14,7 @@ historicalIn = load([pwd , ['/HHCoM_Results/toNow_07Jun23_stochMod_baseline_2dos
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_S9']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_S10']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -334,7 +334,7 @@ for n = 1 : nTests
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 30; % number of years over which initial efficacy level wanes
+    wanePeriod = 20; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
