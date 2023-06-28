@@ -18,3 +18,5 @@ Workflow for single dose CEA:
 
 Other notes: 
 - Scenario 10 is the only one that has a more condensed version of ccSymp and ccTreat. I did this because the cluster was running out of memory. So that means scenario 10 must be processed different from the other scenarios. 
+Use vaxCEA_multSims_mainFunction_sce10 and vaxCEA_multSims_processResults_sce10.
+- When running the matlab to csv code for the waning scenarios, make sure that waning = 0 and singleDoseBool = 0 in loadup2
