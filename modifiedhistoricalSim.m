@@ -2,6 +2,9 @@
 % Runs simulation over the time period and time step specified by the user.
 
 function [] = modifiedhistoricalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , sympParams_in, sympRun)
+
+numDxCC = []; 
+
 %Run from the Command Window: historicalSim(0 , [] , [] , [] , [] , 0 , '17Dec19')
 
 %% If using pattern search algorithm, uncomment the following and change the function above to historicalSim(paramSet). 
@@ -33,7 +36,7 @@ tic
 %%  Variables/parameters to set based on your scenario
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['toNow_' , date , '_stochMod_' , 'recalib_07Jul23_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
+pathModifier = ['toNow_' , date , '_stochMod_' , 'ccCalibration_round1_' , num2str(sympRun)]; % ***SET ME***: name for historical run output file 
  %pathModifier = 'toNow_determMod_final_artDiscontFix';
  %pathModifier = 'toNow_determMod_popFertFix';
 
@@ -102,6 +105,7 @@ end
     hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
     hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
+    stageDist_2018_dObs , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
@@ -126,9 +130,6 @@ end
 %% Modifying the rate of symptomatic detection 
 
 kSymp = sympParams_in(1:3);
-kRL = sympParams_in(4); 
-kDR = sympParams_in(5); 
-
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -679,21 +680,24 @@ for i = iStart : length(s) - 1
 %     end
 
     % Checking for year 1999 to check stage distribution
-    if year >= 1950 && year <= 1950.1
-        local = sum(ccSymp(i, 1, 1:end, 1:end), "all"); 
-        regional = sum(ccSymp(i, 2, 1:end, 1:end), "all"); 
-        distant = sum(ccSymp(i, 3, 1:end, 1:end), "all"); 
-        total = local+regional+distant; 
-        stageDist = [local/total regional/total distant/total]; 
-    end 
+%     if year >= 1999 && year < 2023
+%         local = sum(ccSymp(i, 1, 1:end, 1:end), "all"); 
+%         regional = sum(ccSymp(i, 2, 1:end, 1:end), "all"); 
+%         distant = sum(ccSymp(i, 3, 1:end, 1:end), "all"); 
+%         stageDist_temp = [year local regional distant]; 
+%         stageDist = [stageDist stageDist_temp]; 
+%     end 
 
     % Checking for year 2022 to check the total number of cancers detected
-    if year >= 1950 && year <= 1950.1
+    if year >= 1999 && year < 2023
         local = sum(ccSymp(i, 1, 1:end, 1:end), "all") + sum(ccTreat(i, 1, 1:end, 1:end), "all"); 
         regional = sum(ccSymp(i, 2, 1:end, 1:end), "all") + sum(ccTreat(i, 2, 1:end, 1:end), "all"); 
         distant = sum(ccSymp(i, 3, 1:end, 1:end), "all") + sum(ccTreat(i, 3, 1:end, 1:end), "all"); 
-        total = local+regional+distant; 
-        numDxCC = [local regional distant total];
+        ccDeath_sum = sum(newCC(i, 1:end, 1:end, 1:end), "all"); 
+
+        numDxCC_temp = [year local regional distant ccDeath_sum];
+
+        numDxCC = [numDxCC; numDxCC_temp];
     end 
     
     disp(['Reached year ' num2str(year)])
@@ -703,9 +707,12 @@ popLast = sparse(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
+%% Calculate sum logged likelihood
+negSumLogL = likeFun(ccSymp , ccTreat , stageDist_2018_dObs, startYear , stepsPerYear);
+
 %% Save results
 savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , pathModifier, '') , 'stageDist' , 'numDxCC', 'kSymp', 'kRL', 'kDR');
+save(fullfile(savdir , pathModifier, '') , 'numDxCC', 'kSymp', 'negSumLogL');
 
 disp(' ')
 disp('Simulation complete.')

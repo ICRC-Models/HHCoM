@@ -21,6 +21,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
     hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
+    stageDist_2018_dObs , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
@@ -733,8 +734,8 @@ for v = 1 : viral
 end
 
 % Cervical cancer progression
-kRL = 0.02;
-kDR = 0.025;
+kRL = 0.225;
+kDR = 0.45;
 
 % Cervical cancer probability of symptomatic detection (from Campos, 2018)
 % converting from monthly to yearly probability --> i = 1-(1-j)^12
@@ -837,10 +838,10 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
 end
 
 %% Vaccination waning
-waning = 1;    % bool to turn waning on or off
+waning = 0;    % bool to turn waning on or off
 
 %% Single dose 
-singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
+singleDoseBool = 0; % 1 for single dose vax efficacy, 0 for 2-dose
 
 %% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
@@ -937,7 +938,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 %% Import and save calibration data
-% file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
+file = [pwd , '/Config/Calibration_targets_Kenya.xlsx'];
 % 
 % ccInc2012_dObs(: , 1) = xlsread(file , 'Calibration' , 'E10:E22'); % CC Incidence Rate 2012, by age
 % ccInc2012_dObs(: , 2:3) = xlsread(file , 'Calibration' , 'H10:I22');
@@ -1001,6 +1002,10 @@ end
 % 
 % totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'E171:E174'); % Total population size in 2001, 2011, and 2019
 % totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H171:I174');
+
+% stageDist_2002_dObs = xlsread(file, 'Calibration', 'H175:I177'); % Stage distributions in 2002
+% stageDist_2018_dObs = xlsread(file, 'Calibration', 'H175:I177'); % Stage distributions in 2018
+
 % 
 % save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
 %     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
@@ -1010,7 +1015,14 @@ end
 load([paramDir , 'calibData'], 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
-    'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs');
+    'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs', ...
+    'stageDist_2018_dObs');
+
+% save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+%     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2007_dObs' , 'cin1_2010_dObs' ,'cin2_2010_dObs', ...
+%     'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , 'hpv_all_dObs', 'hpv_hiv2009_dObs'  , ...
+%     'hivPrevF_dObs' , 'hivPrevM_dObs' , 'hivPrevAll_dObs', 'popAgeDist_dObs' , 'totPopSize_dObs', ...
+%     'stageDist_2018_dObs'); 
 
 
 %% Load indices *****************************************************************************************************************************************************************************

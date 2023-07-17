@@ -1,19 +1,3 @@
-sympParams = []; 
-
-for l = 0.0001 : 0.00002 : 0.0002
-    for r = 0.014 : 0.002 : 0.02
-        for d = 0.6 : 0.1 : 0.8 
-            for l_r = 0.02 : 0.02 : 0.1
-                for r_d = 0.025 : 0.02 : 0.1
-
-                    sympParams = [sympParams; l r d l_r r_d]; 
-
-                end
-            end
-        end 
-    end 
-end 
-
 paramSetIdx=1;
 tstep_abc=6;
 date_abc='22Apr20Ph2V11';
@@ -44,20 +28,21 @@ for s = 1 : length(pIdx)
     startIdx = startIdx + paramsSub{s}.length;
 end
 
-%% Obtain model output for each set of sampled parameters
-%
-%negSumLogLSet = zeros(nPrlSets,1);
-% parfor n = 1 : nPrlSets  
-    n=1;
+%% Select the kSymp parameters
 
-    paramSet = paramSetMatrix(:,subMatrixInds(n));
-    %futureSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc);
+file = [pwd , '/Params/kSymp_ParamSets.xlsx'];
+
+paramSet_kSymp = xlsread(file, 'Param sets', 'A2:C101'); 
     
 
-%% Run for loop for the 300 possible symp rate parameter values
+%% Run parfor loop for all the parameter sets 
 
-parfor sympRun = 1 : length(sympParams)
-    sympParams_in = sympParams(sympRun, 1:end);
-%     historicalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc, sympParams_in, sympRun);
+parfor sympRun = 1 : length(paramSet_kSymp)
+    sympParams_in = paramSet_kSymp(sympRun, 1:end);
+
+    % select a random parameter from paramsSub
+    n = randi([1, 25]); 
+    paramSet = paramSetMatrix(:,subMatrixInds(n));
+
     modifiedhistoricalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc, sympParams_in, sympRun);
 end 

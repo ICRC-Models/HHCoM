@@ -20,3 +20,10 @@ Other notes:
 - Scenario 10 is the only one that has a more condensed version of ccSymp and ccTreat. I did this because the cluster was running out of memory. So that means scenario 10 must be processed different from the other scenarios. 
 Use vaxCEA_multSims_mainFunction_sce10 and vaxCEA_multSims_processResults_sce10.
 - When running the matlab to csv code for the waning scenarios, make sure that waning = 0 and singleDoseBool = 0 in loadup2
+- Calibration of kSymp used sympCalibration, debugTreatment_sympCalibration_historicalSim, and debugTreatment_sympCalibration_historicalSim_runthis. 
+
+Recalibration (Jul 10, 2023): 
+- I realized I needed to calibration BOTH kSymp and the progression probabilities. 
+- I ran sympCalibration, which calls modifiedhistoricalSim. I realized you do not have to save the full results file. We only care about the stage distribution at one point in time and the counts of CC cases. 
+- Process results using processRecalibResults. 
+- Then you can read in the subsequent CSV into R to filter through the results. 
