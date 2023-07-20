@@ -66,7 +66,7 @@ timeStep = 1 / stepsPerYear; % ***SET ME***: same here
 
 if gradScaleUp==1
     vaxRate = [0.0; 0.16; 0.31] * vaxRateAdjust; % Coverage over time (Years: [2021; 2026])
-    vaxYrs = [2019; 2020; 2023];
+    vaxYrs = [2019; 2020; 2023]; 
     vaxCover_vec = cell(size(vaxYrs , 1) - 1, 1); % save data over time interval in a cell array
     for i = 1 : size(vaxYrs , 1) - 1          % interpolate values at steps within period
         period = [vaxYrs(i) , vaxYrs(i + 1)];
@@ -76,7 +76,7 @@ if gradScaleUp==1
     vaxRate_vec = vaxCover_vec; 
 else 
     vaxRate_vec = [0.16] * vaxRateAdjust;
-    vaxYrs = [2020]; % for testing 2020 orig
+    vaxYrs = [2020]; 
 end 
 
 %% Save pre-loaded parameters and pre-calculated indices and matrices
@@ -102,6 +102,7 @@ end
     hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
     hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
+    stageDist_2018_dObs , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
@@ -385,7 +386,7 @@ if ~ isfile([pwd , 'HHCoM_Results/' , pathModifier , '.mat'])
 %     newTreatHyst = newScreen;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdSchool = zeros(length(s) - 1 , 1);
-    ccSymp = zeros(length(s) - 1 , disease , 3 , intervens , age , 3); 
+    ccSymp = zeros(length(s) - 1 , 3 , age , 3); 
     ccTreat = ccSymp; 
     
     % ART
@@ -522,7 +523,7 @@ for i = iStart : length(s) - 1
             % CERVICAL CANCER SCREENING AND TREATMENT
             % Screening
             % Treatment
-            [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , : , : , :)]   ...
+            [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -544,7 +545,7 @@ for i = iStart : length(s) - 1
 
         % SYMPTOMATIC CC DETECTION IN A NON-SCREENING YEAR
 %         if (year < hpvScreenStartYear)
-            [dPop , ccSymp(i,:,:,:,:,:)] = symptomaticDetection(pop , ...
+            [dPop , ccSymp(i,:,:,:)] = symptomaticDetection(pop , ...
                 year , hpvScreenStartYear , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , intervens , age , ...
                 screenAlgs , kSymp, hystMult, udPop, udPopNoTreat, udPopTreat, udPopHyst, ccReghpvVaxInds); 
             pop(end , :) = pop(end , :) + dPop(end , :); 

@@ -744,7 +744,12 @@ kDR = 0.45;
 % kSympR = 0.82035; 
 % kSympD = 0.90001;
 
-kSymp = [0.00016 0.015 0.6]; % calibration done on May 16
+% kSymp = [0.00016 0.015 0.6]; % calibration done on May 16
+
+filename = [paramDir 'kSympParams.xlsx'];
+sheet = 1;
+kSymp_mat = xlsread(filename, sheet, 'A2:C26');
+kSymp = kSymp_mat(paramSetIdx, 1:end);  
 
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018
