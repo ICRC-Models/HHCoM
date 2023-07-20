@@ -30,7 +30,7 @@ end
 
 %% Select the kSymp parameters
 
-file = [pwd , '/Params/kSymp_ParamSets.xlsx'];
+file = [pwd , '/Params/kSymp_ParamSets_recalib_round2.xlsx'];
 
 paramSet_kSymp = xlsread(file, 'Param sets', 'A2:C101'); 
     
