@@ -33,9 +33,11 @@ tic
 
 %%  Variables/parameters to set based on your scenario
 
+numDxCC = []; 
+
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_testingTreatment_changeSympProb_1925to1945_', num2str(sympRun), '_' num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_', num2str(paramSetIdx)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -80,7 +82,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud, muCC_d, kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud , muCC_d , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , ...
     artYr , maxRateM , maxRateF , ...
@@ -95,6 +97,7 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     popAgeDist_dObs , totPopSize_dObs , ...
+    stageDist_1997_dObs , ...
     hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
@@ -115,13 +118,9 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue, ...
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
     ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
-
-%% Modifying the rate of symptomatic detection
-
-kSymp = sympParams_in; 
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -134,7 +133,7 @@ end
 screenAlgs.genTypBool = 0;
 screenAlgs.screenHivGrps = {[1:disease]};
 screenAlgs.screenAge = {8};
-screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
+screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
 screenAlgs.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
@@ -201,7 +200,7 @@ for aS = 1 : numScreenAge
                             % CC TREATMENT EDIT - keeping x=1 because that
                             % only undiagnosed will likely be treated
                             noVaxToScreenTreatImm(d,v,aS,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 3 , 2 , a , r));
-                            vaxToScreenTreatImm(d,v,r) = toInd(allcomb(d , v , 7 , 7 , 1 , 4 , 2 , a , r));
+                            vaxToScreenTreatImm(d,v,aS, r) = toInd(allcomb(d , v , 7 , 7 , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatImmVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 7 , s , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatImmNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 7 , 1 , 3 , 2 , a , r));
@@ -211,7 +210,7 @@ for aS = 1 : numScreenAge
                             noVaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 3 , 2 , a , r));
                             vaxToScreenTreatVaxHpv(d,v,s,aS,r) = toInd(allcomb(d , v , 2 , s , 1 , 4 , 2 , a , r));
                             noVaxToScreenTreatNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 2 , 1 , 3 , 2 , a , r));
-                            vaxToScreenTreatNonVaxHpv(d,v,h,r) = toInd(allcomb(d , v , h , 2 , 1 , 4 , 2 , a , r));
+                            vaxToScreenTreatNonVaxHpv(d,v,h,aS,r) = toInd(allcomb(d , v , h , 2 , 1 , 4 , 2 , a , r));
                             noVaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 6 , 6 , 10 , 3 , 2 , a , r));
                             vaxToScreenHyst(d,v,aS,r) = toInd(allcomb(d , v , 6 , 6 , 10 , 4 , 2 , a , r));
                             
@@ -335,8 +334,7 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     ccDeath = newCC;
     ccDeath_treat = newCC; 
     ccDeath_untreat = newCC; 
-    ccDeath_treat_stage = zeros(length(s) - 1 , disease , age , hpvTypeGroups , 6); 
-    newScreen = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
+    newScreen = zeros(length(s) - 1 , disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
 %     newUndx = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , age , 2); 
 %     newDxUntreat = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , age , 2); 
 %     newTreat = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , endpoints , age , 2); % TODO: should i limit to just screening ages? 
@@ -348,13 +346,8 @@ if ~ isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     % ccTreatHyst = newScreen; 
     menCirc = zeros(length(s) - 1 , 1);
     vaxdSchool = zeros(length(s) - 1 , 1);
-    ccSymp = zeros(length(s) - 1 , disease , hpvVaxStates , hpvNonVaxStates , 3 , intervens , age , 3); 
+    ccSymp = zeros(length(s) - 1 , 3 , age , 3); 
     ccTreat = ccSymp; 
-    toScreenMult_collect = zeros(length(s)-1, disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
-    toScreenNoTreat_collect = toScreenMult_collect;
-    toScreenNeg_collect = toScreenMult_collect; 
-    toScreenTreat_collect = toScreenMult_collect; 
-    toScreenTreatHystMult_collect = toScreenMult_collect; 
     
     % ART
     import java.util.LinkedList
@@ -403,12 +396,7 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     vaxdSchool = chckPntIn.vaxdSchool;
     ccSymp = chckPntIn.ccSymp; 
     ccTreat = chckPntIn.ccTreat;
-    toScreenMult_collect = chckPntIn.toScreenMult_collect;
-    toScreenNoTreat_collect = chckPntIn.toScreenNoTreat_collect;
-    toScreenNeg_collect = chckPntIn.toScreenNeg_collect; 
-    toScreenTreat_collect = chckPntIn.toScreenTreat_collect; 
-    toScreenTreatHystMult_collect = chckPntIn.toScreenTreatHystMult_collect; 
-    
+
     % ART
     import java.util.LinkedList
     artDistList = chckPntIn.artDistList;
@@ -466,8 +454,7 @@ for i = iStart : length(s) - 1
         % Development and progression of cervical cancer
         % Cervical cancer-associated mortality by stage and HIV status/CD4 count
         % Waning vaccine immunity
-        [~ , pop , newCC(i , : , : , :) , ccDeath_untreat(i , : , : , :), ccDeath_treat(i , : , : , :), ...
-            ccDeath_treat_stage(i , : , : , : , :)] ...
+        [~ , pop , newCC(i , : , : , :) , ccDeath_untreat(i , : , : , :), ccDeath_treat(i , : , : , :)] ...
             = ode4xtra(@(t , pop) ...
             hpvCCNH(t , pop , hpv_hivClear , rImmuneHiv , c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud , muCC_d , ...
             normalhpvVaxInds , immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , ...
@@ -496,10 +483,7 @@ for i = iStart : length(s) - 1
             % Treatment
             % Symptomatic detection 
 
-            [dPop , newScreen(i , : , : , : , : , : , :), ccTreat(i, : , : , : , : , : , : , :), ...
-                ccSymp(i, : , : , : , : , : , : , :), ...
-                toScreenMult_collect(i,:,:,:,:,:,:,:), toScreenNoTreat_collect(i,:,:,:,:,:,:,:), toScreenNeg_collect(i,:,:,:,:,:,:,:), ...
-                toScreenTreat_collect(i,:,:,:,:,:,:,:), toScreenTreatHystMult_collect(i,:,:,:,:,:,:,:)] ...
+            [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , :)] ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens, endpoints , risk , ...
                     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
@@ -523,7 +507,7 @@ for i = iStart : length(s) - 1
 
         % SYMPTOMATIC CC DETECTION IN A NON-SCREENING YEAR
 %         if (year < hpvScreenStartYear)
-            [dPop , ccSymp(i,:,:,:,:,:,:,:)] = symptomaticDetection(pop , ...
+            [dPop , ccSymp(i,:,:,:)] = symptomaticDetection(pop , ...
                 year , hpvScreenStartYear , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , intervens , age , ...
                 screenAlgs , kSymp, hystMult, udPop, udPopNoTreat, udPopTreat, udPopHyst, ccReghpvVaxInds); 
             pop(end , :) = pop(end , :) + dPop(end , :); 
@@ -640,17 +624,28 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
   
-    if rem(year , 50) == 0.0
-        savdir = [pwd , '/HHCoM_Results/'];
-        save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-            'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-            'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
-            'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
-            'ccSymp' , 'ccTreat' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3', ...
-            'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect' , 'kSymp');
-    end
+    % if rem(year , 50) == 0.0
+    %     savdir = [pwd , '/HHCoM_Results/'];
+    %     save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+    %         'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+    %         'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
+    %         'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
+    %         'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
+    %         'ccSymp' , 'ccTreat' , ...
+    %         'startYear' , 'endYear' , 'i' , '-v7.3', 'kSymp');
+    % end
+
+    % Checking for year 1997 to check stage distribution
+    if year>=1995 && year<2023
+        local = sum(ccSymp(i, 1, 1:end, 1:end), "all") + sum(ccTreat(i, 1, 1:end, 1:end), "all"); 
+        regional = sum(ccSymp(i, 2, 1:end, 1:end), "all") + sum(ccTreat(i, 2, 1:end, 1:end), "all"); 
+        distant = sum(ccSymp(i, 3, 1:end, 1:end), "all") + sum(ccTreat(i, 3, 1:end, 1:end), "all"); 
+        ccDeath_sum = sum(newCC(i, 1:end, 1:end, 1:end), "all"); 
+
+        numDxCC_temp = [year local regional distant ccDeath_sum];
+
+        numDxCC = [numDxCC; numDxCC_temp];
+    end 
 
     disp(['Reached year ' num2str(year)])
 
@@ -660,16 +655,22 @@ popLast = sparse(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
+%% Calculate sum logged likelihood 
+negSumLogL = likeFun_kSympCalib(ccSymp , ccTreat , stageDist_1997_dObs , startYear , stepsPerYear); 
+
+%% Save results 
+savdir = [pwd, '/HHCoM_Results/'];
+save(fullfile(savdir , pathModifier , '') , 'numDxCC' , 'kSymp' , 'negSumLogL'); 
+
 %% Save results
-savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-    'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-    'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-    'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
-    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
-    'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3', ...
-    'toScreenMult_collect', 'toScreenNoTreat_collect', 'toScreenNeg_collect', 'toScreenTreat_collect', 'toScreenTreatHystMult_collect' , 'kSymp');
+% savdir = [pwd , '/HHCoM_Results/'];
+% save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+%     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+%     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
+%     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat',  ...
+%     'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
+%     'ccSymp' , 'ccTreat' , ...
+%     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3' , 'kSymp');
 
 disp(' ')
 disp('Simulation complete.')

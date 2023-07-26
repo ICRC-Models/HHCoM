@@ -1,15 +1,3 @@
-sympParams = []; 
-
-for l = 0.0001 : 0.0004 : 0.001
-    for r = 0.001 : 0.004 : 0.1
-        for d = 0.7 : 0.1 : 1.0 
-
-            sympParams = [sympParams; l r d]; 
-
-        end 
-    end 
-end 
-
 paramSetIdx=1;
 tstep_abc=6;
 date_abc='22Apr20Ph2V11';
@@ -61,15 +49,23 @@ for s = 1 : length(pIdx)
     startIdx = startIdx + paramsSub{s}.length;
 end
 
+%% Select the kSymp parameters
+
+file = [pwd , '/Params/kSymp_ParamSets.xlsx'];
+
+paramSet_kSymp = xlsread(file, 'Param sets', 'A2:C101'); 
+
 %% Obtain model output for each set of sampled parameters
-m=1;
-n=1; 
-subMatrixInds = [m : (m + nPrlSets - 1)];
-paramSet = top50Params(:,subMatrixInds(n));
+parfor sympRun = 1 : length(paramSet_kSymp)
+    sympParams_in = paramSet_kSymp(sympRun, 1:end);
 
-%% Run for loop for the 300 possible symp rate parameter values
+    m = 1; % originally it was paramSetIdx:nPrlSets:(numBestFits+paramSetIdx-1), but this just is 1
+    subMatrixInds = [m : (m + nPrlSets - 1)];
+    
+    % select a random parameter set from 1 to 25
+    n = randi([1, 25]);
+    paramSet = top50Params(:,subMatrixInds(n));
 
-parfor sympRun = 1 : length(sympParams)
-    sympParams_in = sympParams(sympRun, :);
-    modifiedhistoricalSim(1 , pIdx , paramsSub , paramSet ,specIndsList(m + n - 1) , tstep_abc , date_abc, sympParams_in, sympRun);
+    modifiedhistoricalSim(1 , pIdx , paramsSub , paramSet , (paramSetIdx + n - 1) , tstep_abc , date_abc, sympParams_in, sympRun);
+
 end 

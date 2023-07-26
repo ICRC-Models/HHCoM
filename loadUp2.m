@@ -27,6 +27,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     popAgeDist_dObs , totPopSize_dObs , ...
+    stageDist_1997_dObs , ...
     hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
@@ -61,7 +62,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2021; % originally 2021
+currYear = 2023; % originally 2021 
 endYear = currYear;
 years = endYear - startYear;
 
@@ -753,14 +754,14 @@ for v = 1 : viral
 end
 
 % Cervical cancer progression
-kRL = 0.02;
-kDR = 0.025;
+kRL = 0.225;
+kDR = 0.45;
 
 % Cervical cancer probability of symptomatic detection (from Campos, 2018)
 % converting from monthly to yearly probability --> i = 1-(1-j)^2 (because our model runs every 2 months)
 % Campos monthly probability is 0.0039, 0.1333, 0.1746 for L, R, D
 
-kSymp = [0.0001, 0.24883111, 0.31871484]; 
+kSymp = [0.0001, 0.009, 0.7];
 
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018
@@ -916,7 +917,7 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
 end
 
 % Screening timeframe
-screenYrs = [2000; 2003; 2016; currYear; 2023; 2030; 2045];
+screenYrs = [2000; 2003; 2016; currYear; 2030; 2045];
 hpvScreenStartYear = screenYrs(1);
 
 % Proportion of women screened who screen positive
@@ -1108,20 +1109,20 @@ spHpvAve.cinTreatHpvPersistHivNeg = [persAblat , persLeepThrml]; % proportion of
 % 
 % totPopSize_dObs(: , 1) = xlsread(file , 'Calibration' , 'D271 : D273'); % Total population size in 2001, 2011, and 2019
 % totPopSize_dObs(: , 2 : 3) = xlsread(file , 'Calibration' , 'H271 : I273');
-% 
-% save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'ccInc2018_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
-%     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
-%     'cinPos2015_dObs' , 'cinNeg2015_dObs' , 'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , ...
-%     'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , 'hivPrevM_dObs' , 'hivPrevF_dObs' , ...
-%     'popAgeDist_dObs' , 'totPopSize_dObs')
+
+% stageDist_1997_dObs = xlsread(file, 'Calibration', 'H306:I308'); % stage distributions in 1997-1998
 
 load([paramDir , 'calibData'], 'ccInc2012_dObs' , 'ccInc2018_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
     'cinPos2015_dObs' , 'cinNeg2015_dObs' , 'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , ...
     'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , 'hivPrevM_dObs' , 'hivPrevF_dObs' , ...
-    'popAgeDist_dObs' , 'totPopSize_dObs');
+    'popAgeDist_dObs' , 'totPopSize_dObs' , 'stageDist_1997_dObs');
 
-
+% save(fullfile(paramDir , 'calibData'), 'ccInc2012_dObs' , 'ccInc2018_dObs' , 'cc_dist_dObs' , 'cin3_dist_dObs' , ...
+%     'cin1_dist_dObs' , 'hpv_dist_dObs' , 'cinPos2002_dObs' , 'cinNeg2002_dObs' , ...
+%     'cinPos2015_dObs' , 'cinNeg2015_dObs' , 'hpv_hiv_dObs' , 'hpv_hivNeg_dObs' , ...
+%     'hpv_hivM2008_dObs' , 'hpv_hivMNeg2008_dObs' , 'hivPrevM_dObs' , 'hivPrevF_dObs' , ...
+%     'popAgeDist_dObs' , 'totPopSize_dObs' , 'stageDist_1997_dObs'); 
 
 
 %% Load indices *****************************************************************************************************************************************************************************
