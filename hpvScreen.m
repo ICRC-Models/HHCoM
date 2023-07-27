@@ -1,6 +1,5 @@
 % HPV screening and treatment
-function[dPop , ccScreen, ccTreat, ccSymp, ...
-    toScreenMult_collect, toScreenNoTreat_collect, toScreenNeg_collect, toScreenTreat_collect, toScreenTreatHystMult_collect] = hpvScreen(pop , ...
+function[dPop , ccScreen, ccTreat] = hpvScreen(pop , ...
     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens, endpoints , risk , ...
     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
@@ -14,19 +13,14 @@ function[dPop , ccScreen, ccTreat, ccSymp, ...
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
-ccScreen = zeros(disease , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
+ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
 % ccScreenNoTreat = ccScreen; 
 % ccScreenTreat = ccScreen; 
 %ccTreatImm = ccScreen;
 %ccTreatHpv = ccScreen;
 % ccTreatHyst = ccScreen;
-ccTreat = zeros(disease, hpvVaxStates, hpvNonVaxStates, 3, intervens, age, 3); 
-ccSymp = ccTreat; 
-toScreenMult_collect = zeros(disease, viral, hpvVaxStates, hpvNonVaxStates, endpoints, age, risk);
-toScreenNoTreat_collect = toScreenMult_collect;
-toScreenNeg_collect = toScreenMult_collect; 
-toScreenTreat_collect = toScreenMult_collect; 
-toScreenTreatHystMult_collect = toScreenMult_collect; 
+ccTreat = zeros(3, age, 3); 
+% ccSymp = ccTreat; 
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs.screenHivGrps)
@@ -185,25 +179,18 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                     % the number is intervens
                                     % x tells you what stage women were diagnosed at
                                     % for ccTreat, the last compartment tells you whether women diagnosed at that stage were treated, untreated, or hysterectomy
-                                    ccScreen(d,h,s,x,aS,1) = ccScreen(d,h,s,x,aS,1) + sumall(noVaxScreend); % number screened
-                                    ccScreen(d,h,s,x,aS,2) = ccScreen(d,h,s,x,aS,2) + sumall(vaxScreend); 
+                                    ccScreen(d,v,h,s,x,aS,1) = ccScreen(d,v,h,s,x,aS,1) + sumall(noVaxScreend); % number screened
+                                    ccScreen(d,v,h,s,x,aS,2) = ccScreen(d,v,h,s,x,aS,2) + sumall(vaxScreend); 
 
                                     % ccTreat result matrix
-                                    ccTreat(d,h,s,x,3,a,2) = ccTreat(d,h,s,x,3,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 
-                                    ccTreat(d,h,s,x,4,a,2) = ccTreat(d,h,s,x,4,a,2) + sumall(toScreenNoTreat .* vaxScreend); 
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* vaxScreend); 
 
-                                    ccTreat(d,h,s,x,3,a,1) = ccTreat(d,h,s,x,3,a,1) + sumall(toScreenTreat .* noVaxScreend); % screened, treated 
-                                    ccTreat(d,h,s,x,4,a,1) = ccTreat(d,h,s,x,4,a,1) + sumall(toScreenTreat .* vaxScreend); 
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* noVaxScreend); % screened, treated 
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* vaxScreend); 
 
-                                    ccTreat(d,h,s,x,3,a,3) = ccTreat(d,h,s,x,3,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
-                                    ccTreat(d,h,s,x,4,a,3) = ccTreat(d,h,s,x,4,a,3) + sumall(toScreenTreatHystMult .* vaxScreend); 
-
-                                    % debugging: collecting rates into a results matrix
-                                    toScreenMult_collect(d,v,h,s,x,a,r) = toScreenMult; 
-                                    toScreenNoTreat_collect(d,v,h,s,x,a,r) = toScreenNoTreat; 
-                                    toScreenNeg_collect(d,v,h,s,x,a,r) = toScreenNeg; 
-                                    toScreenTreat_collect(d,v,h,s,x,a,r) = toScreenTreat;
-                                    toScreenTreatHystMult_collect(d,v,h,s,x,a,r) = toScreenTreatHystMult;
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* vaxScreend);  
 
                                     % If you have CIN1+ of either HPV type and are susceptible or immune to the other HPV type, don't want 
                                     % to move individuals susceptible/immune to the other HPV type falsely into an HPV infected compartment. 
