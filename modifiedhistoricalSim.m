@@ -37,7 +37,7 @@ numDxCC = [];
 
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_', num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_', num2str(sympRun)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -121,6 +121,10 @@ vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
     ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+
+%% Modifying the rate of symptomatic detection 
+
+kSymp = sympParams_in(1:3);
 
 %% Screening
 if (screenAlgorithm == 1)
