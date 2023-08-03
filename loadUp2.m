@@ -766,7 +766,7 @@ kSymp = [0.0001, 0.009, 0.7];
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018
 
-hystMult = [0.75 0.125 0]; 
+hystMult = [0.796 0.007 0]; 
 
 % Immunity
 rImmune = 0.024; % Clearance rate from Immune to Normal; for HPV16, Johnson (2012)
