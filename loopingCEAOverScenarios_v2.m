@@ -19,7 +19,7 @@ clear;
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud , muCC_d , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , ...
     artYr , maxRateM , maxRateF , ...
@@ -34,6 +34,7 @@ clear;
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     popAgeDist_dObs , totPopSize_dObs , ...
+    stageDist_1997_dObs , ...
     hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
@@ -46,6 +47,7 @@ clear;
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
     infhpvNonVaxInds , fromVaxNoScrnInds , fromVaxScrnInds , toNonVaxNoScrnInds , ...
     toNonVaxScrnInds , ageInd , riskInd , ...
+    kSymp , hystMult , ...
     hivNegNonVMMCinds , hivNegVMMCinds , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
@@ -53,19 +55,21 @@ clear;
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
+    ccLochpvVaxIndsFrom_treat , ...
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(1 , 0 , [] , [] , [] , 1);
 
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
 % code
-fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
-     '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
-    '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
-    '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
-% fileInds = {'6_1', '6_2'}; % FORTESTING
+% fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
+%      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
+%     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
+%     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
+fileInds = {'6_1'}; % FORTESTING
 nRuns = length(fileInds);
 
-lastYear = 2122; % manually set in futureSim 
+lastYear = 2123; % manually set in futureSim 
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
 monthlyTimespanFut = [endYear : timeStep : lastYear]; % screening time span starts at 2021
@@ -74,39 +78,42 @@ nTimepoints = length(monthlyTimespan);
 nTimepointsFut = length(monthlyTimespanFut); 
 
 % parallelizing the for loop
-loopSegments = {0 , round(10/2) , 10}; % running 10 scenarios
+loopSegments = {0 , round(1/2) , 1}; % ********SET ME*********: how many scenarios are you running
 loopSegmentsLength = length(loopSegments);
 
-for k = 1 : loopSegmentsLength-1 
-    parfor j = loopSegments{k}+1 : loopSegments{k+1}
+scenarios = {'0'}; % *********SET ME***********: what are the scenarios you are running
+
+% for k = 1 : loopSegmentsLength-1 
+%     parfor j = loopSegments{k}+1 : loopSegments{k+1}
     
-% for j = [1 4] % FORTESTING
+for j = [1] % FORTESTING
 
     sceNum = j - 1; 
-    sceString = num2str(sceNum); % turn sceNum into string sceString
+    sceString = scenarios{j}; % turn sceNum into string sceString
     sce = sceNum + 1; % add one since indices start at 1 (so scenarios will be 1-10 in this case) 
 
     % Initialize result matrices 
-    deaths = zeros(nTimepoints, age+1, 3, nRuns); % time, age (1:17), 3 death data elements, number of parameters, 10 scenarios
+    deaths = zeros(nTimepoints, age+1, 4, nRuns); % time, age (1:17), 3 death data elements, number of parameters, 10 scenarios
     screenTreat = zeros(nTimepointsFut, age+1, 5, nRuns); % time, age (1:16), 5 screen/treat data elements, number of parameters, 10 scenarios
     hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 10 HPV/CC health states, number of parameters, 10 scenarios
-    ccHealthState = zeros(nTimepoints, age+1, 4, nRuns); 
+    ccHealthState = zeros(nTimepoints, age+1, endpoints, nRuns); 
     hivHealthState = zeros(nTimepoints, age+1, 7, nRuns); % time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios
     totalPerAge = zeros(nTimepoints, age+1, nRuns); % to pull the N per age group at each time point , 10 scenarios
     vax = zeros(nTimepoints, age+1, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
     nonDisabHealthState = zeros(nTimepoints, age+1, nRuns); 
     scen0CinTx = zeros(nTimepointsFut, endpoints, 2, nRuns); % 2 because only LEEP and cryo (for the 3rd dimension, 1 is LEEP 2 is cryo)
     newCC = zeros(nTimepoints, age+1, nRuns); 
+    screenSympCCTreat = zeros(nTimepoints, 3, age+1, 3, 2, nRuns); 
 
     % Feeding in the zeroed result matrix, spitting out the same matrix but with all the counts added in for that scenario
-    [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC] = ...
-        vaxCEA_multSims_SACEA_CH(1 , sceString , {'0'}, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC);  
+    [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC, screenSympCCTreat] = ...
+        vaxCEA_multSims_SACEA_CH(1 , sceString , {'0'}, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC, screenSympCCTreat);  
 
 % turn all the result matrices into 2D 
     for param = 1 : nRuns
         for a = 1 : age + 1 
             % turning deaths into 2D 
-            for var = 1 : 3 
+            for var = 1 : 4
                 if (param == 1 && a ==1 && var == 1)
                     deathsReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
                                         param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), deaths(:, a, var, param)];
@@ -139,7 +146,7 @@ for k = 1 : loopSegmentsLength-1
                 end
             end 
             % turning cc health states matrix into 2D 
-            for var = 1 : 4
+            for var = 1 : 10
                 if (param == 1 && a ==1 && var == 1)
                     ccHealthStateReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), var.*ones(nTimepoints,1), ...
                                              param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ccHealthState(:, a, var, param)];
@@ -187,7 +194,24 @@ for k = 1 : loopSegmentsLength-1
                 newCCReshape = [newCCReshape; 
                                         transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
                                         newCC(:, a, param)]; 
-            end 
+            end
+
+            % turning screen symp into 2D
+            for x = 1 : 3 
+                for index = 1 : 2
+                    for treat = 1 : 3
+                        if (param==1 && a==1 && x==1)
+                            screenSympCCTreatReshape = [transpose(monthlyTimespan), x.*ones(nTimepoints,1), a.*ones(nTimepoints,1), treat.*ones(nTimepoints,1), index.*ones(nTimepoints,1) , param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), screenSympCCTreat(:, x, a, treat, index, param)];
+
+                        else 
+                            screenSympCCTreatReshape = [screenSympCCTreatReshape; 
+                                            transpose(monthlyTimespan), x.*ones(nTimepoints,1), a.*ones(nTimepoints,1), treat.*ones(nTimepoints,1), index.*ones(nTimepoints,1) , param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), screenSympCCTreat(:, x, a, treat, index, param)];
+                        end 
+                    end 
+                end 
+            end  
         end
         disp(['Complete Scenario ', num2str(sce), ', Parameter ', num2str(param)])
     end
@@ -228,6 +252,7 @@ nonDisabHealthStateReshape1 = array2table(nonDisabHealthStateReshape, 'VariableN
         'sceNum', 'count'}); 
 scen0CinTxReshape1 = array2table(scen0CinTxReshape, 'VariableNames', {'year', 'hpvState', 'categ', 'paramNum', 'sceNum', 'count'}); 
 newCCReshape1 = array2table(newCCReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
+screenSympCCTreatReshape1 = array2table(screenSympCCTreatReshape, 'VariableNames', {'year', 'endpoint', 'age', 'treat', 'index', 'paramNum', 'sceNum', 'count'}); 
 
 % spit out into CSV 
 writetable(deathsReshape1,[pwd '/SACEA/deaths_S' sceString '.csv']);
@@ -239,6 +264,7 @@ writetable(totalPerAgeReshape1, [pwd '/SACEA/totalPerAge_S' sceString '.csv']);
 writetable(vaxReshape1, [pwd '/SACEA/vax_S' sceString '.csv']);
 writetable(nonDisabHealthStateReshape1, [pwd '/SACEA/nonDisabHealthState_S' sceString '.csv']);
 writetable(newCCReshape1, [pwd '/SACEA/newCC_S' sceString '.csv']); 
+writetable(screenSympCCTreatReshape1, [pwd '/SACEA/screenSympCCTreat_S' sceString '.csv']);
 
 if sceNum == 0 % only write the cin / treatment file if in scenario 0 
     writetable(scen0CinTxReshape1, [pwd '/SACEA/scen0CinTx_S0.csv']); 
@@ -246,4 +272,4 @@ end
 
     end
 end
-end
+% end

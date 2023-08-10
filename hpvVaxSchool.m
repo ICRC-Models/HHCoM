@@ -1,11 +1,34 @@
 % HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
 function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-    vaxRate , toInd)
+    vaxRate_vec , toInd , vaxYrs , year , stepsPerYear , gradScaleUp)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 hpvVaxd = 0;
+
+if gradScaleUp == 1 % note that gradScaleUp has not been set up for historical sim, only future !!!!!!!
+        % Vaccination level
+        if year >= vaxYrs(1) && year < vaxYrs(2)
+            periodInd = 1;
+        else
+            periodInd = 2; 
+        end
+        
+            dataYr1 = vaxYrs(1);
+            dataYrLast = vaxYrs(size(vaxYrs , 1));
+            baseYrInd = max(find(year >= vaxYrs , 1, 'last') , 1); % get index of first year <= current year
+            baseYr = vaxYrs(baseYrInd);
+            if year < dataYrLast && year > dataYr1 % vax coverage between 1st and last year
+%                 vaxRate = vaxRate_vec{periodInd}(1); % vax coverage up to 1st year
+                vaxRate = vaxRate_vec{periodInd}(round((year - baseYr) * stepsPerYear) + 1);
+            elseif year >= dataYrLast % vax coverage last year and after
+                lastInd = size(vaxRate_vec , 1);
+                vaxRate = vaxRate_vec{1}(size(vaxRate_vec{1} , 2));
+            end 
+else 
+    vaxRate = vaxRate_vec; 
+end 
 
 %% Apply school-based vaccination regimen
 for d = 1 : disease

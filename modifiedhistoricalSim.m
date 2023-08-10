@@ -1,7 +1,8 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
+% Modified for the symptomatic rate calibration
 
-function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , n)    % input variables when using a calibration parameter set
+function [negSumLogL] = modifiedhistoricalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , sympParams_in , sympRun)    % input variables when using a calibration parameter set
 % historicalSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
 % Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
@@ -10,7 +11,7 @@ function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , 
 % Note: If you include incidence calibration data, need to change
 % likelihood function and calibration data Excel document as modeled in likeFun.
 %
-% calibBool = 1; 
+% calibBool = 1;
 % paramSetIdx = 1;
 % tstep_abc = 0;
 % date = '19Nov19';
@@ -32,9 +33,11 @@ tic
 
 %%  Variables/parameters to set based on your scenario
 
+numDxCC = []; 
+
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_', num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_round2_', num2str(sympRun)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -60,8 +63,6 @@ rVaxWane = 0.0; % rate of waning vaccine immunity
 vaxAge = 2;
 vaxRate = 0.57*(0.7/0.9); %0.86*(0.7/0.9);    % (9 year-old coverage * bivalent vaccine efficacy adjustment (0.7/0.9 proportion of cancers prevented)); last dose, first dose pilot
 vaxG = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
-gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
-vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % ART + VIRAL SUPPRESSION & VMMC COVERAGE
 % Instructions: In loadUp2.m, go to the section titled "Save intervention
@@ -119,7 +120,11 @@ vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp 
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+
+%% Modifying the rate of symptomatic detection 
+
+kSymp = sympParams_in(1:3);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -132,7 +137,7 @@ end
 screenAlgs.genTypBool = 0;
 screenAlgs.screenHivGrps = {[1:disease]};
 screenAlgs.screenAge = {8};
-screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
+screenAlgs.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear; 2023; 2030; 2045])
 screenAlgs.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values at steps within period
     period = [screenYrs(i) , screenYrs(i + 1)];
@@ -383,6 +388,7 @@ elseif isfile([pwd , '/HHCoM_Results/' , pathModifier , '.mat'])
     ccDeath = chckPntIn.ccDeath;
     ccDeath_treat = chckPntIn.ccDeath_treat; 
     ccDeath_untreat = chckPntIn.ccDeath_untreat; 
+    ccDeath_treat_stage = chckPntIn.ccDeath_treat_stage; 
     newScreen = chckPntIn.newScreen;
 %     newUndx = chckPntIn.newUndx; 
 %     newUndxUntreat = chckPntIn.newDxUntreat; 
@@ -622,16 +628,28 @@ for i = iStart : length(s) - 1
     % runtimes(i) = toc;
     % progressbar(i/(length(s) - 1))
   
-    if rem(year , 50) == 0.0
-        savdir = [pwd , '/HHCoM_Results/'];
-        save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-            'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-            'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-            'newScreen' , 'ccDeath_treat', 'ccDeath_untreat',  ...
-            'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
-            'ccSymp' , 'ccTreat' , ...
-            'startYear' , 'endYear' , 'i' , '-v7.3');
-    end
+    % if rem(year , 50) == 0.0
+    %     savdir = [pwd , '/HHCoM_Results/'];
+    %     save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+    %         'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+    %         'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
+    %         'newScreen' , 'ccDeath_treat', 'ccDeath_untreat', 'ccDeath_treat_stage', ...
+    %         'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
+    %         'ccSymp' , 'ccTreat' , ...
+    %         'startYear' , 'endYear' , 'i' , '-v7.3', 'kSymp');
+    % end
+
+    % Checking for year 1997 to check stage distribution
+    if year>=1995 && year<2023
+        local = sum(ccSymp(i, 1, 1:end, 1:end), "all") + sum(ccTreat(i, 1, 1:end, 1:end), "all"); 
+        regional = sum(ccSymp(i, 2, 1:end, 1:end), "all") + sum(ccTreat(i, 2, 1:end, 1:end), "all"); 
+        distant = sum(ccSymp(i, 3, 1:end, 1:end), "all") + sum(ccTreat(i, 3, 1:end, 1:end), "all"); 
+        ccDeath_sum = sum(newCC(i, 1:end, 1:end, 1:end), "all"); 
+
+        numDxCC_temp = [year local regional distant ccDeath_sum];
+
+        numDxCC = [numDxCC; numDxCC_temp];
+    end 
 
     disp(['Reached year ' num2str(year)])
 
@@ -641,15 +659,22 @@ popLast = sparse(popVec(end-1 , :));
 disp(['Reached year ' num2str(endYear)])
 popVec = sparse(popVec); % compress population vectors
 
+%% Calculate sum logged likelihood 
+negSumLogL = likeFun_kSympCalib(ccSymp , ccTreat , stageDist_1997_dObs , startYear , stepsPerYear); 
+
+%% Save results 
+savdir = [pwd, '/HHCoM_Results/'];
+save(fullfile(savdir , pathModifier , '') , 'numDxCC' , 'kSymp' , 'negSumLogL'); 
+
 %% Save results
-savdir = [pwd , '/HHCoM_Results/'];
-save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
-    'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
-    'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
-    'newScreen' , 'ccDeath_treat', 'ccDeath_untreat',  ...
-    'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
-    'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , 'kSymp' , '-v7.3');
+% savdir = [pwd , '/HHCoM_Results/'];
+% save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec' , 'newHiv' , ...
+%     'newHpvVax' , 'newImmHpvVax' , 'newHpvNonVax' , 'newImmHpvNonVax' , ...
+%     'hivDeaths' , 'deaths' , 'ccDeath' , 'menCirc' , 'vaxdSchool' , ...
+%     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat',  ...
+%     'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
+%     'ccSymp' , 'ccTreat' , ...
+%     'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3' , 'kSymp');
 
 disp(' ')
 disp('Simulation complete.')

@@ -1,20 +1,26 @@
 % HPV screening and treatment
-function[dPop , ccScreen] = hpvScreen(pop , ...
-    disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , risk , ...
+function[dPop , ccScreen, ccTreat] = hpvScreen(pop , ...
+    disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens, endpoints , risk , ...
     screenYrs , screenAlgs , year , stepsPerYear , screenAgeAll , screenAgeS , ...
     noVaxNoScreen , noVaxToScreen , vaxNoScreen , vaxToScreen , noVaxToScreenTreatImm , ...
     vaxToScreenTreatImm , noVaxToScreenTreatImmVaxHpv , vaxToScreenTreatImmVaxHpv , ...
     noVaxToScreenTreatImmNonVaxHpv , vaxToScreenTreatImmNonVaxHpv , ...        
     noVaxToScreenTreatHpv , vaxToScreenTreatHpv , noVaxToScreenTreatVaxHpv , ...
     vaxToScreenTreatVaxHpv , noVaxToScreenTreatNonVaxHpv , vaxToScreenTreatNonVaxHpv , ...
-    noVaxToScreenHyst , vaxToScreenHyst , numScreenAge)
+    noVaxToScreenHyst , vaxToScreenHyst , numScreenAge , noVaxToScreenCancerNoTreat , noVaxToScreenCancerTreat , ...
+    vaxToScreenCancerNoTreat , vaxToScreenCancerTreat, hystMult, kSymp, udPop, udPopNoTreat, udPopTreat, udPopHyst, ...
+    vaxToScreenCancerNegScreen , noVaxToScreenCancerNegScreen)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
-ccScreen = zeros(disease , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , 2);
+ccScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , 3 , numScreenAge , 2);
+% ccScreenNoTreat = ccScreen; 
+% ccScreenTreat = ccScreen; 
 %ccTreatImm = ccScreen;
 %ccTreatHpv = ccScreen;
-%ccTreatHyst = ccScreen;
+% ccTreatHyst = ccScreen;
+ccTreat = zeros(3, age, 3); 
+% ccSymp = ccTreat; 
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs.screenHivGrps)
@@ -40,12 +46,13 @@ for i = 1 : length(screenAlgs.screenHivGrps)
 
     for aS = (prevAL + 1) : (prevAL + length(screenAlgs.screenAge{i}))
         screenRateAge = screenRate;
+        a = screenAlgs.screenAge{i}; 
         for dS = 1 : length(screenAlgs.screenHivGrps{i})
             d = screenAlgs.screenHivGrps{i}(dS);
             for v = 1 : viral
                 for h = 1 : hpvVaxStates
                     for s = 1 : hpvNonVaxStates
-                        for x = 1 : endpoints
+                        for x = 1 : 3 % this used to be 1:endpoints. but really only x=1 to 3 will be receiving screening
                             for r = 1 : risk
                                 fracScreend = (sumall(pop(screenAgeS(d,v,aS,r,:))) / sumall(pop(screenAgeAll(d,v,aS,r,:)))); % find proportion of population that is currently screened
                                 if screenRateAge - fracScreend > 10 ^ -6 % when proportion screened is below target screening level
@@ -53,11 +60,16 @@ for i = 1 : length(screenAlgs.screenHivGrps)
 
                                     % Apply selected screening algorithm(s)
                                     % if you're susceptible/immune to both HPV types or have had a hysterectomy
-                                    if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
+                                    % only x==1 because diagnosed and untreated unlikely to be screened again, and diagnosed and treated would not be screened again
+                                    % adjusted hysterectomy to x==10
+                                    if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==10) || [(screenAlgs.genTypBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
                                         toScreenMult = 1.0;
                                         toScreenTreatImmMult = 0.0;
                                         toScreenTreatHpvMult = 0.0;
                                         toScreenTreatHystMult = 0.0;
+                                        toScreenNoTreat = 0.0; 
+                                        toScreenTreat = 0.0; 
+                                        toScreenNeg = 0.0; 
                                     % if you're infected with either HPV type
                                     elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==2))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,2)) + (screenAlgs.testSens(d,2) * (1 - screenAlgs.colpoRetain)) + ...
@@ -67,6 +79,9 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (1.0-screenAlgs.cinTreatHpvPersistHivNeg(1));
                                         toScreenTreatHpvMult = 0.0;
                                         toScreenTreatHystMult = 0.0;
+                                        toScreenNoTreat = 0.0; 
+                                        toScreenTreat = 0.0; 
+                                        toScreenNeg = 0.0; 
                                     % if you have CIN1 of either HPV type
                                     elseif [( ((h==3) && ((s<=3) || (s==7))) || (((h<=3) || (h==7)) && (s==3)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,2)) + (screenAlgs.testSens(d,2) * (1 - screenAlgs.colpoRetain)) + ...
@@ -76,7 +91,10 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                             (1.0-(screenAlgs.cinTreatHpvPersistHivNeg(2)/screenAlgs.cinTreatEff(d)));
                                         toScreenTreatHpvMult = screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.treatRetain(1) * screenAlgs.cinTreatEff(d) * ...
                                             (screenAlgs.cinTreatHpvPersistHivNeg(2)/screenAlgs.cinTreatEff(d));
-                                        toScreenTreatHystMult = 0.0;    
+                                        toScreenTreatHystMult = 0.0; 
+                                        toScreenNoTreat = 0.0; 
+                                        toScreenTreat = 0.0; 
+                                        toScreenNeg = 0.0; 
                                     % if you have CIN2 of either HPV type
                                     elseif [( ((h==4) && ((s<=4) || (s==7))) || (((h<=4) || (h==7)) && (s==4)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==4))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,3)) + (screenAlgs.testSens(d,3) * (1 - screenAlgs.colpoRetain)) + ...
@@ -87,6 +105,9 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                         toScreenTreatHpvMult = screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.treatRetain(2) * screenAlgs.cinTreatEff(d) * ...
                                             (screenAlgs.cinTreatHpvPersistHivNeg(3)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
+                                        toScreenNoTreat = 0.0; 
+                                        toScreenTreat = 0.0; 
+                                        toScreenNeg = 0.0; 
                                     % if you have CIN3 of either HPV type
                                     elseif [( ((h==5) && ((s<=5) || (s==7))) || (((h<=5) || (h==7)) && (s==5)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==5))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
@@ -97,25 +118,80 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                         toScreenTreatHpvMult = screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(3) * screenAlgs.cinTreatEff(d) * ...
                                             (screenAlgs.cinTreatHpvPersistHivNeg(4)/screenAlgs.cinTreatEff(d));
                                         toScreenTreatHystMult = 0.0;
+                                        toScreenNoTreat = 0.0; 
+                                        toScreenNeg = 0.0; 
+                                        toScreenTreat = 0.0; 
                                     % if you have cervical cancer
+                                    % no need to change x here because we are only screening undiagnosed women 
                                     elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
                                         toScreenMult = ((1-screenAlgs.testSens(d,4)) + (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
-                                            (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(4))));
+                                            (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(4)))); 
+                                        % toScreenMult is the rate that
+                                        % women are lost to screening (i.e.
+                                        % don't make it to treatment)
                                         toScreenTreatImmMult = 0.0;
                                         toScreenTreatHpvMult = 0.0;
-                                        toScreenTreatHystMult = screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(4);
-                                    end
-                                
-                                    noVaxScreend = screenCover .* pop(noVaxNoScreen(d,v,h,s,x,aS,r));
-                                    dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) = dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) - noVaxScreend;
-                                    dPop(noVaxToScreen(d,v,h,s,x,aS,r)) = dPop(noVaxToScreen(d,v,h,s,x,aS,r)) + toScreenMult .* noVaxScreend;
-                                    dPop(noVaxToScreenHyst(d,v,aS,r)) = dPop(noVaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* noVaxScreend;
-                                    
-                                    vaxScreend = screenCover .* pop(vaxNoScreen(d,v,h,s,x,aS,r));
-                                    dPop(vaxNoScreen(d,v,h,s,x,aS,r)) = dPop(vaxNoScreen(d,v,h,s,x,aS,r)) - vaxScreend;
-                                    dPop(vaxToScreen(d,v,h,s,x,aS,r)) = dPop(vaxToScreen(d,v,h,s,x,aS,r)) + toScreenMult .* vaxScreend;
-                                    dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
-                                            
+                                        % toScreenNoTreat is all people
+                                        % LTFU
+                                        toScreenNoTreat = (screenAlgs.testSens(d,4) * (1 - screenAlgs.colpoRetain)) + ...
+                                            (screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * (1 - screenAlgs.treatRetain(4))); 
+                                        toScreenNeg = 1 - screenAlgs.testSens(d,4); % screened but false negative
+                                        toScreenTreat = (1 - toScreenNoTreat - toScreenNeg) * (1 - hystMult(x)); % treatment, but without hysterectomy
+                                        toScreenTreatHystMult = (1 - toScreenNoTreat - toScreenNeg) * hystMult(x); 
+
+                                    end 
+
+                                    if [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
+                                        
+                                        % moving women between compartments based on screening, no treatment, and treatment
+                                        noVaxScreend = screenCover .* pop(noVaxNoScreen(d,v,h,s,x,aS,r));
+                                        dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) = dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) - noVaxScreend; % remove from unscreened intervens compartment
+                                        dPop(noVaxToScreenHyst(d,v,aS,r)) = dPop(noVaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* noVaxScreend; % add to hysterectomy compartment
+                                        % moving the no treated to compartment 4-6, and the treated to compartment 7-9
+                                        dPop(noVaxToScreenCancerNegScreen(d,v,h,s,x,aS,r)) = dPop(noVaxToScreenCancerNegScreen(d,v,h,s,x,aS,r)) + toScreenNeg .* noVaxScreend; % add to screened intervens and stay in undetected cancer endpoint
+                                        dPop(noVaxToScreenCancerNoTreat(d,v,h,s,x,aS,r)) = dPop(noVaxToScreenCancerNoTreat(d,v,h,s,x,aS,r)) + toScreenNoTreat .* noVaxScreend; % add to screened intervens and untreated cancer compartments
+                                        dPop(noVaxToScreenCancerTreat(d,v,h,s,x,aS,r)) = dPop(noVaxToScreenCancerTreat(d,v,h,s,x,aS,r)) + toScreenTreat .* noVaxScreend; % add to screened intervens and treated cancer compartments
+    
+                                        
+                                        vaxScreend = screenCover .* pop(vaxNoScreen(d,v,h,s,x,aS,r));
+                                        dPop(vaxNoScreen(d,v,h,s,x,aS,r)) = dPop(vaxNoScreen(d,v,h,s,x,aS,r)) - vaxScreend;
+                                        dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
+                                        % moving the no treated to compartment 4-6, and the treated to compartment 7-9
+                                        dPop(vaxToScreenCancerNegScreen(d,v,h,s,x,aS,r)) = dPop(vaxToScreenCancerNegScreen(d,v,h,s,x,aS,r)) + toScreenNeg .* vaxScreend; % add to screened intervens and stay in undetected cancer endpoint
+                                        dPop(vaxToScreenCancerNoTreat(d,v,h,s,x,aS,r)) = dPop(vaxToScreenCancerNoTreat(d,v,h,s,x,aS,r)) + toScreenNoTreat .* vaxScreend;
+                                        dPop(vaxToScreenCancerTreat(d,v,h,s,x,aS,r)) = dPop(vaxToScreenCancerTreat(d,v,h,s,x,aS,r)) + toScreenTreat .* vaxScreend; 
+
+                                    else 
+
+                                        noVaxScreend = screenCover .* pop(noVaxNoScreen(d,v,h,s,x,aS,r));
+                                        dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) = dPop(noVaxNoScreen(d,v,h,s,x,aS,r)) - noVaxScreend;
+                                        dPop(noVaxToScreen(d,v,h,s,x,aS,r)) = dPop(noVaxToScreen(d,v,h,s,x,aS,r)) + toScreenMult .* noVaxScreend;
+                                        dPop(noVaxToScreenHyst(d,v,aS,r)) = dPop(noVaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* noVaxScreend;
+                                        
+                                        vaxScreend = screenCover .* pop(vaxNoScreen(d,v,h,s,x,aS,r));
+                                        dPop(vaxNoScreen(d,v,h,s,x,aS,r)) = dPop(vaxNoScreen(d,v,h,s,x,aS,r)) - vaxScreend;
+                                        dPop(vaxToScreen(d,v,h,s,x,aS,r)) = dPop(vaxToScreen(d,v,h,s,x,aS,r)) + toScreenMult .* vaxScreend;
+                                        dPop(vaxToScreenHyst(d,v,aS,r)) = dPop(vaxToScreenHyst(d,v,aS,r)) + toScreenTreatHystMult .* vaxScreend;
+
+                                    end 
+
+                                    % updating the result matrices 
+                                    % the number is intervens
+                                    % x tells you what stage women were diagnosed at
+                                    % for ccTreat, the last compartment tells you whether women diagnosed at that stage were treated, untreated, or hysterectomy
+                                    ccScreen(d,v,h,s,x,aS,1) = ccScreen(d,v,h,s,x,aS,1) + sumall(noVaxScreend); % number screened
+                                    ccScreen(d,v,h,s,x,aS,2) = ccScreen(d,v,h,s,x,aS,2) + sumall(vaxScreend); 
+
+                                    % ccTreat result matrix
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* noVaxScreend); % screened, untreated 
+                                    ccTreat(x,a,2) = ccTreat(x,a,2) + sumall(toScreenNoTreat .* vaxScreend); 
+
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* noVaxScreend); % screened, treated 
+                                    ccTreat(x,a,1) = ccTreat(x,a,1) + sumall(toScreenTreat .* vaxScreend); 
+
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* noVaxScreend); % screened, hysterectomy 
+                                    ccTreat(x,a,3) = ccTreat(x,a,3) + sumall(toScreenTreatHystMult .* vaxScreend);  
+
                                     % If you have CIN1+ of either HPV type and are susceptible or immune to the other HPV type, don't want 
                                     % to move individuals susceptible/immune to the other HPV type falsely into an HPV infected compartment. 
                                     % Also if you have HPV or CIN1+ of either HPV type and are susceptible to the other HPV type, don't want 
@@ -150,16 +226,6 @@ for i = 1 : length(screenAlgs.screenHivGrps)
                                         dPop(noVaxToScreenTreatImm(d,v,aS,r)) = dPop(noVaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* noVaxScreend;
                                         dPop(vaxToScreenTreatImm(d,v,aS,r)) = dPop(vaxToScreenTreatImm(d,v,aS,r)) + toScreenTreatImmMult .* vaxScreend;
                                     end    
-                                        
-                                    ccScreen(d , h , s , x , aS , 1) = ccScreen(d , h , s , x , aS , 1) + sumall(noVaxScreend);
-                                    %ccTreatImm(d , h , s , x , aS , 1) = ccTreatImm(d , h , s , x , aS , 1) + sumall(toScreenTreatImmMult .* noVaxScreend);
-                                    %ccTreatHpv(d , h , s , x , aS , 1) = ccTreatHpv(d , h , s , x , aS , 1) + sumall(toScreenTreatHpvMult .* noVaxScreend);
-                                    %ccTreatHyst(d , h , s , x , aS , 1) = ccTreatHyst(d , h , s , x , aS , 1) + sumall(toScreenTreatHystMult .* noVaxScreend);
-
-                                    ccScreen(d , h , s , x , aS , 2) = ccScreen(d , h , s , x , aS , 2) + sumall(vaxScreend);
-                                    %ccTreatImm(d , h , s , x , aS , 2) = ccTreatImm(d , h , s , x , aS , 2) + sumall(toScreenTreatImmMult .* vaxScreend);
-                                    %ccTreatHpv(d , h , s , x , aS , 2) = ccTreatHpv(d , h , s , x , aS , 2) + sumall(toScreenTreatHpvMult .* vaxScreend);
-                                    %ccTreatHyst(d , h , s , x , aS , 2) = ccTreatHyst(d , h , s , x , aS , 2) + sumall(toScreenTreatHystMult .* vaxScreend);
                                 end
                             end
                         end
@@ -168,7 +234,7 @@ for i = 1 : length(screenAlgs.screenHivGrps)
             end
         end
     end
-end
+end 
 
 %% Convert dPop to a column vector for output to ODE solver
 dPop = sparse(dPop);
