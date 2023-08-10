@@ -2,8 +2,19 @@
 MODEL BRANCHES:
 ---------------------------------------------------------
 master
-  -Setting: KwaZulu-Natal, South Africa
-  -Base model
+  - Setting: KwaZulu-Natal, South Africa
+  - Base model
+  - Was updated to include CC treatment and symptomatic detection to be able to do CEAs
+
+DRIVE_versionBeforeCCTreatment
+  - Setting: KwaZulu-Natal, South Africa
+  - This was the version of the model that Cara worked on. It is still being used for the CISNET
+    comparative analysis
+  - Does not contain CC treatment or symptomatic detection
+
+Kenya_treatment
+  - Branched from nonVaxInfections_Kenya_national
+  - Being used for the Kenya single dose CEA, contains CC treatment and symptomatic detection
   
 nonVaxInfections_DoArt
   -Setting: KwaZulu-Natal, South Africa
@@ -68,6 +79,10 @@ Trial calibration attempt
   030420_backup_24Feb20calib
   022420_backup_21Feb20calib
   022120_backup_10Feb20calib
+Calibration of kSymp
+  Round 1: kSymp_ParamSets.xlsx
+  Round 2: kSymp_ParamSets_recalib_round2.xlsx
+  Final parameter sets: kSympParams.xlsx
 
 KwaZulu-Natal model outputs (presentation, abstract, result set, etc.):
   062521_output_WHOcompareModelPaper (also used for IPVC2021 abstract)
@@ -117,5 +132,7 @@ Intermediate Kenya model versions:
   073120_backup_KenyaHandCalib
   031120_backup_Kenya
 
-
+Stale branches left by programmer Christine Hathaway: 
+  ccTreatment - this was the branch where I worked on updating the model with symptomatic detection
+                and CC treatment
  

@@ -49,10 +49,16 @@ For s:
 7 - Immune (non-vaccine type)
 
 For x:
-1 - Cervical Cancer (Local) (if h or s = 6)
-2 - Cervical Cancer (Regional)
-3 - Cervical Cancer (Distant)
-4 - Hysterectomy
+1 - Cervical Cancer (Local), undiagnosed (if h or s = 6)
+2 - Cervical Cancer (Regional), undiagnosed
+3 - Cervical Cancer (Distant), undiagnosed
+4 - Cervical Cancer (Local), diagnosed but untreated 
+5 - Cervical Cancer (Regional), diagnosed but untreated
+6 - Cervical Cancer (Distant), diagnosed but untreated
+7 - Cervical Cancer (Local), diagnosed and treated 
+8 - Cervical Cancer (Regional), diagnosed and treated 
+9 - Cervical Cancer (Distant), diagnosed and treated 
+10 - Diagnosed and treated with hysterectomy
 
 For p:
 1 - Non-vaccinated, non-screened
@@ -111,6 +117,7 @@ Run model:
      ode4xtra.m (numerical solver)
      hpvCCNH.m (HPV natural history)
      hpvScreen.m (Cancer screening and treatment)
+     symptomaticDetection.m (symptomatic detection of cervical cancer)
      mixInfect.m (HPV and HIV transmission)
      hivNH.m (HIV natural history)
      calcDist.m (calculate distribution of persons initiating ART)
@@ -136,6 +143,7 @@ Run model:
      ode4xtra.m (numerical solver)
      hpvCCNH.m (HPV natural history)
      hpvScreen.m (Cancer screening and treatment)
+     symptomaticDetection.m (symptomatic detection of cervical cancer)
      mixInfect.m (HPV and HIV transmission)
      hivNH.m (HIV natural history)
      calcDist.m (calculate distribution of persons initiating ART)
@@ -153,9 +161,12 @@ Run model:
      vaxCEA_multSims_CIs_IPVC.m (multiple simulations, script parallelized, designed for IPVC 2021 analysis)
      vaxCEA_multSims_CIs_modScreen.m (multiple simulations, script parallelized, designed for SA screening and CISNET analyses)
      vaxCEA_multSims_CIs_SACEA.m (multiple simulations, script parallelized, designed for SA screening cost-effectiveness analysis)
+     vaxCEA_multSims_SACEA_CH.m (multiple simulations, script parallelized, designed for SA screening cost-effectiveness - UPDATED VERSION BY CHRISTINE)
+     loopingCEAOverScenarios_v2.m (is the overarching script that calls vaxCEA_multSims_SACEA_CH)
    - secondary visualization across scenarios:
      vaxCEA_multSims_WHOsces.m (designed for WHO analysis)
      vaxCEA_multSims_SAsces.m (designed for SA screening analysis)
      vaxCEA_multSims_CISNETsces.m (designed for CISNET analysis)
      vaxCEA_multSims_IPVCsces.m (designed for IPVC 2021 analysis)
+     cleanMatlabOutputs.R (processes the results spit out into the SACEA folder and turns them into excel files to run the economic analysis)
 
