@@ -68,6 +68,7 @@ clear;
 % nRuns = length(fileInds);
 nRuns = 1; 
 fileInds = {'6_1'}; 
+Sname = 'May8'; 
 
 lastYear = 2021; % manually set in futureSim 
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
@@ -215,9 +216,9 @@ screenReshape1 = array2table(screenReshape, 'VariableNames', {'year', 'age', 'st
         'sceNum', 'count'}); 
 
 % spit out into CSV 
-writetable(deathsReshape1,[pwd '/testing/deaths_S' sceString '.csv']);
-writetable(ccHealthStateReshape1, [pwd '/testing/ccHealthState_S' sceString '.csv']);
-writetable(newCCReshape1, [pwd '/testing/newCC_S' sceString '.csv']); 
-writetable(sympReshape1, [pwd '/testing/symp_S' sceString '.csv']);
-writetable(treatReshape1, [pwd '/testing/treat_S' sceString '.csv']);
-writetable(screenReshape1, [pwd '/testing/screen_S' sceString '.csv']);
+writetable(deathsReshape1,[pwd '/testing/deaths_' Sname '.csv']);
+writetable(ccHealthStateReshape1, [pwd '/testing/ccHealthState_' Sname '.csv']);
+writetable(newCCReshape1, [pwd '/testing/newCC_' Sname '.csv']); 
+writetable(sympReshape1, [pwd '/testing/symp_' Sname '.csv']);
+writetable(treatReshape1, [pwd '/testing/treat_' Sname '.csv']);
+writetable(screenReshape1, [pwd '/testing/screen_' Sname '.csv']);

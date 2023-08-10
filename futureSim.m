@@ -1,7 +1,7 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
-function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , username)    % input variables when using a calibration parameter set
+function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , username , n)    % input variables when using a calibration parameter set
 % futureSim(0 , [] , [] , [] , [] , 0 , '19May20' , 'carajb')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
 % Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
@@ -16,12 +16,12 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']);
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '_fullRun_8May23_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
     'popLast' , 'artDistList' , 'artDist'); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
 %pathModifier = '16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib_050futureFert_WHOP1_SCES012';
-pathModifier = [date , '_2v57BaseVax_spCytoScreen_noVMMChpv_currYr2021_CISNET-S1_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
+pathModifier = [date , '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S0_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/' , pathModifier, '/'])
@@ -41,7 +41,7 @@ lastYear = 2123; % ***SET ME***: end year of simulation run
 %   to designate different patterns for HIV-negative and HIV-positive women and 
 %   sceScreenAges={[8 , 10] , [6 , 7 , 8 , 9 , 10]} for 2x screening among HIV-negative women and screening 
 %   every 3 years among HIV-positive women.
-screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve , 7 for spHpvAve)
+screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve , 7 for spHpvAve)
 sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear;     2023; 2030; 2045])
 sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
 sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
@@ -73,7 +73,7 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2 , 3];    % age groups to vaccinate
-% vaxCover = [0.57];    % vaccine coverages
+% vaxCover = [0.57];    % vaccine coverages. CH: i commented out because we are doing gradual scale up below
 vaxCoverInd = 1;    % index for the coverage in vaxCover vec to use for this simulation; use length(vaxCover)+1 to run the baseline scenario (Ex: vaxCoverInd=1 for specified scenario, vaxCoverInd=2 for baseline scenario)
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYear=8 in loadUp2.m if including vaccination of boys 
 
@@ -81,7 +81,7 @@ vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2); set stepsPerYea
 
 vaxRateAdjust = 1; %bivalent/quadrivalent vaccine efficacy adjustment. we are not doing any adjustment in futuresim so set to 1. 
 
-gradScaleUp = 1; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage
+gradScaleUp = 0; % ***SET ME***: 1 if you want gradual scale up of vaccination coverage
 
 stepsPerYear = 6; % ***SET ME***: If this changes in loadup2, you need to change it here as well
 timeStep = 1 / stepsPerYear; % ***SET ME***: same here
@@ -172,7 +172,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -354,7 +354,11 @@ end
 %   Example:
 %   90% efficacy against 70% of CC types, 100% efficacy against 70% of types, 100% efficacy against 90% of types
 %   vaxEff = [0.9 * 0.7 , 0.7 , 0.9]; 
-vaxCover = vaxRate_vec{1}(size(vaxRate_vec{1},2)); % the maximum of the gradual scale up coverage
+if gradScaleUp == 1
+    vaxCover = vaxRate_vec{1}(size(vaxRate_vec{1},2)); % the maximum of the gradual scale up coverage
+else 
+    vaxCover = vaxRate_vec; 
+end 
 testParams = allcomb(vaxCover , vaxEff); % test scenarios consist of all combinations of school-based vaccine coverage and efficacy
 testParams = [testParams ; [vaxCoverB , vaxEff]]; % append baseline vaccination scenario to test scenarios
 nTests = size(testParams , 1); % counts number of school-based scenarios to test + baseline scenario

@@ -37,7 +37,7 @@ numDxCC = [];
 
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_', num2str(sympRun)]; 
+pathModifier = ['toNow_', date, '_kSympCalib_25Jul23_round2_', num2str(sympRun)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 

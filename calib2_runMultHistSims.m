@@ -65,7 +65,7 @@ for m = paramSetIdx : nPrlSets : (numBestFits+paramSetIdx-1)
     subMatrixInds = [m : (m + nPrlSets - 1)];
     parfor n = 1 : nPrlSets
         paramSet = top50Params(:,subMatrixInds(n));
-        [negSumLogL] = historicalSim(1 , pIdx , paramsSub , paramSet ,specIndsList(m + n - 1) , tstep_abc , date_abc);
+        historicalSim(1 , pIdx , paramsSub , paramSet ,specIndsList(m + n - 1) , tstep_abc , date_abc , n);
     end
 end
 

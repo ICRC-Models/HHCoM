@@ -84,7 +84,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['toNow_22Apr20Ph2V11_testingTreatment_26Apr2023_fullsim1']; % ***SET ME***: name for simulation output file
+baseFileName = ['toNow_22Apr20Ph2V11_fullRun_8May231']; % ***SET ME***: name for simulation output file
 % Looping length 
 % loopSegments = {0 , round(nRuns/2) , nRuns};
 % loopSegmentsLength = length(loopSegments);

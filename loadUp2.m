@@ -50,7 +50,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n)
 
 tic
 
@@ -757,11 +757,13 @@ end
 kRL = 0.225;
 kDR = 0.45;
 
-% Cervical cancer probability of symptomatic detection (from Campos, 2018)
-% converting from monthly to yearly probability --> i = 1-(1-j)^2 (because our model runs every 2 months)
-% Campos monthly probability is 0.0039, 0.1333, 0.1746 for L, R, D
+% Cervical cancer probability of symptomatic detection 
+% Calibratio completed on August 6, 2023
 
-kSymp = [0.0001, 0.009, 0.7];
+filename = [paramDir 'kSympParams.xlsx'];
+sheet = 1;
+kSymp_mat = xlsread(filename, sheet, 'A2:C26');
+kSymp = kSymp_mat(n, 1:end);  
 
 % Proportion of women who receive hysterectomy by stage
 % Based on Campos, 2018

@@ -1,4 +1,4 @@
-function [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC)
+function [deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState, totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC, screenSympCCTreat] = vaxCEA_multSims_SACEA_CH(vaxResultInd , sceNum , fileNameNums, fileInds, deaths, screenTreat, hpvHealthState, ccHealthState, hivHealthState,totalPerAge, vax, nonDisabHealthState, scen0CinTx, newCC, screenSympCCTreat)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -21,7 +21,7 @@ paramDir = [pwd , '\Params\'];
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
-    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , kRL , kDR , artHpvMult , ...
+    c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud , muCC_d , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
     condUse , screenYrs , hpvScreenStartYear , ...
     artYr , maxRateM , maxRateF , ...
@@ -36,6 +36,7 @@ paramDir = [pwd , '\Params\'];
     cinPos2015_dObs , cinNeg2015_dObs , hpv_hiv_dObs , hpv_hivNeg_dObs , ...
     hpv_hivM2008_dObs , hpv_hivMNeg2008_dObs , hivPrevM_dObs , hivPrevF_dObs , ...
     popAgeDist_dObs , totPopSize_dObs , ...
+    stageDist_1997_dObs , ...
     hivCurr , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , ...
@@ -48,6 +49,7 @@ paramDir = [pwd , '\Params\'];
     immunehpvVaxInds , infhpvVaxInds , normalhpvNonVaxInds , immunehpvNonVaxInds , ...
     infhpvNonVaxInds , fromVaxNoScrnInds , fromVaxScrnInds , toNonVaxNoScrnInds , ...
     toNonVaxScrnInds , ageInd , riskInd , ...
+    kSymp , hystMult , ...
     hivNegNonVMMCinds , hivNegVMMCinds , ...
     vlAdvancer , ...
     fertMat , hivFertPosBirth , hivFertNegBirth , fertMat2 , ...
@@ -55,13 +57,15 @@ paramDir = [pwd , '\Params\'];
     fertMat4 , hivFertPosBirth4 , hivFertNegBirth4 , ...
     dFertPos1 , dFertNeg1 , dFertMat1 , dFertPos2 , dFertNeg2 , dFertMat2 , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
-    dDeathMat , dDeathMat2 , dDeathMat3 , dMue] = loadUp2(1 , 0 , [] , [] , []);
+    dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
+    ccLochpvVaxIndsFrom_treat , ...
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(1 , 0 , [] , [] , [] , 1);
 
 % Plot settings
 reset(0)
 set(0 , 'defaultlinelinewidth' , 1.5)
 
-lastYear = 2122;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
+lastYear = 2123;  % ***SET ME***: last year of simulation (use 2122 for SA screening analysis)
 
 %% Setting file names, initializing variables 
 nRuns = length(fileInds);
@@ -81,7 +85,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
+baseFileName = ['22Apr20Ph2V112v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -166,7 +170,7 @@ for k = 1 : loopSegmentsLength-1
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
+curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V112v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '/HHCoM_Results/' , pathModifier, '/' , 'vaxSimResult'];
 
@@ -182,7 +186,8 @@ vaxResult{n} = load([resultFileName , num2str(n), '.mat']);
 % notice for vaxResult you start at row 2. likely because of
 % 2021 being double counted in both. 
 vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)]; % consolidating historical population numbers with future
-vaxResult{n}.ccDeath = [curr.ccDeath(1 : end , : , : , :) ; vaxResult{n}.ccDeath(2 : end , : , : , :)]; % consolidating historical CC death #s with future... etc.
+vaxResult{n}.ccDeath_treat = [curr.ccDeath_treat(1 : end , : , : , :) ; vaxResult{n}.ccDeath_treat(2 : end , : , : , :)]; % consolidating historical CC death #s with future... etc.
+vaxResult{n}.ccDeath_untreat = [curr.ccDeath_untreat(1 : end , : , : , :) ; vaxResult{n}.ccDeath_untreat(2 : end , : , : , :)]; 
 vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : , :)];
 vaxResult{n}.deaths = [curr.deaths(1 : end, 1); vaxResult{n}.deaths(2 : end, 1)];
 vaxResult{n}.newHpvVax = [curr.newHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvVax(2 : end , : , : , : , : , :)]; % infected with vaccine type HPV
@@ -195,6 +200,8 @@ vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivD
 vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
 vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end, :)]; 
+vaxResult{n}.ccSymp = [curr.ccSymp(1:end,:, :, :); vaxResult{n}.ccSymp(2:end,:, :, :)]; 
+vaxResult{n}.ccTreat = [curr.ccTreat(1:end, :, :, :); vaxResult{n}.ccTreat(2:end,:, :, :)]; 
 
 % VACCINATIONS ********************************
     vaxTemplate = zeros(nTimepoints, 3); 
@@ -208,7 +215,8 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
 % DEATHS **************************************
     ccDeath = zeros(nTimepoints, age); 
     for a = 1 : age 
-        ccDeath(:, a) = sum(sum(sum(vaxResult{n}.ccDeath(:, :, a, :),2),3),4); 
+        ccDeath_treat(:, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, :, a, :),2),3),4); 
+        ccDeath_untreat(:, a) = sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, :, a, :),2),3),4); 
     end 
 
     hivDeath = zeros(nTimepoints, age); 
@@ -217,9 +225,10 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
     end 
 
     % combine all death data into 3D matrix
-    deaths(:, 1:age, 1, j) = ccDeath;
-    deaths(:, 1:age, 2, j) = hivDeath; 
-    deaths(:, 17, 3, j) = vaxResult{n}.deaths(:); 
+    deaths(:, 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
+    deaths(:, 1:age, 2, j) = ccDeath_untreat;
+    deaths(:, 1:age, 3, j) = hivDeath; 
+    deaths(:, 17, 4, j) = vaxResult{n}.deaths(:); 
 
 % CC HEALTH STATES ****************************
 
@@ -300,11 +309,11 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(:, :); vaxResult{n}.vaxdSchool(2:end,
 
 % SCREENING ************************************************
 
-numScreen = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
-numLEEP = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
-numCryo = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
-numThrml = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
-numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, endpoints); 
+numScreen = zeros(nTimepointsScreen, disease, hpvVaxStates, hpvNonVaxStates, 3, age); 
+numLEEP = zeros(nTimepointsScreen, disease, hpvVaxStates, hpvNonVaxStates, 3, age); 
+numCryo = zeros(nTimepointsScreen, disease, hpvVaxStates, hpvNonVaxStates, 3, age); 
+numThrml = zeros(nTimepointsScreen, disease, hpvVaxStates, hpvNonVaxStates, 3, age); 
+numHyst = zeros(nTimepointsScreen, disease, hpvVaxStates, hpvNonVaxStates, 3, age); 
 
     for aInd = 1 : length(sceScreenInd) % modified to the ages that are screened  
 %         a = sceScreenInd{aInd}; % the actual indices of newScreen  
@@ -315,54 +324,54 @@ numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 
             d = dInd; % originally d was separate from dInd due to the combination of d=2 and d=1 as HIV neg. now we don't care about stratifying. 
             for h = 1 : hpvVaxStates % Vaccine-type HPV precancer state
                 for s = 1 : hpvNonVaxStates % Non-vaccine-type HPV precancer state
-                    for x = 1 : endpoints % Cervical cancer or hysterectomy status. we do not care to stratify by people with hyst, so endpoints-1. 
+                    for x = 1 : 3 % Cervical cancer or hysterectomy status. we do not care to stratify by people with hyst, so endpoints-1. 
                         % Apply selected screening/treatment algorithm
                             % if you're susceptible/immune to both HPV types or
                             % have had a hysterectomy 
                             if [( ((h==1) || (h==7)) && ((s==1) || (s==7)) && (x==1) )] || (x==4) || [(screenAlgs.genTypBool && ((h==1) || (h==7)) && (((s>=2) && (s<=5)) || ((s==6) && (x<=3))))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numCryo(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numThrml(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numHyst(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
 
                             % if you're infected with either HPV type
                             elseif [( ((h==2) && ((s<=2) || (s==7))) || (((h<=2) || (h==7)) && (s==2)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==2))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
-                                numCryo(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(1);
-                                numThrml(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
-                                numHyst(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(1);
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
 
                             % if you have CIN1 of either HPV type
                             elseif [( ((h==3) && ((s<=3) || (s==7))) || (((h<=3) || (h==7)) && (s==3)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==3))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
-                                numCryo(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(1);
-                                numThrml(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
-                                numHyst(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.leepRetain(1);
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(1);
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,2) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(1);
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
 
                             % if you have CIN2 of either HPV type
                             elseif [( ((h==4) && ((s<=4) || (s==7))) || (((h<=4) || (h==7)) && (s==4)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==4))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.leepRetain(2);
-                                numCryo(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(2);
-                                numThrml(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(2);
-                                numHyst(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.leepRetain(2);
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(2);
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,3) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(2);
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
                             % if you have CIN3 of either HPV type
                             elseif [( ((h==5) && ((s<=5) || (s==7))) || (((h<=5) || (h==7)) && (s==5)) ) && (x==1)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==5))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.leepRetain(3);
-                                numCryo(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(3);
-                                numThrml(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(3);
-                                numHyst(: , fullAgeInd, dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.leepRetain(3);
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.cryoRetain(3);
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.thrmlRetain(3);
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
                             % if you have cervical cancer
                             elseif [( (x==1) && ((h==6) || (s==6)) ) || (x==2) || (x==3)] && [(~screenAlgs.genTypBool) || (screenAlgs.genTypBool && (h==6) && (x<=3))]
-                                numScreen(: , fullAgeInd, dInd , h, s, x) = sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , h , s , x , a , :),2),3),4),5),6),7);
-                                numLEEP(: , fullAgeInd,dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numCryo(: , fullAgeInd,dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numThrml(: , fullAgeInd,dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * 0.0;
-                                numHyst(: , fullAgeInd,dInd , h, s, x) = numScreen(: , fullAgeInd, dInd , h, s, x) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(4);
+                                numScreen(: , dInd , h, s, x, fullAgeInd) = sum(sum(sum(sum(sum(sum(sum(vaxResult{n}.newScreen(: , d , 1:viral, h , s , x , a , :),2),3),4),5),6),7),8);
+                                numLEEP(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numCryo(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numThrml(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * 0.0;
+                                numHyst(: , dInd , h, s, x, fullAgeInd) = numScreen(: , dInd , h, s, x, fullAgeInd) * screenAlgs.testSens(d,4) * screenAlgs.colpoRetain * screenAlgs.treatRetain(4);
                             end
                     end
                 end
@@ -371,11 +380,11 @@ numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 
     end
 
     % Sum all dimensions so that we're only stratifying by time and age
-    numScreenSquish = sum(sum(sum(sum(numScreen(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
-    numLEEPSquish = sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
-    numCryoSquish = sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
-    numThrmlSquish = sum(sum(sum(sum(numThrml(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
-    numHystSquish = sum(sum(sum(sum(numHyst(:, 1:age, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints), 3),4),5),6);
+    numScreenSquish = sum(sum(sum(sum(numScreen(:, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3, 1:age), 2),3),4),5);
+    numLEEPSquish = sum(sum(sum(sum(numLEEP(:, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3, 1:age), 2),3),4),5);
+    numCryoSquish = sum(sum(sum(sum(numCryo(:, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3, 1:age), 2),3),4),5);
+    numThrmlSquish = sum(sum(sum(sum(numThrml(:, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3, 1:age), 2),3),4),5);
+    numHystSquish = sum(sum(sum(sum(numHyst(:, 1:disease, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:3, 1:age), 2),3),4),5);
 
     % put screen/treat in a third dimension
     screenTreat(:, 1:age, 1, j) = numScreenSquish; 
@@ -384,25 +393,51 @@ numHyst = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 
     screenTreat(:, 1:age, 4, j) = numThrmlSquish; 
     screenTreat(:, 1:age, 5, j) = numHystSquish; 
 
+    % DIAGNOSED CANCERS ************************************************
+
+    for a = 1:age
+        for x = 1:3
+
+            % val after x is 1 for treatment from screening or 2 for treatment from symptoms 
+            % 2nd val is 1 for treated, 2 for untreated, and 3 for hyst
+            % don't need to multiply by cc treat retain because LTFU is already accounted for within the model
+
+            % cc treatment from screening 
+            numCCTreat(: , x , a , 1 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 1),2),3),4); % treated
+            numCCTreat(: , x , a , 2 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 2),2),3),4); % untreated
+            numCCTreat(: , x , a , 3 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 3),2),3),4); % hyst
+
+            % cc treatment from symptoms
+            numCCTreat(: , x , a , 1 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 1),2),3),4); % treated
+            numCCTreat(: , x , a , 2 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 2),2),3),4); % untreated
+            numCCTreat(: , x , a , 3 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 3),2),3),4); % hyst
+
+        end 
+    end 
+
+    % SQUISHING SCREENING AND DIAGNOSED CANCERS ************************
+
+    screenSympCCTreat(:, 1:3, 1:age , : , : , j) = numCCTreat; 
+
     % Separate therapy count stratified by CC state for a one-off analysis
     % Jacinda wants to do in her CEA only for scenario 0
     % I used the same method of isolating h based on the highest value
     % between the vax and nonvax hpv health state
     for h = 1 : hpvVaxStates
         if h < 7 
-            numLEEP_1 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, [1:h 7], h, 1:endpoints),2),3),4),5),6);
-            numLEEP_2 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, h, [1:(h-1) 7], 1:endpoints),2),3),4),5),6);
+            numLEEP_1 = sum(sum(sum(sum(sum(numLEEP(:, 1:disease, [1:h 7], h, 1:3, 1:age),2),3),4),5),6);
+            numLEEP_2 = sum(sum(sum(sum(sum(numLEEP(:, 1:disease, h, [1:(h-1) 7], 1:3, 1:age),2),3),4),5),6);
             numLEEP_scen0 = numLEEP_1 + numLEEP_2; % hopefully this should result in a vector ??
             
-            numCryo_1 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, [1:h 7], h, 1:endpoints),2),3),4),5),6);
-            numCryo_2 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, h, [1:(h-1) 7], 1:endpoints),2),3),4),5),6);
+            numCryo_1 = sum(sum(sum(sum(sum(numCryo(:, 1:disease, [1:h 7], h, 1:3, 1:age),2),3),4),5),6);
+            numCryo_2 = sum(sum(sum(sum(sum(numCryo(:, 1:disease, h, [1:(h-1) 7], 1:3, 1:age),2),3),4),5),6);
             numCryo_scen0 = numCryo_1 + numCryo_2; % hopefully this should result in a vector ??
 
             scen0CinTx(:, h, 1, j) = numLEEP_scen0; 
             scen0CinTx(:, h, 2, j) = numCryo_scen0; 
         else % h=7 has different rules because only applicable is h=7 and s=7
-            numLEEP_scen0 = sum(sum(sum(sum(sum(numLEEP(:, 1:age, 1:disease, 7, 7, 1:endpoints),2),3),4),5),6); 
-            numCryo_scen0 = sum(sum(sum(sum(sum(numCryo(:, 1:age, 1:disease, 7, 7, 1:endpoints),2),3),4),5),6); 
+            numLEEP_scen0 = sum(sum(sum(sum(sum(numLEEP(:, 1:disease, 7, 7, 1:3, 1:age),2),3),4),5),6); 
+            numCryo_scen0 = sum(sum(sum(sum(sum(numCryo(:, 1:disease, 7, 7, 1:3, 1:age),2),3),4),5),6); 
 
             scen0CinTx(:, h, 1, j) = numLEEP_scen0; 
             scen0CinTx(:, h, 2, j) = numCryo_scen0; 

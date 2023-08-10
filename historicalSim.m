@@ -1,7 +1,7 @@
 % Historical module
 % Runs simulation over the time period and time step specified by the user.
 
-function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date)    % input variables when using a calibration parameter set
+function [negSumLogL] = historicalSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date , n)    % input variables when using a calibration parameter set
 % historicalSim(0 , [] , [] , [] , [] , 0 , '19May20')    % input variables when running from command window using hand-calibrated, hard-coded parameter values
 % Note: if you hard-code the "pathModifier" file output name variable below, then the date, paramSetIdx, and tstep_abc input values here are just dummy values and unused
 
@@ -34,7 +34,7 @@ tic
 
 % DIRECTORY TO SAVE RESULTS
 % pathModifier = ['toNow_' , date , '_2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
-pathModifier = ['toNow_', date, '_fullRun_27Jul23_', num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; 
+pathModifier = ['toNow_', date, '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_', num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; 
 %pathModifier = ['toNow_' , date , '_baseVax057_baseScreen_baseVMMC_DoART_S3_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)]; % ***SET ME***: name for historical run output file 
 %pathModifier = 'toNow_21Feb20_testMuART_1925Start_decBkrndMort';
 
@@ -119,7 +119,7 @@ vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp 
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -649,7 +649,7 @@ save(fullfile(savdir , pathModifier, '') , 'fivYrAgeGrpsOn' , 'tVec' ,  'popVec'
     'newScreen' , 'ccDeath_treat', 'ccDeath_untreat',  ...
     'newCC' , 'artDist' , 'artDistList' , 'artTreatTracker' , 'artDiscont' , ...
     'ccSymp' , 'ccTreat' , ...
-    'startYear' , 'endYear' , 'i' , 'popLast' , '-v7.3' , 'kSymp');
+    'startYear' , 'endYear' , 'i' , 'popLast' , 'kSymp' , '-v7.3');
 
 disp(' ')
 disp('Simulation complete.')
