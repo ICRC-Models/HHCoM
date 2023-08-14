@@ -9,12 +9,12 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_07Jun23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_20Jul23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_S10']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_Test_S13']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -24,7 +24,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run 
+lastYear = 2123; % ***SET ME***: end year of simulation run 2123
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -49,6 +49,12 @@ whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 %   Scenario 2: limited vaccine years --> school-based regimen for ages 9-14 at 90% coverage + catch-up coverage
 %   Scenario 3: baseline regimen for age 9 at 86% coverage
 % vaxEff = 1.0;    % 9v-vaccine, used for all vaccine regimens present
+
+% *********** WARNING: *****************
+% If you choose to use both waning AND catch-up vaccination, note
+% that in the section of mixInfect where you calculate infections, it is
+% only programmed to work for catchup of age 10-19 (age index 3 and 4). 
+
 waning = 1;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -64,9 +70,9 @@ gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual sc
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [4 : 5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxAgeCU = [3 : 4]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
 vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.5*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
@@ -101,6 +107,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
     hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
+    stageDist_2018_dObs , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
@@ -334,7 +341,7 @@ for n = 1 : nTests
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 20; % number of years over which initial efficacy level wanes
+    wanePeriod = 15; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
@@ -354,15 +361,28 @@ for n = 1 : nTests
     end
 end
 
+%% Setup for waning catch-up scenarios
+
+% Aligns to 2023.1667 to 2024 - ratio between count of catch up vaccines / school based vaccines
+vaxCUNormRatio = [0.550110673, 0.395008456, 0.065027778, 0.008920048, 0.001097311, 0.000295031]; 
+ratioPeriod = length(vaxCUNormRatio); 
+
+% Add to lambdaMultVaxMat for the 10YO and 15YO catch up
+lambdaMultVaxMat(1:2, 2) = [0 ; 0]; 
+lambdaMultVaxMat(3:end,2) = lambdaMultVaxMat(2:end-1, 1); 
+lambdaMultVaxMat(1:3, 3) = [0 ; 0 ; 0]; 
+lambdaMultVaxMat(4:end,3) = lambdaMultVaxMat(2:end-2, 1); 
+
 %% Simulation
 %profile on
 
 % parfor n = 1 : nTests 
-for n = 1 : nTests % for testing
+% for n = 1 : nTests % for testing
+n = 1; 
 
     simNum = n;
     vaxEff = testParams(n , 2);
-    lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
+%     lambdaMultVax = 1 - lambdaMultVaxMat(: , n);
     vaxRate = testParams(n , 1);
     vaxAge = testParams2{n , 1};
     vaxG = testParams2{n , 2};
@@ -488,11 +508,11 @@ for n = 1 : nTests % for testing
         age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
         partnersM , partnersF , partnersMmult,...
         beta_hpvVax_mod , beta_hpvNonVax_mod , vaxInds , nonVInds , ...
-        lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
+        lambdaMultImm , lambdaMultVaxMat , artHpvMult , hpv_hivMult , ...
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
         d_partnersMmult,  ...
-        hivSus , toHiv , hivCurr) , tspan , popIn);
+        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , vaxCUNormRatio , ratioPeriod , currYear) , tspan , popIn);
         popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After mixInfect')
@@ -609,13 +629,12 @@ for n = 1 : nTests % for testing
         filename = ['vaxWaneSimResult' , num2str(paramSetIdx)];
     end
     
-    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
-        newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
-        hivDeaths , deaths , ccDeath_treat , ccDeath_untreat , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
-        currYear , lastYear , vaxRate , vaxEff , ccSymp, ccTreat , popLast , pathModifier);
+    parsave_condense(filename , fivYrAgeGrpsOn , tVec , popVec , ...
+        deaths , ccDeath_treat , ccDeath_untreat , ...
+        newCC , vaxdLmtd , vaxdSchool , vaxdCU , newScreen ,  ... %artTreatTracker , newTreatImm , newTreatHpv , newTreatHyst ,
+        ccSymp , ccTreat , pathModifier);
 
-end 
+% end 
 disp('Done')
 
 %profile viewer

@@ -843,10 +843,10 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
 end
 
 %% Vaccination waning
-waning = 0;    % bool to turn waning on or off
+waning = 1;    % bool to turn waning on or off
 
 %% Single dose 
-singleDoseBool = 0; % 1 for single dose vax efficacy, 0 for 2-dose
+singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
 
 %% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
