@@ -29,3 +29,9 @@ probs to align with Cari and Evan models.
 - I ran sympCalibration, which calls modifiedhistoricalSim. I realized you do not have to save the full results file. We only care about the stage distribution at one point in time and the counts of CC cases. 
 - Process results using processRecalibResults. 
 - Then you can read in the subsequent CSV into R to filter through the results. 
+
+Running the model with BOTH waning and catch-up: 
+- I edited mixInfect in order to allow for this. Note that I coded it only specific to catch-up of age 10-19. 
+- You will want to first figure out what your catch-up coverage will be. Then run the model locally and fill out 
+"Adding catch-up and waning.xlsx". Input the first 6 time steps as vaxCUNormRatio. 
+- Make sure waning = 1 and vaxCU = 1.
