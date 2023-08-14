@@ -34,6 +34,7 @@ paramDir = [pwd , '\Params\'];
     hpv_dist_dObs , cinPos2007_dObs , cin1_2010_dObs , cin2_2010_dObs, ...
     hpv_hiv_dObs , hpv_hivNeg_dObs , hpv_all_dObs , hpv_hiv2009_dObs , ...
     hivPrevF_dObs , hivPrevM_dObs , hivPrevAll_dObs, popAgeDist_dObs , totPopSize_dObs , hivCurr , ...
+    stageDist_2018_dObs , ...
     gar , hivSus , hpvVaxSus , hpvVaxImm , hpvNonVaxSus , hpvNonVaxImm , ...
     toHiv , vaxInds , nonVInds , hpvVaxInf , hpvNonVaxInf , hivInds , ...
     cin3hpvVaxIndsFrom , ccLochpvVaxIndsTo , ccLochpvVaxIndsFrom , ...
@@ -53,7 +54,7 @@ paramDir = [pwd , '\Params\'];
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , []);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , [] , 1);
 
 lastYear = 2123; % manually set in futureSim
 
@@ -75,7 +76,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['VaccineKenya1DoseCea_S' , sceNum]; % ***SET ME***: name for simulation output file
+baseFileName = ['VaccineKenya1DoseCea_Jul20_S' , sceNum]; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -172,7 +173,7 @@ for k = 1 : loopSegmentsLength-1
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-curr = load([pwd , '/HHCoM_Results/toNow_07Jun23_stochMod_baseline_2dose_nowane' , fileInds{j}]); % ***SET ME***: name for historical run output file
+curr = load([pwd , '/HHCoM_Results/toNow_20Jul23_stochMod_baseline_2dose_nowane' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxSimResult'];
 
@@ -201,8 +202,8 @@ vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n
 vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
 % vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
 vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
-vaxResult{n}.ccSymp = [curr.ccSymp(1:end,:, :, :, :, :); vaxResult{n}.ccSymp(2:end,:, :, :, :, :)]; 
-vaxResult{n}.ccTreat = [curr.ccTreat(1:end, :, :, :, :, :); vaxResult{n}.ccTreat(2:end,:, :, :, :, :)]; 
+vaxResult{n}.ccSymp = [curr.ccSymp(1:end,:, :, :); vaxResult{n}.ccSymp(2:end,:, :, :)]; 
+vaxResult{n}.ccTreat = [curr.ccTreat(1:end, :, :, :); vaxResult{n}.ccTreat(2:end,:, :, :)]; 
 vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:end, :)]; % the only vax matrix in both historical and future sim 
 
 % VACCINATIONS ********************************
@@ -341,14 +342,14 @@ for a = 1:age
         % don't need to multiply by cc treat retain because LTFU is already accounted for within the model
 
         % cc treatment from screening 
-        numCCTreat(: , x , a , 1 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 1),2),3),4),5),6); % treated
-        numCCTreat(: , x , a , 2 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 2),2),3),4),5),6); % untreated
-        numCCTreat(: , x , a , 3 , 1) = sum(sum(sum(sum(sum(vaxResult{n}.ccTreat(: , 1:disease , x , 1:4 , a , 3),2),3),4),5),6); % hyst
+        numCCTreat(: , x , a , 1 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 1),2),3),4); % treated
+        numCCTreat(: , x , a , 2 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 2),2),3),4); % untreated
+        numCCTreat(: , x , a , 3 , 1) = sum(sum(sum(vaxResult{n}.ccTreat(: , x , a , 3),2),3),4); % hyst
 
         % cc treatment from symptoms
-        numCCTreat(: , x , a , 1 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 1),2),3),4),5),6); % treated
-        numCCTreat(: , x , a , 2 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 2),2),3),4),5),6); % untreated
-        numCCTreat(: , x , a , 3 , 2) = sum(sum(sum(sum(sum(vaxResult{n}.ccSymp(: , 1:disease , x , 1:4 , a , 3),2),3),4),5),6); % hyst
+        numCCTreat(: , x , a , 1 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 1),2),3),4); % treated
+        numCCTreat(: , x , a , 2 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 2),2),3),4); % untreated
+        numCCTreat(: , x , a , 3 , 2) = sum(sum(sum(vaxResult{n}.ccSymp(: , x , a , 3),2),3),4); % hyst
 
     end 
 end 
