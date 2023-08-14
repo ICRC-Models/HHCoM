@@ -22,8 +22,10 @@ Use vaxCEA_multSims_mainFunction_sce10 and vaxCEA_multSims_processResults_sce10.
 - When running the matlab to csv code for the waning scenarios, make sure that waning = 0 and singleDoseBool = 0 in loadup2
 - Calibration of kSymp used sympCalibration, debugTreatment_sympCalibration_historicalSim, and debugTreatment_sympCalibration_historicalSim_runthis. 
 
-Recalibration (Jul 10, 2023): 
-- I realized I needed to calibration BOTH kSymp and the progression probabilities. 
+Recalibration (Jul 10, 2023, completed Jul 20, 2023): 
+- Gui originally use Campos progression probabilities which are monthly. We need yearly. I adjusted prog
+probs to align with Cari and Evan models. 
+- Everything related to this can be found within HHCoM Results. 
 - I ran sympCalibration, which calls modifiedhistoricalSim. I realized you do not have to save the full results file. We only care about the stage distribution at one point in time and the counts of CC cases. 
 - Process results using processRecalibResults. 
 - Then you can read in the subsequent CSV into R to filter through the results. 
