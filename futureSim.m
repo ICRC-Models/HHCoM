@@ -363,6 +363,11 @@ end
 
 %% Setup for waning catch-up scenarios
 
+% ********* SET ME **********: if you are running both a waning and
+% catch-up scenario, you need to adjust vaxCUNormRatio based on manually
+% running the model locally and calculate the ratio between CU and school
+% based vaccines. 
+
 % Aligns to 2023.1667 to 2024 - ratio between count of catch up vaccines / school based vaccines
 vaxCUNormRatio = [0.550110673, 0.395008456, 0.065027778, 0.008920048, 0.001097311, 0.000295031]; 
 ratioPeriod = length(vaxCUNormRatio); 
