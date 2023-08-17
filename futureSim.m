@@ -73,7 +73,7 @@ vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp 
 vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
 vaxAgeCU = [3 : 4]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.5*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.7*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 
 % Parameters for vaccination during limited-vaccine years
@@ -341,7 +341,7 @@ for n = 1 : nTests
     
     % Waning
     effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 15; % number of years over which initial efficacy level wanes
+    wanePeriod = 25; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
@@ -517,7 +517,7 @@ n = 1;
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
         d_partnersMmult,  ...
-        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , vaxCUNormRatio , ratioPeriod , currYear) , tspan , popIn);
+        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear) , tspan , popIn);
         popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After mixInfect')

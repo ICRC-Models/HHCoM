@@ -13,7 +13,7 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult,  ...
-    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, vaxCUNormRatio, ratioPeriod, currYear)
+    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear)
 
 % ratioPeriod = how long after effPeriod you have have a combination of normal vax and catch-up vax 
 % vaxCUNormRatio = the ratio between the number of catch-up vaccines and normal 9 YO vaccines 
@@ -415,7 +415,7 @@ for a = ageSexDebut : age
 
                     % This is your normal vax efficacy scenario
                     % If not in the vaccinated compartment, will also go here with vaxProtect = 1.0 (no protection)
-                    if (year > (currYear + effPeriod + (ratioPeriod/6))) || (waning == 0) || (vaxCU == 0) || ((p == 1) || (p == 3))
+                    if (year > (currYear + effPeriod + wanePeriod)) || (waning == 0) || (vaxCU == 0) || ((p == 1) || (p == 3))
 
                         mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d,r) * lambda(1 , a , r , 1)...
                             , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
@@ -424,35 +424,27 @@ for a = ageSexDebut : age
                         fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                             , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
 
-                    % This is the time period when you have a combination of waning from CU and normal 9YO vaccination
-                    % Must also be in the vaccinated compartment 
-                    elseif (year > (currYear + effPeriod)) && (year <= (currYear + effPeriod + (ratioPeriod/6))) && (waning == 1) && (vaxCU == 1) && ((p == 2) || (p == 4))
+                    % This is the time period between effPeriod and the end of wanePeriod
+                    elseif (year > (currYear + effPeriod)) && (year <= (currYear + effPeriod + wanePeriod)) && (waning == 1) && (vaxCU == 1) && ((p == 2) || (p == 4))
 
-                        % Indexing into vaxCUNormRatio 
-                        index = round((year - (currYear + effPeriod)) * 6); 
+                        % Create start and end indices
+                        % Use years+effPeriod to index into the start and end indices
+                        index = floor((year - (currYear + effPeriod)) / 5); 
 
-                        % Create a vaxProtect value for CU and for normal 9YO vaccinations based on the ratio 
-                        % Times 0.5 because catch up vaccines are split between 10-14 and 15-19 evenly
-                        vaxProtect_NORM = (1 - lambdaMultVaxMat(a , 1)) * (1 - vaxCUNormRatio(index)); 
-                        vaxProtect_10 = (1 - lambdaMultVaxMat(a , 2)) * vaxCUNormRatio(index) * 0.5; 
-                        vaxProtect_15 = (1 - lambdaMultVaxMat(a , 3)) * vaxCUNormRatio(index) * 0.5; 
+                        % Create an adjusted lambdaMultVax
+                        lambdaMultVax_adjust = lambdaMultVax;
+                        lambdaMultVax_adjust(  (  1+(effPeriod/5)+1+index) : (1+(effPeriod/5)+1+index+2)  ) = lambdaMultVax(1+(effPeriod/5)+index+1); 
 
-                        % Set the mInfected values 
-                        mInfectedVax = min( ...
-                            (lambdaMultM * vaxProtect_NORM * psi_hpv(1,d,r) * lambda(1 , a , r , 1)) + ...
-                            (lambdaMultM * vaxProtect_10 * psi_hpv(1,d,r) * lambda(1 , a , r , 1)) + ...
-                            (lambdaMultM * vaxProtect_15 * psi_hpv(1,d,r) * lambda(1 , a , r , 1)) ...
-                            , 0.999 * (vaxProtect_NORM + vaxProtect_10 + vaxProtect_15)) .* pop(mhpvVaxSus);
-                        fInfectedVax = min( ...
-                            (lambdaMultF * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) + ...
-                            (lambdaMultF * vaxProtect_10 * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) + ...
-                            (lambdaMultF * vaxProtect_15 * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) ...
-                            , 0.999 * (vaxProtect_NORM + vaxProtect_10 + vaxProtect_15)) .* pop(fhpvVaxSus);
-                        fInfectedVaxImm = min( ...
-                            (lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) + ...
-                            (lambdaMultF * lambdaMultImm(a) * vaxProtect_10 * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) + ...
-                            (lambdaMultF * lambdaMultImm(a) * vaxProtect_15 * psi_hpv(2,d,r) * lambda(2 , a , r , 1)) ...
-                            , 0.999 * (vaxProtect_NORM + vaxProtect_10 + vaxProtect_15)) .* pop(fhpvVaxImm);
+                        % Based on how far you are into the wanePeriod, everyone, of all ages, has the same waned efficacy
+                        vaxProtect_NORM = lambdaMultVax_adjust(a , 1);
+
+                        % Calculated InfectedVax
+                        mInfectedVax = min(lambdaMultM * vaxProtect_NORM * psi_hpv(1,d,r) * lambda(1 , a , r , 1)...
+                            , 0.999 * vaxProtect_NORM) .* pop(mhpvVaxSus);
+                        fInfectedVax = min(lambdaMultF * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                            , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxSus);
+                        fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                            , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxImm);
 
                     % This is the time period within the first effPeriod when everyone has full vax efficacy
                     else
