@@ -13,7 +13,7 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult,  ...
-    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear)
+    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear , numGrpsCU)
 
 % ratioPeriod = how long after effPeriod you have have a combination of normal vax and catch-up vax 
 % vaxCUNormRatio = the ratio between the number of catch-up vaccines and normal 9 YO vaccines 
@@ -433,7 +433,7 @@ for a = ageSexDebut : age
 
                         % Create an adjusted lambdaMultVax
                         lambdaMultVax_adjust = lambdaMultVax;
-                        lambdaMultVax_adjust(  (  1+(effPeriod/5)+1+index) : (1+(effPeriod/5)+1+index+2)  ) = lambdaMultVax(1+(effPeriod/5)+index+1); 
+                        lambdaMultVax_adjust(  (  1+(effPeriod/5)+1+index) : (1+(effPeriod/5)+1+index+numGrpsCU)  ) = lambdaMultVax(1+(effPeriod/5)+index+1); 
 
                         % Based on how far you are into the wanePeriod, everyone, of all ages, has the same waned efficacy
                         vaxProtect_NORM = lambdaMultVax_adjust(a , 1);
