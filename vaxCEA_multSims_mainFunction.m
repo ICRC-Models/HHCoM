@@ -70,12 +70,12 @@ nTimepoints = length(monthlyTimespan);
 nTimepointsFut = length(monthlyTimespanFut); 
 fivYrAgeGrpsOn = 1;
 
-% parallelizing the for loop
-loopSegments = {0 , round(2/2) , 5}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
-loopSegmentsLength = length(loopSegments);
-
 % scenarios = {'1.1', '1.2', '2.1', '2.2', '3.1'}; ***SET ME***: specify the scenarios to loop through
-scenarios = {'0', '1', '2', '3', '4'}; 
+scenarios = {'18' , '21'}; 
+
+% parallelizing the for loop
+loopSegments = {0 , round(length(scenarios)/2) , length(scenarios)}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
+loopSegmentsLength = length(loopSegments); 
 
 for k = 1 : loopSegmentsLength-1 
     parfor j = loopSegments{k}+1 : loopSegments{k+1} % for testing (parfor)
