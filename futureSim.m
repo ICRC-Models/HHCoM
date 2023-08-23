@@ -65,16 +65,17 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2];
 vaxCover = [0.90*(0.7/0.9)];
-vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = [1,2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [3 : 4]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.7*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxAgeCU = [3:5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.3*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
+numGrpsCU = length(vaxAgeCU); %***SET ME***: number of age groups in the CU schedule that is NOT the same as the school based regimen
 
 % Parameters for vaccination during limited-vaccine years
 vaxLimit = 0;    % turn vaccine limit on or off
@@ -340,8 +341,8 @@ for n = 1 : nTests
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
     
     % Waning
-    effPeriod = 20; % number of years that initial efficacy level is retained
-    wanePeriod = 25; % number of years over which initial efficacy level wanes
+    effPeriod = 5; % number of years that initial efficacy level is retained
+    wanePeriod = 10; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
@@ -369,14 +370,14 @@ end
 % based vaccines. 
 
 % Aligns to 2023.1667 to 2024 - ratio between count of catch up vaccines / school based vaccines
-vaxCUNormRatio = [0.550110673, 0.395008456, 0.065027778, 0.008920048, 0.001097311, 0.000295031]; 
-ratioPeriod = length(vaxCUNormRatio); 
+% vaxCUNormRatio = [0.550110673, 0.395008456, 0.065027778, 0.008920048, 0.001097311, 0.000295031]; 
+% ratioPeriod = length(vaxCUNormRatio); 
 
-% Add to lambdaMultVaxMat for the 10YO and 15YO catch up
-lambdaMultVaxMat(1:2, 2) = [0 ; 0]; 
-lambdaMultVaxMat(3:end,2) = lambdaMultVaxMat(2:end-1, 1); 
-lambdaMultVaxMat(1:3, 3) = [0 ; 0 ; 0]; 
-lambdaMultVaxMat(4:end,3) = lambdaMultVaxMat(2:end-2, 1); 
+% % Add to lambdaMultVaxMat for the 10YO and 15YO catch up
+% lambdaMultVaxMat(1:2, 2) = [0 ; 0]; 
+% lambdaMultVaxMat(3:end,2) = lambdaMultVaxMat(2:end-1, 1); 
+% lambdaMultVaxMat(1:3, 3) = [0 ; 0 ; 0]; 
+% lambdaMultVaxMat(4:end,3) = lambdaMultVaxMat(2:end-2, 1); 
 
 %% Simulation
 %profile on
@@ -464,10 +465,10 @@ n = 1;
             rImmune , fImm , kRL , kDR , maleHpvClearMult , disease , age , hpvVaxStates , hpvNonVaxStates , hpvTypeGroups , ccLochpvVaxIndsFrom_treat , ...
             ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat) , tspan , popIn);
             popIn = pop(end , :);  % for next module
-            if any(pop(end , :) <  0)
-                disp('After hpv')
-                break
-            end
+%             if any(pop(end , :) <  0)
+%                 disp('After hpv')
+%                 break
+%             end
             pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
@@ -484,10 +485,10 @@ n = 1;
                     vaxToScreenCancerNegScreen , noVaxToScreenCancerNegScreen);
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);  % for next module
-                if any(pop(end , :) <  0)
-                    disp('After hpv screen')
-                    break
-                end
+%                 if any(pop(end , :) <  0)
+%                     disp('After hpv screen')
+%                     break
+%                 end
             end
  
 
@@ -497,10 +498,10 @@ n = 1;
                 screenAlgs , kSymp, hystMult, udPop, udPopNoTreat, udPopTreat, udPopHyst, ccReghpvVaxInds); 
             pop(end , :) = pop(end , :) + dPop(end , :); 
             popIn = pop(end , :); % for next module
-            if any(pop(end , :) < 0)
-                disp('After symptomatic detection')
-                break
-            end 
+%             if any(pop(end , :) < 0)
+%                 disp('After symptomatic detection')
+%                 break
+%             end 
         pop = pop(end, :); 
     end
         
@@ -517,12 +518,12 @@ n = 1;
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
         d_partnersMmult,  ...
-        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear) , tspan , popIn);
+        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear , numGrpsCU) , tspan , popIn);
         popIn = pop(end , :);
-        if any(pop(end , :) < 0)
-            disp('After mixInfect')
-            break
-        end
+%         if any(pop(end , :) < 0)
+%             disp('After mixInfect')
+%             break
+%         end
         
         % HIV module, CD4 Progression, VL progression, ART initiation/dropout,
         % excess HIV mortality
@@ -540,10 +541,10 @@ n = 1;
             end
             artDist = calcDist(artDistList , disease , viral , gender , age , ...
                 risk); % 2 year average CD4 and VL distribution at time of ART initiation. Details where ART dropouts return to.
-            if any(pop(end , :) < 0)
-                disp('After hiv')
-                break
-            end
+%             if any(pop(end , :) < 0)
+%                 disp('After hiv')
+%                 break
+%             end
         end
         
         % Birth, aging, risk redistribution module
@@ -560,10 +561,10 @@ n = 1;
             stepsPerYear , currYear , agesComb , noVaxScreen , noVaxXscreen , ...
             vaxScreen , vaxXscreen , hpvScreenStartYear) , tspan , popIn);
         popIn = pop(end , :);
-        if any(pop(end , :) < 0)
-            disp('After bornAgeDieRisk')
-            break
-        end
+%         if any(pop(end , :) < 0)
+%             disp('After bornAgeDieRisk')
+%             break
+%         end
         
         % VOLUNTARY MALE MEDICAL CIRCUMCISION
         % Scale-up of VMMC by age
@@ -573,10 +574,10 @@ n = 1;
             ageSexDebut , year);
             pop(end , :) = pop(end , :) + dPop;
             popIn = pop(end , :);
-            if any(pop(end , :) < 0)
-                disp('After vmmc')
-                break
-            end
+%             if any(pop(end , :) < 0)
+%                 disp('After vmmc')
+%                 break
+%             end
         end
 
         if (year >= vaxStartYear)
@@ -588,10 +589,10 @@ n = 1;
                     intervens , vaxCoverL , vaxRemain , vaxGL , toInd);
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);
-                if any(pop(end , :) < 0)
-                    disp('After hpvVaxLmtd')
-                    break
-                end
+%                 if any(pop(end , :) < 0)
+%                     disp('After hpvVaxLmtd')
+%                     break
+%                 end
             
             % If vaccines are not limited
             else
@@ -601,10 +602,10 @@ n = 1;
                     vaxCover , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);
-                if any(pop(end , :) < 0)
-                    disp('After hpvVaxSchool')
-                    break
-                end
+%                 if any(pop(end , :) < 0)
+%                     disp('After hpvVaxSchool')
+%                     break
+%                 end
                 
                 % If present, apply catch-up vaccination regimen
                 if vaxCU
@@ -613,10 +614,10 @@ n = 1;
                         hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxAgeCU , ...
                         vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd);
                     pop(end , :) = pop(end , :) + dPop;
-                    if any(pop(end , :) < 0)
-                        disp('After hpvVaxCU')
-                        break
-                    end
+%                     if any(pop(end , :) < 0)
+%                         disp('After hpvVaxCU')
+%                         break
+%                     end
                 end
             end
         end
@@ -634,10 +635,11 @@ n = 1;
         filename = ['vaxWaneSimResult' , num2str(paramSetIdx)];
     end
     
-    parsave_condense(filename , fivYrAgeGrpsOn , tVec , popVec , ...
-        deaths , ccDeath_treat , ccDeath_untreat , ...
-        newCC , vaxdLmtd , vaxdSchool , vaxdCU , newScreen ,  ... %artTreatTracker , newTreatImm , newTreatHpv , newTreatHyst ,
-        ccSymp , ccTreat , pathModifier);
+    parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
+        newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
+        hivDeaths , deaths , ccDeath_treat , ccDeath_untreat , ...
+        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
+        currYear , lastYear , vaxRate , vaxEff , ccSymp, ccTreat , popLast , pathModifier);
 
 % end 
 disp('Done')
