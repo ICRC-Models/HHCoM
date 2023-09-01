@@ -175,7 +175,12 @@ pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
 curr = load([pwd , '/HHCoM_Results/toNow_20Jul23_stochMod_baseline_2dose_nowane' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxWaneSimResult'];
+
+if (sceNum < 9) % ***SET ME***: specify which scenarios have "wane" in their file name
+    resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxSimResult'];
+else 
+    resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxWaneSimResult'];
+end 
 
 % load results from vaccine run into cell array
 vaxResult{n} = load([resultFileName , fileInds{j}, '.mat']);
@@ -217,12 +222,15 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
     vax(:, 17, 2, j) = vaxTemplate(:, 3); % catchup vax 
 
 % DEATHS (CC and all cause) **************************************
-    ccDeath_treat = zeros(nTimepoints, age); 
+    ccDeath_treat = zeros(nTimepoints, 7, age); 
     ccDeath_untreat = ccDeath_treat; 
 
     for a = 1 : age 
-        ccDeath_treat(:, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, :, a, :),2),3),4); 
-        ccDeath_untreat(:, a) = sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, :, a, :),2),3),4); 
+        for dInd = 1 : length(diseaseVec_vax)
+            d = diseaseVec_vax{dInd};
+            ccDeath_treat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, d, a, :),2),3),4); 
+            ccDeath_untreat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, d, a, :),2),3),4); 
+        end 
     end 
 
     hivDeath = zeros(nTimepoints, age); 
@@ -232,10 +240,10 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
     end 
 
     % combine all death data into 3D matrix
-    deaths(:, 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
-    deaths(:, 1:age, 2, j) = ccDeath_untreat;
-    deaths(:, 1:age, 3, j) = hivDeath; 
-    deaths(:, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age
+    deaths(:, 1:length(diseaseVec_vax), 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
+    deaths(:, 1: length(diseaseVec_vax), 1:age, 2, j) = ccDeath_untreat;
+    deaths(:, 8, 1:age, 3, j) = hivDeath; 
+    deaths(:, 8, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age
 
 % CC HEALTH STATES (CC stage prevalence) ****************************
 

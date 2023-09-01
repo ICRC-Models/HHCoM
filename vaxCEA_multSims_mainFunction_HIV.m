@@ -91,7 +91,7 @@ for j = [1] % FORTESTING
 
     % Initialize result matrices 
     vax = zeros(nTimepoints, age+1, 2, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
-    deaths = zeros(nTimepoints, age+1, 4, nRuns); 
+    deaths = zeros(nTimepoints, length(diseaseVec_vax)+1, age+1, 4, nRuns); 
     ccHealthState = zeros(nTimepoints, length(diseaseVec_vax), age+1, endpoints, nRuns); 
     hivHealthState = zeros(nTimepoints, 7, age+1, nRuns); % time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios
     hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); 
@@ -130,13 +130,15 @@ for j = [1] % FORTESTING
             end 
 
             for index = 1 : 3 
-                if (param == 1 && a == 1 && index == 1)
-                    deathsReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), deaths(:, a, index, param)];
-                else 
-                    deathsReshape = [deathsReshape; 
-                                        transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), deaths(:, a, index, param)];
+                for dInd = 1 : length(diseaseVec_vax)+1
+                    if (param == 1 && a == 1 && index == 1 && dInd==1)
+                        deathsReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), deaths(:, dInd, a, index, param)];
+                    else 
+                        deathsReshape = [deathsReshape; 
+                                            transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), deaths(:, dInd, a, index, param)];
+                    end 
                 end 
             end 
 
@@ -229,7 +231,7 @@ for j = [1] % FORTESTING
 % turn into arrays
 vaxReshape1 = array2table(vaxReshape, 'VariableNames', {'year', 'age', 'vaxType', 'paramNum', ...
         'sceNum', 'count'}); 
-deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'age', 'index', 'paramNum', ...
+deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'hivState', 'age', 'index', 'paramNum', ...
         'sceNum', 'count'}); 
 ccHealthStateReshape1 = array2table(ccHealthStateReshape, 'VariableNames', {'year',  'hivState' , 'age', 'endpoint', 'paramNum', ...
         'sceNum', 'count'});
