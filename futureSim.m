@@ -43,8 +43,10 @@ lastYear = 2123; % ***SET ME***: end year of simulation run
 %   every 3 years among HIV-positive women.
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve , 7 for spHpvAve)
 sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear;     2023; 2030; 2045])
-sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
-sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
+% sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
+% sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
+sceScreenHivGrps = {[1 : 2] [3 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
+sceScreenAges = {[8 , 10] [6 : 10]}; % ***SET ME***: screening ages that correspond to HIV state groupings
 
 % VACCINATION
 % Instructions: The model will set up a scenario for each school-based vaccine coverage listed in "vaxCover", plus a scenario with only baseline vaccine coverage as in "vaxCoverB".
@@ -63,7 +65,8 @@ sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV sta
 %   Scenario 3: baseline regimen for age 9 at 86% coverage (to run scenario, set vaxCoverInd = 3)
 
 % Common parameters
-vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
+% vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
+% vaxEff commented out because we are pulling from a distribution
 rVaxWane = 0.0; % rate of waning vaccine immunity
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -172,7 +175,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -533,7 +536,7 @@ n = vaxCoverInd; %parfor n = 1 : nTests (can only use parfor loop if not running
             lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
             hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
             circProtect , condProtect , condUse , betaHIV_mod , ...
-            hivSus , toHiv , hivCurr) , tspan , popIn);
+            hivSus , toHiv , hivCurr) , tspan , popIn); 
         popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After mixInfect')

@@ -7,7 +7,7 @@ rm(list = ls(all.names = TRUE))
 
 setwd("/Users/clh89/MATLAB/Projects/ccTreatment_KZN/SACEA/")  # *******SET ME***********
 
-sces = c(0)
+sces = c(8,9)
 
 # Translating Matlab indexes for compartments into R factors
 hivCateg = data.frame("num" = seq(1,7,1),  
@@ -196,6 +196,8 @@ for (sceNum_i in sces) {
   ifelse(!dir.exists(paste0(getwd(), "/Outputs")), dir.create(paste0(getwd(), "/Outputs")), FALSE)
   
   write.csv(sceDf, paste0(getwd(), "/Outputs/modelResultsForCea_S", sceNum_i, ".csv"), row.names = FALSE)
+  
+  print(paste0("Scenario ", sceNum_i, " complete."))
 }
 
 # separately analyze `scen0CinTx_S0.csv`

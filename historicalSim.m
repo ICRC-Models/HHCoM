@@ -53,7 +53,7 @@ screenAlgorithm = 3; % ***SET ME***: screening algorithm to use (1 for baseline,
 %   types, particularly if catch-up vaccination is applied in future years.
 
 % Common parameters
-vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
+% vaxEff = 1.0; % actually bivalent vaccine, but to avoid adding additional compartments, we use nonavalent vaccine and then reduce coverage
 rVaxWane = 0.0; % rate of waning vaccine immunity
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -119,7 +119,7 @@ vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp 
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
 
 %% Screening
 if (screenAlgorithm == 1)

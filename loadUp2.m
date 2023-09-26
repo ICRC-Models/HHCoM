@@ -50,7 +50,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx)
 
 tic
 
@@ -916,6 +916,20 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
     for aInd = 1 : length(circ_aVec)
         vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
     end
+end
+
+%% Vaccination efficacy 
+% Read in excel file where CLH pulled 100 values for vax efficacy from Costa Rica trial from a beta distribution
+
+vaxUncertainty = 1; % bool - if you want to pull from an uncertainty for vax efficacy
+
+if vaxUncertainty == 1
+    filename = [paramDir 'VaxEfficacyRandVal_2dose.xlsx'];
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
+    vaxEff = vaxEff_mat(paramSetIdx);  
+else
+    vaxEff = 1.0; % 9v vaccine
 end
 
 % Screening timeframe
