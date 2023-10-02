@@ -920,11 +920,37 @@ end
 
 %% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from Costa Rica trial from a beta distribution
+% --------- CHANGE ME: -------- update to "_bivalent" or "_nonavalent"
+% depending on which vaccination is being modeled (for KZN CEA, it is
+% bivalent for historicalSim and nonavalent for futureSim. 
+
+% Beta distribution code can be found in
+% ccTreatment_KZN/vaxEfficacyBetaProb_3Dose.R
+
+% Bivalent uncertainty comes from FDA Cervarix licensure, 
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/cervarix
+% Approval History / Clinical Review Memo
+% 100% (98.67% CI: 74.4, 100) 
+% beta distribution alpha = 6.88
+% beta distribution beta = 0.31
+% lower CI: 0.7441952
+% upper CI: 0.9999993
+% median: 0.9878978
+
+% Nonavalent uncertainty comes from FDA Gardasil licensure, 
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/gardasil-9
+% June 9, 2020 Clinical Review - GARDASIL 9
+% 96.7 (80.9-99.8)
+% beta distribution alpha = 15.66
+% beta distribution beta = 0.82
+% lower CI: 0.8091454
+% upper CI: 0.9993367
+% median: 0.9671358 
 
 vaxUncertainty = 1; % bool - if you want to pull from an uncertainty for vax efficacy
 
 if vaxUncertainty == 1
-    filename = [paramDir 'VaxEfficacyRandVal_2dose.xlsx'];
+    filename = [paramDir 'VaxEfficacyRandVal_2dose_bivalent.xlsx'];
     sheet = 1;
     vaxEff_mat = xlsread(filename, sheet);
     vaxEff = vaxEff_mat(paramSetIdx);  
