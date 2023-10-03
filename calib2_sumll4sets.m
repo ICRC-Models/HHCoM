@@ -22,14 +22,14 @@ date = date_abc;
 %% Cluster information for ERISONE
 pc = parcluster('local'); 
 pc.JobStorageLocation = getenv('TMPDIR'); % how to pull job id?
-numCPUperNode = 28; % how to pull CPUs on node? set to 8 as an initial test.
-parpool(pc, numCPUperNode)
+numWorkers = 9; % to run the model on 9 parallel workers 
+parpool(pc, numWorkers)
 
 
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 paramSetMatrix = load([paramDir,'stochasticParamsets.dat']);
-nPrlSets = 25; %numCPUperNode; %16;
+nPrlSets = 50; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = [10, 35, 38];
 
