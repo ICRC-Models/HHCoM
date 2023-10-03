@@ -752,9 +752,10 @@ kSymp_mat = xlsread(filename, sheet, 'A2:C26');
 kSymp = kSymp_mat(paramSetIdx, 1:end);  
 
 % Proportion of women who receive hysterectomy by stage
-% Based on Campos, 2018
+% Based on Campos, 2018 and Mungo, 2021
+% Refer to Config/Hyst_rate_calculation.xlsx for how this was calculated
 
-hystMult = [0.75 0.125 0]; 
+hystMult = [0.696 0.042 0]; 
 
 % Immunity
 rImmune = 0.024; % Clearance rate from Immune to Normal; for HPV16, Johnson (2012)
