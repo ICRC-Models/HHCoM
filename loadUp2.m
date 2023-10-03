@@ -883,7 +883,7 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.04; 0.074; 0.074; 0.074; 0.074]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9
+baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
@@ -903,7 +903,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.04; 0.123; 0.123; 0.123; 0.123; 0.123];
+cisnet.screenCover = [0.0; 0.04; 0.123; 0.123; 0.56; 0.56; 0.56]; % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 cisnet.testSens = cytoSens2;
