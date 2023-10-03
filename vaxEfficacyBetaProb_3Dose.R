@@ -89,3 +89,38 @@ addWorksheet(OUT, "VaxEfficacyRandVal")
 writeData(OUT, x = random_vals, startRow = 1, sheet="VaxEfficacyRandVal")
 
 saveWorkbook(OUT, "/Users/clh89/MATLAB/Projects/Kenya_treatment//Params/VaxEfficacyRandVal_2dose_4valent.xlsx", overwrite = TRUE)
+
+##################### Setting the bounds so that 2-dose efficacy is always greater than 1-dose for each parameter set ############################
+
+effTwo <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Params/VaxEfficacyRandVal_2dose_4valent.xlsx", col_names = FALSE) %>% 
+      gather(., name, twodose, `...1`:`...100`)
+effOne <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Params/VaxEfficacyRandVal.xlsx", col_names = FALSE) %>% 
+      gather(., name, onedose, `...1`:`...100`)
+
+effComb <- effTwo %>% 
+      left_join(effOne, by="name") %>% 
+      filter(twodose >= onedose) 
+
+# updated 2 dose efficacies
+twodose <- effComb %>% 
+      pull(twodose) 
+
+OUT <- createWorkbook()
+
+addWorksheet(OUT, "VaxEfficacyRandVal")
+
+writeData(OUT, x = twodose, startRow = 1, sheet="VaxEfficacyRandVal")
+
+saveWorkbook(OUT, "/Users/clh89/MATLAB/Projects/Kenya_treatment//Params/VaxEfficacyRandVal_2dose_4valent_bounded.xlsx", overwrite = TRUE)
+
+# updated 1 dose efficacies
+onedose <- effComb %>% 
+      pull(onedose) 
+
+OUT <- createWorkbook()
+
+addWorksheet(OUT, "VaxEfficacyRandVal")
+
+writeData(OUT, x = onedose, startRow = 1, sheet="VaxEfficacyRandVal")
+
+saveWorkbook(OUT, "/Users/clh89/MATLAB/Projects/Kenya_treatment//Params/VaxEfficacyRandVal_1dose_4valent_bounded.xlsx", overwrite = TRUE)

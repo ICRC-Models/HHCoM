@@ -857,13 +857,16 @@ singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
 % alpha value = 10.76
 % beta value = 0.15
 
+% Bounded parameters mean that we restrict each parameter set so that 2-dose is always better than 1-dose
+% Unbounded uses 2dose_4valent and 1-dose_2valent.xlsx
+
 if singleDoseBool == 1
-    filename = [paramDir 'VaxEfficacyRandVal.xlsx'];
+    filename = [paramDir 'VaxEfficacyRandVal_1dose_2valent_bounded.xlsx']; % KEN-SHE results
     sheet = 1;
     vaxEff_mat = xlsread(filename, sheet);
     vaxEff = vaxEff_mat(paramSetIdx);  
 else
-    filename = [paramDir 'VaxEfficacyRandVal_2dose_4valent.xlsx'];
+    filename = [paramDir 'VaxEfficacyRandVal_2dose_4valent_bounded.xlsx']; % from FDA clinical review
     sheet = 1;
     vaxEff_mat = xlsread(filename, sheet);
     vaxEff = vaxEff_mat(paramSetIdx);  
