@@ -850,6 +850,12 @@ singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
 
 %% Vaccination efficacy 
 % Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
+% 2-dose is from FDA clinical review of Gardasil 9
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/gardasil-9
+% June 9 Clinical Review
+% 4v (100%, 95% CI 88.4, 100)
+% alpha value = 10.76
+% beta value = 0.15
 
 if singleDoseBool == 1
     filename = [paramDir 'VaxEfficacyRandVal.xlsx'];
