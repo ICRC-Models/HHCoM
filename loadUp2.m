@@ -802,8 +802,8 @@ artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.729] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+maxRateM = [artVScov(:,3) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -857,7 +857,10 @@ if singleDoseBool == 1
     vaxEff_mat = xlsread(filename, sheet);
     vaxEff = vaxEff_mat(paramSetIdx);  
 else
-    vaxEff = 1.0; % 9v vaccine
+    filename = [paramDir 'VaxEfficacyRandVal_2dose_4valent.xlsx'];
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
+    vaxEff = vaxEff_mat(paramSetIdx);  
 end 
 
 % Screening timeframe 
