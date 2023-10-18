@@ -79,6 +79,14 @@ else
     vaxYrs = [2020]; 
 end 
 
+% Parameters for catch-up vaccination regimen - note for historicalSim we do not have CU
+vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
+vaxAgeCU = [3:4]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.32*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
+numGrpsCU = length(vaxAgeCU); %***SET ME***: number of age groups in the CU schedule that is NOT the same as the school based regimen
+
 %% Save pre-loaded parameters and pre-calculated indices and matrices
 [stepsPerYear , timeStep , startYear , currYear , endYear , ...
     years , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , ...
@@ -574,7 +582,7 @@ for i = iStart : length(s) - 1
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
         d_partnersMmult,  ...
-        hivSus , toHiv , hivCurr) , tspan , popIn);
+        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear , numGrpsCU) , tspan , popIn);
     popIn = pop(end , :); % for next module
     if any(pop(end , :) < 0)
         disp('After mixInfect')
