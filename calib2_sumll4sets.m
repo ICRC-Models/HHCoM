@@ -29,7 +29,7 @@ parpool(pc, numWorkers)
 %% Load parameters
 paramDir = [pwd ,'/Params/'];
 paramSetMatrix = load([paramDir,'stochasticParamsets.dat']);
-nPrlSets = 50; %numCPUperNode; %16;
+nPrlSets = 25; %numCPUperNode; %16;
 subMatrixInds = [paramSetIdx : (paramSetIdx + nPrlSets - 1)];
 pIdx = [10, 35, 38];
 
