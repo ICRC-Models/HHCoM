@@ -50,7 +50,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , waning] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx)
 
 tic
 
@@ -62,7 +62,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2023; % originally 2021 
+currYear = 2024; % originally 2021 
 endYear = currYear;
 years = endYear - startYear;
 
@@ -946,6 +946,9 @@ end
 % lower CI: 0.8091454
 % upper CI: 0.9993367
 % median: 0.9671358 
+
+%% Vaccination waning
+waning = 1;    % bool to turn waning on or off
 
 vaxUncertainty = 1; % bool - if you want to pull from an uncertainty for vax efficacy
 

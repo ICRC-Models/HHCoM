@@ -16,7 +16,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']);
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , 'BaseVax_spCytoScreen_noVMMC_noCond_noHiv_', num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
     'popLast' , 'artDistList' , 'artDist'); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
@@ -31,7 +31,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run
+lastYear = 2124; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
@@ -175,7 +175,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , waning] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -387,6 +387,27 @@ lambdaMultVaxMat = zeros(age , nTests); % age-based vector for modifying lambda 
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff));
 for n = 1 : nTests
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
+
+    % Waning
+    effPeriod = 15; % number of years that initial efficacy level is retained
+    wanePeriod = 10; % number of years over which initial efficacy level wanes
+    if waning 
+        % Following a period (in years) where original efficacy is retained, 
+        % specified by 'effPeriod' , linearly scale down vaccine efficacy 
+        % to 0% over time period specificed by 'wanePeriod'
+        % To make waning rate equal in all scenarios, the linear rate of 
+        % waning is based on the least effective initial vaccine efficacy
+        % scenario. 
+        kWane = min(vaxEff) / round(wanePeriod / 5);     
+        vaxInit = vaxEff(vaxEffInd(n));
+        waningEffVec = max(0 , linspace(vaxInit , ...
+            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
+            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); 
+        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : ... 
+            round(effPeriod / 5) + min(testParams2{n , 1}) - 1 + size(waningEffVec,1) - 1 , n) = ...
+            waningEffVec; % ensures vaccine efficacy is >= 0
+        lambdaMultVaxMat(1+(effPeriod/5)+(wanePeriod/5)+1:end,n) = 0; 
+    end
 end
 
 %% Simulation
