@@ -57,19 +57,19 @@ clear;
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_CISNET_S0b(1 , 0 , [] , [] , [] , 1 , 1); % ***SET ME***
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_CISNET_S0(1 , 0 , [] , [] , [] , 1 , 1); % ***SET ME***
 
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
 % code
-fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
-     '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
-    '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
-    '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
-% fileInds = {'6_1'}; % FORTESTING
+% fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
+%      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
+%     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
+%     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
+fileInds = {'6_1'}; % FORTESTING
 nRuns = length(fileInds);
 
-lastYear = 2124; % manually set in futureSim 
+lastYear = 2125; % manually set in futureSim 
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
 monthlyTimespanFut = [endYear : timeStep : lastYear]; % screening time span starts at 2021
@@ -81,7 +81,7 @@ nTimepointsFut = length(monthlyTimespanFut);
 % loopSegments = {0 , round(3/2) , 3}; % ********SET ME*********: how many scenarios are you running
 % loopSegmentsLength = length(loopSegments);
 
-scenarios = {'37'}; % *********SET ME***********: what are the scenarios you are running
+scenarios = {'0'}; % *********SET ME***********: what are the scenarios you are running
 
 % for k = 1 : loopSegmentsLength-1 
 %     parfor j = loopSegments{k}+1 : loopSegments{k+1}
@@ -124,22 +124,22 @@ for j = [1] % FORTESTING
                 else 
                     hpvHealthStateReshape = [hpvHealthStateReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hpvHealthState(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hpvHealthState(:, a, dInd, param)];
                     hivHealthStateReshape = [hivHealthStateReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hivHealthState(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), hivHealthState(:, a, dInd, param)];
                     newCCReshape = [newCCReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), newCC(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), newCC(:, a, dInd, param)];
                     totalPerAgeReshape = [totalPerAgeReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), totalPerAge(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), totalPerAge(:, a, dInd, param)];
                     totalPerAgeNoCCReshape = [totalPerAgeNoCCReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), totalPerAgeNoCC(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), totalPerAgeNoCC(:, a, dInd, param)];
                     onARTReshape = [onARTReshape; 
                                             transpose(monthlyTimespan), a.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), ...
-                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), onART(:, a, var, param)];
+                                             param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), onART(:, a, dInd, param)];
                 end 
             end 
         end 

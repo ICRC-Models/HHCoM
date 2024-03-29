@@ -5,9 +5,9 @@ library(lubridate)
 
 rm(list = ls(all.names = TRUE))
 
-setwd("/Users/clh89/MATLAB/Projects/ccTreatment_KZN/SACEA/")  # *******SET ME***********
+setwd("/Users/clh89/Dropbox (Partners HealthCare)/Cervical Cancer Elimination/Vaccine CEA/Model Outputs/Matlab to CSV/")  # *******SET ME***********
 
-sces = c(8,9)
+sces = seq(3,10,1)
 
 # Translating Matlab indexes for compartments into R factors
 hivCateg = data.frame("num" = seq(1,7,1),  

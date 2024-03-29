@@ -609,7 +609,7 @@ for i = iStart : length(s) - 1
         % School-based vaccination regimen
         [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
             hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-            vaxRate , toInd);
+            vaxRate , toInd , vaxYrs , year , stepsPerYear , gradScaleUp);
         pop(end , :) = pop(end , :) + dPop;
         if any(pop(end , :) < 0)
             disp('After hpvVaxSchool')

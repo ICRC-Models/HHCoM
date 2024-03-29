@@ -59,7 +59,7 @@ paramDir = [pwd , '\Params\'];
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_CISNET_S0b(1 , 0 , [] , [] , [] , 1 , 1); % ***SET ME***
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_CISNET_S0(1 , 0 , [] , [] , [] , 1 , 1); % ***SET ME***
 
 % Plot settings
 reset(0)
@@ -85,7 +85,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['22Apr20Ph2V112v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
+baseFileName = ['22Apr20Ph2V112v57BaseVax_spCytoScreen_shortName_noVMMC_noCond_noHiv_SA-S' , sceNum , '_']; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -95,16 +95,16 @@ loopSegmentsLength = length(loopSegments);
 % the for and parfor basically loops through the first half of the
 % parameters, then the second half. but parfor allows them to run
 % independently of each other. 
-for k = 1 : loopSegmentsLength-1
-    for j = loopSegments{k}+1 : loopSegments{k+1} % trying just a for loop for now
+% for k = 1 : loopSegmentsLength-1
+%     for j = loopSegments{k}+1 : loopSegments{k+1} % trying just a for loop for now
 
-% k=1; % temporarily only running a single parameter to test 
-% j=1; 
+k=1; % temporarily only running a single parameter to test 
+j=1; 
 
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V112v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , fileInds{j}]); % ***SET ME***: name for historical run output file
+curr = load([pwd , '/HHCoM_Results/toNow_22Apr20Ph2V11BaseVax_spCytoScreen_noVMMC_noCond_noHiv_' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
 resultFileName = [pwd , '/HHCoM_Results/' , pathModifier, '/' , 'vaxSimResult'];
 
@@ -130,12 +130,16 @@ vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 
 % HPV HEALTH STATES ************************************
 % To calculate HPV prevalence 
+% CIN and CC also count towards HPV prevalence 
 
     for a = 1 : age
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
-            vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            hpvHealthState(1:end, a, d, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
+            d = diseaseVec_vax{dInd}; 
+            vaxInds1 = toInd(allcomb(d, 1:viral, 2:6, 2:6, 1:endpoints, 1:intervens, 2, a, 1:risk)); %women infected with both vax and nonvax types
+            vaxInds2 = toInd(allcomb(d, 1:viral, [1 7], 2:6, 1:endpoints, 1:intervens, 2, a, 1:risk)); %women infected with only nonvax types
+            vaxInds3 = toInd(allcomb(d, 1:viral, 2:6, [1 7], 1:endpoints, 1:intervens, 2, a, 1:risk)); %women infected with only vax types
+            vaxInds = [vaxInds1; vaxInds2; vaxInds3]; %combine the three inds
+            hpvHealthState(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2);
 	    end
     end
 
@@ -145,9 +149,9 @@ vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 
     for a = 1 : age
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
+            d = diseaseVec_vax{dInd}; 
             vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            hivHealthState(1:end, a, d, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+            hivHealthState(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end
     end 
 
@@ -156,8 +160,8 @@ vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 
     for a = 1 : age 
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
-            newCC(1:end, a, d, j) = sum(sum(sum(vaxResult{n}.newCC(:, d, a, :),2),3),4);
+            d = diseaseVec_vax{dInd}; 
+            newCC(1:end, a, dInd, j) = sum(sum(sum(vaxResult{n}.newCC(:, d, a, :),2),3),4);
         end 
     end 
 
@@ -166,9 +170,9 @@ vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 
     for a = 1 : age 
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
+            d = diseaseVec_vax{dInd}; 
             vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            totalPerAge(1:end, a, d, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+            totalPerAge(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end 
     end 
 
@@ -179,9 +183,9 @@ nonCC = [1 2 3 4 5 7]; % hpvvaxstates or nonvaxstates that are not CC
 
     for a = 1 : age
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
+            d = diseaseVec_vax{dInd}; 
             vaxInds = toInd(allcomb(d, 1:viral, nonCC, nonCC, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            totalPerAgeNoCC(1:end, a, d, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+            totalPerAgeNoCC(1:end, a, dInd, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end 
     end 
 
@@ -190,11 +194,13 @@ nonCC = [1 2 3 4 5 7]; % hpvvaxstates or nonvaxstates that are not CC
 
     for a = 1 : age
         for dInd = 1 : length(diseaseVec_vax)
-            d = diseaseVec_vax(dInd); 
-            onART(1:end, a, d, j) = sum(sum(sum(sum(sum(vaxResult{n}.artTreatTracker(:, d, 1:viral, 2, a, 1:risk), 2),3),4),5),6)
+            d = diseaseVec_vax{dInd}; 
+            onART(1:end, a, dInd, j) = sum(sum(sum(sum(sum(vaxResult{n}.artTreatTracker(:, d, 1:viral, 2, a, 1:risk), 2),3),4),5),6);
         end
     end
 
-end % for loop end 
+% end % for loop end 
 
-end % function end 
+% end % function end 
+
+end

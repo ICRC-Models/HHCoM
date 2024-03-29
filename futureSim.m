@@ -389,8 +389,8 @@ for n = 1 : nTests
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
 
     % Waning
-    effPeriod = 15; % number of years that initial efficacy level is retained
-    wanePeriod = 10; % number of years over which initial efficacy level wanes
+    effPeriod = 25; % number of years that initial efficacy level is retained
+    wanePeriod = 25; % number of years over which initial efficacy level wanes
     if waning 
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
