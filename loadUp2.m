@@ -50,7 +50,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , waning] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx)
 
 tic
 
@@ -62,7 +62,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2023; % originally 2021 
+currYear = 2024; % originally 2021 
 endYear = currYear;
 years = endYear - startYear;
 
@@ -916,6 +916,49 @@ for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within pe
     for aInd = 1 : length(circ_aVec)
         vmmc_vec{i,aInd} = interp1(period , vmmcRate(i : i + 1 , aInd) , xq);
     end
+end
+
+%% Vaccination efficacy 
+% Read in excel file where CLH pulled 100 values for vax efficacy from Costa Rica trial from a beta distribution
+% --------- CHANGE ME: -------- update to "_bivalent" or "_nonavalent"
+% depending on which vaccination is being modeled (for KZN CEA, it is
+% bivalent for historicalSim and nonavalent for futureSim. 
+
+% Beta distribution code can be found in
+% ccTreatment_KZN/vaxEfficacyBetaProb_3Dose.R
+
+% Bivalent uncertainty comes from FDA Cervarix licensure, 
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/cervarix
+% Approval History / Clinical Review Memo
+% 100% (98.67% CI: 74.4, 100) 
+% beta distribution alpha = 6.88
+% beta distribution beta = 0.31
+% lower CI: 0.7441952
+% upper CI: 0.9999993
+% median: 0.9878978
+
+% Nonavalent uncertainty comes from FDA Gardasil licensure, 
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/gardasil-9
+% June 9, 2020 Clinical Review - GARDASIL 9
+% 96.7 (80.9-99.8)
+% beta distribution alpha = 15.66
+% beta distribution beta = 0.82
+% lower CI: 0.8091454
+% upper CI: 0.9993367
+% median: 0.9671358 
+
+%% Vaccination waning
+waning = 1;    % bool to turn waning on or off
+
+vaxUncertainty = 1; % bool - if you want to pull from an uncertainty for vax efficacy
+
+if vaxUncertainty == 1
+    filename = [paramDir 'VaxEfficacyRandVal_2dose_bivalent.xlsx'];
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
+    vaxEff = vaxEff_mat(paramSetIdx);  
+else
+    vaxEff = 1.0; % 9v vaccine
 end
 
 % Screening timeframe

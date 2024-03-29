@@ -16,7 +16,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 
 % LOAD OUTPUT OF HISTORICAL SIMULATION AS INITIAL CONDITIONS FOR FUTURE SIMULATION
 %historicalIn = load([pwd , '/HHCoM_Results/toNow_16Apr20_noBaseVax_baseScreen_hpvHIVcalib_0_1_test3_round1calib']);
-historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , '2v57BaseVax_spCytoScreen_shortName_noVMMChpv_discontFxd_screenCovFxd_hivInt2017_' , num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
+historicalIn = load([pwd , '/HHCoM_Results/toNow_' , date , 'BaseVax_spCytoScreen_noVMMC_noCond_noHiv_', num2str(tstep_abc) , '_' , num2str(paramSetIdx)] , ...
     'popLast' , 'artDistList' , 'artDist'); % ***SET ME***: name for historical run output file 
 
 % DIRECTORY TO SAVE RESULTS
@@ -31,7 +31,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year (fivYrAgeGrpsOn=1) or 1-year age groups (fivYrAgeGrpsOn=0)
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run
+lastYear = 2124; % ***SET ME***: end year of simulation run
 
 % SCREENING
 % Instructions: Choose one screenAlgorithm, and modify the following screening parameters if appropriate.
@@ -43,8 +43,10 @@ lastYear = 2123; % ***SET ME***: end year of simulation run
 %   every 3 years among HIV-positive women.
 screenAlgorithm = 1; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for WHO, 3 for spCyto, 4 for spHpvDna, 5 for spGentyp, 6 for spAve , 7 for spHpvAve)
 sceScreenCover = [0.0; 0.18; 0.48; 0.48;     0.48; 0.48; 0.48]; % Coverage over time (Years: [2000; 2003; 2016; currYear;     2023; 2030; 2045])
-sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
-sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
+% sceScreenHivGrps = {[1 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
+% sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV state groupings
+sceScreenHivGrps = {[1 : 2] [3 : 8]}; % ***SET ME***: Groupings of HIV states with different screening ages
+sceScreenAges = {[8 , 10] [6 : 10]}; % ***SET ME***: screening ages that correspond to HIV state groupings
 
 % VACCINATION
 % Instructions: The model will set up a scenario for each school-based vaccine coverage listed in "vaxCover", plus a scenario with only baseline vaccine coverage as in "vaxCoverB".
@@ -63,7 +65,8 @@ sceScreenAges = {[8]}; % ***SET ME***: screening ages that correspond to HIV sta
 %   Scenario 3: baseline regimen for age 9 at 86% coverage (to run scenario, set vaxCoverInd = 3)
 
 % Common parameters
-vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
+% vaxEff = 1.0;  % 9v-vaccine efficacy, used for all vaccine regimens present
+% vaxEff commented out because we are pulling from a distribution
 rVaxWane = 0.0; % rate of waning vaccine immunity
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
@@ -172,7 +175,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , waning] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
 
 %% Screening
 if (screenAlgorithm == 1)
@@ -384,6 +387,27 @@ lambdaMultVaxMat = zeros(age , nTests); % age-based vector for modifying lambda 
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff));
 for n = 1 : nTests
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
+
+    % Waning
+    effPeriod = 25; % number of years that initial efficacy level is retained
+    wanePeriod = 25; % number of years over which initial efficacy level wanes
+    if waning 
+        % Following a period (in years) where original efficacy is retained, 
+        % specified by 'effPeriod' , linearly scale down vaccine efficacy 
+        % to 0% over time period specificed by 'wanePeriod'
+        % To make waning rate equal in all scenarios, the linear rate of 
+        % waning is based on the least effective initial vaccine efficacy
+        % scenario. 
+        kWane = min(vaxEff) / round(wanePeriod / 5);     
+        vaxInit = vaxEff(vaxEffInd(n));
+        waningEffVec = max(0 , linspace(vaxInit , ...
+            vaxInit - kWane * (1 + age - (round(wanePeriod / 5) + min(testParams2{n , 1}))) ,...
+            age - (round(wanePeriod / 5) + min(testParams2{n , 1})) + 2)'); 
+        lambdaMultVaxMat(round(effPeriod / 5) + min(testParams2{n , 1}) - 1 : ... 
+            round(effPeriod / 5) + min(testParams2{n , 1}) - 1 + size(waningEffVec,1) - 1 , n) = ...
+            waningEffVec; % ensures vaccine efficacy is >= 0
+        lambdaMultVaxMat(1+(effPeriod/5)+(wanePeriod/5)+1:end,n) = 0; 
+    end
 end
 
 %% Simulation
@@ -533,7 +557,7 @@ n = vaxCoverInd; %parfor n = 1 : nTests (can only use parfor loop if not running
             lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
             hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
             circProtect , condProtect , condUse , betaHIV_mod , ...
-            hivSus , toHiv , hivCurr) , tspan , popIn);
+            hivSus , toHiv , hivCurr) , tspan , popIn); 
         popIn = pop(end , :);
         if any(pop(end , :) < 0)
             disp('After mixInfect')

@@ -20,8 +20,11 @@ date = date_abc;
 %% Cluster information -- Erisone
 pc = parcluster('local'); 
 pc.JobStorageLocation = getenv('TMPDIR'); % how to pull job id?
-numCPUperNode = 28; % how to pull CPUs on node? set to 8 as an initial test.
-parpool(pc, numCPUperNode)
+numWorkers = 9; 
+% numCPUperNode = str2double(getenv('LSB_DJOB_NUMPROC')); 
+% numCPUperNode = 28; % how to pull CPUs on node? set to 8 as an initial test.
+% parpool(pc, numCPUperNode)
+parpool(pc, numWorkers)
 
 %%
 nPrlSets = 25;

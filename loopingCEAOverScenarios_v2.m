@@ -57,16 +57,16 @@ clear;
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat] = loadUp2(1 , 0 , [] , [] , [] , 1);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , [] , 1 , 1);
 
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
 % code
-% fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
-%      '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
-%     '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
-%     '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
-fileInds = {'6_1'}; % FORTESTING
+fileInds = {'6_1' , '6_2' , '6_3' , '6_6' , '6_8' , '6_9' , '6_11' , ...
+     '6_12' , '6_13' , '6_15' , '6_20' , '6_21' , '6_22' , '6_26' , ...
+    '6_27' , '6_32' , '6_34' , '6_35' , '6_38' , '6_39' , '6_40' , ...
+    '6_41' , '6_42' , '6_45' , '6_47'};    % 22Apr20Ph2V11 ***************SET ME****************
+% fileInds = {'6_1'}; % FORTESTING
 nRuns = length(fileInds);
 
 lastYear = 2123; % manually set in futureSim 
@@ -78,15 +78,15 @@ nTimepoints = length(monthlyTimespan);
 nTimepointsFut = length(monthlyTimespanFut); 
 
 % parallelizing the for loop
-loopSegments = {0 , round(1/2) , 1}; % ********SET ME*********: how many scenarios are you running
+loopSegments = {0 , round(2/2) , 2}; % ********SET ME*********: how many scenarios are you running
 loopSegmentsLength = length(loopSegments);
 
-scenarios = {'0'}; % *********SET ME***********: what are the scenarios you are running
+scenarios = {'8', '9'}; % *********SET ME***********: what are the scenarios you are running
 
-% for k = 1 : loopSegmentsLength-1 
-%     parfor j = loopSegments{k}+1 : loopSegments{k+1}
+for k = 1 : loopSegmentsLength-1 
+    parfor j = loopSegments{k}+1 : loopSegments{k+1}
     
-for j = [1] % FORTESTING
+% for j = [1] % FORTESTING
 
     sceNum = j - 1; 
     sceString = scenarios{j}; % turn sceNum into string sceString
@@ -272,4 +272,4 @@ end
 
     end
 end
-% end
+end
