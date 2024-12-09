@@ -1,11 +1,13 @@
 % HPV school-based vaccination (assumes girls are not also screened in vaccination age group)
-function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
+function[dPop , hpvVaxd , hpvVaxdNonPrev , hpvVaxdPrev] = hpvVaxSchool(pop , disease , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
     vaxRate_vec , toInd , vaxYrs , year , stepsPerYear , gradScaleUp)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 hpvVaxd = 0;
+hpvVaxdNonPrev = 0; 
+hpvVaxdPrev = 0; 
 
 if gradScaleUp == 1 % note that gradScaleUp has not been set up for future sim, only historical !!!!!!!
         % Vaccination level
@@ -43,10 +45,30 @@ for d = 1 : disease
                         g , a , r));
                     fromNonVImm = toInd(allcomb(d , v , 7 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ... 
                         g , a , r));
+                    fromNonVInf = toInd(allcomb(d , v , 2 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ...
+                        g , a , r)); %include infected and CIN1
+                    fromNonVCin1 = toInd(allcomb(d , v, 3 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ...
+                        g , a, r)); 
+                    fromNonVCin2 = toInd(allcomb(d , v, 4 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ...
+                        g , a, r)); 
+                    fromNonVCin3 = toInd(allcomb(d , v, 5 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ...
+                        g , a, r)); 
+                    fromNonVCc = toInd(allcomb(d , v, 6 , 1 : hpvNonVaxStates , 1 : 3 , 1 , ...
+                        g , a, r)); 
                     toVSus = toInd(allcomb(d , v , 1 , 1 : hpvNonVaxStates , 1 : 3 , 2 , ...
                         g , a , r));
                     toVImm = toInd(allcomb(d , v , 7 , 1 : hpvNonVaxStates , 1 : 3 , 2 , ...
                         g , a , r));
+                    toVInf = toInd(allcomb(d , v , 2 , 1 : hpvNonVaxStates , 1 : 3 , 5 , ...
+                        g , a , r)); %into a vaccinated while HPV+ compartment, assigned to vaxxed in intervens
+                    toVCin1 = toInd(allcomb(d , v, 3 , 1 : hpvNonVaxStates , 1 : 3 , 5 , ...
+                        g , a, r)); 
+                    toVCin2 = toInd(allcomb(d , v, 4 , 1 : hpvNonVaxStates , 1 : 3 , 5 , ...
+                        g , a, r)); 
+                    toVCin3 = toInd(allcomb(d , v, 5 , 1 : hpvNonVaxStates , 1 : 3 , 5 , ...
+                        g , a, r)); 
+                    toVCc = toInd(allcomb(d , v, 6 , 1 : hpvNonVaxStates , 1 : 3 , 5 , ...
+                        g , a, r)); 
                     otherV = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
                         1 : endpoints , 2 , g , a , r));
                     allVNonV = toInd(allcomb(d , v , 1 : hpvVaxStates , 1 : hpvNonVaxStates , ...
@@ -58,11 +80,28 @@ for d = 1 : disease
                         vaxCover = max(0 , (vaxRate - fracVaxd) ./ (1 - fracVaxd)); % vaccinate enough people in age group to reach target
                         vaxdGroupSus = vaxCover .* pop(fromNonVSus);
                         vaxdGroupImm = vaxCover .* pop(fromNonVImm);
+                        vaxdGroupInf = vaxCover .* pop(fromNonVInf); % add vax of infected individuals
+                        vaxdGroupCin1 = vaxCover .* pop(fromNonVCin1);
+                        vaxdGroupCin2 = vaxCover .* pop(fromNonVCin2);
+                        vaxdGroupCin3 = vaxCover .* pop(fromNonVCin3);
+                        vaxdGroupCc = vaxCover .* pop(fromNonVCc);
                         dPop(fromNonVSus) = dPop(fromNonVSus) - vaxdGroupSus;
                         dPop(fromNonVImm) = dPop(fromNonVImm) - vaxdGroupImm;
+                        dPop(fromNonVInf) = dPop(fromNonVInf) - vaxdGroupInf; % remove vax of infected individuals 
+                        dPop(fromNonVCin1) = dPop(fromNonVCin1) - vaxdGroupCin1; 
+                        dPop(fromNonVCin2) = dPop(fromNonVCin2) - vaxdGroupCin2; 
+                        dPop(fromNonVCin3) = dPop(fromNonVCin3) - vaxdGroupCin3; 
+                        dPop(fromNonVCc) = dPop(fromNonVCc) - vaxdGroupCc; 
                         dPop(toVSus) = dPop(toVSus) + vaxdGroupSus;
                         dPop(toVImm) = dPop(toVImm) + vaxdGroupImm;
-                        hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
+                        dPop(toVInf) = dPop(toVInf) + vaxdGroupInf; % add vax of infected individuals 
+                        dPop(toVCin1) = dPop(toVCin1) + vaxdGroupCin1; 
+                        dPop(toVCin2) = dPop(toVCin2) + vaxdGroupCin2; 
+                        dPop(toVCin3) = dPop(toVCin3) + vaxdGroupCin3; 
+                        dPop(toVCc) = dPop(toVCc) + vaxdGroupCc; 
+                        hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm) + sumall(vaxdGroupInf) + sumall(vaxdGroupCin1) + sumall(vaxdGroupCin2) + sumall(vaxdGroupCin3) + sumall(vaxdGroupCc); % count number of people vaccinated at current time step
+                        hpvVaxdNonPrev = hpvVaxdNonPrev + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); 
+                        hpvVaxdPrev = hpvVaxdPrev + sumall(vaxdGroupInf) + sumall(vaxdGroupCin1) + sumall(vaxdGroupCin2) + sumall(vaxdGroupCin3) + sumall(vaxdGroupCc); 
                     end
                 end
             end

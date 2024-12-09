@@ -9,12 +9,12 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_20Jul23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_20Jul23_stochMod_2dose_nowane_9YOVax_BaseScreen_ITTVax_' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_Test_S13']; % ***SET ME***: name for simulation output file
+pathModifier = ['1dose_nowane_BaseScreen_ITTVax_']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -24,7 +24,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2123; % ***SET ME***: end year of simulation run 2123
+lastYear = 2125; % ***SET ME***: end year of simulation run 2123
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
@@ -55,7 +55,7 @@ whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 % that in the section of mixInfect where you calculate infections, it is
 % only programmed to work for catchup of age 10-19 (age index 3 and 4). 
 
-waning = 1;    % turn waning on or off
+waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];
@@ -64,16 +64,16 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2];
-vaxCover = [0.90*(0.7/0.9)];
-vaxG = [1,2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxCover = [0.90];
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % Parameters for catch-up vaccination regimen
-vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
+vaxCU = 1;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
 hivPosVaxCU = 0; % ***SET ME***: 0 applies catch-up vaccination algorithm for all HIV states; 1 applies catch-up vaccination only to HIV+ 
-vaxAgeCU = [3:5]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
-vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.3*(0.7/0.9)]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
+vaxAgeCU = [3]; %[16 : 27];    % ages catch-up vaccinated % ***SET ME***: ages for catch-up vaccination
+vaxCoverCU = [ones(1,length(vaxAgeCU)).*0.70]; %0.50 % coverage for catch-up vaccination by ages catch-up vaccinated % ***SET ME***: coverage for catch-up vaccination by age
 vaxGCU = [2];    % indices of genders to catch-up vaccinate (1 or 2 or 1,2)
 numGrpsCU = length(vaxAgeCU); %***SET ME***: number of age groups in the CU schedule that is NOT the same as the school based regimen
 
@@ -128,7 +128,8 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , vaxEffItt] = loadUp2_NoIttEff(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
+%%Change to loadUp2_IttEff if needed
 
 %% Screening
 
@@ -193,7 +194,7 @@ if hivPosScreen
     ageMultsComb = [ageMultsComb , screenAlgs{2}.screenAgeMults];
 end
 screenAgeAll = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , numScreenAge , risk);
-screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 2 , numScreenAge , risk);
+screenAgeS = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , 3 , numScreenAge , risk);
 noVaxNoScreen = zeros(disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , numScreenAge , risk);
 noVaxToScreen = noVaxNoScreen;
 vaxNoScreen = noVaxNoScreen;
@@ -233,7 +234,7 @@ for aS = 1 : numScreenAge
                     for x = 1 : endpoints
                         for r = 1 : risk
                             screenAgeAll(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 1 : intervens , 2 , a , r)); 
-                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , 3 : intervens , 2 , a , r));
+                            screenAgeS(d,v,h,s,x,:,aS,r) = toInd(allcomb(d , v , h , s , x , [3 4 6] , 2 , a , r));
 
                             noVaxNoScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 1 , 2 , a , r)));
                             noVaxToScreen(d,v,h,s,x,aS,r) = sort(toInd(allcomb(d , v , h , s , x , 3 , 2 , a , r)));
@@ -335,15 +336,19 @@ else
 end
 
 lambdaMultVaxMat = zeros(age , nTests); % age-based vector for modifying lambda based on vaccination status
+lambdaMultVaxMatItt = lambdaMultVaxMat; 
 vaxEffInd = repmat(1 : length(vaxEff) , 1 , (nTests) /length(vaxEff));
+vaxEffIndItt = repmat(1 : length(vaxEffItt) , 1 , (nTests) /length(vaxEffItt)); 
+
 for n = 1 : nTests
     % No waning
     lambdaMultVaxMat(min(testParams2{n , 1}) : age , n) = vaxEff(vaxEffInd(n));
+    lambdaMultVaxMatItt(min(testParams2{n , 1}) : age , n) = vaxEffItt(vaxEffIndItt(n));
     
     % Waning
     effPeriod = 5; % number of years that initial efficacy level is retained
     wanePeriod = 10; % number of years over which initial efficacy level wanes
-    if waning 
+    if waning h
         % Following a period (in years) where original efficacy is retained, 
         % specified by 'effPeriod' , linearly scale down vaccine efficacy 
         % to 0% over time period specificed by 'wanePeriod'
@@ -431,7 +436,11 @@ n = 1;
     menCirc = zeros(length(s) - 1 , 1);
     vaxdLmtd = zeros(length(s) - 1 , 1);
     vaxdSchool = vaxdLmtd;
+    vaxdPrev = vaxdLmtd; 
+    vaxdNonPrev = vaxdLmtd; 
     vaxdCU = vaxdLmtd;
+    vaxdCUPrev = vaxdLmtd; 
+    vaxdCUNonPrev = vaxdLmtd; 
     ccSymp = zeros(length(s) - 1 , 3 , age , 3); 
     ccTreat = ccSymp; 
     
@@ -518,7 +527,7 @@ n = 1;
         hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
         circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
         d_partnersMmult,  ...
-        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear , numGrpsCU) , tspan , popIn);
+        hivSus , toHiv , hivCurr , waning , vaxCU , effPeriod , wanePeriod , currYear , numGrpsCU , lambdaMultVaxMatItt) , tspan , popIn);
         popIn = pop(end , :);
 %         if any(pop(end , :) < 0)
 %             disp('After mixInfect')
@@ -597,7 +606,7 @@ n = 1;
             % If vaccines are not limited
             else
                 % HPV vaccination module- school-based vaccination regimen
-                [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
+                [dPop , vaxdSchool(i , :) , vaxdNonPrev(i, :), vaxdPrev(i, :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
                     vaxCover , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
                 pop(end , :) = pop(end , :) + dPop;
@@ -610,7 +619,7 @@ n = 1;
                 % If present, apply catch-up vaccination regimen
                 if vaxCU
                     % HPV vaccination module- catch-up vaccination regimen
-                    [dPop , vaxdCU(i , :)] = hpvVaxCU(popIn , viral , risk , ...
+                    [dPop , vaxdCU(i , :) , vaxdCUPrev(i , :) , vaxdCUNonPrev(i , :)] = hpvVaxCU(popIn , viral , risk , ...
                         hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxAgeCU , ...
                         vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd);
                     pop(end , :) = pop(end , :) + dPop;
@@ -638,7 +647,7 @@ n = 1;
     parsave(filename , fivYrAgeGrpsOn , tVec ,  popVec , newHiv ,...
         newHpvVax , newImmHpvVax , newHpvNonVax , newImmHpvNonVax , ...
         hivDeaths , deaths , ccDeath_treat , ccDeath_untreat , ...
-        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdCU , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
+        newCC , menCirc , vaxdLmtd , vaxdSchool , vaxdPrev , vaxdNonPrev , vaxdCU , vaxdCUPrev , vaxdCUNonPrev , newScreen , artDist , artDistList , ... %artTreatTracker,newTreatImm , newTreatHpv , newTreatHyst , ... 
         currYear , lastYear , vaxRate , vaxEff , ccSymp, ccTreat , popLast , pathModifier);
 
 % end 
