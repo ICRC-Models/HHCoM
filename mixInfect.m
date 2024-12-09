@@ -13,12 +13,16 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult,  ...
-    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear , numGrpsCU)
+    hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear , numGrpsCU , ...
+    lambdaMultVaxMatItt)
+    % hpvVaxIttSus , hpvVaxIttImm , hpvVaxIttInf , 
+
 
 % ratioPeriod = how long after effPeriod you have have a combination of normal vax and catch-up vax 
 % vaxCUNormRatio = the ratio between the number of catch-up vaccines and normal 9 YO vaccines 
 
 lambdaMultVax = 1 - lambdaMultVaxMat(: , 1);
+lambdaMultVaxItt = 1 - lambdaMultVaxMatItt(: , 1); 
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -379,10 +383,13 @@ for a = ageSexDebut : age
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV
                     mhpvVaxSus = hpvVaxSus(d , 1 , a , r , p , :); % non-naturally immune
                     fhpvVaxSus = hpvVaxSus(d , 2 , a , r , p , :);
+                    % fhpvVaxIttSus = hpvVaxIttSus(d , 2 , a , r , p , :); 
                     fhpvVaxImm = hpvVaxImm(d , 2 , a , r , p , :); % naturally immune, only females have natural immunity
+                    % fhpvVaxIttImm = hpvVaxIttImm(d , 2 , a , r , p , :); 
                     % vaccine-type HPV infection
                     mhpvVaxInf = hpvVaxInf(d , 1 , a , r , p , :); % update to infected
                     fhpvVaxInf = hpvVaxInf(d , 2 , a , r , p , :);
+                    % fhpvVaxIttInf = hpvVaxIttInf(d , 2 , a , r , p , :);
 
                     % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV
                     mhpvNonVaxSus = hpvNonVaxSus(d , 1 , a , r , p , :); % non-naturally immune
@@ -404,10 +411,12 @@ for a = ageSexDebut : age
                         lambdaMultM = artHpvMult;
                     end
                     % Set lambda multiplier for vaccination
-                    if (p == 2) || (p == 4)
+                    if (p == 2) || (p == 4) || (p == 5) || (p == 6)
                         vaxProtect = lambdaMultVax(a , 1);
+                        vaxProtectItt = lambdaMultVaxItt(a , 1); 
                     else
                         vaxProtect = 1.0; % no protection
+                        vaxProtectItt = 1.0; 
                     end
 
                     % Calculate infections
@@ -421,8 +430,21 @@ for a = ageSexDebut : age
                             , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
                         fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                             , 0.999 * vaxProtect) .* pop(fhpvVaxSus);
+                        % fInfectedVaxItt = min(lambdaMultF * vaxProtectItt * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtectItt) .* pop(fhpvVaxIttSus);
                         fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                             , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
+                        % fInfectedVaxIttImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtectItt * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtectItt) .* pop(fhpvVaxIttImm);
+
+                        % people who were vaccinated while infected
+                        % you can only acquire an hpv infection if you are susceptible or immune
+                        if ((p==5) || (p==6))  
+                            fInfectedVax = min(lambdaMultF * vaxProtectItt * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                                , 0.999 * vaxProtectItt) .* pop(fhpvVaxSus);
+                            fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtectItt * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                                , 0.999 * vaxProtectItt) .* pop(fhpvVaxImm);
+                        end 
 
                     % This is the time period between effPeriod and the end of wanePeriod
                     elseif (year > (currYear + effPeriod)) && (year <= (currYear + effPeriod + wanePeriod)) && (waning == 1) && (vaxCU == 1) && ((p == 2) || (p == 4))
@@ -445,6 +467,10 @@ for a = ageSexDebut : age
                             , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxSus);
                         fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                             , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxImm);
+                        % fInfectedVaxItt = min(lambdaMultF * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxIttSus);
+                        % fInfectedVaxIttImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxIttImm);
 
                     % This is the time period within the first effPeriod when everyone has full vax efficacy
                     else
@@ -457,6 +483,10 @@ for a = ageSexDebut : age
                             , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxSus);
                         fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
                             , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxImm);
+                        % fInfectedVaxItt = min(lambdaMultF * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxIttSus);
+                        % fInfectedVaxIttImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect_NORM * psi_hpv(2,d,r) * lambda(2 , a , r , 1)...
+                        %     , 0.999 * vaxProtect_NORM) .* pop(fhpvVaxIttImm);
 
                     end 
 
@@ -487,10 +517,13 @@ for a = ageSexDebut : age
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV
                     dPop(mhpvVaxSus) = dPop(mhpvVaxSus) - mInfectedVax;
                     dPop(fhpvVaxSus) = dPop(fhpvVaxSus) - fInfectedVax;
+                    % dPop(fhpvVaxIttSus) = dPop(fhpvVaxIttSus) - fInfectedVaxItt;
                     dPop(fhpvVaxImm) = dPop(fhpvVaxImm) - fInfectedVaxImm;
+                    % dPop(fhpvVaxIttImm) = dPop(fhpvVaxIttImm) - fInfectedVaxIttImm;
                     
                     dPop(mhpvVaxInf) = dPop(mhpvVaxInf) + mInfectedVax;
                     dPop(fhpvVaxInf) = dPop(fhpvVaxInf) + fInfectedVax + fInfectedVaxImm;
+                    % dPop(fhpvVaxIttInf) = dPop(fhpvVaxIttInf) + fInfectedVaxItt + fInfectedVaxIttImm;
                     
                     % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV
                     dPop(mhpvNonVaxSus) = dPop(mhpvNonVaxSus) - mInfectedNonVax;
