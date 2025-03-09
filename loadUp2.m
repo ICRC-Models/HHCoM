@@ -748,7 +748,7 @@ kDR = 0.45;
 
 filename = [paramDir 'kSympParams.xlsx'];
 sheet = 1;
-kSymp_mat = xlsread(filename, sheet, 'A2:C26');
+kSymp_mat = xlsread(filename, sheet, 'A2:C51');
 kSymp = kSymp_mat(paramSetIdx, 1:end);  
 
 % Proportion of women who receive hysterectomy by stage

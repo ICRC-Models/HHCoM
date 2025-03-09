@@ -9,7 +9,7 @@ function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-historicalIn = load([pwd , ['/HHCoM_Results/toNow_20Jul23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_19Jul23_stochMod_baseline_2dose_nowane' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , ['/HHCoM_Results/toNow_17May23_stochMod_treatmentTest_11May23_2' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
@@ -170,8 +170,8 @@ if hivPosScreen
         screenAlgs{2}.screenCover_vec{i} = interp1(period , screenAlgs{2}.screenCover(i : i + 1 , 1) , ...
             screenYrs(i) : timeStep : screenYrs(i + 1));
     end
-    screenAlgs{1}.diseaseInds = [3 : 8];
-    screenAlgs{2}.diseaseInds = [1 : 2];
+    screenAlgs{1}.diseaseInds = [3 : 8]; % this is hiv+
+    screenAlgs{2}.diseaseInds = [1 : 2]; % this is hiv-
 else
     screenAlgs{1}.diseaseInds = [1 : disease];
 end
