@@ -4,14 +4,14 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd, annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , partnersMmult, maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4,...
-    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...
+    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...p
     hivOn , betaHIV_mod , hiv_hpvMult, muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
     c3c2Mults , c2c1Mults  , muCC , muCC_ud , muCC_d , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
-    condUse , screenYrs , hpvScreenStartYear , waning , ...
+    condUse , prepUse , screenYrs , hpvScreenStartYear , waning , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
@@ -55,7 +55,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2023; 
+currYear = 2025; 
 endYear = currYear; %2015; %currYear;
 years = endYear - startYear;
 
@@ -507,7 +507,7 @@ end
 
 % CIN1 to HPV, ages 10-24
 if calibBool && any(32 == pIdx)
-    idx = find(32 == pIdx);
+    idx = find(32 == pIdx);P
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
@@ -748,7 +748,7 @@ kDR = 0.45;
 
 filename = [paramDir 'kSympParams.xlsx'];
 sheet = 1;
-kSymp_mat = xlsread(filename, sheet, 'A2:C51');
+kSymp_mat = xlsread(filename, sheet, 'A2:C26');
 kSymp = kSymp_mat(paramSetIdx, 1:end);  
 
 % Proportion of women who receive hysterectomy by stage
@@ -793,6 +793,9 @@ end
 % save to hand calibration params file for documentation
 condStart = 1995;
 peakYear = 2000;
+
+% PrEP USE
+prepUse = 0.029 % this is for all sexually active individuals; 
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off

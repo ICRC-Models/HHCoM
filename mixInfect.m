@@ -11,7 +11,7 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     beta_hpvVax_mod , beta_hpvNonVax_mod , vaxInds , nonVInds , ...
     lambdaMultImm , lambdaMultVaxMat , artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
-    circProtect , condProtect , condUse , betaHIV_mod , hiv_hpvMult, ...
+    circProtect , condProtect , condUse , prepUse,  betaHIV_mod , hiv_hpvMult, ...
     d_partnersMmult,  ...
     hivSus , toHiv , hivCurr, waning, vaxCU , effPeriod, wanePeriod , currYear , numGrpsCU)
 
@@ -27,6 +27,8 @@ newImmHpvVax = newHpvVax;
 newHpvNonVax = newHpvVax;
 newImmHpvNonVax = newHpvVax;
 newHiv = zeros(hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+prepCov = zeros (gender,age); %tracking number on elgible PrEP users 
+
 
 %% Find epsAge and epsRisk according to the present year (extent of assortative mixing) 
 % Random mixing (epsilon = 1), mixing proportional to relative sizes of all compartments
@@ -282,6 +284,8 @@ cAdj(isinf(cAdj)) = 0;
 % find condom use according to the present year
 condStart = 1995;
 peakYear = 2000;
+
+
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = zeros(risk, length(yrVec)-1);
 for r = 1 : risk
@@ -294,17 +298,73 @@ if year < peakYear && year > condStart
 elseif year >= peakYear
     condUse = condUseVec(1:risk, end);
 end
+
+
+% Define key years for PrEP implementation
+PrEPStart = 2018; % Year when PrEP intervention begins
+prepPeakYear = 2024; % Year when PrEP reaches its first peak usage
+prepPauseYear = 2025; % Year where PrEP use temporarily stops
+restartYear = 2026; % Year when PrEP usage starts increasing again
+finalPeakYear = 2035; % Year when PrEP reaches its peak again
+
+% Scale-up of PrEP
+yrVecPrep = PrEPStart : 1 / stepsPerYear : prepPeakYear; % Create a vector of years from PrEP start to peak PrEP coverage
+
+% Generate a vector for PrEP usage increasing linearly from 0 to prepUse
+prepUseVec = linspace(0, prepUse, length(yrVecPrep)); % Linearly spaced PrEP usage values
+prepUse = prepUseVec(1); % Initialize PrEP use at the start
+
+newYrVecPrEP = restartYear : 1 / stepsPerYear : finalPeakYear;
+newPrepUseVec = linspace(0, prepUseVec(end), length(newYrVecPrEP)); 
+prepUse = newPrepUseVec(1); % Initialize PrEP use at the start
+
+% Determine PrEP usage based on the current year
+if year >= PrEPStart && year < prepPeakYear 
+    % Before peak year, find the index corresponding to the current year
+    yrIndPrep = year == yrVecPrep; % Find closest index
+    prepUse = prepUseVec(yrIndPrep); % Assign the corresponding PrEP use value
+
+elseif year >= prepPeakYear
+    % At peak year, set PrEP use to the maximum value
+    prepUse = prepUseVec(end);
+
+elseif year == prepPauseYear
+    % In the pause year, set PrEP use to 0
+    prepUse = 0;
+elseif year >= restartYear && year <= finalPeakYear
+    % After the pause, reintroduce PrEP with a linear increase reaching peak in 2035
+    yrIndPrep = year == newYrVecPrEP;
+    prepUse = newPrepUseVec(yrIndPrep); % Assign PrEP use
+
+elseif year > finalPeakYear
+    % After 2035, maintain peak PrEP use
+    prepUse = prepUseVec(end);
+end
+
+
 %%
 % calculate psi vectors for protective factors
 % HIV
 cond_hiv = 1-(condProtect(:,1) .* condUse');
+
+prepEffectiveness = zeros(gender, disease, risk); % Initialize with zeros
+prepEffectiveness(:,1:2,3) = 0.75; % Assign 0.65 only for disease states 1 & 2 at risk 3
+prep_hiv = 1-(prepEffectiveness .* prepUse); % Remaining HIV risk after accounting for PrEP use and effectiveness
+
 psi_hiv = zeros(gender, disease, risk); 
+
 % condom usage and condom protection rates
 for r = 1 : risk
 psi_hiv(:, :, r) = ones(gender,disease) .* cond_hiv(:, r); % condom use only for all disease states
-psi_hiv(:,2, r) = (1 - circProtect(:,1)) .* cond_hiv(:, r);
+psi_hiv(:,2, r) = (1 - circProtect(:,1)) .* cond_hiv(:, r);% condom use + circumcision protection for d=2
 end
-% condom use + circumcision protection for d=2
+% condom use + circumcision + prep in men
+psi_hiv(1,2,3) = (1 - circProtect(1,1)) .* cond_hiv(1,1) .* prep_hiv(1,1,3); 
+% condom us and prep in men
+psi_hiv(1,1,3) = cond_hiv(1,1) .* prep_hiv(1,1,3); 
+% condom use + prep for women 
+psi_hiv(2,1:2,3) = cond_hiv(1,1) .* prep_hiv(2,1:2,3); 
+
 %HPV
 cond_hpv = 1-(condProtect(:,2) * condUse'); % condom usage and condom protection rates
 psi_hpv = zeros(gender, disease, risk);
@@ -481,7 +541,7 @@ for a = ageSexDebut : age
                     newHpvNonVax(2 , d , a , r , p) = newHpvNonVax(2 , d , a , r , p) + sumall(fInfectedNonVax);
                     % naturally immune
                     newImmHpvNonVax(2 , d , a , r , p) = newImmHpvNonVax(2 , d , a , r , p) + sumall(fInfectedNonVaxImm);
-                    
+                
                     
                     % Adjust compartments
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV
@@ -585,6 +645,11 @@ for h = 1 : hpvVaxStates
                             newHiv(h , s , x , 1 , a , r) = newHiv(h , s , x , 1 , a , r) + sumall(mInfected);
                             newHiv(h , s , x , 2 , a , r) = newHiv(h , s , x , 2 , a , r) + sumall(fInfected);
 
+                            %PrEP coverage tracker - those on PrEP
+                            %infected (d=1,2), and at high risk (3)
+                            prepCov(1 , a ) = prepCov(1 , a ) + sumall(mSus .* prepUseVec); % # of males on PrEP
+                            prepCov(2 , a ) = prepCov(2 , a ) + sumall(fSus .* prepUseVec); % # of females on PrEP
+
                             % Adjust compartments
                             dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males
                             dPop(fSus) = dPop(fSus) - fInfected; % efflux of infected females
@@ -600,5 +665,7 @@ end
 
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 newInfs{5} = newHiv;
+newInfs{6} = prepCov; %Added prep coverage output
+
 
 dPop = sparse(dPop);
