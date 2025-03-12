@@ -14,7 +14,7 @@ historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_PrEPTrial1']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_PEPFAR_S0']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -24,7 +24,7 @@ end
 fivYrAgeGrpsOn = 1; % choose whether to use 5-year or 1-year age groups
 
 % LAST YEAR
-lastYear = 2035; % ***SET ME***: end year of simulation run 2123
+lastYear = 2125; % ***SET ME***: end year of simulation run 2123
 
 % SCREENING
 screenAlgorithm = 2; % ***SET ME***: screening algorithm to use (1 for baseline, 2 for CISNET, 3 for WHOa, 4 for WHOb)
