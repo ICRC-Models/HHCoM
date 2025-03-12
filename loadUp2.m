@@ -805,11 +805,13 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
-artYr = [(artVScov(:,1) - 1); (2031 - 1)]; % assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+
+%ART coverage pause from PEPFAR
+artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); (2035 - 1)]; % Changing target for PEPFAR assuming 90-90-90 target reached by 2030
+maxRateM = [artVScov(:,3) ./ 100 ; 0.3; 0.6; 0.857375] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.4; 0.7; 0.857375] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
-artM_vec = cell(size(artYr , 1) - 1, 1);
+artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);
 for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at steps within period
     period = [artYr(i) , artYr(i + 1)];
@@ -820,6 +822,7 @@ for i = 1 : size(artYr , 1) - 1 % interpolate ART viral suppression coverages at
     artF_vec{i} = interp1(period , maxRateF(i : i + 1 , 1) , ...
         artYr(i) : timeStep : artYr(i + 1));
 end
+
 
 % Intervention start years
 hivStartYear = 1978;

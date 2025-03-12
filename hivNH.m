@@ -214,9 +214,17 @@ if year >= 2016
    if year >= 2016 && year < 2017
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
         popCover = {artM_vec{13} , artF_vec{13}};
-    elseif year >= 2017 
+    elseif year >= 2017 %% && year <= 2025 ** Uncomment when doing PEPFAR stoppage
         ind = (round(artYr_vec{14} , 4) == round(year , 4));
         popCover = {artM_vec{14} , artF_vec{14}}; 
+ % elseif year >= 2025 && year <= 2025 + (1/6) %Uncomment when doing PEPFAR stoppage
+      % ind = (round(artYr_vec{15} , 4) == round(year , 4));
+      % popCover = {artM_vec{15} , artF_vec{15}}; 
+ %  elseif year >= 2025 + (1/6) %Uncomment when doing PEPFAR stoppage
+      %  ind = (round(artYr_vec{16} , 4) == round(year , 4));
+       % popCover = {artM_vec{16} , artF_vec{16}}; 
+
+        
    end
     ageVec = [1 : age];
     dRange = [3 : 7];
