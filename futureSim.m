@@ -64,7 +64,7 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2];
-vaxCover = [0.90*(0.7/0.9)];
+vaxCover = [0.77*(0.7/0.9)];%CHANGED TO 77% COVERAGE FOR ALL SCENARIOS
 vaxG = [1,2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
@@ -182,6 +182,11 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values a
     screenAlgs{1}.screenCover_vec{i} = interp1(period , screenAlgs{1}.screenCover(i : i + 1 , 1) , ...
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
+
+% ccScaleup = 1; % S1, S4, S5
+% ccScaleup = 0; % S0, S2, S3
+% scaleupYear = 2030; % S1
+% scaleupYear = 2040; % S4, S5
 
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
@@ -473,6 +478,18 @@ n = 1;
             pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
+
+%                 if (ccScaleup = 1 && year>= scaleupYear) 
+% 
+%                     baseline.screenAge = [8 10];
+%                     baseline.screenAgeMults = [1/5, 1/5];
+% 
+%                     cisnet.screenAge = [6:10];
+%                     cisnet.screenAgeMults = [1/5, 1/5, 1/5, 1/5, 1/5];
+% 
+% 
+%                 end 
+
                 [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
@@ -649,4 +666,3 @@ disp('Done')
 
 %%
 %vaxCEA(pathModifier)
-

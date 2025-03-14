@@ -303,9 +303,10 @@ end
 % Define key years for PrEP implementation
 PrEPStart = 2018; % Year when PrEP intervention begins
 prepPeakYear = 2024; % Year when PrEP reaches its first peak usage
-prepPauseYear = 2025; % Year where PrEP use temporarily stops
-restartYear = 2026; % Year when PrEP usage starts increasing again
-finalPeakYear = 2035; % Year when PrEP reaches its peak again
+% For S2 and S3 
+% prepPauseYear = 2025; % Year where PrEP use temporarily stops
+% restartYear = 2026; % Year when PrEP usage starts increasing again
+% finalPeakYear = 2035; % Year when PrEP reaches its peak again
 
 % Scale-up of PrEP
 yrVecPrep = PrEPStart : 1 / stepsPerYear : prepPeakYear; % Create a vector of years from PrEP start to peak PrEP coverage
@@ -314,9 +315,10 @@ yrVecPrep = PrEPStart : 1 / stepsPerYear : prepPeakYear; % Create a vector of ye
 prepUseVec = linspace(0, prepUse, length(yrVecPrep)); % Linearly spaced PrEP usage values
 prepUse = prepUseVec(1); % Initialize PrEP use at the start
 
-newYrVecPrEP = restartYear : 1 / stepsPerYear : finalPeakYear;
-newPrepUseVec = linspace(0, prepUseVec(end), length(newYrVecPrEP)); 
-prepUse = newPrepUseVec(1); % Initialize PrEP use at the start
+% For S2 and S3
+% newYrVecPrEP = restartYear : 1 / stepsPerYear : finalPeakYear;
+% newPrepUseVec = linspace(0.0234, prepUseVec(end), length(newYrVecPrEP)); 
+% prepUse = newPrepUseVec(1); % Initialize PrEP use at the start
 
 % Determine PrEP usage based on the current year
 if year >= PrEPStart && year < prepPeakYear 
@@ -327,19 +329,17 @@ if year >= PrEPStart && year < prepPeakYear
 elseif year >= prepPeakYear
     % At peak year, set PrEP use to the maximum value
     prepUse = prepUseVec(end);
-
-elseif year == prepPauseYear
-    % In the pause year, set PrEP use to 0
-    prepUse = 0;
-elseif year >= restartYear && year <= finalPeakYear
-    % After the pause, reintroduce PrEP with a linear increase reaching peak in 2035
-    yrIndPrep = year == newYrVecPrEP;
-    prepUse = newPrepUseVec(yrIndPrep); % Assign PrEP use
-
-elseif year > finalPeakYear
-    % After 2035, maintain peak PrEP use
-    prepUse = prepUseVec(end);
 end
+
+% For S2 and S3
+% elseif year >= prepPauseYear & year < restartYear
+    % prepUse = 0.0234;
+% elseif year >= restartYear && year <= finalPeakYear
+   % yrIndPrep = year == newYrVecPrEP;
+   % prepUse = newPrepUseVec(yrIndPrep); % Assign PrEP use
+% elseif year > finalPeakYear
+  % prepUse = newPrepUseVec(end);
+% end
 
 
 %%

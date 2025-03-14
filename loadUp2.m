@@ -807,9 +807,23 @@ minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 
 %ART coverage pause from PEPFAR
-artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); (2035 - 1)]; % Changing target for PEPFAR assuming 90-90-90 target reached by 2030
-maxRateM = [artVScov(:,3) ./ 100 ; 0.3; 0.6; 0.857375] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.4; 0.7; 0.857375] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+artYr = [(artVScov(:,1) - 1); (2031 -1)]; % Changing target for PEPFAR assuming 90-90-90 target reached by 2030
+%artYr = [(artVScov(:,1) - 1); 2025 + (1/6)]; %S0
+%artYr = [(artVScov(:,1) - 1); 2025 + (1/6); 2025 + (2/6); 2030.5]; %S2
+%artYr = [(artVScov(:,1) - 1); 2025 + (1/6); 2025 + (2/6); 2025 + (3/6)]; %S2
+
+maxRateM = [artVScov(:,3) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in males (72.9% if 90-90-90)
+% maxRateM = [artVScov(:,3) ./ 100 ;  0.6320] .* artOutMult; %SO
+% maxRateM = [artVScov(:,3) ./ 100 ;  0.353; 0.353;  0.6320] .* artOutMult; %S2
+% maxRateM = [artVScov(:,3) ./ 100 ;  0.353; 0.353;  0.6320] .* artOutMult; %S3
+
+maxRateF = [artVScov(:,2) ./ 100 ; 0.857375] .* artOutMult; % population-level ART coverage in females (72.9% if 90-90-90)
+% maxRateF = [artVScov(:,2) ./ 100 ;  0.6793] .* artOutMult; %S0
+% maxRateF = [artVScov(:,2) ./ 100 ; 0.353; 0.353  ;  0.6793] .*
+% artOutMult; S2
+% maxRateF = [artVScov(:,2) ./ 100 ; 0.353; 0.353  ;  0.6793] .*
+% artOutMult; S3
+
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -880,7 +894,8 @@ else
 end 
 
 % Screening timeframe 
-screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];
+screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
+% screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
@@ -890,7 +905,10 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
+%Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
+baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.14]; % S0, S2, S3
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % S1
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.70]; % S4, S5
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
@@ -909,8 +927,15 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
 
+% screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
+% screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
+
 % CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.04; 0.123; 0.123; 0.56; 0.56; 0.56]; % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
+% https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
+cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.56]; % S0
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.70]; % S4, S5
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 cisnet.testSens = cytoSens2;
