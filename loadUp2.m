@@ -880,7 +880,8 @@ else
 end 
 
 % Screening timeframe 
-screenYrs = [2000; 2003; 2016; 2023; 2030; 2045];
+screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
+% screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
@@ -890,7 +891,10 @@ hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
 % Baseline screening algorithm
-baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14]; %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
+%Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
+baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.14]; % S0, S2, S3
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % S1
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.70]; % S4, S5
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
@@ -909,8 +913,15 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
 
+% screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
+% screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
+
 % CISNET screening algorithm
-cisnet.screenCover = [0.0; 0.04; 0.123; 0.123; 0.56; 0.56; 0.56]; % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
+% https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
+cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.56]; % S0
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.70]; % S4, S5
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
 cisnet.testSens = cytoSens2;

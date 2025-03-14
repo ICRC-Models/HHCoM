@@ -183,6 +183,11 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate dnaTestCover values a
         screenYrs(i) : timeStep : screenYrs(i + 1));
 end
 
+% ccScaleup = 1; % S1, S4, S5
+% ccScaleup = 0; % S0, S2, S3
+% scaleupYear = 2030; % S1
+% scaleupYear = 2040; % S4, S5
+
 % Create screening indices
 numScreenAge = length(screenAlgs{1}.screenAge);
 agesComb = screenAlgs{1}.screenAge;
@@ -473,6 +478,18 @@ n = 1;
             pop = pop(end , :); % next module reads in pop, not popInd
             
             if (year >= hpvScreenStartYear)
+
+%                 if (ccScaleup = 1 && year>= scaleupYear) 
+% 
+%                     baseline.screenAge = [8 10];
+%                     baseline.screenAgeMults = [1/5, 1/5];
+% 
+%                     cisnet.screenAge = [6:10];
+%                     cisnet.screenAgeMults = [1/5, 1/5, 1/5, 1/5, 1/5];
+% 
+% 
+%                 end 
+
                 [dPop , newScreen(i , : , : , : , :, : , : , :), ccTreat(i, : , : , :)]   ...
                 = hpvScreen(pop , ...
                     disease , viral , age , hpvVaxStates , hpvNonVaxStates , intervens , endpoints , risk , ...
