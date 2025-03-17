@@ -1,7 +1,7 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
-function futureSimS1(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date) 
+function futureSimS2(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date) 
 %%
 %close all; clear all; clc
 % profile clear;
@@ -14,7 +14,7 @@ function futureSimS1(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tst
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
-pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_PEPFAR_S1']; % ***SET ME***: name for simulation output file
+pathModifier = ['Kenya1DoseCea_Aug14_WaningCU_PEPFAR_S2']; % ***SET ME***: name for simulation output file
 % Directory to save results
 if ~ exist([pwd , '/HHCoM_Results/Vaccine' , pathModifier, '/'])
     mkdir ([pwd, '/HHCoM_Results/Vaccine' , pathModifier, '/'])
@@ -66,23 +66,8 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 vaxAge = [2];
 vaxCover = [0.77*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
-gradScaleUp = 1; % **SET ME:** adjust whether or not you want to have gradual scale up
-% vaxYrs = [2025]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
-
-if gradScaleUp==1
-    vaxRate = [0.77; 0.9] * (0.7/0.9); % Coverage over time (Years: [2021; 2026])
-    vaxYrs = [2025; 2030]; 
-    vaxCover_vec = cell(size(vaxYrs , 1) - 1, 1); % save data over time interval in a cell array
-    for i = 1 : size(vaxYrs , 1) - 1          % interpolate values at steps within period
-        period = [vaxYrs(i) , vaxYrs(i + 1)];
-        vaxCover_vec{i} = interp1(period , vaxRate(i : i + 1 , 1) , ...
-            vaxYrs(i) : timeStep : vaxYrs(i + 1));
-    end
-    vaxRate_vec = vaxCover_vec; 
-else 
-    vaxRate_vec = [0.77] * (0.7/0.9);
-    vaxYrs = [2025]; 
-end 
+gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
+vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
 % Parameters for catch-up vaccination regimen
 vaxCU = 0;    % turn catch-up vaccination on or off  % ***SET ME***: 0 for no catch-up vaccination, 1 for catch-up vaccination
@@ -143,7 +128,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
 
 %% Screening
 
@@ -525,7 +510,7 @@ n = 1;
         % coverage, circumcision, ART, PrEP (not currently used) are accounted for. 
         [~ , pop , newHpvVax(i , : , : , : , : , :) , newImmHpvVax(i , : , : , : , : , :) , ...
         newHpvNonVax(i , : , : , : , : , :) , newImmHpvNonVax , newHiv(i , : , : , : , : , : , :), prepCov(i , : , : )] = ...
-        ode4xtra(@(t , pop) mixInfect_S1(t , pop , ...
+        ode4xtra(@(t , pop) mixInfect_S2(t , pop , ...
         stepsPerYear , year , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
         age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
         partnersM , partnersF , partnersMmult,...
@@ -545,7 +530,7 @@ n = 1;
         % excess HIV mortality
         if hivOn
             [~ , pop , hivDeaths(i , :, : , :) , artTreat] =...
-                ode4xtra(@(t , pop) hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
+                ode4xtra(@(t , pop) hivNH_S2(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ... 
                 kCD4 , artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
                 hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
                 ageSexDebut , hivInds , stepsPerYear , year) , tspan , popIn);
@@ -613,7 +598,7 @@ n = 1;
             % If vaccines are not limited
             else
                 % HPV vaccination module- school-based vaccination regimen
-                [dPop , vaxdSchool(i , :)] = hpvVaxSchool_S1(popIn , disease , viral , risk , ...
+                [dPop , vaxdSchool(i , :)] = hpvVaxSchool(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
                     vaxCover , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
                 pop(end , :) = pop(end , :) + dPop;

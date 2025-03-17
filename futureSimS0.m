@@ -1,7 +1,7 @@
 % Future simulation module
 % Accepts population vector from calibrated natural history model as input
 
-function futureSim(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date) 
+function futureSimS0(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tstep_abc , date) 
 %%
 %close all; clear all; clc
 % profile clear;
@@ -55,7 +55,7 @@ whoScreenAgeMults = [0.20 , 0.20]; %[0.40 , 0.40 , 0.20 , 0.40 , 0.40];
 % that in the section of mixInfect where you calculate infections, it is
 % only programmed to work for catchup of age 10-19 (age index 3 and 4). 
 
-waning = 1;    % turn waning on or off
+waning = 0;    % turn waning on or off
 
 % Parameters for baseline vaccination regimen  % ***SET ME***: coverage for baseline vaccination of 9-year-old girls
 vaxAgeB = [2];
@@ -65,7 +65,7 @@ vaxGB = 2;   % indices of genders to vaccinate (1 or 2 or 1,2)
 %Parameters for school-based vaccination regimen  % ***SET ME***: coverage for school-based vaccination of 9-14 year-old girls
 vaxAge = [2];
 vaxCover = [0.77*(0.7/0.9)];%Changed to 77% coverage for PrEP
-vaxG = [1,2];   % indices of genders to vaccinate (1 or 2 or 1,2)
+vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 0; % **SET ME:** adjust whether or not you want to have gradual scale up
 vaxYrs = [0]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
 
@@ -128,7 +128,7 @@ vaxGL = 2;    % index of gender to vaccinate during limited-vaccine years
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S0(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx);
 
 %% Screening
 

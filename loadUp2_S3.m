@@ -41,7 +41,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S3(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
 
 % vaxRate_vec, vaxYrs
 
@@ -807,9 +807,9 @@ minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 
 %ART coverage pause from PEPFAR
-artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); 2025 + (2/6); 2025 + (3/6); 2030.5]; %S2
-maxRateM = [artVScov(:,3) ./ 100 ; 0.6482; 0.492; 0.492 ; 0.336; 0.6482] .* artOutMult; % S2 population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.6875; 0.522; 0.522 ; 0.356; 0.6875] .* artOutMult; % S2 population-level ART coverage in females (72.9% if 90-90-90)
+artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); 2025 + (2/6); 2025 + (3/6); 2030.5]; %S3
+maxRateM = [artVScov(:,3) ./ 100 ; 0.6482; 0.492; 0.492 ; 0.6482; 0.6482] .* artOutMult; % S3 population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.6875; 0.522; 0.522 ; 0.6875; 0.6875] .* artOutMult; % S3 population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);

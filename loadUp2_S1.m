@@ -4,7 +4,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd, annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , partnersMmult, maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4,...
-    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...
+    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...p
     hivOn , betaHIV_mod , hiv_hpvMult, muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
@@ -41,7 +41,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
 
 % vaxRate_vec, vaxYrs
 
@@ -807,9 +807,9 @@ minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 
 %ART coverage pause from PEPFAR
-artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); 2025 + (2/6); 2025 + (3/6); 2030.5]; %S2
-maxRateM = [artVScov(:,3) ./ 100 ; 0.6482; 0.492; 0.492 ; 0.336; 0.6482] .* artOutMult; % S2 population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.6875; 0.522; 0.522 ; 0.356; 0.6875] .* artOutMult; % S2 population-level ART coverage in females (72.9% if 90-90-90)
+artYr = [(artVScov(:,1) - 1); 2030]; %S0
+maxRateM = [artVScov(:,3) ./ 100 ; 0.857375] .* artOutMult; % S0 population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.857375] .* artOutMult; % S0 population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -831,17 +831,13 @@ circNatStartYear = 2008;
 vaxStartYear = 2019; 
 
 % VMMC coverage
-vmmcYr = [circStartYear; 2003; 2008; 2014; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5]; %S0
+vmmcYr = [circStartYear; 2003; 2008; 2014; 2030]; %S0
 circ_aVec = {4 , 5 , 6, [7:8] , [9:10], [11:age]}; % Ages: (15-19), (20-24), (25-29), (30-39), (40-49), (50+)
 vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
             0.715 0.89 0.883 0.893 0.83 0.50; ... % 2003
             0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
             0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
-            0.8663 0.87 0.828 0.8018 0.7939 0.7898; ... %2025
-            0.502 0.505 0.48 0.465 0.46 0.458; ... %2025 + (1/6)
-            0.502 0.505 0.48 0.465 0.46 0.458; ... %2025 + (2/6)
-            0.8663 0.87 0.828 0.8018 0.7939 0.7898]; % 20330.5
-
+            0.9 0.9 0.9 0.9 0.9 0.9];   % 2025 S0
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period
@@ -884,31 +880,32 @@ else
 end 
 
 % Screening timeframe 
-screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
-% screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
+%screenYrs = [2000; 2003; 2016; 2025; 2025 + (1/6); 2025 + (2/6); 2030.5; 2040]; % S0, S2, S3, S4, S5
+screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
-cytoSens = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-pos persons  (based on Chung et al)
-cytoSens2 = [0.0 , 0.62 , 0.62]; % VIA sensitivity for HIV-neg persons
+cytoSens = [0.0 , 0.85 , 0.85]; % HPV DNA sensitivity for HIV-pos persons  (based on KZN model)
+cytoSens2 = [0.0 , 0.94 , 0.94]; % HPV DNA sensitivity for HIV-neg persons (based on KZN model) 
 hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
 % Baseline screening algorithm
 %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
-baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.14]; % S0, S2, S3
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.14]; % S0, S2, S3
+% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14]; %S0
 % baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % S1
 % baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.70]; % S4, S5
 %baseline.diseaseInds = [1 : disease];
-baseline.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
-baseline.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
-baseline.testSens = cytoSens;
+baseline.screenAge = [8 10];
+baseline.screenAgeMults = [(1/5) (1/5)];
+baseline.testSens = cytoSens2; % hpv dna sensitivity for hiv neg persons 
 % cryoElig = [1.0 , 0.85 , 0.75 , 0.10 , 0.10 , 0.10];
-baseline.colpoRetain = 0.72; % Khozaim, 2013, Gyne & Obst
-baseline.cinTreatEff = [0.97 , 0.97 , 0.67 , 0.67 , 0.66 , 0.66 , 0.66 , 0.71];% cryo efficacy in HIV+ based on Greene et al 2020 and in HIV- based on Kuhn et al2010
-baseline.cinTreatRetain = 0.5; % Khozaim, 2013, Gyne & Obst 
-baseline.cinTreatHpvPersist = 0.7; % HPV persistence with cryo including treatment failure among HIV+ DeVuyst, 2014
-baseline.cinTreatHpvPersistHivNeg = 0.195; % Torne, 2012 BJOG; baseline.cinTreatHpvPersist - (1-baseline.cinTreatEff(1));  proportion of effectively treated HIV-negative women who have persistent HPV after LEEP
+baseline.colpoRetain = 1.0; % no triage with colpo
+baseline.cinTreatEff = [0.905 , 0.905 , 0.766 , 0.766 , 0.766 , 0.766 , 0.766 , 0.84]; % taken from KZN treatEff_hivNeg = 0.905; % HIV-negative treatEff_hivPos = 0.766; % HIV-positive untreated treatEff_hivArt = 0.84; % HIV-positive, on ART + VS
+baseline.cinTreatRetain = 0.95; % retention to thermal ablation
+baseline.cinTreatHpvPersist = 0.48; % HPV persistence with thermal ablation, KZN
+baseline.cinTreatHpvPersistHivNeg = 0.48 - (1 - 0.905); % from KZN persAblatHivNeg = persAblat - (1 - treatEff_hivNeg)
 baseline.ccTreatRetain = 0.4; % Khozaim, 2013, Gyne & Obst
 baseline.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
@@ -922,18 +919,18 @@ end
 
 % CISNET screening algorithm
 % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
-% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.56]; % S0
+cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.7]; % S0
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
- cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
+% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.70]; % S4, S5
-cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
-cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];
-cisnet.testSens = cytoSens2;
+cisnet.screenAge = [6:10];
+cisnet.screenAgeMults = [(1/5) (1/5) (1/5) (1/5) (1/5)];
+cisnet.testSens = cytoSens; % hpv dna sensitivity for hpv pos persons
 cisnet.colpoRetain = baseline.colpoRetain; % Khozaim, 2013, Gyne & Obst; 0.333; % (compliance) * (CIN2+/CC correctly identified by same-day colposcopy)
 cisnet.cinTreatEff = baseline.cinTreatEff;
 cisnet.cinTreatRetain = baseline.cinTreatRetain ; % Khozaim, 2013, Gyne & Obst  0.25; % assumed
-cisnet.cinTreatHpvPersist = 0.7; % HPV persistence with cryo including treatment failure among HIV+ DeVuyst, 2014
-cisnet.cinTreatHpvPersistHivNeg = 0.195; % Torne, 2012 BJOG; cisnet.cinTreatHpvPersist - (1-cisnet.cinTreatEff(1)); % proportion of effectively treated HIV-negative women who have persistent HPV after cryotherapy
+cisnet.cinTreatHpvPersist = 0.48; % HPV persistence with thermal ablation, KZN
+cisnet.cinTreatHpvPersistHivNeg = 0.48 - (1 - 0.905); 
 cisnet.ccTreatRetain = baseline.ccTreatRetain; % Khozaim, 2013, Gyne & Obst ; 0.2; % assumed
 cisnet.screenCover_vec = cell(size(screenYrs , 1) - 1, 1); % save data over time interval in a cell array
 for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps within period
@@ -943,7 +940,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % WHO screening algorithm - version a
-who.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.70; 0.90]; % CJB note: removed 90% screening compliance beginning in current year
+who.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % CJB note: removed 90% screening compliance beginning in current year
 who.testSens = hpvSensWHO;
 who.colpoRetain = 1.0;
 who.cinTreatEff = [1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0];
@@ -959,7 +956,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
-whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
+whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
 whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
 whob.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 whob.testSens = hpvSensWHO;

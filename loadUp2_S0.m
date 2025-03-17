@@ -4,7 +4,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     intervens , gender , age , risk , hpvTypeGroups , dim , k , toInd, annlz , ...
     ageSexDebut , mInit , fInit , partnersM , partnersF , partnersMmult, maleActs , ...
     femaleActs , riskDist , fertility , fertility2 , fertility3 , fertility4,...
-    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...p
+    mue , mue2 , mue3 , mue4 , mue5, epsA_vec , epsR_vec , yr , ...
     hivOn , betaHIV_mod , hiv_hpvMult, muHIV , kCD4 , ...
     hpvOn , beta_hpvVax_mod , beta_hpvNonVax_mod , fImm , rImmune , ...
     kCin1_Inf , kCin2_Cin1 , kCin3_Cin2 , kCC_Cin3 , rNormal_Inf , kInf_Cin1 , ...
@@ -507,7 +507,7 @@ end
 
 % CIN1 to HPV, ages 10-24
 if calibBool && any(32 == pIdx)
-    idx = find(32 == pIdx);P
+    idx = find(32 == pIdx);
     kInf_Cin1Mult = paramSet(paramsSub{idx}.inds(:));
     kInf_Cin1(1 : 5 , 1) = kInf_Cin1_orig(1 , 1) * kInf_Cin1Mult(1);
     kInf_Cin1(1 : 5 , 2) = kInf_Cin1_orig(1 , 2) * kInf_Cin1Mult(2);
@@ -808,8 +808,8 @@ maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower v
 
 %ART coverage pause from PEPFAR
 artYr = [(artVScov(:,1) - 1); 2025 + (1/6)]; %S0
-maxRateM = [artVScov(:,3) ./ 100 ; 0.6320] .* artOutMult; % S0 population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.6793] .* artOutMult; % S0 population-level ART coverage in females (72.9% if 90-90-90)
+maxRateM = [artVScov(:,3) ./ 100 ; 0.6482] .* artOutMult; % S0 population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.6875] .* artOutMult; % S0 population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -837,7 +837,7 @@ vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
             0.715 0.89 0.883 0.893 0.83 0.50; ... % 2003
             0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
             0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
-            0.86 0.87 0.82 0.8018 0.7939 0.7898];   % 2025 S0
+            0.8663 0.87 0.828 0.8018 0.7939 0.7898];   % 2025 S0
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
 vmmc_vec = cell(size(vmmcYr , 1) - 1 , length(circ_aVec));
 for i = 1 : size(vmmcYr , 1) - 1 % interpolate VMMC coverages at steps within period

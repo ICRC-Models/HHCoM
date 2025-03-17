@@ -12,7 +12,7 @@
 % on ART according to their disease and viral load status at the time they
 % went on treatment.
 
-function[dPop , extraOuts] = hivNH(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
+function[dPop , extraOuts] = hivNH_S2(t , pop , vlAdvancer , muHIV , dMue , mue3 , mue4 , artDist , ...
     kCD4 ,  artYr_vec , artM_vec , artF_vec , minLim , maxLim , disease , viral , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk , ...
     ageSexDebut , hivInds , stepsPerYear , year)
@@ -218,19 +218,22 @@ if year >= 2016
    if year >= 2016 && year < 2017
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
         popCover = {artM_vec{13} , artF_vec{13}};
-    elseif year >= 2017 %% && year <= 2025 FOR S2 and S3
+    elseif year >= 2017 && year < 2025 %% FOR S2 and S3
         ind = (round(artYr_vec{14} , 4) == round(year , 4));
         popCover = {artM_vec{14} , artF_vec{14}}; 
-% For S2 and S3
- % elseif year >= 2025 + (1/6) && year < 2025 + (2/6) %added for pepfar stoppage
-       % ind = (round(artYr_vec{15} , 4) == round(year , 4));
-       % popCover = {artM_vec{15} , artF_vec{15}}; 
-  % elseif year >= 2025 + (2/6) && year < 2025 + (3/6) 
-       % ind = (round(artYr_vec{16} , 4) == round(year , 4));
-       % popCover = {artM_vec{16} , artF_vec{16}}; 
-   % elseif year >= 2025 + (3/6) %added for pepfar stoppage
-       % ind = (round(artYr_vec{17} , 4) == round(year , 4));
-       % popCover = {artM_vec{17} , artF_vec{16}}; 
+%%For S2 and S3
+elseif year >= 2025 && year < 2025 + (1/6) %% FOR S2 and S3
+        ind = (round(artYr_vec{15} , 4) == round(year , 4));
+        popCover = {artM_vec{15} , artF_vec{15}}; 
+ elseif year >= 2025 + (1/6) && year < 2025 + (2/6) %added for pepfar stoppage
+       ind = (round(artYr_vec{16} , 4) == round(year , 4));
+       popCover = {artM_vec{16} , artF_vec{16}}; 
+  elseif year >= 2025 + (2/6) && year < 2025 + (3/6) 
+       ind = (round(artYr_vec{17} , 4) == round(year , 4));
+       popCover = {artM_vec{17} , artF_vec{17}}; 
+   elseif year >= 2025 + (3/6) %added for pepfar stoppage
+       ind = (round(artYr_vec{18} , 4) == round(year , 4));
+       popCover = {artM_vec{18} , artF_vec{18}}; 
 
         
    end
@@ -254,11 +257,11 @@ if year >= 2016
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
-        if year < (2025 + (1/6))
+        if year < 2030.5
             minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
             maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
             popCoverInd = popCover{g}(ind); % desired population-level ART coverage
-        elseif year >= (2025 + (1/6))
+        elseif year >= 2030.5
             minCoverLim = popCover{g}(end) * minLim;
             maxCoverLim = popCover{g}(end) * maxLim;
             popCoverInd = popCover{g}(end);

@@ -41,7 +41,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S5(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , paramSetIdx)
 
 % vaxRate_vec, vaxYrs
 
@@ -808,8 +808,8 @@ maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower v
 
 %ART coverage pause from PEPFAR
 artYr = [(artVScov(:,1) - 1); 2025; 2025 + (1/6); 2025 + (2/6); 2025 + (3/6); 2030.5]; %S2
-maxRateM = [artVScov(:,3) ./ 100 ; 0.6482; 0.492; 0.492 ; 0.336; 0.6482] .* artOutMult; % S2 population-level ART coverage in males (72.9% if 90-90-90)
-maxRateF = [artVScov(:,2) ./ 100 ; 0.6875; 0.522; 0.522 ; 0.356; 0.6875] .* artOutMult; % S2 population-level ART coverage in females (72.9% if 90-90-90)
+maxRateM = [artVScov(:,3) ./ 100 ; 0.6482; 0.404; 0.404 ; 0.6482; 0.6482] .* artOutMult; % S2 population-level ART coverage in males (72.9% if 90-90-90)
+maxRateF = [artVScov(:,2) ./ 100 ; 0.6875; 0.429; 0.429 ; 0.6875; 0.6875] .* artOutMult; % S2 population-level ART coverage in females (72.9% if 90-90-90)
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1); 
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -838,8 +838,8 @@ vmmcRate = [0.0 0.0 0.0 0.0 0 0; ... % 1980
             0.758 0.886 0.851 0.895 0.919 0.59; ... %2008
             0.81 0.82 0.708 0.638 0.617 0.606; ... %2014 
             0.8663 0.87 0.828 0.8018 0.7939 0.7898; ... %2025
-            0.502 0.505 0.48 0.465 0.46 0.458; ... %2025 + (1/6)
-            0.502 0.505 0.48 0.465 0.46 0.458; ... %2025 + (2/6)
+            0.052 0.0522 0.0497 0.0481 0.0476 0.0474; ... %2025 + (1/6)
+            0.052 0.0522 0.0497 0.0481 0.0476 0.0474; ... %2025 + (2/6)
             0.8663 0.87 0.828 0.8018 0.7939 0.7898]; % 20330.5
 
 vmmcYr_vec = cell(size(vmmcYr , 1) - 1 , 1); % save data over time interval in a cell array
@@ -924,7 +924,7 @@ end
 % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.56]; % S0
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
- cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
+ cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3416; 0.3416; 0.56; 0.56]; % S2, S3
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.70]; % S4, S5
 cisnet.screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
 cisnet.screenAgeMults = [1.0 / max(1 , fivYrAgeGrpsOn*5)];

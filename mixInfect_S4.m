@@ -4,7 +4,7 @@
 % Accepts contact parameters and a population matrix
 % as input and returns dPop, a matrix of derivatives that describes the
 % change in the population's subgroups.
-function [dPop , newInfs] = mixInfect_S2(t , pop , ...
+function [dPop , newInfs] = mixInfect_S4(t , pop , ...
     stepsPerYear , year , disease , viral , hpvVaxStates , hpvNonVaxStates , endpoints , intervens , gender , ...
     age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , partnersMmult, ...
@@ -316,7 +316,7 @@ prepUseVec = linspace(0, prepUse, length(yrVecPrep)); % Linearly spaced PrEP usa
 prepUse = prepUseVec(1); % Initialize PrEP use at the start
 
 newYrVecPrEP = restartYear : 1 / stepsPerYear : finalPeakYear;
-newPrepUseVec = linspace(0.0234, prepUseVec(end), length(newYrVecPrEP)); 
+newPrepUseVec = linspace(0.0168, prepUseVec(end), length(newYrVecPrEP)); 
 prepUse = newPrepUseVec(1); % Initialize PrEP use at the start
 
 % Determine PrEP usage based on the current year
@@ -331,7 +331,7 @@ elseif year >= prepPeakYear
 
 elseif year >= prepPauseYear & year < restartYear
     % In the pause year, set PrEP use to 0
-    prepUse = 0.0234;
+    prepUse = 0.0168;
 
 elseif year >= restartYear && year <= finalPeakYear
     % After the pause, reintroduce PrEP with a linear increase reaching peak in 2035
