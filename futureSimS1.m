@@ -9,8 +9,8 @@ function futureSimS1(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tst
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-% historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase18']]); % ***SET ME***: name for historical run input file *fix this 
- historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase18']]); % ***SET ME***: name for historical run input file *fix this 
+ %historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
@@ -67,7 +67,10 @@ vaxAge = [2];
 vaxCover = [0.77*(0.7/0.9)];
 vaxG = [2];   % indices of genders to vaccinate (1 or 2 or 1,2)
 gradScaleUp = 1; % **SET ME:** adjust whether or not you want to have gradual scale up
-% vaxYrs = [2025]; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
+vaxYrs = [2025; 2030]; ; % i set arbitrarilly as zero. you only need vaxYrs if gradScaleUp = 1. note that gradScaleUp for future sim has not been set up. 
+
+stepsPerYear = 6; % ***SET ME***: If this changes in loadup2, you need to change it here as well
+timeStep = 1 / stepsPerYear; % ***SET ME***: same here
 
 if gradScaleUp==1
     vaxRate = [0.77; 0.9] * (0.7/0.9); % Coverage over time (Years: [2021; 2026])

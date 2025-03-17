@@ -795,7 +795,7 @@ condStart = 1995;
 peakYear = 2000;
 
 % PrEP USE
-prepUse = 0.029 % this is for all sexually active individuals; 
+prepUse = 0.087 % this is for all sexually active individuals; 
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
@@ -894,7 +894,7 @@ hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test
 %Ng'ang'a A, et al. doi:10.1186/s12889-018-6054-9, https://hpvcentre.net/statistics/reports/KEN_FS.pdf for 2023 onwards and feedback from Nelly that screening coverage should be higher
 % baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.14]; % S0, S2, S3
 % baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14]; %S0
-% baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % S1
+ baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.70]; % S1
 % baseline.screenCover = [0.0; 0.04; 0.074; 0.14; 0.14; 0.14; 0.14; 0.70]; % S4, S5
 %baseline.diseaseInds = [1 : disease];
 baseline.screenAge = [8 10];
@@ -919,8 +919,8 @@ end
 
 % CISNET screening algorithm
 % https://obgyn.onlinelibrary.wiley.com/doi/epdf/10.1002/ijgo.13690 for 2023 onwards
-cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.7]; % S0
-% cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
+%cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.7]; % S0
+ cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.70]; % S1
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.56]; % S2, S3
 % cisnet.screenCover = [0.0; 0.04; 0.123; 0.56; 0.3976; 0.3976; 0.56; 0.70]; % S4, S5
 cisnet.screenAge = [6:10];
@@ -956,7 +956,7 @@ for i = 1 : size(screenYrs , 1) - 1          % interpolate values at steps withi
 end
 
 % WHO screening algorithm - version b (to apply WHO screening parameters at different ages by HIV status)
-whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
+whob.screenCover = [0.0; 0.18; 0.48; 0.48; 0.70; 0.90]; %CJB note: removed 90% screening compliance beginning in current year
 whob.screenAge = [(35/max(1 , fivYrAgeGrpsOn*5)+1) , (45/max(1 , fivYrAgeGrpsOn*5)+1)];
 whob.screenAgeMults = [(1.0 / max(1 , fivYrAgeGrpsOn*5)) , (1.0 / max(1 , fivYrAgeGrpsOn*5))];
 whob.testSens = hpvSensWHO;
