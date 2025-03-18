@@ -16,7 +16,6 @@ if gradScaleUp == 1 % note that gradScaleUp has not been set up for future sim, 
         else
             periodInd = 2; 
         end
-        
             dataYr1 = vaxYrs(1);
             dataYrLast = vaxYrs(size(vaxYrs , 1));
             baseYrInd = max(find(year >= vaxYrs , 1, 'last') , 1); % get index of first year <= current year

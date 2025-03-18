@@ -618,7 +618,7 @@ n = 1;
                 % HPV vaccination module- school-based vaccination regimen
                 [dPop , vaxdSchool(i , :)] = hpvVaxSchool_S1(popIn , disease , viral , risk , ...
                     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxG , vaxAge , ...
-                    vaxCover , toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
+                    vaxRate_vec, toInd , vaxYrs , year , stepsPerYear , gradScaleUp); 
                 pop(end , :) = pop(end , :) + dPop;
                 popIn = pop(end , :);
 %                 if any(pop(end , :) < 0)
