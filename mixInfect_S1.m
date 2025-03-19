@@ -311,12 +311,12 @@ finalPeakYear = 2030; % Year when PrEP reaches its peak again
 yrVecPrep = PrEPStart : 1 / stepsPerYear : prepPeakYear; % Create a vector of years from PrEP start to peak PrEP coverage
 
 % Generate a vector for PrEP usage increasing linearly from 0 to prepUse
-prepUseVec = linspace(0, prepUse, length(yrVecPrep)); % Linearly spaced PrEP usage values
+prepUseVec = linspace(0, 0.029, length(yrVecPrep)); % Linearly spaced PrEP usage values
 prepUse = prepUseVec(1); % Initialize PrEP use at the start
 
 % For S2 and S3
  newYrVecPrEP = restartYear : 1 / stepsPerYear : finalPeakYear;
- newPrepUseVec = linspace(0.029, prepUseVec(end), length(newYrVecPrEP)); 
+ newPrepUseVec = linspace(0.029, 0.087, length(newYrVecPrEP)); 
  prepUse = newPrepUseVec(1); % Initialize PrEP use at the start
 
 % Determine PrEP usage based on the current year
@@ -324,7 +324,7 @@ if year >= PrEPStart && year < prepPeakYear
     % Before peak year, find the index corresponding to the current year
     yrIndPrep = year == yrVecPrep; % Find closest index
     prepUse = prepUseVec(yrIndPrep); % Assign the corresponding PrEP use value
-elseif year >= prepPeakYear && year > restartYear
+elseif year >= prepPeakYear && year < restartYear
     prepUse = prepUseVec(end);
 
  elseif year >= restartYear && year <= finalPeakYear

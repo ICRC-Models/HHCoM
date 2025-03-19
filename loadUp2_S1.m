@@ -795,7 +795,7 @@ condStart = 1995;
 peakYear = 2000;
 
 % PrEP USE
-prepUse = 0.087 % this is for all sexually active individuals; 
+prepUse = 0.029 % this is for all sexually active individuals; 
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
@@ -885,8 +885,8 @@ screenYrs = [2000; 2003; 2016; 2025; 2030]; % S1
 hpvScreenStartYear = screenYrs(1);
 
 % Screening test sensitivities
-cytoSens = [0.0 , 0.85 , 0.85]; % HPV DNA sensitivity for HIV-pos persons  (based on KZN model)
-cytoSens2 = [0.0 , 0.94 , 0.94]; % HPV DNA sensitivity for HIV-neg persons (based on KZN model) 
+cytoSens = [0.0 , 0.94 , 0.94]; % HPV DNA sensitivity for HIV-pos persons  (based on KZN model)
+cytoSens2 = [0.0 , 0.85 , 0.85]; % HPV DNA sensitivity for HIV-neg persons (based on KZN model) 
 hpvSens = [0.0 , 0.881 , 0.881]; % careHPV
 hpvSensWHO = [0.0 , 0.90 , 0.94]; % HPV test 
 
