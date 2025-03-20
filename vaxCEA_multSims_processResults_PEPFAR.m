@@ -54,7 +54,7 @@ paramDir = [pwd , '\Params\'];
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , [] , 1);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(1 , 0 , [] , [] , [] , 1);
 
 lastYear = 2035; % manually set in futureSim
 
@@ -76,7 +76,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['VaccineKenya1DoseCea_Aug14_WaningCU_PrEPTrial' , sceNum]; % ***SET ME***: name for simulation output file
+baseFileName = ['VaccineKenya1DoseCea_Aug14_WaningCU_PEPFAR_S' , sceNum]; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -168,9 +168,9 @@ screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];ScreenIndAge = [8 10 6 7 9];
 % Load results
 pathModifier = [baseFileName , fileInds{j}];
 nSims = size(dir([pwd , '/HHCoM_Results/' , pathModifier, '/' , '*.mat']) , 1);
-curr = load([pwd , '/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePrepCompart14' , fileInds{j}]); % ***SET ME***: name for historical run output file
+curr = load([pwd , '/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase' , fileInds{j}]); % ***SET ME***: name for historical run output file
 vaxResult = cell(nSims , 1);
-resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxWaneSimResult'];
+resultFileName = [pwd , '/HHCoM_Results/' , baseFileName, '/' , 'vaxSimResult'];
 
 % load results from vaccine run into cell array
 vaxResult{n} = load([resultFileName , fileInds{j}, '.mat']);
@@ -184,19 +184,24 @@ vaxResult{n} = load([resultFileName , fileInds{j}, '.mat']);
 % notice for vaxResult you start at row 2. likely because of
 % 2023 being double counted in both. 
 vaxResult{n}.popVec = [curr.popVec(1 : end  , :); vaxResult{n}.popVec(2 : end , :)]; % consolidating historical population numbers with future
+vaxResult{n}.ccDeath_treat = [curr.ccDeath_treat(1 : end , : , : , :) ; vaxResult{n}.ccDeath_treat(2 : end , : , : , :)]; % consolidating historical CC death #s with future... etc.
+vaxResult{n}.ccDeath_untreat = [curr.ccDeath_untreat(1 : end , : , : , :) ; vaxResult{n}.ccDeath_untreat(2 : end , : , : , :)]; 
 vaxResult{n}.newCC = [curr.newCC(1 : end , : , : , :); vaxResult{n}.newCC(2 : end , : , : , :)]; 
+vaxResult{n}.deaths = [curr.deaths(1 : end, 1); vaxResult{n}.deaths(2 : end, 1)];
 vaxResult{n}.newHpvVax = [curr.newHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvVax(2 : end , : , : , : , : , :)]; % infected with vaccine type HPV
 vaxResult{n}.newImmHpvVax = [curr.newImmHpvVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvVax(2 : end , : , : , : , : , :)];
 vaxResult{n}.newHpvNonVax = [curr.newHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newHpvNonVax(2 : end , : , : , : , : , :)];
 vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :); vaxResult{n}.newImmHpvNonVax(2 : end , : , : , : , : , :)];
 vaxResult{n}.newScreen = [curr.newScreen(1 : end , :, :, :, :, :, :, :); vaxResult{n}.newScreen(2 : end , : , : , : , : , :, :, :)]; %[curr.newScreen(1 : end , : , : , : , : , : , : ); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , :)];
 vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
+vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
 vaxResult{n}.prepCov = [curr.prepCov(1 : end , : , : , : , : ); vaxResult{n}.prepCov(2 : end , : , : , : , : )]; %added in prep coverage, 
 vaxResult{n}.menCirc = [curr.menCirc(1 : end , : ); vaxResult{n}.menCirc(2 : end , : , : , : , : )]; %newCirc
 %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
 vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 vaxResult{n}.ccSymp = [curr.ccSymp(1:end,:, :, :); vaxResult{n}.ccSymp(2:end,:, :, :)]; 
 vaxResult{n}.ccTreat = [curr.ccTreat(1:end, :, :, :); vaxResult{n}.ccTreat(2:end,:, :, :)]; 
+vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:end, :)]; % the only vax matrix in both historical and future sim 
 
 % VACCINATIONS ********************************
     vaxTemplate = zeros(nTimepoints, 3); 
@@ -245,17 +250,16 @@ newCirc = vaxResult{n}.menCirc
 
 % PREP COVERAGE ****************************** WANT TO CONFIRM
 
-d = diseaseVec_vax{1};
+
 for a = 1:age
    for g = 1:gender
-        r = 3;   % Only risk group 3
-        prepCov(:, g, a, r, j) = sum(sum(sum(sum(vaxResult{n}.prepCov(:, :, g, a, r), 2), 3), 4), 5); 
+        prepCov(:, g, a, j) = sum(sum(sum(vaxResult{n}.prepCov(:, g, a, :), 2), 3), 4); 
     end
 end
 
 % HIV HEALTH STATES ************************************
 
-    for a = 1 : age
+  for a = 1 : age
         for dInd = 1 : length(diseaseVec_vax)
             d = diseaseVec_vax{dInd}; 
 

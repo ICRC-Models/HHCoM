@@ -206,34 +206,18 @@ if year >= 2015 && year < 2016
     end
 end
 
-% When running with PEPFAR stoppage, need to make sure those years are
-% accounted for so uncomment the elseIf for those year and make sure the
-% vectors lineup
-
 % Any CD4, after 2016
 if year >= 2016
     % Calculate HIV-associated mortality on ART
     muART = 0.15 .* mueYear;
     % Calculate population-level ART coverage
-   if year >= 2016 && year < 2017
+   if year >= 2016 && year < 2017 
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
         popCover = {artM_vec{13} , artF_vec{13}};
-    elseif year >= 2017 %% && year <= 2025 FOR S2 and S3
+    elseif year >= 2017 
         ind = (round(artYr_vec{14} , 4) == round(year , 4));
         popCover = {artM_vec{14} , artF_vec{14}};
-%%For S2 and S3
-% elseif year >= 2025 && year < 2025 + (1/6) %% FOR S2 and S3
-%         ind = (round(artYr_vec{15} , 4) == round(year , 4));
-%         popCover = {artM_vec{15} , artF_vec{15}}; 
-%  elseif year >= 2025 + (1/6) && year < 2025 + (2/6) %added for pepfar stoppage
-%        ind = (round(artYr_vec{16} , 4) == round(year , 4));
-%        popCover = {artM_vec{16} , artF_vec{16}}; 
-%   elseif year >= 2025 + (2/6) && year < 2025 + (3/6) 
-%        ind = (round(artYr_vec{17} , 4) == round(year , 4));
-%        popCover = {artM_vec{17} , artF_vec{17}}; 
-
-
-        
+    
    end
     ageVec = [1 : age];
     dRange = [3 : 7];

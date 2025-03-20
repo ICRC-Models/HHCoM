@@ -49,7 +49,7 @@ clear;
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2(1 , 0 , [] , [] , [] , 1);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(1 , 0 , [] , [] , [] , 1);
 
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
@@ -72,7 +72,7 @@ fivYrAgeGrpsOn = 1;
 diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 
 % scenarios = {'1.1', '1.2', '2.1', '2.2', '3.1'}; ***SET ME***: specify the scenarios to loop through
-scenarios = {'1'}; 
+scenarios = {'2'}; 
 
 % parallelizing the for loop
 loopSegments = {0 , round(length(scenarios)/2) , length(scenarios)}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
@@ -88,13 +88,19 @@ loopSegmentsLength = length(loopSegments);
     sce = sceNum + 1; % add one since indices start at 1 (so scenarios will be 1-10 in this case) 
 
     % Initialize result matrices 
+    vax = zeros(nTimepoints, age+1, 2, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
+    deaths = zeros(nTimepoints, length(diseaseVec_vax)+1, age+1, 4, nRuns); 
+    ccHealthState = zeros(nTimepoints, length(diseaseVec_vax), age+1, endpoints, nRuns); 
+    hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); 
+    newCC = zeros(nTimepoints, length(diseaseVec_vax), age+1, nRuns); 
+    totalPerAge = zeros(nTimepoints, age+1, nRuns); 
     screenTreat = zeros(nTimepoints, age+1, 3, nRuns); %CC Screen
     screenSympCCTreat = zeros(nTimepoints, 3, age+1, 3, 2, nRuns); %CC screen
     hivHealthState = zeros(nTimepoints, 7, age+1, nRuns); %  time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios, Get Virally Suppressed number from here and number living
+    newHiv = zeros(nTimepoints, gender, age+1, nRuns); 
     newCirc = zeros(nTimepoints, age+1, nRuns); %VMMC Output - need to confrim
-    prepCov = zeros(nTimepoints, 2, 7, age+1, nRuns);% PrEP output - need to confirm
-    hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); 
-    totalPerAge = zeros(nTimepoints, age+1, nRuns); 
+    prepCov = zeros(nTimepoints, gender, age+1, nRuns);% PrEP output - need to confirm
+
 
 
     % Feeding in the zeroed result matrix, spitting out the same matrix but with all the counts added in for that scenario
@@ -155,15 +161,14 @@ loopSegmentsLength = length(loopSegments);
 
 %PREP - NEED TO VERIFY
             for g = 1:2  % Gender: 1 = Male, 2 = Female
-                for dInd = 1  % Disease index
                     for a = 1:(age + 1)
-                        if (param == 1 && a == 1 && g == 1 && dInd == 1)
-                            prepCovReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                              sce.*ones(nTimepoints,1), prepCov(:, g, dInd, a, param)];
+                        if (param == 1 && a == 1 && g == 1)
+                            prepCovReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                              sce.*ones(nTimepoints,1), prepCov(:, g, a, param)];
                         else 
                             prepCovReshape = [prepCovReshape;
-                                              transpose(monthlyTimespan), g.*ones(nTimepoints,1), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                              sce.*ones(nTimepoints,1), prepCov(:, g, dInd, a, param)];
+                                              transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                              sce.*ones(nTimepoints,1), prepCov(:, g, a, param)];
                         end 
                     end
                 end
@@ -181,7 +186,9 @@ for g = 1
     end
 end
 
-         for dInd = 1 : length(diseaseVec_vax)
+
+
+      for dInd = 1 : length(diseaseVec_vax)
                     d = diseaseVec_vax{dInd};
 
                     if (param == 1 && a == 1 && dInd == 1)
@@ -213,6 +220,7 @@ end
                 end 
             end 
 
+     
             for index = 1 : 3
                 if (param == 1 && a == 1 && index == 1)
                     screenTreatReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
@@ -223,6 +231,7 @@ end
                                         sce.*ones(nTimepoints,1), screenTreat(:, a, index, param)];
                 end 
             end 
+
 
             for x = 1 : 3 
                 for index = 1 : 2
@@ -260,7 +269,7 @@ hpvHealthStateReshape1 = array2table(hpvHealthStateReshape, 'VariableNames', {'y
         'sceNum', 'count'});
 screenTreatReshape1 = array2table(screenTreatReshape, 'VariableNames', {'year', 'age', 'index', 'paramNum', 'sceNum', 'count'}); 
 screenSympCCTreatReshape1 = array2table(screenSympCCTreatReshape, 'VariableNames', {'year', 'endpoint', 'age', 'treat', 'index', 'paramNum', 'sceNum', 'count'}); 
-prepCovReshape1 = array2table(prepCovReshape, 'VariableNames', {'year', 'gender' , 'hivState' , 'age', 'paramNum', 'sceNum', 'count'} ) %need to confirm for prep
+prepCovReshape1 = array2table(prepCovReshape, 'VariableNames', {'year', 'gender' , 'age', 'paramNum', 'sceNum', 'count'} ) %need to confirm for prep
 newCircReshape1 = array2table(newCircReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); %need to confirm for circumsion
 
 % spit out into CSV 
@@ -268,7 +277,6 @@ writetable(vaxReshape1, [pwd '/KECEA/vax_HIV_S' sceString '.csv']);
 writetable(deathsReshape1, [pwd '/KECEA/deaths_HIV_S' sceString '.csv']);
 writetable(ccHealthStateReshape1, [pwd '/KECEA/ccHealthState_HIV_S' sceString '.csv']);
 writetable(newCCReshape1, [pwd '/KECEA/newCC_HIV_S' sceString '.csv']); 
-
 writetable(totalPerAgeReshape1, [pwd '/KECEA/totalPerAge_S' sceString '.csv']);
 writetable(hivHealthStateReshape1, [pwd '/KECEA/hivHealthState_S' sceString '.csv']);
 writetable(hpvHealthStateReshape1, [pwd '/KECEA/hpvHealthState_S' sceString '.csv']);
