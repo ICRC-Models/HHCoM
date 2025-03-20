@@ -215,10 +215,10 @@ if year >= 2016
     % Calculate HIV-associated mortality on ART
     muART = 0.15 .* mueYear;
     % Calculate population-level ART coverage
-   if year >= 2016 && year < 2017
+   if year >= 2016 && year < 2025
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
         popCover = {artM_vec{13} , artF_vec{13}};
-    elseif year >= 2017  %% FOR S2 and S3
+    elseif year >= 2025 && year < 2030 %% FOR S2 and S3
         ind = (round(artYr_vec{14} , 4) == round(year , 4));
         popCover = {artM_vec{14} , artF_vec{14}}; 
 %%For S2 and S3
@@ -231,9 +231,9 @@ if year >= 2016
 %   elseif year >= 2025 + (2/6) && year < 2025 + (3/6) 
 %        ind = (round(artYr_vec{17} , 4) == round(year , 4));
 %        popCover = {artM_vec{17} , artF_vec{17}}; 
-%    elseif year >= 2030 %added for pepfar stoppage
-%        ind = (round(artYr_vec{15} , 4) == round(year , 4));
-%        popCover = {artM_vec{15} , artF_vec{15}}; 
+   elseif year >= 2030 %added for pepfar stoppage
+       ind = (round(artYr_vec{15} , 4) == round(year , 4));
+       popCover = {artM_vec{15} , artF_vec{15}}; 
 
         
    end
