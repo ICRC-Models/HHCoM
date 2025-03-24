@@ -1,4 +1,4 @@
-function [vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc] = vaxCEA_multSims_processResultsPEPFAR(vaxResultInd , sceNum , fileNameNums, fileInds, vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc)
+function [vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc] = vaxCEA_multSims_processResults_PEPFAR(vaxResultInd , sceNum , fileNameNums, fileInds, vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -54,9 +54,9 @@ paramDir = [pwd , '\Params\'];
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(1 , 0 , [] , [] , [] , 1);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S0(1 , 0 , [] , [] , [] , 1);
 
-lastYear = 2035; % manually set in futureSim
+lastYear = 2125; % manually set in futureSim
 
 %% Setting file names, initializing variables 
 nRuns = length(fileInds);
@@ -76,7 +76,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['VaccineKenya1DoseCea_Aug14_WaningCU_PEPFAR_S' , sceNum]; % ***SET ME***: name for simulation output file
+baseFileName = ['VaccineKenyaPrEPCea_Mar14_PEPFARstop_S' , sceNum]; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -199,7 +199,7 @@ vaxResult{n}.newImmHpvNonVax = [curr.newImmHpvNonVax(1 : end , : , : , : , : , :
 vaxResult{n}.newScreen = [curr.newScreen(1 : end , :, :, :, :, :, :, :); vaxResult{n}.newScreen(2 : end , : , : , : , : , :, :, :)]; %[curr.newScreen(1 : end , : , : , : , : , : , : ); vaxResult{n}.newScreen(2 : end , : , : , : , : , : , :)];
 vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
 vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
-vaxResult{n}.prepCov = [curr.prepCov(1 : end , : , : , : , : ); vaxResult{n}.prepCov(2 : end , : , : , : , : )]; %added in prep coverage, 
+vaxResult{n}.prepCov = [curr.prepCov(1 : end , : , :); vaxResult{n}.prepCov(2 : end , : , :)]; %added in prep coverage, 
 vaxResult{n}.menCirc = [curr.menCirc(1 : end , : ); vaxResult{n}.menCirc(2 : end , : )]; %newCirc
 %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
 vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
@@ -261,7 +261,7 @@ newCirc(:, 17, j) = vaxResult{n}.menCirc;
 
 for a = 1:age
    for g = 1:gender
-        prepCov(:, g, a, j) = sum(sum(sum(vaxResult{n}.prepCov(:, g, a, :), 2), 3), 4); 
+        prepCov(:, g, a, j) = sum(sum(vaxResult{n}.prepCov(:, g, a), 2), 3); 
     end
 end
 

@@ -647,8 +647,8 @@ for h = 1 : hpvVaxStates
 
                             %PrEP coverage tracker - those on PrEP
                             %infected (d=1,2), and at high risk (3)
-                            prepCov(1 , a ) = prepCov(1 , a ) + sumall(mSus .* prepUseVec); % # of males on PrEP
-                            prepCov(2 , a ) = prepCov(2 , a ) + sumall(fSus .* prepUseVec); % # of females on PrEP
+                            prepCov(1 , a ) = prepCov(1 , a ) + sumall(mSus .* prepUse); % # of males on PrEP
+                            prepCov(2 , a ) = prepCov(2 , a ) + sumall(fSus .* prepUse); % # of females on PrEP
 
                             % Adjust compartments
                             dPop(mSus) = dPop(mSus) - mInfected; % efflux of infected males

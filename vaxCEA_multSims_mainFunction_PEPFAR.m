@@ -2,7 +2,7 @@
 % numbers, cleaning the output, turning into an array, and exporting to CSV for 
 % processing in R. 
 
-function vaxCEA_multSims_mainFunctionPEPFAR(username)
+function vaxCEA_multSims_mainFunction_PEPFAR(username)
 
 clear;
 
@@ -49,7 +49,7 @@ clear;
     deathMat , deathMat2 , deathMat3 , deathMat4 , deathMat5,...
     dDeathMat , dDeathMat2 , dDeathMat3 , dDeathMat4, dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S1(1 , 0 , [] , [] , [] , 1);
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff] = loadUp2_S0(1 , 0 , [] , [] , [] , 1);
 
 % Indices of calib runs to plot
 % Temporarily commenting out to only run one scenario first to test out
@@ -61,7 +61,7 @@ clear;
 fileInds = {'18'}; % FORTESTING
 nRuns = length(fileInds);
 
-lastYear = 2035; % manually set in futureSim
+lastYear = 2125; % manually set in futureSim
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
 monthlyTimespanFut = [endYear : timeStep : lastYear]; % screening time span starts at 2021
@@ -72,7 +72,7 @@ fivYrAgeGrpsOn = 1;
 diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 
 % scenarios = {'1.1', '1.2', '2.1', '2.2', '3.1'}; ***SET ME***: specify the scenarios to loop through
-scenarios = {'2'}; 
+scenarios = {'0'}; 
 
 % parallelizing the for loop
 loopSegments = {0 , round(length(scenarios)/2) , length(scenarios)}; % running 10 scenarios ***SET ME***: the number of scenarios will be different
@@ -133,7 +133,7 @@ loopSegmentsLength = length(loopSegments);
                 end 
             end 
 
-            for index = 1 : 3 
+            for index = 1 : 4
                 for dInd = 1 : length(diseaseVec_vax)+1
                     for g = 1 : 3
                         if (param == 1 && a == 1 && index == 1 && dInd==1 && g == 1)
@@ -179,11 +179,11 @@ loopSegmentsLength = length(loopSegments);
      %VMMC         
                 if (param == 1 && a == 1)
                     newCircReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param .* ones(nTimepoints, 1), ...
-                                      sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Use only the first dimension (since newCirc is 660x1)
+                                      sce .* ones(nTimepoints, 1), newCirc(:, a, param)];  % Use only the first dimension (since newCirc is 660x1)
                 else
                     newCircReshape = [newCircReshape;
                                       transpose(monthlyTimespan), a.*ones(nTimepoints,1), param .* ones(nTimepoints, 1), ...
-                                      sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Same for the other params
+                                      sce .* ones(nTimepoints, 1), newCirc(:, a, param)];  % Same for the other params
                 end
 
             for dInd = 1 : length(diseaseVec_vax)
@@ -277,7 +277,7 @@ hpvHealthStateReshape1 = array2table(hpvHealthStateReshape, 'VariableNames', {'y
         'sceNum', 'count'});
 screenTreatReshape1 = array2table(screenTreatReshape, 'VariableNames', {'year', 'age', 'index', 'paramNum', 'sceNum', 'count'}); 
 screenSympCCTreatReshape1 = array2table(screenSympCCTreatReshape, 'VariableNames', {'year', 'endpoint', 'age', 'treat', 'index', 'paramNum', 'sceNum', 'count'}); 
-prepCovReshape1 = array2table(prepCovReshape, 'VariableNames', {'year', 'gender' , 'age', 'paramNum', 'sceNum', 'count'} ) %need to confirm for prep
+prepCovReshape1 = array2table(prepCovReshape, 'VariableNames', {'year', 'gender' , 'age', 'paramNum', 'sceNum', 'count'} ); %need to confirm for prep
 newCircReshape1 = array2table(newCircReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); %need to confirm for circumsion
 
 % spit out into CSV 
