@@ -89,14 +89,14 @@ loopSegmentsLength = length(loopSegments);
 
     % Initialize result matrices 
     vax = zeros(nTimepoints, age+1, 2, nRuns); % number of vaccinations is not stratified by age. only time and parameter.    , 10 scenarios  
-    deaths = zeros(nTimepoints, length(diseaseVec_vax)+1, age+1, 4, nRuns); 
+    deaths = zeros(nTimepoints, length(diseaseVec_vax)+1, gender+1, age+1, 4, nRuns); 
     ccHealthState = zeros(nTimepoints, length(diseaseVec_vax), age+1, endpoints, nRuns); 
     hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); 
     newCC = zeros(nTimepoints, length(diseaseVec_vax), age+1, nRuns); 
-    totalPerAge = zeros(nTimepoints, age+1, nRuns); 
+    totalPerAge = zeros(nTimepoints, gender, age+1, nRuns); 
     screenTreat = zeros(nTimepoints, age+1, 3, nRuns); %CC Screen
     screenSympCCTreat = zeros(nTimepoints, 3, age+1, 3, 2, nRuns); %CC screen
-    hivHealthState = zeros(nTimepoints, 7, age+1, nRuns); %  time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios, Get Virally Suppressed number from here and number living
+    hivHealthState = zeros(nTimepoints, 7, gender, age+1, nRuns); %  time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios, Get Virally Suppressed number from here and number living
     newHiv = zeros(nTimepoints, gender, age+1, nRuns); 
     newCirc = zeros(nTimepoints, age+1, nRuns); %VMMC Output - need to confrim
     prepCov = zeros(nTimepoints, gender, age+1, nRuns);% PrEP output - need to confirm
@@ -110,14 +110,16 @@ loopSegmentsLength = length(loopSegments);
 % turn all the result matrices into 2D 
     for param = 1 : nRuns
         for a = 1 : (age + 1)
+            for g = 1 : gender
             % turning total per age matrix into 2D 
-            if (param == 1 && a == 1)
-                totalPerAgeReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
-                                        totalPerAge(:, a, param)];
-            else 
-                totalPerAgeReshape = [totalPerAgeReshape; 
-                                        transpose(monthlyTimespan), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
-                                        totalPerAge(:, a, param)]; 
+                if (param == 1 && a == 1 && g == 1)
+                    totalPerAgeReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                            totalPerAge(:, g, a, param)];
+                else 
+                    totalPerAgeReshape = [totalPerAgeReshape; 
+                                            transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                            totalPerAge(:, g, a, param)]; 
+                end 
             end 
 
             for index = 1 : 2
@@ -133,13 +135,15 @@ loopSegmentsLength = length(loopSegments);
 
             for index = 1 : 3 
                 for dInd = 1 : length(diseaseVec_vax)+1
-                    if (param == 1 && a == 1 && index == 1 && dInd==1)
-                        deathsReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                            sce.*ones(nTimepoints,1), deaths(:, dInd, a, index, param)];
-                    else 
-                        deathsReshape = [deathsReshape; 
-                                            transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                            sce.*ones(nTimepoints,1), deaths(:, dInd, a, index, param)];
+                    for g = 1 : 3
+                        if (param == 1 && a == 1 && index == 1 && dInd==1 && g == 1)
+                            deathsReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                                sce.*ones(nTimepoints,1), deaths(:, dInd, g, a, index, param)];
+                        else 
+                            deathsReshape = [deathsReshape; 
+                                                transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                                sce.*ones(nTimepoints,1), deaths(:, dInd, g, a, index, param)];
+                        end 
                     end 
                 end 
             end 
@@ -159,9 +163,8 @@ loopSegmentsLength = length(loopSegments);
                 end 
                end 
 
-%PREP - NEED TO VERIFY
+            %PREP - NEED TO VERIFY
             for g = 1:2  % Gender: 1 = Male, 2 = Female
-                    for a = 1:(age + 1)
                         if (param == 1 && a == 1 && g == 1)
                             prepCovReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
                                               sce.*ones(nTimepoints,1), prepCov(:, g, a, param)];
@@ -170,41 +173,46 @@ loopSegmentsLength = length(loopSegments);
                                               transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
                                               sce.*ones(nTimepoints,1), prepCov(:, g, a, param)];
                         end 
-                    end
-                end
             end
+            
 
-%VMMC         
-for g = 1
-    if param == 1
-        newCircReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1) , param .* ones(nTimepoints, 1), ...
-                          sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Use only the first dimension (since newCirc is 660x1)
-    else
-        newCircReshape = [newCircReshape;
-                          transpose(monthlyTimespan), g.*ones(nTimepoints,1) , param .* ones(nTimepoints, 1), ...
-                          sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Same for the other params
-    end
-end
+     %VMMC         
+                if (param == 1 && a == 1)
+                    newCircReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), param .* ones(nTimepoints, 1), ...
+                                      sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Use only the first dimension (since newCirc is 660x1)
+                else
+                    newCircReshape = [newCircReshape;
+                                      transpose(monthlyTimespan), a.*ones(nTimepoints,1), param .* ones(nTimepoints, 1), ...
+                                      sce .* ones(nTimepoints, 1), newCirc(:, 1)];  % Same for the other params
+                end
 
-
-
-      for dInd = 1 : length(diseaseVec_vax)
+            for dInd = 1 : length(diseaseVec_vax)
                     d = diseaseVec_vax{dInd};
 
                     if (param == 1 && a == 1 && dInd == 1)
-                        hivHealthStateReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1) , a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                            sce.*ones(nTimepoints,1), hivHealthState(:, dInd, a, param)];
-
+                        
                         newCCReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
                                         newCC(:, dInd, a, param)]; 
                     else 
-                        hivHealthStateReshape = [hivHealthStateReshape; 
-                                            transpose(monthlyTimespan), dInd.*ones(nTimepoints,1) , a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                            sce.*ones(nTimepoints,1), hivHealthState(:, dInd, a, param)];
+                        
                         newCCReshape = [newCCReshape; 
                                         transpose(monthlyTimespan), dInd.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
                                         newCC(:, dInd, a, param)]; 
                     end 
+            end 
+
+            for dInd = 1 : length(diseaseVec_vax) 
+                d = diseaseVec_vax{dInd};
+                for g = 1 : gender 
+                    if (param == 1 && a == 1 && dInd == 1 && g == 1)
+                        hivHealthStateReshape = [transpose(monthlyTimespan), dInd.*ones(nTimepoints,1) , g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), hivHealthState(:, dInd, g, a, param)];
+                    else
+                        hivHealthStateReshape = [hivHealthStateReshape; 
+                                            transpose(monthlyTimespan), dInd.*ones(nTimepoints,1) , g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
+                                            sce.*ones(nTimepoints,1), hivHealthState(:, dInd, g, a, param)];
+                    end 
+                end 
             end 
  
 
@@ -256,15 +264,15 @@ end
 
 vaxReshape1 = array2table(vaxReshape, 'VariableNames', {'year', 'age', 'vaxType', 'paramNum', ...
         'sceNum', 'count'}); 
-deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'hivState', 'age', 'index', 'paramNum', ...
+deathsReshape1 = array2table(deathsReshape, 'VariableNames', {'year', 'hivState', 'gender', 'age', 'index', 'paramNum', ...
         'sceNum', 'count'}); 
 ccHealthStateReshape1 = array2table(ccHealthStateReshape, 'VariableNames', {'year',  'hivState' , 'age', 'endpoint', 'paramNum', ...
         'sceNum', 'count'});
 hpvHealthStateReshape1 = array2table(hpvHealthStateReshape, 'VariableNames', {'year', 'age', 'healthState', 'paramNum', ...
         'sceNum', 'count'});
 newCCReshape1 = array2table(newCCReshape, 'VariableNames', {'year', 'hivState', 'age', 'paramNum', 'sceNum', 'count'});
-totalPerAgeReshape1 = array2table(totalPerAgeReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); 
-hivHealthStateReshape1 = array2table(hivHealthStateReshape, 'VariableNames', {'year', 'hivState', 'age', 'paramNum', 'sceNum', 'count'}); 
+totalPerAgeReshape1 = array2table(totalPerAgeReshape, 'VariableNames', {'year', 'gender', 'age', 'paramNum', 'sceNum', 'count'}); 
+hivHealthStateReshape1 = array2table(hivHealthStateReshape, 'VariableNames', {'year', 'hivState', 'gender', 'age', 'paramNum', 'sceNum', 'count'}); 
 hpvHealthStateReshape1 = array2table(hpvHealthStateReshape, 'VariableNames', {'year', 'age', 'healthState', 'paramNum', ...
         'sceNum', 'count'});
 screenTreatReshape1 = array2table(screenTreatReshape, 'VariableNames', {'year', 'age', 'index', 'paramNum', 'sceNum', 'count'}); 

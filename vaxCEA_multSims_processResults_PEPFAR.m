@@ -151,7 +151,11 @@ colpoRetain = 0.72;
 cinTreatRetain = 0.5;
 ccTreatRetain = 0.4;
 
-screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];ScreenIndAge = [8 10 6 7 9]; 
+% CH: I think you will have to run this process results code separately for
+% sce 0,2,3,4,5 and sce1 (scaleup with multi age screening), since the
+% below values will differ 
+screenAge = [35/max(1 , fivYrAgeGrpsOn*5)+1];
+% ScreenIndAge = [8 10 6 7 9]; 
 
 
 %% START FOR LOOP FOR RUNNING PARAMETERS 
@@ -196,7 +200,7 @@ vaxResult{n}.newScreen = [curr.newScreen(1 : end , :, :, :, :, :, :, :); vaxResu
 vaxResult{n}.newHiv = [curr.newHiv(1 : end , : , : , : , : , : , :); vaxResult{n}.newHiv(2 : end , : , : , : , : , : , :)];
 vaxResult{n}.hivDeaths = [curr.hivDeaths(1 : end , : , : , :); vaxResult{n}.hivDeaths(2 : end , : , : , :)];
 vaxResult{n}.prepCov = [curr.prepCov(1 : end , : , : , : , : ); vaxResult{n}.prepCov(2 : end , : , : , : , : )]; %added in prep coverage, 
-vaxResult{n}.menCirc = [curr.menCirc(1 : end , : ); vaxResult{n}.menCirc(2 : end , : , : , : , : )]; %newCirc
+vaxResult{n}.menCirc = [curr.menCirc(1 : end , : ); vaxResult{n}.menCirc(2 : end , : )]; %newCirc
 %vaxResult{n}.artTreatTracker = [curr.artTreatTracker(1 : end , :  , : , : , : , :); vaxResult{n}.artTreatTracker(2 : end , : , : , : , : , :)];
 vaxResult{n}.tVec = [curr.tVec(1 : end), vaxResult{n}.tVec(2 : end)];
 vaxResult{n}.ccSymp = [curr.ccSymp(1:end,:, :, :); vaxResult{n}.ccSymp(2:end,:, :, :)]; 
@@ -225,17 +229,19 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
         end 
     end 
 
-  % hivDeath = zeros(nTimepoints, age); 
+  hivDeath = zeros(nTimepoints, gender, age); 
 
     for a = 1 : age 
-        hivDeath(:, a) = sum(sum(sum(vaxResult{n}.hivDeaths(:, :, 2, a),2),3),4); 
+        for g = 1 : gender
+            hivDeath(:, g, a) = sum(sum(sum(vaxResult{n}.hivDeaths(:, :, g, a),2),3),4); 
+        end 
     end 
 
     % combine all death data into 3D matrix
-    deaths(:, 1:length(diseaseVec_vax), 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
-    deaths(:, 1: length(diseaseVec_vax), 1:age, 2, j) = ccDeath_untreat;
-    deaths(:, 8, 1:age, 3, j) = hivDeath; 
-    deaths(:, 8, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age
+    deaths(:, 1:length(diseaseVec_vax), 2, 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
+    deaths(:, 1: length(diseaseVec_vax), 2, 1:age, 2, j) = ccDeath_untreat;
+    deaths(:, 8, 1:gender, 1:age, 3, j) = hivDeath; 
+    deaths(:, 8, 3, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age, both genders combined 
 
    % NEW HIV CASES *****************************************
 
@@ -245,10 +251,12 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
         end
     end 
 
-% VMMC **************************** WANT TO CONFRIM
-newCirc = vaxResult{n}.menCirc
+% VMMC **************************** WANT TO CONFRIM - CH: edited
 
-% PREP COVERAGE ****************************** WANT TO CONFIRM
+newCirc(:, 17, j) = vaxResult{n}.menCirc; 
+
+% PREP COVERAGE ****************************** WANT TO CONFIRM - CH: looks
+% right
 
 
 for a = 1:age
@@ -260,13 +268,15 @@ end
 % HIV HEALTH STATES ************************************
 
   for a = 1 : age
+      for g = 1 : gender 
         for dInd = 1 : length(diseaseVec_vax)
             d = diseaseVec_vax{dInd}; 
 
-            vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-            hivHealthState(1:end, dInd, a, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+            vaxInds = toInd(allcomb(d, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, g, a, 1:risk)); 
+            hivHealthState(1:end, dInd, g, a, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
         end
-    end 
+      end 
+  end 
 
 % NEW CERVICAL CANCER CASES ******************************
 
@@ -281,18 +291,24 @@ end
 % TOTAL NUMBER OF PEOPLE PER AGE GROUP ********************
 
     for a = 1 : age 
-        vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, a, 1:risk)); 
-        totalPerAge(1:end, a, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+        for g = 1 : gender 
+            vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, g, a, 1:risk)); 
+            totalPerAge(1:end, g, a, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+        end 
     end 
 
-    % Adding index 17 to the age dimension for the total number of people of all ages 
-    vaxInds = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
-    totalPerAge(1:end, 17, j) = sum(vaxResult{n}.popVec(:, vaxInds), 2); 
+    % Adding index 17 to the age dimension for the total number of people
+    % of all ages, strat by sex
+    vaxInds1 = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 1, 1:age, 1:risk)); 
+    vaxInds2 = toInd(allcomb(1:disease, 1:viral, 1:hpvVaxStates, 1:hpvNonVaxStates, 1:endpoints, 1:intervens, 2, 1:age, 1:risk)); 
+    totalPerAge(1:end, 1, 17, j) = sum(vaxResult{n}.popVec(:, vaxInds1), 2); 
+    totalPerAge(1:end, 2, 17, j) = sum(vaxResult{n}.popVec(:, vaxInds2), 2); 
 
 % SCREENING ************************************************
 
 % note that the results show 2 sceening age indices, but i believe results
 % should only show up for one column of the matrix
+% CH: we will have to modify this for S1 
 
 colpoRetain = 0.72;
 cinTreatRetain = 0.5;
