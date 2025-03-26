@@ -65,10 +65,10 @@ nRuns = length(fileInds);
 % Timespans
 monthlyTimespan = [startYear : timeStep : lastYear]; % list all the timespans in a vector
 monthlyTimespan = monthlyTimespan(1 : end-1); % remove the very last date
-monthlyTimespanScreen = [2000 : timeStep : lastYear]; % screening time span starts at 2021
+monthlyTimespanScreen = [2025 : timeStep : lastYear]; % screening for multi-age starts at 2025
 monthlyTimespanScreen = monthlyTimespanScreen(1:end-1); 
-nTimepoints = length(monthlyTimespan);
-nTimepointsScreen = length(monthlyTimespanScreen); 
+nTimepoints = length(monthlyTimespan); 
+nTimepointsScreen = length(monthlyTimespanScreen); %SK: Screening for multi-age
 % Population outputs
  diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
 % Results directory
@@ -76,7 +76,7 @@ resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
 fileKeyNums = fileNameNums;
 n = vaxResultInd;
-baseFileName = ['VaccineKenyaPrEPCea_Mar14_PEPFARstop_S' , sceNum]; % ***SET ME***: name for simulation output file
+baseFileName = ['VaccineKenya1DoseCea_Aug14_WaningCU_PEPFAR_S' , sceNum]; % ***SET ME***: name for simulation output file
 % Looping length 
 loopSegments = {0 , round(nRuns/2) , nRuns};
 loopSegmentsLength = length(loopSegments);
@@ -316,7 +316,7 @@ colpoRetain = 1.0;
 cinTreatRetain = 0.95;
 ccTreatRetain = 0.4;
 
-numScreen = zeros(nTimepoints, age, disease, hpvVaxStates, hpvNonVaxStates, 3); 
+numScreen = zeros(nTimepointsScreen, age, disease, hpvVaxStates, hpvNonVaxStates, 3); %SK: Update screening timepoints so only futureSim
 numColpo = numScreen; 
 numCinTreat = numScreen; 
 numCCTreat = zeros(nTimepoints, 3, age , 3, 2); % 2 is for treatment by screening or symptoms, and 3 is for treated, untreated, or hyst

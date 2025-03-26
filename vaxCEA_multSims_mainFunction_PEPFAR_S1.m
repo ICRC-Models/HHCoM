@@ -94,7 +94,7 @@ loopSegmentsLength = length(loopSegments);
     hpvHealthState = zeros(nTimepoints, age+1, 7, nRuns); 
     newCC = zeros(nTimepoints, length(diseaseVec_vax), age+1, nRuns); 
     totalPerAge = zeros(nTimepoints, gender, age+1, nRuns); 
-    screenTreat = zeros(nTimepoints, age+1, 3, nRuns); %CC Screen
+    screenTreat = zeros(nTimepointsFut, age+1, 3, nRuns); %CC Screen
     screenSympCCTreat = zeros(nTimepoints, 3, age+1, 3, 2, nRuns); %CC screen
     hivHealthState = zeros(nTimepoints, 7, gender, age+1, nRuns); %  time, age (1:16), 7 HIV health states, number of parameters , 10 scenarios, Get Virally Suppressed number from here and number living
     newHiv = zeros(nTimepoints, gender, age+1, nRuns); 
@@ -229,14 +229,14 @@ loopSegmentsLength = length(loopSegments);
             end 
 
      
-            for index = 1 : 3
+            for index = 1 : 3 %SK: changed timesteps to be for futureSim Only 
                 if (param == 1 && a == 1 && index == 1)
-                    screenTreatReshape = [transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), screenTreat(:, a, index, param)];
+                    screenTreatReshape = [transpose(monthlyTimespanFut), a.*ones(nTimepointsFut,1), index.*ones(nTimepointsFut,1), param.*ones(nTimepointsFut,1), ...
+                                        sce.*ones(nTimepointsFut,1), screenTreat(:, a, index, param)];
                 else 
                     screenTreatReshape = [screenTreatReshape; 
-                                        transpose(monthlyTimespan), a.*ones(nTimepoints,1), index.*ones(nTimepoints,1), param.*ones(nTimepoints,1), ...
-                                        sce.*ones(nTimepoints,1), screenTreat(:, a, index, param)];
+                                        transpose(monthlyTimespanFut), a.*ones(nTimepointsFut,1), index.*ones(nTimepointsFut,1), param.*ones(nTimepointsFut,1), ...
+                                        sce.*ones(nTimepointsFut,1), screenTreat(:, a, index, param)];
                 end 
             end 
 
