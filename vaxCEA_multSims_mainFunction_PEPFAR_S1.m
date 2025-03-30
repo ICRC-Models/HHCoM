@@ -115,10 +115,15 @@ loopSegmentsLength = length(loopSegments);
                 if (param == 1 && a == 1 && g == 1)
                     totalPerAgeReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
                                             totalPerAge(:, g, a, param)];
+                    newHivReshape = [transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                            newHiv(:, g, a, param)];
                 else 
                     totalPerAgeReshape = [totalPerAgeReshape; 
                                             transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
                                             totalPerAge(:, g, a, param)]; 
+                    newHivReshape = [newHivReshape; 
+                                            transpose(monthlyTimespan), g.*ones(nTimepoints,1), a.*ones(nTimepoints,1), param.*ones(nTimepoints,1), sce.*ones(nTimepoints,1), ...
+                                            newHiv(:, g, a, param)]; 
                 end 
             end 
 
@@ -279,6 +284,7 @@ screenTreatReshape1 = array2table(screenTreatReshape, 'VariableNames', {'year', 
 screenSympCCTreatReshape1 = array2table(screenSympCCTreatReshape, 'VariableNames', {'year', 'endpoint', 'age', 'treat', 'index', 'paramNum', 'sceNum', 'count'}); 
 prepCovReshape1 = array2table(prepCovReshape, 'VariableNames', {'year', 'gender' , 'age', 'paramNum', 'sceNum', 'count'} ); %need to confirm for prep
 newCircReshape1 = array2table(newCircReshape, 'VariableNames', {'year', 'age', 'paramNum', 'sceNum', 'count'}); %need to confirm for circumsion
+newHivReshape1 = array2table(newHivReshape, 'VariableNames', {'year', 'gender', 'age', 'paramNum', 'sceNum', 'count'}); 
 
 % spit out into CSV 
 writetable(vaxReshape1, [pwd '/KECEA/vax_HIV_S' sceString '.csv']);
@@ -292,5 +298,6 @@ writetable(screenTreatReshape1, [pwd '/KECEA/screenTreat_S' sceString '.csv']);
 writetable(screenSympCCTreatReshape1, [pwd '/KECEA/screenSympCCTreat_S' sceString '.csv']);
 writetable(prepCovReshape1, [pwd '/KECEA/prepCov_S' sceString '.csv']); 
 writetable(newCircReshape1, [pwd '/KECEA/newCirc_S' sceString '.csv']);
+writetable(newHivReshape1, [pwd '/KECEA/newHiv_S' sceString '.csv']); 
 
 end % closing the parfor loops 
