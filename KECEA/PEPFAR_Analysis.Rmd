@@ -1,0 +1,246 @@
+---
+title: "PEPFAR_Analysis"
+author: Christine Hathaway, Sydney Klein
+date: 03/30/2025
+description: Analyzing PEPFAR model results and generating figures/tables for manuscript. 
+---
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+library(gcookbook)
+```
+
+Dictionaries
+```{r}
+# rm(list = ls(all.names = TRUE))
+
+setwd("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/")  # *******SET ME***********
+numSces = 5 # number of scenarios to run through
+
+# Translating Matlab indexes for compartments into R factors
+ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
+                     "ageCateg" = c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
+                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages"))
+hpvCateg = data.frame("index" = seq(1,7,1), 
+                        "hpvCateg" = c("hpv.susceptible", "hpv.infected", "cin1", "cin2", "cin3", "cc", "hpv.immune"))
+dxCateg = data.frame("index" = seq(1,10,1), 
+                     "dxCateg" = c("undiagnosed", "undiagnosed", "undiagnosed", "dx, untreated", "dx, untreated", "dx, untreated", "dx, treated", "dx, treated", "dx, treated", "hysterectomy"))
+ccStageCateg = data.frame("index" = seq(1,10,1), 
+                          "stageCateg" = c("local", "regional", "distant", "local", "regional", "distant", "local", "regional", "distant", "hysterectomy"))
+deathsCateg = data.frame("index" = seq(1, 4, 1), 
+                         "deathsCateg" = c("treated cc", "untreated cc", "hiv", "all cause"))
+screenTreatCateg = data.frame("index" = seq(1,3,1), 
+                              "screenTreatCateg" = c("nScreened", "nColpo", "nCinTreat"))
+dxCCTreatCateg = data.frame("treat" = seq(1,3,1), 
+                                    "dxType" = c("dx, treated", "dx, untreated", "hysterectomy"))
+screenSympCCTreatCateg = data.frame("index" = c(1, 2), 
+                                    "screenSymp" = c("screening", "symptoms"))
+genderCateg = data.frame("index" = seq(1,2,1), 
+                         "genderCateg" = c("male", "female"))
+hivCateg = data.frame("index" = seq(1,7,1), 
+                      "hivCateg" = c("hiv negative", "acute", "cd4.500", "cd4.500.350", "cd4.350.200", "cd4.200", "vs"))
+sceDesc = data.frame("sceNum" = seq(0, 5, 1), 
+                     "desc" = c("PEPFAR_100, no scale-up", "PEPFAR_100, scale-up as planned", "PEPFAR_0_LB", "PEPFAR_ART_LB", 
+                                "PEPFAR_0_UB", "PEPFAR_ART_UB"))
+```
+
+Read in results
+```{r}
+setwd("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/")  # *******SET ME***********
+
+scenarios <- c(0,1,2,3) # *********SET ME*************
+
+deaths <- data.frame()
+screenTreat <- data.frame()
+ccHealthState <- data.frame()
+newCC <- data.frame()
+hivHealthState <- data.frame()
+newCirc <- data.frame()
+totalPerAge <- data.frame()
+
+for (sce in scenarios) {
+
+    deaths_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/deaths_HIV_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020) %>% 
+          filter(index != 4) 
+    screenTreat_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/screenTreat_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    # hpvHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/hpvHealthState_S", sce, ".csv")) %>%
+    #       mutate(sceNum = sce) %>%
+    #       filter(year >= 1995)
+    totalPerAge_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/totalPerAge_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    # vax_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/vax_S", sce, ".csv")) %>%
+    #       mutate(sceNum = sce) %>%
+    #       filter(year >= 1995)
+    ccHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/ccHealthState_HIV_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    newCC_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/newCC_HIV_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    hivHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/hivHealthState_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    newCirc_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/newCirc_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2020)
+    # screenSympCCTreat_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/screenSympCCTreat_S", sce, ".csv")) %>%
+    #       mutate(sceNum = sce) 
+    #       filter(paramNum == 1)
+    #       filter(year >= 1995)
+
+    deaths <- bind_rows(deaths, deaths_temp)
+    screenTreat <- bind_rows(screenTreat, screenTreat_temp)
+    # hpvHealthState <- bind_rows(hpvHealthState, hpvHealthState_temp)
+    totalPerAge <- bind_rows(totalPerAge, totalPerAge_temp)
+    # vax <- bind_rows(vax, vax_temp)
+    ccHealthState <- bind_rows(ccHealthState, ccHealthState_temp)
+    newCC <- bind_rows(newCC, newCC_temp)
+    hivHealthState <- bind_rows(hivHealthState, hivHealthState_temp)
+    newCirc <- bind_rows(newCirc, newCirc_temp)
+    # screenSympCCTreat <- bind_rows(screenSympCCTreat, screenSympCCTreat_temp)
+    
+    print(paste0("Scenario ", sce, " done."))
+    
+}
+```
+
+Clean results
+```{r}
+deaths_2 <- deaths %>%
+      filter(index != 4) %>%  
+      left_join(., ageCateg, by=c("age" = "index")) %>%
+      left_join(., genderCateg, by=c("gender" = "index")) %>% 
+      left_join(., sceDesc, by="sceNum") %>% 
+      mutate(deathCateg = case_when(index %in% c(1, 2) ~ "ccDeath", 
+                                    index == 3 ~ "hivDeath")) %>% 
+      group_by(sceNum, paramNum, year, deathCateg, ageCateg, genderCateg) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, deathCateg, ageCateg, genderCateg, desc, sum) %>% unique %>% 
+      rename(count = sum)
+
+totalPerAge_2 <- totalPerAge %>% 
+      left_join(., ageCateg, by=c("age" = "index")) %>%
+      left_join(., genderCateg, by=c("gender" = "index")) %>% 
+      left_join(., sceDesc, by="sceNum") %>% 
+      select(sceNum, paramNum, year, ageCateg, genderCateg, desc, count) 
+
+# screenTreat_2 <- screenTreat %>%
+#       left_join(., ageCateg, by=c("age" = "index")) %>%
+#       left_join(., screenTreatCateg, by=c("index")) %>%
+#       left_join(., sceDesc, by="sceNum") %>%
+#       # mutate(sceNum = sceNum - 1) %>%
+#       group_by(sceNum, paramNum, year, screenTreatCateg) %>%
+#             mutate(sum = sum(count, na.rm=TRUE)) %>% ungroup %>%
+#       select(sceNum, paramNum, year, screenTreatCateg, desc, sum) %>% unique %>%
+#       rename(count=sum)
+
+# ccHealthState_2 <- ccHealthState %>% 
+#       left_join(., ccStageCateg, by=c("endpoint" = "index")) %>% 
+#       left_join(., dxCateg, by=c("endpoint" = "index")) %>% 
+#       left_join(., hivCateg, by=c("hivState" = "index")) %>% 
+#       left_join(., sceDesc, by="sceNum") %>% 
+#       group_by(sceNum, paramNum, year, stageCateg, dxCateg, hivCateg) %>% 
+#             mutate(sum = sum(count, na.rm=TRUE)) %>%  ungroup %>% 
+#       select(sceNum, paramNum, year, stageCateg, dxCateg, hivCateg, desc, sum) %>% unique %>% 
+#       rename(count=sum)
+
+newCC_2 <- newCC %>%
+  left_join(., ageCateg, by=c("age" = "index")) %>%
+  left_join(., hivCateg, by=c("hivState" = "index")) %>% 
+  left_join(., sceDesc, by="sceNum") %>% 
+  # mutate(sceNum = sceNum - 1) %>%
+  select(sceNum, paramNum, year, ageCateg, hivCateg, desc, count) %>% unique %>%
+  rename(newCC = count) 
+
+# hivHealthState_2 <- hivHealthState %>% 
+#   left_join(., ageCateg, by=c("age" = "index")) %>%
+#   left_join(., hivCateg, by=c("hivState" = "index")) %>% 
+#   left_join(., sceDesc, by="sceNum") %>% 
+#   left_join(., genderCateg, by=c("genderCateg" = "index")) %>% 
+#   rename(index = age) %>% 
+#   select(sceNum, paramNum, year, index, genderCateg, ageCateg, hivCateg, desc, count) %>% unique %>%
+#   rename(newCC = count) 
+
+# newCirc_2 <- newCirc %>% 
+#   left_join(., ageCateg, by=c("age" = "index")) %>%    
+#   select(sceNum, paramNum, year, ageCateg, desc, count) %>% unique %>%
+#   rename(newCirc = count) 
+```
+
+Saving results
+```{r}
+deaths <- deaths_2
+screenTreat <- screenTreat_2
+ccHealthState <- ccHealthState_2
+newCC <- newCC_2
+hivHealthState <- hivHealthState_2
+newCirc <- newCirc_2
+
+save(deaths, screenTreat, ccHealthState, newCC, hivHealthState, newCirc,  totalPerAge, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2.RData")
+```
+
+Load results
+```{r}
+load(file = "/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2.RData")
+```
+
+Sce 0-2
+```{r}
+deaths_0.2 <- deaths_2
+screenTreat_0.2 <- screenTreat_2
+ccHealthState_0.2 <- ccHealthState_2
+newCC_0.2 <- newCC_2
+hivHealthState_0.2 <- hivHealthState_2
+newCirc_0.2 <- newCirc_2
+totalPerAge_0.2 <- totalPerAge
+save(deaths_0.2, screenTreat_0.2, ccHealthState_0.2, newCC_0.2, hivHealthState_0.2, newCirc_0.2,  totalPerAge_0.2, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2_cleaned.RData")
+```
+
+# CC incidence
+
+Age adjusted incidence rate
+Coverage is split by colour 
+Dose is split by line type
+```{r}
+worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+      rename(age = Age, 
+             worldPop = `2015 World Pop`) %>% 
+      select(age, worldPop) %>% 
+      bind_cols(., data.frame(index = seq(1, 16, 1)))
+
+incRate <-
+      newCC %>% 
+      left_join(worldStandard, by="index") %>% 
+      left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
+      filter(!ageCateg %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>% 
+      mutate(inc = (newCC/N)*100000*worldPop*6) %>% 
+      group_by(sceNum, paramNum, year) %>% 
+            mutate(sum_inc = sum(inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, paramNum, year, desc, sum_inc) %>% unique %>% 
+      # calculate median of the params
+      group_by(sceNum, year) %>% 
+            mutate(inc_med = median(sum_inc, na.rm=TRUE)) %>% ungroup %>% 
+      select(sceNum, year, desc, inc_med) %>% unique %>%
+      arrange(sceNum, year) 
+
+incRate %>% 
+      filter(year >= 2020) %>% 
+      ggplot(., aes(x=year, y=inc_med, colour=desc)) + geom_line(size=1.5) + theme_bw() + 
+            labs(title="Age adjusted CC incidence", 
+                 x="Year", 
+                 y="Age adjusted CC incidence", 
+                 colour="Scenario") + 
+            scale_colour_viridis_d() + 
+            # scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            geom_hline(yintercept = 4, linetype = "dotted", color="grey")
+```
+

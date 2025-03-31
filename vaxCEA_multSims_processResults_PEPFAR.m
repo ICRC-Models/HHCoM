@@ -1,4 +1,4 @@
-function [vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc] = vaxCEA_multSims_processResults_PEPFAR(vaxResultInd , sceNum , fileNameNums, fileInds, vax, deaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc)
+function [vax, ccDeaths, hivDeaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc] = vaxCEA_multSims_processResults_PEPFAR(vaxResultInd , sceNum , fileNameNums, fileInds, vax, ccDeaths, hivDeaths, ccHealthState, hpvHealthState, newCC, totalPerAge, screenTreat, screenSympCCTreat, hivHealthState, newHiv, prepCov, newCirc)
 % Description: This function links with the script
 % loopingCeaOverScenarios.m. It takes in initialized result variables and
 % places the results into 3D matrices. Looks at death counts,
@@ -70,7 +70,7 @@ monthlyTimespanScreen = monthlyTimespanScreen(1:end-1);
 nTimepoints = length(monthlyTimespan);
 nTimepointsScreen = length(monthlyTimespanScreen); 
 % Population outputs
- diseaseVec_vax = {[1:2], 3, 4, 5, 6, 7, 8}; % HIV negative grouped together, and then all the HIV positive states 
+ diseaseVec_vax = {[1:2], [3:7], 8}; % HIV negative grouped together, and then all the HIV positive states 
 % Results directory
 resultsDir = [pwd , '/HHCoM_Results/'];
 fileKey = {'sim1' , 'sim0'};
@@ -218,14 +218,16 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
     vax(:, 17, 2, j) = vaxTemplate(:, 3); % catchup vax 
 
 % DEATHS (CC and all cause) **************************************
-    ccDeath_treat = zeros(nTimepoints, 7, age); 
+    ccDeath_treat = zeros(nTimepoints, length(diseaseVec_vax), age); 
     ccDeath_untreat = ccDeath_treat; 
+    ccDeath = ccDeath_treat; 
 
     for a = 1 : age 
         for dInd = 1 : length(diseaseVec_vax)
             d = diseaseVec_vax{dInd};
-            ccDeath_treat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, d, a, :),2),3),4); 
-            ccDeath_untreat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, d, a, :),2),3),4); 
+%             ccDeath_treat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, d, a, :),2),3),4); 
+%             ccDeath_untreat(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, d, a, :),2),3),4);
+            ccDeath(:, dInd, a) = sum(sum(sum(vaxResult{n}.ccDeath_treat(:, d, a, :),2),3),4) + sum(sum(sum(vaxResult{n}.ccDeath_untreat(:, d, a, :),2),3),4);
         end 
     end 
 
@@ -238,10 +240,10 @@ vaxResult{n}.vaxdSchool = [curr.vaxdSchool(1:end, :); vaxResult{n}.vaxdSchool(2:
     end 
 
     % combine all death data into 3D matrix
-    deaths(:, 1:length(diseaseVec_vax), 2, 1:age, 1, j) = ccDeath_treat; % cc death stratified by age
-    deaths(:, 1: length(diseaseVec_vax), 2, 1:age, 2, j) = ccDeath_untreat;
-    deaths(:, 8, 1:gender, 1:age, 3, j) = hivDeath; 
-    deaths(:, 8, 3, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age, both genders combined 
+    ccDeaths(:, 1:length(diseaseVec_vax), 1:age, j) = ccDeath; % cc death stratified by age
+%     deaths(:, 1: length(diseaseVec_vax), 2, 1:age, 2, j) = ccDeath_untreat;
+    hivDeaths(:, 1:gender, 1:age, j) = hivDeath; 
+%     deaths(:, 8, 3, 17, 4, j) = vaxResult{n}.deaths(:); % total all cause deaths not stratified by age, both genders combined 
 
    % NEW HIV CASES *****************************************
 
