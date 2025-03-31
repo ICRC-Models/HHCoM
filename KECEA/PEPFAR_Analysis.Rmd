@@ -54,20 +54,28 @@ setwd("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/")  # *******SET ME******
 
 scenarios <- c(0,1,2,3) # *********SET ME*************
 
-deaths <- data.frame()
+HIVdeaths <- data.frame()
+CCdeaths <- data.frame()
 screenTreat <- data.frame()
 ccHealthState <- data.frame()
 newCC <- data.frame()
 hivHealthState <- data.frame()
 newCirc <- data.frame()
+newHiv <- data.frame()
 totalPerAge <- data.frame()
 
 for (sce in scenarios) {
 
-    deaths_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/deaths_HIV_S", sce, ".csv")) %>%
+  HIVdeaths_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/hivDeaths_S", sce, ".csv")) %>%
           mutate(sceNum = sce) %>%
-          filter(year >= 2000) %>% 
-          filter(index != 4) 
+         filter(year >= 2000) 
+        # filter(index != 4) 
+    
+     CCdeaths_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/ccDeaths_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+         filter(year >= 2000) 
+         #filter(index != 4) 
+ 
     screenTreat_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/screenTreat_S", sce, ".csv")) %>%
           mutate(sceNum = sce) %>%
           filter(year >= 2000)
@@ -86,6 +94,9 @@ for (sce in scenarios) {
     newCC_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/newCC_HIV_S", sce, ".csv")) %>%
           mutate(sceNum = sce) %>%
           filter(year >= 2000)
+    newHiv_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_treatment/KECEA/newHiv_S", sce, ".csv")) %>%
+          mutate(sceNum = sce) %>%
+          filter(year >= 2000)
     hivHealthState_temp = read.csv(paste0("/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/hivHealthState_S", sce, ".csv")) %>%
           mutate(sceNum = sce) %>%
           filter(year >= 2000)
@@ -97,13 +108,15 @@ for (sce in scenarios) {
     #       filter(paramNum == 1)
     #       filter(year >= 1995)
 
-    deaths <- bind_rows(deaths, deaths_temp)
+    HIVdeaths <- bind_rows(HIVdeaths, HIVdeaths_temp)
+    CCdeaths <- bind_rows(CCdeaths, CCdeaths_temp)
     screenTreat <- bind_rows(screenTreat, screenTreat_temp)
     # hpvHealthState <- bind_rows(hpvHealthState, hpvHealthState_temp)
     totalPerAge <- bind_rows(totalPerAge, totalPerAge_temp)
     # vax <- bind_rows(vax, vax_temp)
     ccHealthState <- bind_rows(ccHealthState, ccHealthState_temp)
     newCC <- bind_rows(newCC, newCC_temp)
+    newHiv <- bind_rows(newHiv, newHiv_temp)
     hivHealthState <- bind_rows(hivHealthState, hivHealthState_temp)
     newCirc <- bind_rows(newCirc, newCirc_temp)
     # screenSympCCTreat <- bind_rows(screenSympCCTreat, screenSympCCTreat_temp)
@@ -115,16 +128,22 @@ for (sce in scenarios) {
 
 Clean results
 ```{r}
-deaths_2 <- deaths %>%
-      filter(index != 4) %>%  
-      left_join(., ageCateg, by=c("age" = "index")) %>%
-      left_join(., genderCateg, by=c("gender" = "index")) %>% 
-      left_join(., sceDesc, by="sceNum") %>% 
-      mutate(deathCateg = case_when(index %in% c(1, 2) ~ "ccDeath", 
-                                    index == 3 ~ "hivDeath")) %>% 
-      group_by(sceNum, paramNum, year, deathCateg, ageCateg, genderCateg) %>% 
+HIVdeaths_2 <- HIVdeaths %>%
+     left_join(., ageCateg, by=c("age" = "index")) %>%
+     left_join(., genderCateg, by=c("gender" = "index")) %>% 
+     left_join(., sceDesc, by="sceNum") %>% 
+      group_by(sceNum, paramNum, year,  ageCateg, genderCateg) %>% 
             mutate(sum = sum(count)) %>% ungroup %>% 
-      select(sceNum, paramNum, year, deathCateg, ageCateg, genderCateg, desc, sum) %>% unique %>% 
+      select(sceNum, paramNum, year,  ageCateg, genderCateg, desc, sum) %>% unique %>% 
+      rename(count = sum)
+
+CCdeaths_2 <- CCdeaths %>%
+     left_join(., ageCateg, by=c("age" = "index")) %>%
+    left_join(., hivCateg, by=c("hivState" = "index")) %>% 
+     left_join(., sceDesc, by="sceNum") %>% 
+      group_by(sceNum, paramNum, year,  ageCateg, hivCateg) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(sceNum, paramNum, year,  ageCateg, hivCateg, desc, sum) %>% unique %>% 
       rename(count = sum)
 
 totalPerAge_2 <- totalPerAge %>% 
@@ -161,6 +180,13 @@ newCC_2 <- newCC %>%
   select(sceNum, paramNum, year, ageCateg, hivCateg, desc, count) %>% unique %>%
   rename(newCC = count) 
 
+newHiv_2 <- newHiv %>%
+  left_join(., ageCateg, by=c("age" = "index")) %>%
+  left_join(., sceDesc, by="sceNum") %>% 
+  # mutate(sceNum = sceNum - 1) %>%
+  select(sceNum, paramNum, year, ageCateg, desc, count) %>% unique %>%
+  rename(newHiv = count) 
+
 # hivHealthState_2 <- hivHealthState %>% 
 #   left_join(., ageCateg, by=c("age" = "index")) %>%
 #   left_join(., hivCateg, by=c("hivState" = "index")) %>% 
@@ -178,14 +204,16 @@ newCC_2 <- newCC %>%
 
 Saving results
 ```{r}
-deaths <- deaths_2
+HIVdeaths <- HIVdeaths_2
+CCdeaths <- CCdeaths_2
 screenTreat <- screenTreat_2
 ccHealthState <- ccHealthState_2
 newCC <- newCC_2
+newHiv <- newHiv_2
 hivHealthState <- hivHealthState_2
 newCirc <- newCirc_2
 
-save(deaths, screenTreat, ccHealthState, newCC, hivHealthState, newCirc,  totalPerAge, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2.RData")
+save(HIVdeaths, CCdeaths, screenTreat, ccHealthState, newCC, newHiv, hivHealthState, newCirc,  totalPerAge, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2.RData")
 ```
 
 Load results
@@ -195,15 +223,68 @@ load(file = "/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-
 
 Sce 0-2
 ```{r}
-deaths_0.2 <- deaths_2
+HIVdeaths_0.2 <- HIVdeaths_2
+CCdeaths_0.2 <- CCdeaths_2
 screenTreat_0.2 <- screenTreat_2
 ccHealthState_0.2 <- ccHealthState_2
 newCC_0.2 <- newCC_2
+newHiv_0.2 <- newHiv_2
 hivHealthState_0.2 <- hivHealthState_2
 newCirc_0.2 <- newCirc_2
 totalPerAge_0.2 <- totalPerAge
-save(deaths_0.2, screenTreat_0.2, ccHealthState_0.2, newCC_0.2, hivHealthState_0.2, newCirc_0.2,  totalPerAge_0.2, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2_cleaned.RData")
+save(HIVdeaths_0.2, CCdeaths_0.2, screenTreat_0.2, ccHealthState_0.2, newCC_0.2, newHiv_0.2, hivHealthState_0.2, newCirc_0.2,  totalPerAge_0.2, file="/Users/clh89/MATLAB/Projects/Kenya_PEPFAR/KECEA/PepfarResults_sce0-2_cleaned.RData")
 ```
+
+
+# Number of HIV cases and deaths and CC cases and CC deaths for each scenario with IQR
+```{r}
+
+newHIV_summary <- newHiv_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
+  group_by(sceNum, paramNum, desc) %>%
+  summarise(total = sum(newHiv, na.rm = TRUE), .groups = "drop") %>%
+  group_by(sceNum, desc) %>%
+  summarise(
+    median_total = median(total),
+    lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
+    upper = quantile(total, 0.75)
+  )
+
+deathsHIV_summary <- HIVdeaths_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
+  group_by(sceNum, paramNum, desc) %>%
+  summarise(total = sum(count, na.rm = TRUE), .groups = "drop") %>%
+  group_by(sceNum, desc) %>%
+  summarise(
+    median_total = median(total),
+    lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
+    upper = quantile(total, 0.75)
+  )
+
+newCC_summary <- newCC_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
+  group_by(sceNum, paramNum, desc) %>%
+  summarise(total = sum(newCC, na.rm = TRUE), .groups = "drop") %>%
+  group_by(sceNum, desc) %>%
+  summarise(
+    median_total = median(total),
+    lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
+    upper = quantile(total, 0.75)
+  )
+
+deathsCC_summary <- CCdeaths_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
+  group_by(sceNum, paramNum, desc) %>%
+  summarise(total = sum(count, na.rm = TRUE), .groups = "drop") %>%
+  group_by(sceNum, desc) %>%
+  summarise(
+    median_total = median(total),
+    lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
+    upper = quantile(total, 0.75)
+  )
+
+```
+
 
 # CC incidence
 
