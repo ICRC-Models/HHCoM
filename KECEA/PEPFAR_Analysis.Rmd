@@ -238,6 +238,12 @@ save(HIVdeaths_0.2, CCdeaths_0.2, screenTreat_0.2, ccHealthState_0.2, newCC_0.2,
 
 # Number of HIV cases and deaths and CC cases and CC deaths for each scenario with IQR
 ```{r}
+## ****Change years for data needed**** ##
+
+# Calculate percent change between specific scenarios
+calculate_pct_change <- function(median_total1, median_total2) {
+  (median_total2 - median_total1) / median_total1 * 100
+}
 
 newHIV_summary <- newHiv_0.2 %>%
   filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
@@ -248,6 +254,25 @@ newHIV_summary <- newHiv_0.2 %>%
     median_total = median(total),
     lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
     upper = quantile(total, 0.75)
+  )%>% ungroup()
+
+newHIV_summary <- newHIV_summary %>%
+  mutate(
+    pct_change = case_when(
+      sceNum == 1 ~ calculate_pct_change(
+        median_total[which(sceNum == 0)],
+        median_total
+      ),
+      sceNum == 3 ~ calculate_pct_change(
+        median_total[which(sceNum == 2)],
+        median_total
+      ),
+      sceNum == 5 ~ calculate_pct_change(
+        median_total[which(sceNum == 4)],
+        median_total
+      ),
+      TRUE ~ NA_real_
+    )
   )
 
 deathsHIV_summary <- HIVdeaths_0.2 %>%
@@ -259,6 +284,25 @@ deathsHIV_summary <- HIVdeaths_0.2 %>%
     median_total = median(total),
     lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
     upper = quantile(total, 0.75)
+  )%>% ungroup()
+
+deathsHIV_summary <- deathsHIV_summary %>%
+  mutate(
+    pct_change = case_when(
+      sceNum == 1 ~ calculate_pct_change(
+        median_total[which(sceNum == 0)],
+        median_total
+      ),
+      sceNum == 3 ~ calculate_pct_change(
+        median_total[which(sceNum == 2)],
+        median_total
+      ),
+      sceNum == 5 ~ calculate_pct_change(
+        median_total[which(sceNum == 4)],
+        median_total
+      ),
+      TRUE ~ NA_real_
+    )
   )
 
 newCC_summary <- newCC_0.2 %>%
@@ -270,6 +314,25 @@ newCC_summary <- newCC_0.2 %>%
     median_total = median(total),
     lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
     upper = quantile(total, 0.75)
+  ) %>% ungroup()
+
+newCC_summary <- newCC_summary %>%
+  mutate(
+    pct_change = case_when(
+      sceNum == 1 ~ calculate_pct_change(
+        median_total[which(sceNum == 0)],
+        median_total
+      ),
+      sceNum == 3 ~ calculate_pct_change(
+        median_total[which(sceNum == 2)],
+        median_total
+      ),
+      sceNum == 5 ~ calculate_pct_change(
+        median_total[which(sceNum == 4)],
+        median_total
+      ),
+      TRUE ~ NA_real_
+    )
   )
 
 deathsCC_summary <- CCdeaths_0.2 %>%
@@ -281,47 +344,133 @@ deathsCC_summary <- CCdeaths_0.2 %>%
     median_total = median(total),
     lower = quantile(total, 0.25),  # 1st quartile (IQR lower bound)
     upper = quantile(total, 0.75)
+  )%>% ungroup()
+
+deathsCC_summary <- deathsCC_summary %>%
+  mutate(
+    pct_change = case_when(
+      sceNum == 1 ~ calculate_pct_change(
+        median_total[which(sceNum == 0)],
+        median_total
+      ),
+      sceNum == 3 ~ calculate_pct_change(
+        median_total[which(sceNum == 2)],
+        median_total
+      ),
+      sceNum == 5 ~ calculate_pct_change(
+        median_total[which(sceNum == 4)],
+        median_total
+      ),
+      TRUE ~ NA_real_
+    )
   )
 
 ```
-
-
 # CC incidence
 
-Age adjusted incidence rate
-Coverage is split by colour 
-Dose is split by line type
+Age adjusted CC incidence rate
 ```{r}
-worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+worldStandard <- read_xlsx("/Users/sk1822/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
       rename(age = Age, 
              worldPop = `2015 World Pop`) %>% 
       select(age, worldPop) %>% 
       bind_cols(., data.frame(index = seq(1, 16, 1)))
 
-incRate <-
-      newCC %>% 
-      left_join(worldStandard, by="index") %>% 
-      left_join(., (totalPerAge %>% rename(N=count, index=age)), by=c("sceNum", "paramNum", "year", "index")) %>% 
-      filter(!ageCateg %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>% 
-      mutate(inc = (newCC/N)*100000*worldPop*6) %>% 
-      group_by(sceNum, paramNum, year) %>% 
-            mutate(sum_inc = sum(inc, na.rm=TRUE)) %>% ungroup %>% 
-      select(sceNum, paramNum, year, desc, sum_inc) %>% unique %>% 
-      # calculate median of the params
-      group_by(sceNum, year) %>% 
-            mutate(inc_med = median(sum_inc, na.rm=TRUE)) %>% ungroup %>% 
-      select(sceNum, year, desc, inc_med) %>% unique %>%
-      arrange(sceNum, year) 
+ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
+                     "ageCateg" = c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
+                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages"))
+# Merge worldStandard with ageCateg
+worldStandard <- worldStandard %>%
+  left_join(ageCateg, by = "index")
 
-incRate %>% 
-      filter(year >= 2020) %>% 
-      ggplot(., aes(x=year, y=inc_med, colour=desc)) + geom_line(size=1.5) + theme_bw() + 
+
+# Calculate incidence for newCC_0.2 with different scenarios
+CCincRate <- newCC_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2, 3, 4, 5)) %>%
+  left_join(worldStandard, by = "ageCateg") %>%
+  left_join(., (totalPerAge_0.2 %>%
+                  filter(gender == 2) %>%  # Keep only females
+                  rename(N = count, index = age)),
+            by = c("sceNum", "paramNum", "year", "index")) %>%
+  filter(!age %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>%
+  mutate(inc = (newCC/ N) * 100000 * worldPop * 6) %>%
+  group_by(sceNum, paramNum, year) %>%
+  mutate(sum_inc = sum(inc, na.rm = TRUE)) %>%
+  ungroup %>%
+  select(sceNum, paramNum, year, sum_inc) %>%
+  unique() %>%
+  # Calculate median of the params
+  group_by(sceNum, year) %>%
+  mutate(inc_med = median(sum_inc, na.rm = TRUE),
+          lower = quantile(sum_inc, 0.25, na.rm=TRUE),  # IQR lower bound
+          upper = quantile(sum_inc, 0.75, na.rm=TRUE))  %>%  # IQR upper bound) %>%
+  select(sceNum, year, inc_med, lower, upper) %>%
+  unique() %>%
+  arrange(sceNum, year) %>%
+  left_join(sceDesc, by = "sceNum")
+
+
+CCincRate %>% 
+      filter(year >= 2000) %>% 
+      ggplot(., aes(x=year, y=inc_med, colour=desc)) +
+      geom_line(size=1) + 
+      theme_bw() + 
             labs(title="Age adjusted CC incidence", 
                  x="Year", 
                  y="Age adjusted CC incidence", 
                  colour="Scenario") + 
-            scale_colour_viridis_d() + 
             # scale_linetype_manual(values=c("twodash", "solid", "solid")) +
             geom_hline(yintercept = 4, linetype = "dotted", color="grey")
-```
 
+```
+# HIV Incidence
+```{r}
+worldStandard <- read_xlsx("/Users/sk1822/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+      rename(age = Age, 
+             worldPop = `2015 World Pop`) %>% 
+      select(age, worldPop) %>% 
+      bind_cols(., data.frame(index = seq(1, 16, 1)))
+
+ageCateg = data.frame("index" = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17), 
+                     "ageCateg" = c("age.0.4", "age.5.9", "age.10.14", "age.15.19", "age.20.24", "age.25.29", "age.30.34", "age.35.39", 
+                                      "age.40.44", "age.45.49", "age.50.54", "age.55.59", "age.60.64", "age.65.69", "age.70.74", "age.75.79", "all.ages"))
+# Merge worldStandard with ageCateg
+worldStandard <- worldStandard %>%
+  left_join(ageCateg, by = "index")
+
+
+# Calculate incidence 
+HIVincRate <- newHiv_0.2 %>%
+  filter(sceNum %in% c(0, 1, 2, 3, 4, 5)) %>%
+  left_join(worldStandard, by = "ageCateg") %>%
+  left_join(., (totalPerAge_0.2 %>%
+                  rename(N = count, index = age)),
+            by = c("sceNum", "paramNum", "year", "index")) %>%
+  filter(!age %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>%
+  mutate(inc = (newHiv/ N) * 100000 * worldPop * 6) %>%
+  group_by(sceNum, paramNum, year) %>%
+  mutate(sum_inc = sum(inc, na.rm = TRUE)) %>%
+  ungroup %>%
+  select(sceNum, paramNum, year, sum_inc) %>%
+  unique() %>%
+  # Calculate median of the params
+  group_by(sceNum, year) %>%
+  mutate(inc_med = median(sum_inc, na.rm = TRUE)) %>%
+  ungroup %>%
+  select(sceNum, year, inc_med) %>%
+  unique() %>%
+  arrange(sceNum, year)
+
+HIVincRate %>% 
+      filter(year >= 2000) %>% 
+      ggplot(., aes(x=year, y=inc_med, colour=factor(sceNum))) +
+      geom_line(size=1) + 
+      theme_bw() + 
+            labs(title="Age adjusted HIV incidence", 
+                 x="Year", 
+                 y="Age adjusted HIV incidence", 
+                 colour="Scenario") + 
+            # scale_linetype_manual(values=c("twodash", "solid", "solid")) +
+            geom_hline(yintercept = 4, linetype = "dotted", color="grey")
+
+```
