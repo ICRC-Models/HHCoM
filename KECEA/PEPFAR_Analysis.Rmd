@@ -245,7 +245,7 @@ calculate_pct_change <- function(median_total1, median_total2) {
   (median_total2 - median_total1) / median_total1 * 100
 }
 
-newHIV_summary <- newHiv_0.2 %>%
+newHIV_summary <- newHiv %>%
   filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
   group_by(sceNum, paramNum, desc) %>%
   summarise(total = sum(newHiv, na.rm = TRUE), .groups = "drop") %>%
@@ -275,7 +275,7 @@ newHIV_summary <- newHIV_summary %>%
     )
   )
 
-deathsHIV_summary <- HIVdeaths_0.2 %>%
+deathsHIV_summary <- HIVdeaths %>%
   filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
   group_by(sceNum, paramNum, desc) %>%
   summarise(total = sum(count, na.rm = TRUE), .groups = "drop") %>%
@@ -305,7 +305,7 @@ deathsHIV_summary <- deathsHIV_summary %>%
     )
   )
 
-newCC_summary <- newCC_0.2 %>%
+newCC_summary <- newCC %>%
   filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
   group_by(sceNum, paramNum, desc) %>%
   summarise(total = sum(newCC, na.rm = TRUE), .groups = "drop") %>%
@@ -335,7 +335,7 @@ newCC_summary <- newCC_summary %>%
     )
   )
 
-deathsCC_summary <- CCdeaths_0.2 %>%
+deathsCC_summary <- CCdeaths %>%
   filter(sceNum %in% c(0, 1, 2 ,3 ,4, 5), year >= 2025, year < 2125) %>%
   group_by(sceNum, paramNum, desc) %>%
   summarise(total = sum(count, na.rm = TRUE), .groups = "drop") %>%
@@ -370,7 +370,7 @@ deathsCC_summary <- deathsCC_summary %>%
 
 Age adjusted CC incidence rate
 ```{r}
-worldStandard <- read_xlsx("/Users/sk1822/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
       rename(age = Age, 
              worldPop = `2015 World Pop`) %>% 
       select(age, worldPop) %>% 
@@ -385,10 +385,10 @@ worldStandard <- worldStandard %>%
 
 
 # Calculate incidence for newCC_0.2 with different scenarios
-CCincRate <- newCC_0.2 %>%
+CCincRate <- newCC %>%
   filter(sceNum %in% c(0, 1, 2, 3, 4, 5)) %>%
   left_join(worldStandard, by = "ageCateg") %>%
-  left_join(., (totalPerAge_0.2 %>%
+  left_join(., (totalPerAge %>%
                   filter(gender == 2) %>%  # Keep only females
                   rename(N = count, index = age)),
             by = c("sceNum", "paramNum", "year", "index")) %>%
@@ -411,21 +411,49 @@ CCincRate <- newCC_0.2 %>%
 
 
 CCincRate %>% 
-      filter(year >= 2000) %>% 
+      filter(year >= 2020, year <= 2040) %>% 
       ggplot(., aes(x=year, y=inc_med, colour=desc)) +
       geom_line(size=1) + 
       theme_bw() + 
             labs(title="Age adjusted CC incidence", 
                  x="Year", 
                  y="Age adjusted CC incidence", 
-                 colour="Scenario") + 
+                 colour="Scenario") 
             # scale_linetype_manual(values=c("twodash", "solid", "solid")) +
-            geom_hline(yintercept = 4, linetype = "dotted", color="grey")
+            # geom_hline(yintercept = 4, linetype = "dotted", color="grey")
+
+
+
 
 ```
+
+```{r}
+newHiv %>% 
+      filter(year >= 2025, year<= 2030) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(sum = sum(newHiv)) %>% ungroup %>% 
+      select(sceNum, desc, paramNum, sum) %>% unique %>% 
+      group_by(sceNum) %>% 
+            mutate(med = median(sum)) %>% ungroup %>% 
+      select(sceNum, desc, med) %>% unique %>% arrange(med)
+```
+
+
+```{r}
+newCC %>% 
+      filter(year >= 2025, year <= 2030) %>% 
+      group_by(sceNum, paramNum) %>% 
+            mutate(sum = sum(newCC)) %>% ungroup %>% 
+      select(sceNum, desc, paramNum, sum) %>% unique %>% 
+      group_by(sceNum) %>% 
+            mutate(med = median(sum)) %>% ungroup %>% 
+      select(sceNum, desc, med) %>% unique %>% arrange(med)
+```
+
+
 # HIV Incidence
 ```{r}
-worldStandard <- read_xlsx("/Users/sk1822/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
+worldStandard <- read_xlsx("/Users/clh89/MATLAB/Projects/Kenya_treatment/Config/Kenya_parameters_Feb20.xlsx", sheet = "ASR_pops", range = "B49:D65") %>% 
       rename(age = Age, 
              worldPop = `2015 World Pop`) %>% 
       select(age, worldPop) %>% 
@@ -440,10 +468,10 @@ worldStandard <- worldStandard %>%
 
 
 # Calculate incidence 
-HIVincRate <- newHiv_0.2 %>%
+HIVincRate <- newHiv %>%
   filter(sceNum %in% c(0, 1, 2, 3, 4, 5)) %>%
   left_join(worldStandard, by = "ageCateg") %>%
-  left_join(., (totalPerAge_0.2 %>%
+  left_join(., (totalPerAge %>%
                   rename(N = count, index = age)),
             by = c("sceNum", "paramNum", "year", "index")) %>%
   filter(!age %in% c("age.0.4", "age.5.9", "age.10.14", "all.ages")) %>%
@@ -474,3 +502,16 @@ HIVincRate %>%
             geom_hline(yintercept = 4, linetype = "dotted", color="grey")
 
 ```
+
+CH: debugging 
+
+```{r}
+hivHealthState %>% 
+      filter(year >= 2025, year <= 2030) %>% 
+      group_by(hivState, paramNum, sceNum) %>% 
+            mutate(sum = sum(count)) %>% ungroup %>% 
+      select(hivState, paramNum, sceNum, sum) %>% unique %>% 
+      filter(paramNum == 1) %>% 
+      spread(., hivState, sum)
+```
+
