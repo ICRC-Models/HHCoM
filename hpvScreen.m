@@ -17,14 +17,14 @@ ccTreat = zeros(3, age, 3);
 
 %% Run screening algorithm
 for i = 1 : length(screenAlgs)
-    prevAL = 0;
+    prevAL = 0; % screenAlgs 1 HIV +
     if i == 2
-        prevAL = length(screenAlgs{1}.screenAge);
+        prevAL = length(screenAlgs{1}.screenAge); % screenAlgs 2 HIV-
     end
 
     % Screening level
-    dataYr1 = screenYrs(1);
-    dataYrLast = screenYrs(size(screenYrs , 1));
+    dataYr1 = screenYrs(1); %when screening starts
+    dataYrLast = screenYrs(size(screenYrs , 1)); %last year of screening
     baseYrInd = max(find(year >= screenYrs , 1, 'last') , 1); % get index of first year <= current year
     baseYr = screenYrs(baseYrInd);
     screenRate = screenAlgs{i}.screenCover_vec{1}(1); % screening coverage up to 1st year

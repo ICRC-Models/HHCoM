@@ -325,13 +325,13 @@ if year >= PrEPStart && year < prepPeakYear
     yrIndPrep = year == yrVecPrep; % Find closest index
     prepUse = prepUseVec(yrIndPrep); % Assign the corresponding PrEP use value
 
-elseif year >= prepPeakYear
+elseif year >= prepPeakYear && year < prepPauseYear
     % At peak year, set PrEP use to the maximum value
     prepUse = prepUseVec(end);
 
-elseif year >= prepPauseYear & year < restartYear
+elseif year >= prepPauseYear && year < restartYear
     % In the pause year, set PrEP use to 0
-    prepUse = 0.0234;
+    prepUse = 0.0235;
 
 elseif year >= restartYear && year <= finalPeakYear
     % After the pause, reintroduce PrEP with a linear increase reaching peak in 2035
@@ -341,6 +341,7 @@ elseif year >= restartYear && year <= finalPeakYear
 elseif year > finalPeakYear
     prepUse = newPrepUseVec(end);
 end
+
 
 
 %%

@@ -9,8 +9,8 @@ function futureSimS2(calibBool , pIdx , paramsSub , paramSet , paramSetIdx , tst
 %%  Variables/parameters to set based on your scenario
 
 % LOAD POPULATION
-% historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase18']]); % ***SET ME***: name for historical run input file *fix this 
- historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
+ historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase18']]); % ***SET ME***: name for historical run input file *fix this 
+ %historicalIn = load([pwd , ['/HHCoM_Results/toNow_sk1822_stochMod_baseline_2dose_nowanePEPFARHistoricalBase' , num2str(paramSetIdx)]]); % ***SET ME***: name for historical run input file *fix this 
 % historicalIn = load([pwd , '/HHCoM_Results/toNow_determMod_final_artDiscontFix']);
 
 % DIRECTORY TO SAVE RESULTS
@@ -570,7 +570,7 @@ n = 1;
         % VOLUNTARY MALE MEDICAL CIRCUMCISION
         % Scale-up of VMMC by age
         if (year >= circStartYear)
-            [dPop , menCirc(i , :)] = vmmc(popIn , circStartYear , circNatStartYear , ...
+            [dPop , menCirc(i , :)] = vmmc_S2(popIn , circStartYear , circNatStartYear , ...
                 vmmcYr_vec , vmmc_vec , circ_aVec , hivNegNonVMMCinds , hivNegVMMCinds , ...
             ageSexDebut , year);
             pop(end , :) = pop(end , :) + dPop;
