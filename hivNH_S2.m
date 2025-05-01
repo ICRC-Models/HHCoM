@@ -206,36 +206,20 @@ if year >= 2015 && year < 2016
     end
 end
 
-% When running with PEPFAR stoppage, need to make sure those years are
-% accounted for so uncomment the elseIf for those year and make sure the
-% vectors lineup
-
-% Any CD4, after 2016
-if year >= 2016
+%Any CD4, after 2016 ,
+if year >= 2016 & year < 2025 + (1/6)
     % Calculate HIV-associated mortality on ART
     muART = 0.15 .* mueYear;
     % Calculate population-level ART coverage
    if year >= 2016 && year < 2017
         ind = (round(artYr_vec{13} , 4) == round(year , 4));
         popCover = {artM_vec{13} , artF_vec{13}};
-    elseif year >= 2017 && year < 2025 %% FOR S2 and S3
+    elseif year >= 2017  && year < 2025
         ind = (round(artYr_vec{14} , 4) == round(year , 4));
-        popCover = {artM_vec{14} , artF_vec{14}}; 
-%%For S2 and S3
-elseif year >= 2025 && year < 2025 + (1/6) %% FOR S2 and S3
+        popCover = {artM_vec{14} , artF_vec{14}};  
+    elseif year >= 2025  && year < 2025 + (1/6)
         ind = (round(artYr_vec{15} , 4) == round(year , 4));
-        popCover = {artM_vec{15} , artF_vec{15}}; 
- elseif year >= 2025 + (1/6) && year < 2025 + (2/6) %added for pepfar stoppage
-       ind = (round(artYr_vec{16} , 4) == round(year , 4));
-       popCover = {artM_vec{16} , artF_vec{16}}; 
-  elseif year >= 2025 + (2/6) && year < 2025 + (3/6) 
-       ind = (round(artYr_vec{17} , 4) == round(year , 4));
-       popCover = {artM_vec{17} , artF_vec{17}}; 
-   elseif year >= 2025 + (3/6) %added for pepfar stoppage
-       ind = (round(artYr_vec{18} , 4) == round(year , 4));
-       popCover = {artM_vec{18} , artF_vec{18}}; 
-
-        
+        popCover = {artM_vec{15} , artF_vec{1}};      
    end
     ageVec = [1 : age];
     dRange = [3 : 7];
@@ -254,6 +238,110 @@ elseif year >= 2025 && year < 2025 + (1/6) %% FOR S2 and S3
             ageHIVeligSubTots(1 , a) = totHivPosEligAge;
             ageHIVallSubTots(1 , a) = totHivPosAllAge;
         end
+        fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
+        agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
+        
+        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , ageHIVallSubTots , ageHIVeligSubTots , ...
+            g , risk , ageSexDebut , dRange);
+        
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVallSubTots , ageHIVeligSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
+    end
+end
+
+% Adjusting muART to reflective the drop in ART coverage. More
+% needs to be done to this and values are not right
+if year >= 2025 + (1/6) && year < 2025 + (3/6)
+    % Calculate HIV-associated mortality on ART
+    muART = 0.75 .* mueYear;
+    % Calculate population-level ART coverage
+   if year >= 2025 + (1/6) && year < 2025 + (2/6)
+        ind = (round(artYr_vec{16} , 4) == round(year , 4));
+        popCover = {artM_vec{16} , artF_vec{16}};
+    elseif year >= 2025 + (2/6)  && year < 2025 + (3/6)
+        ind = (round(artYr_vec{17} , 4) == round(year , 4));
+        popCover = {artM_vec{17} , artF_vec{17}};  
+   end
+    ageVec = [1 : age];
+    dRange = [3 : 7];
+    for g = 1 : gender
+        ageARTSubTots = zeros(1 , age); % number persons on ART by age
+        ageHIVeligSubTots = zeros(1 , age); % number HIV-positives with CD4 eligible for ART by age
+        ageHIVallSubTots = zeros(1 , age); % number HIV-positives of all CD4 by age
+        for a = ageSexDebut : age
+            onArtAge = sumall(pop(hivInds(8 , 6 , g , a , : , :)));
+            totHivPosEligAge = 0;
+            for d = 3 : 7
+                totHivPosEligAge = totHivPosEligAge + sumall(pop(hivInds(d , 1 : 5 , g , a , : , :)));
+            end
+            totHivPosAllAge = sumall(pop(hivInds(3 : 7 , 1 : 5 , g , a , : , :)));
+            ageARTSubTots(1 , a) = onArtAge;
+            ageHIVeligSubTots(1 , a) = totHivPosEligAge;
+            ageHIVallSubTots(1 , a) = totHivPosAllAge;
+        end
+        fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
+        agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
+        
+        minCoverLim = popCover{g}(ind) * minLim; % minimum ART coverage by age
+        maxCoverLim = popCover{g}(ind) * maxLim; % maximum ART coverage by age
+        popCoverInd = popCover{g}(ind); % desired population-level ART coverage
+
+        % Calculate treat/artOut matrices to maintain ART coverage min/max by age
+        [artOut , treat , maxAges , excMaxAges , minAges , excMinAges] = ...
+            artMinMax(artOut , treat , minCoverLim , maxCoverLim , ...
+            fracARTAge , ageVec , ageHIVallSubTots , ageHIVeligSubTots , ...
+            g , risk , ageSexDebut , dRange);
+        
+        % Calculate treat/artOut matrices to maintain population-level ART coverage
+        [artOut , treat] = artPopCov(artOut , treat , excMaxAges , ...
+            excMinAges , popCoverInd , g , risk , ...
+            ageHIVallSubTots , ageHIVeligSubTots , ageARTSubTots , maxAges , minAges , ...
+            fracARTAge , minCoverLim , maxCoverLim , ageSexDebut , ...
+            agePopSubTots , dRange);
+    end
+end
+
+
+
+% Adjusting muART to reflective the drop in ART coverage. More
+% needs to be done to this and values are not right
+if year >= 2025 + (3/6)
+    % Calculate HIV-associated mortality on ART
+    muART = 0.15 .* mueYear;
+    % Calculate population-level ART coverage
+   if year >= 2025 + (3/6) 
+        ind = (round(artYr_vec{18} , 4) == round(year , 4));
+        popCover = {artM_vec{18} , artF_vec{18}};  
+   end
+    ageVec = [1 : age];
+    dRange = [3 : 7];
+    for g = 1 : gender
+        ageARTSubTots = zeros(1 , age); % number persons on ART by age
+        ageHIVeligSubTots = zeros(1 , age); % number HIV-positives with CD4 eligible for ART by age
+        ageHIVallSubTots = zeros(1 , age); % number HIV-positives of all CD4 by age
+        for a = ageSexDebut : age
+            onArtAge = sumall(pop(hivInds(8 , 6 , g , a , : , :)));
+            totHivPosEligAge = 0;
+            for d = 3 : 7
+                totHivPosEligAge = totHivPosEligAge + sumall(pop(hivInds(d , 1 : 5 , g , a , : , :)));
+            end
+            totHivPosAllAge = sumall(pop(hivInds(3 : 7 , 1 : 5 , g , a , : , :)));
+            ageARTSubTots(1 , a) = onArtAge;
+            ageHIVeligSubTots(1 , a) = totHivPosEligAge;
+            ageHIVallSubTots(1 , a) = totHivPosAllAge;
+        end
+        
         fracARTAge = (ageARTSubTots ./ (ageARTSubTots + ageHIVallSubTots)); % fraction on ART by age
         agePopSubTots = ageARTSubTots + ageHIVallSubTots; % total HIV-positives (on/off ART) by age
         
@@ -280,6 +368,7 @@ elseif year >= 2025 && year < 2025 + (1/6) %% FOR S2 and S3
             agePopSubTots , dRange);
     end  
 end
+
 
 %% Apply CD4 count progression, HIV-associated mortality, ART treatment, and ART dropout
 % for h = 1 : hpvVaxStates
