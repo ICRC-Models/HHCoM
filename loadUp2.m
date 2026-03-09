@@ -14,7 +14,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     kCin1_Cin2 , kCin2_Cin3 , lambdaMultImm , hpv_hivClear , rImmuneHiv , ...
     c3c2Mults , c2c1Mults , c2c3Mults , c1c2Mults , muCC , muCC_ud , muCC_d , kRL , kDR , artHpvMult , ...
     hpv_hivMult , maleHpvClearMult , ...
-    condUse , screenYrs , hpvScreenStartYear , ...
+    condUse ,  screenYrs , hpvScreenStartYear , ...
     artYr , maxRateM , maxRateF , ...
     artYr_vec , artM_vec , artF_vec , minLim , maxLim , ...
     circ_aVec , vmmcYr_vec , vmmc_vec , vmmcYr , vmmcRate , ...
@@ -50,7 +50,7 @@ function[stepsPerYear , timeStep , startYear , currYear , endYear , ...
     dFertPos3 , dFertNeg3 , dFertMat3 , deathMat , deathMat2 , deathMat3 , deathMat4 , ...
     dDeathMat , dDeathMat2 , dDeathMat3 , dMue , ...
     ccLochpvVaxIndsFrom_treat , ...
-    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff , waning] = loadUp2(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx)
+    ccReghpvVaxInds_treat , ccDisthpvVaxInds_treat , vaxEff, waning, vaxEffHIV] = loadUp2_S1(fivYrAgeGrpsOn , calibBool , pIdx , paramsSub , paramSet , n , paramSetIdx);
 
 tic
 
@@ -62,7 +62,7 @@ paramDir = [pwd , '/Params/'];
 stepsPerYear = 6;    % default=6; set stepsPerYear=8 if including vaccination of boys  
 timeStep = 1 / stepsPerYear;
 startYear = 1925;
-currYear = 2024; % originally 2021 
+currYear = 2025; % originally 2021 
 endYear = currYear;
 years = endYear - startYear;
 
@@ -74,7 +74,7 @@ hpvNonVaxStates = 7;
 endpoints = 10; % CC TREATMENT EDIT
 intervens = 4; 
 gender = 2;
-age = 80 / max(1,fivYrAgeGrpsOn*5);
+age = 80 / max(1, fivYrAgeGrpsOn * 5);
 risk = 3;
 
 hpvTypeGroups = 2;
@@ -817,6 +817,7 @@ vaxStartYear = 2014;
 circProtect = [[circProtect; 0.0] , [0.0; 0.0]];    % HIV protection , HPV protection (previously included 0.30 HPV protection for men)
 condProtect = [ones(gender,1).*condProtect , [0.46; 0.70]];    % HIV protection , HPV protection
 
+
 % Condom use
 if calibBool && any(5 == pIdx);
     idx = find(5 == pIdx);
@@ -828,6 +829,11 @@ else
         condUse = 0.20;
     end
 end
+
+% PrEP USE
+% Remains constant, currently no scale up. If want to have scale up to a
+% certain aim or target, need to update code
+%prepUse = 0; %0.16 %FOR TESTING %0.016; % this is for all sexually active individuals; if only want AGYW  change to 0.065 
 
 % Background hysterectomy ********NOT UPDATED!!!!!!!!!!!!!!!!!
 hyst = 0; % bool to turn background hysterectomy on or off
@@ -856,12 +862,16 @@ OMEGA = zeros(age , 1); % hysterectomy rate
 %      the values below:
 %       maxRateM = [artVScov((1:end-1),3) ; 0.530400 ; 0.530400] .* artOutMult;
 %       maxRateF = [artVScov((1:end-1),2) ; 0.637946 ; 0.637946] .* artOutMult;
+%   5) Linear scale-up to 95-95-95 targets from 2025 to 2030
+%      Run futureSim using the values below:
+%       maxRateM = [artVScov(:,3) ; 0.857375] .* artOutMult; 
+%       maxRateF = [artVScov(:,2) ; 0.857375] .* artOutMult;
 artOutMult = 1.0; %0.95;
 minLim = (0.70/0.81); % minimum ART coverage by age
 maxLim = ((1-(0.78/0.81)) + 1); % maximum ART coverage by age, adjust to lower value to compensate for HIV-associated mortality
 artYr = [(artVScov(:,1) - 1); (2030 - 1)]; % assuming 90-90-90 target reached by 2030; subtract years by 1 so that desired coverage is reached BY the given year
-maxRateM = [artVScov(:,3) ; artVScov(end,3)] .* artOutMult; % population-level ART coverage in males
-maxRateF = [artVScov(:,2) ; artVScov(end,2)] .* artOutMult; % population-level ART coverage in females
+maxRateM = [artVScov(:,3) ; 0.857375] .* artOutMult; % population-level ART coverage in males
+maxRateF = [artVScov(:,2) ; 0.857375] .* artOutMult; % population-level ART coverage in females
 artYr_vec = cell(size(artYr , 1) - 1, 1); % save data over time interval in a cell array
 artM_vec = cell(size(artYr , 1) - 1, 1);
 artF_vec = cell(size(artYr , 1) - 1, 1);
@@ -948,18 +958,48 @@ end
 % median: 0.9671358 
 
 %% Vaccination waning
-waning = 1;    % bool to turn waning on or off
+waning = 0;    % bool to turn waning on or off
 
 vaxUncertainty = 1; % bool - if you want to pull from an uncertainty for vax efficacy
 
+% This tracks VaxEff for those HIV +. 
 if vaxUncertainty == 1
     filename = [paramDir 'VaxEfficacyRandVal_2dose_bivalent.xlsx'];
     sheet = 1;
     vaxEff_mat = xlsread(filename, sheet);
+    vaxEffHIV= vaxEff_mat(paramSetIdx);  
+else
+    vaxEffHIV = 1.0; % 9v vaccine
+end
+
+%% Single dose %PULLED FROM KENYA
+singleDoseBool = 1; % 1 for single dose vax efficacy, 0 for 2-dose
+
+%% Vaccination efficacy- These come from KEN-SHE and the Kenya model
+% Read in excel file where CLH pulled 100 values for vax efficacy from KEN-SHE 2v from a beta distribution
+% 2-dose is from FDA clinical review of Gardasil 9
+% https://www.fda.gov/vaccines-blood-biologics/vaccines/gardasil-9
+% June 9 Clinical Review
+% 4v (100%, 95% CI 88.4, 100)
+% alpha value = 10.76
+% beta value = 0.15
+
+% Bounded parameters mean that we restrict each parameter set so that 2-dose is always better than 1-dose
+% Unbounded uses 2dose_4valent and 1-dose_2valent.xlsx
+
+if singleDoseBool == 1
+    filename = [paramDir 'VaxEfficacyRandVal_1dose_nonavalent_bounded.xlsx']; % KEN-SHE results
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
     vaxEff = vaxEff_mat(paramSetIdx);  
 else
-    vaxEff = 1.0; % 9v vaccine
-end
+    filename = [paramDir 'VaxEfficacyRandVal_2dose_nonavalent_bounded.xlsx']; % from FDA clinical review
+    sheet = 1;
+    vaxEff_mat = xlsread(filename, sheet);
+    vaxEff = vaxEff_mat(paramSetIdx);  
+end 
+
+%
 
 % Screening timeframe
 screenYrs = [2000; 2003; 2016; currYear; 2030; 2045];

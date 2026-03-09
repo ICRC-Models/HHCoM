@@ -9,10 +9,15 @@ function [dPop , newInfs] = mixInfect(t , pop , ...
     age , risk , fivYrAgeGrpsOn , hpvTypeGroups , ageSexDebut , gar , epsA_vec , epsR_vec , yr , ...
     partnersM , partnersF , ...
     beta_hpvVax_mod , beta_hpvNonVax_mod , vaxInds , nonVInds , ...
-    lambdaMultImm , lambdaMultVax , artHpvMult , hpv_hivMult , ...
+    lambdaMultImm , lambdaMultVaxMat, lambdaMultVaxMatHIV,  artHpvMult , hpv_hivMult , ...
     hpvVaxSus , hpvVaxImm , hpvVaxInf , hpvNonVaxSus , hpvNonVaxImm , hpvNonVaxInf , ...
     circProtect , condProtect , condUse , betaHIV_mod , ...
     hivSus , toHiv , hivCurr)
+
+
+lambdaMultVax = 1 - lambdaMultVaxMat(: , 1);
+lambdaMultVaxHIV = 1 - lambdaMultVaxMatHIV(: , 1); %for HIV VAC
+
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
@@ -21,6 +26,7 @@ newImmHpvVax = newHpvVax;
 newHpvNonVax = newHpvVax;
 newImmHpvNonVax = newHpvVax;
 newHiv = zeros(hpvVaxStates , hpvNonVaxStates , endpoints , gender , age , risk);
+
 
 %% Find epsAge and epsRisk according to the present year (extent of assortative mixing) 
 % Random mixing (epsilon = 1), mixing proportional to relative sizes of all compartments
@@ -222,6 +228,8 @@ cAdj(isinf(cAdj)) = 0;
 % find condom use according to the present year
 condStart = 1995;
 peakYear = 2000;
+ 
+
 yrVec = condStart : 1 / stepsPerYear : peakYear;
 condUseVec = linspace(0 , condUse , (peakYear - condStart) * stepsPerYear);
 condUse = condUseVec(1); % year <= peakYear
@@ -232,11 +240,13 @@ elseif year >= peakYear
     condUse = condUseVec(end);
 end
 
+
 % calculate psi vectors for protective factors
 % HIV
 cond_hiv = 1-(condProtect(:,1) .* condUse); % condom usage and condom protection rates
 psi_hiv = ones(gender,disease) .* cond_hiv; % condom use only for all disease states
 psi_hiv(:,2) = (1 - circProtect(:,1)) .* cond_hiv; % condom use + circumcision protection for d=2
+
 %HPV
 cond_hpv = 1-(condProtect(:,2) * condUse); % condom usage and condom protection rates
 psi_hpv = ones(gender,disease) .* cond_hpv;
@@ -319,7 +329,6 @@ for a = ageSexDebut : age
                     mhpvNonVaxInf = hpvNonVaxInf(d , 1 , a , r , p , :); % update to infected
                     fhpvNonVaxInf = hpvNonVaxInf(d , 2 , a , r , p , :);
 
-
                     % Set lambda multipliers based on CD4 count
                     lambdaMultF = 1;
                     lambdaMultM = 1;
@@ -330,21 +339,51 @@ for a = ageSexDebut : age
                         lambdaMultF = artHpvMult; 
                         lambdaMultM = artHpvMult;
                     end
-                    % Set lambda multiplier for vaccination
-                    if (p == 2) || (p == 4)
-                        vaxProtect = lambdaMultVax(a , 1);
-                    else
-                        vaxProtect = 1.0; % no protection
-                    end
 
-                    % Calculate infections
+                    %***COMMENT OUT WHEN RUNNING TWO EFFICACIES***
+                    % Set lambda multiplier for vaccination
+                    % if (p == 2) || (p == 4)
+                     %   vaxProtect = lambdaMultVax(a , 1);
+                   %  else
+                      %  vaxProtect = 1.0; % no protection
+                   % end
+
+                     % Set lambda multiplier for vaccination OF DIFFERING
+                     % EFFICAIES BASED ON HIV STATE
+                       if (p == 2) || (p == 4)
+                        % HIV-negative disease states
+                        if d <= 2
+                            vaxProtect = lambdaMultVax(a , 1); %0.0394 (Efficacy is ~97 for 1 dose)
+                        % HIV-positive disease states
+                        else
+                            vaxProtect = lambdaMultVaxHIV(a , 1); %.000000612 (Efficacy is ~99 for two dosese)
+                        end
+                         else
+                             vaxProtect = 1.0; % no protection
+                             end
+
+                             
+            % Calculate infections
+                    % Vaccine-type HPV infections **** THIS IS FOR DIFFERING
+                    % EFF BASED ON HIV STATUS ******
+                 
+                    mInfectedVax = min( lambdaMultM * vaxProtect * psi_hpv(1,d) * lambda(1, a, r, 1), ...
+                                        0.999 * vaxProtect ) .* pop(mhpvVaxSus);
+                    fInfectedVax = min( lambdaMultF * vaxProtect * psi_hpv(2,d) * lambda(2, a, r, 1), ...
+                                        0.999 * vaxProtect ) .* pop(fhpvVaxSus);
+                    fInfectedVaxImm = min( lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d) * lambda(2, a, r, 1), ...
+                                           0.999 * vaxProtect ) .* pop(fhpvVaxImm);
+
+
                     % susceptible to vaccine-type HPV --> infected with vaccine-type HPV (infection rate capped at 0.99) 
-                    mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d) * lambda(1 , a , r , 1)...
-                        , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
-                    fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
-                        , 0.999 * vaxProtect) .* pop(fhpvVaxSus);
-                    fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
-                        , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
+                   % mInfectedVax = min(lambdaMultM * vaxProtect * psi_hpv(1,d) * lambda(1 , a , r , 1)...
+                      %  , 0.999 * vaxProtect) .* pop(mhpvVaxSus);
+                   % fInfectedVax = min(lambdaMultF * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                      %  , 0.999 * vaxProtect) .* pop(fhpvVaxSus);
+                   %  fInfectedVaxImm = min(lambdaMultF * lambdaMultImm(a) * vaxProtect * psi_hpv(2,d) * lambda(2 , a , r , 1)...
+                       % , 0.999 * vaxProtect) .* pop(fhpvVaxImm);
+
+
 
                     % susceptible to non-vaccine-type HPV --> infected with non-vaccine-type HPV (infection rate capped at 0.99) 
                     mInfectedNonVax = min(lambdaMultM * psi_hpv(1,d) * lambda(1 , a , r , 2)...
@@ -475,8 +514,10 @@ for h = 1 : hpvVaxStates
     end
 end
 
+
 %% Save outputs and convert dPop to a column vector for output to ODE solver
 newInfs{5} = newHiv;
+
 
 dPop = sparse(dPop);
 

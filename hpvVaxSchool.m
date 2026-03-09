@@ -6,6 +6,11 @@ function[dPop , hpvVaxd] = hpvVaxSchool(pop , disease , viral , risk , ...
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 hpvVaxd = 0;
+% **Uncomment when want school vax with different vax eff for HIV -/+; This
+% sets up tracking number of vaccines given to each group**
+
+%hpvVaxd1 = 0; %HIV neg vaccination 
+%hpvVaxd2 = 0; % HIV positive
 
 if gradScaleUp == 1 % note that gradScaleUp has not been set up for historical sim, only future !!!!!!!
         % Vaccination level
@@ -24,7 +29,7 @@ if gradScaleUp == 1 % note that gradScaleUp has not been set up for historical s
                 vaxRate = vaxRate_vec{periodInd}(round((year - baseYr) * stepsPerYear) + 1);
             elseif year >= dataYrLast % vax coverage last year and after
                 lastInd = size(vaxRate_vec , 1);
-                vaxRate = vaxRate_vec{1}(size(vaxRate_vec{1} , 2));
+                vaxRate = vaxRate_vec{2}(size(vaxRate_vec{2} , 2));
             end 
 else 
     vaxRate = vaxRate_vec; 
@@ -32,6 +37,12 @@ end
 
 %% Apply school-based vaccination regimen
 for d = 1 : disease
+
+%Classify disease state ** UNCOMMENT WHEN RUNNING DIFFERENT VAX EFF FOR HIV -/+ 
+    %TRACKED FOR CU
+%isHIVneg = (d == 1 || d == 2); 
+%isHIVpos = (d >= 3 && d <= 8);
+
     for v = 1 : viral
         for g = min(vaxG) : max(vaxG) 
             for r = 1 : risk
@@ -60,7 +71,24 @@ for d = 1 : disease
                         dPop(fromNonVImm) = dPop(fromNonVImm) - vaxdGroupImm;
                         dPop(toVSus) = dPop(toVSus) + vaxdGroupSus;
                         dPop(toVImm) = dPop(toVImm) + vaxdGroupImm;
+
+                        % **Comment out when tracking hiv-/+ seperate vacciantion
                         hpvVaxd = hpvVaxd + sumall(vaxdGroupSus) + sumall(vaxdGroupImm); % count number of people vaccinated at current time step
+
+%% ** Uncomment when tracking hiv -/+ vaccination, groups vaccines given to
+% those + or - **                      
+%numVaxd = sumall(vaxdGroupSus) + ...
+          %sumall(vaxdGroupImm);
+
+% Update overall vaccination count
+%hpvVaxd = hpvVaxd + numVaxd;
+
+ %Track totals by HIV status
+%if isHIVneg
+  %  hpvVaxd1 = hpvVaxd1 + numVaxd;   % disease states 1–2
+%elseif isHIVpos
+ % hpvVaxd2 = hpvVaxd2 + numVaxd;   % disease states 3–8
+%end
                     end
                 end
             end

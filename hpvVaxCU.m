@@ -1,15 +1,26 @@
 % HPV catch-up vaccination
-function[dPop , hpvVaxd] = hpvVaxCU(pop , viral , risk , ...
+function[dPop , hpvVaxd, hpvVaxd1, hpvVaxd2] = hpvVaxCU(pop , viral , risk , ...
     hpvVaxStates , hpvNonVaxStates , endpoints , intervens , vaxAgeCU , ...
     vaxCoverCU , vaxGCU , vaxDiseaseIndsCU , toInd)
 
 %% Initialize dPop and output vectors
 dPop = zeros(size(pop));
 hpvVaxd = 0;
+% *** Uncomment when want CU vax with different vax eff for HIV -/+; This
+% sets up tracking number of vaccines given to each group
+%hpvVaxd1 = 0; %HIV neg vaccination 
+%hpvVaxd2 = 0; % HIV positive
 
-% Apply catch-up vaccination regimen
+
+%% Apply catch-up vaccination regimen
 for dS = 1 : length(vaxDiseaseIndsCU)
     d = vaxDiseaseIndsCU(dS);
+
+%Classify disease state * UNCOMMENT WHEN RUNNING DIFFERENT VAX EFF FOR HIV -/+ 
+%TRACKED FOR CU
+%isHIVneg = (d == 1 || d == 2); 
+%isHIVpos = (d >= 3 && d <= 8);
+
     for v = 1 : viral
         for g = min(vaxGCU) : max(vaxGCU) 
             for r = 1 : risk
@@ -52,9 +63,30 @@ for dS = 1 : length(vaxDiseaseIndsCU)
                         dPop(toVSusCU_scrn) = dPop(toVSusCU_scrn) + vaxdGroupSus_scrn;
                         dPop(toVImmCU_noScrn) = dPop(toVImmCU_noScrn) + vaxdGroupImm_noScrn;
                         dPop(toVImmCU_scrn) = dPop(toVImmCU_scrn) + vaxdGroupImm_scrn;
-                        hpvVaxd = hpvVaxd + sumall(vaxdGroupSus_noScrn) + ...
-                            sumall(vaxdGroupSus_scrn) + sumall(vaxdGroupImm_noScrn) + ...
-                            sumall(vaxdGroupImm_scrn); % count number of people vaccinated at current time step
+
+                         hpvVaxd = hpvVaxd + sumall(vaxdGroupSus_noScrn) + ...
+                           sumall(vaxdGroupSus_scrn) + sumall(vaxdGroupImm_noScrn) + ...
+                           sumall(vaxdGroupImm_scrn); % count number of people vaccinated at current time step **Comment out when tracking hiv-/+ seperate vacciantion
+
+
+% Uncomment when tracking hiv -/+ vaccination, groups vaccines given to
+% those + or - when cu is on
+%numVaxd = sumall(vaxdGroupSus_noScrn) + ...
+         % sumall(vaxdGroupSus_scrn) + ...
+         % sumall(vaxdGroupImm_noScrn) + ...
+          %sumall(vaxdGroupImm_scrn);
+
+% Update overall vaccination count
+%hpvVaxd = hpvVaxd + numVaxd;
+
+ %Track totals by HIV status
+%if isHIVneg
+   % hpvVaxd1 = hpvVaxd1 + numVaxd;   % disease states 1–2
+%elseif isHIVpos
+  %hpvVaxd2 = hpvVaxd2 + numVaxd;   % disease states 3–8
+%end
+
+
                     end
 
                 end
